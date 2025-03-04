@@ -100,7 +100,7 @@
 }
 
 
-.sidebar-module-icons{
+.sidebar-module-icons, .sidebar-module-icons.opened{
   width: 100%;
   height: 100%;
   display: flex;
@@ -110,9 +110,20 @@
   flex: 1; 
   overflow-y: auto;
   scrollbar-width: none; 
+  transition: 0.25s ease-in-out;
+  gap: 0.25rem;
+}
+
+.sidebar-module-icons{
+  margin-left: 0;
+}
+
+.sidebar-module-icons.opened{
+  margin-left: 1rem;
 }
 
 .sidebar-module-descs{
+  padding: 0;
   width: 100%;
   height: 100%;
   padding-right: 1rem;
@@ -123,6 +134,7 @@
   flex: 1; 
   overflow-y: auto;
   scrollbar-width: none; 
+  gap: 0.25rem;
 }
 
 
@@ -156,7 +168,7 @@
   padding-right: 0rem;
 }
 
-.sidebar-module-icons-item{
+.sidebar-module-icons-item, .sidebar-module-icons-item.opened{
   display: flex;
   align-items: center;
   justify-content: center;
@@ -164,13 +176,19 @@
   height: 3rem;
   width: 3rem;
   cursor: pointer;
-  margin: 0.25rem;
-  border-radius: 0.2rem;
   transition: 0.2s ease;
-
+}
+.sidebar-module-icons-item{
+  border-radius: 0.2rem;
+}
+.sidebar-module-icons-item.opened{
+  border-top-right-radius: 0; 
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 0.5rem; 
+  border-bottom-left-radius: 0.5rem; 
 }
 
-.sidebar-module-desc-item{
+.sidebar-module-desc-item {
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
@@ -178,8 +196,10 @@
   height: 3rem;
   width: 10.7rem;
   cursor: pointer;
-  margin: 0.25rem;
-  border-radius: 0.2rem;
+  border-top-right-radius: 0.5rem; 
+  border-bottom-right-radius: 0.5rem;
+  border-top-left-radius: 0; 
+  border-bottom-left-radius: 0; 
   transition: 0.2s ease;
 }
 
@@ -189,14 +209,14 @@
   line-height: 0;
 }
 
-.sidebar-module-icons-item.hovered, .sidebar-module-desc-item.hovered{
+.sidebar-module-icons-item.hovered, .sidebar-module-desc-item.hovered, sidebar-module-icons-item.opened.hovered, sidebar-module-icons-item.opened.hovered{
   background-color: #e0f2f5;
 }
 
 .sidebar-module-icons-item.active, .sidebar-module-desc-item.active{
   background-color: var(--light-grey-selected);
 }
-.sidebar-module-icons-item.active.hovered, .sidebar-module-desc-item.active.hovered{
+.sidebar-module-icons-item.active.hovered, .sidebar-module-desc-item.active.hovered, sidebar-module-icons-item.opened.active.hovered, sidebar-module-icons-item.opened.active.hovered{
   background-color: #c2c2c2;
 }
 

@@ -48,14 +48,21 @@ function App() {
 
         <div className='sidebar-main-menu-container'></div>
 
-        <div className='sidebar-module-icons' ref={iconsRef} onScroll={() => handleScroll("icons")}>
+        <div 
+          className={`sidebar-module-icons ${isSidebarOpen ? "opened" : ""}`} 
+          ref={iconsRef} 
+          onScroll={() => handleScroll("icons")}
+        >
+
           {modules.map((module) => (
           <div
             key={module.id}
-            className={`sidebar-module-icons-item 
+            className={` ${isSidebarOpen ? "opened" : ""} 
+              sidebar-module-icons-item 
               ${activeModule === module.id ? "active" : ""} 
               ${hoveredModule === module.id ? "hovered" : ""}`
             }
+
             onClick={() => setActiveModule(module.id)}
             onMouseEnter={() => setHoveredModule(module.id)}
             onMouseLeave={() => setHoveredModule(null)}
