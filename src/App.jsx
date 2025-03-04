@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import './App.css'
 
 function App() {
@@ -8,14 +8,29 @@ function App() {
                          "MRP", "Project Management", "Human Resources", "Report Generator"];
 
   const [activeModule, setActiveModule] = useState(null);
+  const [hoveredModule, setHoveredModule] = useState(null); // Track hovered module
+
   const modules = moduleImageNames.map((name) => ({
     id: name,
     icon: `/icons/module-icons/${name}.png`,
   }));
 
+  const iconsRef = useRef(null);
+  const descsRef = useRef(null);
+
+  // Sync Scroll
+  const handleScroll = (source) => {
+    if (!iconsRef.current || !descsRef.current) return;
+
+    if (source === "icons") {
+      descsRef.current.scrollTop = iconsRef.current.scrollTop;
+    } else {
+      iconsRef.current.scrollTop = descsRef.current.scrollTop;
+    }
+  };
+
   return (
     <div className='shell-container'>
-
 
       {/* collapsible menu */}
 
@@ -31,16 +46,19 @@ function App() {
           </div>
         </div>
 
-        <div className='sidebar-main-menu-container'>
-          
-        </div>
+        <div className='sidebar-main-menu-container'></div>
 
-        <div className='sidebar-module-icons'>
+        <div className='sidebar-module-icons' ref={iconsRef} onScroll={() => handleScroll("icons")}>
           {modules.map((module) => (
           <div
             key={module.id}
-            className={`sidebar-module-icons-item ${activeModule === module.id ? "active" : ""}`}
+            className={`sidebar-module-icons-item 
+              ${activeModule === module.id ? "active" : ""} 
+              ${hoveredModule === module.id ? "hovered" : ""}`
+            }
             onClick={() => setActiveModule(module.id)}
+            onMouseEnter={() => setHoveredModule(module.id)}
+            onMouseLeave={() => setHoveredModule(null)}
           >
             <img src={module.icon} alt={module.id} />
           </div>
@@ -49,44 +67,36 @@ function App() {
       </div>
 
       {/* collapsible description navi */}
-      {isSidebarOpen && <div className="sidebar-desc-container">
-        <div className='sidebar-icons-hamburger-container'>
-          
-        </div>
-        <div className='sidebar-main-menu-container'>
-          
-        </div>  
+      <div className={`sidebar-desc-container ${isSidebarOpen ? "open" : "closed"}`}>
+        <div className='sidebar-icons-hamburger-container'></div>
+        <div className='sidebar-main-menu-container'></div>  
 
-        <div className='sidebar-module-icons'>
+        <div className='sidebar-module-descs' ref={descsRef} onScroll={() => handleScroll("descs")}>
           {modules.map((module) => (
-          <div
-            key={module.id}
-            className={`sidebar-module-icons-item ${activeModule === module.id ? "active" : ""}`}
-            onClick={() => setActiveModule(module.id)}
-          >
-            <p>{module.id}</p>
-          </div>
+            <div
+              key={module.id}
+              className={`sidebar-module-desc-item 
+                ${activeModule === module.id ? "active" : ""} 
+                ${hoveredModule === module.id ? "hovered" : ""}`
+              }
+              onClick={() => setActiveModule(module.id)}
+              onMouseEnter={() => setHoveredModule(module.id)}
+              onMouseLeave={() => setHoveredModule(null)}
+            >
+              <p>{module.id}</p>
+            </div>
           ))}
-        </div>
-        
-        </div>}
-
-
-      
-      {/* adjustable right content */}
-      <div className='header-body-container'>
-        <div className='header-navi'>
-
-        </div>
-        <div className='body-container'>
-
         </div>
       </div>
 
-      
+      {/* adjustable right content */}
+      <div className='header-body-container'>
+        <div className='header-navi'></div>
+        <div className='body-container'></div>
+      </div>
 
     </div>
   )
 }
 
-export default App
+export default App;
