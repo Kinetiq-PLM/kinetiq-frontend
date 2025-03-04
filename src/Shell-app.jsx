@@ -3,6 +3,12 @@ import './Shell-app.css'
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const moduleNames = ["accounting", "mrp", "sales", "project_management"];
+  const [activeModule, setActiveModule] = useState(null);
+  const modules = moduleNames.map((name) => ({
+    id: name,
+    icon: `/icons/module-icons/${name}-sidebar.png`,
+  }));
 
   return (
     <div className='shell-container'>
@@ -22,12 +28,22 @@ function App() {
             </div>
           </div>
         </div>
+
+        <div className='sidebar-module-icons'>
+          {modules.map((module) => (
+          <div
+            key={module.id}
+            className={`sidebar-module-icons-item ${activeModule === module.id ? "active" : ""}`}
+            onClick={() => setActiveModule(module.id)}
+          >
+            <img src={module.icon} alt={module.id} />
+          </div>
+          ))}
+        </div>
       </div>
 
       {/* collapsible description navi */}
-      <div className='sidebar-desc-container'>
-
-      </div>
+      {isSidebarOpen && <div className="sidebar-desc-container"></div>}
 
 
       
