@@ -1,8 +1,11 @@
 import { useState, useRef } from 'react'
 import './App.css'
+import SearchBar from "./shared/components/SearchBar"; 
+
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [hasNotification, setHasNotification] = useState(false);
   const moduleImageNames = ["Management", "Administration", "Accounting", "Financials", "Purchasing", "Operations",
                         "Sales", "Support & Services", "Inventory", "Distribution", "Production", 
                          "MRP", "Project Management", "Human Resources", "Report Generator"];
@@ -113,6 +116,15 @@ function App() {
             <p>{activeModule}</p>
           </div>
         )}
+
+        <div className='header-right-container'>
+          <SearchBar />
+          <img src={`/icons/Notification-${hasNotification ? "active-" : ""}logo.png`} alt='Notificaton-Logo'></img>
+          <div className='header-profile-container'>
+            <div className='header-profile-icon'> <p>C</p></div>
+            <p>Crusch K.</p>
+          </div>
+        </div>
 
 
         </div>

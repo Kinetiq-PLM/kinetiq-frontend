@@ -248,8 +248,10 @@
 .header-body-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   flex: 1; 
-  border: 1px solid rgb(68, 0, 255);
+  border: 1px solid rgb(0, 91, 36);
 }
 
 /* header navigation -- fixed height */
@@ -258,7 +260,7 @@
   width: 100%;
   display: flex;
   align-items: center;
-  justify-items: center;
+  justify-content: space-between;
   background-color: white;
   padding: 1rem 2rem;
   border-bottom: 1px solid rgb(68, 0, 255);
@@ -269,20 +271,67 @@
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
+  border: 1px solid rgb(255, 0, 0);
 }
 
 .header-tabs-container img{
   height: 2.1rem;
   width: 2.1rem;
 }
+
 .header-tabs-container p{
   margin-left: 0.8rem;
   cursor: pointer;
   transition: 0.2s ease-in-out;
   color: var(--light-grey-text);
 }
+
 .header-tabs-container p:hover{
   color: var(--primary-teal);
+}
+
+.header-right-container{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  border: 1px solid rgb(255, 0, 0);
+}
+
+.header-right-container img {
+  height: 1.25rem;
+  width: 1.80rem;
+  cursor: pointer;
+}
+
+.header-right-container p {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-left: 0.75rem;
+}
+
+.header-profile-container{
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.header-profile-icon {
+  background-color: #E4F1F2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border-radius: 10rem;
+  height: 1rem;
+  width: 1rem;
+}
+
+.header-profile-icon p{
+  font-size: 1rem;
+  font-weight: 500;
+  color: #00A8A8;
+  margin-left: 0rem;
 }
 
 /* body container -- takes remaining space below header */
