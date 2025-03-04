@@ -1,9 +1,12 @@
 import { useState } from 'react'
-import './Shell-app.css'
+import './App.css'
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const moduleNames = ["accounting", "mrp", "sales", "project_management"];
+  const moduleNames = ["management", "admin", "accounting", "financials", "purchasing", "operations",
+                        "sales", "support_services", "inventory", "distribution", "production", 
+                         "mrp", "project_management", "human_resources", "solutions_customizing"];
+
   const [activeModule, setActiveModule] = useState(null);
   const modules = moduleNames.map((name) => ({
     id: name,
@@ -19,14 +22,17 @@ function App() {
       {/* static left navi -- icons */}
       <div className='sidebar-icons-container'>
         <div className='sidebar-icons-hamburger-container'>
-          <div className='sidebar-icons-ham-icon-wrapper'>
-            <div className={`ham-menu-icon ${isSidebarOpen ? "active" : ""}`}
-                              onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+          <div className='sidebar-icons-ham-icon-wrapper' onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+            <div className={`ham-menu-icon ${isSidebarOpen ? "active" : ""}`}>
               <span></span>
               <span></span>
               <span></span>
             </div>
           </div>
+        </div>
+
+        <div className='sidebar-main-menu-container'>
+          
         </div>
 
         <div className='sidebar-module-icons'>
