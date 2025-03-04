@@ -2,23 +2,64 @@ import { useState } from 'react'
 import './Shell-app.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const moduleNames = ["accounting", "mrp", "sales", "project_management"];
+  const [activeModule, setActiveModule] = useState(null);
+  const modules = moduleNames.map((name) => ({
+    id: name,
+    icon: `/icons/module-icons/${name}-sidebar.png`,
+  }));
 
   return (
-    <>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+    <div className='shell-container'>
+
+
+      {/* collapsible menu */}
+
+      {/* static left navi -- icons */}
+      <div className='sidebar-icons-container'>
+        <div className='sidebar-icons-hamburger-container'>
+          <div className='sidebar-icons-ham-icon-wrapper'>
+            <div className={`ham-menu-icon ${isSidebarOpen ? "active" : ""}`}
+                              onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+
+        <div className='sidebar-module-icons'>
+          {modules.map((module) => (
+          <div
+            key={module.id}
+            className={`sidebar-module-icons-item ${activeModule === module.id ? "active" : ""}`}
+            onClick={() => setActiveModule(module.id)}
+          >
+            <img src={module.icon} alt={module.id} />
+          </div>
+          ))}
+        </div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      {/* collapsible description navi */}
+      {isSidebarOpen && <div className="sidebar-desc-container"></div>}
+
+
+      
+      {/* adjustable right content */}
+      <div className='header-body-container'>
+        <div className='header-navi'>
+
+        </div>
+        <div className='body-container'>
+
+        </div>
+      </div>
+
+      
+
+    </div>
   )
 }
 
