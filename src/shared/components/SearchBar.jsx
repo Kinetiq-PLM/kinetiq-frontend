@@ -3,7 +3,7 @@ import React from "react";
 const SearchBar = () => {
   return (
     <div style={styles.container}>
-      <img src="/icons/search.svg" alt="Search" style={styles.icon} />
+      <img src="/icons/search-icon.png" alt="Search" style={styles.icon} />
       <input type="text" placeholder="Search..." style={styles.input} />
     </div>
   );
@@ -17,12 +17,11 @@ const styles = {
     borderRadius: "0.5rem",
     padding: "0.5rem",
     width: "100%",
-    maxWidth: "300px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+    maxWidth: "20rem",
   },
   icon: {
-    width: "20px",
-    height: "20px",
+    width: "1rem",
+    height: "1rem",
     marginRight: "0.5rem",
   },
   input: {
@@ -31,6 +30,7 @@ const styles = {
     backgroundColor: "transparent",
     flex: 1,
     fontSize: "1rem",
+    color:"#787878"
   },
 };
 
