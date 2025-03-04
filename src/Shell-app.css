@@ -1,5 +1,10 @@
 :root {
   --light-teal-background: #EFF8F9;
+
+  /* size variables */
+  --header-navi-height: 4rem;
+  --sidebar-icons-width: 4rem;
+  --sidebar-desc-width: 8rem;
 }
 
 .shell-container {
@@ -14,10 +19,10 @@
 .sidebar-icons-container {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   height: 100%;
-  width: 4rem;
+  width: var(--sidebar-icons-width);
   background-color: white;
   border: 1px solid rgb(255, 0, 0);
 }
@@ -26,13 +31,75 @@
 .sidebar-desc-container {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   height: 100%;
-  width: 8rem;
+  width: var(--sidebar-desc-width);
   background-color: white;
   border: 1px solid rgb(255, 0, 0);
 }
+
+.sidebar-icons-ham-icon-wrapper{
+  padding: 0.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #DDDDDD;
+  border-radius: 0.3rem;
+  width: fit-content;
+  height: fit-content;
+}
+
+.sidebar-icons-hamburger-container{
+  height: var(--header-navi-height);
+  width: 100%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ham-menu-icon{
+  height: 1.5rem;
+  width: 1.5rem;
+  position: relative;
+  cursor: pointer;
+}
+
+.ham-menu-icon span{
+  height: 0.1rem;
+  width: 100%;
+  background-color: rgb(46, 46, 46);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: .3s ease;
+}
+
+.ham-menu-icon span:nth-child(1){
+  top: 20%;
+}
+
+.ham-menu-icon span:nth-child(3){
+  top: 80%;
+}
+
+.ham-menu-icon.active span:nth-child(1){
+  top: 50%;
+  transform: translate(-50%, -55%) rotate(45deg);
+}
+
+.ham-menu-icon.active span:nth-child(2){
+  opacity: 0;
+}
+
+.ham-menu-icon.active span:nth-child(3){
+  top: 50%;
+  transform: translate(-50%, -55%) rotate(-45deg);
+}
+
+
 
 /* main content area that takes up the remaining space */
 .header-body-container {
@@ -45,7 +112,7 @@
 
 /* header navigation -- fixed height */
 .header-navi {
-  height: 4rem;
+  height: var(--header-navi-height);
   width: 100%;
   background-color: white;
   border-bottom: 1px solid rgb(68, 0, 255);
