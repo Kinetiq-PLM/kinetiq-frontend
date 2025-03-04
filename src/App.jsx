@@ -99,14 +99,23 @@ function App() {
           ))}
         </div>
 
-        <div className='sidebar-kinetiq-footer'>
-          
+        <div className='sidebar-kinetiq-footer-desc'>
+          <p>Kinetiq</p>
         </div>
       </div>
 
       {/* adjustable right content */}
       <div className='header-body-container'>
-        <div className='header-navi'></div>
+        <div className='header-navi'>
+        {activeModule && (
+          <div className="header-tabs-container">
+            <img src={`/icons/header-module-icons/${activeModule}.png`} alt={activeModule} />
+            <p>{activeModule}</p>
+          </div>
+        )}
+
+
+        </div>
         <div className='body-container'></div>
       </div>
 
