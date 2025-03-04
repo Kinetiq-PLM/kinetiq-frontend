@@ -9,11 +9,7 @@
   --sidebar-main-menu-container-height: 1.5rem;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+
 
 .shell-container {
   display: flex;
@@ -26,13 +22,14 @@
 /* sidebar description -- fixed width */
 .sidebar-desc-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   height: 100%;
   width: var(--sidebar-desc-width);
   background-color: white;
   border: 1px solid rgb(255, 0, 0);
+  
 }
 
 .sidebar-icons-hamburger-container{
@@ -42,6 +39,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid green;
 }
 
 .ham-menu-icon{
@@ -112,6 +110,7 @@
   width: 100%;
   display: flex;
   flex-direction: row;
+  border: 1px solid brown;
 }
 
 
@@ -125,7 +124,11 @@
   flex: 1; 
   overflow-y: auto;
   scrollbar-width: none; 
-  
+}
+
+.sidebar-module-icons p{
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .sidebar-module-icons::-webkit-scrollbar {
@@ -147,6 +150,7 @@
   margin: 0.25rem;
   border-radius: 0.2rem;
   transition: 0.3s ease-in-out;
+  border: 1px solid red;
 }
 
 .sidebar-module-icons-item:hover{
@@ -159,6 +163,7 @@
 .sidebar-module-icons-item.active:hover{
   background-color: #c2c2c2;
 }
+
 
 
 

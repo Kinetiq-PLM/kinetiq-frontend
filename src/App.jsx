@@ -3,14 +3,14 @@ import './App.css'
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const moduleNames = ["management", "admin", "accounting", "financials", "purchasing", "operations",
-                        "sales", "support_services", "inventory", "distribution", "production", 
-                         "mrp", "project_management", "human_resources", "solutions_customizing"];
+  const moduleImageNames = ["Management", "Administration", "Accounting", "Financials", "Purchasing", "Operations",
+                        "Sales", "Support & Services", "Inventory", "Distribution", "Production", 
+                         "MRP", "Project Management", "Human Resources", "Report Generator"];
 
   const [activeModule, setActiveModule] = useState(null);
-  const modules = moduleNames.map((name) => ({
+  const modules = moduleImageNames.map((name) => ({
     id: name,
-    icon: `/icons/module-icons/${name}-sidebar.png`,
+    icon: `/icons/module-icons/${name}.png`,
   }));
 
   return (
@@ -49,7 +49,27 @@ function App() {
       </div>
 
       {/* collapsible description navi */}
-      {isSidebarOpen && <div className="sidebar-desc-container"></div>}
+      {isSidebarOpen && <div className="sidebar-desc-container">
+        <div className='sidebar-icons-hamburger-container'>
+          
+        </div>
+        <div className='sidebar-main-menu-container'>
+          
+        </div>  
+
+        <div className='sidebar-module-icons'>
+          {modules.map((module) => (
+          <div
+            key={module.id}
+            className={`sidebar-module-icons-item ${activeModule === module.id ? "active" : ""}`}
+            onClick={() => setActiveModule(module.id)}
+          >
+            <p>{module.id}</p>
+          </div>
+          ))}
+        </div>
+        
+        </div>}
 
 
       
