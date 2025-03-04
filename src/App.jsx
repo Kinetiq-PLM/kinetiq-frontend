@@ -8,7 +8,7 @@ function App() {
                          "MRP", "Project Management", "Human Resources", "Report Generator"];
 
   const [activeModule, setActiveModule] = useState(null);
-  const [hoveredModule, setHoveredModule] = useState(null); // Track hovered module
+  const [hoveredModule, setHoveredModule] = useState(null);
 
   const modules = moduleImageNames.map((name) => ({
     id: name,
@@ -64,6 +64,10 @@ function App() {
           </div>
           ))}
         </div>
+
+        <div className='sidebar-kinetiq-footer'>
+          <img src={"/icons/Kinetiq-Logo.png"} alt={"Kinetiq Logo"}></img>
+        </div>
       </div>
 
       {/* collapsible description navi */}
@@ -86,6 +90,10 @@ function App() {
               <p>{module.id}</p>
             </div>
           ))}
+        </div>
+
+        <div className='sidebar-kinetiq-footer'>
+          
         </div>
       </div>
 
