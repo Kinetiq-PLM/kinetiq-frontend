@@ -6,14 +6,14 @@ import SearchBar from "./shared/components/SearchBar";
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
-  const moduleImageNames = ["Management", "Administration", "Accounting", "Financials", "Purchasing", "Operations",
+  const moduleNames = ["Management", "Administration", "Accounting", "Financials", "Purchasing", "Operations",
                         "Sales", "Support & Services", "Inventory", "Distribution", "Production", 
                          "MRP", "Project Management", "Human Resources", "Report Generator"];
 
   const [activeModule, setActiveModule] = useState(null);
   const [hoveredModule, setHoveredModule] = useState(null);
 
-  const modules = moduleImageNames.map((name) => ({
+  const modules = moduleNames.map((name) => ({
     id: name,
     icon: `/icons/module-icons/${name}.png`,
   }));
@@ -100,6 +100,12 @@ function App() {
               <p>{module.id}</p>
             </div>
           ))}
+
+          
+          <div className='sidebar-module-icons-item'>
+            <p>s</p>
+          </div>
+          
         </div>
 
         <div className='sidebar-kinetiq-footer-desc'>
@@ -110,21 +116,21 @@ function App() {
       {/* adjustable right content */}
       <div className='header-body-container'>
         <div className='header-navi'>
-        <div className={`header-tabs-container ${activeModule ? "visible" : "hidden"}`}>
-          <img src={`/icons/header-module-icons/${activeModule}.png`} alt={activeModule} />
-          <p>{activeModule}</p>
-        </div>
-
-
-        <div className='header-right-container'>
-          <SearchBar />
-          <img src={`/icons/Notification-${hasNotification ? "active-" : ""}logo.png`}
-               alt='Notificaton-Logo'  onClick={() =>setHasNotification(!hasNotification)}></img>
-          <div className='header-profile-container'>
-            <div className='header-profile-icon'> <p>C</p></div>
-            <p>Crusch K.</p>
+          <div className={`header-tabs-container ${activeModule ? "visible" : "hidden"}`}>
+            <img src={`/icons/header-module-icons/${activeModule}.png`} alt={activeModule} />
+            <p>{activeModule}</p>
           </div>
-        </div>
+
+
+          <div className='header-right-container'>
+            <SearchBar />
+            <img src={`/icons/Notification-${hasNotification ? "active-" : ""}logo.png`}
+                alt='Notificaton-Logo'  onClick={() =>setHasNotification(!hasNotification)}></img>
+            <div className='header-profile-container'>
+              <div className='header-profile-icon'> <p>C</p></div>
+              <p>Crusch K.</p>
+            </div>
+          </div>
 
 
         </div>

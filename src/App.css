@@ -14,6 +14,18 @@
   --sidebar-main-menu-container-height: 1.5rem;
 }
 
+div {
+  outline: none;
+}
+
+img {
+  user-select: none;  /* Prevents text selection */
+  -webkit-user-drag: none; /* Disables dragging in WebKit browsers */
+  -moz-user-select: none; /* Firefox-specific */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+
 .shell-container {
   display: flex;
   flex-direction: row;
@@ -78,6 +90,7 @@
   justify-content: flex-start;
   height: 100%;
   width: var(--sidebar-icons-width);
+  min-width: var(--sidebar-icons-width);
   background-color: white;
 }
 
@@ -263,6 +276,7 @@
   justify-content: space-between;
   background-color: white;
   padding: 1rem 3rem 1rem 2rem;
+  gap: 1rem;
 }
 
 .header-tabs-container{
@@ -342,6 +356,8 @@
 /* body container -- takes remaining space below header */
 .body-container {
   flex: 1;
-  border-top: 1px solid #D2D2D2;
+  width: 100%;
+  height: 100%;
+  border-top: 1px solid var(--light-grey-lines);
 }
 
