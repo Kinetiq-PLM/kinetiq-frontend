@@ -102,9 +102,9 @@ function App() {
           ))}
 
           
-          <div className='sidebar-module-icons-item'>
+          {/*<div className='sidebar-module-icons-item'>
             <p>s</p>
-          </div>
+          </div>*/}
           
         </div>
 
