@@ -9,5 +9,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
   }
   
