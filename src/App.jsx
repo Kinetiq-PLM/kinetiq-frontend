@@ -85,7 +85,11 @@ function App() {
                     ${activeModule === module.id ? "active" : ""} 
                     ${hoveredModule === module.id ? "hovered" : ""}`
                   }
-                  onClick={() => setActiveModule(module.id)}
+                  onClick={() => {
+                    setActiveModule(module.id);
+                    setActiveSubModule(null); // Reset submodule when a main module is clicked
+                    setIsSidebarOpen(true);
+                  }}
                   onMouseEnter={() => setHoveredModule(module.id)}
                   onMouseLeave={() => setHoveredModule(null)}
                 >
@@ -138,7 +142,7 @@ function App() {
                       }
                       onClick={() => {
                           setActiveModule(module.id);
-                          setActiveSubModule(null); // Reset submodule when a main module is clicked
+                          setActiveSubModule(null);
                       }}
                       onMouseEnter={() => setHoveredModule(module.id)}
                       onMouseLeave={() => setHoveredModule(null)}
