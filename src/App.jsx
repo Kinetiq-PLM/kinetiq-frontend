@@ -170,7 +170,14 @@ function App() {
         <div className='header-navi'>
           <div className={`header-tabs-container ${activeModule ? "visible" : "hidden"}`}>
             <img src={`/icons/header-module-icons/${activeModule}.png`} alt={activeModule} />
-            <p>{activeModule}</p>
+            <p id="header-module-name" onClick={() => {
+                          setActiveModule(activeModule);
+                          setActiveSubModule(null);
+                      }}>
+              {activeModule}
+            </p>
+            <p>{activeSubModule ? ` > ` : ""}</p>
+            <p>{activeSubModule ? activeSubModule : ""}</p>
           </div>
 
 

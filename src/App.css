@@ -127,7 +127,7 @@ img {
   overflow-y: auto;
   scrollbar-width: none; 
   transition: 0.25s ease-in-out;
-  gap: 0.25rem;
+  gap: 0.3rem;
   padding-bottom: 1rem;
 }
 
@@ -151,7 +151,7 @@ img {
   flex: 1; 
   overflow-y: auto;
   scrollbar-width: none; 
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
 
 
@@ -261,7 +261,7 @@ img {
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  padding: 1rem;
+  padding: 0.5rem;
   height: 2rem;
   margin-top: 0.3rem;
   width: var(--sidebar-desc-item-width);
@@ -269,17 +269,25 @@ img {
   transition: 0.2s ease;
   font-size: 0.75rem;
   gap: 0.75rem;
-  border-radius: 0.5rem;
+  border-bottom: 1px solid var(--light-grey-lines);
 }
 
 .sidebar-submodule-item.active {
   background-color: var(--light-grey-selected);
+  border-radius: 0.5rem;
 }
 
-.sidebar-submodule-item img {
-  height: 0.85rem;
-  width: 0.85rem;
+
+.sidebar-submodule-container {
+  overflow: hidden; /* Prevents abrupt changes */
+  transition: height 0.3s ease-in-out; /* Controls dropdown animation */
+  height: 0; /* Initially hidden */
 }
+
+.sidebar-submodule-container.open {
+  height: auto; /* Expands naturally */
+}
+
 
 
 .sidebar-kinetiq-footer, .sidebar-kinetiq-footer-desc{
@@ -345,12 +353,13 @@ img {
 
 .header-tabs-container p{
   margin-left: 0.8rem;
-  cursor: pointer;
   transition: 0.2s ease-in-out;
   color: var(--light-grey-text);
+  cursor: default;
 }
 
-.header-tabs-container p:hover{
+#header-module-name:hover{
+  cursor: pointer;
   color: var(--primary-teal);
 }
 
@@ -379,6 +388,7 @@ img {
   display: flex;
   align-items: center;
   width: 100%;
+  pointer-events: none; 
 }
 
 .header-profile-icon {
