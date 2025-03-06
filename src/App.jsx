@@ -92,13 +92,19 @@ function App() {
                   <img src={module.icon} alt={module.id}/>
                   
                 </div>
+                
 
-                {/* Submodules - Only show if this module is active */}
-                {activeModule === module.id && moduleSubmodules[module.id]?.map((_, index) => (
-                  <div key={index} className={"sidebar-submodule-item-empty"}>
-                    <p></p>
-                  </div>
-                ))}
+                <div 
+                  className={`sidebar-submodule-empty-container ${(isSidebarOpen && activeModule === module.id) ? "opened" : ""}`} 
+                >
+                  {/* Submodules - Only show if this module is active */}
+                  {moduleSubmodules[module.id]?.map((_, index) => (
+                    <div key={index} className={"sidebar-submodule-item-empty"}>
+                      <p></p>
+                    </div>
+                  ))}
+
+                </div>
 
               </div>
           ))}
@@ -113,7 +119,7 @@ function App() {
       </div>
 
       {/* collapsible description navi */}
-      <div className={`sidebar-desc-container ${isSidebarOpen ? "open" : "closed"}`}>
+      <div className={`sidebar-desc-container ${isSidebarOpen ? "" : "closed"}`}>
         <div className='sidebar-icons-hamburger-container'></div>
         <div className='sidebar-main-menu-container'></div>  
 
@@ -140,20 +146,25 @@ function App() {
                       <p>{module.id}</p>
                   </div>
 
-                  {/* Submodules - only show if the main module is active */}
-                  {activeModule === module.id && moduleSubmodules[module.id]?.map((sub, index) => (
-                      <div 
-                          key={index} 
-                          className={`sidebar-submodule-item
-                              ${activeSubModule === sub ? "active" : ""} 
-                              ${hoveredSubModule === sub ? "hovered" : ""}`}
-                          onClick={() => setActiveSubModule(sub)}
-                          onMouseEnter={() => setHoveredSubModule(sub)}
-                          onMouseLeave={() => setHoveredSubModule(null)}
-                      >
-                          <p>{sub}</p>
-                      </div>
-                  ))}
+                  <div 
+                  className={`sidebar-submodule-empty-container ${(isSidebarOpen && activeModule === module.id) ? "opened" : ""}`} 
+                  >
+
+                    {/* Submodules - only show if the main module is active */}
+                    {moduleSubmodules[module.id]?.map((sub, index) => (
+                        <div 
+                            key={index} 
+                            className={`sidebar-submodule-item
+                                ${activeSubModule === sub ? "active" : ""} 
+                                ${hoveredSubModule === sub ? "hovered" : ""}`}
+                            onClick={() => setActiveSubModule(sub)}
+                            onMouseEnter={() => setHoveredSubModule(sub)}
+                            onMouseLeave={() => setHoveredSubModule(null)}
+                        >
+                            <p>{sub}</p>
+                        </div>
+                    ))} 
+                  </div>
               </div>
           ))}
         </div>
