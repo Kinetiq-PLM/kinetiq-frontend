@@ -9,11 +9,31 @@ function App() {
   const moduleNames = ["Management", "Administration", "Accounting", "Financials", "Purchasing", "Operations",
                         "Sales", "Support & Services", "Inventory", "Distribution", "Production", 
                          "MRP", "Project Management", "Human Resources", "Report Generator"];
+  const moduleSubmodules = {
+                          "Management": ["User Roles", "Access Control", "Settings"],
+                          "Administration": ["Company Policies", "User Accounts"],
+                          "Accounting": ["General Ledger", "Accounts Payable", "Accounts Receivable"],
+                          "Financials": ["Budgeting", "Cash Flow", "Financial Reports"],
+                          "Purchasing": ["Supplier Management", "Purchase Orders"],
+                          "Operations": ["Workflow Automation", "Operational Analytics"],
+                          "Sales": ["Lead Management", "Invoices", "Quotations"],
+                          "Support & Services": ["Ticketing System", "Customer Support"],
+                          "Inventory": ["Stock Levels", "Product Catalog"],
+                          "Distribution": ["Shipping", "Order Fulfillment"],
+                          "Production": ["Manufacturing Process", "Quality Control"],
+                          "MRP": ["Material Requirements Planning", "Production Scheduling"],
+                          "Project Management": ["Task Assignments", "Gantt Charts"],
+                          "Human Resources": ["Employee Records", "Payroll", "Recruitment"],
+                          "Report Generator": ["Custom Reports", "Data Visualization"],
+                        };
+                        
 
   const [activeModule, setActiveModule] = useState(null);
+  const [activeSubModule, setActiveSubModule] = useState(null);
   const [hoveredModule, setHoveredModule] = useState(null);
+  const [hoveredSubModule, setHoveredSubModule] = useState(null);
 
-  const modules = moduleNames.map((name) => ({
+  const modulesIcons = moduleNames.map((name) => ({
     id: name,
     icon: `/icons/module-icons/${name}.png`,
   }));
@@ -56,29 +76,36 @@ function App() {
           ref={iconsRef} 
           onScroll={() => handleScroll("icons")}
         >
+          {modulesIcons.map((module) => (
+              <div key={module.id}>
+                {/* Main Module Icons */}
+                <div
+                  className={`sidebar-module-icons-item 
+                    ${isSidebarOpen ? "opened" : ""}
+                    ${activeModule === module.id ? "active" : ""} 
+                    ${hoveredModule === module.id ? "hovered" : ""}`
+                  }
+                  onClick={() => setActiveModule(module.id)}
+                  onMouseEnter={() => setHoveredModule(module.id)}
+                  onMouseLeave={() => setHoveredModule(null)}
+                >
+                  <img src={module.icon} alt={module.id}/>
+                  
+                </div>
 
-          {modules.map((module) => (
-          <div
-            key={module.id}
-            className={` ${isSidebarOpen ? "opened" : ""} 
-              sidebar-module-icons-item 
-              ${activeModule === module.id ? "active" : ""} 
-              ${hoveredModule === module.id ? "hovered" : ""}`
-            }
+                {/* Submodules - Only show if this module is active */}
+                {activeModule === module.id && moduleSubmodules[module.id]?.map((_, index) => (
+                  <div key={index} className={"sidebar-submodule-item-empty"}>
+                    <p></p>
+                  </div>
+                ))}
 
-            onClick={() => setActiveModule(module.id)}
-            onMouseEnter={() => setHoveredModule(module.id)}
-            onMouseLeave={() => setHoveredModule(null)}
-          >
-            <img src={module.icon} alt={module.id} />
-          </div>
+              </div>
           ))}
-
-          <div className='sidebar-submodule-item-empty'>
-            <p>dsaads </p>
-          </div>
-
         </div>
+
+
+
 
         <div className='sidebar-kinetiq-footer'>
           <img src={"/icons/Kinetiq-Logo.png"} alt={"Kinetiq Logo"}></img>
@@ -90,29 +117,48 @@ function App() {
         <div className='sidebar-icons-hamburger-container'></div>
         <div className='sidebar-main-menu-container'></div>  
 
-        <div className='sidebar-module-descs' ref={descsRef} onScroll={() => handleScroll("descs")}>
-          {modules.map((module) => (
-            <div
-              key={module.id}
-              className={`sidebar-module-desc-item 
-                ${activeModule === module.id ? "active" : ""} 
-                ${hoveredModule === module.id ? "hovered" : ""}`
-              }
-              onClick={() => setActiveModule(module.id)}
-              onMouseEnter={() => setHoveredModule(module.id)}
-              onMouseLeave={() => setHoveredModule(null)}
-            >
-              <p>{module.id}</p>
-            </div>
-          ))}
+        <div 
+          className='sidebar-module-descs' 
+          ref={descsRef} 
+          onScroll={() => handleScroll("descs")}
+        >
+          {modulesIcons.map((module) => (
+              <div key={module.id}>
+                  {/* Main Module Items */}
+                  <div
+                      className={`sidebar-module-desc-item 
+                          ${activeModule === module.id ? "active" : ""} 
+                          ${hoveredModule === module.id ? "hovered" : ""}`
+                      }
+                      onClick={() => {
+                          setActiveModule(module.id);
+                          setActiveSubModule(null); // Reset submodule when a main module is clicked
+                      }}
+                      onMouseEnter={() => setHoveredModule(module.id)}
+                      onMouseLeave={() => setHoveredModule(null)}
+                  >
+                      <p>{module.id}</p>
+                  </div>
 
-          
-          <div className='sidebar-submodule-item'>
-            <img src ={"/icons/module-icons/Management.png"} alt={"Kinetiq Logo"} ></img>
-            <p>Submoduile 1</p>
-          </div>
-          
+                  {/* Submodules - only show if the main module is active */}
+                  {activeModule === module.id && moduleSubmodules[module.id]?.map((sub, index) => (
+                      <div 
+                          key={index} 
+                          className={`sidebar-submodule-item
+                              ${activeSubModule === sub ? "active" : ""} 
+                              ${hoveredSubModule === sub ? "hovered" : ""}`}
+                          onClick={() => setActiveSubModule(sub)}
+                          onMouseEnter={() => setHoveredSubModule(sub)}
+                          onMouseLeave={() => setHoveredSubModule(null)}
+                      >
+                          <p>{sub}</p>
+                      </div>
+                  ))}
+              </div>
+          ))}
         </div>
+
+
 
         <div className='sidebar-kinetiq-footer-desc'>
           <p>Kinetiq</p>
