@@ -1,42 +1,15 @@
 import { useState, useRef } from 'react'
 import './App.css'
 import SearchBar from "./shared/components/SearchBar"; 
-
+import BodyContent from "./shared/components/BodyContent";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
-  const moduleNames = ["Management", "Administration", "Accounting", "Financials", "Purchasing", "Operations",
-                        "Sales", "Support & Services", "Inventory", "Distribution", "Production", 
-                         "MRP", "Project Management", "Human Resources", "Report Generator"];
-  const moduleSubmodules = {
-                          "Management": ["User Roles", "Access Control", "Settings"],
-                          "Administration": ["Company Policies", "User Accounts"],
-                          "Accounting": ["General Ledger", "Accounts Payable", "Accounts Receivable"],
-                          "Financials": ["Budgeting", "Cash Flow", "Financial Reports"],
-                          "Purchasing": ["Supplier Management", "Purchase Orders"],
-                          "Operations": ["Workflow Automation", "Operational Analytics"],
-                          "Sales": ["Lead Management", "Invoices", "Quotations"],
-                          "Support & Services": ["Ticketing System", "Customer Support"],
-                          "Inventory": ["Stock Levels", "Product Catalog"],
-                          "Distribution": ["Shipping", "Order Fulfillment"],
-                          "Production": ["Manufacturing Process", "Quality Control"],
-                          "MRP": ["Material Requirements Planning", "Production Scheduling"],
-                          "Project Management": ["Task Assignments", "Gantt Charts"],
-                          "Human Resources": ["Employee Records", "Payroll", "Recruitment"],
-                          "Report Generator": ["Custom Reports", "Data Visualization"],
-                        };
-                        
-
   const [activeModule, setActiveModule] = useState(null);
   const [activeSubModule, setActiveSubModule] = useState(null);
   const [hoveredModule, setHoveredModule] = useState(null);
   const [hoveredSubModule, setHoveredSubModule] = useState(null);
-
-  const modulesIcons = moduleNames.map((name) => ({
-    id: name,
-    icon: `/icons/module-icons/${name}.png`,
-  }));
 
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
@@ -51,6 +24,100 @@ function App() {
       iconsRef.current.scrollTop = descsRef.current.scrollTop;
     }
   };
+                         
+  const moduleFileNames = {
+                          "Management": "Management",
+                          "Administration": "Administration",
+                          "Accounting": "Accounting",
+                          "Financials": "Financials",
+                          "Purchasing": "Purchasing",
+                          "Operations": "Operations",
+                          "Sales": "Sales",
+                          "Support & Services": "SupportServices",
+                          "Inventory": "Inventory",
+                          "Distribution": "Distribution",
+                          "Production": "Production",
+                          "MRP": "MRP",
+                          "Project Management": "ProjectManagement",
+                          "Human Resources": "HumanResources",
+                          "Report Generator": "ReportGenertor",
+                        };
+
+  const moduleSubmoduleFileNames = {
+                          "Management": {
+                            "User Roles": "UserRoles",
+                            "Access Control": "AccessControl",
+                            "Settings": "Settings",
+                          },
+                          "Administration": {
+                            "Company Policies": "CompanyPolicies",
+                            "User Accounts": "UserAccounts",
+                          },
+                          "Accounting": {
+                            "General Ledger": "GeneralLedger",
+                            "Accounts Payable": "AccountsPayable",
+                            "Accounts Receivable": "AccountsReceivable",
+                          },
+                          "Financials": {
+                            "Budgeting": "Budgeting",
+                            "Cash Flow": "CashFlow",
+                            "Financial Reports": "FinancialReports",
+                          },
+                          "Purchasing": {
+                            "Supplier Management": "SupplierManagement",
+                            "Purchase Orders": "PurchaseOrders",
+                          },
+                          "Operations": {
+                            "Workflow Automation": "WorkflowAutomation",
+                            "Operational Analytics": "OperationalAnalytics",
+                          },
+                          "Sales": {
+                            "Lead Management": "LeadManagement",
+                            "Invoices": "Invoices",
+                            "Quotations": "Quotations",
+                          },
+                          "Support & Services": {
+                            "Ticketing System": "TicketingSystem",
+                            "Customer Support": "CustomerSupport",
+                          },
+                          "Inventory": {
+                            "Stock Levels": "StockLevels",
+                            "Product Catalog": "ProductCatalog",
+                          },
+                          "Distribution": {
+                            "Shipping": "Shipping",
+                            "Order Fulfillment": "OrderFulfillment",
+                          },
+                          "Production": {
+                            "Manufacturing Process": "ManufacturingProcess",
+                            "Quality Control": "QualityControl",
+                          },
+                          "MRP": {
+                            "Material Requirements Planning": "MaterialRequirementsPlanning",
+                            "Production Scheduling": "ProductionScheduling",
+                          },
+                          "Project Management": {
+                            "Task Assignments": "TaskAssignments",
+                            "Gantt Charts": "GanttCharts",
+                          },
+                          "Human Resources": {
+                            "Employee Records": "EmployeeRecords",
+                            "Payroll": "Payroll",
+                            "Recruitment": "Recruitment",
+                          },
+                          "Report Generator": {
+                            "Custom Reports": "CustomReports",
+                            "Data Visualization": "DataVisualization",
+                          },
+                        };
+                        
+  const modulesIcons = Object.keys(moduleFileNames).map((module) => ({
+    id: module,
+    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
+  }));
+             
+
+                        
 
   return (
     <div className='shell-container'>
@@ -102,11 +169,13 @@ function App() {
                   className={`sidebar-submodule-empty-container ${(isSidebarOpen && activeModule === module.id) ? "opened" : ""}`} 
                 >
                   {/* Submodules - Only show if this module is active */}
-                  {moduleSubmodules[module.id]?.map((_, index) => (
-                    <div key={index} className={"sidebar-submodule-item-empty"}>
+                  {moduleSubmoduleFileNames[module.id] &&
+                  Object.keys(moduleSubmoduleFileNames[module.id]).map((submodule, index) => (
+                    <div key={index} className="sidebar-submodule-item-empty">
                       <p></p>
                     </div>
                   ))}
+
 
                 </div>
 
@@ -114,13 +183,12 @@ function App() {
           ))}
         </div>
 
-
-
-
         <div className='sidebar-kinetiq-footer'>
           <img src={"/icons/Kinetiq-Logo.png"} alt={"Kinetiq Logo"}></img>
         </div>
       </div>
+
+
 
       {/* collapsible description navi */}
       <div className={`sidebar-desc-container ${isSidebarOpen ? "" : "closed"}`}>
@@ -155,19 +223,21 @@ function App() {
                   >
 
                     {/* Submodules - only show if the main module is active */}
-                    {moduleSubmodules[module.id]?.map((sub, index) => (
-                        <div 
-                            key={index} 
-                            className={`sidebar-submodule-item
-                                ${activeSubModule === sub ? "active" : ""} 
-                                ${hoveredSubModule === sub ? "hovered" : ""}`}
-                            onClick={() => setActiveSubModule(sub)}
-                            onMouseEnter={() => setHoveredSubModule(sub)}
-                            onMouseLeave={() => setHoveredSubModule(null)}
-                        >
-                            <p>{sub}</p>
-                        </div>
-                    ))} 
+                    {moduleSubmoduleFileNames[module.id] &&
+                    Object.keys(moduleSubmoduleFileNames[module.id]).map((sub, index) => (
+                      <div
+                        key={index}
+                        className={`sidebar-submodule-item
+                          ${activeSubModule === sub ? "active" : ""} 
+                          ${hoveredSubModule === sub ? "hovered" : ""}`}
+                        onClick={() => setActiveSubModule(sub)}
+                        onMouseEnter={() => setHoveredSubModule(sub)}
+                        onMouseLeave={() => setHoveredSubModule(null)}
+                      >
+                        <p>{sub}</p>
+                      </div>
+                    ))}
+
                   </div>
               </div>
           ))}
@@ -184,7 +254,7 @@ function App() {
       <div className='header-body-container'>
         <div className='header-navi'>
           <div className={`header-tabs-container ${activeModule ? "visible" : "hidden"}`}>
-            <img src={`/icons/header-module-icons/${activeModule}.png`} alt={activeModule} />
+            <img src={`/icons/header-module-icons/${moduleFileNames[activeModule]}.png`} alt={activeModule} />
             <p className={`header-module-name ${!activeSubModule ? "active" : ""}`} onClick={() => {
                 setActiveModule(activeModule);
                 setActiveSubModule(null);
@@ -210,9 +280,7 @@ function App() {
 
         </div>
         <div className='body-container'>
-          <div className='body-content-container'>
-
-          </div>
+          <BodyContent activeModule={activeModule} />
         </div>
       </div>
 

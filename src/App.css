@@ -286,6 +286,9 @@ img {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.5s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
 .sidebar-submodule-empty-container.opened {
@@ -441,13 +444,15 @@ img {
   width: 100%;
   height: 100%;
   padding: 1.75rem;
+  flex-direction: column;
 }
-
 
 .body-content-container{
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
   background-color: white;
+  padding: 1rem;
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
 }
+
