@@ -185,14 +185,15 @@ function App() {
         <div className='header-navi'>
           <div className={`header-tabs-container ${activeModule ? "visible" : "hidden"}`}>
             <img src={`/icons/header-module-icons/${activeModule}.png`} alt={activeModule} />
-            <p id="header-module-name" onClick={() => {
-                          setActiveModule(activeModule);
-                          setActiveSubModule(null);
-                      }}>
+            <p className={`header-module-name ${!activeSubModule ? "active" : ""}`} onClick={() => {
+                setActiveModule(activeModule);
+                setActiveSubModule(null);
+            }}>
               {activeModule}
             </p>
+
             <p>{activeSubModule ? ` > ` : ""}</p>
-            <p>{activeSubModule ? activeSubModule : ""}</p>
+            <p id="header-submodule-name">{activeSubModule ? activeSubModule : ""}</p>
           </div>
 
 
@@ -208,7 +209,11 @@ function App() {
 
 
         </div>
-        <div className='body-container'></div>
+        <div className='body-container'>
+          <div className='body-content-container'>
+
+          </div>
+        </div>
       </div>
 
     </div>

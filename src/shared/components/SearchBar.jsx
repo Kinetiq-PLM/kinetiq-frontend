@@ -28,6 +28,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     backgroundColor: "#F7F9FB",
+    border:"1px solid rgb(239, 239, 239)",
     borderRadius: "0.5rem",
     padding: "0.5rem",
     width: "100%",
@@ -44,7 +45,7 @@ const styles = {
     outline: "none",
     backgroundColor: "transparent",
     flex: 1,
-    fontSize: "1rem",
+    fontSize: "0.8rem",
     color: "#787878",
   },
 };
