@@ -73,6 +73,11 @@ function App() {
             <img src={module.icon} alt={module.id} />
           </div>
           ))}
+
+          <div className='sidebar-submodule-item-empty'>
+            <p>dsaads </p>
+          </div>
+
         </div>
 
         <div className='sidebar-kinetiq-footer'>
@@ -102,9 +107,10 @@ function App() {
           ))}
 
           
-          {/*<div className='sidebar-module-icons-item'>
-            <p>s</p>
-          </div>*/}
+          <div className='sidebar-submodule-item'>
+            <img src ={"/icons/module-icons/Management.png"} alt={"Kinetiq Logo"} ></img>
+            <p>Submoduile 1</p>
+          </div>
           
         </div>
 

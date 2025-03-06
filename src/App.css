@@ -11,6 +11,7 @@
   --footer-kinetiq-height: 4rem;
   --sidebar-icons-width: 4rem;
   --sidebar-desc-width: 12rem;
+  --sidebar-desc-item-width: 10.7rem;
   --sidebar-main-menu-container-height: 1.5rem;
 }
 
@@ -210,7 +211,7 @@ img {
   justify-content: flex-start;
   padding: 0.5rem;
   height: 3rem;
-  width: 10.7rem;
+  width: var(--sidebar-desc-item-width);
   cursor: pointer;
   border-top-right-radius: 0.5rem; 
   border-bottom-right-radius: 0.5rem;
@@ -235,6 +236,37 @@ img {
 .sidebar-module-icons-item.active.hovered, .sidebar-module-desc-item.active.hovered, sidebar-module-icons-item.opened.active.hovered, sidebar-module-icons-item.opened.active.hovered{
   background-color: #c2c2c2;
 }
+
+.sidebar-submodule-item-empty{
+  height: 2rem;
+  width: var(--sidebar-desc-width);
+}
+
+.sidebar-submodule-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.5rem;
+  height: 2rem;
+  width: var(--sidebar-desc-item-width);
+  cursor: pointer;
+  transition: 0.2s ease;
+  font-size: 0.75rem;
+  gap: 0.75rem;
+  background-color: var(--light-grey-selected);
+  border-radius: 0.5rem;
+}
+
+.sidebar-submodule-item.active {
+
+}
+
+.sidebar-submodule-item img {
+  height: 0.85rem;
+  width: 0.85rem;
+}
+
 
 .sidebar-kinetiq-footer, .sidebar-kinetiq-footer-desc{
   display: flex;
