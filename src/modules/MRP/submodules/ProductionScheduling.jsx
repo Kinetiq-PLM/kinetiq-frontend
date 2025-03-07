@@ -7,7 +7,7 @@ const BodyContent = () => {
             <div className="body-content-container">
                 <p>Hello Production Scheduling SubModule!</p>
                 <p>Fill this container with your elements, change the display if need be.</p>
-                <p>If you're going to style with css, use your unique namespace '.ProductionScheduling' at the start.</p>
+                <p>If you're going to style with css, use your unique namespace '.prodsched' at the start.</p>
             </div>
         </div>
 
