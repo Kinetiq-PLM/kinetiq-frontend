@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   /* color variables */
   --light-teal-background: #EFF8F9;

@@ -1,16 +1,15 @@
 import React from "react";
-import "./styles/Accounting.css";
+import "./styles/Operations.css";
 
 const BodyContent = () => {
     return (
-        <div className="accounting">
+        <div className="ops">
             <div className="body-content-container">
-                <p>Hello Accounting Module!</p>
+                <p>Hello Operations Module!</p>
                 <p>Fill this container with your elements, change the display if need be.</p>
-                <p>If you're going to style with css, use your unique namespace '.accounting' at the start.</p>
+                <p>If you're going to style with css, use your unique namespace '.ops' at the start.</p>
             </div>
         </div>
-
     );
 };
 
