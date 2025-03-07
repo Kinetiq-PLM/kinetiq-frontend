@@ -28,7 +28,7 @@ function App() {
 
   // load jsx files for main modules
   const loadMainModule = (moduleId) => {
-    if (moduleFileNames[moduleId] && !(activeModule == moduleId)) {
+    if (moduleFileNames[moduleId] && !(activeModule == moduleId && !activeSubModule)) {
 
       const LazyComponent = lazy(() => import(/* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`));
 

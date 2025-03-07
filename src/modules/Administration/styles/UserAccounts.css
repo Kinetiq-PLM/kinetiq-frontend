@@ -1,12 +1,12 @@
-/* REMINDER! All of your elements must use your unique namespace '.acctpay' at the start to avoid leaking */
+/* REMINDER! All of your elements must use your unique namespace '.useraccs' at the start to avoid leaking */
 
-.acctpay {
+.useraccs {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
-.acctpay .body-content-container {
+.useraccs .body-content-container {
     width: 100%;
     height: 100%;
     border-radius: 0.5rem;
@@ -20,6 +20,4 @@
     min-width: 40rem;
     min-height: 30rem;
   }
-
-
   
