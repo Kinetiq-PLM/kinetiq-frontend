@@ -54,6 +54,7 @@ function App() {
     "Purchasing": "Purchasing",
     "Operations": "Operations",
     "Sales": "Sales",
+    "CRM": "CRM",
     "Support & Services": "SupportServices",
     "Inventory": "Inventory",
     "Distribution": "Distribution",
@@ -96,6 +97,11 @@ function App() {
       "Lead Management": "LeadManagement",
       "Invoices": "Invoices",
       "Quotations": "Quotations",
+    },
+    "CRM": {
+      "Contact Management": "ContactManagement",
+      "Marketing": "Marketing",
+      "Customer Support": "CustomerSupport",
     },
     "Support & Services": {
       "Ticketing System": "TicketingSystem",
