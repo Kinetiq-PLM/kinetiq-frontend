@@ -320,7 +320,9 @@ function App() {
                 }`}
                 onClick={() => {
                   setActiveModule(activeModule);
+                  loadMainModule(activeModule);
                   setActiveSubModule(null);
+                  loadSubModule(null);
                 }}
               >
                 {activeModule}
