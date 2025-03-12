@@ -302,11 +302,11 @@ img {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out;
 }
 
 .sidebar-submodule-empty-container.opened {
-  max-height: fit-content;
+  max-height: 25rem;
   opacity: 1;
 }
 
