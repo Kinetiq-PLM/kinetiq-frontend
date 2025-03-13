@@ -106,9 +106,17 @@ function App() {
       "Operational Analytics": "OperationalAnalytics",
     },
     Sales: {
-      "Lead Management": "LeadManagement",
-      Invoices: "Invoices",
-      Quotations: "Quotations",
+      Quotation: "Quotation",
+      Order: "Order",
+      Delivery: "Delivery",
+      Invoice: "Invoice",
+      "Master List": "MasterList",
+      Dunning: "Dunning",
+      Reporting: "Reporting",
+      Returns: "Returns",
+      "Contact Management": "ContactManagement",
+      Marketing: "Marketing",
+      "Customer Support": "CustomerSupport",
     },
     CRM: {
       "Contact Management": "ContactManagement",
@@ -316,7 +324,9 @@ function App() {
                 }`}
                 onClick={() => {
                   setActiveModule(activeModule);
+                  loadMainModule(activeModule);
                   setActiveSubModule(null);
+                  loadSubModule(null);
                 }}
               >
                 {activeModule}
