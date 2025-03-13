@@ -1,0 +1,92 @@
+/* REMINDER! All of your elements must use your unique namespace '.gantt' at the start to avoid leaking */
+
+.taskss{
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .taskss .body-content-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 0.5rem;
+      background-color: white;
+      padding: 1rem;
+      box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 40rem;
+      min-height: 30rem;
+    }
+    #hdtask{
+      color: black;
+      font-size: 20px;
+      font-family: 'Inter';
+    }
+  #bg8{
+  background-color: white;
+  height: 380px;
+  width:1020px;
+  filter:drop-shadow(0px 5px 5px rgba(0,0,0,0.25));
+  border-radius:10px; 
+  position: absolute;
+  bottom: 100px;
+  }
+  .attach{
+    color: white;
+    background-color: #00A8A8;
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: 'Inter';
+    height: 27px;
+    width: 159px;
+    text-align: center;
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+  }
+  .del{
+    color: black;
+    background-color: #C0C6CC;
+    border-radius: 8px;
+    border: 1px solid #E8E8E8;
+    font-size: 16px;
+    font-family: 'Inter';
+    height: 41px;
+    width: 113px;
+    text-align: center;
+    position: absolute;
+    top: 110px;
+    right: 160px;
+  }
+  .atasks{
+    color:white;
+    background-color:#00A8A8;
+    border-radius: 8px;
+    border: 1px solid #E8E8E8;
+    font-size: 16px;
+    font-family: 'Inter';
+    height: 41px;
+    width: 99px;
+    text-align: center;
+    position: absolute;
+    top: 110px;
+    right: 50px;
+  }
+  #sched{
+    color: black;
+    background-color: white;
+    border: 1px solid #E8E8E8;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: 'Inter';
+    height: 36px;
+    width: 110px;
+    text-align: center;
+    position: absolute;
+    top: 180px;
+    right: 70px;
+  }

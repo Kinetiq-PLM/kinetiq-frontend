@@ -136,8 +136,12 @@ function App() {
       "Production Scheduling": "ProductionScheduling",
     },
     "Project Management": {
-      "Task Assignments": "TaskAssignments",
-      "Gantt Charts": "GanttCharts",
+      "DashBoard": "DashBoard",
+      "Project Request": "Project Request",
+      "Project Planning": "ProjectPlanning",
+      "Tasks": "TaskMonitoring",
+      "Reports": "Reports",
+      
     },
     "Human Resources": {
       "Employee Records": "EmployeeRecords",

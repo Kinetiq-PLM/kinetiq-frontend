@@ -1,0 +1,142 @@
+/* REMINDER! All of your elements must use your unique namespace '.taskass' at the start to avoid leaking */
+
+.overview {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+ .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+.overview {
+  color: #000000;
+  font-size: 20px;
+  font-family: 'Inter'; 
+  line-height: auto;
+  outline: none;
+}
+
+.rectangle{
+  background-color: white;
+  height: 170px;
+  width:1000px;
+  filter:drop-shadow(0px 5px 5px rgba(0,0,0,0.25));
+  border-radius:10px;
+  position: absolute;
+  bottom: 50px; 
+}
+.rectangle2{
+background-color: #ffffffff;
+height: 170px;
+width:480px;
+filter:drop-shadow(0px 5px 5px rgba(0,0,0,0.25));
+border-radius:10px;
+position: absolute;
+top: 200px;
+left: 310px;
+}
+
+.rectangle3{
+  background-color: #ffffffff;
+  height: 170px;
+  width:480px;
+  filter:drop-shadow(0px 5px 5px rgba(0,0,0,0.25));
+  border-radius:10px;
+  position: absolute;
+  top: 200px;
+  right: 55px;
+  }
+  .overdue{
+  display: flex;
+  color: #000000;
+  font-size: 20px;
+  font-family: 'Inter'; 
+  line-height: auto;
+  outline: none;
+  position: absolute;
+  top: 160px;
+  left: 310px;
+
+   }
+  .add{
+    color: #444444;
+    border: none;
+    font-size: 12px;
+    font-family: 'Inter';
+    position: absolute;
+    top: 180px;
+    right: 60px;
+  }
+  .tft{
+  display: flex;
+  color: #000000;
+  font-size: 16px;
+  font-family: 'Inter'; 
+  line-height: auto;
+  outline: none;
+  position: absolute;
+  top: 160px;
+  right: 410px;
+  }
+  .projsum{
+  display: flex;
+  color: #000000;
+  font-size: 16px;
+  font-family: 'Inter'; 
+  line-height: auto;
+  outline: none;
+  position: absolute;
+  bottom: 230px;
+  left: 310px;
+  }
+  .ALL{
+    color: white;
+    background-color: #087D7D;
+    width: 85px;
+    height: 20px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-family: 'Inter';
+    position: absolute;
+    bottom: 230px;
+    right: 350px;
+  }
+  .dev{
+    color: #000000;
+    font-size: 12px;
+    font-family: 'Inter';
+    position: absolute;
+    bottom: 230px;
+    right: 250px;
+  }
+  .dep{
+    color: #000000;
+    font-size: 12px;
+    font-family: 'Inter';
+    position: absolute;
+    bottom: 230px;
+    right: 150px;
+  }
+  .prio{
+    color: #000000;
+    font-size: 12px;
+    font-family: 'Inter';
+    position: absolute;
+    bottom: 230px;
+    right: 90px;
+  }
+
+
+
