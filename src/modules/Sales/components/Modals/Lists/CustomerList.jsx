@@ -70,7 +70,7 @@ const CustomerListModal = ({ isOpen, onClose, setCustomer }) => {
       >
         <button
           ref={closeButtonRef}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300 rounded-full p-1 text-2xl cursor-pointer transition-all duration-200"
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-900 rounded-full p-1 text-2xl cursor-pointer transition-all duration-200"
           onClick={onClose}
           aria-label="Close modal"
         >
