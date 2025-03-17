@@ -18,13 +18,21 @@ import BlanketAgreementDateModal from "../components/Modals/BlanketAgreementDate
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
-import generateRandomID from "../components/GenerateID";
+import { useMutation } from "@tanstack/react-query";
+import { addQuotation } from "../api/api";
 
 const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
 
   const copyFromOptions = [];
   const copyToOptions = ["Order", "Blanket Agreement"];
+
+  const quotationMutation = useMutation({
+    mutationFn: addQuotation,
+    onSuccess: (data, variables, context) => {
+      console.log(data);
+    },
+  });
 
   const [copyToModal, setCopyToModal] = useState("");
   // save current info to local storage
