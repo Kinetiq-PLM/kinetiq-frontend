@@ -2,33 +2,31 @@
 
 import { useState, useEffect, useRef } from "react";
 import Table from "../../Table";
-import { CUSTOMER_DATA } from "./../../../temp_data/customer_data";
+import { PRODUCTS_DATA } from "../../../temp_data/products_data";
 import Button from "../../Button";
 
-const CustomerListModal = ({ isOpen, onClose, setCustomer }) => {
-  const customer_data = CUSTOMER_DATA;
+const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
+  const products_data = PRODUCTS_DATA;
 
-  // setCustomer is used to set the selected customer in the parent component
-  // setSelectedCustomer is used to set the selected customer in this component
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(customer_data);
+  const [filteredData, setFilteredData] = useState(products_data);
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
   const columns = [
-    { key: "customer_id", label: "Customer ID" },
-    { key: "name", label: "Name" }, // Company Name
-    { key: "country", label: "Country" }, // Country
+    { key: "product_id", label: "Product ID" },
+    { key: "product_name", label: "Name" }, // Company Name
+    { key: "stock", label: "Stock" }, // Country
   ];
 
   const handleConfirm = () => {
-    if (selectedCustomer) {
-      setCustomer(selectedCustomer);
+    if (selectedProduct) {
+      addProduct([...products, selectedProduct]); // Properly update the array
       onClose();
-      setSelectedCustomer(null);
+      setSelectedProduct(null);
     }
   };
 
@@ -76,7 +74,7 @@ const CustomerListModal = ({ isOpen, onClose, setCustomer }) => {
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Business Partners
+            List Of Items
           </h2>
         </div>
 
@@ -100,8 +98,8 @@ const CustomerListModal = ({ isOpen, onClose, setCustomer }) => {
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filteredData = customer_data.filter((customer) =>
-                  customer.name.toLowerCase().includes(searchTerm)
+                const filteredData = products_data.filter((product) =>
+                  product.product_name.toLowerCase().includes(searchTerm)
                 );
                 setFilteredData(filteredData);
               }}
@@ -111,21 +109,17 @@ const CustomerListModal = ({ isOpen, onClose, setCustomer }) => {
             <Table
               columns={columns}
               data={filteredData}
-              onSelect={setSelectedCustomer}
+              onSelect={setSelectedProduct}
             />
           </div>
           <div className="mt-4 flex justify-between">
             <div>
               <Button
                 type="primary"
-                className={"mr-2"}
                 onClick={handleConfirm}
-                disabled={!selectedCustomer}
+                disabled={!selectedProduct}
               >
-                Select
-              </Button>
-              <Button type="primary" onClick={handleConfirm}>
-                New
+                Add
               </Button>
             </div>
             <div>
@@ -140,4 +134,4 @@ const CustomerListModal = ({ isOpen, onClose, setCustomer }) => {
   );
 };
 
-export default CustomerListModal;
+export default ProductListModal;

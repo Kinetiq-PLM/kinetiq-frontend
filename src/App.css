@@ -338,6 +338,8 @@ img {
   align-items: center;
   justify-content: flex-start;
   flex: 1;
+  max-height: 100vh;
+  overflow: auto;
 }
 
 /* header navigation -- fixed height */
