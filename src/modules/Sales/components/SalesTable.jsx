@@ -126,6 +126,23 @@ const SalesTable = ({
     };
   }, [editingCell]);
 
+  useEffect(() => {
+    // This should run whenever the data prop changes
+    const updatedData = data.map((item) => {
+      const unitPrice = Number(item.unit_price); // Keep unit_price as a number
+      const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
+      const total = unitPrice * item.quantity + tax - item.discount;
+      return {
+        ...item,
+        unit_price: unitPrice.toFixed(2), // Convert to string only for display
+        tax: tax.toFixed(2), // Ensure tax is formatted properly
+        total_price: total.toFixed(2), // Calculate total price
+      };
+    });
+
+    setTableData(updatedData);
+  }, [data]);
+
   return (
     <div
       ref={tableRef}

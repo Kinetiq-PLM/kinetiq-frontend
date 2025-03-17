@@ -69,10 +69,6 @@ const BodyContent = () => {
     }));
   }, [selectedCustomer, products]);
 
-  useEffect(() => {
-    console.log("added: " + JSON.stringify(products));
-  }, [products]);
-
   // useEffect(() => {
   //   console.log("Page: " + selectedProduct.product_id);
   // }, [selectedProduct]);
@@ -109,7 +105,7 @@ const BodyContent = () => {
           />
         </div>
         {/* TABLE */}
-        <section className="border border-[#CBCBCB] w-full h-[350px] overflow-x-auto rounded-md mt-2 table-layout">
+        <section className="border border-[#CBCBCB] w-full min-h-[350px] overflow-x-auto rounded-md mt-2 table-layout">
           <SalesTable
             columns={columns}
             data={products}
