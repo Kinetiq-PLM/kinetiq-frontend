@@ -7,6 +7,8 @@ import { useAlert } from "../../Context/AlertContext.jsx";
 import Table from "../../Table";
 import { CUSTOMER_DATA } from "./../../../temp_data/customer_data";
 import Button from "../../Button";
+import { useQuery } from "@tanstack/react-query";
+import { getCustomers } from "../../../api/api";
 
 const CustomerListModal = ({
   isOpen,
@@ -23,10 +25,17 @@ const CustomerListModal = ({
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(customer_data);
+  const [filteredData, setFilteredData] = useState([]);
+  const [customers, setCustomers] = useState([]);
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
+
+  const customersQuery = useQuery({
+    queryKey: ["customers"],
+    queryFn: getCustomers,
+    enabled: isOpen,
+  });
 
   const columns = [
     { key: "customer_id", label: "Customer ID" },
@@ -45,6 +54,18 @@ const CustomerListModal = ({
       setSelectedCustomer(null);
     }
   };
+
+  useEffect(() => {
+    if (customersQuery.status === "success") {
+      setFilteredData(customersQuery.data);
+      setCustomers(customersQuery.data);
+    } else if (customersQuery.status === "error") {
+      alert(
+        "An error occurred while fetching the data: " +
+          customersQuery.error?.message
+      );
+    }
+  }, [customersQuery.status]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -114,7 +135,7 @@ const CustomerListModal = ({
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filteredData = customer_data.filter((customer) =>
+                const filteredData = customers.filter((customer) =>
                   customer.name.toLowerCase().includes(searchTerm)
                 );
                 setFilteredData(filteredData);
