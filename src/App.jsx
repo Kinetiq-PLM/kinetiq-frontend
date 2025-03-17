@@ -2,6 +2,7 @@ import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
 import SearchBar from "./shared/components/SearchBar";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -15,6 +16,7 @@ function App() {
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
 
+  const queryClient = new QueryClient();
   // Sync Scroll
   const handleScroll = (source) => {
     if (!iconsRef.current || !descsRef.current) return;
@@ -351,16 +353,18 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="body-container">
-            {ModuleComponent && (
-              <Suspense>
-                <ModuleComponent
-                  loadSubModule={loadSubModule}
-                  setActiveSubModule={setActiveSubModule}
-                />
-              </Suspense>
-            )}
-          </div>
+          <QueryClientProvider client={queryClient}>
+            <div className="body-container">
+              {ModuleComponent && (
+                <Suspense>
+                  <ModuleComponent
+                    loadSubModule={loadSubModule}
+                    setActiveSubModule={setActiveSubModule}
+                  />
+                </Suspense>
+              )}
+            </div>
+          </QueryClientProvider>
         </div>
       </div>
     </div>

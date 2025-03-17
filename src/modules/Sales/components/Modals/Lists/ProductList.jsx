@@ -7,6 +7,8 @@ import { useAlert } from "../../Context/AlertContext.jsx";
 import Table from "../../Table";
 import { PRODUCTS_DATA } from "../../../temp_data/products_data";
 import Button from "../../Button";
+import { useQuery } from "@tanstack/react-query";
+import { getProducts } from "../../../api/api";
 
 const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   const { showAlert } = useAlert();
@@ -16,10 +18,17 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(products_data);
+  const [filteredData, setFilteredData] = useState([]);
+  const [productList, setProductList] = useState([]);
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
+
+  const productsQuery = useQuery({
+    queryKey: ["products"],
+    queryFn: getProducts,
+    enabled: isOpen,
+  });
 
   const columns = [
     { key: "product_id", label: "Product ID" },
@@ -41,6 +50,18 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
       setSelectedProduct(null);
     }
   };
+
+  useEffect(() => {
+    if (productsQuery.status === "success") {
+      setProductList(productsQuery.data);
+      setFilteredData(productsQuery.data);
+    } else if (productsQuery.status === "error") {
+      alert(
+        "An error occurred while fetching products: " +
+          productsQuery.error?.data
+      );
+    }
+  }, [productsQuery.status]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -70,11 +91,11 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
 
   useEffect(() => {
     // Exclude products that are already in the selected products list
-    const filtered = products_data.filter(
+    const filtered = productList.filter(
       (product) => !products.some((p) => p.product_id === product.product_id)
     );
     setFilteredData(filtered);
-  }, [products, products_data]);
+  }, [products]);
 
   if (!isOpen) return null;
 
@@ -118,7 +139,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filtered = products_data.filter((product) =>
+                const filtered = productList.filter((product) =>
                   product.product_name.toLowerCase().includes(searchTerm)
                 );
                 setFilteredData(filtered);
