@@ -6,7 +6,7 @@ const InputCustomer = ({ label, value = "", customerListModal }) => {
     <div className="flex justify-between mb-2 w-full">
       <p className="flex-1">{label}</p>
       <div
-        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px]"
+        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
         onClick={() => customerListModal(true)}
       >
         <p className="text-sm">{value}</p>
@@ -24,7 +24,7 @@ const Information = ({ label, value = "" }) => {
     <div className="flex justify-between mb-2 w-full">
       <p className="flex-1">{label}</p>
       <div
-        className={`border border-[#9a9a9a] flex-1 p-1 h-[30px] ${
+        className={`border border-[#9a9a9a] flex-1 p-1 h-[30px] rounded ${
           value === "" ? "bg-[#f7f7f7]" : ""
         }`}
       >
@@ -65,7 +65,7 @@ const AddressDropbar = ({ label, customer, setCustomerInfo }) => {
       <p className="flex-1">{label}</p>
       {customer ? (
         <select
-          className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white cursor-pointer text-sm"
+          className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white rounded cursor-pointer text-sm"
           onChange={handleAddressChange}
           value={address || ""}
         >
@@ -117,7 +117,7 @@ const DateSelector = ({ label, customer, setCustomerInfo }) => {
       <p className="flex-1">{label}</p>
       <input
         type="date"
-        className="border border-[#9a9a9a] flex-1 p-1 h-[30px] cursor-pointer"
+        className="border border-[#9a9a9a] flex-1 p-1 h-[30px] rounded cursor-pointer"
         onChange={handleDateChange}
         value={date}
         min={defaultDate} // Restrict to at least 3 days from now

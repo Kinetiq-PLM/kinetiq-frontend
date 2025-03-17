@@ -7,6 +7,7 @@ import SalesInfo from "../components/SalesInfo";
 import CustomerListModal from "../components/Modals/Lists/CustomerList";
 import ProductListModal from "../components/Modals/Lists/ProductList";
 import Button from "../components/Button";
+import InfoField from "../components/InfoField";
 import SalesDropdown from "../components/SalesDropdown";
 
 const BodyContent = () => {
@@ -40,8 +41,8 @@ const BodyContent = () => {
     { key: "product_name", label: "Product Name", editable: false },
     { key: "quantity", label: "Quantity" },
     { key: "unit_price", label: "Unit Price" },
-    { key: "tax", label: "Tax", editable: false }, // Default Tax: 12%
-    { key: "discount", label: "Discount" }, // Default Discount: 0%
+    { key: "tax", label: "Tax", editable: false },
+    { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },
   ];
 
@@ -86,12 +87,39 @@ const BodyContent = () => {
 
   // This useEffect updates the quotationInfo state when a customer is selected
   useEffect(() => {
-    setQuotationInfo((prev) => ({
-      ...prev,
+    const totalBeforeDiscount = products.reduce(
+      (acc, product) => acc + product.unit_price * product.quantity,
+      0
+    );
+    const totalTax = products.reduce(
+      (acc, product) =>
+        acc + TAX_RATE * (product.unit_price * product.quantity),
+      0
+    );
+    const totalDiscount = products.reduce(
+      (acc, product) => acc + product.discount,
+      0
+    );
+    const shippingFee = products.length * 100;
+    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
+    const totalPrice =
+      Number(totalBeforeDiscount) -
+      Number(totalDiscount) +
+      Number(totalTax) +
+      Number(shippingFee) +
+      Number(warrantyFee);
+
+    setQuotationInfo({
       customer_id: selectedCustomer.customer_id,
       selected_products: products,
       quotation_id: generateRandomID(),
-    }));
+      total_before_discount: totalBeforeDiscount,
+      total_tax: totalTax,
+      discount: totalDiscount,
+      shipping_fee: shippingFee,
+      warranty_fee: warrantyFee,
+      total_price: totalPrice,
+    });
   }, [selectedCustomer, products]);
 
   // useEffect(() => {
@@ -163,7 +191,7 @@ const BodyContent = () => {
               <Button
                 type="primary"
                 className=""
-                onClick={() => console.log([quotationInfo])}
+                onClick={() => console.log([selectedCustomer.customer_id])}
               >
                 Submit Quotation
               </Button>
@@ -173,26 +201,15 @@ const BodyContent = () => {
           <div className="w-full hidden xl:block"></div>
 
           <div className="w-full flex flex-col gap-3 mt-4 lg:mt-0">
-            <div className="flex items-center gap-2 justify-between">
-              <p className="text-gray-700 text-sm">Total Before Discount</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[200px] bg-gray-200 rounded"></div>
-            </div>
-            <div className="flex items-center gap-2 justify-between">
-              <p className="text-gray-700 text-sm">Discount</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[200px] bg-gray-200 rounded"></div>
-            </div>
-            <div className="flex items-center gap-2 justify-between">
-              <p className="text-gray-700 text-sm">Shipping</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[200px] bg-gray-200 rounded"></div>
-            </div>
-            <div className="flex items-center gap-2 justify-between">
-              <p className="text-gray-700 text-sm">Warranty</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[200px] bg-gray-200 rounded"></div>
-            </div>
-            <div className="flex items-center gap-2 justify-between">
-              <p className="text-gray-700 text-sm">Total</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[200px] bg-gray-200 rounded"></div>
-            </div>
+            <InfoField
+              label={"Total Before Discount"}
+              value={quotationInfo.total_before_discount}
+            />
+            <InfoField label={"Discount"} value={quotationInfo.discount} />
+            <InfoField label={"Shipping"} value={quotationInfo.shipping_fee} />
+            <InfoField label={"Warranty"} value={quotationInfo.warranty_fee} />
+            <InfoField label={"Tax"} value={quotationInfo.total_tax} />
+            <InfoField label={"Total"} value={quotationInfo.total_price} />
             <div className="flex justify-center md:justify-end gap-2">
               <SalesDropdown
                 label=""
@@ -204,6 +221,10 @@ const BodyContent = () => {
                 label=""
                 placeholder="Copy To"
                 options={copyToOptions}
+                disabled={
+                  selectedCustomer.customer_id == undefined ||
+                  products.length === 0
+                }
               />
             </div>
           </div>

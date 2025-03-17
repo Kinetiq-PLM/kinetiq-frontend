@@ -25,7 +25,6 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   const handleConfirm = () => {
     if (selectedProduct) {
       selectedProduct.quantity = 1;
-      selectedProduct.unit_price = Number(100).toFixed(2); // CHANGE Default unit price
       selectedProduct.tax = 0;
       selectedProduct.discount = 0;
       addProduct([...products, selectedProduct]); // Properly update the array

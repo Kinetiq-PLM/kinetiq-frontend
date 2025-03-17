@@ -5,6 +5,7 @@ export const PRODUCTS_DATA = [
     description: "High-performance laptop with Intel i7 processor",
     unit_of_measure: "Piece",
     warranty_period: 24,
+    unit_price: 1200.0,
   },
   {
     product_id: "P002",
@@ -12,6 +13,7 @@ export const PRODUCTS_DATA = [
     description: "Flagship smartphone with OLED display",
     unit_of_measure: "Piece",
     warranty_period: 12,
+    unit_price: 800.0,
   },
   {
     product_id: "P003",
@@ -19,6 +21,7 @@ export const PRODUCTS_DATA = [
     description: "Ergonomic office chair with lumbar support",
     unit_of_measure: "Piece",
     warranty_period: 36,
+    unit_price: 150.0,
   },
   {
     product_id: "P004",
@@ -26,6 +29,7 @@ export const PRODUCTS_DATA = [
     description: "Bluetooth keyboard with mechanical keys",
     unit_of_measure: "Piece",
     warranty_period: 18,
+    unit_price: 70.0,
   },
   {
     product_id: "P005",
@@ -33,6 +37,7 @@ export const PRODUCTS_DATA = [
     description: "27-inch Full HD monitor with IPS display",
     unit_of_measure: "Piece",
     warranty_period: 24,
+    unit_price: 250.0,
   },
   {
     product_id: "P006",
@@ -40,6 +45,7 @@ export const PRODUCTS_DATA = [
     description: "1TB external SSD with USB-C connectivity",
     unit_of_measure: "Piece",
     warranty_period: 36,
+    unit_price: 180.0,
   },
   {
     product_id: "P007",
@@ -47,6 +53,7 @@ export const PRODUCTS_DATA = [
     description: "Automatic coffee maker with timer function",
     unit_of_measure: "Piece",
     warranty_period: 12,
+    unit_price: 90.0,
   },
   {
     product_id: "P008",
@@ -54,6 +61,7 @@ export const PRODUCTS_DATA = [
     description: "Split-type air conditioner with inverter technology",
     unit_of_measure: "Unit",
     warranty_period: 60,
+    unit_price: 900.0,
   },
   {
     product_id: "P009",
@@ -61,6 +69,7 @@ export const PRODUCTS_DATA = [
     description: "4K UHD projector with HDR support",
     unit_of_measure: "Piece",
     warranty_period: 24,
+    unit_price: 600.0,
   },
   {
     product_id: "P010",
@@ -68,5 +77,6 @@ export const PRODUCTS_DATA = [
     description: "High DPI gaming mouse with RGB lighting",
     unit_of_measure: "Piece",
     warranty_period: 12,
+    unit_price: 50.0,
   },
 ];
