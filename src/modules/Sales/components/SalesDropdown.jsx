@@ -15,14 +15,12 @@ const SalesDropdown = ({
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    // Update selected option when value prop changes
     if (value !== undefined) {
       setSelectedOption(value);
     }
   }, [value]);
 
   useEffect(() => {
-    // Close dropdown when clicking outside
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
@@ -38,8 +36,7 @@ const SalesDropdown = ({
   const handleOptionClick = (option) => {
     if (disabled) return;
 
-    alert(option);
-    // setSelectedOption(option);
+    setSelectedOption(option);
     setIsOpen(false);
   };
 
@@ -50,7 +47,7 @@ const SalesDropdown = ({
   };
 
   return (
-    <div className="relative font-sans" style={{ width }}>
+    <div className="relative text-sm" style={{ width }}>
       {label && <div className="text-base mb-2 text-gray-900">{label}</div>}
       <div ref={dropdownRef} className="relative">
         <div
@@ -89,7 +86,11 @@ const SalesDropdown = ({
           </div>
         </div>
         {isOpen && !disabled && (
-          <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md mt-1 max-h-48 overflow-y-auto z-10 shadow-lg">
+          <div
+            className={`absolute bottom-full left-0 right-0 bg-white border border-gray-200 rounded-md mb-1 max-h-48 overflow-y-auto z-10 shadow-lg transition-all duration-300 transform ${
+              isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+            }`}
+          >
             {options.map((option, index) => (
               <div
                 key={index}

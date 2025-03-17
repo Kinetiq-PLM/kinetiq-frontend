@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { SALES_DATA, TAX_RATE } from "../temp_data/sales_data";
 
@@ -60,6 +60,18 @@ const BodyContent = () => {
   //   })
   // );
 
+  const generateRandomID = () => {
+    if (!selectedCustomer) return;
+    const characters = "0123456789ABCDEF";
+    let result = "";
+    for (let i = 0; i < 6; i++) {
+      result += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+    return "Q-" + result;
+  };
+
   const handleDelete = () => {
     if (selectedProduct === "") {
       return;
@@ -78,6 +90,7 @@ const BodyContent = () => {
       ...prev,
       customer_id: selectedCustomer.customer_id,
       selected_products: products,
+      quotation_id: generateRandomID(),
     }));
   }, [selectedCustomer, products]);
 
@@ -86,9 +99,7 @@ const BodyContent = () => {
   // }, [selectedProduct]);
 
   // useEffect(() => {
-  //   console.log("Info: " + quotationInfo.customer_id);
-  //   console.log("Info: " + quotationInfo.selected_address);
-  //   console.log("Info: " + quotationInfo.selected_delivery_date);
+  //   console.log("Info: " + JSON.stringify(quotationInfo));
   // }, [quotationInfo]);
 
   return (
@@ -114,6 +125,7 @@ const BodyContent = () => {
             customer={selectedCustomer}
             customerListModal={setIsCustomerListOpen}
             setCustomerInfo={setQuotationInfo}
+            operationID={quotationInfo.quotation_id}
           />
         </div>
         {/* TABLE */}
@@ -128,7 +140,7 @@ const BodyContent = () => {
         </section>
 
         {/* OTHERS */}
-        <section className="mt-4 flex justify-between flex-col md:flex-row">
+        <section className="mt-4 flex justify-between flex-col lg:flex-row">
           <div className="h-full flex flex-col gap-3 w-full">
             {/* Buttons Row */}
             <div className="flex gap-2">
@@ -142,13 +154,17 @@ const BodyContent = () => {
 
             {/* Employee ID Input */}
             <div className="flex items-center gap-2">
-              <p className="text-gray-700">Employee ID</p>
+              <p className="text-gray-700 text-sm">Employee ID</p>
               <div className="border border-gray-400 flex-1 p-1 h-[30px] max-w-[300px] bg-gray-200 rounded"></div>
             </div>
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto">
-              <Button type="primary" className="">
+              <Button
+                type="primary"
+                className=""
+                onClick={() => console.log([quotationInfo])}
+              >
                 Submit Quotation
               </Button>
             </div>
@@ -156,26 +172,26 @@ const BodyContent = () => {
 
           <div className="w-full hidden xl:block"></div>
 
-          <div className="w-full flex flex-col gap-3 mt-4 md:mt-0">
+          <div className="w-full flex flex-col gap-3 mt-4 lg:mt-0">
             <div className="flex items-center gap-2 justify-between">
-              <p className="text-gray-700">Total Before Discount</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[300px] bg-gray-200 rounded"></div>
+              <p className="text-gray-700 text-sm">Total Before Discount</p>
+              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[200px] bg-gray-200 rounded"></div>
             </div>
             <div className="flex items-center gap-2 justify-between">
-              <p className="text-gray-700">Discount</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[300px] bg-gray-200 rounded"></div>
+              <p className="text-gray-700 text-sm">Discount</p>
+              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[200px] bg-gray-200 rounded"></div>
             </div>
             <div className="flex items-center gap-2 justify-between">
-              <p className="text-gray-700">Shipping</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[300px] bg-gray-200 rounded"></div>
+              <p className="text-gray-700 text-sm">Shipping</p>
+              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[200px] bg-gray-200 rounded"></div>
             </div>
             <div className="flex items-center gap-2 justify-between">
-              <p className="text-gray-700">Warranty</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[300px] bg-gray-200 rounded"></div>
+              <p className="text-gray-700 text-sm">Warranty</p>
+              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[200px] bg-gray-200 rounded"></div>
             </div>
             <div className="flex items-center gap-2 justify-between">
-              <p className="text-gray-700">Total</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[300px] bg-gray-200 rounded"></div>
+              <p className="text-gray-700 text-sm">Total</p>
+              <div className="border border-gray-400 flex-1 p-1 h-[30px] w-full max-w-[200px] bg-gray-200 rounded"></div>
             </div>
             <div className="flex justify-center md:justify-end gap-2">
               <SalesDropdown

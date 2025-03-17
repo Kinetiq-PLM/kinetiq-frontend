@@ -126,7 +126,13 @@ const DateSelector = ({ label, customer, setCustomerInfo }) => {
   );
 };
 
-const SalesInfo = ({ type, customerListModal, customer, setCustomerInfo }) => {
+const SalesInfo = ({
+  type,
+  customerListModal,
+  customer,
+  setCustomerInfo,
+  operationID,
+}) => {
   let id = "";
   if (type === "Quotation") {
     id = "quotation_id";
@@ -152,7 +158,8 @@ const SalesInfo = ({ type, customerListModal, customer, setCustomerInfo }) => {
       </div>
       <div className="w-full hidden xl:block"></div>
       <div className="h-full w-full flex flex-col items-center">
-        <Information label={`${type} ID`} /> {/* Generate a random ID */}
+        <Information label={`${type} ID`} value={operationID} />
+        {/* Generate a random ID */}
         <Information label={"Status"} value={customer.status} />
         {/* Current status of the customer: Active or Inactive, after a transaction update to Active  */}
         <AddressDropbar
