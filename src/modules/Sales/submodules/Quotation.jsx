@@ -60,6 +60,18 @@ const BodyContent = () => {
   //   })
   // );
 
+  const handleDelete = () => {
+    if (selectedProduct === "") {
+      return;
+    }
+
+    setProducts(
+      products.filter(
+        (product) => product.product_id != selectedProduct.product_id
+      )
+    );
+  };
+
   // This useEffect updates the quotationInfo state when a customer is selected
   useEffect(() => {
     setQuotationInfo((prev) => ({
@@ -123,7 +135,9 @@ const BodyContent = () => {
               <Button type="primary" onClick={() => setIsProductListOpen(true)}>
                 Add Item
               </Button>
-              <Button type="outline">Delete Item</Button>
+              <Button type="outline" onClick={() => handleDelete()}>
+                Delete Item
+              </Button>
             </div>
 
             {/* Employee ID Input */}

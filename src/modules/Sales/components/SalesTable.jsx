@@ -148,7 +148,7 @@ const SalesTable = ({
       ref={tableRef}
       className="h-full max-w-full min-w-[350px] overflow-auto"
     >
-      <table className="w-full text-sm border border-gray-200">
+      <table className="w-full text-sm ">
         <thead className="sticky top-0 bg-[#F7F7F7]">
           <tr className="bg-muted/50">
             {columns.map((column, index) => (

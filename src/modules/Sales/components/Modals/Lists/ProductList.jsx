@@ -60,6 +60,14 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    // Exclude products that are already in the selected products list
+    const filtered = products_data.filter(
+      (product) => !products.some((p) => p.product_id === product.product_id)
+    );
+    setFilteredData(filtered);
+  }, [products, products_data]);
+
   if (!isOpen) return null;
 
   return (
@@ -102,10 +110,10 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filteredData = products_data.filter((product) =>
+                const filtered = products_data.filter((product) =>
                   product.product_name.toLowerCase().includes(searchTerm)
                 );
-                setFilteredData(filteredData);
+                setFilteredData(filtered);
               }}
             />
           </div>
