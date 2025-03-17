@@ -15,13 +15,21 @@ import NewCustomerModal from "../components/Modals/NewCustomer";
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
-import generateRandomID from "../components/GenerateID";
+import { useMutation } from "@tanstack/react-query";
+import { addQuotation } from "../api/api";
 
 const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
 
   const copyFromOptions = [];
   const copyToOptions = ["Order", "Blanket Agreement"];
+
+  const quotationMutation = useMutation({
+    mutationFn: addQuotation,
+    onSuccess: (data, variables, context) => {
+      console.log(data);
+    },
+  });
 
   const [address, setAddress] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -223,7 +231,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
               <Button
                 type="primary"
                 className=""
-                onClick={() => console.log(quotationInfo)}
+                onClick={() => console.log([selectedCustomer.customer_id])}
               >
                 Submit Quotation
               </Button>
