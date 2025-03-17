@@ -1,8 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { TAX_RATE } from "../temp_data/sales_data";
 
-const EditableTable = ({ columns, data, onSelect, onDataChange }) => {
+const SalesTable = ({
+  columns,
+  data,
+  onSelect,
+  onDataChange,
+  minWidth = false,
+  updateData,
+}) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState("");
@@ -43,12 +51,54 @@ const EditableTable = ({ columns, data, onSelect, onDataChange }) => {
     if (!editingCell) return;
 
     const newData = [...tableData];
+    const newValue = isNaN(editValue) ? editValue : Number(editValue);
+
+    // Validate discount
+    if (
+      editingCell.columnKey === "discount" &&
+      (newValue < 0 || newValue > newData[rowIndex].total_price)
+    ) {
+      alert(
+        "Invalid discount value: Discount cannot be negative or bigger than the total price."
+      );
+      return; // Prevent saving invalid discount values
+    }
+
+    // Validate quantity HERE
+    if (
+      editingCell.columnKey === "quantity" &&
+      (newValue <= 0 || !Number.isInteger(newValue))
+    ) {
+      alert("Invalid quantity: Quantity must be a positive whole number.");
+      return;
+    }
+
+    // Validate unit price
+    if (editingCell.columnKey === "unit_price" && newValue < 0) {
+      alert("Invalid unit price: Price cannot be negative.");
+      return;
+    }
+
     newData[rowIndex] = {
       ...newData[rowIndex],
-      [editingCell.columnKey]: editValue,
+      [editingCell.columnKey]: isNaN(editValue) ? editValue : Number(editValue),
     };
 
-    setTableData(newData);
+    const updatedData = newData.map((item) => {
+      const unitPrice = Number(item.unit_price); // Keep unit_price as a number
+      const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
+      const total = unitPrice * item.quantity + tax - item.discount;
+      return {
+        ...item,
+        unit_price: unitPrice.toFixed(2), // Convert to string only for display
+        tax: tax.toFixed(2), // Ensure tax is formatted properly
+        total_price: total.toFixed(2), // Calculate total price
+      };
+    });
+
+    setTableData(updatedData);
+    updateData(updatedData);
+
     setEditingCell(null);
 
     if (onDataChange) {
@@ -85,7 +135,12 @@ const EditableTable = ({ columns, data, onSelect, onDataChange }) => {
         <thead className="sticky top-0 bg-[#F7F7F7]">
           <tr className="bg-muted/50">
             {columns.map((column, index) => (
-              <th key={index} className="px-4 py-3 font-medium text-center">
+              <th
+                key={index}
+                className={`px-4 py-3 font-medium text-center ${
+                  minWidth ? "min-w-[150px]" : ""
+                }`}
+              >
                 {column.label}
               </th>
             ))}
@@ -146,4 +201,4 @@ const EditableTable = ({ columns, data, onSelect, onDataChange }) => {
   );
 };
 
-export default EditableTable;
+export default SalesTable;

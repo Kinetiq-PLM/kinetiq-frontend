@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Table = ({ columns, data, onSelect }) => {
+const Table = ({ columns, data, onSelect, minWidth = false }) => {
   const [selectedRow, setSelectedRow] = useState(null);
 
   const handleRowClick = (row) => {
@@ -12,11 +12,16 @@ const Table = ({ columns, data, onSelect }) => {
 
   return (
     <div className="h-full">
-      <table className="w-full text-sm border border-gray-200">
+      <table className="w-full text-sm">
         <thead className="sticky top-0 bg-[#F7F7F7]">
           <tr className="bg-muted/50">
             {columns.map((column, index) => (
-              <th key={index} className="px-4 py-3 font-medium text-center">
+              <th
+                key={index}
+                className={`px-4 py-3 font-medium text-center ${
+                  minWidth ? "min-w-[200px]" : ""
+                }`}
+              >
                 {column.label}
               </th>
             ))}

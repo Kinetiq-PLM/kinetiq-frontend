@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
-import { SALES_DATA } from "../temp_data/sales_data";
+import { SALES_DATA, TAX_RATE } from "../temp_data/sales_data";
+
 import Table from "../components/Table";
-import EditableTable from "../components/EditableTable";
+import SalesTable from "../components/SalesTable";
 import SalesInfo from "../components/SalesInfo";
 import CustomerListModal from "../components/Modals/Lists/CustomerList";
 
@@ -29,19 +30,25 @@ const BodyContent = () => {
     { key: "product_name", label: "Product Name", editable: false },
     { key: "quantity", label: "Quantity" },
     { key: "unit_price", label: "Unit Price" },
-    { key: "tax", label: "Tax" }, // Default Tax: 12%
+    { key: "tax", label: "Tax", editable: false }, // Default Tax: 12%
     { key: "discount", label: "Discount" }, // Default Discount: 0%
     { key: "total_price", label: "Total Price", editable: false },
   ];
 
-  const [data, setData] = useState(
-    SALES_DATA.map((item) => ({
-      ...item,
-      unit_price: item.unit_price.toFixed(2),
-      total_price: item.total_price.toFixed(2),
-    }))
+  const [products, setProducts] = useState(
+    SALES_DATA.map((item) => {
+      const unitPrice = Number(item.unit_price); // Keep unit_price as a number
+      const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
+      return {
+        ...item,
+        unit_price: unitPrice.toFixed(2), // Convert to string only for display
+        tax: tax.toFixed(2), // Ensure tax is formatted properly
+        total_price: (unitPrice * item.quantity + tax).toFixed(2), // Use converted unitPrice & tax
+      };
+    })
   );
 
+  // This useEffect updates the quotationInfo state when a customer is selected
   useEffect(() => {
     setQuotationInfo((prev) => ({
       ...prev,
@@ -49,15 +56,15 @@ const BodyContent = () => {
     }));
   }, [selectedCustomer]);
 
-  useEffect(() => {
-    console.log("Page: " + selectedProduct.product_id);
-  }, [selectedProduct]);
+  // useEffect(() => {
+  //   console.log("Page: " + selectedProduct.product_id);
+  // }, [selectedProduct]);
 
-  useEffect(() => {
-    console.log("Info: " + quotationInfo.customer_id);
-    console.log("Info: " + quotationInfo.selected_address);
-    console.log("Info: " + quotationInfo.selected_delivery_date);
-  }, [quotationInfo]);
+  // useEffect(() => {
+  //   console.log("Info: " + quotationInfo.customer_id);
+  //   console.log("Info: " + quotationInfo.selected_address);
+  //   console.log("Info: " + quotationInfo.selected_delivery_date);
+  // }, [quotationInfo]);
 
   return (
     <div className="quotation">
@@ -80,10 +87,12 @@ const BodyContent = () => {
         </div>
         {/* TABLE */}
         <section className="border border-[#CBCBCB] w-full h-[350px] overflow-x-auto rounded-md mt-2 table-layout">
-          <EditableTable
+          <SalesTable
             columns={columns}
-            data={data}
+            data={products}
+            updateData={setProducts}
             onSelect={setSelectedProduct}
+            minWidth={true}
           />
         </section>
       </div>

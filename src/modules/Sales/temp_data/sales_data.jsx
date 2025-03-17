@@ -270,3 +270,6 @@ export const SALES_DATA = [
     total_price: 12000 * 3 * 1.12 * 0.95,
   },
 ];
+
+export const TAX_RATE = 0.12;
+export const SHIPPING_FEE = 1000;

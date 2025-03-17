@@ -33,6 +33,11 @@
 }
 
 /* If width is smaller than 1000 */
+@media (max-width: 1300px) {
+  .table-layout {
+    max-width: 85vw;
+  }
+}
 @media (max-width: 1000px) {
   .table-layout {
     max-width: 80vw;
