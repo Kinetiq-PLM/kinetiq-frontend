@@ -48,24 +48,34 @@ const Dropdown = ({
   };
 
   return (
-    <div className="dropdown-container" style={{ width }}>
-      {label && <div className="dropdown-label">{label}</div>}
-      <div ref={dropdownRef} className="dropdown-wrapper">
-        <div className="dropdown-header" onClick={toggleDropdown}>
-          <div className="dropdown-selected-value">
-            {selectedOption || placeholder}
-          </div>
-          <div className={`dropdown-arrow ${isOpen ? "open" : ""}`}>
+    <div className="flex-1 text-sm" style={{ width }}>
+      {label && (
+        <div className="mb-2 text-gray-900">
+          {label} <span className="text-red-900 ml-1">*</span>{" "}
+        </div>
+      )}
+      <div ref={dropdownRef} className="relative">
+        <div
+          className="flex justify-between items-center py-2 px-3 bg-white border border-gray-200 rounded-md cursor-pointer select-none box-border"
+          onClick={toggleDropdown}
+        >
+          <div className="text-gray-600">{selectedOption || placeholder}</div>
+          <div
+            className={`transition-transform duration-200 ${
+              isOpen ? "transform rotate-180" : ""
+            }`}
+          >
             <svg
               width="24"
               height="24"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className="text-gray-500"
             >
               <path
                 d="M7 10L12 15L17 10"
-                stroke="#6B7280"
+                stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -74,11 +84,11 @@ const Dropdown = ({
           </div>
         </div>
         {isOpen && (
-          <div className="dropdown-options">
+          <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md mt-1 max-h-[200px] overflow-y-auto z-10 shadow-md">
             {options.map((option, index) => (
               <div
                 key={index}
-                className="dropdown-option"
+                className="px-4 py-3 cursor-pointer transition-colors duration-200 text-gray-600 hover:bg-gray-100"
                 onClick={() => handleOptionClick(option)}
               >
                 {option}
@@ -87,76 +97,6 @@ const Dropdown = ({
           </div>
         )}
       </div>
-      <style jsx>{`
-        .dropdown-container {
-          position: relative;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-            Helvetica, Arial, sans-serif;
-        }
-
-        .dropdown-label {
-          font-size: 16px;
-          margin-bottom: 8px;
-          color: #111827;
-        }
-
-        .dropdown-wrapper {
-          position: relative;
-        }
-
-        .dropdown-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 12px 16px;
-          background: white;
-          border: 1px solid #e5e7eb;
-          border-radius: 6px;
-          cursor: pointer;
-          user-select: none;
-          height: 48px;
-          box-sizing: border-box;
-        }
-
-        .dropdown-selected-value {
-          color: #4b5563;
-        }
-
-        .dropdown-arrow {
-          transition: transform 0.2s ease;
-        }
-
-        .dropdown-arrow.open {
-          transform: rotate(180deg);
-        }
-
-        .dropdown-options {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          background: white;
-          border: 1px solid #e5e7eb;
-          border-radius: 6px;
-          margin-top: 4px;
-          max-height: 200px;
-          overflow-y: auto;
-          z-index: 10;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-            0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        .dropdown-option {
-          padding: 12px 16px;
-          cursor: pointer;
-          transition: background-color 0.2s;
-          color: #4b5563;
-        }
-
-        .dropdown-option:hover {
-          background-color: #f3f4f6;
-        }
-      `}</style>
     </div>
   );
 };

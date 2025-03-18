@@ -6,9 +6,11 @@ import SalesTable from "../components/SalesTable";
 import SalesInfo from "../components/SalesInfo";
 import CustomerListModal from "../components/Modals/Lists/CustomerList";
 import ProductListModal from "../components/Modals/Lists/ProductList";
+import NewCustomerModal from "../components/Modals/NewCustomer";
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropdown from "../components/SalesDropdown";
+import generateRandomID from "../components/GenerateID";
 
 const BodyContent = () => {
   const copyFromOptions = [];
@@ -25,6 +27,7 @@ const BodyContent = () => {
     selected_address: "",
     selected_delivery_date: "",
     total_before_discount: 0,
+    date_issued: new Date().toISOString().split("T")[0],
     discount: 0,
     total_tax: 0,
     shipping_fee: 0,
@@ -35,6 +38,7 @@ const BodyContent = () => {
   // Modals
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
+  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
 
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
@@ -60,18 +64,6 @@ const BodyContent = () => {
   //     };
   //   })
   // );
-
-  const generateRandomID = () => {
-    if (!selectedCustomer) return;
-    const characters = "0123456789ABCDEF";
-    let result = "";
-    for (let i = 0; i < 6; i++) {
-      result += characters.charAt(
-        Math.floor(Math.random() * characters.length)
-      );
-    }
-    return "Q-" + result;
-  };
 
   const handleDelete = () => {
     if (selectedProduct === "") {
@@ -109,10 +101,13 @@ const BodyContent = () => {
       Number(shippingFee) +
       Number(warrantyFee);
 
+    const randomID = selectedCustomer ? generateRandomID("Q") : undefined;
+
     setQuotationInfo({
+      ...quotationInfo,
       customer_id: selectedCustomer.customer_id,
       selected_products: products,
-      quotation_id: generateRandomID(),
+      quotation_id: randomID,
       total_before_discount: totalBeforeDiscount,
       total_tax: totalTax,
       discount: totalDiscount,
@@ -137,6 +132,7 @@ const BodyContent = () => {
         <CustomerListModal
           isOpen={isCustomerListOpen}
           onClose={() => setIsCustomerListOpen(false)}
+          newCustomerModal={setIsNewCustomerModalOpen}
           setSelectedCustomer={setSelectedCustomer}
           setCustomer={setSelectedCustomer}
         ></CustomerListModal>
@@ -146,6 +142,10 @@ const BodyContent = () => {
           addProduct={setProducts}
           products={products}
         ></ProductListModal>
+        <NewCustomerModal
+          isOpen={isNewCustomerModalOpen}
+          onClose={() => setIsNewCustomerModalOpen(false)}
+        ></NewCustomerModal>
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -191,7 +191,7 @@ const BodyContent = () => {
               <Button
                 type="primary"
                 className=""
-                onClick={() => console.log([selectedCustomer.customer_id])}
+                onClick={() => console.log(quotationInfo)}
               >
                 Submit Quotation
               </Button>

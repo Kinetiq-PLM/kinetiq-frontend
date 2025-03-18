@@ -5,7 +5,12 @@ import Table from "../../Table";
 import { CUSTOMER_DATA } from "./../../../temp_data/customer_data";
 import Button from "../../Button";
 
-const CustomerListModal = ({ isOpen, onClose, setCustomer }) => {
+const CustomerListModal = ({
+  isOpen,
+  onClose,
+  setCustomer,
+  newCustomerModal,
+}) => {
   const customer_data = CUSTOMER_DATA;
 
   // setCustomer is used to set the selected customer in the parent component
@@ -124,7 +129,7 @@ const CustomerListModal = ({ isOpen, onClose, setCustomer }) => {
               >
                 Select
               </Button>
-              <Button type="primary" onClick={handleConfirm}>
+              <Button type="primary" onClick={() => newCustomerModal(true)}>
                 New
               </Button>
             </div>
