@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+
+import { useAlert } from "../../Context/AlertContext.jsx";
+
 import Table from "../../Table";
 import { CUSTOMER_DATA } from "./../../../temp_data/customer_data";
 import Button from "../../Button";
@@ -11,6 +14,8 @@ const CustomerListModal = ({
   setCustomer,
   newCustomerModal,
 }) => {
+  const { showAlert } = useAlert();
+
   const customer_data = CUSTOMER_DATA;
 
   // setCustomer is used to set the selected customer in the parent component
@@ -33,6 +38,10 @@ const CustomerListModal = ({
     if (selectedCustomer) {
       setCustomer(selectedCustomer);
       onClose();
+      showAlert({
+        type: "success",
+        title: "Customer Selected",
+      });
       setSelectedCustomer(null);
     }
   };

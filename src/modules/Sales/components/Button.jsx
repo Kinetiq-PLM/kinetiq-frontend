@@ -18,7 +18,7 @@ const Button = ({
 
   return (
     <button
-      className={`cursor-pointer ${styling} ${className} ${
+      className={`cursor-pointer  ${styling} ${className} ${
         disabled ? "opacity-50 cursor-not-allowed" : ""
       }`}
       onClick={onClick}

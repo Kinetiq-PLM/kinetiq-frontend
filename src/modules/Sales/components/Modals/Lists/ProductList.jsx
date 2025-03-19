@@ -1,11 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+
+import { useAlert } from "../../Context/AlertContext.jsx";
+
 import Table from "../../Table";
 import { PRODUCTS_DATA } from "../../../temp_data/products_data";
 import Button from "../../Button";
 
 const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
+  const { showAlert } = useAlert();
+
   const products_data = PRODUCTS_DATA;
 
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -29,6 +34,10 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
       selectedProduct.discount = 0;
       addProduct([...products, selectedProduct]); // Properly update the array
       onClose();
+      showAlert({
+        type: "success",
+        title: "Added Product",
+      });
       setSelectedProduct(null);
     }
   };

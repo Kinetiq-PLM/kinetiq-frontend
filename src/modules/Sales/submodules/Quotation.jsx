@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 
 import { SALES_DATA, TAX_RATE } from "../temp_data/sales_data";
 
+import {
+  AlertProvider,
+  useAlert,
+} from "../components/Context/AlertContext.jsx";
+
 import SalesTable from "../components/SalesTable";
 import SalesInfo from "../components/SalesInfo";
 import CustomerListModal from "../components/Modals/Lists/CustomerList";
@@ -12,7 +17,9 @@ import InfoField from "../components/InfoField";
 import SalesDropdown from "../components/SalesDropdown";
 import generateRandomID from "../components/GenerateID";
 
-const BodyContent = () => {
+const Quotation = () => {
+  const { showAlert } = useAlert();
+
   const copyFromOptions = [];
   const copyToOptions = ["Order", "Blanket Agreement"];
 
@@ -44,7 +51,7 @@ const BodyContent = () => {
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
     { key: "quantity", label: "Quantity" },
-    { key: "markup_price", label: "Unit Price" },
+    { key: "markup_price", label: "Price" },
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },
@@ -75,6 +82,11 @@ const BodyContent = () => {
         (product) => product.product_id != selectedProduct.product_id
       )
     );
+
+    showAlert({
+      type: "success",
+      title: "Product Removed",
+    });
   };
 
   // This useEffect updates the quotationInfo state when a customer is selected
@@ -246,6 +258,14 @@ const BodyContent = () => {
         </section>
       </div>
     </div>
+  );
+};
+
+const BodyContent = () => {
+  return (
+    <AlertProvider>
+      <Quotation />
+    </AlertProvider>
   );
 };
 
