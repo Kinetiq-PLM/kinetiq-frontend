@@ -13,7 +13,11 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
-  const countryNames = CountryData.map((country) => country.country);
+  const [countries, setCountries] = useState(
+    CountryData.map((country) => country.country)
+  );
+  const [cities, setCities] = useState([]);
+  const [isValidationVisible, setIsValidationVisible] = useState(false);
 
   const [customerID, setCustomerID] = useState(generateRandomID("C"));
   const [companyName, setCompanyName] = useState("");
@@ -28,7 +32,114 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
   const [customerType, setCustomerType] = useState("");
 
   const handleConfirm = () => {
-    onClose();
+    setIsValidationVisible(true);
+
+    const validators = [
+      validateCompanyName,
+      validateContactPerson,
+      validateContactNumber,
+      validateEmail,
+      validateCountry,
+      validateCity,
+      validatePostalCode,
+      validateMainAddress,
+      validateSecondaryAddress,
+      validateCustomerType,
+    ];
+
+    const errorCount = validators.reduce(
+      (count, validate) => count + (validate() ? 1 : 0),
+      0
+    );
+
+    console.log(errorCount === 0 ? "NO ERRORS" : errorCount);
+
+    if (errorCount === 0) {
+      // Add new customer HERE to database
+      onClose();
+    }
+  };
+
+  const validateCompanyName = () => {
+    if (!companyName.trim()) {
+      return "Company name is required.";
+    }
+    return "";
+  };
+
+  const validateContactPerson = () => {
+    if (!contactPerson.trim()) {
+      return "Contact person is required.";
+    }
+    return "";
+  };
+
+  const validateContactNumber = () => {
+    const phoneRegex = /^[0-9]{11}$/;
+    if (!contactNumber.trim()) {
+      return "Contact number is required.";
+    }
+    if (!phoneRegex.test(contactNumber)) {
+      return "Invalid contact number. Use only digits (11 characters).";
+    }
+    return "";
+  };
+
+  const validateEmail = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      return "Email is required.";
+    }
+    if (!emailRegex.test(email)) {
+      return "Invalid email format.";
+    }
+    return "";
+  };
+
+  const validateCountry = () => {
+    if (!country.trim()) {
+      return "Country is required.";
+    }
+    return "";
+  };
+
+  const validateCity = () => {
+    if (!city.trim()) {
+      return "City is required.";
+    }
+    return "";
+  };
+
+  const validatePostalCode = () => {
+    const postalCodeRegex = /^[0-9]+$/;
+    if (!postalCode.trim()) {
+      return "Postal code is required.";
+    }
+    if (!postalCodeRegex.test(postalCode)) {
+      return "Invalid postal code. Use only digits.";
+    }
+    return "";
+  };
+
+  const validateMainAddress = () => {
+    if (!mainAddress.trim()) {
+      return "Main address is required.";
+    }
+    return "";
+  };
+
+  const validateSecondaryAddress = () => {
+    if (!secondaryAddress.trim()) {
+      return "Main address is required.";
+    }
+    return "";
+  };
+
+  const validateCustomerType = () => {
+    if (!customerType.trim()) {
+      return "Customer type is required.";
+    }
+    return "";
   };
 
   useEffect(() => {
@@ -61,6 +172,14 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     setCustomerID(generateRandomID("C"));
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!country) return;
+    setCities(
+      CountryData.find((c) => c.country === country).cities.map((c) => c.city)
+    );
+    setCity("");
+  }, [country]);
 
   if (!isOpen) return null;
 
@@ -107,68 +226,91 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
               label={"Company Name"}
               value={companyName}
               setValue={setCompanyName}
+              validation={validateCompanyName}
+              isValidationVisible={isValidationVisible}
             />
             <InputField
               label={"Contact Person"}
               value={contactPerson}
               setValue={setContactPerson}
+              validation={validateContactPerson}
+              isValidationVisible={isValidationVisible}
             />
             <InputField
               label={"Contact Number"}
               value={contactNumber}
               setValue={setContactNumber}
+              validation={validateContactNumber}
+              isValidationVisible={isValidationVisible}
             />
-            <InputField label={"Email"} value={email} setValue={setEmail} />
+            <InputField
+              label={"Email"}
+              value={email}
+              setValue={setEmail}
+              validation={validateEmail}
+              isValidationVisible={isValidationVisible}
+            />
             <Dropdown
               label="Country"
-              options={countryNames}
+              options={countries}
               onChange={setCountry}
               value={country}
+              validation={validateCountry}
+              isValidationVisible={isValidationVisible}
             />
             {/* cities dropdown and postal code input field */}
             <div className="flex flex-row space-x-2">
               <Dropdown
                 label="City"
-                options={countryNames}
-                onChange={setCountry}
-                value={country}
+                options={cities}
+                onChange={setCity}
+                value={city}
+                validation={validateCity}
+                isValidationVisible={isValidationVisible}
               />
               <InputField
                 label={"Postal Code"}
-                value={mainAddress}
-                setValue={setMainAddress}
+                value={postalCode}
+                setValue={setPostalCode}
+                validation={validatePostalCode}
+                isValidationVisible={isValidationVisible}
               />
             </div>
             <InputField
               label={"Main Address"}
               value={mainAddress}
               setValue={setMainAddress}
+              validation={validateMainAddress}
+              isValidationVisible={isValidationVisible}
             />
             <InputField
               label={"Secondary Address"}
               value={secondaryAddress}
               setValue={setSecondaryAddress}
+              validation={validateSecondaryAddress}
+              isValidationVisible={isValidationVisible}
             />
             <Dropdown
               label="Customer Type"
               options={CustomerTypes}
               onChange={setCustomerType}
               value={customerType}
+              validation={validateCustomerType}
+              isValidationVisible={isValidationVisible}
             />
           </form>
 
           <div className="mt-4 flex justify-between">
             <div>
-              <Button type="primary" className={"mr-2"} onClick={handleConfirm}>
-                Add
-              </Button>
               <Button
                 type="primary"
                 className={"mr-2"}
-                onClick={() => {
-                  console.log(countryNames);
-                }}
+                onClick={handleConfirm}
+                submit={true}
               >
+                Add
+              </Button>
+              <Button type="primary" className={"mr-2"}>
                 Countries
               </Button>
             </div>

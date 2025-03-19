@@ -6,6 +6,7 @@ const Button = ({
   type = "",
   className,
   disabled = false,
+  submit = false,
 }) => {
   let styling = "py-1 px-6 rounded-md font-medium transition-all duration-500";
 
@@ -21,6 +22,7 @@ const Button = ({
         disabled ? "opacity-50 cursor-not-allowed" : ""
       }`}
       onClick={onClick}
+      type={submit ? "submit" : "button"}
     >
       {children}
     </button>

@@ -1,4 +1,20 @@
-const InputField = ({ label, value = "", setValue = () => {} }) => {
+import { useState, useEffect } from "react";
+
+const InputField = ({
+  label,
+  value = "",
+  setValue = () => {},
+  validation = () => {
+    return "";
+  },
+  isValidationVisible = false,
+}) => {
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    setError(validation());
+  }, [value]);
+
   return (
     <div className="flex-1">
       <p className="text-sm">
@@ -11,7 +27,11 @@ const InputField = ({ label, value = "", setValue = () => {} }) => {
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
+          required
         />
+        {isValidationVisible ? (
+          <p className="text-xs text-red-900 font-light mt-1">{error}</p>
+        ) : null}
       </div>
     </div>
   );

@@ -9,7 +9,12 @@ const Dropdown = ({
   onChange,
   value,
   width = "100%",
+  validation = () => {
+    return "";
+  },
+  isValidationVisible = false,
 }) => {
+  const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(value || null);
   const dropdownRef = useRef(null);
@@ -19,6 +24,7 @@ const Dropdown = ({
     if (value !== undefined) {
       setSelectedOption(value);
     }
+    setError(validation());
   }, [value]);
 
   useEffect(() => {
@@ -96,6 +102,9 @@ const Dropdown = ({
             ))}
           </div>
         )}
+        {isValidationVisible ? (
+          <p className="text-xs text-red-900 font-light mt-1">{error}</p>
+        ) : null}
       </div>
     </div>
   );

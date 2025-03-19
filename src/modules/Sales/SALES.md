@@ -52,7 +52,10 @@ Modals are used to confirm actions such as deleting an operation or copying data
    1. `CustomerList.jsx` - Displays a list of customers. Uses the `customer_data.jsx` file in the `temp_data` folder.
    2. `ProductList.jsx` - Displays a list of products. Uses the `product_data.jsx` file in the `temp_data` folder.
 2. `Modals folder` - Components that are used to display modals for an action in the module.
+   1. `NewCustomerModal.jsx` - Modal for adding a new customer. Uses the `new_customer_data.jsx` file in the `temp_data` folder for countries and respective cities and customer types.
 
 ## TODO
 
 1. Implement invalid alerts for Sales table when editing values.
+2. Implement a proper alert system for the module.
+3. Implement a form validation system for the module.
