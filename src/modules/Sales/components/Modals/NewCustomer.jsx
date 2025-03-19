@@ -310,9 +310,6 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
               >
                 Add
               </Button>
-              <Button type="primary" className={"mr-2"}>
-                Countries
-              </Button>
             </div>
             <div>
               <Button type="outline" onClick={onClose}>

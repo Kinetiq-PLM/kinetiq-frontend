@@ -59,3 +59,5 @@ Modals are used to confirm actions such as deleting an operation or copying data
 1. Implement invalid alerts for Sales table when editing values.
 2. Implement a proper alert system for the module.
 3. Implement a form validation system for the module.
+4. Switch unit price to markup price in the product list.
+5. Implement a proper search system for the module.

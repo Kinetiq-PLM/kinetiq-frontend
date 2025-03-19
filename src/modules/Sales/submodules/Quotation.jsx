@@ -44,7 +44,7 @@ const BodyContent = () => {
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
     { key: "quantity", label: "Quantity" },
-    { key: "unit_price", label: "Unit Price" },
+    { key: "markup_price", label: "Unit Price" },
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },
@@ -54,11 +54,11 @@ const BodyContent = () => {
 
   // const [products, setProducts] = useState(
   //   SALES_DATA.map((item) => {
-  //     const unitPrice = Number(item.unit_price); // Keep unit_price as a number
+  //     const unitPrice = Number(item.markup_price); // Keep markup_price as a number
   //     const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
   //     return {
   //       ...item,
-  //       unit_price: unitPrice.toFixed(2), // Convert to string only for display
+  //       markup_price: unitPrice.toFixed(2), // Convert to string only for display
   //       tax: tax.toFixed(2), // Ensure tax is formatted properly
   //       total_price: (unitPrice * item.quantity + tax).toFixed(2), // Use converted unitPrice & tax
   //     };
@@ -80,12 +80,12 @@ const BodyContent = () => {
   // This useEffect updates the quotationInfo state when a customer is selected
   useEffect(() => {
     const totalBeforeDiscount = products.reduce(
-      (acc, product) => acc + product.unit_price * product.quantity,
+      (acc, product) => acc + product.markup_price * product.quantity,
       0
     );
     const totalTax = products.reduce(
       (acc, product) =>
-        acc + TAX_RATE * (product.unit_price * product.quantity),
+        acc + TAX_RATE * (product.markup_price * product.quantity),
       0
     );
     const totalDiscount = products.reduce(
@@ -205,11 +205,26 @@ const BodyContent = () => {
               label={"Total Before Discount"}
               value={quotationInfo.total_before_discount}
             />
-            <InfoField label={"Discount"} value={quotationInfo.discount} />
-            <InfoField label={"Shipping"} value={quotationInfo.shipping_fee} />
-            <InfoField label={"Warranty"} value={quotationInfo.warranty_fee} />
-            <InfoField label={"Tax"} value={quotationInfo.total_tax} />
-            <InfoField label={"Total"} value={quotationInfo.total_price} />
+            <InfoField
+              label={"Discount"}
+              value={Number(quotationInfo.discount).toFixed(2)}
+            />
+            <InfoField
+              label={"Shipping"}
+              value={Number(quotationInfo.shipping_fee).toFixed(2)}
+            />
+            <InfoField
+              label={"Warranty"}
+              value={Number(quotationInfo.warranty_fee).toFixed(2)}
+            />
+            <InfoField
+              label={"Tax"}
+              value={Number(quotationInfo.total_tax).toFixed(2)}
+            />
+            <InfoField
+              label={"Total"}
+              value={Number(quotationInfo.total_price).toFixed(2)}
+            />
             <div className="flex justify-center md:justify-end gap-2">
               <SalesDropdown
                 label=""

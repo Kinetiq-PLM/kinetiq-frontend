@@ -6,6 +6,7 @@ export const PRODUCTS_DATA = [
     unit_of_measure: "Piece",
     warranty_period: 24,
     unit_price: 1200.0,
+    markup_price: 1440.0,
   },
   {
     product_id: "P002",
@@ -14,6 +15,7 @@ export const PRODUCTS_DATA = [
     unit_of_measure: "Piece",
     warranty_period: 12,
     unit_price: 800.0,
+    markup_price: 960.0,
   },
   {
     product_id: "P003",
@@ -22,6 +24,7 @@ export const PRODUCTS_DATA = [
     unit_of_measure: "Piece",
     warranty_period: 36,
     unit_price: 150.0,
+    markup_price: 180.0,
   },
   {
     product_id: "P004",
@@ -30,6 +33,7 @@ export const PRODUCTS_DATA = [
     unit_of_measure: "Piece",
     warranty_period: 18,
     unit_price: 70.0,
+    markup_price: 84.0,
   },
   {
     product_id: "P005",
@@ -38,6 +42,7 @@ export const PRODUCTS_DATA = [
     unit_of_measure: "Piece",
     warranty_period: 24,
     unit_price: 250.0,
+    markup_price: 300.0,
   },
   {
     product_id: "P006",
@@ -46,6 +51,7 @@ export const PRODUCTS_DATA = [
     unit_of_measure: "Piece",
     warranty_period: 36,
     unit_price: 180.0,
+    markup_price: 216.0,
   },
   {
     product_id: "P007",
@@ -54,6 +60,7 @@ export const PRODUCTS_DATA = [
     unit_of_measure: "Piece",
     warranty_period: 12,
     unit_price: 90.0,
+    markup_price: 108.0,
   },
   {
     product_id: "P008",
@@ -62,6 +69,7 @@ export const PRODUCTS_DATA = [
     unit_of_measure: "Unit",
     warranty_period: 60,
     unit_price: 900.0,
+    markup_price: 1080.0,
   },
   {
     product_id: "P009",
@@ -70,6 +78,7 @@ export const PRODUCTS_DATA = [
     unit_of_measure: "Piece",
     warranty_period: 24,
     unit_price: 600.0,
+    markup_price: 720.0,
   },
   {
     product_id: "P010",
@@ -78,5 +87,6 @@ export const PRODUCTS_DATA = [
     unit_of_measure: "Piece",
     warranty_period: 12,
     unit_price: 50.0,
+    markup_price: 60.0,
   },
 ];
