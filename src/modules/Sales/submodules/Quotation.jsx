@@ -108,6 +108,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // the products customer chose
   const [products, setProducts] = useState([]);
 
+<<<<<<< HEAD
   // };
   // const [products, setProducts] = useState(
   //   SALES_DATA.map((item) => {
@@ -116,6 +117,23 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   //     return {
   //       ...item,
   //       selling_price: unitPrice.toFixed(2), // Convert to string only for display
+=======
+  const setProductsFix = (items) => {
+    const newProd = items.map((item) => ({
+      ...item,
+      markup_price: !item.markup_price ? 0.0 : item.markup_price,
+      tax: !item.tax ? 0.0 : item.tax,
+    }));
+    setProducts(newProd);
+  };
+  // const [products, setProducts] = useState(
+  //   SALES_DATA.map((item) => {
+  //     const unitPrice = Number(item.markup_price); // Keep markup_price as a number
+  //     const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
+  //     return {
+  //       ...item,
+  //       markup_price: unitPrice.toFixed(2), // Convert to string only for display
+>>>>>>> 69541a5 (fix NaN when setting product table)
   //       tax: tax.toFixed(2), // Ensure tax is formatted properly
   //       total_price: (unitPrice * item.quantity + tax).toFixed(2), // Use converted unitPrice & tax
   //     };
@@ -131,7 +149,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       return;
     }
 
-    setProducts(
+    setProductsFix(
       products.filter(
         (product) => product.product_id != selectedProduct.product_id
       )
@@ -283,7 +301,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
         <ProductListModal
           isOpen={isProductListOpen}
           onClose={() => setIsProductListOpen(false)}
-          addProduct={setProducts}
+          addProduct={setProductsFix}
           products={products}
         ></ProductListModal>
         <NewCustomerModal
@@ -317,7 +335,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           <SalesTable
             columns={columns}
             data={products}
-            updateData={setProducts}
+            updateData={setProductsFix}
             onSelect={setSelectedProduct}
             minWidth={true}
           />
