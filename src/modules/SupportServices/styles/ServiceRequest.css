@@ -1,0 +1,482 @@
+/* REMINDER! All of your elements must use your unique namespace '.servrequ' at the start to avoid leaking */
+.servrequ {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.scroll-container {
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+  background-color: #f9f9f9;
+}
+
+/* Custom scrollbar */
+.scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+  border-radius: 4px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: #00a8a8;
+}
+
+.servrequ .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 2rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+/* Header */
+.servrequ .header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.servrequ .icon-container {
+  margin-right: 0.75rem;
+}
+
+.servrequ .title-container h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.servrequ .subtitle {
+  margin: 0.125rem 0 0;
+  font-size: 0.875rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Line Dividers */
+.servrequ .first-divider,
+.servrequ .second-divider {
+  width: 100%;
+  height: 3px;
+  background-color: #00a8a8;
+  margin: 0.5rem 0;
+  flex-shrink: 0;
+}
+
+/* Input Fields Container */
+.servrequ .input-fields-container {
+  width: 100%;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.servrequ .input-fields-left,
+.servrequ .input-fields-right {
+  display: flex;
+  flex-direction: column;
+  width: 45%;
+  gap: 1.5rem;
+}
+
+.servrequ .input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.servrequ label {
+  font-size: 0.75rem;
+  color: #00a8a8;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.servrequ .required {
+  color: #ff0000;
+  margin-left: 2px;
+}
+
+.servrequ input,
+.servrequ select {
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.servrequ input::placeholder {
+  color: #999;
+}
+
+.servrequ input:focus,
+.servrequ select:focus {
+  border-color: #00a8a8;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.servrequ .select-wrapper {
+  position: relative;
+}
+
+.servrequ .select-wrapper::after {
+  content: "";
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #666;
+  pointer-events: none;
+}
+
+.servrequ select {
+  appearance: none;
+  padding-right: 2rem;
+  color: #666;
+}
+
+.servrequ .date-input {
+  position: relative;
+}
+
+.servrequ .calendar-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Table Section */
+.servrequ .table-section {
+  width: 100%;
+  padding: 0;
+}
+
+.servrequ .section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.servrequ .section-header span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Search and Filter */
+.servrequ .search-filter-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.servrequ .search-container {
+  position: relative;
+  width: 50%;
+}
+
+.servrequ .search-container svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.servrequ .search-container input {
+  padding-left: 2.5rem;
+  width: 100%;
+}
+
+.servrequ .filter-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.servrequ .date-filter,
+.servrequ .filter-by {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.servrequ .date-filter span,
+.servrequ .filter-by span {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Table */
+.servrequ .table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+}
+
+.servrequ table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.servrequ th {
+  text-align: center;
+  background-color: #00a8a8;
+  padding: 0.75rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+  border: 1px solid white;
+}
+
+.servrequ th:first-child {
+  border-left: 1px solid #00a8a8;
+}
+
+.servrequ th:last-child {
+  border-right: 1px solid #00a8a8;
+}
+
+.servrequ td {
+  text-align: center;
+  padding: 0.75rem 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid #e0e0e0;
+  color: #666;
+}
+
+/* Status indicators */
+.servrequ .status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.servrequ .status.completed {
+  background-color: #e8f9f1;
+  color: #1f9254;
+}
+
+.servrequ .status.pending {
+  background-color: #fff8e5;
+  color: #b25e09;
+}
+
+.servrequ .status.in-progress {
+  background-color: #e5f6ff;
+  color: #006ba1;
+}
+
+/* Pagination */
+.servrequ .pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.servrequ .pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.servrequ .pagination-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  background-color: white;
+  cursor: pointer;
+}
+
+.servrequ .pagination-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  background-color: white;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.servrequ .pagination-number.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+/* Action Buttons */
+.servrequ .action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+}
+
+.servrequ .left-buttons,
+.servrequ .right-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.servrequ .submit-approval,
+.servrequ .submit-sales {
+  padding: 0.5rem 1rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.servrequ .submit-approval:hover,
+.servrequ .submit-sales:hover {
+  background-color: #009999;
+}
+
+.servrequ .cancel-button {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.servrequ .edit-button {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.servrequ .add-button {
+  padding: 0.5rem 1rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.servrequ .cancel-button:hover {
+  background-color: #f5f5f5;
+}
+
+.servrequ .edit-button:hover {
+  background-color: #f5f5f5;
+}
+
+.servrequ .add-button:hover {
+  background-color: #009999;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .servrequ .input-fields-container {
+    flex-direction: column;
+  }
+
+  .servrequ .input-fields-left,
+  .servrequ .input-fields-right {
+    width: 100%;
+  }
+
+  .servrequ .search-filter-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .servrequ .search-container {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .servrequ .body-content-container {
+    padding: 1rem;
+  }
+
+  .servrequ .action-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .servrequ .left-buttons,
+  .servrequ .right-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .servrequ .submit-approval,
+  .servrequ .submit-sales,
+  .servrequ .cancel-button,
+  .servrequ .edit-button,
+  .servrequ .add-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .servrequ .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .servrequ .icon-container {
+    margin-bottom: 0.5rem;
+  }
+}
+

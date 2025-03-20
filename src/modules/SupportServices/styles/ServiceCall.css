@@ -1,0 +1,552 @@
+/* REMINDER! All of your elements must use your unique namespace '.servcall' at the start to avoid leaking */
+.servcall {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+  
+  
+  .scroll-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #f9f9f9;
+  }
+  
+  /* Custom scrollbar */
+  .scroll-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .scroll-container::-webkit-scrollbar-thumb {
+    background-color: #00a8a8;
+    border-radius: 4px;
+  }
+  
+  .scroll-container::-webkit-scrollbar-thumb:hover {
+    background-color: #00a8a8;
+  }
+  
+  .servcall .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 32px;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    min-width: 40rem;
+    min-height: 30rem;
+    align-items: stretch;
+  }
+  
+  .servcall .header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .servcall .title-container h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #000;
+  }
+  
+  .servcall .subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+    color: #666;
+    font-style: italic;
+  }
+  
+  .servcall .first-divider {
+    width: 100%;
+    height: 3px;
+    background-color: #00a8a8;
+    margin: 0 0 1.5rem;
+    display: block;
+  }
+  
+  .servcall .second-divider {
+    width: 100%;
+    height: 2px;
+    background-color: #00a8a8;
+    margin: 1.5rem 0;
+    display: block;
+  }
+  
+  .servcall .input-fields-container {
+    width: 100%;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 2rem;
+    border: 1px solid #e0e0e0;
+  }
+  
+  /* Left and Right Input Fields */
+  .servcall .input-fields-left,
+  .servcall .input-fields-right {
+    display: flex;
+    flex-direction: column;
+    width: 48%;
+  }
+  
+  .servcall .input-group {
+    margin-bottom: 1.25rem;
+  }
+  
+  .servcall label {
+    font-size: 0.75rem;
+    color: #00a8a8;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  
+  .servcall .required {
+    color: #ff0000;
+    margin-left: 2px;
+  }
+  
+  .servcall input,
+  .servcall select,
+  .servcall textarea {
+    width: 100%;
+    padding: 0.625rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    color: #333;
+    background-color: #fff;
+    transition: border-color 0.2s ease;
+  }
+  
+  .servcall input::placeholder,
+  .servcall select::placeholder,
+  .servcall textarea::placeholder {
+    color: #999;
+    font-weight: normal;
+  }
+  
+  .servcall input:focus,
+  .servcall select:focus,
+  .servcall textarea:focus {
+    border-color: #00a8a8;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+    border: 2px solid #00a8a8;
+  }
+  
+  .servcall .select-wrapper {
+    position: relative;
+  }
+  
+  .servcall .select-wrapper::after {
+    content: "";
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #666;
+    pointer-events: none;
+  }
+  
+  .servcall select {
+    appearance: none;
+    width: 100%;
+    padding-right: 2rem;
+    cursor: pointer;
+  }
+  
+  .servcall .date-input {
+    position: relative;
+  }
+  
+  .servcall .calendar-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  
+  .servcall .tabs-container {
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  .servcall .tabs {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    position: relative;
+  }
+  
+  .servcall .tab {
+    padding: 0.75rem 0;
+    background: transparent;
+    border: none;
+    color: #666;
+    font-size: 0.875rem;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+  
+  .servcall .tab.active {
+    color: #00a8a8;
+    font-weight: 500;
+  }
+  
+  .servcall .tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #00a8a8;
+  }
+  
+  .servcall .tab-content {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+  }
+  
+  .servcall .general-content textarea {
+    width: 100%;
+    height: 120px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 0.625rem;
+    font-size: 0.875rem;
+    resize: none;
+  }
+  
+  .servcall .general-content textarea:focus {
+    border: 2px solid #00a8a8;
+  }
+  
+  .servcall .resolution-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .servcall .resolution-content .remarks-input {
+    width: 100%;
+    height: 120px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 0.625rem;
+    font-size: 0.875rem;
+    resize: none;
+  }
+  
+  .servcall .resolution-content .remarks-input:focus {
+    border: 2px solid #00a8a8;
+    outline: none;
+  }
+  
+  .servcall .was-resolved-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .servcall .was-resolved-container .select-wrapper {
+    margin-top: 0.3rem;
+  }
+  
+  .servcall .small-select {
+    width: 120px; /* Make the dropdown smaller */
+  }
+  
+  .servcall .service-request-button {
+    padding: 0.625rem 1.5rem;
+    background: #00a8a8;
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    height: 38px; /* Match height with input fields */
+    margin-left: 1rem; /* Add some space between dropdown and button */
+  }
+  
+  .servcall .service-request-button:hover {
+    background: #008c8c;
+  }
+  
+  .servcall .history-container {
+    width: 100%;
+    margin-top: 1.5rem;
+  }
+  
+  .servcall .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    font-size: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .servcall .history-search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .servcall .search-box {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    width: 300px;
+  }
+  
+  .servcall .search-box svg {
+    margin-right: 0.5rem;
+  }
+  
+  .servcall .search-box input {
+    border: none;
+    padding: 0;
+    width: 100%;
+  }
+  
+  .servcall .search-box input:focus {
+    box-shadow: none;
+    border: none;
+  }
+  
+  .servcall .filter-options {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .servcall .date-filter,
+  .servcall .filter-by {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+  
+  .servcall .history-table {
+    width: 100%;
+    margin-top: 1rem;
+    overflow-x: auto;
+  }
+  
+  .servcall .history-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .servcall .history-table th,
+  .servcall .history-table td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+    font-size: 0.875rem;
+  }
+  
+  .servcall .history-table th {
+    background-color: #00a8a8;
+    color: #fff;
+    font-weight: 500;
+  }
+  
+  .servcall .history-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .servcall .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  
+  .servcall .cancel-button {
+    padding: 0.5rem 1.5rem;
+    border: 1px solid #00a8a8;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #00a8a8;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .servcall .add-button {
+    padding: 0.5rem 1.5rem;
+    background: #00a8a8;
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .servcall .cancel-button:hover {
+    background: #f0f9f9;
+  }
+  
+  .servcall .add-button:hover {
+    background: #008c8c;
+  }
+  
+  /* Status colors for dropdown */
+  .servcall select option[value="Completed"] {
+    background-color: #e6f4ea;
+    color: #1e8e3e;
+  }
+  
+  .servcall select option[value="Pending"] {
+    background-color: #fef7e0;
+    color: #f2994a;
+  }
+  
+  .servcall select option[value="OPEN/NEW"] {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1200px) {
+    .servcall .body-content-container {
+      padding: 1rem;
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .servcall .input-fields-container {
+      flex-direction: column;
+    }
+  
+    .servcall .input-fields-left,
+    .servcall .input-fields-right {
+      width: 100%;
+    }
+  
+    .servcall .history-search-container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  
+    .servcall .search-box {
+      width: 100%;
+    }
+  
+    .servcall .was-resolved-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .servcall .service-request-button {
+      margin-left: 0;
+      margin-top: 0.5rem;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .servcall .action-buttons {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  
+    .servcall .cancel-button,
+    .servcall .add-button {
+      width: 100%;
+    }
+  }
+  
+  .servcall .pagination {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+  }
+  
+  .servcall .pagination-numbers {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .servcall .pagination-number {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+  }
+  
+  .servcall .pagination-number.active {
+    background-color: #00a8a8;
+    color: #fff;
+    border-color: #00a8a8;
+  }
+  
+  .servcall .pagination-arrow {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fff;
+    cursor: pointer;
+    color: #666;
+    font-size: 1.25rem;
+    font-weight: 300;
+  }
+  
+  .servcall .resolution-fields {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 1rem;
+  }
+  
+  
