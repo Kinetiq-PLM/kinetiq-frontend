@@ -74,7 +74,7 @@ const SalesTable = ({
     }
 
     // Validate unit price
-    if (editingCell.columnKey === "markup_price" && newValue < 0) {
+    if (editingCell.columnKey === "selling_price" && newValue < 0) {
       alert("Invalid unit price: Price cannot be negative.");
       return;
     }
@@ -85,12 +85,12 @@ const SalesTable = ({
     };
 
     const updatedData = newData.map((item) => {
-      const unitPrice = Number(item.markup_price); // Keep markup_price as a number
+      const unitPrice = Number(item.selling_price); // Keep selling_price as a number
       const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
       const total = unitPrice * item.quantity + tax - item.discount;
       return {
         ...item,
-        markup_price: unitPrice.toFixed(2), // Convert to string only for display
+        selling_price: unitPrice.toFixed(2), // Convert to string only for display
         tax: tax.toFixed(2), // Ensure tax is formatted properly
         total_price: total.toFixed(2), // Calculate total price
       };
@@ -129,12 +129,12 @@ const SalesTable = ({
   useEffect(() => {
     // This should run whenever the data prop changes
     const updatedData = data.map((item) => {
-      const unitPrice = Number(item.markup_price); // Keep markup_price as a number
+      const unitPrice = Number(item.selling_price); // Keep selling_price as a number
       const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
       const total = unitPrice * item.quantity + tax - item.discount;
       return {
         ...item,
-        markup_price: unitPrice.toFixed(2), // Convert to string only for display
+        selling_price: unitPrice.toFixed(2), // Convert to string only for display
         tax: tax.toFixed(2), // Ensure tax is formatted properly
         total_price: total.toFixed(2), // Calculate total price
       };
