@@ -93,15 +93,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // the products customer chose
   const [products, setProducts] = useState([]);
 
-  const setProductsFix = (items) => {
-    const newProd = items.map((item) => ({
-      ...item,
-      selling_price: !item.selling_price ? 0.0 : item.selling_price,
-      tax: !item.tax ? 0.0 : item.tax,
-      discount: !item.discount ? 0.0 : item.discount,
-    }));
-    setProducts(newProd);
-  };
+  // };
   // const [products, setProducts] = useState(
   //   SALES_DATA.map((item) => {
   //     const unitPrice = Number(item.selling_price); // Keep selling_price as a number
@@ -120,7 +112,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       return;
     }
 
-    setProductsFix(
+    setProducts(
       products.filter(
         (product) => product.product_id != selectedProduct.product_id
       )
@@ -277,7 +269,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
         <ProductListModal
           isOpen={isProductListOpen}
           onClose={() => setIsProductListOpen(false)}
-          addProduct={setProductsFix}
+          addProduct={setProducts}
           products={products}
         ></ProductListModal>
         <NewCustomerModal
@@ -306,7 +298,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           <SalesTable
             columns={columns}
             data={products}
-            updateData={setProductsFix}
+            updateData={setProducts}
             onSelect={setSelectedProduct}
             minWidth={true}
           />
