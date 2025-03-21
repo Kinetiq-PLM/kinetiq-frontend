@@ -14,7 +14,7 @@ import ProductListModal from "../components/Modals/Lists/ProductList";
 import NewCustomerModal from "../components/Modals/NewCustomer";
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
-import SalesDropdown from "../components/SalesDropdown";
+import SalesDropup from "../components/SalesDropup.jsx";
 import generateRandomID from "../components/GenerateID";
 
 const Quotation = ({ loadSubModule, setActiveSubModule }) => {
@@ -83,13 +83,13 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     });
   };
 
-  const handleTransfer = () => {
-    return false;
-  };
+  // const handleTransfer = () => {
+  //   return false;
+  // };
 
-  useEffect(() => {
-    console.log("test");
-  }, []);
+  // useEffect(() => {
+  //   console.log("test");
+  // }, []);
 
   // This useEffect updates the quotationInfo state when a customer is selected
   useEffect(() => {
@@ -258,7 +258,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
               value={Number(quotationInfo.total_price).toFixed(2)}
             />
             <div className="flex justify-center md:justify-end gap-2">
-              <SalesDropdown
+              <SalesDropup
                 label=""
                 placeholder="Copy From"
                 options={copyFromOptions}
@@ -266,7 +266,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
                 loadSubModule={loadSubModule}
                 setActiveSubModule={setActiveSubModule}
               />
-              <SalesDropdown
+              <SalesDropup
                 label=""
                 placeholder="Copy To"
                 options={copyToOptions}

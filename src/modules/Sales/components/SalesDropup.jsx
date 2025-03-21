@@ -2,12 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 
-const SalesDropdown = ({
+const SalesDropup = ({
   label,
   options = [],
   placeholder = "Select an option",
   width = "100%",
   disabled = false,
+  loadSubModule,
+  setActiveSubModule,
 }) => {
   const [value, setValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +39,8 @@ const SalesDropdown = ({
     if (disabled) return;
 
     setSelectedOption(option);
+    loadSubModule(option);
+    setActiveSubModule(option);
     setIsOpen(false);
   };
 
@@ -107,4 +111,4 @@ const SalesDropdown = ({
   );
 };
 
-export default SalesDropdown;
+export default SalesDropup;

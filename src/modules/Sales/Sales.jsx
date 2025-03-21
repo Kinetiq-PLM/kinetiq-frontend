@@ -12,6 +12,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
     Dunning: "Dunning",
     Reporting: "Reporting",
     Returns: "Returns",
+    "Blanket Agreement": "BlanketAgreement",
   };
 
   return (
