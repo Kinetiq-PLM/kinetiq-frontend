@@ -17,7 +17,6 @@ const SalesTable = ({
   const [tableData, setTableData] = useState(data);
 
   const tableRef = useRef(null); // Ref for the table container
-
   const handleRowClick = (row, rowIndex) => {
     if (!editingCell) {
       setSelectedRow(row);
@@ -70,6 +69,13 @@ const SalesTable = ({
       (newValue <= 0 || !Number.isInteger(newValue))
     ) {
       alert("Invalid quantity: Quantity must be a positive whole number.");
+      return;
+    }
+    if (
+      editingCell.columnKey === "quantity" &&
+      newValue > Number(newData[rowIndex].stock_level)
+    ) {
+      alert("Invalid quantity: Quantity must not exceed stock level.");
       return;
     }
 

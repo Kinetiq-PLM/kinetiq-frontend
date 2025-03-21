@@ -114,14 +114,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     });
   };
 
-  // const handleTransfer = () => {
-  //   return false;
-  // };
-
-  // useEffect(() => {
-  //   console.log("test");
-  // }, []);
-
   // This useEffect updates the quotationInfo state when a customer is selected
   useEffect(() => {
     const totalBeforeDiscount = products.reduce(
