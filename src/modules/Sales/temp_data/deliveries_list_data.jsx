@@ -1,0 +1,108 @@
+const DELIVERY_LIST_DATA = [
+  {
+    delivery_id: "D-1A2B3C",
+    order_id: "O-3F5A1C",
+    customer_id: 1000,
+    date_shipped: "2025-03-22",
+    expected_delivery_date: "2025-03-24",
+    delivered_date: null,
+    delivery_address: "Street 1",
+    delivery_fee: 300,
+    selected_products: [
+      {
+        product_id: "P003",
+        product_name: "Office Chair",
+        description: "Ergonomic office chair with lumbar support",
+        quantity: 2,
+        unit_price: 150,
+      },
+      {
+        product_id: "P006",
+        product_name: "External Hard Drive",
+        description: "1TB external SSD with USB-C connectivity",
+        quantity: 1,
+        unit_price: 100,
+      },
+      {
+        product_id: "P001",
+        product_name: "Laptop",
+        description: "High-performance laptop with Intel i7 processor",
+        quantity: 1,
+        unit_price: 1436,
+      },
+    ],
+  },
+  {
+    delivery_id: "D-4D5E6F",
+    order_id: "O-9D3E7F",
+    customer_id: 1001,
+    date_shipped: "2025-03-23",
+    expected_delivery_date: "2025-03-26",
+    delivered_date: "2025-03-26",
+    delivery_address: "Street 5",
+    delivery_fee: 150,
+    selected_products: [
+      {
+        product_id: "P002",
+        product_name: "Standing Desk",
+        description: "Adjustable height standing desk",
+        quantity: 1,
+        unit_price: 400,
+      },
+      {
+        product_id: "P004",
+        product_name: "Wireless Mouse",
+        description: "Ergonomic wireless mouse",
+        quantity: 2,
+        unit_price: 50,
+      },
+    ],
+  },
+  {
+    delivery_id: "D-7G8H9I",
+    order_id: "O-5A1B2C",
+    customer_id: 1002,
+    date_shipped: "2025-03-24",
+    expected_delivery_date: "2025-03-27",
+    delivered_date: "2025-03-27",
+    delivery_address: "Street 12",
+    delivery_fee: 200,
+    selected_products: [
+      {
+        product_id: "P005",
+        product_name: "Monitor",
+        description: "27-inch 4K UHD monitor",
+        quantity: 1,
+        unit_price: 500,
+      },
+      {
+        product_id: "P007",
+        product_name: "Mechanical Keyboard",
+        description: "RGB backlit mechanical keyboard",
+        quantity: 1,
+        unit_price: 120,
+      },
+    ],
+  },
+  {
+    delivery_id: "D-9J1K2L",
+    order_id: "O-8E6D4B",
+    customer_id: 1003,
+    date_shipped: "2025-03-25",
+    expected_delivery_date: "2025-03-29",
+    delivered_date: null,
+    delivery_address: "Street 20",
+    delivery_fee: 100,
+    selected_products: [
+      {
+        product_id: "P008",
+        product_name: "Smartphone",
+        description: "Flagship smartphone with 256GB storage",
+        quantity: 1,
+        unit_price: 999,
+      },
+    ],
+  },
+];
+
+export default DELIVERY_LIST_DATA;

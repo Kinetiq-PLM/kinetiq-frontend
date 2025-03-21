@@ -17,36 +17,42 @@ import InfoField from "../components/InfoField";
 import SalesDropdown from "../components/SalesDropdown";
 import generateRandomID from "../components/GenerateID";
 
-const Quotation = () => {
+const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
 
   const copyFromOptions = [];
   const copyToOptions = ["Order", "Blanket Agreement"];
 
+  const [address, setAddress] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+
   const [selectedProduct, setSelectedProduct] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("");
 
-  const [quotationInfo, setQuotationInfo] = useState({
-    // Customer information
-    customer_id: "",
-    quotation_id: "",
-    selected_products: [],
-    selected_address: "",
-    selected_delivery_date: "",
-    total_before_discount: 0,
-    date_issued: new Date().toISOString().split("T")[0],
-    discount: 0,
-    total_tax: 0,
-    shipping_fee: 0,
-    warranty_fee: 0,
-    total_price: 0,
-  });
+  const [quotationInfo, setQuotationInfo] = useState(
+    localStorage.getItem("Transfer") || {
+      // Customer information
+      customer_id: "",
+      quotation_id: "",
+      selected_products: [],
+      selected_address: "",
+      selected_delivery_date: "",
+      total_before_discount: 0,
+      date_issued: new Date().toISOString().split("T")[0],
+      discount: 0,
+      total_tax: 0,
+      shipping_fee: 0,
+      warranty_fee: 0,
+      total_price: 0,
+    }
+  );
 
   // Modals
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
 
+  // columns for table
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
@@ -57,20 +63,8 @@ const Quotation = () => {
     { key: "total_price", label: "Total Price", editable: false },
   ];
 
+  // the products customer chose
   const [products, setProducts] = useState([]);
-
-  // const [products, setProducts] = useState(
-  //   SALES_DATA.map((item) => {
-  //     const unitPrice = Number(item.markup_price); // Keep markup_price as a number
-  //     const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
-  //     return {
-  //       ...item,
-  //       markup_price: unitPrice.toFixed(2), // Convert to string only for display
-  //       tax: tax.toFixed(2), // Ensure tax is formatted properly
-  //       total_price: (unitPrice * item.quantity + tax).toFixed(2), // Use converted unitPrice & tax
-  //     };
-  //   })
-  // );
 
   const handleDelete = () => {
     if (selectedProduct === "") {
@@ -89,17 +83,27 @@ const Quotation = () => {
     });
   };
 
+  const handleTransfer = () => {
+    return false;
+  };
+
+  useEffect(() => {
+    console.log("test");
+  }, []);
+
   // This useEffect updates the quotationInfo state when a customer is selected
   useEffect(() => {
     const totalBeforeDiscount = products.reduce(
       (acc, product) => acc + product.markup_price * product.quantity,
       0
     );
-    const totalTax = products.reduce(
-      (acc, product) =>
-        acc + TAX_RATE * (product.markup_price * product.quantity),
-      0
-    );
+    const totalTax = Number(
+      products.reduce(
+        (acc, product) =>
+          acc + TAX_RATE * (product.markup_price * product.quantity),
+        0
+      )
+    ).toFixed(2);
     const totalDiscount = products.reduce(
       (acc, product) => acc + product.discount,
       0
@@ -121,11 +125,11 @@ const Quotation = () => {
       selected_products: products,
       quotation_id: randomID,
       total_before_discount: totalBeforeDiscount,
-      total_tax: totalTax,
+      total_tax: Number(totalTax),
       discount: totalDiscount,
       shipping_fee: shippingFee,
-      warranty_fee: warrantyFee,
-      total_price: totalPrice,
+      warranty_fee: Number(warrantyFee),
+      total_price: Number(totalPrice),
     });
   }, [selectedCustomer, products]);
 
@@ -133,8 +137,22 @@ const Quotation = () => {
   //   console.log("Page: " + selectedProduct.product_id);
   // }, [selectedProduct]);
 
+  useEffect(() => {
+    setQuotationInfo({
+      ...quotationInfo,
+      selected_address: address,
+    });
+  }, [address]);
+
+  useEffect(() => {
+    setQuotationInfo({
+      ...quotationInfo,
+      selected_delivery_date: deliveryDate,
+    });
+  }, [deliveryDate]);
+
   // useEffect(() => {
-  //   console.log("Info: " + JSON.stringify(quotationInfo));
+  //   console.log(quotationInfo);
   // }, [quotationInfo]);
 
   return (
@@ -166,6 +184,8 @@ const Quotation = () => {
             customerListModal={setIsCustomerListOpen}
             setCustomerInfo={setQuotationInfo}
             operationID={quotationInfo.quotation_id}
+            setDeliveryDate={setDeliveryDate}
+            setAddress={setAddress}
           />
         </div>
         {/* TABLE */}
@@ -243,6 +263,8 @@ const Quotation = () => {
                 placeholder="Copy From"
                 options={copyFromOptions}
                 disabled={true}
+                loadSubModule={loadSubModule}
+                setActiveSubModule={setActiveSubModule}
               />
               <SalesDropdown
                 label=""
@@ -252,6 +274,8 @@ const Quotation = () => {
                   selectedCustomer.customer_id == undefined ||
                   products.length === 0
                 }
+                loadSubModule={loadSubModule}
+                setActiveSubModule={setActiveSubModule}
               />
             </div>
           </div>
@@ -261,10 +285,13 @@ const Quotation = () => {
   );
 };
 
-const BodyContent = () => {
+const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   return (
     <AlertProvider>
-      <Quotation />
+      <Quotation
+        loadSubModule={loadSubModule}
+        setActiveSubModule={setActiveSubModule}
+      />
     </AlertProvider>
   );
 };

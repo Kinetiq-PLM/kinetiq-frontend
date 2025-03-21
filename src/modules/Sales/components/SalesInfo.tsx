@@ -34,7 +34,7 @@ const Information = ({ label, value = "" }) => {
   );
 };
 
-const AddressDropbar = ({ label, customer, setCustomerInfo }) => {
+const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
   const [address, setAddress] = useState(
     customer.address_line1 || customer.address_line2 || ""
   );
@@ -46,18 +46,12 @@ const AddressDropbar = ({ label, customer, setCustomerInfo }) => {
   const handleAddressChange = (event) => {
     const selectedAddress = event.target.value;
     setAddress(selectedAddress);
-    setCustomerInfo((prev) => ({
-      ...prev,
-      selected_address: selectedAddress,
-    }));
+    setCustomerAddress(selectedAddress);
   };
 
   useEffect(() => {
     setAddress(customer.address_line1);
-    setCustomerInfo((prev) => ({
-      ...prev,
-      selected_address: customer.address_line1,
-    }));
+    setCustomerAddress(customer.address_line1);
   }, [customer]);
 
   return (
@@ -84,7 +78,7 @@ const AddressDropbar = ({ label, customer, setCustomerInfo }) => {
   );
 };
 
-const DateSelector = ({ label, customer, setCustomerInfo }) => {
+const DateSelector = ({ label, customer, setDeliveryDate }) => {
   // Calculate the default date (3 days from today)
   const defaultDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
     .toISOString()
@@ -96,20 +90,14 @@ const DateSelector = ({ label, customer, setCustomerInfo }) => {
   // Effect to set the default date when the component mounts
   useEffect(() => {
     if (!customer.delivery_date) {
-      setCustomerInfo((prev) => ({
-        ...prev,
-        selected_delivery_date: defaultDate,
-      }));
+      setDeliveryDate(defaultDate);
     }
   }, []); // Runs only once on mount
 
   const handleDateChange = (event) => {
     const selectedDate = event.target.value;
     setDate(selectedDate);
-    setCustomerInfo((prev) => ({
-      ...prev,
-      selected_delivery_date: selectedDate,
-    }));
+    setDeliveryDate(defaultDate);
   };
 
   return (
@@ -132,6 +120,8 @@ const SalesInfo = ({
   customer,
   setCustomerInfo,
   operationID,
+  setAddress,
+  setDeliveryDate,
 }) => {
   let id = "";
   if (type === "Quotation") {
@@ -165,12 +155,12 @@ const SalesInfo = ({
         <AddressDropbar
           label={"Address"}
           customer={customer}
-          setCustomerInfo={setCustomerInfo}
+          setCustomerAddress={setAddress}
         />
         {/* Dropdown to select address 1 or 2 */}
         <DateSelector
           customer={customer}
-          setCustomerInfo={setCustomerInfo}
+          setDeliveryDate={setDeliveryDate}
           label={"Delivery Date"}
         />
         {/* Date Selector*/}
