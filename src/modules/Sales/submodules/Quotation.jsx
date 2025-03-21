@@ -108,16 +108,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // the products customer chose
   const [products, setProducts] = useState([]);
 
-<<<<<<< HEAD
-  // };
-  // const [products, setProducts] = useState(
-  //   SALES_DATA.map((item) => {
-  //     const unitPrice = Number(item.selling_price); // Keep selling_price as a number
-  //     const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
-  //     return {
-  //       ...item,
-  //       selling_price: unitPrice.toFixed(2), // Convert to string only for display
-=======
   const setProductsFix = (items) => {
     const newProd = items.map((item) => ({
       ...item,
@@ -133,7 +123,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   //     return {
   //       ...item,
   //       markup_price: unitPrice.toFixed(2), // Convert to string only for display
->>>>>>> 69541a5 (fix NaN when setting product table)
   //       tax: tax.toFixed(2), // Ensure tax is formatted properly
   //       total_price: (unitPrice * item.quantity + tax).toFixed(2), // Use converted unitPrice & tax
   //     };
@@ -149,7 +138,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       return;
     }
 
-    setProductsFix(
+    setProducts(
       products.filter(
         (product) => product.product_id != selectedProduct.product_id
       )
@@ -287,6 +276,20 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     quotationMutation.mutate(request);
   };
 
+  useEffect(() => {
+    setQuotationInfo({
+      ...quotationInfo,
+      selected_address: address,
+    });
+  }, [address]);
+
+  useEffect(() => {
+    setQuotationInfo({
+      ...quotationInfo,
+      selected_delivery_date: deliveryDate,
+    });
+  }, [deliveryDate]);
+
   return (
     <div className="quotation">
       <div className="body-content-container">
@@ -301,7 +304,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
         <ProductListModal
           isOpen={isProductListOpen}
           onClose={() => setIsProductListOpen(false)}
-          addProduct={setProductsFix}
+          addProduct={setProducts}
           products={products}
         ></ProductListModal>
         <NewCustomerModal
@@ -335,7 +338,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           <SalesTable
             columns={columns}
             data={products}
-            updateData={setProductsFix}
+            updateData={setProducts}
             onSelect={setSelectedProduct}
             minWidth={true}
           />
