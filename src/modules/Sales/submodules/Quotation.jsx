@@ -84,7 +84,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
     { key: "quantity", label: "Quantity" },
-    { key: "markup_price", label: "Price" },
+    { key: "selling_price", label: "Price" },
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },
@@ -96,18 +96,19 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const setProductsFix = (items) => {
     const newProd = items.map((item) => ({
       ...item,
-      markup_price: !item.markup_price ? 0.0 : item.markup_price,
+      selling_price: !item.selling_price ? 0.0 : item.selling_price,
       tax: !item.tax ? 0.0 : item.tax,
+      discount: !item.discount ? 0.0 : item.discount,
     }));
     setProducts(newProd);
   };
   // const [products, setProducts] = useState(
   //   SALES_DATA.map((item) => {
-  //     const unitPrice = Number(item.markup_price); // Keep markup_price as a number
+  //     const unitPrice = Number(item.selling_price); // Keep selling_price as a number
   //     const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
   //     return {
   //       ...item,
-  //       markup_price: unitPrice.toFixed(2), // Convert to string only for display
+  //       selling_price: unitPrice.toFixed(2), // Convert to string only for display
   //       tax: tax.toFixed(2), // Ensure tax is formatted properly
   //       total_price: (unitPrice * item.quantity + tax).toFixed(2), // Use converted unitPrice & tax
   //     };
@@ -154,18 +155,18 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // This useEffect updates the quotationInfo state when a customer is selected
   useEffect(() => {
     const totalBeforeDiscount = products.reduce(
-      (acc, product) => acc + product.markup_price * product.quantity,
+      (acc, product) => acc + Number(product.selling_price) * product.quantity,
       0
     );
     const totalTax = Number(
       products.reduce(
         (acc, product) =>
-          acc + TAX_RATE * (product.markup_price * product.quantity),
+          acc + TAX_RATE * (Number(product.selling_price) * product.quantity),
         0
       )
     ).toFixed(2);
     const totalDiscount = products.reduce(
-      (acc, product) => acc + product.discount,
+      (acc, product) => acc + Number(product.discount),
       0
     );
     const shippingFee = products.length * 100;
@@ -235,6 +236,32 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // useEffect(() => {
   //   console.log(quotationInfo);
   // }, [quotationInfo]);
+
+  const handleSubmit = () => {
+    const request = {
+      statement_data: {
+        customer: selectedCustomer.customer_id,
+        // salesrep: selectedEmployee.employee_id
+        total_amount: quotationInfo.total_price,
+        discount: quotationInfo.discount,
+        total_tax: quotationInfo.total_tax,
+        items: products.map((product) => ({
+          product: product.product_id,
+          quantity: product.quantity,
+          unit_price: product.selling_price,
+          total_price: Number(product.total_price),
+          discount: product.discount,
+          tax_amount: Number(product.tax),
+        })),
+      },
+      quotation_data: {
+        status: "Pending",
+      },
+    };
+
+    // handle POST request to /api/sales/quotation
+    console.log(request);
+  };
 
   return (
     <div className="quotation">
