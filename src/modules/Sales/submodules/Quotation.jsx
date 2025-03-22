@@ -19,7 +19,7 @@ import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
 import { useMutation } from "@tanstack/react-query";
-import { addQuotation } from "../api/api";
+import { addQuotation, addStatement, addStatementItem } from "../api/api";
 import generateRandomID from "../components/GenerateID";
 
 const Quotation = ({ loadSubModule, setActiveSubModule }) => {
@@ -29,9 +29,27 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const copyToOptions = ["Order", "Blanket Agreement"];
 
   const quotationMutation = useMutation({
-    mutationFn: addQuotation,
-    onSuccess: (data, variables, context) => {
+    mutationFn: async (data) => {
       console.log(data);
+      const statement = await addStatement(data.statement_data);
+      data.statement_items.map(
+        async (statement_item) =>
+          await addStatementItem({
+            ...statement_item,
+            statement: statement.statement_id,
+          })
+      );
+      const quotation = await addQuotation({
+        ...data.quotation_data,
+        statement: statement.statement_id,
+      });
+      return quotation;
+    },
+    onSuccess: (data, variables, context) => {
+      alert("success" + data);
+    },
+    onError: (error) => {
+      alert("error " + error);
     },
   });
 
@@ -76,6 +94,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [isBlanketAgreementDateOpen, setIsBlanketAgreementDateOpen] =
     useState(false);
 
@@ -229,30 +248,37 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   //   console.log(quotationInfo);
   // }, [quotationInfo]);
 
-  const handleSubmit = () => {
-    const request = {
-      statement_data: {
-        customer: selectedCustomer.customer_id,
-        // salesrep: selectedEmployee.employee_id
-        total_amount: quotationInfo.total_price,
-        discount: quotationInfo.discount,
-        total_tax: quotationInfo.total_tax,
-        items: products.map((product) => ({
-          product: product.product_id,
-          quantity: product.quantity,
-          unit_price: product.selling_price,
-          total_price: Number(product.total_price),
-          discount: product.discount,
-          tax_amount: Number(product.tax),
-        })),
-      },
-      quotation_data: {
-        status: "Pending",
-      },
+  const handleSubmit = async () => {
+    const statement_data = {
+      customer: selectedCustomer.customer_id,
+      salesrep: selectedEmployee,
+      type: "Non-Project-Based", // make a variable
+      total_amount: +parseFloat(quotationInfo.total_price).toFixed(2),
+      discount: +parseFloat(quotationInfo.discount).toFixed(2),
+      total_tax: +parseFloat(quotationInfo.total_tax).toFixed(2),
+    };
+
+    const items = products.map((product) => ({
+      product: product.product_id,
+      quantity: +parseInt(product.quantity),
+      unit_price: +parseFloat(product.selling_price).toFixed(2),
+      total_price: +parseFloat(product.total_price).toFixed(2),
+      discount: +parseFloat(product.discount).toFixed(2),
+      tax_amount: +parseFloat(product.tax).toFixed(2),
+    }));
+
+    const quotation_data = {
+      status: "Pending",
     };
 
     // handle POST request to /api/sales/quotation
-    console.log(request);
+
+    console.log(statement_data, items, quotation_data);
+    quotationMutation.mutate({
+      statement_data,
+      statement_items: items,
+      quotation_data,
+    });
   };
 
   return (
@@ -320,7 +346,12 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
             {/* Employee ID Input */}
             <div className="flex items-center gap-2">
               <p className="text-gray-700 text-sm">Employee ID</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] max-w-[250px] bg-gray-200 rounded"></div>
+              <input
+                type="text"
+                className="border border-gray-400 flex-1 p-1 h-[30px] max-w-[250px] rounded"
+                onChange={(e) => setSelectedEmployee(e.target.value)}
+                value={selectedEmployee || ""}
+              ></input>
             </div>
 
             {/* Submit Button Aligned Right */}

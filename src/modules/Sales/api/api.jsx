@@ -18,6 +18,29 @@ export async function getCustomers() {
   return {};
 }
 
+export async function addStatement(newStatement) {
+  const res = await fetch(BASE_API_URL + "sales/statement/", {
+    method: "POST",
+    body: JSON.stringify(newStatement),
+    headers: { "Content-Type": "application/json" },
+  });
+  if (res.ok) {
+    return await res.json();
+  }
+  return {};
+}
+export async function addStatementItem(newStatement) {
+  const res = await fetch(BASE_API_URL + "sales/statement-item/", {
+    method: "POST",
+    body: JSON.stringify(newStatement),
+    headers: { "Content-Type": "application/json" },
+  });
+  if (res.ok) {
+    return await res.json();
+  }
+  return {};
+}
+
 export async function addQuotation(newQuotation) {
   const res = await fetch(BASE_API_URL + "sales/quotation/", {
     method: "POST",
