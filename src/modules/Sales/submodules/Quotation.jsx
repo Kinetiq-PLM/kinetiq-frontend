@@ -24,7 +24,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
 
   const copyFromOptions = [];
   const copyToOptions = ["Order", "Blanket Agreement"];
-
+  const [q_id, setQ_id] = useState("");
   const quotationMutation = useMutation({
     mutationFn: async (data) => {
       console.log(data);
@@ -43,6 +43,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       return quotation;
     },
     onSuccess: (data, variables, context) => {
+      setQ_id(data.quotation_id);
       alert("success" + data);
     },
     onError: (error) => {
@@ -156,7 +157,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       ...quotationInfo,
       customer_id: selectedCustomer.customer_id,
       selected_products: products,
-      quotation_id: randomID,
+      quotation_id: q_id,
       total_before_discount: totalBeforeDiscount,
       total_tax: Number(totalTax),
       discount: totalDiscount,
@@ -249,7 +250,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
             customer={selectedCustomer}
             customerListModal={setIsCustomerListOpen}
             setCustomerInfo={setQuotationInfo}
-            operationID={quotationInfo.quotation_id}
+            operationID={q_id}
             setDeliveryDate={setDeliveryDate}
             setAddress={setAddress}
           />
