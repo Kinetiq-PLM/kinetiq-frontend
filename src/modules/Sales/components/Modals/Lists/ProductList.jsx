@@ -41,6 +41,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
       selectedProduct.quantity = 1;
       selectedProduct.tax = 0;
       selectedProduct.discount = 0;
+      selectedProduct.total_price = selectedProduct.selling_price;
       addProduct([...products, selectedProduct]); // Properly update the array
       onClose();
       showAlert({
