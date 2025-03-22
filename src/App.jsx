@@ -124,8 +124,12 @@ function App() {
       "Customer Support": "CustomerSupport",
     },
     "Support & Services": {
-      "Ticketing System": "TicketingSystem",
-      "Customer Support": "CustomerSupport",
+      "Service Ticket": "ServiceTicket",
+      "Service Call": "ServiceCall",
+      "Service Request": "ServiceCall",
+      "Service Analysis": "ServiceTicket",
+      "Service Contract": "ServiceContract",
+      "Service Report": "ServiceReport",
     },
     Inventory: {
       "Stock Levels": "StockLevels",
