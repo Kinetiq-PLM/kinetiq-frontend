@@ -108,14 +108,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // the products customer chose
   const [products, setProducts] = useState([]);
 
-  const setProductsFix = (items) => {
-    const newProd = items.map((item) => ({
-      ...item,
-      markup_price: !item.markup_price ? 0.0 : item.markup_price,
-      tax: !item.tax ? 0.0 : item.tax,
-    }));
-    setProducts(newProd);
-  };
   // const [products, setProducts] = useState(
   //   SALES_DATA.map((item) => {
   //     const unitPrice = Number(item.markup_price); // Keep markup_price as a number
@@ -210,12 +202,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     });
   }, [selectedCustomer, products]);
 
-  // useEffect(() => {
-  //   if(employeeQuery.status === "success"){
-
-  //   }
-  // }, [employeeQuery.data]);
-
   useEffect(() => {
     setQuotationInfo({
       ...quotationInfo,
@@ -253,7 +239,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     const request = {
       statement_data: {
         customer: selectedCustomer.customer_id,
-        salesrep: selectedEmployee.employee_id,
+        salesrep: selectedEmployee,
         type: "Non-Project-Based", // make a variable
         total_amount: +parseFloat(quotationInfo.total_price).toFixed(2),
         discount: +parseFloat(quotationInfo.discount).toFixed(2),
