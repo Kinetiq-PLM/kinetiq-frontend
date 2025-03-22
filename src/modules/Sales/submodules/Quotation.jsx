@@ -29,22 +29,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const copyToOptions = ["Order", "Blanket Agreement"];
   const [q_id, setQ_id] = useState("");
   const quotationMutation = useMutation({
-    mutationFn: async (data) => {
-      console.log(data);
-      const statement = await addStatement(data.statement_data);
-      data.statement_items.map(
-        async (statement_item) =>
-          await addStatementItem({
-            ...statement_item,
-            statement: statement.statement_id,
-          })
-      );
-      const quotation = await addQuotation({
-        ...data.quotation_data,
-        statement: statement.statement_id,
-      });
-      return quotation;
-    },
+    mutationFn: async (data) => await addQuotation(data),
     onSuccess: (data, variables, context) => {
       setQ_id(data.quotation_id);
       alert("success" + data);
@@ -204,9 +189,9 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     });
   }, [selectedCustomer, products]);
 
-  // useEffect(() => {
-  //   console.log("Page: " + selectedProduct.product_id);
-  // }, [selectedProduct]);
+  useEffect(() => {
+    console.log(products);
+  }, [products]);
 
   const handleSubmit = () => {
     if (selectedCustomer.customer_id == undefined) {
@@ -251,36 +236,29 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // }, [quotationInfo]);
 
   const handleSubmit = async () => {
-    const statement_data = {
-      customer: selectedCustomer.customer_id,
-      salesrep: selectedEmployee,
-      type: "Non-Project-Based", // make a variable
-      total_amount: +parseFloat(quotationInfo.total_price).toFixed(2),
-      discount: +parseFloat(quotationInfo.discount).toFixed(2),
-      total_tax: +parseFloat(quotationInfo.total_tax).toFixed(2),
+    const request = {
+      statement_data: {
+        customer: selectedCustomer.customer_id,
+        salesrep: selectedEmployee,
+        type: "Non-Project-Based", // make a variable
+        total_amount: +parseFloat(quotationInfo.total_price).toFixed(2),
+        discount: +parseFloat(quotationInfo.discount).toFixed(2),
+        total_tax: +parseFloat(quotationInfo.total_tax).toFixed(2),
+        items: products.map((product) => ({
+          product: product.product_id,
+          quantity: +parseInt(product.quantity),
+          unit_price: +parseFloat(product.selling_price).toFixed(2),
+          total_price: +parseFloat(product.total_price).toFixed(2),
+          discount: +parseFloat(product.discount).toFixed(2),
+          tax_amount: +parseFloat(product.tax).toFixed(2),
+        })),
+      },
+      quotation_data: {
+        status: "Pending",
+      },
     };
 
-    const items = products.map((product) => ({
-      product: product.product_id,
-      quantity: +parseInt(product.quantity),
-      unit_price: +parseFloat(product.selling_price).toFixed(2),
-      total_price: +parseFloat(product.total_price).toFixed(2),
-      discount: +parseFloat(product.discount).toFixed(2),
-      tax_amount: +parseFloat(product.tax).toFixed(2),
-    }));
-
-    const quotation_data = {
-      status: "Pending",
-    };
-
-    // handle POST request to /api/sales/quotation
-
-    console.log(statement_data, items, quotation_data);
-    quotationMutation.mutate({
-      statement_data,
-      statement_items: items,
-      quotation_data,
-    });
+    quotationMutation.mutate(request);
   };
 
   return (
