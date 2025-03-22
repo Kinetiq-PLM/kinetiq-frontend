@@ -104,8 +104,7 @@ function App() {
       "Customer Support": "CustomerSupport",
     },
     "Support & Services": {
-      "Ticketing System": "TicketingSystem",
-      "Customer Support": "CustomerSupport",
+      "Service Analysis": "ServiceAnalysis",
     },
     "Inventory": {
       "Stock Levels": "StockLevels",
