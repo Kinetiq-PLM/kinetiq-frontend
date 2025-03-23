@@ -23,6 +23,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const productsQuery = useQuery({
     queryKey: ["products"],
@@ -55,7 +56,10 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   useEffect(() => {
     if (productsQuery.status === "success") {
       setProductList(productsQuery.data);
-      setFilteredData(productsQuery.data);
+      if (!hasLoaded) {
+        setFilteredData(productsQuery.data);
+        setHasLoaded(true);
+      }
     } else if (productsQuery.status === "error") {
       showAlert({
         type: "error",
