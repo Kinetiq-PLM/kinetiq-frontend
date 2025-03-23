@@ -255,6 +255,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       },
       quotation_data: {
         status: "Pending",
+        date_issued: new Date().toISOString(),
       },
     };
 
