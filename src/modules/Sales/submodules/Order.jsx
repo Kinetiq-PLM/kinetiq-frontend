@@ -12,13 +12,15 @@ import CustomerListModal from "../components/Modals/Lists/CustomerList";
 import ProductListModal from "../components/Modals/Lists/ProductList";
 import QuotationListModal from "../components/Modals/Lists/QuotationList";
 import BlanketAgreementListModal from "../components/Modals/Lists/BlanketAgreementList";
-
+import EmployeeListModal from "../components/Modals/Lists/EmployeeListModal.jsx";
 import NewCustomerModal from "../components/Modals/NewCustomer";
 import SalesTable from "../components/SalesTable";
 import SalesInfo from "../components/SalesInfo";
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
+import { useMutation } from "@tanstack/react-query";
+import { GET, POST } from "../api/api.jsx";
 
 const Order = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
@@ -51,18 +53,53 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
 
   const [isQuotationListOpen, setIsQuotationListOpen] = useState(false);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState("");
+  const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
 
   const [isBlanketAgreementListOpen, setIsBlanketAgreementListOpen] =
     useState(false);
   const [selectedBlanketAgreement, setSelectedBlanketAgreement] =
     useState(null);
 
+  const copyFromMutation = useMutation({
+    mutationFn: async (data) =>
+      await GET(`sales/${data.transferOperation}/${data.transferID}`),
+    onSuccess: (data, variables, context) => {
+      const prods = data.statement.items.map((item) => ({
+        product_id: item.product.product_id,
+        product_name: item.product.product_name,
+        quantity: Number(item.quantity),
+        selling_price: Number(item.unit_price),
+        discount: Number(item.discount),
+        tax: Number(item.tax_amount),
+        total_price: Number(item.total_price),
+      }));
+      setProducts(prods);
+      setSelectedCustomer(data.statement.customer);
+      setSelectedEmployee(data.statement.salesrep);
+      transferData();
+
+      localStorage.removeItem("TransferID");
+      localStorage.removeItem("TransferOperation");
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const orderMutation = useMutation({
+    mutationFn: async (data) => await POST("sales/order/", data),
+    onSuccess: (data, variables, context) => {
+      setOrderInfo({ ...orderInfo, order_id: data.order_id });
+    },
+  });
+
   // columns for table
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
     { key: "quantity", label: "Quantity" },
-    { key: "markup_price", label: "Price" },
+    { key: "selling_price", label: "Price" },
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },
@@ -124,10 +161,37 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       return;
     }
 
-    console.log(orderInfo);
-
     // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
     setSubmitted(true);
+
+    const request = {
+      order_data: {
+        quotation_id: selectedQuotation.quotation_id,
+        order_date: new Date().toISOString(),
+        order_status: "Pending",
+        order_total_amount: orderInfo.total_price,
+        order_type: "Direct", // temporary value
+        items: products.map((product) => ({
+          product: product.product_id,
+          quantity: +parseInt(product.quantity),
+          unit_price: +parseFloat(product.selling_price).toFixed(2),
+          total_price: +parseFloat(product.total_price).toFixed(2),
+          discount: +parseFloat(product.discount).toFixed(2),
+          tax_amount: +parseFloat(product.tax).toFixed(2),
+        })),
+      },
+      statement_data: {
+        customer: selectedCustomer.customer_id,
+        salesrep: selectedEmployee.employee_id,
+        type: "Non-Project-Based", // make a variable
+        total_amount: parseFloat(orderInfo.total_price),
+        discount: parseFloat(orderInfo.discount),
+        total_tax: parseFloat(orderInfo.total_tax),
+      },
+    };
+    console.log(request);
+
+    // orderMutation.mutate(request);
     showAlert({
       type: "success",
       title: "Order Submitted",
@@ -137,14 +201,14 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const transferData = () => {
     if (!selectedCustomer || products.length === 0) return;
     const totalBeforeDiscount = products.reduce(
-      (acc, product) => acc + product.markup_price * product.quantity,
+      (acc, product) => acc + product.selling_price * product.quantity,
       0
     );
 
     const totalTax = Number(
       products.reduce(
         (acc, product) =>
-          acc + TAX_RATE * (product.markup_price * product.quantity),
+          acc + TAX_RATE * (product.selling_price * product.quantity),
         0
       )
     ).toFixed(2);
@@ -162,7 +226,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       Number(totalTax) +
       Number(shippingFee) +
       Number(warrantyFee);
-
     setOrderInfo((prevOrderInfo) => ({
       ...prevOrderInfo,
       customer_id: selectedCustomer.customer_id,
@@ -187,10 +250,12 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
 
   useEffect(() => {
     if (copyFromModal === "Quotation" && selectedQuotation) {
-      setOrderInfo(selectedQuotation);
       setCopyFromModal("");
-      console.log(selectedQuotation);
-      setSelectedQuotation(null);
+      copyFromMutation.mutate({
+        transferID: selectedQuotation.quotation_id,
+        transferOperation: "quotation",
+      });
+      // setSelectedQuotation(null);  temp
       // fill out fields HERE
     } else if (
       copyFromModal === "Blanket Agreement" &&
@@ -198,8 +263,12 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     ) {
       setOrderInfo(selectedBlanketAgreement);
       setCopyFromModal("");
-      console.log(selectedBlanketAgreement);
-      setSelectedBlanketAgreement(null);
+      copyFromMutation.mutate({
+        transferID: selectedBlanketAgreement.agreement_id,
+        transferOperation: "agreement",
+      });
+      transferData();
+      // setSelectedBlanketAgreement(null);
       // fill out fields HERE
     }
   }, [selectedQuotation, selectedBlanketAgreement]);
@@ -223,8 +292,12 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     if (transferID && transferOperation) {
       // SEARCH DB FOR TRANSFERID with TRANSFEROPERATION
       // FILL DETAILS WITH DATA
+
       console.log("Searching for ID: ", transferID);
       console.log("At Operation: ", transferOperation);
+
+      copyFromMutation.mutate({ transferOperation, transferID });
+
       localStorage.removeItem("TransferID");
       localStorage.removeItem("TransferOperation");
     }
@@ -282,6 +355,11 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsBlanketAgreementListOpen(false)}
           setBlanketAgreement={setSelectedBlanketAgreement}
         ></BlanketAgreementListModal>
+        <EmployeeListModal
+          isOpen={isEmployeeListOpen}
+          onClose={() => setIsEmployeeListOpen(false)}
+          setEmployee={setSelectedEmployee}
+        ></EmployeeListModal>
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -319,9 +397,21 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
             </div>
 
             {/* Employee ID Input */}
-            <div className="flex items-center gap-2">
-              <p className="text-gray-700 text-sm">Employee ID</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] max-w-[250px] bg-gray-200 rounded"></div>
+            <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+              <p className="">Employee ID</p>
+              <div
+                className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
+                onClick={() => setIsEmployeeListOpen(true)}
+              >
+                <p className="text-sm">
+                  {selectedEmployee ? selectedEmployee : ""}
+                </p>
+                <img
+                  src="/icons/information-icon.svg"
+                  className="h-[15px]"
+                  alt="info icon"
+                />
+              </div>
             </div>
 
             {/* Submit Button Aligned Right */}

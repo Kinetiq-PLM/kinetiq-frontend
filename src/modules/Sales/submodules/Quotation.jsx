@@ -145,10 +145,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
 
   useEffect(() => {
     if (copyToModal === "Order") {
-      localStorage.setItem(
-        "TransferID",
-        JSON.stringify(quotationInfo.quotation_id)
-      );
+      localStorage.setItem("TransferID", JSON.stringify(q_id));
       localStorage.setItem("TransferOperation", JSON.stringify("quotation"));
       console.log("Saved to local storage: operation and ID");
       loadSubModule("Order");
