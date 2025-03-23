@@ -9,11 +9,7 @@ import ORDER_LIST_DATA from "./../../../temp_data/order_list_data";
 import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-<<<<<<< HEAD
 import { GET } from "../../../api/api.jsx";
-=======
-import { getOrders } from "../../../api/api.jsx";
->>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
 
 const OrderListModal = ({ isOpen, onClose, setOrder }) => {
   const { showAlert } = useAlert();
@@ -30,11 +26,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
 
   const orderQuery = useQuery({
     queryKey: ["orders"],
-<<<<<<< HEAD
     queryFn: async () => await GET("sales/order"),
-=======
-    queryFn: async () => await getOrders(),
->>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
     enabled: isOpen,
   });
   const columns = [
@@ -99,11 +91,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
       setFilteredData(formattedData);
       setOrderList(formattedData);
     }
-<<<<<<< HEAD
   }, [orderQuery.data]);
-=======
-  }, [orderQuery.status]);
->>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
 
   if (!isOpen) return null;
 
