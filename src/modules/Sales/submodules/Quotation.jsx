@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "../styles/Index.css";
 
-import { SALES_DATA, TAX_RATE } from "../temp_data/sales_data";
+import { TAX_RATE } from "../temp_data/sales_data";
 
 import {
   AlertProvider,
@@ -13,6 +13,8 @@ import SalesInfo from "../components/SalesInfo";
 import CustomerListModal from "../components/Modals/Lists/CustomerList";
 import ProductListModal from "../components/Modals/Lists/ProductList";
 import NewCustomerModal from "../components/Modals/NewCustomer";
+import BlanketAgreementDateModal from "../components/Modals/BlanketAgreementDates.jsx";
+
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
@@ -23,6 +25,17 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
 
   const copyFromOptions = [];
   const copyToOptions = ["Order", "Blanket Agreement"];
+
+  const [copyToModal, setCopyToModal] = useState("");
+  // save current info to local storage
+  // navigate to selected modal
+  // use local storage to populate the fields
+  // remove local storage after use
+
+  const [copyFromModal, setCopyFromModal] = useState(""); // variable to set what list will be shown
+  // show list modal
+  // replace current info with selected info
+  const [copyInfo, setCopyInfo] = useState({}); // Info from copyFromModal
 
   const [address, setAddress] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -52,6 +65,8 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+  const [isBlanketAgreementDateOpen, setIsBlanketAgreementDateOpen] =
+    useState(false);
 
   // columns for table
   const columns = [
@@ -83,6 +98,18 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       title: "Product Removed",
     });
   };
+
+  useEffect(() => {
+    if (copyToModal === "Order") {
+      localStorage.setItem("Transfer", JSON.stringify(quotationInfo));
+      console.log(quotationInfo);
+      loadSubModule("Order");
+      setActiveSubModule("Order");
+    } else if (copyToModal === "Blanket Agreement") {
+      setIsBlanketAgreementDateOpen(true);
+    }
+    setCopyToModal("");
+  }, [copyToModal]);
 
   // const handleTransfer = () => {
   //   return false;
@@ -177,6 +204,10 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           isOpen={isNewCustomerModalOpen}
           onClose={() => setIsNewCustomerModalOpen(false)}
         ></NewCustomerModal>
+        <BlanketAgreementDateModal
+          isOpen={isBlanketAgreementDateOpen}
+          onClose={() => setIsBlanketAgreementDateOpen(false)}
+        ></BlanketAgreementDateModal>
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -201,7 +232,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
         </section>
 
         {/* OTHERS */}
-        <section className="mt-4 flex justify-between flex-col lg:flex-row">
+        <section className="mt-4 flex justify-between flex-col lg:flex-row space-x-4">
           <div className="h-full flex flex-col gap-3 w-full">
             {/* Buttons Row */}
             <div className="flex gap-2">
@@ -216,7 +247,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
             {/* Employee ID Input */}
             <div className="flex items-center gap-2">
               <p className="text-gray-700 text-sm">Employee ID</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] max-w-[300px] bg-gray-200 rounded"></div>
+              <div className="border border-gray-400 flex-1 p-1 h-[30px] max-w-[250px] bg-gray-200 rounded"></div>
             </div>
 
             {/* Submit Button Aligned Right */}
@@ -266,6 +297,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
                 disabled={true}
                 loadSubModule={loadSubModule}
                 setActiveSubModule={setActiveSubModule}
+                setOption={setCopyFromModal}
               />
               <SalesDropup
                 label=""
@@ -277,6 +309,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
                 }
                 loadSubModule={loadSubModule}
                 setActiveSubModule={setActiveSubModule}
+                setOption={setCopyToModal}
               />
             </div>
           </div>

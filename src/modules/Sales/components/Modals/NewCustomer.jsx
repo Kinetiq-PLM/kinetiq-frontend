@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import { CountryData, CustomerTypes } from "../../temp_data/new_customer_data";
+import { useAlert } from "../Context/AlertContext.jsx";
 
 import Button from "../Button";
 import generateRandomID from "../GenerateID.jsx";
@@ -10,6 +11,8 @@ import InputField from "../InputField.jsx";
 import Dropdown from "../Dropdown.jsx";
 
 const NewCustomerModal = ({ isOpen, onClose }) => {
+  const { showAlert } = useAlert();
+
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
@@ -56,6 +59,25 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
 
     if (errorCount === 0) {
       // Add new customer HERE to database
+
+      // Reset form fields
+      setCustomerID(generateRandomID("C"));
+      setCompanyName("");
+      setContactPerson("");
+      setContactNumber("");
+      setEmail("");
+      setCountry("");
+      setCity("");
+      setPostalCode("");
+      setMainAddress("");
+      setSecondaryAddress("");
+      setCustomerType("");
+      setIsValidationVisible(false);
+
+      showAlert({
+        type: "success",
+        title: "Customer Created",
+      });
       onClose();
     }
   };

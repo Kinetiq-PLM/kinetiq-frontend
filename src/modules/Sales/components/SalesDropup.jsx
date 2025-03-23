@@ -8,8 +8,7 @@ const SalesDropup = ({
   placeholder = "Select an option",
   width = "100%",
   disabled = false,
-  loadSubModule,
-  setActiveSubModule,
+  setOption,
 }) => {
   const [value, setValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -38,9 +37,8 @@ const SalesDropup = ({
   const handleOptionClick = (option) => {
     if (disabled) return;
 
-    setSelectedOption(option);
-    loadSubModule(option);
-    setActiveSubModule(option);
+    setSelectedOption(option); // update dropup
+    setOption(option); // update parent component
     setIsOpen(false);
   };
 

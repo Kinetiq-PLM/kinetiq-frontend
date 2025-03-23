@@ -12,6 +12,7 @@ import QuotationListModal from "../components/Modals/Lists/QuotationList.jsx";
 import BlanketAgreementListModal from "./../components/Modals/Lists/BlanketAgreementList";
 import OrderListModal from "../components/Modals/Lists/OrderList.jsx";
 import InvoiceListModal from "../components/Modals/Lists/InvoiceList.jsx";
+import DeliveryListModal from "../components/Modals/Lists/DeliveryList.jsx";
 
 import Button from "../components/Button";
 
@@ -74,6 +75,12 @@ const BlanketAgreement = ({ loadSubModule, setActiveSubModule }) => {
           setInvoice={setSelectedInvoice}
         ></InvoiceListModal>
 
+        <DeliveryListModal
+          isOpen={isDeliveryListOpen}
+          onClose={() => setIsDeliveryListOpen(false)}
+          setDelivery={setSelectedDelivery}
+        ></DeliveryListModal>
+
         <div className="space-y-2 space-x-2">
           <Button type="primary" onClick={() => setIsProductListOpen(true)}>
             Product List
@@ -92,6 +99,9 @@ const BlanketAgreement = ({ loadSubModule, setActiveSubModule }) => {
           </Button>
           <Button type="primary" onClick={() => setIsInvoiceListOpen(true)}>
             Invoice List
+          </Button>
+          <Button type="primary" onClick={() => setIsDeliveryListOpen(true)}>
+            Delivery List
           </Button>
         </div>
       </div>

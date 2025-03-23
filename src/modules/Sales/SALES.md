@@ -54,6 +54,10 @@ Modals are used to confirm actions such as deleting an operation or copying data
 2. `Modals folder` - Components that are used to display modals for an action in the module.
    1. `NewCustomerModal.jsx` - Modal for adding a new customer. Uses the `new_customer_data.jsx` file in the `temp_data` folder for countries and respective cities and customer types.
 
+## Implementation Notes
+
+1. To create Blanket Agreements checkout `BlanketAgreementDates.jsx` in the `components/Modals` folder.
+
 ## TODO
 
 1. Implement invalid alerts for Sales table when editing values.
