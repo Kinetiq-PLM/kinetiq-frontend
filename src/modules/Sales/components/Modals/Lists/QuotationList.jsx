@@ -8,17 +8,25 @@ import QUOTATION_LIST_DATA from "./../../../temp_data/quotation_list_data";
 
 import Table from "../../Table";
 import Button from "../../Button";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getQuotations } from "../../../api/api.jsx";
 
 const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
   const { showAlert } = useAlert();
 
-  const quotation_list = QUOTATION_LIST_DATA;
-
+  const [quotationList, setQuotationList] = useState([]);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(quotation_list);
+  const [filteredData, setFilteredData] = useState([]);
 
+  const quotationQuery = useQuery({
+    queryKey: ["quotations"],
+    queryFn: async () => await getQuotations(),
+    enabled: isOpen,
+  });
+
+  const queryClient = useQueryClient();
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
@@ -44,12 +52,14 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
+        queryClient.invalidateQueries({ queryKey: ["quotations"] });
         onClose();
       }
     };
 
     // Focus the close button when modal opens
     if (isOpen && closeButtonRef.current) {
+      queryClient.invalidateQueries({ queryKey: ["quotations"] });
       closeButtonRef.current.focus();
     }
 
@@ -67,6 +77,28 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (quotationQuery.status === "success") {
+      const data = quotationQuery.data;
+
+      const formattedData = data.map((quotation) => ({
+        ...quotation,
+        customer_name: quotation.statement.customer.name,
+        total_price: Number(quotation.statement.total_amount).toLocaleString(
+          "en-US",
+          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        ),
+        date_issued: new Date(quotation.date_issued).toLocaleString(),
+      }));
+      setQuotationList(formattedData);
+      setFilteredData(formattedData);
+    } else if (quotationQuery.status === "error") {
+      alert(
+        "An error occurred while fetching quotations." +
+          quotationQuery.error.message
+      );
+    }
+  }, [quotationQuery.status]);
   if (!isOpen) return null;
 
   return (
@@ -109,7 +141,7 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filtered = quotation_list.filter((item) =>
+                const filtered = quotationList.filter((item) =>
                   item.customer_name.toLowerCase().includes(searchTerm)
                 );
                 setFilteredData(filtered);

@@ -9,6 +9,8 @@ import BLANKET_AGREEMENT_LIST from "./../../../temp_data/ba_list_data";
 
 import Table from "../../Table";
 import Button from "../../Button";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getBlanketAgreements } from "../../../api/api.jsx";
 const BlanketAgreementListModal = ({
   isOpen,
   onClose,
@@ -16,13 +18,19 @@ const BlanketAgreementListModal = ({
 }) => {
   const { showAlert } = useAlert();
 
-  const blanket_agreement_list = BLANKET_AGREEMENT_LIST;
+  const [agreementList, setAgreementList] = useState([]);
 
   const [selectedBlanketAgreement, setSelectedBlanketAgreement] =
     useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(blanket_agreement_list);
+  const [filteredData, setFilteredData] = useState([]);
+  const agreementQuery = useQuery({
+    queryKey: ["agreements"],
+    queryFn: async () => await getBlanketAgreements(),
+    enabled: isOpen,
+  });
+  const queryClient = useQueryClient();
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -49,6 +57,7 @@ const BlanketAgreementListModal = ({
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
+        queryClient.invalidateQueries({ queryKey: ["agreements"] });
         onClose();
       }
     };
@@ -56,6 +65,7 @@ const BlanketAgreementListModal = ({
     // Focus the close button when modal opens
     if (isOpen && closeButtonRef.current) {
       closeButtonRef.current.focus();
+      queryClient.invalidateQueries({ queryKey: ["agreements"] });
     }
 
     // Prevent scrolling on body when modal is open
@@ -72,6 +82,23 @@ const BlanketAgreementListModal = ({
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (agreementQuery.status === "success") {
+      const data = agreementQuery.data;
+      const formattedData = data.map((agreement) => ({
+        ...agreement,
+        customer_name: agreement.statement?.customer.name,
+        total_price:
+          Number(agreement.statement?.total_amount).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }) || "0.00",
+        end_date: new Date(agreement.end_date).toLocaleString(),
+      }));
+      setFilteredData(formattedData);
+      setAgreementList(formattedData);
+    }
+  }, [agreementQuery.status]);
   if (!isOpen) return null;
 
   return (
@@ -116,7 +143,7 @@ const BlanketAgreementListModal = ({
                 const searchTerm = e.target.value.toLowerCase();
                 const today = new Date(); // Get the current date
 
-                const filtered = blanket_agreement_list.filter((item) => {
+                const filtered = agreementList.filter((item) => {
                   const endDate = new Date(item.end_date); // Convert end_date to a Date object
 
                   return (

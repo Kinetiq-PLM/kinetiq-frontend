@@ -8,20 +8,27 @@ import ORDER_LIST_DATA from "./../../../temp_data/order_list_data";
 
 import Table from "../../Table";
 import Button from "../../Button";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getOrders } from "../../../api/api.jsx";
 
 const OrderListModal = ({ isOpen, onClose, setOrder }) => {
   const { showAlert } = useAlert();
 
-  const order_list = ORDER_LIST_DATA;
+  const [orderList, setOrderList] = useState([]);
 
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(order_list);
-
+  const [filteredData, setFilteredData] = useState([]);
+  const queryClient = useQueryClient();
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
+  const orderQuery = useQuery({
+    queryKey: ["orders"],
+    queryFn: async () => await getOrders(),
+    enabled: isOpen,
+  });
   const columns = [
     { key: "order_id", label: "Order ID" },
     { key: "customer_name", label: "Name" }, // Company Name
@@ -44,12 +51,14 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
+        queryClient.invalidateQueries({ queryKey: ["orders"] });
         onClose();
       }
     };
 
     // Focus the close button when modal opens
     if (isOpen && closeButtonRef.current) {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
       closeButtonRef.current.focus();
     }
 
@@ -66,6 +75,23 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
       document.body.style.overflow = "";
     };
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (orderQuery.status === "success") {
+      const data = orderQuery.data;
+      const formattedData = data.map((order) => ({
+        ...order,
+        customer_name: order.statement.customer.name,
+        total_price: Number(order.order_total_amount).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        date_issued: new Date(order.order_date).toLocaleString(),
+      }));
+      setFilteredData(formattedData);
+      setOrderList(formattedData);
+    }
+  }, [orderQuery.status]);
 
   if (!isOpen) return null;
 
@@ -109,7 +135,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filtered = order_list.filter((item) =>
+                const filtered = orderList.filter((item) =>
                   item.customer_name.toLowerCase().includes(searchTerm)
                 );
                 setFilteredData(filtered);

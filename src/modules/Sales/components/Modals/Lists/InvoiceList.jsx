@@ -8,16 +8,24 @@ import INVOICE_LIST_DATA from "./../../../temp_data/invoice_list_data";
 
 import Table from "../../Table";
 import Button from "../../Button";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getInvoices } from "../../../api/api.jsx";
 
 const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
   const { showAlert } = useAlert();
 
-  const invoice_list = INVOICE_LIST_DATA;
+  const [invoiceList, setInvoiceList] = useState([]);
 
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(invoice_list);
+  const [filteredData, setFilteredData] = useState([]);
+  const invoiceQuery = useQuery({
+    queryKey: ["invoices"],
+    queryFn: async () => await getInvoices(),
+    enabled: isOpen,
+  });
+  const queryClient = useQueryClient();
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -44,12 +52,14 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
+        queryClient.invalidateQueries({ queryKey: ["invoices"] });
         onClose();
       }
     };
 
     // Focus the close button when modal opens
     if (isOpen && closeButtonRef.current) {
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
       closeButtonRef.current.focus();
     }
 
@@ -67,6 +77,18 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (invoiceQuery.status === "success") {
+      const data = invoiceQuery.data;
+      const formattedData = data.map((invoice) => ({
+        ...invoice,
+        customer_name: invoice.order.statement.customer.name,
+        date_issued: new Date(invoice.invoice_date).toLocaleString(),
+      }));
+      setInvoiceList(formattedData);
+      setFilteredData(formattedData);
+    }
+  }, [invoiceQuery.status]);
   if (!isOpen) return null;
 
   return (
@@ -109,7 +131,7 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filtered = invoice_list.filter((item) =>
+                const filtered = invoiceList.filter((item) =>
                   item.customer_name.toLowerCase().includes(searchTerm)
                 );
                 setFilteredData(filtered);
