@@ -9,11 +9,7 @@ import QUOTATION_LIST_DATA from "./../../../temp_data/quotation_list_data";
 import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-<<<<<<< HEAD
 import { GET } from "../../../api/api.jsx";
-=======
-import { getQuotations } from "../../../api/api.jsx";
->>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
 
 const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
   const { showAlert } = useAlert();
@@ -26,11 +22,7 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
 
   const quotationQuery = useQuery({
     queryKey: ["quotations"],
-<<<<<<< HEAD
     queryFn: async () => await GET("sales/quotation"),
-=======
-    queryFn: async () => await getQuotations(),
->>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
     enabled: isOpen,
   });
 
@@ -101,7 +93,6 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
       setQuotationList(formattedData);
       setFilteredData(formattedData);
     } else if (quotationQuery.status === "error") {
-<<<<<<< HEAD
       showAlert({
         type: "error",
         title:
@@ -110,14 +101,6 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
       });
     }
   }, [quotationQuery.data]);
-=======
-      alert(
-        "An error occurred while fetching quotations." +
-          quotationQuery.error.message
-      );
-    }
-  }, [quotationQuery.status]);
->>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
   if (!isOpen) return null;
 
   return (
