@@ -2,11 +2,12 @@ const ORDER_LIST_DATA = [
   {
     order_id: "O-3F5A1C",
     customer_id: 1000,
+    customer_name: "Tech Solutions Inc.",
     date_issued: "2025-03-21",
-    discount: 0,
     quotation_id: "Q-781A84",
     selected_address: "Street 1",
     selected_delivery_date: "2025-03-24",
+    discount: 0,
     selected_products: [
       {
         product_id: "P003",
@@ -39,11 +40,12 @@ const ORDER_LIST_DATA = [
   {
     order_id: "O-9D3E7F",
     customer_id: 1001,
+    customer_name: "Global Enterprises Ltd.",
     date_issued: "2025-03-22",
-    discount: 10,
     quotation_id: "Q-9B2C6D",
     selected_address: "Street 5",
     selected_delivery_date: "2025-03-26",
+    discount: 10,
     selected_products: [
       {
         product_id: "P002",
@@ -69,11 +71,12 @@ const ORDER_LIST_DATA = [
   {
     order_id: "O-5A1B2C",
     customer_id: 1002,
+    customer_name: "NextGen Tech Corp.",
     date_issued: "2025-03-23",
-    discount: 5,
     quotation_id: "Q-4F2D9A",
     selected_address: "Street 12",
     selected_delivery_date: "2025-03-27",
+    discount: 5,
     selected_products: [
       {
         product_id: "P005",
@@ -99,11 +102,12 @@ const ORDER_LIST_DATA = [
   {
     order_id: "O-8E6D4B",
     customer_id: 1003,
+    customer_name: "Innovatech Industries",
     date_issued: "2025-03-24",
-    discount: 15,
     quotation_id: "Q-6C3F1B",
     selected_address: "Street 20",
     selected_delivery_date: "2025-03-29",
+    discount: 15,
     selected_products: [
       {
         product_id: "P008",

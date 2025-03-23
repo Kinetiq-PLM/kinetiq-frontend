@@ -4,40 +4,45 @@ import { useState, useEffect, useRef } from "react";
 
 import { useAlert } from "../../Context/AlertContext.jsx";
 
-import ORDER_LIST_DATA from "./../../../temp_data/order_list_data";
+import QUOTATION_LIST_DATA from "./../../../temp_data/quotation_list_data";
+import BLANKET_AGREEMENT_LIST from "./../../../temp_data/ba_list_data";
 
 import Table from "../../Table";
 import Button from "../../Button";
-
-const OrderListModal = ({ isOpen, onClose, setOrder }) => {
+const BlanketAgreementListModal = ({
+  isOpen,
+  onClose,
+  setBlanketAgreement,
+}) => {
   const { showAlert } = useAlert();
 
-  const order_list = ORDER_LIST_DATA;
+  const blanket_agreement_list = BLANKET_AGREEMENT_LIST;
 
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedBlanketAgreement, setSelectedBlanketAgreement] =
+    useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(order_list);
+  const [filteredData, setFilteredData] = useState(blanket_agreement_list);
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
   const columns = [
-    { key: "order_id", label: "Order ID" },
+    { key: "agreement_id", label: "Agreement ID" },
     { key: "customer_name", label: "Name" }, // Company Name
     { key: "total_price", label: "Total Amount" },
-    { key: "date_issued", label: "Date" },
+    { key: "end_date", label: "End Date" },
   ];
 
   const handleConfirm = () => {
-    if (selectedOrder) {
-      setOrder(selectedOrder); // Properly update the array
+    if (selectedBlanketAgreement) {
+      setBlanketAgreement(selectedBlanketAgreement); // Properly update the array
       onClose();
       showAlert({
         type: "success",
-        title: "Order Selected",
+        title: "Added Product",
       });
-      setSelectedOrder(null);
+      setSelectedBlanketAgreement(null);
     }
   };
 
@@ -85,7 +90,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Orders
+            List Of Blanket Agreements
           </h2>
         </div>
 
@@ -109,9 +114,17 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filtered = order_list.filter((item) =>
-                  item.customer_name.toLowerCase().includes(searchTerm)
-                );
+                const today = new Date(); // Get the current date
+
+                const filtered = blanket_agreement_list.filter((item) => {
+                  const endDate = new Date(item.end_date); // Convert end_date to a Date object
+
+                  return (
+                    item.customer_name.toLowerCase().includes(searchTerm) &&
+                    endDate >= today // Only include items where end_date is in the future or today
+                  );
+                });
+
                 setFilteredData(filtered);
               }}
             />
@@ -120,7 +133,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
             <Table
               columns={columns}
               data={filteredData}
-              onSelect={setSelectedOrder}
+              onSelect={setSelectedBlanketAgreement}
             />
           </div>
           <div className="mt-4 flex justify-between">
@@ -128,7 +141,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
               <Button
                 type="primary"
                 onClick={handleConfirm}
-                disabled={!selectedOrder}
+                disabled={!selectedBlanketAgreement}
               >
                 Select
               </Button>
@@ -145,4 +158,4 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
   );
 };
 
-export default OrderListModal;
+export default BlanketAgreementListModal;

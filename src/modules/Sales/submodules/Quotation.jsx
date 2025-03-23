@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "../styles/Index.css";
 
 import { SALES_DATA, TAX_RATE } from "../temp_data/sales_data";
 
