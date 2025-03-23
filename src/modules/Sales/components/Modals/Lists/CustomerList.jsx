@@ -8,7 +8,7 @@ import Table from "../../Table";
 import { CUSTOMER_DATA } from "./../../../temp_data/customer_data";
 import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
-import { getCustomers } from "../../../api/api";
+import { GET } from "../../../api/api";
 
 const CustomerListModal = ({
   isOpen,
@@ -33,7 +33,7 @@ const CustomerListModal = ({
 
   const customersQuery = useQuery({
     queryKey: ["customers"],
-    queryFn: async () => await getCustomers(),
+    queryFn: async () => await GET("sales/customer"),
     enabled: isOpen,
   });
 
@@ -60,10 +60,12 @@ const CustomerListModal = ({
       setFilteredData(customersQuery.data);
       setCustomers(customersQuery.data);
     } else if (customersQuery.status === "error") {
-      alert(
-        "An error occurred while fetching the data: " +
-          customersQuery.error?.message
-      );
+      showAlert({
+        type: "error",
+        title:
+          "An error occurred while fetching the data: " +
+          customersQuery.error?.message,
+      });
     }
   }, [customersQuery.data]);
 

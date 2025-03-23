@@ -9,7 +9,7 @@ import QUOTATION_LIST_DATA from "./../../../temp_data/quotation_list_data";
 import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getQuotations } from "../../../api/api.jsx";
+import { GET } from "../../../api/api.jsx";
 
 const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
   const { showAlert } = useAlert();
@@ -22,7 +22,7 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
 
   const quotationQuery = useQuery({
     queryKey: ["quotations"],
-    queryFn: async () => await getQuotations(),
+    queryFn: async () => await GET("sales/quotation"),
     enabled: isOpen,
   });
 
@@ -93,10 +93,12 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
       setQuotationList(formattedData);
       setFilteredData(formattedData);
     } else if (quotationQuery.status === "error") {
-      alert(
-        "An error occurred while fetching quotations." +
-          quotationQuery.error.message
-      );
+      showAlert({
+        type: "error",
+        title:
+          "An error occurred while fetching quotations." +
+          quotationQuery.error.message,
+      });
     }
   }, [quotationQuery.data]);
   if (!isOpen) return null;

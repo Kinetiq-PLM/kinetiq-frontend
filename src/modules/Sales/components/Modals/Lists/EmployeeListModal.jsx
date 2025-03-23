@@ -7,13 +7,12 @@ import { useAlert } from "../../Context/AlertContext.jsx";
 import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
-import { getEmployees } from "../../../api/api";
+import { GET } from "../../../api/api";
 
 const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
   const { showAlert } = useAlert();
 
   // setEmployee is used to set the selected customer in the parent component
-  // setSelectedCustomer is used to set the selected customer in this component
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
@@ -25,7 +24,7 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
 
   const employeesQuery = useQuery({
     queryKey: ["employees"],
-    queryFn: async () => await getEmployees(),
+    queryFn: async () => await GET("misc/employee"),
     enabled: isOpen,
   });
 
@@ -52,10 +51,12 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
       setFilteredData(employeesQuery.data);
       setEmployees(employeesQuery.data);
     } else if (employeesQuery.status === "error") {
-      alert(
-        "An error occurred while fetching the data: " +
-          employeesQuery.error?.message
-      );
+      showAlert({
+        type: "error",
+        title:
+          "An error occurred while fetching the data: " +
+          employeesQuery.error?.message,
+      });
     }
   }, [employeesQuery.data]);
 

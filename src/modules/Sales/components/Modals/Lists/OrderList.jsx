@@ -9,7 +9,7 @@ import ORDER_LIST_DATA from "./../../../temp_data/order_list_data";
 import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getOrders } from "../../../api/api.jsx";
+import { GET } from "../../../api/api.jsx";
 
 const OrderListModal = ({ isOpen, onClose, setOrder }) => {
   const { showAlert } = useAlert();
@@ -26,7 +26,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
 
   const orderQuery = useQuery({
     queryKey: ["orders"],
-    queryFn: async () => await getOrders(),
+    queryFn: async () => await GET("sales/order"),
     enabled: isOpen,
   });
   const columns = [

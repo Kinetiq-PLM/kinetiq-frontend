@@ -10,7 +10,7 @@ import generateRandomID from "../GenerateID.jsx";
 import InputField from "../InputField.jsx";
 import Dropdown from "../Dropdown.jsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addCustomer } from "../../api/api.jsx";
+import { POST } from "../../api/api.jsx";
 
 const NewCustomerModal = ({ isOpen, onClose }) => {
   const { showAlert } = useAlert();
@@ -38,7 +38,7 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
 
   const queryClient = useQueryClient();
   const customerMutation = useMutation({
-    mutationFn: async (data) => await addCustomer(data),
+    mutationFn: async (data) => await addCustomer("sales/customer/", data),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries(["customers"]);
     },

@@ -8,7 +8,7 @@ import Table from "../../Table";
 import { PRODUCTS_DATA } from "../../../temp_data/products_data";
 import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
-import { getProducts } from "../../../api/api";
+import { GET } from "../../../api/api";
 
 const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   const { showAlert } = useAlert();
@@ -26,7 +26,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
 
   const productsQuery = useQuery({
     queryKey: ["products"],
-    queryFn: async () => await getProducts(),
+    queryFn: async () => await GET("misc/product"),
     enabled: isOpen,
   });
 
@@ -57,10 +57,12 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
       setProductList(productsQuery.data);
       setFilteredData(productsQuery.data);
     } else if (productsQuery.status === "error") {
-      alert(
-        "An error occurred while fetching products: " +
-          productsQuery.error?.data
-      );
+      showAlert({
+        type: "error",
+        title:
+          "An error occurred while fetching products: " +
+          productsQuery.error?.data,
+      });
     }
   }, [productsQuery.data]);
 

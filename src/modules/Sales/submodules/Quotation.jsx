@@ -19,8 +19,8 @@ import EmployeeListModal from "../components/Modals/Lists/EmployeeListModal.jsx"
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { addQuotation, addStatement, addStatementItem } from "../api/api";
+import { useMutation } from "@tanstack/react-query";
+import { POST } from "../api/api";
 import generateRandomID from "../components/GenerateID";
 
 const Quotation = ({ loadSubModule, setActiveSubModule }) => {
@@ -30,7 +30,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const copyToOptions = ["Order", "Blanket Agreement"];
   const [q_id, setQ_id] = useState("");
   const quotationMutation = useMutation({
-    mutationFn: async (data) => await addQuotation(data),
+    mutationFn: async (data) => await POST("sales/quotation/", data),
     onSuccess: (data, variables, context) => {
       setQ_id(data.quotation_id);
       showAlert({

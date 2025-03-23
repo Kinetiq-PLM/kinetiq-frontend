@@ -9,7 +9,7 @@ import INVOICE_LIST_DATA from "./../../../temp_data/invoice_list_data";
 import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getInvoices } from "../../../api/api.jsx";
+import { GET } from "../../../api/api.jsx";
 
 const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
   const { showAlert } = useAlert();
@@ -22,7 +22,7 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
   const [filteredData, setFilteredData] = useState([]);
   const invoiceQuery = useQuery({
     queryKey: ["invoices"],
-    queryFn: async () => await getInvoices(),
+    queryFn: async () => await GET("sales/invoice"),
     enabled: isOpen,
   });
   const queryClient = useQueryClient();

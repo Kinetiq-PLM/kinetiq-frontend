@@ -10,7 +10,7 @@ import BLANKET_AGREEMENT_LIST from "./../../../temp_data/ba_list_data";
 import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getBlanketAgreements } from "../../../api/api.jsx";
+import { GET } from "../../../api/api.jsx";
 const BlanketAgreementListModal = ({
   isOpen,
   onClose,
@@ -27,7 +27,7 @@ const BlanketAgreementListModal = ({
   const [filteredData, setFilteredData] = useState([]);
   const agreementQuery = useQuery({
     queryKey: ["agreements"],
-    queryFn: async () => await getBlanketAgreements(),
+    queryFn: async () => await GET("sales/agreement"),
     enabled: isOpen,
   });
   const queryClient = useQueryClient();
