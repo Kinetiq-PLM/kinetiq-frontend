@@ -32,6 +32,8 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // use local storage to populate the fields
   // remove local storage after use
 
+  const [submitted, setSubmitted] = useState(false);
+
   const [copyFromModal, setCopyFromModal] = useState(""); // variable to set what list will be shown
   // show list modal
   // replace current info with selected info
@@ -145,13 +147,10 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       Number(shippingFee) +
       Number(warrantyFee);
 
-    const randomID = selectedCustomer ? generateRandomID("Q") : undefined;
-
     setQuotationInfo({
       ...quotationInfo,
       customer_id: selectedCustomer.customer_id,
       selected_products: products,
-      quotation_id: randomID,
       total_before_discount: totalBeforeDiscount,
       total_tax: Number(totalTax),
       discount: totalDiscount,
@@ -164,6 +163,30 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // useEffect(() => {
   //   console.log("Page: " + selectedProduct.product_id);
   // }, [selectedProduct]);
+
+  const handleSubmit = () => {
+    if (selectedCustomer.customer_id == undefined) {
+      showAlert({
+        type: "error",
+        title: "Please select a customer.",
+      });
+      return;
+    }
+    if (products.length === 0) {
+      showAlert({
+        type: "error",
+        title: "Please add products.",
+      });
+      return;
+    }
+
+    // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
+    setSubmitted(true);
+    showAlert({
+      type: "success",
+      title: "Quotation Submitted",
+    });
+  };
 
   useEffect(() => {
     setQuotationInfo({
@@ -253,11 +276,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto">
-              <Button
-                type="primary"
-                className=""
-                onClick={() => console.log(quotationInfo)}
-              >
+              <Button type="primary" className="" onClick={handleSubmit}>
                 Submit Quotation
               </Button>
             </div>
@@ -304,10 +323,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
                 label=""
                 placeholder="Copy To"
                 options={copyToOptions}
-                disabled={
-                  selectedCustomer.customer_id == undefined ||
-                  products.length === 0
-                }
+                disabled={!submitted}
                 loadSubModule={loadSubModule}
                 setActiveSubModule={setActiveSubModule}
                 setOption={setCopyToModal}
