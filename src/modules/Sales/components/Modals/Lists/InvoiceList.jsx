@@ -9,11 +9,7 @@ import INVOICE_LIST_DATA from "./../../../temp_data/invoice_list_data";
 import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-<<<<<<< HEAD
 import { GET } from "../../../api/api.jsx";
-=======
-import { getInvoices } from "../../../api/api.jsx";
->>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
 
 const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
   const { showAlert } = useAlert();
@@ -26,11 +22,7 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
   const [filteredData, setFilteredData] = useState([]);
   const invoiceQuery = useQuery({
     queryKey: ["invoices"],
-<<<<<<< HEAD
     queryFn: async () => await GET("sales/invoice"),
-=======
-    queryFn: async () => await getInvoices(),
->>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
     enabled: isOpen,
   });
   const queryClient = useQueryClient();
@@ -96,11 +88,7 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
       setInvoiceList(formattedData);
       setFilteredData(formattedData);
     }
-<<<<<<< HEAD
   }, [invoiceQuery.data]);
-=======
-  }, [invoiceQuery.status]);
->>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
   if (!isOpen) return null;
 
   return (
