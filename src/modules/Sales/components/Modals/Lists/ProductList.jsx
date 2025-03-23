@@ -36,7 +36,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
       onClose();
       showAlert({
         type: "success",
-        title: "Added Product",
+        title: "Added product.",
       });
       setSelectedProduct(null);
     }

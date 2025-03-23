@@ -18,7 +18,6 @@ import BlanketAgreementDateModal from "../components/Modals/BlanketAgreementDate
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
-import generateRandomID from "../components/GenerateID";
 
 const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
@@ -45,23 +44,21 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const [selectedProduct, setSelectedProduct] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("");
 
-  const [quotationInfo, setQuotationInfo] = useState(
-    localStorage.getItem("Transfer") || {
-      // Customer information
-      customer_id: "",
-      quotation_id: "",
-      selected_products: [],
-      selected_address: "",
-      selected_delivery_date: "",
-      total_before_discount: 0,
-      date_issued: new Date().toISOString().split("T")[0],
-      discount: 0,
-      total_tax: 0,
-      shipping_fee: 0,
-      warranty_fee: 0,
-      total_price: 0,
-    }
-  );
+  const [quotationInfo, setQuotationInfo] = useState({
+    // Customer information
+    customer_id: "",
+    quotation_id: "",
+    selected_products: [],
+    selected_address: "",
+    selected_delivery_date: "",
+    total_before_discount: 0,
+    date_issued: new Date().toISOString().split("T")[0],
+    discount: 0,
+    total_tax: 0,
+    shipping_fee: 0,
+    warranty_fee: 0,
+    total_price: 0,
+  });
 
   // Modals
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
@@ -86,6 +83,10 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
 
   const handleDelete = () => {
     if (selectedProduct === "") {
+      showAlert({
+        type: "error",
+        title: "Select a product to delete.",
+      });
       return;
     }
 
@@ -97,29 +98,29 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
 
     showAlert({
       type: "success",
-      title: "Product Removed",
+      title: "Product removed.",
     });
   };
 
   useEffect(() => {
     if (copyToModal === "Order") {
-      localStorage.setItem("Transfer", JSON.stringify(quotationInfo));
-      console.log(quotationInfo);
+      localStorage.setItem(
+        "TransferID",
+        JSON.stringify(quotationInfo.quotation_id)
+      );
+      localStorage.setItem("TransferOperation", JSON.stringify("quotation"));
+      console.log("Saved to local storage: operation and ID");
       loadSubModule("Order");
       setActiveSubModule("Order");
     } else if (copyToModal === "Blanket Agreement") {
       setIsBlanketAgreementDateOpen(true);
+      // Creates blanket agreement at BlanketAgreementDateModal
     }
-    setCopyToModal("");
   }, [copyToModal]);
 
   // const handleTransfer = () => {
   //   return false;
   // };
-
-  // useEffect(() => {
-  //   console.log("test");
-  // }, []);
 
   // This useEffect updates the quotationInfo state when a customer is selected
   useEffect(() => {
@@ -160,10 +161,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     });
   }, [selectedCustomer, products]);
 
-  // useEffect(() => {
-  //   console.log("Page: " + selectedProduct.product_id);
-  // }, [selectedProduct]);
-
   const handleSubmit = () => {
     if (selectedCustomer.customer_id == undefined) {
       showAlert({
@@ -201,10 +198,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       selected_delivery_date: deliveryDate,
     });
   }, [deliveryDate]);
-
-  // useEffect(() => {
-  //   console.log(quotationInfo);
-  // }, [quotationInfo]);
 
   return (
     <div className="quotation">

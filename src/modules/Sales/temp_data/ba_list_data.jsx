@@ -1,4 +1,4 @@
-const BLANKET_AGREEMENT_LIST = [
+const BLANKET_AGREEMENT_LIST_DATA = [
   {
     agreement_id: "B-9A2D4E",
     customer_id: 1000,
@@ -173,4 +173,4 @@ const BLANKET_AGREEMENT_LIST = [
   },
 ];
 
-export default BLANKET_AGREEMENT_LIST;
+export default BLANKET_AGREEMENT_LIST_DATA;

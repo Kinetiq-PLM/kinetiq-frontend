@@ -37,10 +37,6 @@ const BlanketAgreement = ({ loadSubModule, setActiveSubModule }) => {
   const [isDeliveryListOpen, setIsDeliveryListOpen] = useState(false);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
 
-  useEffect(() => {
-    console.log(selectedBlanketAgreement);
-  }, [selectedBlanketAgreement]);
-
   return (
     <div className="blanket-agreement">
       <div className="body-content-container">
