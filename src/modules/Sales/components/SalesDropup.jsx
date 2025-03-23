@@ -37,7 +37,6 @@ const SalesDropup = ({
   const handleOptionClick = (option) => {
     if (disabled) return;
 
-    setSelectedOption(option); // update dropup
     setOption(option); // update parent component
     setIsOpen(false);
   };

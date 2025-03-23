@@ -43,7 +43,7 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
       onClose();
       showAlert({
         type: "success",
-        title: "Quotation Selected",
+        title: "Copied from Quotation.",
       });
       setSelectedQuotation(null);
     }

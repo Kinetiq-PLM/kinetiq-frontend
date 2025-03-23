@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAlert } from "../../Context/AlertContext.jsx";
 
 import QUOTATION_LIST_DATA from "./../../../temp_data/quotation_list_data";
-import BLANKET_AGREEMENT_LIST from "./../../../temp_data/ba_list_data";
+import BLANKET_AGREEMENT_LIST_DATA from "./../../../temp_data/ba_list_data";
 
 import Table from "../../Table";
 import Button from "../../Button";
@@ -18,7 +18,11 @@ const BlanketAgreementListModal = ({
 }) => {
   const { showAlert } = useAlert();
 
+<<<<<<< HEAD
   const [agreementList, setAgreementList] = useState([]);
+=======
+  const blanket_agreement_list = BLANKET_AGREEMENT_LIST_DATA;
+>>>>>>> 9703250 (worked on transitions and master list)
 
   const [selectedBlanketAgreement, setSelectedBlanketAgreement] =
     useState(null);
@@ -48,7 +52,7 @@ const BlanketAgreementListModal = ({
       onClose();
       showAlert({
         type: "success",
-        title: "Added Product",
+        title: "Copied from Blanket Agreement.",
       });
       setSelectedBlanketAgreement(null);
     }
