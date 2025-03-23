@@ -207,6 +207,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
         <BlanketAgreementDateModal
           isOpen={isBlanketAgreementDateOpen}
           onClose={() => setIsBlanketAgreementDateOpen(false)}
+          quotationInfo={quotationInfo}
         ></BlanketAgreementDateModal>
         {/* DETAILS */}
         <div>
