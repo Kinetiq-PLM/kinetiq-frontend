@@ -14,11 +14,12 @@ import CustomerListModal from "../components/Modals/Lists/CustomerList";
 import ProductListModal from "../components/Modals/Lists/ProductList";
 import NewCustomerModal from "../components/Modals/NewCustomer";
 import BlanketAgreementDateModal from "../components/Modals/BlanketAgreementDates.jsx";
+import EmployeeListModal from "../components/Modals/Lists/EmployeeListModal.jsx";
 
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { addQuotation, addStatement, addStatementItem } from "../api/api";
 import generateRandomID from "../components/GenerateID";
 
@@ -32,10 +33,18 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     mutationFn: async (data) => await addQuotation(data),
     onSuccess: (data, variables, context) => {
       setQ_id(data.quotation_id);
-      alert("success" + data);
+      showAlert({
+        type: "success",
+        title: "Quotation Submitted",
+      });
+      setSubmitted(true);
+      localStorage.setItem("quotation_id", data.quotation_id);
     },
     onError: (error) => {
-      alert("error " + error);
+      showAlert({
+        type: "error",
+        title: "An error occurred while submitting quotation: " + error,
+      });
     },
   });
 
@@ -79,6 +88,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // Modals
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
+  const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [isBlanketAgreementDateOpen, setIsBlanketAgreementDateOpen] =
@@ -131,8 +141,8 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
 
   useEffect(() => {
     if (copyToModal === "Order") {
-      localStorage.setItem("Transfer", JSON.stringify(quotationInfo));
-      console.log(quotationInfo);
+      // localStorage.setItem("Transfer", JSON.stringify(quotationInfo));
+      // console.log(quotationInfo);
       loadSubModule("Order");
       setActiveSubModule("Order");
     } else if (copyToModal === "Blanket Agreement") {
@@ -189,33 +199,11 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     });
   }, [selectedCustomer, products]);
 
-  useEffect(() => {
-    console.log(products);
-  }, [products]);
+  // useEffect(() => {
+  //   if(employeeQuery.status === "success"){
 
-  const handleSubmit = () => {
-    if (selectedCustomer.customer_id == undefined) {
-      showAlert({
-        type: "error",
-        title: "Please select a customer.",
-      });
-      return;
-    }
-    if (products.length === 0) {
-      showAlert({
-        type: "error",
-        title: "Please add products.",
-      });
-      return;
-    }
-
-    // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
-    setSubmitted(true);
-    showAlert({
-      type: "success",
-      title: "Quotation Submitted",
-    });
-  };
+  //   }
+  // }, [employeeQuery.data]);
 
   useEffect(() => {
     setQuotationInfo({
@@ -236,10 +224,25 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // }, [quotationInfo]);
 
   const handleSubmit = async () => {
+    if (selectedCustomer.customer_id == undefined) {
+      showAlert({
+        type: "error",
+        title: "Please select a customer.",
+      });
+      return;
+    }
+    if (products.length === 0) {
+      showAlert({
+        type: "error",
+        title: "Please add products.",
+      });
+      return;
+    }
+
     const request = {
       statement_data: {
         customer: selectedCustomer.customer_id,
-        salesrep: selectedEmployee,
+        salesrep: selectedEmployee.employee_id,
         type: "Non-Project-Based", // make a variable
         total_amount: +parseFloat(quotationInfo.total_price).toFixed(2),
         discount: +parseFloat(quotationInfo.discount).toFixed(2),
@@ -288,6 +291,11 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsBlanketAgreementDateOpen(false)}
           quotationInfo={quotationInfo}
         ></BlanketAgreementDateModal>
+        <EmployeeListModal
+          isOpen={isEmployeeListOpen}
+          onClose={() => setIsEmployeeListOpen(false)}
+          setEmployee={setSelectedEmployee}
+        ></EmployeeListModal>
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -325,7 +333,23 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
             </div>
 
             {/* Employee ID Input */}
-            <div className="flex items-center gap-2">
+            <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+              <p className="">Employee ID</p>
+              <div
+                className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
+                onClick={() => setIsEmployeeListOpen(true)}
+              >
+                <p className="text-sm">
+                  {selectedEmployee ? selectedEmployee.employee_id : ""}
+                </p>
+                <img
+                  src="/icons/information-icon.svg"
+                  className="h-[15px]"
+                  alt="info icon"
+                />
+              </div>
+            </div>
+            {/* <div className="flex items-center gap-2">
               <p className="text-gray-700 text-sm">Employee ID</p>
               <input
                 type="text"
@@ -333,7 +357,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
                 onChange={(e) => setSelectedEmployee(e.target.value)}
                 value={selectedEmployee || ""}
               ></input>
-            </div>
+            </div> */}
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto">

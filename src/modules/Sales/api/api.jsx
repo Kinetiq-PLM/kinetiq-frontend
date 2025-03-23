@@ -17,6 +17,15 @@ export async function getCustomers() {
   }
   return {};
 }
+export async function getEmployees() {
+  const res = await fetch(BASE_API_URL + "misc/employee", {
+    method: "GET",
+  });
+  if (res.ok) {
+    return await res.json();
+  }
+  return {};
+}
 
 export async function addStatement(newStatement) {
   const res = await fetch(BASE_API_URL + "sales/statement/", {
