@@ -140,7 +140,15 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       0
     );
     const shippingFee = products.length * 100;
-    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
+    const warrantyFee = products.reduce(
+      (acc, product) =>
+        acc +
+        ((product.markup_price - product.unit_price) *
+          product.quantity *
+          product.warranty_period) /
+          12,
+      0
+    );
     const totalPrice =
       Number(totalBeforeDiscount) -
       Number(totalDiscount) +

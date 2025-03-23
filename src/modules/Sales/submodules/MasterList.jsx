@@ -2,24 +2,33 @@ import React, { useState } from "react";
 import "../styles/Index.css";
 import Heading from "../components/Heading";
 import Button from "../components/Button";
+import Dropdown from "../components/Dropdown";
 
-const tabs = [
-  "Quotations",
-  "Orders",
-  "Deliveries",
-  "Invoices",
-  "Blanket Agreements",
-  "Opportunities",
-];
+import QuotationsTab from "./../components/MasterListTabs/QuotationsTab";
+import OrdersTab from "./../components/MasterListTabs/OrdersTab";
+import DeliveriesTab from "./../components/MasterListTabs/DeliveriesTab";
+import InvoicesTab from "./../components/MasterListTabs/InvoicesTab";
+import BlanketAgreementsTab from "./../components/MasterListTabs/BlanketAgreementsTab";
+import OpportunitiesTab from "./../components/MasterListTabs/OpportunitiesTab";
 
 const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
-  const [activeTab, setActiveTab] = useState(tabs[0]); // Default to first tab
-
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-    if (setActiveSubModule) setActiveSubModule(tab); // Update parent state if provided
-  };
-
+  const tabs = [
+    {
+      name: "Quotations",
+      component: (
+        <QuotationsTab
+          loadSubModule={loadSubModule}
+          setActiveSubModule={setActiveSubModule}
+        />
+      ),
+    },
+    { name: "Orders", component: <OrdersTab /> },
+    { name: "Deliveries", component: <DeliveriesTab /> },
+    { name: "Invoices", component: <InvoicesTab /> },
+    { name: "Blanket Agreements", component: <BlanketAgreementsTab /> },
+    { name: "Opportunities", component: <OpportunitiesTab /> },
+  ];
+  const [activeTab, setActiveTab] = useState(tabs[0].name); // Default to first tab
   return (
     <div className="master-list">
       <div className="body-content-container">
@@ -28,18 +37,42 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           SubTitle="Comprehensive lists regarding various information used in sales."
         />
 
-        {/* Tab Selector */}
-        <div className="mt-4 border-b border-[#E8E8E8] w-fit">
-          {tabs.map((tab) => (
-            <Button
-              key={tab}
-              type={activeTab === tab ? "active" : "link"}
-              onClick={() => handleTabClick(tab)}
-            >
-              {tab}
-            </Button>
-          ))}
-        </div>
+        <main className="">
+          {/* Tab Selector */}
+          <div className="mt-4 flex flex-col md:flex-row lg:hidden md:justify-between md:items-center gap-4">
+            <div>
+              <h4 className="font-medium">Select Data:</h4>
+            </div>
+            <div className="flex items-center gap-2">
+              <h4 className="text-lg font-medium text-gray-400">View:</h4>
+              <div className="w-64">
+                <Dropdown
+                  label=""
+                  options={tabs.map((tab) => tab.name)}
+                  onChange={setActiveTab}
+                  value={activeTab}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex mt-4 border-b border-[#E8E8E8] w-fit gap-2">
+            {tabs.map((tab) => (
+              <Button
+                key={tab.name}
+                type={activeTab === tab.name ? "active" : "link"}
+                onClick={() => setActiveTab(tab.name)}
+              >
+                {tab.name}
+              </Button>
+            ))}
+          </div>
+
+          {/* Active Tab Content */}
+          <div className="mt-6">
+            {tabs.find((tab) => tab.name === activeTab)?.component}
+          </div>
+        </main>
       </div>
     </div>
   );
