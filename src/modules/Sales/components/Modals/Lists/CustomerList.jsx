@@ -33,7 +33,11 @@ const CustomerListModal = ({
 
   const customersQuery = useQuery({
     queryKey: ["customers"],
+<<<<<<< HEAD
     queryFn: async () => await GET("sales/customer"),
+=======
+    queryFn: async () => await getCustomers(),
+>>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
     enabled: isOpen,
   });
 
