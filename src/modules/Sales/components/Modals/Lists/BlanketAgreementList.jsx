@@ -98,7 +98,7 @@ const BlanketAgreementListModal = ({
       setFilteredData(formattedData);
       setAgreementList(formattedData);
     }
-  }, [agreementQuery.status]);
+  }, [agreementQuery.data]);
   if (!isOpen) return null;
 
   return (

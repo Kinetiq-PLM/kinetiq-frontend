@@ -98,7 +98,7 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
           quotationQuery.error.message
       );
     }
-  }, [quotationQuery.status]);
+  }, [quotationQuery.data]);
   if (!isOpen) return null;
 
   return (

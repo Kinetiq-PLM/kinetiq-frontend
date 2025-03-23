@@ -52,6 +52,18 @@ export async function addQuotation(newQuotation) {
   }
   return {};
 }
+
+export async function addCustomer(newCustomer) {
+  const res = await fetch(BASE_API_URL + "sales/customer/", {
+    method: "POST",
+    body: JSON.stringify(newCustomer),
+    headers: { "Content-Type": "application/json" },
+  });
+  if (res.ok) {
+    return await res.json();
+  }
+  return {};
+}
 export async function getQuotations() {
   const res = await fetch(BASE_API_URL + "sales/quotation/", {
     method: "GET",

@@ -65,7 +65,7 @@ const CustomerListModal = ({
           customersQuery.error?.message
       );
     }
-  }, [customersQuery.status]);
+  }, [customersQuery.data]);
 
   useEffect(() => {
     const handleEscape = (e) => {

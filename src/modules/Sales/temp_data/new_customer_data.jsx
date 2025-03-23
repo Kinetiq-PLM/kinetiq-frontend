@@ -1,4 +1,4 @@
-const CustomerTypes = ["Lead", "Prospect", "Existing Client"];
+const CustomerTypes = ["Lead", "Prospect", "Client"];
 
 const CountryData = [
   {

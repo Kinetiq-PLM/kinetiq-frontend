@@ -62,7 +62,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
           productsQuery.error?.data
       );
     }
-  }, [productsQuery.status]);
+  }, [productsQuery.data]);
 
   useEffect(() => {
     const handleEscape = (e) => {

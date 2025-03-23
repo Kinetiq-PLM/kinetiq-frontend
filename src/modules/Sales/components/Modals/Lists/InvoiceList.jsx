@@ -88,7 +88,7 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
       setInvoiceList(formattedData);
       setFilteredData(formattedData);
     }
-  }, [invoiceQuery.status]);
+  }, [invoiceQuery.data]);
   if (!isOpen) return null;
 
   return (

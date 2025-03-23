@@ -9,6 +9,8 @@ import Button from "../Button";
 import generateRandomID from "../GenerateID.jsx";
 import InputField from "../InputField.jsx";
 import Dropdown from "../Dropdown.jsx";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addCustomer } from "../../api/api.jsx";
 
 const NewCustomerModal = ({ isOpen, onClose }) => {
   const { showAlert } = useAlert();
@@ -33,6 +35,14 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
   const [mainAddress, setMainAddress] = useState("");
   const [secondaryAddress, setSecondaryAddress] = useState("");
   const [customerType, setCustomerType] = useState("");
+
+  const queryClient = useQueryClient();
+  const customerMutation = useMutation({
+    mutationFn: async (data) => await addCustomer(data),
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries(["customers"]);
+    },
+  });
 
   const handleConfirm = () => {
     setIsValidationVisible(true);
@@ -59,6 +69,20 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
 
     if (errorCount === 0) {
       // Add new customer HERE to database
+      const request = {
+        name: companyName,
+        email_address: email,
+        phone_number: contactNumber,
+        country,
+        city,
+        postal_code: postalCode,
+        address_line1: mainAddress,
+        address_line2: secondaryAddress,
+        customer_type: customerType,
+        status: "Active",
+        debt: 0,
+      };
+      customerMutation.mutate(request);
 
       // Reset form fields
       setCustomerID(generateRandomID("C"));

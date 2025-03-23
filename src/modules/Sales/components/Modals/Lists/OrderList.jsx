@@ -91,7 +91,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
       setFilteredData(formattedData);
       setOrderList(formattedData);
     }
-  }, [orderQuery.status]);
+  }, [orderQuery.data]);
 
   if (!isOpen) return null;
 
