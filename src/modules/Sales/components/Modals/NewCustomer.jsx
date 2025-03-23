@@ -38,8 +38,11 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
 
   const queryClient = useQueryClient();
   const customerMutation = useMutation({
-    mutationFn: async (data) => await addCustomer("sales/customer/", data),
+    mutationFn: async (data) => await POST("sales/customer/", data),
     onSuccess: (data, variables, context) => {
+      queryClient.setQueryData(["customers"], (oldCustomers) => {
+        return [...(oldCustomers || []), data];
+      });
       queryClient.invalidateQueries(["customers"]);
     },
   });
