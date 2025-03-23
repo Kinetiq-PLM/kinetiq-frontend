@@ -27,11 +27,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
 
   const productsQuery = useQuery({
     queryKey: ["products"],
-<<<<<<< HEAD
     queryFn: async () => await GET("misc/product"),
-=======
-    queryFn: async () => await getProducts(),
->>>>>>> a5ff70e (add api calls for quotation, order, agreement, invoice list modals)
     enabled: isOpen,
   });
 
