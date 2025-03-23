@@ -21,6 +21,7 @@ import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
 import { useMutation } from "@tanstack/react-query";
 import { POST } from "../api/api";
+
 import generateRandomID from "../components/GenerateID";
 
 const Quotation = ({ loadSubModule, setActiveSubModule }) => {
@@ -239,7 +240,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     const request = {
       statement_data: {
         customer: selectedCustomer.customer_id,
-        salesrep: selectedEmployee,
+        salesrep: selectedEmployee.employee_id,
         type: "Non-Project-Based", // make a variable
         total_amount: +parseFloat(quotationInfo.total_price).toFixed(2),
         discount: +parseFloat(quotationInfo.discount).toFixed(2),

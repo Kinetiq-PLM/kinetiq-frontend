@@ -13,6 +13,7 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
   const { showAlert } = useAlert();
 
   // setEmployee is used to set the selected customer in the parent component
+  // setSelectedCustomer is used to set the selected customer in this component
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
