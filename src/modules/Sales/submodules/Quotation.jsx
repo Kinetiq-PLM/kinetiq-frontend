@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import "../styles/Index.css";
 
 import { TAX_RATE } from "../temp_data/sales_data";
@@ -159,15 +159,18 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       0
     );
     const shippingFee = products.length * 100;
-    const warrantyFee = products.reduce(
-      (acc, product) =>
-        acc +
-        ((product.markup_price - product.unit_price) *
-          product.quantity *
-          product.warranty_period) /
-          12,
-      0
-    );
+    // const warrantyFee = products.reduce(
+    //   (acc, product) =>
+    //     acc +
+    //     ((Number(product.selling_price) - Number(product.unit_price)) *
+    //       product.quantity *
+    //       product.warranty_period) /
+    //       12,
+    //   0
+    // );
+    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
+
+    console.log(warrantyFee);
     const totalPrice =
       Number(totalBeforeDiscount) -
       Number(totalDiscount) +
@@ -180,7 +183,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       customer_id: selectedCustomer.customer_id,
       selected_products: products,
       quotation_id: q_id,
-      total_before_discount: totalBeforeDiscount,
+      total_before_discount: Number(totalBeforeDiscount),
       total_tax: Number(totalTax),
       discount: totalDiscount,
       shipping_fee: shippingFee,
@@ -188,6 +191,10 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       total_price: Number(totalPrice),
     });
   }, [selectedCustomer, products]);
+
+  useEffect(() => {
+    console.log(quotationInfo);
+  }, [quotationInfo]);
 
   useEffect(() => {
     setQuotationInfo({
@@ -359,27 +366,48 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           <div className="w-full flex flex-col gap-3 mt-4 lg:mt-0">
             <InfoField
               label={"Total Before Discount"}
-              value={Number(quotationInfo.total_before_discount).toFixed(2)}
+              value={Number(quotationInfo.total_before_discount).toLocaleString(
+                "en-US",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}
             />
             <InfoField
               label={"Discount"}
-              value={Number(quotationInfo.discount).toFixed(2)}
+              value={Number(quotationInfo.discount).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <InfoField
               label={"Shipping"}
-              value={Number(quotationInfo.shipping_fee).toFixed(2)}
+              value={Number(quotationInfo.shipping_fee).toLocaleString(
+                "en-US",
+                { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+              )}
             />
             <InfoField
               label={"Warranty"}
-              value={Number(quotationInfo.warranty_fee).toFixed(2)}
+              value={Number(quotationInfo.warranty_fee).toLocaleString(
+                "en-US",
+                { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+              )}
             />
             <InfoField
               label={"Tax"}
-              value={Number(quotationInfo.total_tax).toFixed(2)}
+              value={Number(quotationInfo.total_tax).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <InfoField
               label={"Total"}
-              value={Number(quotationInfo.total_price).toFixed(2)}
+              value={Number(quotationInfo.total_price).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <div className="flex justify-center md:justify-end gap-2">
               <SalesDropup

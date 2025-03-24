@@ -140,9 +140,18 @@ const SalesTable = ({
       const total = unitPrice * item.quantity + tax - item.discount;
       return {
         ...item,
-        selling_price: unitPrice.toFixed(2), // Convert to string only for display
-        tax: tax.toFixed(2), // Ensure tax is formatted properly
-        total_price: total.toFixed(2), // Calculate total price
+        selling_price: Number(unitPrice).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }), // Convert to string only for display
+        tax: Number(tax).toLocaleString("en-US", {
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+        }), // Ensure tax is formatted properly
+        total_price: Number(total).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }), // Calculate total price
       };
     });
 

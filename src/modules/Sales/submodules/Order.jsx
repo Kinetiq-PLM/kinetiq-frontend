@@ -256,7 +256,10 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       console.log("Searching for ID: ", transferID);
       console.log("At Operation: ", transferOperation);
 
-      copyFromMutation.mutate({ transferOperation, transferID });
+      copyFromMutation.mutate({
+        transferOperation: JSON.parse(transferOperation),
+        transferID: JSON.parse(transferID),
+      });
     }
   }, []);
 
