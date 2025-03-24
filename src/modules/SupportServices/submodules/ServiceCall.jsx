@@ -14,7 +14,7 @@ const ServiceCall = () => {
 
   // Fetch service calls from API (mock function)
   useEffect(() => {
-    // Replace with actual API call
+    // Replace with d actual API call
     const fetchServiceCalls = async () => {
       try {
         // Mock data for demonstration
@@ -69,12 +69,12 @@ const ServiceCall = () => {
 
   const handleViewDetails = (callId) => {
     console.log(`View details for call ID: ${callId}`)
-    // Implement view details functionality
+    // Implement d view details functionality
   }
 
   const handleUpdate = () => {
     console.log("Update button clicked")
-    // Implement update functionality
+    // Implement d update functionality
   }
 
   return (
@@ -156,7 +156,7 @@ const ServiceCall = () => {
                     </td>
                   </tr>
                 ))}
-                {/* Empty rows to fill the table */}
+                {/* Empty rows to fill d table */}
                 {Array(5 - filteredServiceCalls.length)
                   .fill()
                   .map((_, index) => (
