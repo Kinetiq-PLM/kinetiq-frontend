@@ -16,11 +16,11 @@ const BodyContent = () => {
             <div className="body-content-container">
 
                 <div className="flex w-full h-full flex-col min-h-screen p-5">
-                    <div className="flex w-full h-full space-x-4 p-6">
+                    <div className="flex w-full h-full space-x-4 py-7">
 
                         {/* Main Table */} 
                         {/* Table Container */}
-                        <div className="pcounts-table-container flex-1 border border-gray-300 rounded-lg scroll-container overflow-y-auto min-h-40 p-3">
+                        <div className="pcounts-table-container flex-2 border border-gray-300 rounded-lg scroll-container overflow-y-auto min-h-40 p-3">
                             <table className="w-full table-layout:fixed text-center cursor-pointer">
                                 <thead>
                                     <tr className="border-b border-gray-300">
@@ -43,7 +43,7 @@ const BodyContent = () => {
                             </table>
                         </div>
 
-                        {/* Right Section: Filters and Details */}
+                     
                         <div className="grid grid-rows-4 gap-3 justify-between h-full">
                             <div className="self-center text-sm text-gray-500">00 - 00 - 0000 / 00:00 UTC</div>
 
@@ -70,8 +70,9 @@ const BodyContent = () => {
 
 
                             {/* P-Count Details */}
-                            <div className="border border-gray-300 rounded-lg p-4">
-                                <h3 className="text-gray-600 font-semibold mb-2">P-Count Details</h3>
+                            <h3 className="text-gray-600 font-semibold">P-Count Details</h3>
+                            <div className="w-60 border border-gray-300 rounded-lg p-3">
+                                
                                 {[
                                     'Selected Product',
                                     'Total Quantity Checked',
