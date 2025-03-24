@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useEffect, useState } from "react";
 import { TAX_RATE } from "../temp_data/sales_data";
 import "../styles/Index.css";
@@ -77,8 +77,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       setProducts(prods);
       setSelectedCustomer(data.statement.customer);
       setSelectedEmployee(data.statement.salesrep);
-      transferData();
-
       localStorage.removeItem("TransferID");
       localStorage.removeItem("TransferOperation");
     },
@@ -198,47 +196,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     });
   };
 
-  const transferData = () => {
-    if (!selectedCustomer || products.length === 0) return;
-    const totalBeforeDiscount = products.reduce(
-      (acc, product) => acc + product.selling_price * product.quantity,
-      0
-    );
-
-    const totalTax = Number(
-      products.reduce(
-        (acc, product) =>
-          acc + TAX_RATE * (product.selling_price * product.quantity),
-        0
-      )
-    ).toFixed(2);
-
-    const totalDiscount = products.reduce(
-      (acc, product) => acc + product.discount,
-      0
-    );
-
-    const shippingFee = products.length * 100;
-    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
-    const totalPrice =
-      Number(totalBeforeDiscount) -
-      Number(totalDiscount) +
-      Number(totalTax) +
-      Number(shippingFee) +
-      Number(warrantyFee);
-    setOrderInfo((prevOrderInfo) => ({
-      ...prevOrderInfo,
-      customer_id: selectedCustomer.customer_id,
-      selected_products: products,
-      total_before_discount: totalBeforeDiscount,
-      total_tax: Number(totalTax),
-      discount: totalDiscount,
-      shipping_fee: shippingFee,
-      warranty_fee: Number(warrantyFee),
-      total_price: Number(totalPrice),
-    }));
-  };
-
   // For copy from feature
   useEffect(() => {
     if (copyFromModal === "Quotation") {
@@ -251,12 +208,16 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   useEffect(() => {
     if (copyFromModal === "Quotation" && selectedQuotation) {
       setCopyFromModal("");
+      console.log("copy from");
+      console.log(selectedQuotation);
+      setOrderInfo((prev) => ({
+        ...prev,
+        quotation_id: selectedQuotation.quotation_id,
+      }));
       copyFromMutation.mutate({
         transferID: selectedQuotation.quotation_id,
         transferOperation: "quotation",
       });
-      // setSelectedQuotation(null);  temp
-      // fill out fields HERE
     } else if (
       copyFromModal === "Blanket Agreement" &&
       selectedBlanketAgreement
@@ -267,7 +228,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
         transferID: selectedBlanketAgreement.agreement_id,
         transferOperation: "agreement",
       });
-      transferData();
       // setSelectedBlanketAgreement(null);
       // fill out fields HERE
     }
@@ -297,29 +257,78 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       console.log("At Operation: ", transferOperation);
 
       copyFromMutation.mutate({ transferOperation, transferID });
-
-      localStorage.removeItem("TransferID");
-      localStorage.removeItem("TransferOperation");
     }
   }, []);
 
   useEffect(() => {
-    transferData();
-  }, [selectedCustomer, products]);
+    if (!selectedCustomer || products.length === 0) return;
+    const totalBeforeDiscount = products.reduce(
+      (acc, product) => acc + product.selling_price * product.quantity,
+      0
+    );
+
+    const totalTax = Number(
+      products.reduce(
+        (acc, product) =>
+          acc + TAX_RATE * (product.selling_price * product.quantity),
+        0
+      )
+    ).toFixed(2);
+
+    const totalDiscount = products.reduce(
+      (acc, product) => acc + product.discount,
+      0
+    );
+
+    const shippingFee = products.length * 100;
+    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
+    const totalPrice =
+      Number(totalBeforeDiscount) -
+      Number(totalDiscount) +
+      Number(totalTax) +
+      Number(shippingFee) +
+      Number(warrantyFee);
+    console.log(totalBeforeDiscount);
+    console.log(totalTax);
+    console.log(totalDiscount);
+    console.log(totalPrice);
+    const order = {
+      ...orderInfo,
+      customer_id: selectedCustomer.customer_id,
+      selected_products: [...products],
+      total_before_discount: Number(totalBeforeDiscount),
+      selected_delivery_date:
+        orderInfo.selected_delivery_date || new Date().toISOString(),
+      selected_address: selectedCustomer.address_line1,
+      total_tax: Number(totalTax),
+      discount: Number(totalDiscount),
+      shipping_fee: Number(shippingFee),
+      warranty_fee: Number(warrantyFee),
+      total_price: Number(totalPrice),
+    };
+    console.log(order);
+    setOrderInfo(order);
+    // console.log(products);
+  }, [products, selectedCustomer]);
+
+  useEffect(() => {
+    console.log("here");
+    console.log(orderInfo);
+  }, [orderInfo]);
 
   useEffect(() => {
     setOrderInfo({
       ...orderInfo,
       selected_address: address,
     });
-  }, [selectedCustomer, address]);
+  }, [address]);
 
   useEffect(() => {
     setOrderInfo({
       ...orderInfo,
       selected_delivery_date: deliveryDate,
     });
-  }, [selectedCustomer, deliveryDate]);
+  }, [deliveryDate]);
 
   return (
     <div className="quotation">
