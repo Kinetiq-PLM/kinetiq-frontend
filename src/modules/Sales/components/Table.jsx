@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Table = ({ columns, data, onSelect, minWidth = false }) => {
+const Table = ({ columns, data, onSelect = () => {}, minWidth = false }) => {
   const [selectedRow, setSelectedRow] = useState(null);
 
   const handleRowClick = (row) => {

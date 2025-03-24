@@ -68,23 +68,21 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const [selectedProduct, setSelectedProduct] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("");
 
-  const [quotationInfo, setQuotationInfo] = useState(
-    localStorage.getItem("Transfer") || {
-      // Customer information
-      customer_id: "",
-      quotation_id: "",
-      selected_products: [],
-      selected_address: "",
-      selected_delivery_date: "",
-      total_before_discount: 0,
-      date_issued: new Date().toISOString().split("T")[0],
-      discount: 0,
-      total_tax: 0,
-      shipping_fee: 0,
-      warranty_fee: 0,
-      total_price: 0,
-    }
-  );
+  const [quotationInfo, setQuotationInfo] = useState({
+    // Customer information
+    customer_id: "",
+    quotation_id: "",
+    selected_products: [],
+    selected_address: "",
+    selected_delivery_date: "",
+    total_before_discount: 0,
+    date_issued: new Date().toISOString().split("T")[0],
+    discount: 0,
+    total_tax: 0,
+    shipping_fee: 0,
+    warranty_fee: 0,
+    total_price: 0,
+  });
 
   // Modals
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
@@ -178,7 +176,15 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       0
     );
     const shippingFee = products.length * 100;
-    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
+    const warrantyFee = products.reduce(
+      (acc, product) =>
+        acc +
+        ((product.markup_price - product.unit_price) *
+          product.quantity *
+          product.warranty_period) /
+          12,
+      0
+    );
     const totalPrice =
       Number(totalBeforeDiscount) -
       Number(totalDiscount) +

@@ -18,7 +18,11 @@ const BlanketAgreementListModal = ({
 }) => {
   const { showAlert } = useAlert();
 
+<<<<<<< HEAD
   const [agreementList, setAgreementList] = useState([]);
+=======
+  const blanket_agreement_list = BLANKET_AGREEMENT_LIST_DATA;
+>>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
 
   const [selectedBlanketAgreement, setSelectedBlanketAgreement] =
     useState(null);
