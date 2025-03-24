@@ -171,25 +171,25 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
         order_type: "Direct", // temporary value
         items: products.map((product) => ({
           product: product.product_id,
-          quantity: +parseInt(product.quantity),
-          unit_price: +parseFloat(product.selling_price).toFixed(2),
-          total_price: +parseFloat(product.total_price).toFixed(2),
-          discount: +parseFloat(product.discount).toFixed(2),
-          tax_amount: +parseFloat(product.tax).toFixed(2),
+          quantity: parseInt(product.quantity),
+          unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
+          total_price: Number(parseFloat(product.total_price).toFixed(2)),
+          discount: Number(parseFloat(product.discount).toFixed(2)),
+          tax_amount: Number(parseFloat(product.tax).toFixed(2)),
         })),
       },
       statement_data: {
         customer: selectedCustomer.customer_id,
-        salesrep: selectedEmployee.employee_id,
+        salesrep: selectedEmployee,
         type: "Non-Project-Based", // make a variable
-        total_amount: parseFloat(orderInfo.total_price),
-        discount: parseFloat(orderInfo.discount),
-        total_tax: parseFloat(orderInfo.total_tax),
+        total_amount: Number(parseFloat(orderInfo.total_price).toFixed(2)),
+        discount: Number(parseFloat(orderInfo.discount).toFixed(2)),
+        total_tax: Number(parseFloat(orderInfo.total_tax).toFixed(2)),
       },
     };
     console.log(request);
 
-    // orderMutation.mutate(request);
+    orderMutation.mutate(request);
     showAlert({
       type: "success",
       title: "Order Submitted",
@@ -426,7 +426,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
             {/* Submit Button Aligned Right */}
             <div className="mt-auto">
               <Button type="primary" className="" onClick={handleSubmit}>
-                Submit Quotation
+                Submit Order
               </Button>
             </div>
           </div>

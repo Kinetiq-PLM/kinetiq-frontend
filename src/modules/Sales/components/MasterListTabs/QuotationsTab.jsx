@@ -1,19 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../Table";
 import Dropdown from "../Dropdown";
 import Button from "../Button";
 import QUOTATION_LIST_DATA from "../../temp_data/quotation_list_data";
+import { useQuery } from "@tanstack/react-query";
+import { GET } from "../../api/api";
 
 export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
+  const [quotationList, setQuotationList] = useState([]);
+  const [filteredQuotations, setFilteredQuotations] = useState([]);
+
+  const quotationQuery = useQuery({
+    queryKey: ["quotations"],
+    queryFn: async () => await GET("sales/quotation/"),
+  });
 
   const columns = [
     { key: "quotation_id", label: "Quotation ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
-    { key: "selected_address", label: "Address" },
+    { key: "address", label: "Address" },
     { key: "total_price", label: "Total Price" },
     { key: "date_issued", label: "Date Issued" },
   ];
@@ -30,31 +39,55 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = QUOTATION_LIST_DATA.filter((quotation) => {
-    // Filter by search term
-    if (searchTerm) {
-      const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
-      if (!fieldValue.includes(searchTerm.toLowerCase())) return false;
-    }
-
-    // Filter by date (assuming date_issued is in YYYY-MM-DD format)
-    if (dateFilter !== "All Time") {
-      const today = new Date();
-      const pastDate = new Date();
-      const days = parseInt(dateFilter.match(/\d+/)[0], 10); // Extract number from filter
-      pastDate.setDate(today.getDate() - days);
-
-      const issuedDate = new Date(quotation.date_issued);
-      if (issuedDate < pastDate) return false;
-    }
-
-    return true;
-  });
 
   const handleRedirect = () => {
     loadSubModule("Quotation");
     setActiveSubModule("Quotation");
   };
+
+  useEffect(() => {
+    if (quotationQuery.status === "success") {
+      console.log(quotationQuery.data);
+      const data = quotationQuery.data.map((quote) => ({
+        quotation_id: quote.quotation_id,
+        customer_id: quote.statement.customer.customer_id,
+        customer_name: quote.statement.customer.name,
+        address: quote.statement.customer.address_line1,
+        total_price: Number(quote.statement.total_amount).toLocaleString(
+          "en-US",
+          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        ),
+        date_issued: new Date(quote.date_issued).toLocaleString(),
+      }));
+      setQuotationList(data);
+    } else if (quotationQuery.status === "error") {
+      alert("Error while fetching quotations");
+    }
+  }, [quotationQuery.data]);
+
+  useEffect(() => {
+    const filteredQuotations = quotationList.filter((quotation) => {
+      // Filter by search term
+      if (searchTerm) {
+        const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
+        if (!fieldValue.includes(searchTerm.toLowerCase())) return false;
+      }
+
+      // Filter by date (assuming date_issued is in YYYY-MM-DD format)
+      if (dateFilter !== "All Time") {
+        const today = new Date();
+        const pastDate = new Date();
+        const days = parseInt(dateFilter.match(/\d+/)[0], 10); // Extract number from filter
+        pastDate.setDate(today.getDate() - days);
+
+        const issuedDate = new Date(quotation.date_issued);
+        if (issuedDate < pastDate) return false;
+      }
+
+      return true;
+    });
+    setFilteredQuotations(filteredQuotations);
+  }, [quotationList]);
 
   return (
     <section className="h-full">
