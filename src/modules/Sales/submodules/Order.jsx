@@ -12,22 +12,15 @@ import CustomerListModal from "../components/Modals/Lists/CustomerList";
 import ProductListModal from "../components/Modals/Lists/ProductList";
 import QuotationListModal from "../components/Modals/Lists/QuotationList";
 import BlanketAgreementListModal from "../components/Modals/Lists/BlanketAgreementList";
-<<<<<<< HEAD
 import EmployeeListModal from "../components/Modals/Lists/EmployeeListModal.jsx";
-=======
-
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
 import NewCustomerModal from "../components/Modals/NewCustomer";
 import SalesTable from "../components/SalesTable";
 import SalesInfo from "../components/SalesInfo";
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
-<<<<<<< HEAD
 import { useMutation } from "@tanstack/react-query";
 import { GET, POST } from "../api/api.jsx";
-=======
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
 
 const Order = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
@@ -60,18 +53,14 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
 
   const [isQuotationListOpen, setIsQuotationListOpen] = useState(false);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
-<<<<<<< HEAD
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
-=======
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
 
   const [isBlanketAgreementListOpen, setIsBlanketAgreementListOpen] =
     useState(false);
   const [selectedBlanketAgreement, setSelectedBlanketAgreement] =
     useState(null);
 
-<<<<<<< HEAD
   const copyFromMutation = useMutation({
     mutationFn: async (data) =>
       await GET(`sales/${data.transferOperation}/${data.transferID}`),
@@ -105,18 +94,12 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     },
   });
 
-=======
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
   // columns for table
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
     { key: "quantity", label: "Quantity" },
-<<<<<<< HEAD
     { key: "selling_price", label: "Price" },
-=======
-    { key: "markup_price", label: "Price" },
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },
@@ -178,7 +161,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       return;
     }
 
-<<<<<<< HEAD
     // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
     setSubmitted(true);
 
@@ -210,12 +192,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     console.log(request);
 
     // orderMutation.mutate(request);
-=======
-    console.log(orderInfo);
-
-    // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
-    setSubmitted(true);
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
     showAlert({
       type: "success",
       title: "Order Submitted",
@@ -225,22 +201,14 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const transferData = () => {
     if (!selectedCustomer || products.length === 0) return;
     const totalBeforeDiscount = products.reduce(
-<<<<<<< HEAD
       (acc, product) => acc + product.selling_price * product.quantity,
-=======
-      (acc, product) => acc + product.markup_price * product.quantity,
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
       0
     );
 
     const totalTax = Number(
       products.reduce(
         (acc, product) =>
-<<<<<<< HEAD
           acc + TAX_RATE * (product.selling_price * product.quantity),
-=======
-          acc + TAX_RATE * (product.markup_price * product.quantity),
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
         0
       )
     ).toFixed(2);
@@ -251,29 +219,13 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     );
 
     const shippingFee = products.length * 100;
-<<<<<<< HEAD
     const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
-=======
-    const warrantyFee = products.reduce(
-      (acc, product) =>
-        acc +
-        ((product.markup_price - product.unit_price) *
-          product.quantity *
-          product.warranty_period) /
-          12,
-      0
-    );
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
     const totalPrice =
       Number(totalBeforeDiscount) -
       Number(totalDiscount) +
       Number(totalTax) +
       Number(shippingFee) +
       Number(warrantyFee);
-<<<<<<< HEAD
-=======
-
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
     setOrderInfo((prevOrderInfo) => ({
       ...prevOrderInfo,
       customer_id: selectedCustomer.customer_id,
@@ -298,19 +250,12 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
 
   useEffect(() => {
     if (copyFromModal === "Quotation" && selectedQuotation) {
-<<<<<<< HEAD
       setCopyFromModal("");
       copyFromMutation.mutate({
         transferID: selectedQuotation.quotation_id,
         transferOperation: "quotation",
       });
       // setSelectedQuotation(null);  temp
-=======
-      setOrderInfo(selectedQuotation);
-      setCopyFromModal("");
-      console.log(selectedQuotation);
-      setSelectedQuotation(null);
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
       // fill out fields HERE
     } else if (
       copyFromModal === "Blanket Agreement" &&
@@ -318,17 +263,12 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     ) {
       setOrderInfo(selectedBlanketAgreement);
       setCopyFromModal("");
-<<<<<<< HEAD
       copyFromMutation.mutate({
         transferID: selectedBlanketAgreement.agreement_id,
         transferOperation: "agreement",
       });
       transferData();
       // setSelectedBlanketAgreement(null);
-=======
-      console.log(selectedBlanketAgreement);
-      setSelectedBlanketAgreement(null);
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
       // fill out fields HERE
     }
   }, [selectedQuotation, selectedBlanketAgreement]);
@@ -352,17 +292,12 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     if (transferID && transferOperation) {
       // SEARCH DB FOR TRANSFERID with TRANSFEROPERATION
       // FILL DETAILS WITH DATA
-<<<<<<< HEAD
 
       console.log("Searching for ID: ", transferID);
       console.log("At Operation: ", transferOperation);
 
       copyFromMutation.mutate({ transferOperation, transferID });
 
-=======
-      console.log("Searching for ID: ", transferID);
-      console.log("At Operation: ", transferOperation);
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
       localStorage.removeItem("TransferID");
       localStorage.removeItem("TransferOperation");
     }
@@ -420,14 +355,11 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsBlanketAgreementListOpen(false)}
           setBlanketAgreement={setSelectedBlanketAgreement}
         ></BlanketAgreementListModal>
-<<<<<<< HEAD
         <EmployeeListModal
           isOpen={isEmployeeListOpen}
           onClose={() => setIsEmployeeListOpen(false)}
           setEmployee={setSelectedEmployee}
         ></EmployeeListModal>
-=======
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -465,7 +397,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
             </div>
 
             {/* Employee ID Input */}
-<<<<<<< HEAD
             <div className="flex mb-2 w-full mt-4 gap-4 items-center">
               <p className="">Employee ID</p>
               <div
@@ -481,11 +412,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
                   alt="info icon"
                 />
               </div>
-=======
-            <div className="flex items-center gap-2">
-              <p className="text-gray-700 text-sm">Employee ID</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] max-w-[250px] bg-gray-200 rounded"></div>
->>>>>>> 760fd56b3517e9987a816ea7f76b05421d85304c
             </div>
 
             {/* Submit Button Aligned Right */}
