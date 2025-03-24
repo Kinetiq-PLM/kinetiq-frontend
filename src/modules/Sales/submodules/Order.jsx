@@ -288,10 +288,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       Number(totalTax) +
       Number(shippingFee) +
       Number(warrantyFee);
-    console.log(totalBeforeDiscount);
-    console.log(totalTax);
-    console.log(totalDiscount);
-    console.log(totalPrice);
     const order = {
       ...orderInfo,
       customer_id: selectedCustomer.customer_id,
@@ -306,15 +302,8 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       warranty_fee: Number(warrantyFee),
       total_price: Number(totalPrice),
     };
-    console.log(order);
     setOrderInfo(order);
-    // console.log(products);
   }, [products, selectedCustomer]);
-
-  useEffect(() => {
-    console.log("here");
-    console.log(orderInfo);
-  }, [orderInfo]);
 
   useEffect(() => {
     setOrderInfo({
@@ -435,7 +424,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
           <div className="w-full flex flex-col gap-3 mt-4 lg:mt-0">
             <InfoField
               label={"Total Before Discount"}
-              value={orderInfo.total_before_discount}
+              value={Number(orderInfo.total_before_discount).toFixed(2)}
             />
             <InfoField
               label={"Discount"}

@@ -359,7 +359,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           <div className="w-full flex flex-col gap-3 mt-4 lg:mt-0">
             <InfoField
               label={"Total Before Discount"}
-              value={quotationInfo.total_before_discount}
+              value={Number(quotationInfo.total_before_discount).toFixed(2)}
             />
             <InfoField
               label={"Discount"}
