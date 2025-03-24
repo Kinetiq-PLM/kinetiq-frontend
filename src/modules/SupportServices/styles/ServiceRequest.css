@@ -1,21 +1,324 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
+
 .servrequ {
-    display: flex;
-    width: 100%;
-    height: 100%;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  font-family: "Inter", "Poppins", sans-serif;
+}
+
+.servrequ-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  max-height: 39rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.servrequ-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+}
+
+.servrequ-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.servrequ-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.servrequ-icon img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.servrequ-title h1 {
+  margin: 0;
+  color: #000000;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+}
+
+.servrequ-title p {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-family: "Inter", sans-serif;
+}
+
+.servrequ-divider {
+  height: 2px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 0.5rem 0 1.5rem 0;
+}
+
+/* Content section - scrollable */
+.servrequ-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #00a8a8 #f0f0f0;
+}
+
+/* Custom scrollbar for Webkit browsers */
+.servrequ-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.servrequ-content::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.servrequ-content::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+  border-radius: 4px;
+}
+
+/* Search and filter section */
+.servrequ-search-filter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.servrequ-search {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.servrequ-search input {
+  width: 100%;
+  padding: 0.625rem 0.625rem 0.625rem 2.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: "Inter", sans-serif;
+  color: #333;
+}
+
+.servrequ-search input:focus {
+  outline: none;
+  border-color: #e0e0e0;
+  box-shadow: none;
+}
+
+.servrequ-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+}
+
+.servrequ-filter {
+  position: relative;
+}
+
+.servrequ-filter-button {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "Inter", sans-serif;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.servrequ-chevron {
+  font-size: 0.625rem;
+  margin-left: 0.25rem;
+  color: #888;
+}
+
+.servrequ-filter-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 180px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 0.25rem;
+}
+
+.servrequ-filter-option {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.servrequ-filter-option:hover {
+  background-color: #f5f5f5;
+}
+
+/* Table section */
+.servrequ-table-container {
+  width: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.servrequ-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inter", sans-serif;
+}
+
+.servrequ-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: #00a8a8;
+  color: white;
+}
+
+.servrequ-table th {
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.servrequ-table td {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+}
+
+.servrequ-table tbody tr:nth-child(even) {
+  background-color: #eff8f9;
+}
+
+.servrequ-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.servrequ-empty-row td {
+  height: 2.5rem;
+}
+
+.servrequ-view-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+}
+
+.servrequ-view-button:hover {
+  background-color: #008b8b;
+}
+
+/* Actions section */
+.servrequ-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.servrequ-update-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.50rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+}
+
+.servrequ-update-button:hover {
+  background-color: #008b8b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .servrequ-container {
+    min-width: auto;
+    max-height: none;
+    padding: 1.25rem;
   }
-  
-  .servrequ .body-content-container {
-      width: 100%;
-      height: 100%;
-      border-radius: 0.5rem;
-      background-color: white;
-      padding: 1rem;
-      box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-width: 40rem;
-      min-height: 30rem;
-    }
-    
+}
+
+@media (max-width: 768px) {
+  .servrequ-search-filter {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .servrequ-search {
+    max-width: none;
+  }
+
+  .servrequ-filter {
+    width: 100%;
+  }
+
+  .servrequ-filter-button {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .servrequ-container {
+    padding: 1rem;
+  }
+
+  .servrequ-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
