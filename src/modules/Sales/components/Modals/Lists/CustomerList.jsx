@@ -33,7 +33,7 @@ const CustomerListModal = ({
 
   const customersQuery = useQuery({
     queryKey: ["customers"],
-    queryFn: async () => await GET("sales/customer"),
+    queryFn: async () => await GET("sales/customer?status=Active"),
     enabled: isOpen,
   });
 

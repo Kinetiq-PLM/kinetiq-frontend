@@ -22,7 +22,7 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
 
   const quotationQuery = useQuery({
     queryKey: ["quotations"],
-    queryFn: async () => await GET("sales/quotation"),
+    queryFn: async () => await GET("sales/quotation?status=Pending"),
     enabled: isOpen,
   });
 
