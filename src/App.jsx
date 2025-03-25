@@ -118,9 +118,10 @@ function App() {
       "Customer Support": "CustomerSupport",
     },
     CRM: {
-      "Contact Management": "ContactManagement",
-      Marketing: "Marketing",
-      "Customer Support": "CustomerSupport",
+      Ticket: "Ticket",
+      Campaign: "Campaign",
+      "Partner Master Data": "PartnerMasterData",
+      Opportunity: "Opportunity",
     },
     "Support & Services": {
       "Ticketing System": "TicketingSystem",

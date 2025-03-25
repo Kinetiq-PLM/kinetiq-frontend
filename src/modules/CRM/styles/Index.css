@@ -1,0 +1,71 @@
+.ticket,
+.campaign,
+.opportunity,
+.partner-master-data,
+.crm {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.ticket .body-content-container,
+.campaign .body-content-container,
+.opportunity .body-content-container,
+.partner-master-data .body-content-container,
+.crm .body-content-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 2rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-height: 30rem;
+}
+
+/* If width is smaller than 1000 */
+@media (max-width: 1300px) {
+  .table-layout {
+    max-width: 85vw;
+  }
+}
+@media (max-width: 1000px) {
+  .table-layout {
+    max-width: 80vw;
+  }
+}
+
+@media (max-width: 900px) {
+  .table-layout {
+    max-width: 85vw;
+  }
+}
+@media (max-width: 860px) {
+  .table-layout {
+    max-width: 78vw;
+  }
+}
+@media (max-width: 800px) {
+  .table-layout {
+    max-width: 75vw;
+  }
+}
+
+@media (max-width: 700px) {
+  .table-layout {
+    max-width: 72vw;
+  }
+}
+@media (max-width: 600px) {
+  .table-layout {
+    max-width: 70vw;
+  }
+}
+
+@media (max-width: 564px) {
+  .table-layout {
+    max-width: 400px;
+  }
+}
