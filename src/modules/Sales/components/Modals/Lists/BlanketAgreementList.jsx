@@ -27,7 +27,7 @@ const BlanketAgreementListModal = ({
   const [filteredData, setFilteredData] = useState([]);
   const agreementQuery = useQuery({
     queryKey: ["agreements"],
-    queryFn: async () => await GET("sales/agreement"),
+    queryFn: async () => await GET("sales/agreement?status=Active"),
     enabled: isOpen,
   });
   const queryClient = useQueryClient();

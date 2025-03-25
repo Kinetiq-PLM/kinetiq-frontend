@@ -427,27 +427,45 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
           <div className="w-full flex flex-col gap-3 mt-4 lg:mt-0">
             <InfoField
               label={"Total Before Discount"}
-              value={Number(orderInfo.total_before_discount).toFixed(2)}
+              value={Number(orderInfo.total_before_discount).toLocaleString(
+                "en-US",
+                { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+              )}
             />
             <InfoField
               label={"Discount"}
-              value={Number(orderInfo.discount).toFixed(2)}
+              value={Number(orderInfo.discount).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <InfoField
               label={"Shipping"}
-              value={Number(orderInfo.shipping_fee).toFixed(2)}
+              value={Number(orderInfo.shipping_fee).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <InfoField
               label={"Warranty"}
-              value={Number(orderInfo.warranty_fee).toFixed(2)}
+              value={Number(orderInfo.warranty_fee).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <InfoField
               label={"Tax"}
-              value={Number(orderInfo.total_tax).toFixed(2)}
+              value={Number(orderInfo.total_tax).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <InfoField
               label={"Total"}
-              value={Number(orderInfo.total_price).toFixed(2)}
+              value={Number(orderInfo.total_price).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <div className="flex justify-center md:justify-end gap-2">
               <SalesDropup
