@@ -1,17 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../../../Sales/components/Table";
 import Dropdown from "../../../Sales/components/Dropdown";
 import Button from "../../../Sales/components/Button";
 import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
+import { GET } from "../../../Sales/api/api";
+import { useQuery } from "@tanstack/react-query";
 
 export default function CampaignListTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
+  const [campaignList, setCampaignList] = useState([]);
+  const campaignQuery = useQuery({
+    queryKey: ["campaigns"],
+    queryFn: async () => await GET("crm/campaigns"),
+  });
 
   const columns = [
-    { key: "customer_id", label: "Customer ID" },
-    { key: "customer_name", label: "Customer Name" },
+    { key: "campaign_id", label: "Campaign ID" },
+    { key: "campaign_name", label: "Campaign Name" },
+    { key: "type", label: "Type" },
+    { key: "start_date", label: "Start Date" },
+    { key: "end_date", label: "End Date" },
+    { key: "status", label: "Status" },
   ];
 
   const dateFilters = [
@@ -26,7 +37,7 @@ export default function CampaignListTab() {
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = CUSTOMER_DATA.filter((quotation) => {
+  const filteredQuotations = campaignList.filter((quotation) => {
     // Filter by search term
     if (searchTerm) {
       const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
@@ -46,6 +57,20 @@ export default function CampaignListTab() {
 
     return true;
   });
+
+  useEffect(() => {
+    if (campaignQuery.status === "success") {
+      const data = campaignQuery.data.map((campaign) => ({
+        campaign_id: campaign.campaign_id,
+        campaign_name: campaign.campaign_name,
+        type: campaign.type,
+        start_date: new Date(campaign.start_date).toLocaleString(),
+        end_date: new Date(campaign.end_date).toLocaleString(),
+        status: campaign.status,
+      }));
+      setCampaignList(data);
+    }
+  }, [campaignQuery.data]);
 
   return (
     <section className="h-full">

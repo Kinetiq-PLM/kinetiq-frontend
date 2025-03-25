@@ -5,37 +5,42 @@ import { useState, useEffect, useRef } from "react";
 import { useAlert } from "../../Sales/components/Context/AlertContext.jsx";
 
 import Table from "../../Sales/components/Table";
-import { PRODUCTS_DATA } from "../../Sales/temp_data/products_data";
 import Button from "../../Sales/components/Button.jsx";
+import { GET } from "../../Sales/api/api.jsx";
+import { useQuery } from "@tanstack/react-query";
 
 const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
   const { showAlert } = useAlert();
 
-  const products_data = PRODUCTS_DATA;
-
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(products_data);
+  const [filteredData, setFilteredData] = useState([]);
+  const [campaignList, setCampaignList] = useState([]);
+  const campaignQuery = useQuery({
+    queryKey: ["campaigns"],
+    queryFn: async () => await GET("crm/campaigns"),
+    enabled: isOpen,
+  });
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
   const columns = [
-    { key: "product_id", label: "Product ID" },
-    { key: "product_name", label: "Name" }, // Company Name
-    { key: "stock", label: "Stock" }, // Country
+    { key: "campaign_id", label: "Campaign ID" },
+    { key: "campaign_name", label: "Name" }, // Company Name
+    { key: "type", label: "Type" }, // Country
   ];
 
   const handleConfirm = () => {
-    if (selectedProduct) {
-      setCampaign(selectedProduct); // Properly update the array
+    if (selectedCampaign) {
+      setCampaign(selectedCampaign); // Properly update the array
       onClose();
       showAlert({
         type: "success",
         title: "Added product.",
       });
-      setSelectedProduct(null);
+      setSelectedCampaign(null);
     }
   };
 
@@ -65,6 +70,21 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (campaignQuery.status === "success") {
+      const data = campaignQuery.data.map((campaign) => ({
+        campaign_id: campaign.campaign_id,
+        campaign_name: campaign.campaign_name,
+        type: campaign.type,
+      }));
+      setCampaignList(data);
+      setFilteredData(data);
+    }
+  }, [campaignQuery.data]);
+
+  // useEffect(() => {
+  //   console.log(campaignList);
+  // }, [campaignList]);
   if (!isOpen) return null;
 
   return (
@@ -107,8 +127,8 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filtered = products_data.filter((product) =>
-                  product.product_name.toLowerCase().includes(searchTerm)
+                const filtered = campaignList.filter((campaign) =>
+                  campaign.campaign_name.toLowerCase().includes(searchTerm)
                 );
                 setFilteredData(filtered);
               }}
@@ -118,7 +138,7 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
             <Table
               columns={columns}
               data={filteredData}
-              onSelect={setSelectedProduct}
+              onSelect={setSelectedCampaign}
             />
           </div>
           <div className="mt-4 flex justify-between">
@@ -126,7 +146,7 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
               <Button
                 type="primary"
                 onClick={handleConfirm}
-                disabled={!selectedProduct}
+                disabled={!selectedCampaign}
               >
                 Add
               </Button>
