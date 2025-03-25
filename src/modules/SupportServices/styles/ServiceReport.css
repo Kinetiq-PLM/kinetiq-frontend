@@ -1,21 +1,581 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
+
 .servrepo {
-    display: flex;
-    width: 100%;
-    height: 100%;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  font-family: "Inter", "Poppins", sans-serif;
+}
+
+.servrepo-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  max-height: 39rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.servrepo-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+}
+
+.servrepo-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.servrepo-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.servrepo-icon img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.servrepo-title h1 {
+  margin: 0;
+  color: #000000;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+}
+
+.servrepo-title p {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-family: "Inter", sans-serif;
+}
+
+.servrepo-divider {
+  height: 2px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 0.5rem 0 1.5rem 0;
+}
+
+/* Content section - scrollable */
+.servrepo-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #00a8a8 #f0f0f0;
+  padding-right: 0.5rem; /* Added padding to create space between content and scrollbar */
+}
+
+/* Custom scrollbar for Webkit browsers */
+.servrepo-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.servrepo-content::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.servrepo-content::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+  border-radius: 4px;
+}
+
+/* Form section */
+.servrepo-form {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+  border: 1px solid #e0e0e0;
+}
+
+.servrepo-form-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.servrepo-form-row:last-child {
+  margin-bottom: 0;
+}
+
+.servrepo-form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.servrepo-form-group label {
+  font-size: 0.75rem;
+  color: #00a8a8;
+  font-weight: 500;
+}
+
+.servrepo-form-group input {
+  padding: 0.625rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.servrepo-form-group input:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 1px rgba(0, 168, 168, 0.2);
+}
+
+.servrepo-form-group input::placeholder {
+  color: #999;
+}
+
+.required {
+  color: #ff0000;
+  margin-left: 0.25rem;
+}
+
+.servrepo-select-wrapper {
+  position: relative;
+}
+
+.servrepo-select-arrow {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.625rem;
+  color: #888;
+  pointer-events: none;
+}
+
+.servrepo-date-wrapper {
+  position: relative;
+}
+
+.servrepo-calendar-icon-small {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.25rem;
+}
+
+.servrepo-calendar-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+/* General section */
+.servrepo-general-section {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.servrepo-section-header {
+  margin-bottom: 1.5rem;
+}
+
+.servrepo-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.servrepo-section-title img {
+  width: 20px;
+  height: 20px;
+}
+
+.servrepo-section-title h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.servrepo-section-divider {
+  height: 2px; /* Changed from 3px to 2px as requested */
+  background-color: #00a8a8;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Table controls */
+.servrepo-table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.servrepo-search {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+  min-width: 200px;
+}
+
+.servrepo-search input {
+  width: 100%;
+  padding: 0.625rem 0.625rem 0.625rem 2.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: "Inter", sans-serif;
+  color: #333;
+}
+
+.servrepo-search input:focus {
+  outline: none;
+  border-color: #e0e0e0;
+  box-shadow: none;
+}
+
+.servrepo-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+}
+
+.servrepo-filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.servrepo-date-filter,
+.servrepo-status-filter {
+  position: relative;
+}
+
+.servrepo-filter-button {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "Inter", sans-serif;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+.servrepo-calendar-small {
+  font-size: 0.875rem;
+  margin-right: 0.25rem;
+}
+
+.servrepo-chevron {
+  font-size: 0.625rem;
+  margin-left: 0.25rem;
+  color: #888;
+}
+
+.servrepo-filter-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 180px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 0.25rem;
+}
+
+.servrepo-filter-option {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.servrepo-filter-option:hover {
+  background-color: #f5f5f5;
+}
+
+/* Table section */
+.servrepo-table-container {
+  width: 100%;
+  border: none; /* Removed border from container */
+  background: transparent; /* Made container transparent */
+  border-radius: 0; /* Removed border radius from container */
+  overflow: visible; /* Changed to visible */
+  padding: 0; /* Removed any padding */
+  margin: 0; /* Removed any margin */
+  box-shadow: none; /* Removed any shadow */
+}
+
+.servrepo-table {
+  width: 100%;
+  border-collapse: separate; /* Changed from collapse to separate to support border-radius */
+  border-spacing: 0; /* Ensure no spacing between cells */
+  font-family: "Inter", sans-serif;
+  border-radius: 0.5rem; /* Keep border radius on table */
+  overflow: hidden; /* Ensure border-radius is applied */
+  border: 1px solid #e0e0e0; /* Added border to table instead of container */
+}
+
+.servrepo-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: #00a8a8;
+  color: white;
+}
+
+.servrepo-table thead tr:first-child th:first-child {
+  border-top-left-radius: 0.5rem;
+}
+
+.servrepo-table thead tr:first-child th:last-child {
+  border-top-right-radius: 0.5rem;
+}
+
+.servrepo-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 0.5rem;
+}
+
+.servrepo-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 0.5rem;
+}
+
+.servrepo-table th {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.servrepo-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.servrepo-table tbody tr:nth-child(even) {
+  background-color: #eff8f9;
+}
+
+.servrepo-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.servrepo-empty-row td {
+  height: 2.5rem;
+}
+
+/* Actions section */
+.servrepo-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  margin-right: 0.5rem; /* Added margin to create space between buttons and scrollbar */
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.servrepo-left-actions,
+.servrepo-right-actions {
+  display: flex;
+  gap: 1.5rem; /* Increased gap between buttons */
+}
+
+.servrepo-close-button,
+.servrepo-accounting-button,
+.servrepo-cancel-button,
+.servrepo-update-button {
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  border: none;
+  white-space: nowrap;
+}
+
+.servrepo-close-button,
+.servrepo-accounting-button {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.servrepo-close-button:hover,
+.servrepo-accounting-button:hover {
+  background-color: #008b8b;
+}
+
+.servrepo-cancel-button {
+  background-color: #ffffff;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+}
+
+.servrepo-cancel-button:hover {
+  background-color: #f5f5f5;
+}
+
+.servrepo-update-button {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.servrepo-update-button:hover {
+  background-color: #008b8b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .servrepo-container {
+    min-width: auto;
+    max-height: none;
+    padding: 1.25rem;
   }
-  
-  .servrepo .body-content-container {
-      width: 100%;
-      height: 100%;
-      border-radius: 0.5rem;
-      background-color: white;
-      padding: 1rem;
-      box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-width: 40rem;
-      min-height: 30rem;
-    }
-    
+
+  .servrepo-form-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .servrepo-table-controls {
+    flex-wrap: wrap;
+  }
+
+  .servrepo-search {
+    flex: 1 0 100%;
+    max-width: 100%;
+    order: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .servrepo-filters {
+    width: 100%;
+    justify-content: flex-end;
+    order: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .servrepo-form-row {
+    flex-direction: column; /* Stack form fields on smaller tablets/mobile */
+    gap: 1rem;
+  }
+
+  .servrepo-table-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .servrepo-search {
+    max-width: none;
+    width: 100%;
+  }
+
+  .servrepo-filters {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .servrepo-date-filter,
+  .servrepo-status-filter {
+    width: 100%;
+  }
+
+  .servrepo-filter-button {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .servrepo-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .servrepo-left-actions,
+  .servrepo-right-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .servrepo-container {
+    padding: 1rem;
+  }
+
+  .servrepo-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .servrepo-form {
+    padding: 1rem;
+  }
+
+  .servrepo-general-section {
+    padding: 1rem;
+  }
+
+  .servrepo-left-actions,
+  .servrepo-right-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .servrepo-close-button,
+  .servrepo-accounting-button,
+  .servrepo-cancel-button,
+  .servrepo-update-button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
