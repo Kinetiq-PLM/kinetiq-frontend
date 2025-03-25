@@ -39,20 +39,19 @@ function App() {
           /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
         )
       );
-
       setModuleComponent(() => LazyComponent);
     }
   };
 
   // load jsx files for submodules
-  const loadSubModule = (submoduleId) => {
+  const loadSubModule = (submoduleId, mainModule = activeModule) => {
     if (
-      moduleSubmoduleFileNames[activeModule][submoduleId] &&
+      moduleSubmoduleFileNames[mainModule][submoduleId] &&
       !(activeSubModule == submoduleId)
     ) {
       const LazyComponent = lazy(() =>
         import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[activeModule]}/submodules/${moduleSubmoduleFileNames[activeModule][submoduleId]}.jsx`
+          /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
         )
       );
 
@@ -117,7 +116,6 @@ function App() {
       Dunning: "Dunning",
       Reporting: "Reporting",
       Returns: "Returns",
-      "Contact Management": "ContactManagement",
       Marketing: "Marketing",
       "Customer Support": "CustomerSupport",
     },
@@ -358,6 +356,7 @@ function App() {
               {ModuleComponent && (
                 <Suspense>
                   <ModuleComponent
+                    setActiveModule={setActiveModule}
                     loadSubModule={loadSubModule}
                     setActiveSubModule={setActiveSubModule}
                   />
