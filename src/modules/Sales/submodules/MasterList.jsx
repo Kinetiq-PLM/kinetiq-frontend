@@ -11,7 +11,11 @@ import InvoicesTab from "./../components/MasterListTabs/InvoicesTab";
 import BlanketAgreementsTab from "./../components/MasterListTabs/BlanketAgreementsTab";
 import OpportunitiesTab from "./../components/MasterListTabs/OpportunitiesTab";
 
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+const BodyContent = ({
+  setActiveModule,
+  loadSubModule,
+  setActiveSubModule,
+}) => {
   const tabs = [
     {
       name: "Quotations",
@@ -22,11 +26,52 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
         />
       ),
     },
-    { name: "Orders", component: <OrdersTab /> },
-    { name: "Deliveries", component: <DeliveriesTab /> },
-    { name: "Invoices", component: <InvoicesTab /> },
-    { name: "Blanket Agreements", component: <BlanketAgreementsTab /> },
-    { name: "Opportunities", component: <OpportunitiesTab /> },
+    {
+      name: "Orders",
+      component: (
+        <OrdersTab
+          loadSubModule={loadSubModule}
+          setActiveSubModule={setActiveSubModule}
+        />
+      ),
+    },
+    {
+      name: "Deliveries",
+      component: (
+        <DeliveriesTab
+          loadSubModule={loadSubModule}
+          setActiveSubModule={setActiveSubModule}
+        />
+      ),
+    },
+    {
+      name: "Invoices",
+      component: (
+        <InvoicesTab
+          loadSubModule={loadSubModule}
+          setActiveSubModule={setActiveSubModule}
+        />
+      ),
+    },
+    {
+      name: "Blanket Agreements",
+      component: (
+        <BlanketAgreementsTab
+          loadSubModule={loadSubModule}
+          setActiveSubModule={setActiveSubModule}
+        />
+      ),
+    },
+    {
+      name: "Opportunities",
+      component: (
+        <OpportunitiesTab
+          setActiveModule={setActiveModule}
+          loadSubModule={loadSubModule}
+          setActiveSubModule={setActiveSubModule}
+        />
+      ),
+    },
   ];
   const [activeTab, setActiveTab] = useState(tabs[0].name); // Default to first tab
   return (

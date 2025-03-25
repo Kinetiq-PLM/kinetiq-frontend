@@ -1,6 +1,6 @@
 const DELIVERY_LIST_DATA = [
   {
-    delivery_id: "D-1A2B3C",
+    shipping_id: "D-1A2B3C",
     order_id: "O-3F5A1C",
     customer_id: 1000,
     customer_name: "Customer 1",
@@ -54,7 +54,7 @@ const DELIVERY_LIST_DATA = [
     warranty_fee: 1363.2,
   },
   {
-    delivery_id: "D-4D5E6F",
+    shipping_id: "D-4D5E6F",
     order_id: "O-9D3E7F",
     customer_id: 1001,
     customer_name: "Customer 2",
@@ -96,7 +96,7 @@ const DELIVERY_LIST_DATA = [
     warranty_fee: 785.0,
   },
   {
-    delivery_id: "D-7G8H9I",
+    shipping_id: "D-7G8H9I",
     order_id: "O-5A1B2C",
     customer_id: 1002,
     customer_name: "Customer 3",
@@ -138,7 +138,7 @@ const DELIVERY_LIST_DATA = [
     warranty_fee: 1290.0,
   },
   {
-    delivery_id: "D-9J1K2L",
+    shipping_id: "D-9J1K2L",
     order_id: "O-8E6D4B",
     customer_id: 1003,
     customer_name: "Customer 4",

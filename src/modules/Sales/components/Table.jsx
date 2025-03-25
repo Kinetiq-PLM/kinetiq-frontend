@@ -18,7 +18,7 @@ const Table = ({ columns, data, onSelect = () => {}, minWidth = false }) => {
             {columns.map((column, index) => (
               <th
                 key={index}
-                className={`px-4 py-3 font-medium text-center ${
+                className={`px-4 py-3 font-medium text-center min-w-[200px] ${
                   minWidth ? "min-w-[200px]" : ""
                 }`}
               >
