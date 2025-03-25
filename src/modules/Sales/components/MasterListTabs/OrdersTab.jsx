@@ -1,23 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../Table";
 import Dropdown from "../Dropdown";
 import Button from "../Button";
 import ORDER_LIST_DATA from "../../temp_data/order_list_data";
-
+import { useQuery } from "@tanstack/react-query";
+import { GET } from "../../api/api";
 export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
-
+  const [orderList, setOrderList] = useState([]); // Default date filter
+  const orderQuery = useQuery({
+    queryKey: ["orders"],
+    queryFn: async () => await GET("sales/order"),
+  });
   const columns = [
     { key: "order_id", label: "Order ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
-    { key: "selected_address", label: "Address" },
+    { key: "address", label: "Address" },
     { key: "type", label: "Type" },
     { key: "total_price", label: "Total Price" },
-    { key: "salesrep_id", label: "Sales Rep" }, // name of salesrep if available
-    { key: "date_issued", label: "Date Issued" },
+    { key: "salesrep", label: "Sales Rep" }, // name of salesrep if available
+    { key: "order_date", label: "Date Issued" },
   ];
 
   const dateFilters = [
@@ -32,7 +37,7 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = ORDER_LIST_DATA.filter((quotation) => {
+  const filteredQuotations = orderList.filter((quotation) => {
     // Filter by search term
     if (searchTerm) {
       const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
@@ -57,6 +62,25 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
     loadSubModule("Quotation");
     setActiveSubModule("Quotation");
   };
+
+  useEffect(() => {
+    if (orderQuery.status === "success") {
+      const data = orderQuery.data.map((order) => ({
+        order_id: order.order_id,
+        customer_id: order.statement.customer.customer_id,
+        customer_name: order.statement.customer.name,
+        address: order.statement.customer.address_line1,
+        type: order.statement.type,
+        salesrep: `${order.statement.salesrep.first_name} ${order.statement.salesrep.last_name}`,
+        total_price: Number(order.statement.total_amount).toLocaleString(
+          "en-US",
+          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        ),
+        order_date: new Date(order.order_date).toLocaleString(),
+      }));
+      setOrderList(data);
+    }
+  }, [orderQuery.data]);
 
   return (
     <section className="h-full">

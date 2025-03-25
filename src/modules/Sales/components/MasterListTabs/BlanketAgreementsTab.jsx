@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../Table";
 import Dropdown from "../Dropdown";
 import Button from "../Button";
 import BLANKET_AGREEMENT_LIST_DATA from "../../temp_data/ba_list_data";
-
+import { GET } from "../../api/api";
+import { useQuery } from "@tanstack/react-query";
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
@@ -11,15 +12,20 @@ export default function BlanketAgreementsTab({
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
+  const [agreementList, setAgreementList] = useState([]);
 
+  const agreementQuery = useQuery({
+    queryKey: ["agreements"],
+    queryFn: async () => await GET("sales/agreement"),
+  });
   const columns = [
     { key: "agreement_id", label: "Agreement ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
-    { key: "selected_address", label: "Address" },
+    { key: "address", label: "Address" },
     { key: "type", label: "Type" },
     { key: "total_price", label: "Total Price" },
-    { key: "salesrep_id", label: "Sales Rep" }, // name of salesrep if available
+    { key: "salesrep", label: "Sales Rep" }, // name of salesrep if available
     { key: "agreement_method", label: "Agreement Method" }, // signed date
     { key: "date_issued", label: "Signed Date" }, // signed date
     { key: "start_date", label: "Start Date" },
@@ -39,7 +45,7 @@ export default function BlanketAgreementsTab({
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = BLANKET_AGREEMENT_LIST_DATA.filter((quotation) => {
+  const filteredQuotations = agreementList.filter((quotation) => {
     // Filter by search term
     if (searchTerm) {
       const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
@@ -64,7 +70,25 @@ export default function BlanketAgreementsTab({
     loadSubModule("Quotation");
     setActiveSubModule("Quotation");
   };
-
+  useEffect(() => {
+    if (agreementQuery.status === "success") {
+      const data = agreementQuery.data.map((agreement) => ({
+        agreement_id: agreement.agreement_id,
+        customer_id: agreement.statement.customer.customer_id,
+        customer_name: agreement.statement.customer.name,
+        address: agreement.statement.customer.address_line1,
+        type: agreement.statement.type,
+        total_price: agreement.statement.total_amount,
+        salesrep: `${agreement.statement.salesrep.first_name} ${agreement.statement.salesrep.last_name}`,
+        agreement_method: agreement.agreement_method,
+        date_issued: new Date(agreement.signed_date).toLocaleString(),
+        start_date: new Date(agreement.start_date).toLocaleString(),
+        end_date: new Date(agreement.end_date).toLocaleString(),
+        status: agreement.status,
+      }));
+      setAgreementList(data);
+    }
+  }, [agreementQuery.data]);
   return (
     <section className="h-full">
       {/* Header Section */}

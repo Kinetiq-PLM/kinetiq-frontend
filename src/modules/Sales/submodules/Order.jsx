@@ -180,7 +180,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       },
       statement_data: {
         customer: selectedCustomer.customer_id,
-        salesrep: selectedEmployee,
+        salesrep: selectedEmployee.employee_id,
         type: "Non-Project-Based", // make a variable
         total_amount: Number(parseFloat(orderInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(orderInfo.discount).toFixed(2)),
@@ -405,7 +405,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
                 onClick={() => setIsEmployeeListOpen(true)}
               >
                 <p className="text-sm">
-                  {selectedEmployee ? selectedEmployee : ""}
+                  {selectedEmployee ? selectedEmployee.employee_id : ""}
                 </p>
                 <img
                   src="/icons/information-icon.svg"

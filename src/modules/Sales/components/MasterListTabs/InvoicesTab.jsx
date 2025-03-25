@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../Table";
 import Dropdown from "../Dropdown";
 import Button from "../Button";
 import INVOICE_LIST_DATA from "../../temp_data/invoice_list_data";
-
+import { GET } from "../../api/api";
+import { useQuery } from "@tanstack/react-query";
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
@@ -23,6 +24,12 @@ export default function BlanketAgreementsTab({
     { key: "due_date", label: "Due Date" },
   ];
 
+  const [invoiceList, setInvoiceList] = useState([]);
+  const invoiceQuery = useQuery({
+    queryKey: ["invoices"],
+    queryFn: async () => await GET("sales/invoice"),
+  });
+
   const dateFilters = [
     "Last 30 days",
     "Last 60 days",
@@ -35,7 +42,7 @@ export default function BlanketAgreementsTab({
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = INVOICE_LIST_DATA.filter((quotation) => {
+  const filteredQuotations = invoiceList.filter((quotation) => {
     // Filter by search term
     if (searchTerm) {
       const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
@@ -60,6 +67,27 @@ export default function BlanketAgreementsTab({
     loadSubModule("Quotation");
     setActiveSubModule("Quotation");
   };
+
+  useEffect(() => {
+    if (invoiceQuery.status === "success") {
+      const data = invoiceQuery.data.map((invoice) => ({
+        invoice_id: invoice.invoice_id,
+        customer_id: invoice.order.statement.customer.customer_id,
+        customer_name: invoice.order.statement.customer.name,
+        invoice_date: new Date(invoice.invoice_date).toLocaleString(),
+        total_price: Number(
+          invoice.order.statement.total_amount
+        ).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        invoice_status: invoice.invoice_status,
+        payment_status: invoice.payment_status,
+        due_date: invoice.due_date,
+      }));
+      setInvoiceList(data);
+    }
+  }, [invoiceQuery.data]);
 
   return (
     <section className="h-full">

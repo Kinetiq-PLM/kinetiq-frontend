@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../Table";
 import Dropdown from "../Dropdown";
 import Button from "../Button";
 import DELIVERY_LIST_DATA from "../../temp_data/deliveries_list_data";
-
+import { useQuery } from "@tanstack/react-query";
+import { GET } from "../../api/api";
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
@@ -11,21 +12,26 @@ export default function BlanketAgreementsTab({
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
-
+  const [deliveryList, setDeliveryList] = useState([]);
   const columns = [
     { key: "shipping_id", label: "Shipping ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "order_id", label: "Order ID" },
     { key: "tracking_num", label: "Tracking Number" },
-    { key: "shipping_method", label: "Operational Cost ID" },
+    { key: "shipping_method", label: "Shipping Method" },
     { key: "customer_name", label: "Customer Name" },
     { key: "delivery_status", label: "Status" },
-    { key: "selected_address", label: "Address" },
+    { key: "address", label: "Address" },
     { key: "type", label: "Type" },
     { key: "total_price", label: "Total Price" },
     { key: "shipping_date", label: "Shipping Date" },
     { key: "estimated_delivery", label: "Estimated Delivery" },
   ];
+
+  const deliveryQuery = useQuery({
+    queryKey: ["deliveries"],
+    queryFn: async () => await GET("sales/delivery"),
+  });
 
   const dateFilters = [
     "Last 30 days",
@@ -39,7 +45,7 @@ export default function BlanketAgreementsTab({
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = DELIVERY_LIST_DATA.filter((quotation) => {
+  const filteredQuotations = deliveryList.filter((quotation) => {
     // Filter by search term
     if (searchTerm) {
       const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
@@ -64,6 +70,33 @@ export default function BlanketAgreementsTab({
     loadSubModule("Quotation");
     setActiveSubModule("Quotation");
   };
+
+  useEffect(() => {
+    if (deliveryQuery.status === "success") {
+      const data = deliveryQuery.data.map((delivery) => ({
+        shipping_id: delivery.shipping_id,
+        customer_id: delivery.order.statement.customer.customer_id,
+        order_id: delivery.order.order_id,
+        tracking_num: delivery.tracking_num,
+        shipping_method: delivery.shipping_method,
+        customer_name: delivery.order.statement.customer.name,
+        delivery_status: delivery.delivery_status,
+        address: delivery.order.statement.customer.address_line1,
+        type: delivery.order.statement.type,
+        total_price: Number(
+          delivery.order.statement.total_amount
+        ).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        shipping_date: new Date(delivery.shipping_date).toLocaleString(),
+        estimated_delivery: new Date(
+          delivery.estimated_delivery
+        ).toLocaleString(),
+      }));
+      setDeliveryList(data);
+    }
+  }, [deliveryQuery.data]);
 
   return (
     <section className="h-full">
