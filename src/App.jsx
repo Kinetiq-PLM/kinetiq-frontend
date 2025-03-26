@@ -440,7 +440,7 @@ function App() {
               ></img>
               { notifOpen && <div className="notif-menu">
                 {notifs.map((notif, i) => 
-                  <div className="notif-item" 
+                  <div className={ notif.read ? "notif-item" : "notif-item-unread" }
                     onClick = {
                       notif.orig_submodule ? () => {
                           setActiveModule(notif.orig_module)
@@ -450,16 +450,17 @@ function App() {
                           setActiveModule(notif.orig_module)
                           setActiveSubModule(null)
                         }
-
                     }
                     key={i}
                   >
                     <div className="notif-toprow">
                       <p className="notif-origin">{notif.orig_submodule ? notif.orig_submodule : notif.orig_module}</p>
+                      <div className="notif-time-and-icon">
                       <p className="notif-time">{notif.time}</p>
-                        {!notif.read && <p>O</p>/* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */} 
+                        {!notif.read && <p className="unread-notif-icon"><img src="/icons/unread-notif-icon.png"/></p>/* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */} 
+                        </div>
                     </div>
-                    <p className="notif-msg">{notif.msg}</p>
+                    <div className="notif-msg"><p>{notif.msg}</p></div>
                   </div>
                 )}
               </div> }
