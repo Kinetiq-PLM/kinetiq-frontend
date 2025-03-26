@@ -11,9 +11,98 @@ function App() {
   const [hoveredModule, setHoveredModule] = useState(null);
   const [hoveredSubModule, setHoveredSubModule] = useState(null);
   const [ModuleComponent, setModuleComponent] = useState(null);
+  const [notifOpen, setNotifOpen] = useState(false);
 
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
+
+  //dummy notifs
+  const notifs = [
+    {
+      time:"8:00 PM",
+      msg:"Ur phone ringing!!!",
+      orig_module:"Administration",
+      orig_submodule: null,
+      read: false
+    },
+    {
+      time:"9:00 PM",
+      msg:"keep urself safe!!!",
+      orig_module:"Sales",
+      orig_submodule: null,
+      read: false
+    },
+    {
+      time:"8:00 PM",
+      msg:"bibidi bobidi boo wah",
+      orig_module: "Management",
+      orig_submodule:"Access Control",
+      read: false
+
+    },
+    {
+      time:"8:00 PM",
+      msg:"wowee",
+      orig_module: "Accounting",
+      orig_submodule:"Accounts Receivable",
+      read: false
+    },
+    {
+      time:"8:00 PM",
+      msg:"wowee!",
+      orig_module: "Accounting",
+      orig_submodule:"Accounts Receivable",
+      read: false
+    },
+    {
+      time:"8:00 PM",
+      msg:"Non incididunt commodo consequat occaecat proident consequat non.",
+      orig_module: "Accounting",
+      orig_submodule:"Accounts Receivable",
+      read: true
+    },
+    {
+      time:"8:00 PM",
+      msg:"Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
+      orig_module: "Accounting",
+      orig_submodule:"Accounts Receivable",
+      read: true
+    },
+    {
+      time:"8:00 PM",
+      msg:"yippee!",
+      orig_module: "Accounting",
+      orig_submodule:"Accounts Receivable",
+      read: true
+    },
+    {
+      time:"8:00 PM",
+      msg:"Minim amet et non irure quis ea Lorem et dolor et tempor excepteur est.",
+      orig_module: "Accounting",
+      orig_submodule:"Accounts Receivable",
+      read: true
+    }
+  ];
+
+  // hooks for loading modules
+  useEffect(() => {
+    console.log("(debug) main hook")
+    if (activeModule) {
+      console.log("(debug) calling loadmainmodule")
+      loadMainModule(activeModule)
+    }
+  }, [activeModule]);
+
+  useEffect(() => {
+    console.log("(debug) sub hook")
+    if (activeSubModule) {
+      console.log("(debug) calling loadsubmodule")
+      loadSubModule(activeSubModule)
+    } else {
+      console.log("(debug) calling loadmainmodule from sub hook")
+      loadMainModule(activeModule)
+    }
+  }, [activeSubModule]);
 
   // Sync Scroll
   const handleScroll = (source) => {
@@ -29,8 +118,8 @@ function App() {
   // load jsx files for main modules
   const loadMainModule = (moduleId) => {
     if (
-      moduleFileNames[moduleId] &&
-      !(activeModule == moduleId && !activeSubModule)
+      moduleFileNames[moduleId] && !activeSubModule
+      // !(activeModule == moduleId && !activeSubModule)
     ) {
       const LazyComponent = lazy(() =>
         import(
@@ -40,13 +129,14 @@ function App() {
 
       setModuleComponent(() => LazyComponent);
     }
+    console.log("(debug) load main module called")
   };
 
   // load jsx files for submodules
   const loadSubModule = (submoduleId) => {
     if (
-      moduleSubmoduleFileNames[activeModule][submoduleId] &&
-      !(activeSubModule == submoduleId)
+      moduleSubmoduleFileNames[activeModule][submoduleId] 
+      // && !(activeSubModule == submoduleId)
     ) {
       const LazyComponent = lazy(() =>
         import(
@@ -56,6 +146,7 @@ function App() {
 
       setModuleComponent(() => LazyComponent);
     }
+    console.log("(debug) load sub module called")
   };
 
   const moduleFileNames = {
@@ -202,7 +293,7 @@ function App() {
                     setActiveModule(module.id);
                     setActiveSubModule(null); // Reset submodule when a main module is clicked
                     setIsSidebarOpen(true);
-                    loadMainModule(module.id); // load active module
+                    // loadMainModule(module.id); // load active module
                   }}
                   onMouseEnter={() => setHoveredModule(module.id)}
                   onMouseLeave={() => setHoveredModule(null)}
@@ -259,7 +350,7 @@ function App() {
                   onClick={() => {
                     setActiveModule(module.id);
                     setActiveSubModule(null);
-                    loadMainModule(module.id);
+                    // loadMainModule(module.id);
                   }}
                   onMouseEnter={() => setHoveredModule(module.id)}
                   onMouseLeave={() => setHoveredModule(null)}
@@ -283,7 +374,7 @@ function App() {
                             ${hoveredSubModule === sub ? "hovered" : ""}`}
                           onClick={() => {
                             setActiveSubModule(sub);
-                            loadSubModule(sub);
+                            // loadSubModule(sub);
                           }}
                           onMouseEnter={() => setHoveredSubModule(sub)}
                           onMouseLeave={() => setHoveredSubModule(null)}
@@ -320,9 +411,9 @@ function App() {
                 }`}
                 onClick={() => {
                   setActiveModule(activeModule);
-                  loadMainModule(activeModule);
+                  // loadMainModule(activeModule);
                   setActiveSubModule(null);
-                  loadSubModule(null);
+                  // loadSubModule(null);
                 }}
               >
                 {activeModule}
@@ -341,8 +432,37 @@ function App() {
                   hasNotification ? "active-" : ""
                 }logo.png`}
                 alt="Notificaton-Logo"
-                onClick={() => setHasNotification(!hasNotification)}
+                // onClick={() => setHasNotification(!hasNotification)}
+                onClick={() => {
+                  setNotifOpen(!notifOpen)
+                  setHasNotification(false)} //to be replaecd by func for setting notifs as read
+                }
               ></img>
+              { notifOpen && <div className="notif-menu">
+                {notifs.map((notif, i) => 
+                  <div className="notif-item" 
+                    onClick = {
+                      notif.orig_submodule ? () => {
+                          setActiveModule(notif.orig_module)
+                          setActiveSubModule(notif.orig_submodule)
+                        }
+                      : () => {
+                          setActiveModule(notif.orig_module)
+                          setActiveSubModule(null)
+                        }
+
+                    }
+                    key={i}
+                  >
+                    <div className="notif-toprow">
+                      <p className="notif-origin">{notif.orig_submodule ? notif.orig_submodule : notif.orig_module}</p>
+                      <p className="notif-time">{notif.time}</p>
+                        {!notif.read && <p>O</p>} /* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */
+                    </div>
+                    <p className="notif-msg">{notif.msg}</p>
+                  </div>
+                )}
+              </div> }
               <div className="header-profile-container">
                 <div className="header-profile-icon">
                   {" "}

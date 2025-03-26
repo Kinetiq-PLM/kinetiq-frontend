@@ -427,6 +427,11 @@ img {
   text-overflow: ellipsis;
 }
 
+.header-profile-name { /*separate thing to avoid messing up the placeholder pfp */
+  overflow: hidden;
+  width: 160px;
+}
+
 .header-profile-icon {
   background-color: #e4f1f2;
   display: flex;
@@ -443,6 +448,45 @@ img {
   font-weight: 500;
   color: #00a8a8;
   margin-left: 0rem;
+}
+
+.notif-menu {
+  position: absolute;
+  top: 3rem;
+  right: 16.25rem;
+  padding: 1rem;
+  /* border-radius: 0.5rem; */
+  /* border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem; */
+  background: rgb(217,217,217);
+  background: linear-gradient(0deg, rgba(217,217,217,1) 0%, rgba(255,255,255,1) 9%);  
+  width: 20rem;
+  height:50vh;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0.1rem 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  overflow-x: wrap;
+  overflow-y: scroll;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;  
+}
+
+.notif-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.25rem;
+}
+
+.notif-item:hover {
+  background-color: var(--light-grey-selected);
+  cursor: pointer;
+}
+
+.notif-toprow {
+  display: flex;
+  justify-content: space-between;
 }
 
 /* body container -- takes remaining space below header */
