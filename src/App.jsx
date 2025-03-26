@@ -457,7 +457,7 @@ function App() {
                     <div className="notif-toprow">
                       <p className="notif-origin">{notif.orig_submodule ? notif.orig_submodule : notif.orig_module}</p>
                       <p className="notif-time">{notif.time}</p>
-                        {!notif.read && <p>O</p>} /* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */
+                        {!notif.read && <p>O</p>/* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */} 
                     </div>
                     <p className="notif-msg">{notif.msg}</p>
                   </div>
