@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react"
 import "../styles/ServiceTicket.css"
 import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
+import SubmitTicketModal from "../components/SubmitTicketModal"
+import QueueTicketModal from "../components/QueueTicketModal"
+import ServTickInputField from "../components/ServTickInputField"
+import ServTickTable from "../components/ServTickTable"
 
 const ServiceTicket = () => {
   // State for form fields
@@ -16,6 +20,10 @@ const ServiceTicket = () => {
   const [tickets, setTickets] = useState([])
   const [filterBy, setFilterBy] = useState("")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
+
+  // Modal states
+  const [showSubmitModal, setShowSubmitModal] = useState(false)
+  const [showQueueModal, setShowQueueModal] = useState(false)
 
   // Fetch tickets from API (mock function)
   useEffect(() => {
@@ -48,46 +56,32 @@ const ServiceTicket = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setShowSubmitModal(true)
+  }
 
-    // Create ticket object
-    const newTicket = {
-      ticketId,
-      customerId,
-      subject,
-      name,
-      description,
-      email,
-      phone,
-    }
+  // Handle submit from modal
+  const handleSubmitTicket = (ticketData) => {
+    console.log("Submitting ticket:", ticketData)
 
-    // Replace with actual API call
-    try {
-      // const response = await fetch('your-api-endpoint', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(newTicket),
-      // });
+    // Here you would typically make an API call to submit the ticket
+    // For now, we'll just close the modal
+    setShowSubmitModal(false)
 
-      console.log("Submitting ticket:", newTicket)
-
-      // Reset form for demonstration
-      setTicketId("")
-      setCustomerId("")
-      setSubject("")
-      setName("")
-      setDescription("")
-      setEmail("")
-      setPhone("")
-    } catch (error) {
-      console.error("Error submitting ticket:", error)
-    }
+    // Optionally refresh the ticket list
+    // fetchTickets()
   }
 
   const handleQueueTicket = () => {
-    // Implement queue ticket functionality
-    console.log("Queue ticket clicked")
+    setShowQueueModal(true)
+  }
+
+  // Handle queue from modal
+  const handleQueueCall = (queueData) => {
+    console.log("Queueing ticket:", queueData)
+
+    // Here you would typically make an API call to queue the ticket
+    // For now, we'll just close the modal
+    setShowQueueModal(false)
   }
 
   const handleFilterChange = (value) => {
@@ -131,92 +125,28 @@ const ServiceTicket = () => {
         <div className="divider"></div>
 
         <div className="content-scroll-area">
-          <div className="input-fields-container">
-            <div className="form-column">
-              <div className="form-group">
-                <label htmlFor="ticketId">Ticket ID</label>
-                <input
-                  type="text"
-                  id="ticketId"
-                  value={ticketId}
-                  onChange={(e) => setTicketId(e.target.value)}
-                  placeholder="1321"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="subject">Ticket Subject</label>
-                <input
-                  type="text"
-                  id="subject"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  placeholder="e.g. MRI Machine Maintenance"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="description">Ticket Description</label>
-                <textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="e.g. Scheduled preventive maintenance for MRI scanner."
-                />
-              </div>
-            </div>
-
-            <div className="form-column">
-              <div className="form-group">
-                <label htmlFor="customerId">Customer ID</label>
-                <input
-                  type="text"
-                  id="customerId"
-                  value={customerId}
-                  onChange={(e) => setCustomerId(e.target.value)}
-                  placeholder="CID#89423"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="name">Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter name"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="email">Email Address</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="user@gmail.com"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="phone">Phone Number</label>
-                <input
-                  type="text"
-                  id="phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter Phone Number"
-                />
-              </div>
-            </div>
-          </div>
+          {/* Input Fields Component */}
+          <ServTickInputField
+            ticketId={ticketId}
+            setTicketId={setTicketId}
+            customerId={customerId}
+            setCustomerId={setCustomerId}
+            subject={subject}
+            setSubject={setSubject}
+            name={name}
+            setName={setName}
+            description={description}
+            setDescription={setDescription}
+            email={email}
+            setEmail={setEmail}
+            phone={phone}
+            setPhone={setPhone}
+          />
 
           <div className="filter-submit-container">
             <div className="filter-dropdown">
               <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-                Filter by {filterBy ? `: ${filterOptions.find((opt) => opt.value === filterBy)?.label}` : ""}{" "}
+                Filter by
                 <span className="arrow">▼</span>
               </button>
               {showFilterOptions && (
@@ -234,45 +164,8 @@ const ServiceTicket = () => {
             </button>
           </div>
 
-          <div className="table-container">
-            <table className="tickets-table">
-              <thead>
-                <tr>
-                  <th>Ticket ID</th>
-                  <th>Customer Name</th>
-                  <th>Created at</th>
-                  <th>Priority</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTickets.map((ticket, index) => (
-                  <tr key={ticket.id} className={index % 2 === 0 ? "" : "alternate-row"}>
-                    <td>{ticket.id}</td>
-                    <td>{ticket.customerName}</td>
-                    <td>{ticket.createdAt}</td>
-                    <td className={`priority-${ticket.priority.toLowerCase()}`}>{ticket.priority}</td>
-                    <td>{ticket.status}</td>
-                  </tr>
-                ))}
-                {/* Empty rows to match the design */}
-                {Array(5 - filteredTickets.length)
-                  .fill()
-                  .map((_, index) => (
-                    <tr
-                      key={`empty-${index}`}
-                      className={`empty-row ${(index + filteredTickets.length) % 2 === 0 ? "" : "alternate-row"}`}
-                    >
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+          {/* Table Component */}
+          <ServTickTable filteredTickets={filteredTickets} />
 
           <div className="queue-container">
             <button type="button" onClick={handleQueueTicket} className="queue-button">
@@ -281,6 +174,15 @@ const ServiceTicket = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <SubmitTicketModal
+        isOpen={showSubmitModal}
+        onClose={() => setShowSubmitModal(false)}
+        onSubmit={handleSubmitTicket}
+      />
+
+      <QueueTicketModal isOpen={showQueueModal} onClose={() => setShowQueueModal(false)} onQueue={handleQueueCall} />
     </div>
   )
 }
