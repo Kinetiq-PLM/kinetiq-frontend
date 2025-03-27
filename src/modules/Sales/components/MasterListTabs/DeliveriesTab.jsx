@@ -81,7 +81,7 @@ export default function BlanketAgreementsTab({
         shipping_method: delivery.shipping_method,
         customer_name: delivery.order.statement.customer.name,
         delivery_status: delivery.delivery_status,
-        address: delivery.order.statement.customer.address_line1,
+        address: `${delivery.order.statement.customer.address_line1} ${delivery.order.statement.customer.address_line2}`,
         type: delivery.order.statement.type,
         total_price: Number(
           delivery.order.statement.total_amount

@@ -76,7 +76,7 @@ export default function BlanketAgreementsTab({
         agreement_id: agreement.agreement_id,
         customer_id: agreement.statement.customer.customer_id,
         customer_name: agreement.statement.customer.name,
-        address: agreement.statement.customer.address_line1,
+        address: `${agreement.statement.customer.address_line1} ${agreement.statement.customer.address_line2}`,
         type: agreement.statement.type,
         total_price: agreement.statement.total_amount,
         salesrep: `${agreement.statement.salesrep.first_name} ${agreement.statement.salesrep.last_name}`,

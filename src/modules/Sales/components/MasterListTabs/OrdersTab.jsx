@@ -69,7 +69,7 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
         order_id: order.order_id,
         customer_id: order.statement.customer.customer_id,
         customer_name: order.statement.customer.name,
-        address: order.statement.customer.address_line1,
+        address: `${order.statement.customer.address_line1} ${order.statement.customer.address_line2}`,
         type: order.statement.type,
         salesrep: `${order.statement.salesrep.first_name} ${order.statement.salesrep.last_name}`,
         total_price: Number(order.statement.total_amount).toLocaleString(

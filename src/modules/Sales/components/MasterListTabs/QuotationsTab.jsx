@@ -54,7 +54,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
         quotation_id: quote.quotation_id,
         customer_id: quote.statement.customer.customer_id,
         customer_name: quote.statement.customer.name,
-        address: quote.statement.customer.address_line1,
+        address: `${quote.statement.customer.address_line1} ${quote.statement.customer.address_line2}`,
         type: quote.statement.type,
         salesrep: `${quote.statement.salesrep.first_name} ${quote.statement.salesrep.last_name}`,
         total_price: Number(quote.statement.total_amount).toLocaleString(

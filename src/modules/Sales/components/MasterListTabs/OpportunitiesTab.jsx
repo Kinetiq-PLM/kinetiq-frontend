@@ -79,7 +79,7 @@ export default function OpportunitiesTab({
         opportunity_id: opp.opportunity_id,
         customer_id: opp.customer.customer_id,
         customer_name: opp.customer.name,
-        selected_address: opp.customer.address_line1,
+        selected_address: `${opp.customer.address_line1} ${opp.customer.address_line2}`,
         estimated_value: Number(opp.estimated_value).toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
