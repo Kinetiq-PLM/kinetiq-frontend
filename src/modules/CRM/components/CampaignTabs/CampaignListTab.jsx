@@ -64,8 +64,8 @@ export default function CampaignListTab() {
         campaign_id: campaign.campaign_id,
         campaign_name: campaign.campaign_name,
         type: campaign.type,
-        start_date: new Date(campaign.start_date).toLocaleString(),
-        end_date: new Date(campaign.end_date).toLocaleString(),
+        start_date: new Date(campaign.start_date).toLocaleDateString(),
+        end_date: new Date(campaign.end_date).toLocaleDateString(),
         status: campaign.status,
       }));
       setCampaignList(data);
