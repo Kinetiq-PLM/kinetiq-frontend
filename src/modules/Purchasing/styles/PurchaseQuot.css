@@ -1,0 +1,249 @@
+.purchquote {
+    display: flex;
+    width: 100%;
+    height: auto;
+}
+
+.purchquote .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+}
+
+.purchquote .purchquote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    width: 100%;
+}
+
+.purchquote .purchquote-back {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease;
+}
+
+.purchquote .purchquote-back:hover {
+    color: #00A8A8;
+}
+
+.purchquote .purchquote-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.purchquote .purchquote-date-filter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.purchquote .date-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.purchquote .date-options-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.purchquote .date-option {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.purchquote .date-option:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    color: #00A8A8;
+}
+
+.purchquote .date-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.purchquote .purchquote-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #00bcd4;
+    border-radius: 0.25rem;
+    color: #00bcd4;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.purchquote .purchquote-filter-btn:hover {
+    border-color: #00A8A8;
+    color: #00A8A8;
+    background-color: rgba(0, 168, 168, 0.05);
+}
+
+.purchquote .purchquote-search input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    width: 300px;
+}
+
+.purchquote .purchquote-content {
+    flex: 1;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.purchquote .purchquote-table {
+    flex: 1;
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.purchquote .purchquote-table-header {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
+}
+
+.purchquote .purchquote-table-header > div {
+    text-align: center;
+}
+
+.purchquote .purchquote-table-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.purchquote .purchquote-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.purchquote .purchquote-row > div {
+    text-align: center;
+}
+
+.purchquote .purchquote-row:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    cursor: pointer;
+}
+
+.purchquote .status-closed,
+.purchquote .status-open,
+.purchquote .status-cancelled,
+.purchquote .status-draft {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.purchquote .status-closed {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.purchquote .status-open {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.purchquote .status-cancelled {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.purchquote .status-draft {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.purchquote .purchquote-footer {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+    width: 100%;
+}
+
+.purchquote .purchquote-compare {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #00bcd4;
+    color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.purchquote .purchquote-compare:hover {
+    background-color: #00A8A8;
+}
+
+.status-pending {
+    color: #f57c00;
+    background-color: rgba(245, 124, 0, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.status-approved {
+    color: #4caf50;
+    background-color: rgba(76, 175, 80, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.status-rejected {
+    color: #f44336;
+    background-color: rgba(244, 67, 54, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}

@@ -98,8 +98,15 @@ function App() {
       "Financial Reports": "FinancialReports",
     },
     Purchasing: {
-      "Supplier Management": "SupplierManagement",
       "Purchase Orders": "PurchaseOrders",
+      "Purchase Request List": "PurchaseReqList",
+      "Purchase Request Form": "PurchaseReqForm",
+      "Purchase Order Status": "PurchaseOrdStat",
+      "Puchase Quotation List": "PurchaseQuot",
+      "A/P Invoice": "PurchaseAPInvoice",
+      "Credit Memo": "PurchaseCredMemo",
+      "Vendor Application Form": "VendorAppForm",
+      "Purchase Quotation Form": "PurchForQuotForm",
     },
     Operations: {
       "Workflow Automation": "WorkflowAutomation",

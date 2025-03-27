@@ -1,0 +1,225 @@
+.apinvoice {
+    display: flex;
+    width: 100%;
+    height: auto;
+}
+  
+  .apinvoice .body-content-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 0.5rem;
+      background-color: white;
+      padding: 1rem;
+      box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 40rem;
+      min-height: 30rem;
+    }
+
+.apinvoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    width: 100%;
+}
+
+.apinvoice-back {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease;
+}
+
+.apinvoice-back:hover {
+    color: #00A8A8;
+}
+
+.apinvoice-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.apinvoice-date-filter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-options-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.date-option {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.date-option:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    color: #00A8A8;
+}
+
+.date-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.apinvoice-filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #00bcd4;
+    border-radius: 0.25rem;
+    color: #00bcd4;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.apinvoice-filter-btn:hover {
+    border-color: #00A8A8;
+    color: #00A8A8;
+    background-color: rgba(0, 168, 168, 0.05);
+}
+
+.apinvoice-search input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    width: 300px;
+}
+
+.apinvoice-content {
+    flex: 1;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.apinvoice-table {
+    flex: 1;
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.apinvoice-table-header {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
+}
+
+.apinvoice-table-header > div {
+    text-align: center;
+}
+
+.apinvoice-table-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.apinvoice-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.apinvoice-row > div {
+    text-align: center;
+}
+
+.apinvoice-row:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    cursor: pointer;
+}
+
+.status-closed,
+.status-open,
+.status-cancelled,
+.status-draft {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.status-closed {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-open {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-cancelled {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.status-draft {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.apinvoice-footer {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+    width: 100%;
+}
+
+.apinvoice-compare {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #00bcd4;
+    color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.apinvoice-compare:hover {
+    background-color: #00A8A8;
+}

@@ -1,0 +1,173 @@
+/* Main container for the purchase request list */
+.purchreq { 
+  display: flex;
+  width: 100%;
+  height: auto;
+}
+
+/* Body container that holds all the content */
+.purchreq-body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Prevents unwanted centering */
+  justify-content: flex-start;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+/* Header section containing the back button & search bar */
+.purchreq-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Back button styling */
+.purchreq-back-btn {
+  border: none;
+  background: none;
+  color: #666;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.purchreq-back-btn:hover {
+  color: #00A8A8;
+}
+
+/* Search input field */
+.purchreq-search {
+  border: 1px solid #ddd;
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+  width: 20rem;
+  outline: none;
+}
+
+/* Table container */
+.purchreq-table-container {
+  width: 100%;
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  /* Ensuring table maintains consistent layout */
+  min-height: 35rem;
+  max-height: 20rem;
+  overflow-y: auto; /* Enables scrolling */
+}
+
+/* Table styles */
+.purchreq-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.purchreq-table th, 
+.purchreq-table td {
+  border-bottom: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+/* Table header */
+.purchreq-table th {
+  background-color: #f8f8f8;
+  font-weight: bold;
+}
+
+/* No results found message */
+.purchreq-no-results {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 10px;
+  color: #00A8A8;
+}
+
+/* Custom checkbox styling */
+.purchreq-table input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #00A8A8;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Checked checkbox styling */
+.purchreq-table input[type="checkbox"]:checked {
+  background-color: #00A8A8;
+  border-color: #00A8A8;
+}
+
+/* Checkmark icon when checked */
+.purchreq-table input[type="checkbox"]:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.purchreq-new-btn {
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 0.25rem;
+  background-color: #00bcd4;
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.purchreq-new-btn:hover {
+  background-color: #00A8A8;
+}
+
+/* Load More button */
+.purchreq-load-more {
+  padding: 0.5rem 1.5rem;
+  border: 1px solid #00bcd4;
+  border-radius: 0.25rem;
+  background: none;
+  color: #00bcd4;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 1rem auto;
+  display: block;
+}
+
+.purchreq-load-more:hover {
+  border-color: #00A8A8;
+  color: #00A8A8;
+  background-color: rgba(0, 168, 168, 0.05);
+}
+
+.purchreq-item {
+  transition: background-color 0.2s ease;
+}
+
+.purchreq-item:hover {
+  background-color: rgba(0, 168, 168, 0.05);
+  cursor: pointer;
+}
