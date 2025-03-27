@@ -42,7 +42,7 @@ function App() {
     },
     {
       time:"8:00 PM",
-      msg:"wowee",
+      msg:"Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
       orig_module: "Accounting",
       orig_submodule:"Accounts Receivable",
       read: false
@@ -439,6 +439,7 @@ function App() {
                 }
               ></img>
               { notifOpen && <div className="notif-menu">
+                <div className="notif-title"><p>Notifications</p></div>
                 {notifs.map((notif, i) => 
                   <div className={ notif.read ? "notif-item" : "notif-item-unread" }
                     onClick = {
@@ -454,7 +455,7 @@ function App() {
                     key={i}
                   >
                     <div className="notif-toprow">
-                      <p className="notif-origin">{notif.orig_submodule ? notif.orig_submodule : notif.orig_module}</p>
+                      <div className="notif-origin"><p>{notif.orig_submodule ? notif.orig_submodule : notif.orig_module}</p></div>
                       <div className="notif-time-and-icon">
                       <p className="notif-time">{notif.time}</p>
                         {!notif.read && <p className="unread-notif-icon"><img src="/icons/unread-notif-icon.png"/></p>/* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */} 

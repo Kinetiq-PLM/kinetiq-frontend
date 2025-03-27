@@ -450,26 +450,52 @@ img {
   margin-left: 0rem;
 }
 
+@keyframes smooth-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px); /* Slide down effect */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .notif-menu {
   position: absolute;
   top: 3rem;
   right: 16.25rem;
   padding-top: 1rem;
-  /* border-radius: 0.5rem; */
-  /* border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem; */
-  background: rgb(217,217,217);
-  background: linear-gradient(0deg, rgba(217,217,217,1) 0%, rgba(255,255,255,1) 9%);  
+  background-color: white;
   width: 20rem;
-  height:50vh;
+  height: 50vh;
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0.1rem 0.5rem 1rem rgba(0, 0, 0, 0.1);
   overflow-x: wrap;
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
-  /*gap: 1rem;*/  
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0.3rem;
 
+  background: /* Shadow covers */
+  /* Shadow covers */
+  linear-gradient(white 30%, rgba(255, 255, 255, 0)), 
+  linear-gradient(rgba(255, 255, 255, 0), white 70%) 0 100%,
+
+  /* Shadows (converted radial to linear) */
+  linear-gradient(to bottom, rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0)) top,
+  linear-gradient(to top, rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0)) bottom;
+  
+  background-repeat: no-repeat;
+  background-color: white;
+
+  background-repeat: no-repeat;
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+  background-attachment: local, local, scroll, scroll;
+
+  animation: smooth-appear 0.3s ease;
 }
 
 .notif-menu::-webkit-scrollbar {
@@ -487,6 +513,15 @@ img {
   border-radius: 10px;
 }
 
+.notif-title p{
+  margin-left: 2rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #00A8A8;
+}
+
 .notif-item {
   display: flex;
   flex-direction: column;
@@ -502,8 +537,12 @@ img {
 }
 
 .notif-item:hover {
-  background-color: var(--light-grey-selected);
+  background-color: rgba(79, 79, 79, 0.1);
   cursor: pointer;
+}
+
+.notif-item-unread .notif-origin p{
+  font-weight: 700;
 }
 
 .notif-item-unread {
@@ -519,12 +558,8 @@ img {
   border-bottom: 1px solid #D2D2D2;
 }
 
-.notif-item-unread p{
-  font-weight: 600;
-}
-
 .notif-item-unread:hover {
-  background-color: var(--light-grey-selected);
+  background-color: rgba(79, 79, 79, 0.1);
   cursor: pointer;
 }
 
@@ -540,7 +575,11 @@ img {
 .notif-time-and-icon {
   display: flex;
   justify-content: end;
-  
+}
+
+.notif-item-unread .notif-time-and-icon p{
+  font-weight: 600;
+  color: #469FC2;
 }
 
 .unread-notif-icon img {
@@ -550,7 +589,7 @@ img {
 }
 
 .notif-msg p{
-  font-size: 0.80rem;
+  font-size: 0.70rem;
 }
 
 /* body container -- takes remaining space below header */
