@@ -1,0 +1,21 @@
+.dropdown {
+    font-size: 14px;
+    border: 1.5px solid #A4A4A4;
+    background-color: #F9F9F9;
+    color: black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+/* Variant 1 of dropdown */
+.dropdown-selection {
+    padding: 10px 20px;
+}
+
+
+
+/* Variant 2 of dropdown */
+.dropdown-sorting {
+    padding: 8px 12px;
+}

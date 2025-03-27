@@ -1,0 +1,111 @@
+.table-container {
+    width: 100%;
+    max-height: 30rem; /* Adjust height as needed */
+    overflow-y: auto;
+    overflow-x: auto;
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0px 4px 7.5px 1px rgba(0, 0, 0, 0.15);
+}
+
+/* Ensure the table structure stays aligned */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Ensures columns remain aligned */
+}
+
+/* Fix the table header */
+thead {
+    position: sticky;
+    top: 0;
+    background-color: #5a9ecf;
+    z-index: 2;
+}
+
+/* Ensure header cells align with body */
+th,
+td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #E8E8E8;
+}
+
+tr:hover {
+    background-color: #E8E8E8;
+}
+
+th {
+    background-color: #5a9ecf;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 2px solid black;
+}
+
+td {
+    font-size: 14px;
+    font-weight: 300; 
+    text-wrap: wrap;
+}
+
+th, td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer; /* Indicate clickable behavior */
+}
+
+/* Wrapped text when toggled */
+td.wrapped {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+
+/* Scrollbar Styling */
+.table-container::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #5a9ecf;
+    border-radius: 5px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #4a8bb3;
+}
+
+/* For Firefox */
+.table-container {
+    scrollbar-width: thin;
+    scrollbar-color: #5a9ecf #f1f1f1;
+}
+
+/* Style for checkbox to reduce width when checkbox is enabled */
+.table-container.checkbox-enabled th:first-child,
+.table-container.checkbox-enabled td:first-child {
+    width: 40px; /* Adjust this value to make the checkbox column narrower */
+    text-align: center;
+}
+input[type="checkbox"] {
+    appearance: none; /* Remove default styling */
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid #A4A4A4;
+    background-color: white; /* White background */
+    border-radius: 3px; /* Optional: Rounded corners */
+    cursor: pointer;
+  }
+  
+  input[type="checkbox"]:checked {
+    background-color: #A4A4A4; /* Change background when checked */
+  }
+  

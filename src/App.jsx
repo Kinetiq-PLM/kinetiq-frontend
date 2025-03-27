@@ -88,6 +88,7 @@ function App() {
       "User Accounts": "UserAccounts",
     },
     Accounting: {
+      "Chart of Accounts": "ChartOfAccounts",
       "General Ledger": "GeneralLedger",
       "Accounts Payable": "AccountsPayable",
       "Accounts Receivable": "AccountsReceivable",
