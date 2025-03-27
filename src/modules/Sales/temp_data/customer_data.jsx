@@ -12,4 +12,5 @@ export const CUSTOMER_DATA = Array.from({ length: 30 }, (_, index) => ({
   customer_type: ["Retail", "Wholesale", "Enterprise"][index % 3],
   status: ["Active", "Inactive"][index % 2],
   debt: (Math.random() * 5000).toFixed(2), // Random debt between 0 and 5000
+  contact_person: `Contact Person ${index + 1}`,
 }));

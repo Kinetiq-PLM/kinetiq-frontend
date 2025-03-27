@@ -94,7 +94,7 @@ export default function CustomerTab() {
           type="primary"
           className={"w-[200px] py-2"}
         >
-          New Quotation
+          New Customer
         </Button>
       </div>
 

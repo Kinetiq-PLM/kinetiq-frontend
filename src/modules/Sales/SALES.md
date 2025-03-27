@@ -58,3 +58,4 @@ Modals are used to confirm actions such as deleting an operation or copying data
 
 1. To create Blanket Agreements checkout `BlanketAgreementDates.jsx` in the `components/Modals` folder.
 2. Implement proper warranty and shipping prices.
+3. Implement filter for customer countries instead of last 30 days in CRM's BPMD.

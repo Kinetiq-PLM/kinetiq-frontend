@@ -1,71 +1,114 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../../../Sales/components/Table";
-import Dropdown from "../../../Sales/components/Dropdown";
 import Button from "../../../Sales/components/Button";
-import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
+import CampaignInfo from "../CampaignInfo";
 
 import CampaignListModal from "./../CampaignListModal";
+import CustomerListModal from "./../../../Sales/components/Modals/Lists/CustomerList";
+import { useAlert } from "../../../Sales/components/Context/AlertContext.jsx";
 
 export default function CampaignContactTab() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
-  const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
+  const { showAlert } = useAlert();
 
   const [isCampaignListOpen, setIsCampaignListOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [selectedCampaign, setSelectedCampaign] = useState("");
+
+  const [contactList, setContactList] = useState([]); // Customers part of the campaign
+
+  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(""); // table data that is selected
+  const [selectedCustomer, setSelectedCustomer] = useState(""); // customer selected from modal
+  const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
 
   const columns = [
-    { key: "customer_id", label: "Customer ID" },
-    { key: "customer_name", label: "Customer Name" },
+    { key: "customer_id", label: "Contact ID" },
+    { key: "customer_name", label: "Name" },
+    { key: "city", label: "City" },
+    { key: "email_address", label: "Email" },
+    { key: "phone_number", label: "Phone" },
+    { key: "contact_person", label: "Contact Person" },
   ];
 
-  const dateFilters = [
-    "Last 30 days",
-    "Last 60 days",
-    "Last 90 days",
-    "All Time",
-  ];
-  const searchFields = columns.map((col) => ({
-    key: col.key,
-    label: col.label,
-  }));
+  useEffect(() => {
+    if (selectedCustomer) {
+      setContactList((prevList) => [...prevList, selectedCustomer]);
+    }
+  }, [selectedCustomer]);
 
-  // Filter quotations based on search and date
-  const filteredQuotations = CUSTOMER_DATA.filter((quotation) => {
-    // Filter by search term
-    if (searchTerm) {
-      const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
-      if (!fieldValue.includes(searchTerm.toLowerCase())) return false;
+  useEffect(() => {
+    setContactList([]); // Fetch contacts based on selectedCampaign
+  }, [selectedCampaign]);
+
+  const handleDelete = () => {
+    if (selectedContact === "") {
+      showAlert({
+        type: "error",
+        title: "Select a contact to remove.",
+      });
+      return;
     }
 
-    // Filter by date (assuming date_issued is in YYYY-MM-DD format)
-    if (dateFilter !== "All Time") {
-      const today = new Date();
-      const pastDate = new Date();
-      const days = parseInt(dateFilter.match(/\d+/)[0], 10); // Extract number from filter
-      pastDate.setDate(today.getDate() - days);
+    setContactList(
+      contactList.filter(
+        (contact) => contact.customer_id != selectedContact.customer_id
+      )
+    );
+    setSelectedContact("");
 
-      const issuedDate = new Date(quotation.date_issued);
-      if (issuedDate < pastDate) return false;
-    }
-
-    return true;
-  });
+    showAlert({
+      type: "success",
+      title: "Contact removed.",
+    });
+  };
 
   return (
     <section className="h-full">
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-        {/* Filters */}
+      <div className="flexflex-col justify-between mb-4 flex-wrap gap-4">
+        <CustomerListModal
+          isOpen={isCustomerListOpen}
+          onClose={() => setIsCustomerListOpen(false)}
+          newCustomerModal={setIsNewCustomerModalOpen}
+          setCustomer={setSelectedCustomer}
+          duplicates={contactList}
+        ></CustomerListModal>
+
         <CampaignListModal
           isOpen={isCampaignListOpen}
           onClose={() => setIsCampaignListOpen(false)}
           setCampaign={setSelectedCampaign}
           campaign={selectedCampaign}
         ></CampaignListModal>
-        <Button type="primary" onClick={() => setIsCampaignListOpen(true)}>
-          Open Campaign List
-        </Button>
+
+        <div>
+          <CampaignInfo
+            campaignListModal={setIsCampaignListOpen}
+            campaign={selectedCampaign}
+          ></CampaignInfo>
+        </div>
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] rounded-md mt-2 table-layout overflow-auto">
+          <Table
+            onSelect={setSelectedContact}
+            data={contactList}
+            columns={columns}
+          />
+        </div>
+        <section className="mt-4 flex justify-between flex-col lg:flex-row space-x-4">
+          <div className="h-full flex flex-col gap-3 w-full">
+            {/* Buttons Row */}
+            <div className="flex gap-2">
+              <Button
+                type="primary"
+                onClick={() => setIsCustomerListOpen(true)}
+              >
+                Add Contact
+              </Button>
+              <Button type="outline" onClick={() => handleDelete()}>
+                Delete Item
+              </Button>
+            </div>
+          </div>
+        </section>
       </div>
     </section>
   );

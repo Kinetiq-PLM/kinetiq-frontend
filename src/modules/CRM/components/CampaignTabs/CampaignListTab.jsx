@@ -2,16 +2,20 @@ import { useState } from "react";
 import Table from "../../../Sales/components/Table";
 import Dropdown from "../../../Sales/components/Dropdown";
 import Button from "../../../Sales/components/Button";
-import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
+
+import CAMPAIGN_LIST_DATA from "./../../../Sales/temp_data/campaign_list_data";
+import CampaignListModal from "./../CampaignListModal";
 
 export default function CampaignListTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
 
+  const campaign_list = CAMPAIGN_LIST_DATA;
+
   const columns = [
-    { key: "customer_id", label: "Customer ID" },
-    { key: "customer_name", label: "Customer Name" },
+    { key: "campaign_id", label: "Campaign ID" },
+    { key: "campaign_name", label: "Campaign Name" },
   ];
 
   const dateFilters = [
@@ -26,7 +30,7 @@ export default function CampaignListTab() {
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = CUSTOMER_DATA.filter((quotation) => {
+  const filteredCampaigns = campaign_list.filter((quotation) => {
     // Filter by search term
     if (searchTerm) {
       const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
@@ -84,15 +88,15 @@ export default function CampaignListTab() {
           />
         </div>
 
-        {/* New Quotation Button (No onClick) */}
+        {/* Campaign Button */}
         <Button type="primary" className={"w-[200px] py-2"}>
-          New Quotation
+          New Campaign
         </Button>
       </div>
 
       {/* Table Section */}
       <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
+        <Table data={filteredCampaigns} columns={columns} />
       </div>
     </section>
   );

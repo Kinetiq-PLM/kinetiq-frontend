@@ -5,37 +5,38 @@ import { useState, useEffect, useRef } from "react";
 import { useAlert } from "../../Sales/components/Context/AlertContext.jsx";
 
 import Table from "../../Sales/components/Table";
-import { PRODUCTS_DATA } from "../../Sales/temp_data/products_data";
+import CAMPAIGN_LIST_DATA from "../../Sales/temp_data/campaign_list_data.jsx";
+
 import Button from "../../Sales/components/Button.jsx";
 
-const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
+const CampaignListModal = ({ isOpen, onClose, setCampaign }) => {
   const { showAlert } = useAlert();
 
-  const products_data = PRODUCTS_DATA;
+  const campaign_data = CAMPAIGN_LIST_DATA;
 
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(products_data);
+  const [filteredData, setFilteredData] = useState(campaign_data);
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
   const columns = [
-    { key: "product_id", label: "Product ID" },
-    { key: "product_name", label: "Name" }, // Company Name
-    { key: "stock", label: "Stock" }, // Country
+    { key: "campaign_id", label: "Campaign ID" },
+    { key: "campaign_name", label: "Name" }, // Company Nam
+    { key: "status", label: "Status" }, // Company Nam
   ];
 
   const handleConfirm = () => {
-    if (selectedProduct) {
-      setCampaign(selectedProduct); // Properly update the array
+    if (selectedCampaign) {
+      setCampaign(selectedCampaign); // Properly update the array
       onClose();
       showAlert({
         type: "success",
-        title: "Added product.",
+        title: "Campaign selected.",
       });
-      setSelectedProduct(null);
+      setSelectedCampaign(null);
     }
   };
 
@@ -107,7 +108,7 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filtered = products_data.filter((product) =>
+                const filtered = campaign_data.filter((product) =>
                   product.product_name.toLowerCase().includes(searchTerm)
                 );
                 setFilteredData(filtered);
@@ -118,7 +119,7 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
             <Table
               columns={columns}
               data={filteredData}
-              onSelect={setSelectedProduct}
+              onSelect={setSelectedCampaign}
             />
           </div>
           <div className="mt-4 flex justify-between">
@@ -126,9 +127,9 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
               <Button
                 type="primary"
                 onClick={handleConfirm}
-                disabled={!selectedProduct}
+                disabled={!selectedCampaign}
               >
-                Add
+                Select
               </Button>
             </div>
             <div>

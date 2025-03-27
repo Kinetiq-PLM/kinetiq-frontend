@@ -215,7 +215,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           isOpen={isCustomerListOpen}
           onClose={() => setIsCustomerListOpen(false)}
           newCustomerModal={setIsNewCustomerModalOpen}
-          setSelectedCustomer={setSelectedCustomer}
           setCustomer={setSelectedCustomer}
         ></CustomerListModal>
         <ProductListModal

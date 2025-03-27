@@ -111,11 +111,8 @@ function App() {
       Invoice: "Invoice",
       "Blanket Agreement": "BlanketAgreement",
       "Master List": "MasterList",
-      Dunning: "Dunning",
       Reporting: "Reporting",
       Returns: "Returns",
-      Marketing: "Marketing",
-      "Customer Support": "CustomerSupport",
     },
     CRM: {
       Ticket: "Ticket",
