@@ -4,23 +4,26 @@ import { useState, useEffect } from "react"
 import "../styles/ServiceRequest.css"
 import ServiceRequestIcon from "/icons/SupportServices/ServiceRequestIcon.png"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
+import Table from "../components/ServiceRequest/Table"
+import UpdateViewModal from "../components/ServiceRequest/UpdateViewModal"
 
 const ServiceRequest = () => {
-  // State for search and filter
-  const [searchQuery, setSearchQuery] = useState("")
+  const [requests, setRequests] = useState([])
   const [filterBy, setFilterBy] = useState("")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
-  const [serviceRequests, setServiceRequests] = useState([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const [showUpdateModal, setShowUpdateModal] = useState(false)
+  const [selectedRequest, setSelectedRequest] = useState(null)
 
-  // Fetch d service requests from API (mock function)
+  // Fetch service requests from API (mock function)
   useEffect(() => {
-    // Replace ng actual API call
-    const fetchServiceRequests = async () => {
+    // Replace with actual API call
+    const fetchRequests = async () => {
       try {
-        // Mock data for demo
-        setServiceRequests([
+        // Mock data for demonstration
+        setRequests([
           {
-            requestId: "123",
+            id: "123",
             callId: "456",
             requestDate: "dd/mm/yy",
             customerName: "Paula Manalo",
@@ -28,7 +31,7 @@ const ServiceRequest = () => {
             status: "Pending",
           },
           {
-            requestId: "124",
+            id: "124",
             callId: "789",
             requestDate: "dd/mm/yy",
             customerName: "Samantha Hospital",
@@ -41,7 +44,7 @@ const ServiceRequest = () => {
       }
     }
 
-    fetchServiceRequests()
+    fetchRequests()
   }, [])
 
   const handleFilterChange = (value) => {
@@ -49,142 +52,113 @@ const ServiceRequest = () => {
     setShowFilterOptions(false)
   }
 
-  const filterOptions = [
-    { value: "all", label: "All" },
-    { value: "pending", label: "Pending" },
-    { value: "approved", label: "Approved" },
-    { value: "rejected", label: "Rejected" },
-    { value: "repair", label: "Repair" },
-    { value: "installation", label: "Installation" },
-  ]
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value)
+  }
 
-  // Filter service requests based on selected filter
-  const filteredServiceRequests = serviceRequests.filter((request) => {
-    if (!filterBy || filterBy === "all") return true
-    if (filterBy === "pending" && request.status === "Pending") return true
-    if (filterBy === "approved" && request.status === "Approved") return true
-    if (filterBy === "rejected" && request.status === "Rejected") return true
-    if (filterBy === "repair" && request.type === "Repair") return true
-    if (filterBy === "installation" && request.type === "Installation") return true
+  const handleViewRequest = (request) => {
+    setSelectedRequest(request)
+    setShowUpdateModal(true)
+  }
+
+  const handleUpdateRequest = (updatedRequest) => {
+    // Here will make an API call to update the request
+    console.log("Updating request:", updatedRequest)
+
+    // Update the local state
+    const updatedRequests = requests.map((req) => (req.id === updatedRequest.id ? updatedRequest : req))
+    setRequests(updatedRequests)
+    setShowUpdateModal(false)
+  }
+
+  // Filter requests based on search query and selected filter
+  const filteredRequests = requests.filter((request) => {
+    const matchesSearch =
+      searchQuery === "" ||
+      request.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      request.customerName.toLowerCase().includes(searchQuery.toLowerCase())
+
+    if (!filterBy || filterBy === "all") return matchesSearch
+    if (filterBy === "pending" && request.status === "Pending") return matchesSearch
+    if (filterBy === "approved" && request.status === "Approved") return matchesSearch
+    if (filterBy === "repair" && request.type === "Repair") return matchesSearch
+    if (filterBy === "installation" && request.type === "Installation") return matchesSearch
     return false
   })
 
-  const handleViewDetails = (requestId) => {
-    console.log(`View details for request ID: ${requestId}`)
-    // Implement d view details functionality
-  }
-
-  const handleUpdate = () => {
-    console.log("Update button clicked")
-    // Implement d update functionality
-  }
-
   return (
     <div className="servrequ">
-      <div className="servrequ-container">
-        <div className="servrequ-header">
-          <div className="servrequ-title">
-            <div className="servrequ-icon">
-              <img src={ServiceRequestIcon || "/placeholder.svg?height=24&width=24"} alt="Service Requests" />
-            </div>
-            <div>
-              <h1>Service Requests</h1>
-              <p>Review and update service requests</p>
-            </div>
+      <div className="body-content-container">
+        <div className="header">
+          <div className="icon-container">
+            <img src={ServiceRequestIcon || "/placeholder.svg?height=24&width=24"} alt="Service Request" />
           </div>
-          <div className="servrequ-divider"></div>
+          <div className="title-container">
+            <h2>Service Requests</h2>
+            <p className="subtitle">Review and update service requests</p>
+          </div>
         </div>
 
-        <div className="servrequ-content">
-          <div className="servrequ-search-filter">
-            <div className="servrequ-search">
+        <div className="divider"></div>
+
+        <div className="content-scroll-area">
+          <div className="search-filter-container">
+            <div className="search-container">
               <input
                 type="text"
                 placeholder="Search or type a command (Ctrl + G)"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearch}
+                className="search-input"
               />
-              <img
-                src={SearchIcon || "/placeholder.svg?height=16&width=16"}
-                alt="Search"
-                className="servrequ-search-icon"
-              />
+              <img src={SearchIcon || "/placeholder.svg?height=16&width=16"} alt="Search" className="search-icon" />
             </div>
-            <div className="servrequ-filter">
-              <button className="servrequ-filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-                Filter by {filterBy ? `: ${filterOptions.find((opt) => opt.value === filterBy)?.label}` : ""}
-                <span className="servrequ-chevron">▼</span>
+
+            <div className="filter-dropdown">
+              <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
+                Filter by
+                <span className="arrow">▼</span>
               </button>
               {showFilterOptions && (
-                <div className="servrequ-filter-options">
-                  {filterOptions.map((option) => (
-                    <div
-                      key={option.value}
-                      className="servrequ-filter-option"
-                      onClick={() => handleFilterChange(option.value)}
-                    >
-                      {option.label}
-                    </div>
-                  ))}
+                <div className="filter-options">
+                  <div className="filter-option" onClick={() => handleFilterChange("all")}>
+                    All
+                  </div>
+                  <div className="filter-option" onClick={() => handleFilterChange("pending")}>
+                    Pending
+                  </div>
+                  <div className="filter-option" onClick={() => handleFilterChange("approved")}>
+                    Approved
+                  </div>
+                  <div className="filter-option" onClick={() => handleFilterChange("repair")}>
+                    Repair
+                  </div>
+                  <div className="filter-option" onClick={() => handleFilterChange("installation")}>
+                    Installation
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="servrequ-table-container">
-            <table className="servrequ-table">
-              <thead>
-                <tr>
-                  <th>Request ID</th>
-                  <th>Call ID</th>
-                  <th>Request Date</th>
-                  <th>Customer Name</th>
-                  <th>Type</th>
-                  <th>Status</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredServiceRequests.map((request) => (
-                  <tr key={request.requestId}>
-                    <td>{request.requestId}</td>
-                    <td>{request.callId}</td>
-                    <td>{request.requestDate}</td>
-                    <td>{request.customerName}</td>
-                    <td>{request.type}</td>
-                    <td>{request.status}</td>
-                    <td>
-                      <button className="servrequ-view-button" onClick={() => handleViewDetails(request.requestId)}>
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {/* Empty rows to fill the table */}
-                {Array(10 - filteredServiceRequests.length)
-                  .fill()
-                  .map((_, index) => (
-                    <tr key={`empty-${index}`} className="servrequ-empty-row">
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+          {/* Table Component */}
+          <Table requests={filteredRequests} onViewRequest={handleViewRequest} />
 
-          <div className="servrequ-actions">
-            <button className="servrequ-update-button" onClick={handleUpdate}>
+          <div className="update-container">
+            <button type="button" className="update-button">
               Update
             </button>
           </div>
         </div>
       </div>
+
+      {/* Update/View Modal */}
+      <UpdateViewModal
+        isOpen={showUpdateModal}
+        onClose={() => setShowUpdateModal(false)}
+        request={selectedRequest}
+        onUpdate={handleUpdateRequest}
+      />
     </div>
   )
 }
