@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
+import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 
 const QueueTicketModal = ({ isOpen, onClose, onQueue }) => {
   const [ticketId, setTicketId] = useState("")
@@ -41,11 +42,15 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue }) => {
     <div className="modal-overlay">
       <div className="modal-container queue-ticket-modal">
         <div className="modal-header">
-          <h2>Queue Ticket</h2>
+          <div className="modal-header-left">
+            <img src={ServiceTicketIcon || "/placeholder.svg"} alt="Service Ticket" className="modal-header-icon" />
+            <h2>Queue Ticket</h2>
+          </div>
           <button className="close-button" onClick={onClose}>
             <img src={ExitIcon || "/placeholder.svg"} alt="Close" />
           </button>
         </div>
+        <div className="modal-header-divider"></div>
 
         <div className="modal-content">
           <div className="modal-form two-column">
@@ -124,7 +129,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue }) => {
                     id="assignTechnicianId"
                     value={technicianId}
                     onChange={(e) => setTechnicianId(e.target.value)}
-                    placeholder="Select technician ID"
+                    placeholder="Enter technician ID"
                   />
                   <span className="select-arrow">▼</span>
                 </div>
@@ -159,7 +164,8 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue }) => {
 
               <div className="notification-message">
                 <p>
-                  An automated email will be sent to the customer notifying them the a call will happen within 24 hours.
+                  An automated email will be sent to the customer notifying them that a call will happen within 24
+                  hours.
                 </p>
               </div>
             </div>

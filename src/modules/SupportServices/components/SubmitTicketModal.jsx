@@ -3,6 +3,7 @@
 import { useState } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
+import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 
 const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
   const [customerId, setCustomerId] = useState("")
@@ -39,11 +40,15 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
     <div className="modal-overlay">
       <div className="modal-container submit-ticket-modal">
         <div className="modal-header">
-          <h2>Submit a Ticket</h2>
+          <div className="modal-header-left">
+            <img src={ServiceTicketIcon || "/placeholder.svg"} alt="Service Ticket" className="modal-header-icon" />
+            <h2>Submit a Ticket</h2>
+          </div>
           <button className="close-button" onClick={onClose}>
             <img src={ExitIcon || "/placeholder.svg"} alt="Close" />
           </button>
         </div>
+        <div className="modal-header-divider"></div>
 
         <div className="modal-content">
           <div className="modal-form">
@@ -91,20 +96,6 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="ticketDescription">
-                  Ticket Description <span className="required">*</span>
-                </label>
-                <textarea
-                  id="ticketDescription"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter ticket description"
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
                 <label htmlFor="technicianId">Technician ID</label>
                 <input
                   type="text"
@@ -114,7 +105,9 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
                   placeholder="Enter technician ID"
                 />
               </div>
+            </div>
 
+            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="createdAt">Created at</label>
                 <div className="date-input-wrapper">
@@ -128,9 +121,7 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
                   <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" />
                 </div>
               </div>
-            </div>
 
-            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="priority">
                   Priority <span className="required">*</span>
@@ -145,6 +136,20 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
                   />
                   <span className="select-arrow">▼</span>
                 </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group" style={{ flex: "1 1 100%" }}>
+                <label htmlFor="ticketDescription">
+                  Ticket Description <span className="required">*</span>
+                </label>
+                <textarea
+                  id="ticketDescription"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Enter ticket description"
+                />
               </div>
             </div>
           </div>

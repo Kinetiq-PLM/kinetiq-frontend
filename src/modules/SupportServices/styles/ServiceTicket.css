@@ -22,6 +22,7 @@
   position: relative;
 }
 
+/* Header styling to match the image */
 .servtick .header {
   display: flex;
   align-items: center;
@@ -33,13 +34,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0.25rem;
 }
 
 .servtick .icon-container img {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
   color: #00a8a8;
+  margin-top: 0.125rem; 
 }
 
 .servtick .title-container {
@@ -50,7 +51,7 @@
 .servtick .title-container h2 {
   margin: 0;
   color: #000000;
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   font-weight: 600;
   font-family: "Inter", sans-serif;
   line-height: 1.2;
@@ -71,12 +72,17 @@
   margin: 0.5rem 0 1.5rem 0;
 }
 
+/* Hide scrollbar arrows unless hovered */
 .servtick .content-scroll-area {
   flex: 1;
   overflow-y: auto;
   padding-right: 0.5rem;
-  margin-right: -0.5rem; /* Offset the padding to keep the scrollbar at the edge */
+  margin-right: -0.5rem;
   scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.servtick .content-scroll-area:hover {
   scrollbar-color: #00a8a8 #f0f0f0;
 }
 
@@ -86,16 +92,23 @@
 }
 
 .servtick .content-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.servtick .content-scroll-area:hover::-webkit-scrollbar-track {
   background: #f0f0f0;
   border-radius: 4px;
 }
 
 .servtick .content-scroll-area::-webkit-scrollbar-thumb {
-  background-color: #00a8a8;
+  background-color: transparent;
   border-radius: 4px;
 }
 
-/* Additional fixes for input fields and modals */
+.servtick .content-scroll-area:hover::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+}
+
 .servtick .input-fields-container {
   width: 100%;
   border-radius: 0.5rem;
@@ -123,11 +136,12 @@
   gap: 0.375rem;
 }
 
+/* Update font weights for labels and placeholders */
 .servtick label {
   font-size: 0.75rem;
   color: #00a8a8;
   font-family: "Poppins", sans-serif;
-  font-weight: 500;
+  font-weight: 500; /* Medium weight */
 }
 
 .servtick input,
@@ -138,6 +152,7 @@
   border-radius: 0.25rem;
   font-size: 0.875rem;
   font-family: "Poppins", sans-serif;
+  font-weight: 400; /* Regular weight */
   height: 2.75rem;
   box-sizing: border-box;
   width: 100%;
@@ -168,25 +183,27 @@
   position: relative;
 }
 
+/* Update Filter by button styling */
 .servtick .filter-button {
-  background-color: #ffffff;
+  background-color: white;
   border: 1px solid #e8e8e8;
-  border-radius: 2rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem; /* Smaller font size */
   color: #888;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-family: "Inter", sans-serif;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  min-width: 12rem;
+  font-weight: 500; /* Medium weight */
+  box-shadow: none;
+  width: auto; /* Only as wide as needed */
 }
 
 .servtick .filter-button .arrow {
-  font-size: 0.75rem;
-  margin-left: auto;
+  font-size: 0.625rem;
+  margin-left: 0.25rem; /* Reduced spacing */
   color: #888;
 }
 
@@ -208,12 +225,14 @@
   font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
 }
 
 .servtick .filter-option:hover {
   background-color: #f5f5f5;
 }
 
+/* Button styling with Inter semi-bold font */
 .servtick .submit-button,
 .servtick .queue-button {
   background-color: #00a8a8;
@@ -224,12 +243,11 @@
   font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.2s;
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
   height: 2.5rem;
 }
 
-/* Fix button hover and active states */
 .servtick .submit-button:hover,
 .servtick .queue-button:hover {
   background-color: #098f8f;
@@ -248,10 +266,11 @@
   border: 1px solid #e0e0e0;
 }
 
+/* Table with Inter font */
 .servtick .tickets-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: "Poppins", sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .servtick thead {
@@ -333,22 +352,37 @@
   max-width: 800px;
 }
 
+/* Modal header with logo */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: none;
+}
+
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-header-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #00a8a8;
+  margin-top: 0.125rem; 
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.25rem; /* Smaller font size */
   font-weight: 600;
   color: #000;
   font-family: "Inter", sans-serif;
 }
 
+/* Larger exit icon */
 .close-button {
   background: none;
   border: none;
@@ -357,8 +391,16 @@
 }
 
 .close-button img {
-  width: 1rem;
-  height: 1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* Colored line below modal title */
+.modal-header-divider {
+  height: 2px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 0;
 }
 
 .modal-content {
@@ -396,6 +438,7 @@
   position: relative;
 }
 
+/* Dropdown arrow without shading */
 .select-arrow {
   position: absolute;
   right: 0.75rem;
@@ -407,23 +450,24 @@
   background: none;
 }
 
+/* Adjust spacing in modals */
 .column-header {
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.5rem 0;
   font-size: 1rem;
   font-weight: 600;
   color: #000;
   font-family: "Inter", sans-serif;
 }
 
+/* Improved notification message */
 .notification-message {
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: #f5f5f5;
-  border-radius: 0.25rem;
+  margin-top: 1rem;
+  padding: 0;
   color: #00a8a8;
   font-size: 0.875rem;
   line-height: 1.5;
   text-align: center;
+  font-family: "Inter", sans-serif;
 }
 
 .modal-footer {
@@ -434,6 +478,7 @@
   border-top: 1px solid #e0e0e0;
 }
 
+/* Cancel button matching other buttons */
 .cancel-button {
   background-color: white;
   color: #00a8a8;
@@ -443,8 +488,8 @@
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
   height: 2.5rem;
   min-width: 7rem;
 }
@@ -461,14 +506,14 @@
   background-color: #00a8a8;
   color: white;
   border: none;
-  border-radius: 2rem;
+  border-radius: 0.5rem;
   padding: 0.625rem 1.75rem;
   font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.2s;
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-  height: 2.75rem;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
   min-width: 7rem;
 }
 
@@ -480,7 +525,14 @@
   background-color: #087d7d;
 }
 
-/* Fix modal input fields */
+/* Modal form labels and placeholders */
+.modal-form label {
+  font-size: 0.75rem;
+  color: #00a8a8;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500; /* Medium weight */
+}
+
 .modal-form input,
 .modal-form textarea,
 .modal-form select {
@@ -489,7 +541,8 @@
   border-radius: 0.25rem;
   font-size: 0.875rem;
   font-family: "Poppins", sans-serif;
-  height: 2.75rem;
+  font-weight: 400; /* Regular weight */
+  height: 2.5rem;
   box-sizing: border-box;
   width: 100%;
 }
@@ -498,7 +551,7 @@
   height: 5.5rem;
 }
 
-/* Calendar icon styling */
+/* Even smaller calendar icon */
 .date-input-wrapper {
   position: relative;
   width: 100%;
@@ -513,8 +566,8 @@
   right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 0.85rem;
+  height: 0.85rem;
   pointer-events: none;
 }
 

@@ -37,7 +37,7 @@ const ServTickInputField = ({
             id="subject"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            placeholder="e.g. MRI Machine Maintenance"
+            placeholder="Enter ticket subject"
           />
         </div>
 
@@ -47,7 +47,8 @@ const ServTickInputField = ({
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="e.g. Scheduled preventive maintenance for MRI scanner."
+            placeholder="Enter ticket description"
+            style={{ height: "8.5rem" }} /* Align exactly with phone number */
           />
         </div>
       </div>
