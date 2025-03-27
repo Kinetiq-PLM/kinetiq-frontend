@@ -265,6 +265,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
         {/* Displays a table and can confirm what was selected */}
         <CustomerListModal
           isOpen={isCustomerListOpen}
+          isNewCustomerModalOpen={isNewCustomerModalOpen}
           onClose={() => setIsCustomerListOpen(false)}
           newCustomerModal={setIsNewCustomerModalOpen}
           setSelectedCustomer={setSelectedCustomer}

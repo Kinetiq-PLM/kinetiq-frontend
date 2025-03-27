@@ -12,6 +12,7 @@ import { GET } from "../../../api/api";
 
 const CustomerListModal = ({
   isOpen,
+  isNewCustomerModalOpen,
   onClose,
   setCustomer,
   newCustomerModal,
@@ -34,7 +35,7 @@ const CustomerListModal = ({
   const customersQuery = useQuery({
     queryKey: ["customers"],
     queryFn: async () => await GET("sales/customer?status=Active"),
-    enabled: isOpen,
+    enabled: isOpen || isNewCustomerModalOpen,
   });
 
   const columns = [
