@@ -1,19 +1,57 @@
-import React from "react";
+import React, {useState} from "react";
 import "../styles/StockFlow.css";
 
 const BodyContent = () => {
 
-        // Dummy data for 20 items
-        const dummyData = Array.from({ length: 20 }, (_, i) => ({
-            productName: `Product ${i + 1}`,
-            pCount: Math.floor(Math.random() * 100),
-            dateChecked: `2024-03-${String(i + 1).padStart(2, '0')}`,
-            managerId: `MGR${1000 + i}`,
-            status: i % 2 === 0 ? "Verified" : "Pending",
-        }));
+        // Dummy data 
+        const inTransitData = Array(20).fill({
+            "Product Name": "Product Name",
+            "Transaction Type": "Transfer",
+            "Destination": "Manila",
+            "Origin": "Cebu",
+            "Stock in Transit": "000",
+            "Delivery Team": "Avengers"
+        });
+    
+        const warehouseData = Array(20).fill({
+            "Warehouse Name": "Warehouse Name",
+            "Total Capacity": "000",
+            "Available Space": "000"
+        });
+    
+        const transHistoryData = Array(20).fill({
+            "Product Type": "Raw Material Name",
+            "Transaction Type": "000",
+            "Destination": "Raw Material Name",
+            "Origin": "Manila",
+            "Stock in Transit": "000",
+            "Delivery Team": "Avengers"
+        });
+
+    // Table Configurations per Active Tab
+    const stockFlowTableConfigs = {
+        "In Transit" : { 
+            Columns : ["Product Name", "Transaction Type", "Destination", "Origin", "Stock in Transit", "Delivery Team"],
+            Data: inTransitData
+            
+        },
+
+        "Warehouse" : {
+            Columns : ["Warehouse Name", "Total Capacity", "Available Space"],
+            Data: warehouseData
+         },
+
+        "Transfer History" : {
+            Columns: ["Product Type", "Transaction Type", "Destination", "Origin", "Stock in Transit", "Delivery Team"],
+            Data: transHistoryData
+        }
+
+    }
+ 
 
     const tabs = ["In Transit",  "Warehouse", "Transfer History"];
-    const [activeTab, setActiveTab] = React.useState(tabs[0]);
+    const [activeTab, setActiveTab] = useState("In Transit");
+    const activeConfig = stockFlowTableConfigs[activeTab];
     
 
     return (
@@ -59,19 +97,19 @@ const BodyContent = () => {
                         <table className="w-full table-layout:fixed text-center cursor-pointer">
                                 <thead>
                                     <tr className="border-b border-gray-300">
-                                        {['Product Name', 'P-Count', 'Date Checked', 'Manager ID', 'Status'].map((header) => (
+                                        {activeConfig.Columns.map((header) => (
                                            <th key={header} className="p-2 text-gray-600">{header}</th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {dummyData.map((item, index) => (
+                                    {activeConfig.Data.map((item, index) => (
                                         <tr key={index} className="border-b border-gray-300">
-                                            <td className="p-2">{item.productName}</td>
-                                            <td className="p-2">{item.pCount}</td>
-                                            <td className="p-2">{item.dateChecked}</td>
-                                            <td className="p-2">{item.managerId}</td>
-                                            <td className={`p-2 ${item.status === 'Verified' ? 'text-green-600' : 'text-yellow-600'}`}>{item.status}</td>
+                                           {activeConfig.Columns.map((col) => (
+                                            <td key={col} className="p-2">
+                                                {item[col]}
+                                            </td>
+                                           ))}
                                         </tr>
                                     ))}
                                 </tbody>
@@ -90,10 +128,3 @@ const BodyContent = () => {
 export default BodyContent;
 
 
-
-// {/* Warehouse Filter */}
-{/* <select name="" id="" className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer">
-<option>Select Warehouse</option>
-{["Warehouse 1", "Warehouse 2", "Warehouse 3"].map((warehouse) => (
-    <option key={warehouse}>{warehouse}</option>))}
-</select> */}
