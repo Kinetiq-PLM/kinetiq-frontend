@@ -3,6 +3,8 @@ import Table from "../Table";
 import Dropdown from "../Dropdown";
 import Button from "../Button";
 import BLANKET_AGREEMENT_LIST_DATA from "../../temp_data/ba_list_data";
+import { GET } from "../../api/api";
+import { useQuery } from "@tanstack/react-query";
 
 export default function OpportunitiesTab({
   setActiveModule,
@@ -14,19 +16,21 @@ export default function OpportunitiesTab({
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
+  const [opportunities, setOpportunities] = useState([]);
+  const opportunitiesQuery = useQuery({
+    queryKey: ["opportunities"],
+    queryFn: async () => await GET("crm/opportunities"),
+  });
 
   const columns = [
-    { key: "agreement_id", label: "Agreement ID" },
+    { key: "opportunity_id", label: "Opportunity ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "selected_address", label: "Address" },
-    { key: "type", label: "Type" },
-    { key: "total_price", label: "Total Price" },
-    { key: "salesrep_id", label: "Sales Rep" }, // name of salesrep if available
-    { key: "agreement_method", label: "Agreement Method" }, // signed date
-    { key: "date_issued", label: "Signed Date" }, // signed date
-    { key: "start_date", label: "Start Date" },
-    { key: "end_date", label: "End Date" },
+    { key: "estimated_value", label: "Estimated Value" },
+    { key: "salesrep", label: "Sales Rep" }, // name of salesrep if available
+    { key: "stage", label: "Stage" }, // signed date
+    { key: "expected_closed_date", label: "Expected Closed Date" }, // signed date
     { key: "status", label: "Status" },
   ];
 
@@ -42,7 +46,7 @@ export default function OpportunitiesTab({
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = BLANKET_AGREEMENT_LIST_DATA.filter((quotation) => {
+  const filteredQuotations = opportunities.filter((quotation) => {
     // Filter by search term
     if (searchTerm) {
       const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
@@ -68,6 +72,28 @@ export default function OpportunitiesTab({
     setActiveSubModule("Marketing", "CRM");
     loadSubModule("Marketing", "CRM");
   };
+
+  useEffect(() => {
+    if (opportunitiesQuery.status === "success") {
+      const data = opportunitiesQuery.data.map((opp) => ({
+        opportunity_id: opp.opportunity_id,
+        customer_id: opp.customer.customer_id,
+        customer_name: opp.customer.name,
+        selected_address: opp.customer.address_line1,
+        estimated_value: Number(opp.estimated_value).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        salesrep: opp.salesrep.employee_id,
+        stage: opp.stage,
+        expected_closed_date: new Date(
+          opp.expected_closed_date
+        ).toLocaleDateString(),
+        status: opp.status,
+      }));
+      setOpportunities(data);
+    }
+  }, [opportunitiesQuery.data]);
 
   return (
     <section className="h-full">
