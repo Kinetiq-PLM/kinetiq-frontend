@@ -78,7 +78,7 @@ const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
   );
 };
 
-const DateSelector = ({ label, customer, setDeliveryDate }) => {
+const DateSelector = ({ label, customer, setDeliveryDate, disabled }) => {
   // Calculate the default date (3 days from today)
   const defaultDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
     .toISOString()
@@ -105,10 +105,11 @@ const DateSelector = ({ label, customer, setDeliveryDate }) => {
       <p className="flex-1">{label}</p>
       <input
         type="date"
-        className="border border-[#9a9a9a] flex-1 p-1 h-[30px] rounded cursor-pointer"
+        className="border border-[#9a9a9a] flex-1 p-1 h-[30px] rounded cursor-pointer disabled:cursor-default disabled:bg-[#f7f7f7]"
         onChange={handleDateChange}
         value={date}
         min={defaultDate} // Restrict to at least 3 days from now
+        disabled={disabled}
       />
     </div>
   );
@@ -143,7 +144,7 @@ const SalesInfo = ({
           customerListModal={customerListModal}
         />
         <Information label={"Name"} value={customer.name} />
-        <Information label={"Email"} value={customer.country} />
+        <Information label={"Country"} value={customer.country} />
         <Information label={"Number"} value={customer.phone_number} />
       </div>
       <div className="w-full hidden xl:block"></div>
@@ -161,7 +162,8 @@ const SalesInfo = ({
         <DateSelector
           customer={customer}
           setDeliveryDate={setDeliveryDate}
-          label={"Delivery Date"}
+          label={type === "Quotation" ? "Date Issued" : "Delivery Date"}
+          disabled={type === "Quotation"}
         />
         {/* Date Selector*/}
       </div>

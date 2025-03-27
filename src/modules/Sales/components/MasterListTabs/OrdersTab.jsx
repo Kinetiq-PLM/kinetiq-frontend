@@ -21,7 +21,7 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
     { key: "address", label: "Address" },
     { key: "type", label: "Type" },
     { key: "total_price", label: "Total Price" },
-    { key: "salesrep", label: "Sales Rep" }, // name of salesrep if available
+    { key: "salesrep", label: "Sales Representative" }, // name of salesrep if available
     { key: "order_date", label: "Date Issued" },
   ];
 
@@ -59,8 +59,8 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
   });
 
   const handleRedirect = () => {
-    loadSubModule("Quotation");
-    setActiveSubModule("Quotation");
+    loadSubModule("Order");
+    setActiveSubModule("Order");
   };
 
   useEffect(() => {
@@ -125,7 +125,7 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
           type="primary"
           className={"w-[200px] py-2"}
         >
-          New Quotation
+          New Order
         </Button>
       </div>
 

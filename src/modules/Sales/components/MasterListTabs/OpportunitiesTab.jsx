@@ -28,7 +28,7 @@ export default function OpportunitiesTab({
     { key: "customer_name", label: "Customer Name" },
     { key: "selected_address", label: "Address" },
     { key: "estimated_value", label: "Estimated Value" },
-    { key: "salesrep", label: "Sales Rep" }, // name of salesrep if available
+    { key: "salesrep", label: "Sales Representative" }, // name of salesrep if available
     { key: "stage", label: "Stage" }, // signed date
     { key: "expected_closed_date", label: "Expected Closed Date" }, // signed date
     { key: "status", label: "Status" },

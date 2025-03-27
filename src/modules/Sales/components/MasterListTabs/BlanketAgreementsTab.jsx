@@ -132,7 +132,7 @@ export default function BlanketAgreementsTab({
           type="primary"
           className={"w-[200px] py-2"}
         >
-          New Quotation
+          New Agreement
         </Button>
       </div>
 
