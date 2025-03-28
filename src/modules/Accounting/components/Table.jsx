@@ -3,7 +3,6 @@ import "./Table.css"; // Ensure this file is updated
 
 const Table = ({ columns, data, enableCheckbox }) => {
     const [selectedRows, setSelectedRows] = useState([]);
-    const [wrappedColumns, setWrappedColumns] = useState({}); // Track wrapped columns
 
     const handleCheckboxChange = (index) => {
         setSelectedRows((prevSelectedRows) =>
@@ -13,13 +12,6 @@ const Table = ({ columns, data, enableCheckbox }) => {
         );
     };
 
-    const toggleWrap = (index) => {
-        setWrappedColumns((prev) => ({
-            ...prev,
-            [index]: !prev[index] // Toggle wrap state
-        }));
-    };
-
     return (
         <div className={`table-container ${enableCheckbox ? 'checkbox-enabled' : ''}`}>
             <table>
@@ -27,7 +19,7 @@ const Table = ({ columns, data, enableCheckbox }) => {
                     <tr>
                         {enableCheckbox && <th></th>}
                         {columns.map((column, index) => (
-                            <th key={index} onClick={() => toggleWrap(index)}>
+                            <th key={index} >
                                 {column}
                             </th>
                         ))}
@@ -47,11 +39,7 @@ const Table = ({ columns, data, enableCheckbox }) => {
                                 </td>
                             )}
                             {row.map((cell, cellIndex) => (
-                                <td
-                                    key={cellIndex}
-                                    className={wrappedColumns[cellIndex] ? "wrapped" : ""}
-                                    onClick={() => toggleWrap(cellIndex)}
-                                >
+                                <td key={cellIndex} >
                                     {cell}
                                 </td>
                             ))}
