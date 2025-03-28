@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 import { useAlert } from "../../Context/AlertContext.jsx";
 
@@ -16,18 +16,23 @@ const CustomerListModal = ({
   onClose,
   setCustomer,
   newCustomerModal,
+  duplicates = [],
 }) => {
   const { showAlert } = useAlert();
 
-  const customer_data = CUSTOMER_DATA;
+  const customer_data = useMemo(() => CUSTOMER_DATA, []);
 
-  // setCustomer is used to set the selected customer in the parent component
   // setSelectedCustomer is used to set the selected customer in this component
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
+<<<<<<< HEAD
   const [filteredData, setFilteredData] = useState([]);
   const [customers, setCustomers] = useState([]);
+=======
+  const [filteredData, setFilteredData] = useState(customer_data);
+  const [searchTerm, setSearchTerm] = useState("");
+>>>>>>> 1d5d58078685c67558f7498bd82918aa09cf3762
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -44,16 +49,27 @@ const CustomerListModal = ({
     { key: "country", label: "Country" }, // Country
   ];
 
+  useEffect(() => {
+    // Exclude products that are already in the customer list
+    setFilteredData(
+      customer_data.filter(
+        (customer) =>
+          !duplicates.some((c) => c.customer_id === customer.customer_id)
+      )
+    );
+  }, [duplicates]);
+
   const handleConfirm = () => {
     if (selectedCustomer) {
       setCustomer(selectedCustomer);
       onClose();
       showAlert({
         type: "success",
-        title: "Customer Selected",
+        title: "Customer selected.",
       });
       setSelectedCustomer(null);
     }
+    setSearchTerm(""); // Reset search input after selection
   };
 
   useEffect(() => {
@@ -138,10 +154,15 @@ const CustomerListModal = ({
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
+<<<<<<< HEAD
                 const filteredData = customers.filter((customer) =>
                   customer.name.toLowerCase().includes(searchTerm)
+=======
+                const filtered = customer_data.filter((product) =>
+                  product.name.toLowerCase().includes(searchTerm)
+>>>>>>> 1d5d58078685c67558f7498bd82918aa09cf3762
                 );
-                setFilteredData(filteredData);
+                setFilteredData(filtered);
               }}
             />
           </div>

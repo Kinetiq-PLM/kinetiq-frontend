@@ -88,14 +88,14 @@ export default function SupplierTab() {
           />
         </div>
 
-        {/* New Quotation Button (No onClick) */}
-        <Button
+        {/* New Supplier Button (No onClick) */}
+        {/* <Button
           onClick={handleClick}
           type="primary"
           className={"w-[200px] py-2"}
         >
           New Quotation
-        </Button>
+        </Button> */}
       </div>
 
       {/* Table Section */}

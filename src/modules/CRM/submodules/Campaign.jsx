@@ -34,7 +34,7 @@ const Campaign = () => {
           {/* Tab Selector */}
           <div className="mt-4 flex flex-col md:flex-row lg:hidden md:justify-between md:items-center gap-4">
             <div>
-              <h4 className="font-medium">Select Data:</h4>
+              <h4 className="font-medium">Select Action:</h4>
             </div>
             <div className="flex items-center gap-2">
               <h4 className="text-lg font-medium text-gray-400">View:</h4>

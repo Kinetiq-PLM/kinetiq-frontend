@@ -9,7 +9,7 @@ import Button from "../../Sales/components/Button.jsx";
 import { GET } from "../../Sales/api/api.jsx";
 import { useQuery } from "@tanstack/react-query";
 
-const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
+const CampaignListModal = ({ isOpen, onClose, setCampaign }) => {
   const { showAlert } = useAlert();
 
   const [selectedCampaign, setSelectedCampaign] = useState(null);
@@ -22,7 +22,7 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
     queryFn: async () => await GET("crm/campaigns"),
     enabled: isOpen,
   });
-
+  const campaign_data = CAMPAIGN_LIST_DATA;
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
@@ -30,6 +30,7 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
     { key: "campaign_id", label: "Campaign ID" },
     { key: "campaign_name", label: "Name" }, // Company Name
     { key: "type", label: "Type" }, // Country
+    { key: "status", label: "Status" }, // Company Nam
   ];
 
   const handleConfirm = () => {
@@ -38,7 +39,7 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
       onClose();
       showAlert({
         type: "success",
-        title: "Added product.",
+        title: "Campaign selected.",
       });
       setSelectedCampaign(null);
     }
@@ -76,6 +77,7 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
         campaign_id: campaign.campaign_id,
         campaign_name: campaign.campaign_name,
         type: campaign.type,
+        status: campaign.status,
       }));
       setCampaignList(data);
       setFilteredData(data);
@@ -148,7 +150,7 @@ const CampaignListModal = ({ isOpen, onClose, campaign, setCampaign }) => {
                 onClick={handleConfirm}
                 disabled={!selectedCampaign}
               >
-                Add
+                Select
               </Button>
             </div>
             <div>
