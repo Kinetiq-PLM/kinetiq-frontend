@@ -8,7 +8,7 @@ import CustomerListModal from "./../../../Sales/components/Modals/Lists/Customer
 import NewCustomerModal from "./../../../Sales/components/Modals/NewCustomer";
 import MessageModal from "../MessageModal.jsx";
 import { useAlert } from "../../../Sales/components/Context/AlertContext.jsx";
-import { GET } from "../../../Sales/api/api.jsx";
+import { GET, PATCH } from "../../../Sales/api/api.jsx";
 import { useMutation } from "@tanstack/react-query";
 export default function CampaignContactTab() {
   const { showAlert } = useAlert();
@@ -27,11 +27,11 @@ export default function CampaignContactTab() {
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
 
   const columns = [
-    { key: "lead_id", label: "Contact ID" },
-    { key: "lead_name", label: "Name" },
-    { key: "lead_email", label: "Email" },
-    { key: "lead_phonenum", label: "Phone" },
-    // { key: "contact_person", label: "Contact Person" },
+    { key: "customer_id", label: "Customer ID" },
+    { key: "name", label: "Name" },
+    { key: "email_address", label: "Email" },
+    { key: "phone_number", label: "Phone" },
+    { key: "contact_person", label: "Contact Person" },
   ];
 
   const contactsMutation = useMutation({
@@ -39,10 +39,32 @@ export default function CampaignContactTab() {
     onSuccess: (data) => {
       console.log(data);
       const contacts = data.contacts.map((contact) => ({
-        contact_id: contact.customer_id,
-        customer_id: contact.lead,
+        customer_id: contact.customer.customer_id,
+        name: contact.customer.name,
+        email_address: contact.customer.email_address,
+        phone_number: contact.customer.phone_number,
+        contact_person: contact.customer.contact_person,
       }));
       setContactList(contacts);
+    },
+  });
+
+  const campaignMutation = useMutation({
+    mutationFn: async (data) =>
+      await PATCH(`crm/campaigns/${data.campaign}/`, {
+        contacts: data.contacts,
+      }),
+    onSuccess: (data) => {
+      showAlert({
+        type: "success",
+        title: "Campaign saved.",
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title: "An error occurred while saving the campaign.",
+      });
     },
   });
 
@@ -94,12 +116,11 @@ export default function CampaignContactTab() {
   };
 
   const handleSave = () => {
-    console.log("Save campaign data to DB");
-
-    showAlert({
-      type: "success",
-      title: "Campaign saved.",
-    });
+    const request = {
+      campaign: selectedCampaign.campaign_id,
+      contacts: contactList.map((contact) => contact.customer_id),
+    };
+    campaignMutation.mutate(request);
   };
 
   return (
@@ -115,6 +136,7 @@ export default function CampaignContactTab() {
         <CustomerListModal
           isOpen={isCustomerListOpen}
           onClose={() => setIsCustomerListOpen(false)}
+          isNewCustomerModalOpen={isNewCustomerModalOpen}
           newCustomerModal={setIsNewCustomerModalOpen}
           setCustomer={setSelectedCustomer}
           duplicates={contactList}

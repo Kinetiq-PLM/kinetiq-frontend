@@ -14,3 +14,12 @@ export async function POST(endpoint, data) {
   });
   return await res.json();
 }
+
+export async function PATCH(endpoint, data) {
+  const res = await fetch(BASE_API_URL + endpoint, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" },
+  });
+  return await res.json();
+}
