@@ -6,7 +6,6 @@ import InvRestockForm from "./components/InvRestockForm";
 import InvItemCards from "./components/InvItemCards";
 
 const BodyContent = () => {
-
   const [productData, setProductData] = useState([]);
   const [assetData, setAssetData] = useState([]);
   const [rawMaterialData, setRawMaterialData] = useState([]);
@@ -16,10 +15,22 @@ const BodyContent = () => {
   const [loadingRawMats, setLoadingRawMats] = useState(true);
 
   const [activeTab, setActiveTab] = useState("Products");
-  const [selectedItem, setSelectedItem] = useState(null); 
+  const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); 
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [searchTerm]);
+
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/products/")
       .then((res) => res.json())
@@ -32,7 +43,6 @@ const BodyContent = () => {
         setLoadingProducts(false);
       });
   }, []);
-
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/assets/")
@@ -47,7 +57,6 @@ const BodyContent = () => {
       });
   }, []);
 
-  
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/raw-materials/")
       .then((res) => res.json())
@@ -61,7 +70,6 @@ const BodyContent = () => {
       });
   }, []);
 
-  
   const tableConfigs = {
     Products: {
       columns: ["Name", "Total Stock", "Ordered Stock", "Commited Stock", "Available Stock"],
@@ -100,18 +108,34 @@ const BodyContent = () => {
 
   const currentConfig = tableConfigs[activeTab];
 
+
+  const search = debouncedSearchTerm.toLowerCase().trim();
+  const filteredData = currentConfig.data
+  .filter((item) => {
+    const nameVal = (item.Name || "").toLowerCase();
+    return search === "" || nameVal.startsWith(search);
+  })
+  .sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
+
+
   const toggleModal = () => setShowModal(!showModal);
 
   return (
     <div className={`inv ${showModal ? "blurred" : ""}`}>
       <div className="body-content-container flex">
 
-        <InvNav activeTab={activeTab} onTabChange={setActiveTab} />
+        <InvNav
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+        />
+
 
         <InvProductTable
           loading={currentConfig.loading}
           columns={currentConfig.columns}
-          data={currentConfig.data}
+          data={filteredData}
           onSelectProduct={setSelectedItem}
         />
 
@@ -144,7 +168,7 @@ const BodyContent = () => {
 
         <div className="inventory-cards-container w-full overflow-y-auto max-h-[80vh]">
           <InvItemCards
-            items={currentConfig.data}
+            items={filteredData}
             onSelectItem={setSelectedItem}
             openModal={toggleModal}
           />
