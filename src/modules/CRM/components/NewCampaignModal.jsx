@@ -56,7 +56,6 @@ const NewCampaignModal = ({ isOpen, onClose }) => {
         type: campaignType,
         start_date: startDate,
         end_date: endDate,
-        status: "Planned", // replace later
       };
       campaignMutation.mutate(request);
       // Reset form fields
