@@ -43,6 +43,8 @@ const CustomerListModal = ({
 
   useEffect(() => {
     // Exclude products that are already in the customer list
+    if (duplicates.length === 0) return;
+
     setFilteredData(
       customers.filter(
         (customer) =>

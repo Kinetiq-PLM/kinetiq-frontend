@@ -5,6 +5,8 @@ import CampaignInfo from "../CampaignInfo";
 
 import CampaignListModal from "./../CampaignListModal";
 import CustomerListModal from "./../../../Sales/components/Modals/Lists/CustomerList";
+import NewCustomerModal from "./../../../Sales/components/Modals/NewCustomer";
+import MessageModal from "../MessageModal.jsx";
 import { useAlert } from "../../../Sales/components/Context/AlertContext.jsx";
 import { GET } from "../../../Sales/api/api.jsx";
 import { useMutation } from "@tanstack/react-query";
@@ -13,6 +15,9 @@ export default function CampaignContactTab() {
 
   const [isCampaignListOpen, setIsCampaignListOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState("");
+  const [canSave, setCanSave] = useState(false); // Save button state
+
+  const [isMessageOpen, setIsMessageOpen] = useState(false); // Message modal open state
 
   const [contactList, setContactList] = useState([]); // Customers part of the campaign
 
@@ -44,6 +49,7 @@ export default function CampaignContactTab() {
   useEffect(() => {
     if (selectedCustomer) {
       setContactList((prevList) => [...prevList, selectedCustomer]);
+      setCanSave(true);
     }
   }, [selectedCustomer]);
 
@@ -75,10 +81,37 @@ export default function CampaignContactTab() {
     });
   };
 
+  const handleSendMessage = () => {
+    if (contactList.length === 0) {
+      showAlert({
+        type: "error",
+        title: "Add contact.",
+      });
+    } else {
+      // SAVE CAMPAIGN DATA TO DB
+      setIsMessageOpen(true);
+    }
+  };
+
+  const handleSave = () => {
+    console.log("Save campaign data to DB");
+
+    showAlert({
+      type: "success",
+      title: "Campaign saved.",
+    });
+  };
+
   return (
     <section className="h-full">
       {/* Header Section */}
       <div className="flexflex-col justify-between mb-4 flex-wrap gap-4">
+        <MessageModal
+          isOpen={isMessageOpen}
+          onClose={() => setIsMessageOpen(false)}
+          campaign={selectedCampaign}
+        ></MessageModal>
+
         <CustomerListModal
           isOpen={isCustomerListOpen}
           onClose={() => setIsCustomerListOpen(false)}
@@ -86,6 +119,11 @@ export default function CampaignContactTab() {
           setCustomer={setSelectedCustomer}
           duplicates={contactList}
         ></CustomerListModal>
+
+        <NewCustomerModal
+          isOpen={isNewCustomerModalOpen}
+          onClose={() => setIsNewCustomerModalOpen(false)}
+        ></NewCustomerModal>
 
         <CampaignListModal
           isOpen={isCampaignListOpen}
@@ -108,18 +146,41 @@ export default function CampaignContactTab() {
           />
         </div>
         <section className="mt-4 flex justify-between flex-col lg:flex-row space-x-4">
-          <div className="h-full flex flex-col gap-3 w-full">
-            {/* Buttons Row */}
-            <div className="flex gap-2">
-              <Button
-                type="primary"
-                onClick={() => setIsCustomerListOpen(true)}
-              >
-                Add Contact
-              </Button>
-              <Button type="outline" onClick={() => handleDelete()}>
-                Delete Item
-              </Button>
+          <div className="h-full flex flex-col gap-3 w-full justify-between">
+            {/* Buttons Row 1*/}
+            <div className="flex flex-row flex-wrap justify-between mb-20 sm:mb-10 gap-2">
+              <div className="flex gap-2 flex-wrap ">
+                <Button
+                  type="primary"
+                  onClick={() => setIsCustomerListOpen(true)}
+                  disabled={selectedCampaign === ""}
+                >
+                  Add Contact
+                </Button>
+                <Button
+                  type="outline"
+                  disabled={selectedCampaign === ""}
+                  onClick={() => handleDelete()}
+                >
+                  Remove
+                </Button>
+              </div>
+              <div className="flex">
+                <Button
+                  type="primary"
+                  disabled={selectedCampaign === ""}
+                  onClick={handleSendMessage}
+                >
+                  Send Message
+                </Button>
+              </div>
+            </div>
+            <div>
+              <div className="flex">
+                <Button type="primary" disabled={!canSave} onClick={handleSave}>
+                  Save Campaign
+                </Button>
+              </div>
             </div>
           </div>
         </section>
