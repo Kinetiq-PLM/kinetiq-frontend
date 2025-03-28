@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "../styles/accounting-styling.css";
 import { accounts } from "./ListOfAccounts";
 import SearchBar from "../../../shared/components/SearchBar";
@@ -22,14 +21,14 @@ const BodyContent = () => {
         account_type: ""
     });
 
-    // Fetch data from API when the component mounts
-    useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/chart-of-accounts/")
-            .then(response => {
-                setData(response.data.map(acc => [acc.account_code, acc.account_name, acc.account_type]));
-            })
-            .catch(error => console.error("Error fetching data:", error));
-    }, []);
+    // // Fetch data from API when the component mounts
+    // useEffect(() => {
+    //     axios.get("http://127.0.0.1:8000/api/chart-of-accounts/")
+    //         .then(response => {
+    //             setData(response.data.map(acc => [acc.account_code, acc.account_name, acc.account_type]));
+    //         })
+    //         .catch(error => console.error("Error fetching data:", error));
+    // }, []);
 
     // Handle Input Change
     const handleInputChange = (field, value) => {
@@ -58,7 +57,7 @@ const BodyContent = () => {
                 const addedAccount = response.data;
                 setData(prevData => [...prevData, [addedAccount.account_code, addedAccount.account_name, addedAccount.account_type]]);
                 setNewAccount({ account_code: "", account_name: "", account_type: "" });
-                closeModal(); // ✅ Close modal after adding account
+                closeModal(); 
             } else {
                 alert("Failed to save data. Please try again.");
             }
