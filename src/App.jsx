@@ -92,6 +92,7 @@ function App() {
       "Journal": "Journal",
       "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
+      "General Ledger Accounts": "GeneralLedgerAccounts",
       "Accounts Payable": "AccountsPayable",
       "Accounts Receivable": "AccountsReceivable",
     },
