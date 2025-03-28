@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/Accounting-Global-Styling.css';
+import '../styles/accounting-styling.css';
 import { sortingChoices } from './ListOfAccounts';
 import Button from '../components/Button';
 import Dropdown from '../components/Dropdown';
