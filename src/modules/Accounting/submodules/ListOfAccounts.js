@@ -105,4 +105,27 @@ const sortByDate = [
   "Last month"
 ]
 
-export { accounts, subAccounts, sortByDate, sortingChoices };
+const currencies = [
+  "US Dollar",
+  "Euro",
+  "British Pound",
+  "Japanese Yen",
+  "Australian Dollar",
+  "Canadian Dollar",
+  "Swiss Franc",
+  "Chinese Yuan",
+  "Indian Rupee",
+  "Brazilian Real",
+  "South African Rand",
+  "Singapore Dollar",
+  "Hong Kong Dollar",
+  "Mexican Peso",
+  "South Korean Won",
+  "Swedish Krona",
+  "Norwegian Krone",
+  "Russian Ruble",
+  "Turkish Lira",
+  "UAE Dirham"
+];
+
+export { accounts, subAccounts, sortByDate, sortingChoices, currencies };
