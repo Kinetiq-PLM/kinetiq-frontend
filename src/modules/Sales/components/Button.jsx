@@ -33,7 +33,7 @@ const Button = ({
       className={`cursor-pointer  ${styling}  ${
         disabled ? "opacity-50 cursor-not-allowed" : ""
       } ${className}`}
-      onClick={onClick}
+      onClick={disabled ? () => {} : onClick}
       type={submit ? "submit" : "button"}
     >
       {children}
