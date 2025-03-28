@@ -1,17 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../../../Sales/components/Table";
 import Dropdown from "../../../Sales/components/Dropdown";
 import Button from "../../../Sales/components/Button";
 import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
+import { GET } from "../../../Sales/api/api";
+import { useQuery } from "@tanstack/react-query";
 
 export default function CustomerTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
-
+  const [customers, setCustomers] = useState([]);
+  const customersQuery = useQuery({
+    queryKey: ["customers"],
+    queryFn: async () => await GET("misc/business-partners?category=Customer"),
+  });
   const columns = [
+    { key: "partner_id", label: "Partner ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
+    { key: "contact_info", label: "Contact Information" },
   ];
 
   const dateFilters = [
@@ -26,7 +34,7 @@ export default function CustomerTab() {
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = CUSTOMER_DATA.filter((quotation) => {
+  const filteredQuotations = customers.filter((quotation) => {
     // Filter by search term
     if (searchTerm) {
       const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
@@ -50,6 +58,18 @@ export default function CustomerTab() {
   const handleClick = () => {
     console.log("CLICKED");
   };
+
+  useEffect(() => {
+    if (customersQuery.status === "success") {
+      const data = customersQuery.data.map((customer) => ({
+        partner_id: customer.partner_id,
+        customer_id: customer.customer_id,
+        customer_name: customer.partner_name,
+        contact_info: customer.contact_info,
+      }));
+      setCustomers(data);
+    }
+  }, [customersQuery.data]);
 
   return (
     <section className="h-full">

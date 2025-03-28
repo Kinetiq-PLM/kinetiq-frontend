@@ -22,7 +22,6 @@ const CampaignListModal = ({ isOpen, onClose, setCampaign }) => {
     queryFn: async () => await GET("crm/campaigns"),
     enabled: isOpen,
   });
-  const campaign_data = CAMPAIGN_LIST_DATA;
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 

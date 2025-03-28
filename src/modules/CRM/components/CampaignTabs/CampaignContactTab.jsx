@@ -6,7 +6,8 @@ import CampaignInfo from "../CampaignInfo";
 import CampaignListModal from "./../CampaignListModal";
 import CustomerListModal from "./../../../Sales/components/Modals/Lists/CustomerList";
 import { useAlert } from "../../../Sales/components/Context/AlertContext.jsx";
-
+import { GET } from "../../../Sales/api/api.jsx";
+import { useMutation } from "@tanstack/react-query";
 export default function CampaignContactTab() {
   const { showAlert } = useAlert();
 
@@ -21,13 +22,24 @@ export default function CampaignContactTab() {
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
 
   const columns = [
-    { key: "customer_id", label: "Contact ID" },
-    { key: "customer_name", label: "Name" },
-    { key: "city", label: "City" },
-    { key: "email_address", label: "Email" },
-    { key: "phone_number", label: "Phone" },
-    { key: "contact_person", label: "Contact Person" },
+    { key: "lead_id", label: "Contact ID" },
+    { key: "lead_name", label: "Name" },
+    { key: "lead_email", label: "Email" },
+    { key: "lead_phonenum", label: "Phone" },
+    // { key: "contact_person", label: "Contact Person" },
   ];
+
+  const contactsMutation = useMutation({
+    mutationFn: async (data) => await GET(`crm/campaigns/${data.campaign}`),
+    onSuccess: (data) => {
+      console.log(data);
+      const contacts = data.contacts.map((contact) => ({
+        contact_id: contact.customer_id,
+        customer_id: contact.lead,
+      }));
+      setContactList(contacts);
+    },
+  });
 
   useEffect(() => {
     if (selectedCustomer) {
@@ -36,7 +48,9 @@ export default function CampaignContactTab() {
   }, [selectedCustomer]);
 
   useEffect(() => {
-    setContactList([]); // Fetch contacts based on selectedCampaign
+    // setContactList([]); // Fetch contacts based on selectedCampaign
+    if (selectedCampaign)
+      contactsMutation.mutate({ campaign: selectedCampaign.campaign_id });
   }, [selectedCampaign]);
 
   const handleDelete = () => {

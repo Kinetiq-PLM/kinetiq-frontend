@@ -41,7 +41,7 @@ export default function CampaignListTab() {
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = campaignList.filter((quotation) => {
+  const filteredCampaigns = campaignList.filter((quotation) => {
     // Filter by search term
     if (searchTerm) {
       const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";

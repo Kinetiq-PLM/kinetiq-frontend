@@ -1,17 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../../../Sales/components/Table";
 import Dropdown from "../../../Sales/components/Dropdown";
 import Button from "../../../Sales/components/Button";
 import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
+import { GET } from "../../../Sales/api/api";
+import { useQuery } from "@tanstack/react-query";
 
 export default function SupplierTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
-
+  const [customers, setCustomers] = useState([]);
+  const customersQuery = useQuery({
+    queryKey: ["suppliers"],
+    queryFn: async () => await GET("misc/business-partners?category=Supplier"),
+  });
   const columns = [
-    { key: "customer_id", label: "Customer ID" },
-    { key: "customer_name", label: "Customer Name" },
+    { key: "partner_id", label: "Partner ID" },
+    { key: "vendor_code", label: "Supplier Code" },
+    { key: "partner_name", label: "Supplier Name" },
+    { key: "contact_info", label: "Contact Information" },
   ];
 
   const dateFilters = [
@@ -26,7 +34,7 @@ export default function SupplierTab() {
   }));
 
   // Filter quotations based on search and date
-  const filteredQuotations = CUSTOMER_DATA.filter((quotation) => {
+  const filteredQuotations = customers.filter((quotation) => {
     // Filter by search term
     if (searchTerm) {
       const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
@@ -50,6 +58,18 @@ export default function SupplierTab() {
   const handleClick = () => {
     console.log("CLICKED");
   };
+
+  useEffect(() => {
+    if (customersQuery.status === "success") {
+      const data = customersQuery.data.map((customer) => ({
+        partner_id: customer.partner_id,
+        vendor_code: customer.vendor_code,
+        partner_name: customer.partner_name,
+        contact_info: customer.contact_info,
+      }));
+      setCustomers(data);
+    }
+  }, [customersQuery.data]);
 
   return (
     <section className="h-full">
@@ -87,15 +107,6 @@ export default function SupplierTab() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-
-        {/* New Supplier Button (No onClick) */}
-        {/* <Button
-          onClick={handleClick}
-          type="primary"
-          className={"w-[200px] py-2"}
-        >
-          New Quotation
-        </Button> */}
       </div>
 
       {/* Table Section */}
