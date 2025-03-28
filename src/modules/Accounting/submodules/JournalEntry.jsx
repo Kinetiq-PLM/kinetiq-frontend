@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/JournalEntry.css';
-import '../styles/Accounting-Global-Styling.css';
+import '../styles/accounting-styling.css';
 import Button from '../components/Button';
 import Forms from '../components/Forms';
 
