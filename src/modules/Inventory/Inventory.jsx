@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./styles/Inventory.css";
 import InvNav from "./components/InvNav";
 import InvProductTable from "./components/InvProductTable";
@@ -6,105 +6,179 @@ import InvRestockForm from "./components/InvRestockForm";
 import InvItemCards from "./components/InvItemCards";
 
 const BodyContent = () => {
-    // Sample Data for place holders muna
-    const productData = Array(20).fill({
-        "Name": "Product Name",
-        "Total Stock": "000",
-        "Ordered Stock": "000",
-        "Commited Stock": "000",
-        "Available Stock": "000"
-    });
-
-    const assetData = Array(20).fill({
-        "Name": "Asset Name",
-        "Available Stock": "000"
-    });
-
-    const rawmatData = Array(20).fill({
-        "Name": "Raw Material Name",
-        "Available Stock": "000"
-    });
-
-    // Table Configurations
-    const tableConfigs = {
-        Products: {
-            columns: ["Name", "Total Stock", "Ordered Stock", "Commited Stock", "Available Stock"],
-            data: productData,
-        },
-        Assets: {
-            columns: ["Name", "Available Stock"],
-            data: assetData,
-        },
-        "Raw Materials": {
-            columns: ["Name", "Available Stock"],
-            data: rawmatData,
-        },
-    };
-
-    // --- STATES ----
-
-    // State management para kay active tab
-    const [activeTab, setActiveTab] = useState("Products");
-    const currentConfig = tableConfigs[activeTab];
-
-    // State management para sa selected item
-    const [selectedItem, setSelectedItem] = useState(productData[0]);
-
-    // Modal Stock Request
-    const [showModal, setShowModal] = useState(false);
-
-    // Open/Close Modal
-    const toggleModal = () => setShowModal(!showModal);
-
-    return (
-        <div className={`inv ${showModal ? "blurred" : ""}`}>
-            <div className="body-content-container flex">
-                <InvNav activeTab={activeTab} onTabChange={setActiveTab} />
-
-                <InvProductTable
-                    columns={currentConfig.columns}
-                    data={currentConfig.data}
-                    onSelectProduct={setSelectedItem}
-                />
-
-                <div className="w-full hidden md:block">
-                    <div className="flex justify-between items-center p-3 h-15">
-                        <h2 className="text-lg font-semibold mt-6">Selected Item Details</h2>
-                        <button
-                            onClick={toggleModal}
-                            className="mt-4 bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
-                        >
-                            Restock Request
-                        </button>
-                    </div>
-
-                    <div className="border border-gray-300 rounded-lg p-6 mt-2">
-                        <div className="grid grid-cols-5 gap-4">
-                            {Object.entries(selectedItem).map(([label, value]) => (
-                                <div key={label}>
-                                    <p className="text-cyan-600 font-medium">{label}</p>
-                                    <p>{value}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Inventory Item Cards for Small Screens  */}
-                <div className="inventory-cards-container w-full  overflow-y-auto max-h-[80vh]">
-                    <InvItemCards 
-                        items={currentConfig.data} 
-                        onSelectItem={setSelectedItem} 
-                        openModal={toggleModal} 
-                    />
-                </div>
+  
+  const [productData, setProductData] = useState([]);
+  const [assetData, setAssetData] = useState([]);
+  const [rawMaterialData, setRawMaterialData] = useState([]);
 
 
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [loadingAssets, setLoadingAssets] = useState(true);
+  const [loadingRawMats, setLoadingRawMats] = useState(true);
+
+
+  const [activeTab, setActiveTab] = useState("Products");
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/products/")
+      .then((res) => res.json())
+      .then((data) => {
+        setProductData(data);
+        if (data.length > 0) {
+          setSelectedItem(data[0]); 
+        }
+        setLoadingProducts(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching products:", err);
+        setLoadingProducts(false);
+      });
+  }, []);
+
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/assets/")
+      .then((res) => res.json())
+      .then((data) => {
+        setAssetData(data);
+        setLoadingAssets(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching assets:", err);
+        setLoadingAssets(false);
+      });
+  }, []);
+
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/raw-materials/")
+      .then((res) => res.json())
+      .then((data) => {
+        setRawMaterialData(data);
+        setLoadingRawMats(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching raw materials:", err);
+        setLoadingRawMats(false);
+      });
+  }, []);
+
+
+  const tableConfigs = {
+    Products: {
+      columns: [
+        "Name",
+        "Total Stock",
+        "Ordered Stock",
+        "Commited Stock",
+        "Available Stock",
+      ],
+      data: productData.map((product) => {
+        const itemData =
+          product.item_master_data && product.item_master_data.length > 0
+            ? product.item_master_data[0]
+            : {};
+        return {
+          Name: product.product_name,
+          "Total Stock": itemData.total_stock || "000",
+          "Ordered Stock": itemData.stock_on_order || "000",
+          "Commited Stock": itemData.stock_committed || "000",
+          "Available Stock": itemData.available_stock || "000",
+        };
+      }),
+      loading: loadingProducts,
+    },
+    Assets: {
+      columns: ["Name", "Available Stock"],
+      data: assetData.map((asset) => ({
+        Name: asset.asset_name || "Asset Name",
+        "Available Stock": asset.available_stock || "000",
+      })),
+      loading: loadingAssets,
+    },
+    "Raw Materials": {
+      columns: ["Name", "Available Stock"],
+      data: rawMaterialData.map((mat) => ({
+        Name: mat.material_name || "Raw Material Name",
+        "Available Stock": mat.available_stock || "000",
+      })),
+      loading: loadingRawMats,
+    },
+  };
+
+ 
+  const currentConfig = tableConfigs[activeTab];
+
+
+  const toggleModal = () => setShowModal(!showModal);
+
+ 
+  useEffect(() => {
+    if (!selectedItem && currentConfig.data.length > 0) {
+      setSelectedItem(currentConfig.data[0]);
+    }
+  }, [activeTab, currentConfig.data, selectedItem]);
+
+  return (
+    <div className={`inv ${showModal ? "blurred" : ""}`}>
+      <div className="body-content-container flex">
+    
+        <InvNav activeTab={activeTab} onTabChange={setActiveTab} />
+
+      
+        <InvProductTable
+          loading={currentConfig.loading}
+          columns={currentConfig.columns}
+          data={currentConfig.data}
+          onSelectProduct={setSelectedItem}
+        />
+
+        <div className="w-full hidden md:block">
+          <div className="flex justify-between items-center p-3 h-15">
+            <h2 className="text-lg font-semibold mt-6">
+              Selected Item Details
+            </h2>
+            <button
+              onClick={toggleModal}
+              className="mt-4 bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
+            >
+              Restock Request
+            </button>
+          </div>
+
+          <div className="border border-gray-300 rounded-lg p-6 mt-2">
+            <div className="grid grid-cols-5 gap-4">
+              {selectedItem ? (
+                Object.entries(selectedItem).map(([label, value]) => (
+                  <div key={label}>
+                    <p className="text-cyan-600 font-medium">{label}</p>
+                    <p>{value}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No item selected</p>
+              )}
             </div>
-
-            {showModal && <InvRestockForm onClose={toggleModal} />}
+          </div>
         </div>
-    );
+
+       
+        <div className="inventory-cards-container w-full overflow-y-auto max-h-[80vh]">
+          <InvItemCards
+            items={currentConfig.data}
+            onSelectItem={setSelectedItem}
+            openModal={toggleModal}
+          />
+        </div>
+      </div>
+
+      {/* RESTOCK MODAL */}
+      {showModal && <InvRestockForm onClose={toggleModal} />}
+    </div>
+  );
 };
 
 export default BodyContent;
