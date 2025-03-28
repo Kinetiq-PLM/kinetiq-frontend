@@ -130,9 +130,25 @@ img {
   flex: 1;
   overflow-y: auto;
   scrollbar-width: none;
+  scrollbar-color: transparent;
   transition: 0.25s ease-in-out;
   gap: 0.3rem;
   padding-bottom: 1rem;
+
+  background: /* Shadow covers */
+  /* Shadow covers */
+  linear-gradient(white 30%, rgba(255, 255, 255, 0)), 
+  linear-gradient(rgba(255, 255, 255, 0), white 70%) 0 100%,
+
+  /* Shadows (converted radial to linear) */
+  linear-gradient(to top, rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0)) bottom;
+  
+  background-repeat: no-repeat;
+  background-color: white;
+
+  background-repeat: no-repeat;
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+  background-attachment: local, local, scroll, scroll;
 }
 
 .sidebar-module-icons {
@@ -156,6 +172,21 @@ img {
   overflow-y: auto;
   scrollbar-width: none;
   gap: 0.3rem;
+
+  background: /* Shadow covers */
+  /* Shadow covers */
+  linear-gradient(white 30%, rgba(255, 255, 255, 0)), 
+  linear-gradient(rgba(255, 255, 255, 0), white 70%) 0 100%,
+
+  /* Shadows (converted radial to linear) */
+  linear-gradient(to top, rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0)) bottom;
+  
+  background-repeat: no-repeat;
+  background-color: white;
+
+  background-repeat: no-repeat;
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+  background-attachment: local, local, scroll, scroll;
 }
 
 .sidebar-module-icons::-webkit-scrollbar,
@@ -475,7 +506,6 @@ img {
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
-  overflow: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 0.3rem;
 
@@ -499,18 +529,17 @@ img {
 }
 
 .notif-menu::-webkit-scrollbar {
-  width: 7px;
+  width: 14px; 
 }
 
 .notif-menu::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 10px;
-  border-right: 1px rgb(217,217,217);
+  background: transparent; 
 }
 
 .notif-menu::-webkit-scrollbar-thumb {
-  background: #00a8a8; 
+  background: #00a8a8;
   border-radius: 10px;
+  border: 4px solid white; 
 }
 
 .notif-title p{
@@ -527,7 +556,7 @@ img {
   flex-direction: column;
   gap: 0.3rem;
   padding-left: 1.4rem;
-  padding-right: 1.4rem;
+  padding-right: 2rem;
   padding-top: 1rem;
   padding-bottom: 1rem;
   color: #787878;
@@ -545,12 +574,19 @@ img {
   font-weight: 700;
 }
 
+.notif-origin p{
+  text-overflow: wrap;
+  overflow: hidden;
+  width: 9rem;
+  line-height: 1.1rem;
+}
+
 .notif-item-unread {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
   padding-left: 1.4rem;
-  padding-right: 1.4rem;
+  padding-right: 1.8rem;
   padding-top: 1rem;
   padding-bottom: 1rem;
   font-weight: 600;
@@ -588,8 +624,16 @@ img {
   margin-top: 4px;
 }
 
+.notif-item-unread .notif-msg p{
+  color: #787878;
+}
+
 .notif-msg p{
   font-size: 0.70rem;
+}
+
+.notif-time p{
+  font-size: 0.75rem;
 }
 
 /* body container -- takes remaining space below header */

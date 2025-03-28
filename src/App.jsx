@@ -44,7 +44,7 @@ function App() {
       time:"8:00 PM",
       msg:"Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
       orig_module: "Accounting",
-      orig_submodule:"Accounts Receivable",
+      orig_submodule:"Manufacturing Process",
       read: false
     },
     {
@@ -65,7 +65,7 @@ function App() {
       time:"8:00 PM",
       msg:"Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
       orig_module: "Accounting",
-      orig_submodule:"Accounts Receivable",
+      orig_submodule:"Manufacturing Process",
       read: true
     },
     {
@@ -457,7 +457,7 @@ function App() {
                     <div className="notif-toprow">
                       <div className="notif-origin"><p>{notif.orig_submodule ? notif.orig_submodule : notif.orig_module}</p></div>
                       <div className="notif-time-and-icon">
-                      <p className="notif-time">{notif.time}</p>
+                      <div className="notif-time"><p>{notif.time}</p></div>
                         {!notif.read && <p className="unread-notif-icon"><img src="/icons/unread-notif-icon.png"/></p>/* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */} 
                         </div>
                     </div>
