@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import "../styles/Accounting-Global-Styling.css";
+// import axios from "axios";
+import "../styles/accounting-styling.css";
 import { accounts } from "./ListOfAccounts";
 import SearchBar from "../../../shared/components/SearchBar";
 import Button from "../components/Button";
@@ -22,14 +22,14 @@ const BodyContent = () => {
         account_type: ""
     });
 
-    // Fetch data from API when the component mounts
-    useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/chart-of-accounts/")
-            .then(response => {
-                setData(response.data.map(acc => [acc.account_code, acc.account_name, acc.account_type]));
-            })
-            .catch(error => console.error("Error fetching data:", error));
-    }, []);
+    // // Fetch data from API when the component mounts
+    // useEffect(() => {
+    //     axios.get("http://127.0.0.1:8000/api/chart-of-accounts/")
+    //         .then(response => {
+    //             setData(response.data.map(acc => [acc.account_code, acc.account_name, acc.account_type]));
+    //         })
+    //         .catch(error => console.error("Error fetching data:", error));
+    // }, []);
 
     // Handle Input Change
     const handleInputChange = (field, value) => {
