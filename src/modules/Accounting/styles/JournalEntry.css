@@ -1,0 +1,52 @@
+/* Journal Table Styling */
+.JournalEntry .journal-table {
+  width: 100%;
+  max-height: 24rem;
+  border-collapse: collapse;
+  margin-top: 20px;
+  overflow-y: auto; /* Enables vertical scrolling */
+  display: block; /* Makes overflow work properly */
+}
+
+/* Scrollbar Styling */
+.JournalEntry .journal-table::-webkit-scrollbar {
+  width: 4px;
+  height: 10px;
+}
+
+.JournalEntry .journal-table::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.JournalEntry .journal-table::-webkit-scrollbar-thumb {
+  background: #5a9ecf;
+  border-radius: 2px;
+}
+
+.JournalEntry .journal-table::-webkit-scrollbar-thumb:hover {
+  background: #4a8bb3;
+}
+
+.JournalEntry .table-header {
+  display: grid;
+  grid-template-columns: 1fr .5fr .5fr 0.2fr;
+  background-color: #5a9ecf;
+  color: white;
+  font-weight: bold;
+  padding: 1rem;
+  border-radius: 4px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Ensure rows stay inside scrollable container */
+.JournalEntry .table-row, .totals-row, .totals-row2 {
+  display: grid;
+  grid-template-columns: 1fr .5fr .5fr 0.2fr;
+  gap: 10px;
+  padding: 1rem;
+  border-bottom: 1px solid #ccc;
+  align-items: center;
+}

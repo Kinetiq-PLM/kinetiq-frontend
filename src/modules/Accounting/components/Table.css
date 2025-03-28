@@ -40,7 +40,6 @@ th {
     color: white;
     font-size: 16px;
     font-weight: bold;
-    border-bottom: 2px solid black;
 }
 
 td {
@@ -50,16 +49,9 @@ td {
 }
 
 th, td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer; /* Indicate clickable behavior */
-}
-
-/* Wrapped text when toggled */
-td.wrapped {
     white-space: normal;
     word-wrap: break-word;
+    overflow: hidden;
 }
 
 
