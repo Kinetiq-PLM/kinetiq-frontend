@@ -8,7 +8,8 @@ import Button from "../../Sales/components/Button.jsx";
 import InputField from "../../Sales/components/InputField.jsx";
 import DateInputField from "../../Sales/components/DateInputField.jsx";
 import Dropdown from "../../Sales/components/Dropdown.jsx";
-
+import { POST } from "../../Sales/api/api.jsx";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 const NewCampaignModal = ({ isOpen, onClose }) => {
   const { showAlert } = useAlert();
 
@@ -16,7 +17,7 @@ const NewCampaignModal = ({ isOpen, onClose }) => {
   const closeButtonRef = useRef(null);
 
   // ========== DATA ==========
-  const campaignTypes = ["Email", "SMS", "Social Media", "Referral"];
+  const campaignTypes = ["Email", "Advertisement", "Social Media", "Referral"];
 
   const [campaignName, setCampaignName] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -25,6 +26,15 @@ const NewCampaignModal = ({ isOpen, onClose }) => {
   // ========== DATA ==========
 
   const [isValidationVisible, setIsValidationVisible] = useState(false);
+  const queryClient = useQueryClient();
+  const campaignMutation = useMutation({
+    mutationFn: async (data) => await POST("crm/campaigns/", data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["campaigns"], (old) => {
+        return [...old, data];
+      });
+    },
+  });
 
   const handleConfirm = () => {
     const validators = [
@@ -41,7 +51,14 @@ const NewCampaignModal = ({ isOpen, onClose }) => {
 
     if (errorCount === 0) {
       // Send message here
-
+      const request = {
+        campaign_name: campaignName,
+        type: campaignType,
+        start_date: startDate,
+        end_date: endDate,
+        status: "Planned", // replace later
+      };
+      campaignMutation.mutate(request);
       // Reset form fields
       setCampaignName("");
       setStartDate("");

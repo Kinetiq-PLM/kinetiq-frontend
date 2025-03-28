@@ -33,6 +33,7 @@ export default function CampaignContactTab() {
     { key: "phone_number", label: "Phone" },
     { key: "contact_person", label: "Contact Person" },
   ];
+  const [toRemove, setToRemove] = useState([]);
 
   const contactsMutation = useMutation({
     mutationFn: async (data) => await GET(`crm/campaigns/${data.campaign}`),
@@ -53,12 +54,14 @@ export default function CampaignContactTab() {
     mutationFn: async (data) =>
       await PATCH(`crm/campaigns/${data.campaign}/`, {
         contacts: data.contacts,
+        remove: data.remove,
       }),
     onSuccess: (data) => {
       showAlert({
         type: "success",
         title: "Campaign saved.",
       });
+      setCanSave(false);
     },
     onError: (error) => {
       showAlert({
@@ -95,6 +98,8 @@ export default function CampaignContactTab() {
         (contact) => contact.customer_id != selectedContact.customer_id
       )
     );
+    setToRemove((prev) => [...prev, selectedContact.customer_id]);
+    setCanSave(true);
     setSelectedContact("");
 
     showAlert({
@@ -119,8 +124,10 @@ export default function CampaignContactTab() {
     const request = {
       campaign: selectedCampaign.campaign_id,
       contacts: contactList.map((contact) => contact.customer_id),
+      remove: toRemove,
     };
     campaignMutation.mutate(request);
+    setToRemove([]);
   };
 
   return (
