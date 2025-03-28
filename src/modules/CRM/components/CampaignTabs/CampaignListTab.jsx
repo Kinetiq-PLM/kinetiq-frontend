@@ -4,18 +4,22 @@ import Dropdown from "../../../Sales/components/Dropdown";
 import Button from "../../../Sales/components/Button";
 
 import CAMPAIGN_LIST_DATA from "./../../../Sales/temp_data/campaign_list_data";
-import CampaignListModal from "./../CampaignListModal";
+import NewCampaignModal from "../NewCampaignModal";
 
 export default function CampaignListTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
 
+  const [isNewCampaignOpen, setIsNewCampaignOpen] = useState(false);
+
   const campaign_list = CAMPAIGN_LIST_DATA;
 
   const columns = [
     { key: "campaign_id", label: "Campaign ID" },
     { key: "campaign_name", label: "Campaign Name" },
+    { key: "type", label: "Type" },
+    { key: "status", label: "Status" },
   ];
 
   const dateFilters = [
@@ -55,6 +59,11 @@ export default function CampaignListTab() {
     <section className="h-full">
       {/* Header Section */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+        <NewCampaignModal
+          isOpen={isNewCampaignOpen}
+          onClose={() => setIsNewCampaignOpen(false)}
+        ></NewCampaignModal>
+
         {/* Filters */}
         <div className="flex flex-1/2 items-center space-x-2 gap-2 w-fit flex-wrap">
           {/* Date Filter Dropdown */}
@@ -89,7 +98,11 @@ export default function CampaignListTab() {
         </div>
 
         {/* Campaign Button */}
-        <Button type="primary" className={"w-[200px] py-2"}>
+        <Button
+          type="primary"
+          onClick={() => setIsNewCampaignOpen(true)}
+          className={"w-[200px] py-2"}
+        >
           New Campaign
         </Button>
       </div>
