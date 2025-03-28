@@ -1,13 +1,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
 
-.servrepo {
+/* Main container */
+.service-report {
   display: flex;
   width: 100%;
   height: 100%;
-  font-family: "Inter", "Poppins", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
-.servrepo-container {
+.report-container {
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
@@ -22,560 +23,713 @@
   position: relative;
 }
 
-.servrepo-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: white;
-}
-
-.servrepo-title {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-  font-style: italic;
-}
-
-.servrepo-icon {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
+/* Header styling */
+.report-header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
 }
 
-.servrepo-icon img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+.header-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.servrepo-title h1 {
+.header-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #00a8a8;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-title h2 {
   margin: 0;
   color: #000000;
   font-size: 1.25rem;
   font-weight: 600;
-  font-family: "Poppins", sans-serif;
+  font-family: "Inter", sans-serif;
+  line-height: 1.2;
 }
 
-.servrepo-title p {
+.header-title .subtitle {
   margin: 0;
   color: #666;
   font-size: 0.875rem;
-  font-weight: 400;
+  font-style: italic;
   font-family: "Inter", sans-serif;
 }
 
-.servrepo-divider {
+.report-divider {
   height: 2px;
   background-color: #00a8a8;
   width: 100%;
   margin: 0.5rem 0 1.5rem 0;
 }
 
-/* Content section - scrollable */
-.servrepo-content {
+/* Content area */
+.report-content {
   flex: 1;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  padding-right: 0.5rem;
+  margin-right: -0.5rem;
   scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.report-content:hover {
   scrollbar-color: #00a8a8 #f0f0f0;
-  padding-right: 0.5rem; /* Added padding to create space between content and scrollbar */
 }
 
 /* Custom scrollbar for Webkit browsers */
-.servrepo-content::-webkit-scrollbar {
+.report-content::-webkit-scrollbar {
   width: 8px;
 }
 
-.servrepo-content::-webkit-scrollbar-track {
+.report-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.report-content:hover::-webkit-scrollbar-track {
   background: #f0f0f0;
   border-radius: 4px;
 }
 
-.servrepo-content::-webkit-scrollbar-thumb {
+.report-content::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+.report-content:hover::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+}
+
+/* Input fields container */
+.input-fields-container {
+  width: 100%;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 2rem;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 2rem;
+}
+
+.input-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin: 0;
+}
+
+.description-group {
+  margin-bottom: 1.25rem;
+}
+
+/* Form elements */
+.service-report label {
+  font-size: 0.75rem;
+  color: #00a8a8;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+}
+
+.service-report input,
+.service-report select {
+  padding: 0.625rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  height: 2.75rem;
+  box-sizing: border-box;
+  width: 100%;
+  color: #666;
+}
+
+.service-report textarea {
+  padding: 0.625rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  box-sizing: border-box;
+  width: 100%;
+  color: #666;
+  resize: none;
+}
+
+.service-report textarea.description-textarea {
+  height: 6.75rem; /* Match the height of two input fields plus gap */
+}
+
+.service-report input::placeholder,
+.service-report textarea::placeholder {
+  color: #999;
+}
+
+.service-report input:focus,
+.service-report textarea:focus,
+.service-report select:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 1px #00a8a8;
+}
+
+/* Textarea with custom scrollbar */
+.textarea-container {
+  position: relative;
+  display: flex;
+}
+
+.textarea-container textarea {
+  flex: 1;
+  padding-right: 20px; /* Make room for the scrollbar */
+}
+
+.custom-scrollbar-container {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  bottom: 4px;
+  width: 8px;
+  display: none;
+  flex-direction: column;
+}
+
+/* Only show scrollbar when content overflows and is not empty */
+.textarea-container textarea:not(:placeholder-shown) {
+  overflow-y: auto;
+}
+
+.textarea-container textarea.description-textarea:not(:placeholder-shown) {
+  overflow-y: auto;
+}
+
+/* Only show custom scrollbar when content is long enough to need scrolling */
+.textarea-container textarea.description-textarea:not(:placeholder-shown):not([value=""]):not(:empty) {
+  overflow-y: auto;
+}
+
+.textarea-container
+  textarea.description-textarea:not(:placeholder-shown):not([value=""]):not(:empty)::-webkit-scrollbar {
+  width: 8px;
+}
+
+.textarea-container
+  textarea.description-textarea:not(:placeholder-shown):not([value=""]):not(:empty)::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.textarea-container
+  textarea.description-textarea:not(:placeholder-shown):not([value=""]):not(:empty)::-webkit-scrollbar-thumb {
   background-color: #00a8a8;
   border-radius: 4px;
 }
 
-/* Form section */
-.servrepo-form {
-  background-color: white;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1rem;
-  border: 1px solid #e0e0e0;
+/* Modal specific styles */
+.modal-form .description-group textarea.description-textarea {
+  height: 10.5rem; /* Match the height to align with the renewal ID field */
 }
 
-.servrepo-form-row {
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.servrepo-form-row:last-child {
-  margin-bottom: 0;
-}
-
-.servrepo-form-group {
+.scroll-track {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  position: relative;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  margin: 2px 0;
 }
 
-.servrepo-form-group label {
-  font-size: 0.75rem;
-  color: #00a8a8;
-  font-weight: 500;
-}
-
-.servrepo-form-group input {
-  padding: 0.625rem;
-  border: 1px solid #ccc;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
+.scroll-thumb {
+  position: absolute;
   width: 100%;
-}
-
-.servrepo-form-group input:focus {
-  outline: none;
-  border-color: #00a8a8;
-  box-shadow: 0 0 0 1px rgba(0, 168, 168, 0.2);
-}
-
-.servrepo-form-group input::placeholder {
-  color: #999;
-}
-
-.required {
-  color: #ff0000;
-  margin-left: 0.25rem;
-}
-
-.servrepo-select-wrapper {
-  position: relative;
-}
-
-.servrepo-select-arrow {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.625rem;
-  color: #888;
-  pointer-events: none;
-}
-
-.servrepo-date-wrapper {
-  position: relative;
-}
-
-.servrepo-calendar-icon-small {
-  width: 16px;
-  height: 16px;
-  margin-right: 0.25rem;
-}
-
-.servrepo-calendar-icon {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  pointer-events: none;
-}
-
-/* General section */
-.servrepo-general-section {
-  background-color: white;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.servrepo-section-header {
-  margin-bottom: 1.5rem;
-}
-
-.servrepo-section-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.servrepo-section-title img {
-  width: 20px;
-  height: 20px;
-}
-
-.servrepo-section-title h2 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #333;
-}
-
-.servrepo-section-divider {
-  height: 2px; /* Changed from 3px to 2px as requested */
   background-color: #00a8a8;
-  width: 100%;
-  margin-top: 0.5rem;
+  border-radius: 4px;
+  top: 0;
+  height: 30%;
+  min-height: 20px;
 }
 
-/* Table controls */
-.servrepo-table-controls {
+.scroll-arrow {
+  background: none;
+  border: none;
+  color: #00a8a8;
+  font-size: 8px;
+  padding: 0;
+  height: 12px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
+  justify-content: center;
+  cursor: pointer;
+  transform: rotate(180deg);
+}
+
+.scroll-arrow.scroll-down {
+  transform: rotate(0deg);
+}
+
+.scroll-arrow:hover {
+  color: #098f8f;
+}
+
+/* Filter and search */
+.filter-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 1.5rem;
   gap: 1rem;
 }
 
-.servrepo-search {
+.search-box {
   position: relative;
   flex: 1;
-  max-width: 400px;
-  min-width: 200px;
+  max-width: 300px;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  background-color: white;
 }
 
-.servrepo-search input {
-  width: 100%;
+.search-box input {
   padding: 0.625rem 0.625rem 0.625rem 2.5rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 0.25rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  width: 100%;
   font-size: 0.875rem;
   font-family: "Inter", sans-serif;
-  color: #333;
+  color: #888;
+  background: transparent;
 }
 
-.servrepo-search input:focus {
+.search-box input:focus {
   outline: none;
-  border-color: #e0e0e0;
   box-shadow: none;
+  border-color: transparent;
 }
 
-.servrepo-search-icon {
+.search-icon {
   position: absolute;
-  left: 0.75rem;
+  left: 0.875rem;
   top: 50%;
   transform: translateY(-50%);
   width: 1rem;
   height: 1rem;
+  color: #888;
 }
 
-.servrepo-filters {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+/* Calendar icon styling */
+.date-input-wrapper {
+  position: relative;
+  width: 100%;
 }
 
-.servrepo-date-filter,
-.servrepo-status-filter {
+.date-input-wrapper input {
+  padding-right: 2.5rem;
+}
+
+.calendar-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+  pointer-events: none;
+}
+
+.filter-dropdown {
   position: relative;
 }
 
-.servrepo-filter-button {
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 0.25rem;
-  padding: 0.625rem 1rem;
+.filter-button {
+  background-color: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
   font-size: 0.875rem;
-  color: #666;
+  color: #888;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-family: "Inter", sans-serif;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  white-space: nowrap;
+  font-weight: 500;
+  box-shadow: none;
+  height: 2.5rem;
 }
 
-.servrepo-calendar-small {
-  font-size: 0.875rem;
-  margin-right: 0.25rem;
+.filter-icon {
+  color: #888;
+  width: 1rem;
+  height: 1rem;
 }
 
-.servrepo-chevron {
+.filter-button .arrow {
   font-size: 0.625rem;
   margin-left: 0.25rem;
   color: #888;
 }
 
-.servrepo-filter-options {
+.filter-options {
   position: absolute;
   top: 100%;
-  right: 0;
-  width: 180px;
+  left: 0;
+  width: 100%;
   background-color: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e8e8e8;
   border-radius: 0.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
   margin-top: 0.25rem;
 }
 
-.servrepo-filter-option {
+.filter-option {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
 }
 
-.servrepo-filter-option:hover {
+.filter-option:hover {
   background-color: #f5f5f5;
 }
 
-/* Table section */
-.servrepo-table-container {
+/* Table styling */
+.table-container {
   width: 100%;
-  border: none; /* Removed border from container */
-  background: transparent; /* Made container transparent */
-  border-radius: 0; /* Removed border radius from container */
-  overflow: visible; /* Changed to visible */
-  padding: 0; /* Removed any padding */
-  margin: 0; /* Removed any margin */
-  box-shadow: none; /* Removed any shadow */
+  margin-bottom: 2rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
 }
 
-.servrepo-table {
+.reports-table {
   width: 100%;
-  border-collapse: separate; /* Changed from collapse to separate to support border-radius */
-  border-spacing: 0; /* Ensure no spacing between cells */
+  border-collapse: collapse;
   font-family: "Inter", sans-serif;
-  border-radius: 0.5rem; /* Keep border radius on table */
-  overflow: hidden; /* Ensure border-radius is applied */
-  border: 1px solid #e0e0e0; /* Added border to table instead of container */
 }
 
-.servrepo-table thead {
-  position: sticky;
-  top: 0;
-  z-index: 5;
+.reports-table thead {
   background-color: #00a8a8;
   color: white;
 }
 
-.servrepo-table thead tr:first-child th:first-child {
-  border-top-left-radius: 0.5rem;
-}
-
-.servrepo-table thead tr:first-child th:last-child {
-  border-top-right-radius: 0.5rem;
-}
-
-.servrepo-table tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 0.5rem;
-}
-
-.servrepo-table tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 0.5rem;
-}
-
-.servrepo-table th {
+.reports-table th {
   padding: 0.75rem 1rem;
   text-align: center;
   font-weight: 500;
   font-size: 0.875rem;
-  white-space: nowrap;
 }
 
-.servrepo-table td {
+.reports-table td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #e0e0e0;
   font-size: 0.875rem;
   color: #333;
   text-align: center;
-  white-space: nowrap;
 }
 
-.servrepo-table tbody tr:nth-child(even) {
+.reports-table tbody tr.alternate-row {
   background-color: #eff8f9;
 }
 
-.servrepo-table tbody tr:last-child td {
+.reports-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.servrepo-empty-row td {
-  height: 2.5rem;
-}
-
-/* Actions section */
-.servrepo-actions {
+/* Action buttons */
+.action-buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 1.5rem;
-  margin-right: 0.5rem; /* Added margin to create space between buttons and scrollbar */
-  flex-wrap: wrap;
+  margin-top: 1rem;
+  padding: 0 0.25rem;
+}
+
+.right-buttons {
+  display: flex;
   gap: 1rem;
 }
 
-.servrepo-left-actions,
-.servrepo-right-actions {
-  display: flex;
-  gap: 1.5rem; /* Increased gap between buttons */
+.close-ticket-button {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
 }
 
-.servrepo-close-button,
-.servrepo-accounting-button,
-.servrepo-cancel-button,
-.servrepo-update-button {
+.close-ticket-button:hover {
+  background-color: #e4fdfb;
+}
+
+.action-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
   border-radius: 0.5rem;
-  padding: 0.625rem 1.25rem;
+  padding: 0.625rem 1.75rem;
   font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.2s;
   font-family: "Inter", sans-serif;
-  font-weight: 500;
+  font-weight: 600;
+  height: 2.5rem;
+}
+
+.action-button:hover {
+  background-color: #098f8f;
+}
+
+.action-button:active {
+  background-color: #087d7d;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
+  font-family: "Inter", sans-serif;
+}
+
+.close-button {
+  background: none;
   border: none;
-  white-space: nowrap;
+  cursor: pointer;
+  padding: 0.25rem;
 }
 
-.servrepo-close-button,
-.servrepo-accounting-button {
+.close-button img {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.modal-divider {
+  height: 2px;
   background-color: #00a8a8;
-  color: white;
+  width: 100%;
+  margin: 0;
 }
 
-.servrepo-close-button:hover,
-.servrepo-accounting-button:hover {
-  background-color: #008b8b;
+.modal-content {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
 }
 
-.servrepo-cancel-button {
-  background-color: #ffffff;
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.modal-form .form-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.modal-form .form-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.modal-form .form-group {
+  flex: 1;
+}
+
+.required {
+  color: #f44336;
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.625rem;
+  color: #888;
+  pointer-events: none;
+  background: none;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.cancel-button {
+  background-color: white;
   color: #00a8a8;
   border: 1px solid #00a8a8;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  min-width: 7rem;
 }
 
-.servrepo-cancel-button:hover {
-  background-color: #f5f5f5;
-}
-
-.servrepo-update-button {
-  background-color: #00a8a8;
-  color: white;
-}
-
-.servrepo-update-button:hover {
-  background-color: #008b8b;
+.cancel-button:hover {
+  background-color: #e4fdfb;
 }
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
-  .servrepo-container {
+  .report-container {
     min-width: auto;
     max-height: none;
     padding: 1.25rem;
   }
 
-  .servrepo-form-row {
-    flex-direction: column;
-    gap: 1rem;
+  .input-fields-container {
+    padding: 1.25rem;
   }
 
-  .servrepo-table-controls {
-    flex-wrap: wrap;
-  }
-
-  .servrepo-search {
-    flex: 1 0 100%;
-    max-width: 100%;
-    order: 1;
-    margin-bottom: 0.5rem;
-  }
-
-  .servrepo-filters {
-    width: 100%;
-    justify-content: flex-end;
-    order: 2;
+  .modal-container {
+    max-width: 90%;
   }
 }
 
 @media (max-width: 768px) {
-  .servrepo-form-row {
-    flex-direction: column; /* Stack form fields on smaller tablets/mobile */
-    gap: 1rem;
+  .input-fields-container {
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
-  .servrepo-table-controls {
+  .filter-container {
     flex-direction: column;
+    gap: 1rem;
     align-items: stretch;
   }
 
-  .servrepo-search {
+  .search-box {
     max-width: none;
-    width: 100%;
   }
 
-  .servrepo-filters {
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .reports-table {
+    min-width: 600px;
+  }
+
+  .modal-form .form-row {
     flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
+    gap: 1.25rem;
   }
 
-  .servrepo-date-filter,
-  .servrepo-status-filter {
-    width: 100%;
-  }
-
-  .servrepo-filter-button {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .servrepo-actions {
+  .action-buttons {
     flex-direction: column;
     gap: 1rem;
   }
 
-  .servrepo-left-actions,
-  .servrepo-right-actions {
-    width: 100%;
+  .right-buttons {
     justify-content: space-between;
   }
 }
 
 @media (max-width: 480px) {
-  .servrepo-container {
+  .report-container {
     padding: 1rem;
   }
 
-  .servrepo-title {
+  .input-fields-container {
+    padding: 1rem;
+  }
+
+  .report-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
 
-  .servrepo-form {
+  .modal-header,
+  .modal-content,
+  .modal-footer {
     padding: 1rem;
-  }
-
-  .servrepo-general-section {
-    padding: 1rem;
-  }
-
-  .servrepo-left-actions,
-  .servrepo-right-actions {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .servrepo-close-button,
-  .servrepo-accounting-button,
-  .servrepo-cancel-button,
-  .servrepo-update-button {
-    width: 100%;
-    text-align: center;
   }
 }
 

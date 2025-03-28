@@ -3,370 +3,277 @@
 import { useState, useEffect } from "react"
 import "../styles/ServiceReport.css"
 import ServiceReportIcon from "/icons/SupportServices/ServiceReportIcon.png"
-import GeneralIcon from "/icons/SupportServices/GeneralIcon.png"
-import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 import CalendarFilterIcon from "/icons/SupportServices/CalendarFilterIcon.png"
-import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
+import SearchIcon from "/icons/SupportServices/SearchIcon.png"
+import Table from "../components/ServiceReport/Table"
+import InputField from "../components/ServiceReport/InputField"
+import UpdateReportModal from "../components/ServiceReport/UpdateReportModal"
+import SubmitReportModal from "../components/ServiceReport/SubmitReportModal"
 
 const ServiceReport = () => {
-  // State for customer information
-  const [customerInfo, setCustomerInfo] = useState({
-    customerId: "",
-    name: "",
-    email: "",
-    callId: "",
-    contractNo: "",
-    terminationDate: "",
-  })
-
-  // State for search and filter
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filterBy, setFilterBy] = useState("")
+  // State for form fields
+  const [ticketSubject, setTicketSubject] = useState("")
+  const [requestType, setRequestType] = useState("")
+  const [customerId, setCustomerId] = useState("")
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
+  const [renewalId, setRenewalId] = useState("")
+  const [billingId, setBillingId] = useState("")
+  const [reports, setReports] = useState([])
+  const [filterPeriod, setFilterPeriod] = useState("Last 30 days")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
-  const [dateFilter, setDateFilter] = useState("Last 30 days")
-  const [showDateOptions, setShowDateOptions] = useState(false)
-  const [serviceReports, setServiceReports] = useState([])
+  const [showFilterByOptions, setShowFilterByOptions] = useState(false)
+  const [filterBy, setFilterBy] = useState("Filter by")
 
-  // Fetch service reports from API (mock function)
+  // Modal states
+  const [showUpdateModal, setShowUpdateModal] = useState(false)
+  const [showSubmitModal, setShowSubmitModal] = useState(false)
+  const [selectedReport, setSelectedReport] = useState(null)
+
+  // Fetch reports from API (mock function)
   useEffect(() => {
     // Replace with actual API call
-    const fetchServiceReports = async () => {
+    const fetchReports = async () => {
       try {
-        // Mock data for demo
-        setServiceReports([
+        // Mock data for demonstration
+        setReports([
           {
-            reportId: "SR001",
-            serviceCall: "SC123",
-            serviceBilling: "SB456",
-            technicianId: "T001",
-            description: "Routine maintenance",
-            billingAmount: "$150.00",
-            status: "Completed",
-            submissionDate: "15/03/2023",
+            reportId: "SR-2023-001",
+            ticketId: "TK-4872",
+            requestId: "REQ-9283",
+            callId: "CALL-5621",
+            technicianName: "Edrill Baylan",
+            submissionDate: "2025-03-20",
+            status: "Submitted",
           },
           {
-            reportId: "SR002",
-            serviceCall: "SC124",
-            serviceBilling: "SB457",
-            technicianId: "T002",
-            description: "Emergency repair",
-            billingAmount: "$250.00",
+            reportId: "SR-2023-002",
+            ticketId: "TK-4873",
+            requestId: "REQ-9284",
+            callId: "CALL-5622",
+            technicianName: "Nicole Jokic",
+            submissionDate: "2025-03-21",
+            status: "Submitted",
+          },
+          {
+            reportId: "SR-2023-003",
+            ticketId: "TK-4875",
+            requestId: "REQ-9286",
+            callId: "CALL-5624",
+            technicianName: "Michael Chen",
+            submissionDate: "2025-03-22",
+            status: "Draft",
+          },
+          {
+            reportId: "SR-2023-004",
+            ticketId: "TK-4878",
+            requestId: "REQ-9290",
+            callId: "CALL-5628",
+            technicianName: "Sarah Johnson",
+            submissionDate: "2025-03-23",
             status: "Pending",
-            submissionDate: "20/03/2023",
+          },
+          {
+            reportId: "SR-2023-005",
+            ticketId: "TK-4880",
+            requestId: "REQ-9292",
+            callId: "CALL-5630",
+            technicianName: "David Rodriguez",
+            submissionDate: "2025-03-24",
+            status: "Submitted",
           },
         ])
       } catch (error) {
-        console.error("Error fetching service reports:", error)
+        console.error("Error fetching reports:", error)
       }
     }
 
-    fetchServiceReports()
+    fetchReports()
   }, [])
 
+  // Handle update report
+  const handleUpdate = () => {
+    setSelectedReport({
+      ticketId: "",
+      requestId: "",
+      requestType: "",
+      renewalId: "",
+      billingId: "",
+      description: "",
+      status: "",
+    })
+    setShowUpdateModal(true)
+  }
+
+  // Handle submit report
+  const handleSubmit = () => {
+    setSelectedReport({
+      ticketId: "",
+      requestId: "",
+      requestType: "",
+      renewalId: "",
+      billingId: "",
+      description: "",
+      status: "",
+    })
+    setShowSubmitModal(true)
+  }
+
+  // Handle update from modal
+  const handleUpdateReport = (reportData) => {
+    console.log("Updating report:", reportData)
+    setShowUpdateModal(false)
+  }
+
+  // Handle submit from modal
+  const handleSubmitReport = (reportData) => {
+    console.log("Submitting report:", reportData)
+    setShowSubmitModal(false)
+  }
+
+  // Handle close ticket
+  const handleCloseTicket = () => {
+    console.log("Closing ticket")
+  }
+
+  // Handle filter change
   const handleFilterChange = (value) => {
-    setFilterBy(value)
+    setFilterPeriod(value)
     setShowFilterOptions(false)
   }
 
-  const handleDateFilterChange = (value) => {
-    setDateFilter(value)
-    setShowDateOptions(false)
-  }
-
-  const filterOptions = [
-    { value: "all", label: "All" },
-    { value: "completed", label: "Completed" },
-    { value: "pending", label: "Pending" },
-    { value: "cancelled", label: "Cancelled" },
-  ]
-
-  const dateOptions = [
-    { value: "last30", label: "Last 30 days" },
-    { value: "last60", label: "Last 60 days" },
-    { value: "last90", label: "Last 90 days" },
-    { value: "thisYear", label: "This year" },
-  ]
-
-  // Handle form input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setCustomerInfo({
-      ...customerInfo,
-      [name]: value,
-    })
-  }
-
-  const handleCloseTicket = () => {
-    console.log("Close Ticket clicked")
-    // Implement close ticket functionality
-  }
-
-  const handleSendToAccounting = () => {
-    console.log("Send to Accounting clicked")
-    // Implement send to accounting functionality
-  }
-
-  const handleCancel = () => {
-    console.log("Cancel clicked")
-    // Implement cancel functionality
-  }
-
-  const handleUpdate = () => {
-    console.log("Update clicked")
-    // Implement update functionality
+  // Handle filter by change
+  const handleFilterByChange = (value) => {
+    setFilterBy(value)
+    setShowFilterByOptions(false)
   }
 
   return (
-    <div className="servrepo">
-      <div className="servrepo-container">
-        <div className="servrepo-header">
-          <div className="servrepo-title">
-            <div className="servrepo-icon">
-              <img src={ServiceReportIcon || "/placeholder.svg?height=24&width=24"} alt="Service Report" />
-            </div>
-            <div>
-              <h1>Service Report</h1>
-              <p>Comprehensive Record of Completed Service Tasks and Actions</p>
+    <div className="service-report">
+      <div className="report-container">
+        <div className="report-header">
+          <div className="header-icon-title">
+            <img
+              src={ServiceReportIcon || "/placeholder.svg?height=24&width=24"}
+              alt="Service Report"
+              className="header-icon"
+            />
+            <div className="header-title">
+              <h2>Service Report</h2>
+              <p className="subtitle">Comprehensive Record of Completed Service Tasks and Actions</p>
             </div>
           </div>
-          <div className="servrepo-divider"></div>
         </div>
 
-        <div className="servrepo-content">
-          {/* Customer Information Form */}
-          <div className="servrepo-form">
-            <div className="servrepo-form-row">
-              <div className="servrepo-form-group">
-                <label>
-                  Customer ID<span className="required">*</span>
-                </label>
-                <div className="servrepo-select-wrapper">
-                  <input
-                    type="text"
-                    name="customerId"
-                    value={customerInfo.customerId}
-                    onChange={handleInputChange}
-                    placeholder="CID#89423"
-                    readOnly
-                  />
-                  <span className="servrepo-select-arrow">▼</span>
-                </div>
-              </div>
-              <div className="servrepo-form-group">
-                <label>
-                  Call ID<span className="required">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="callId"
-                  value={customerInfo.callId}
-                  onChange={handleInputChange}
-                  placeholder="1321"
-                />
-              </div>
-            </div>
-            <div className="servrepo-form-row">
-              <div className="servrepo-form-group">
-                <label>
-                  Name<span className="required">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={customerInfo.name}
-                  onChange={handleInputChange}
-                  placeholder="Paula Manglo"
-                />
-              </div>
-              <div className="servrepo-form-group">
-                <label>
-                  Contract No<span className="required">*</span>
-                </label>
-                <div className="servrepo-select-wrapper">
-                  <input
-                    type="text"
-                    name="contractNo"
-                    value={customerInfo.contractNo}
-                    onChange={handleInputChange}
-                    placeholder="124235"
-                    readOnly
-                  />
-                  <span className="servrepo-select-arrow">▼</span>
-                </div>
-              </div>
-            </div>
-            <div className="servrepo-form-row">
-              <div className="servrepo-form-group">
-                <label>
-                  Email Address<span className="required">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={customerInfo.email}
-                  onChange={handleInputChange}
-                  placeholder="user@gmail.com"
-                />
-              </div>
-              <div className="servrepo-form-group">
-                <label>
-                  Termination Date<span className="required">*</span>
-                </label>
-                <div className="servrepo-date-wrapper">
-                  <input
-                    type="text"
-                    name="terminationDate"
-                    value={customerInfo.terminationDate}
-                    onChange={handleInputChange}
-                    placeholder="dd/mm/yy"
-                  />
-                  <img
-                    src={CalendarInputIcon || "/placeholder.svg?height=16&width=16"}
-                    alt="Calendar"
-                    className="servrepo-calendar-icon"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="report-divider"></div>
 
-          {/* General Section */}
-          <div className="servrepo-general-section">
-            <div className="servrepo-section-header">
-              <div className="servrepo-section-title">
-                <img src={GeneralIcon || "/placeholder.svg?height=20&width=20"} alt="General" />
-                <h2>General</h2>
-              </div>
-              <div className="servrepo-section-divider"></div>
+        <div className="report-content">
+          {/* Input Fields Component */}
+          <InputField
+            ticketSubject={ticketSubject}
+            setTicketSubject={setTicketSubject}
+            requestType={requestType}
+            setRequestType={setRequestType}
+            customerId={customerId}
+            setCustomerId={setCustomerId}
+            name={name}
+            setName={setName}
+            description={description}
+            setDescription={setDescription}
+            renewalId={renewalId}
+            setRenewalId={setRenewalId}
+            billingId={billingId}
+            setBillingId={setBillingId}
+          />
+
+          <div className="filter-container">
+            <div className="search-box">
+              <img src={SearchIcon || "/placeholder.svg?height=16&width=16"} alt="Search" className="search-icon" />
+              <input type="text" placeholder="Search or type a command (Ctrl + G)" />
             </div>
 
-            <div className="servrepo-table-controls">
-              <div className="servrepo-search">
+            <div className="filter-dropdown">
+              <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
                 <img
-                  src={SearchIcon || "/placeholder.svg?height=16&width=16"}
-                  alt="Search"
-                  className="servrepo-search-icon"
+                  src={CalendarFilterIcon || "/placeholder.svg?height=16&width=16"}
+                  alt="Calendar"
+                  className="filter-icon"
                 />
-                <input
-                  type="text"
-                  placeholder="Search or type a command (Ctrl + G)"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <div className="servrepo-filters">
-                <div className="servrepo-date-filter">
-                  <button className="servrepo-filter-button" onClick={() => setShowDateOptions(!showDateOptions)}>
-                    <img
-                      src={CalendarFilterIcon || "/placeholder.svg?height=16&width=16"}
-                      alt="Calendar"
-                      className="servrepo-calendar-icon-small"
-                    />
-                    {dateFilter}
-                    <span className="servrepo-chevron">▼</span>
-                  </button>
-                  {showDateOptions && (
-                    <div className="servrepo-filter-options">
-                      {dateOptions.map((option) => (
-                        <div
-                          key={option.value}
-                          className="servrepo-filter-option"
-                          onClick={() => handleDateFilterChange(option.label)}
-                        >
-                          {option.label}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                {filterPeriod}
+                <span className="arrow">▼</span>
+              </button>
+              {showFilterOptions && (
+                <div className="filter-options">
+                  <div className="filter-option" onClick={() => handleFilterChange("Last 7 days")}>
+                    Last 7 days
+                  </div>
+                  <div className="filter-option" onClick={() => handleFilterChange("Last 30 days")}>
+                    Last 30 days
+                  </div>
+                  <div className="filter-option" onClick={() => handleFilterChange("Last 90 days")}>
+                    Last 90 days
+                  </div>
                 </div>
-                <div className="servrepo-status-filter">
-                  <button className="servrepo-filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-                    Filter by {filterBy ? `: ${filterOptions.find((opt) => opt.value === filterBy)?.label}` : ""}
-                    <span className="servrepo-chevron">▼</span>
-                  </button>
-                  {showFilterOptions && (
-                    <div className="servrepo-filter-options">
-                      {filterOptions.map((option) => (
-                        <div
-                          key={option.value}
-                          className="servrepo-filter-option"
-                          onClick={() => handleFilterChange(option.value)}
-                        >
-                          {option.label}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Table with no container */}
-            <table className="servrepo-table">
-              <thead>
-                <tr>
-                  <th>Report ID</th>
-                  <th>Service Call</th>
-                  <th>Service Billing</th>
-                  <th>Technician ID</th>
-                  <th>Description</th>
-                  <th>Service Billing Amount</th>
-                  <th>Report Status</th>
-                  <th>Submission Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {serviceReports.map((report) => (
-                  <tr key={report.reportId}>
-                    <td>{report.reportId}</td>
-                    <td>{report.serviceCall}</td>
-                    <td>{report.serviceBilling}</td>
-                    <td>{report.technicianId}</td>
-                    <td>{report.description}</td>
-                    <td>{report.billingAmount}</td>
-                    <td>{report.status}</td>
-                    <td>{report.submissionDate}</td>
-                  </tr>
-                ))}
-                {/* Empty rows to fill the table */}
-                {Array(5 - serviceReports.length)
-                  .fill()
-                  .map((_, index) => (
-                    <tr key={`empty-${index}`} className="servrepo-empty-row">
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <div className="filter-dropdown">
+              <button className="filter-button" onClick={() => setShowFilterByOptions(!showFilterByOptions)}>
+                {filterBy}
+                <span className="arrow">▼</span>
+              </button>
+              {showFilterByOptions && (
+                <div className="filter-options">
+                  <div className="filter-option" onClick={() => handleFilterByChange("All Reports")}>
+                    All Reports
+                  </div>
+                  <div className="filter-option" onClick={() => handleFilterByChange("Submitted")}>
+                    Submitted
+                  </div>
+                  <div className="filter-option" onClick={() => handleFilterByChange("Draft")}>
+                    Draft
+                  </div>
+                  <div className="filter-option" onClick={() => handleFilterByChange("Pending")}>
+                    Pending
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="servrepo-actions">
-            <div className="servrepo-left-actions">
-              <button className="servrepo-close-button" onClick={handleCloseTicket}>
-                Close Ticket
-              </button>
-              <button className="servrepo-accounting-button" onClick={handleSendToAccounting}>
-                Send to Accounting
-              </button>
-            </div>
-            <div className="servrepo-right-actions">
-              <button className="servrepo-cancel-button" onClick={handleCancel}>
-                Cancel
-              </button>
-              <button className="servrepo-update-button" onClick={handleUpdate}>
+          {/* Table Component */}
+          <Table reports={reports} />
+
+          <div className="action-buttons">
+            <button className="close-ticket-button" onClick={handleCloseTicket}>
+              Close Ticket
+            </button>
+            <div className="right-buttons">
+              <button className="action-button" onClick={handleUpdate}>
                 Update
+              </button>
+              <button className="action-button" onClick={handleSubmit}>
+                Submit Report
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <UpdateReportModal
+        isOpen={showUpdateModal}
+        onClose={() => setShowUpdateModal(false)}
+        onUpdate={handleUpdateReport}
+        report={selectedReport}
+      />
+
+      <SubmitReportModal
+        isOpen={showSubmitModal}
+        onClose={() => setShowSubmitModal(false)}
+        onSubmit={handleSubmitReport}
+        report={selectedReport}
+      />
     </div>
   )
 }
