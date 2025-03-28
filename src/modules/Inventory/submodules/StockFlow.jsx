@@ -1,130 +1,135 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/StockFlow.css";
 
 const BodyContent = () => {
+    const [warehouseMovements, setWarehouseMovements] = useState([]); // State to store fetched data
+    const[warehouseData, setWarehouseData] = useState([]); // State to store warehouse data
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [activeTab, setActiveTab] = useState("In Transit");
 
-        // Dummy data 
-        const inTransitData = Array(20).fill({
-            "Product Name": "Product Name",
-            "Transaction Type": "Transfer",
-            "Destination": "Manila",
-            "Origin": "Cebu",
-            "Stock in Transit": "000",
-            "Delivery Team": "Avengers"
-        });
-    
-        const warehouseData = Array(20).fill({
-            "Warehouse Name": "Warehouse Name",
-            "Total Capacity": "000",
-            "Available Space": "000"
-        });
-    
-        const transHistoryData = Array(20).fill({
-            "Product Type": "Raw Material Name",
-            "Transaction Type": "000",
-            "Destination": "Raw Material Name",
-            "Origin": "Manila",
-            "Stock in Transit": "000",
-            "Delivery Team": "Avengers"
-        });
+    // Fetch data from Warehouse Transfers Django API
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/api/warehouse-transfers/");
+                if (!response.ok) throw new Error("Failed to fetch data");
+                const data = await response.json();
+                setWarehouseMovements(data);
+                console.log("Fetched Data:", data); 
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []); 
+
+    // Fetch data from Warehouse API
+    useEffect(() => {
+        const fetchWarehouseData = async () => { 
+            try {
+                const response = await fetch("http://localhost:8000/api/warehouse-list/");
+                if (!response.ok) throw new Error("Failed to fetch data");
+                const data = await response.json();
+                setWarehouseData(data);
+                console.log("Fetched Warehouse Data:", data); 
+            }
+            catch (err) {
+                setError(err.message);
+            }
+            finally {
+                setLoading(false);
+            }
+        };
+        
+        fetchWarehouseData();
+    }, []); 
+
 
     // Table Configurations per Active Tab
     const stockFlowTableConfigs = {
-        "In Transit" : { 
-            Columns : ["Product Name", "Transaction Type", "Destination", "Origin", "Stock in Transit", "Delivery Team"],
-            Data: inTransitData
-            
+        "In Transit": { 
+            Columns: ["Item", "Transaction Type", "Destination", "Origin", "Quantity"],
+            Data: warehouseMovements
         },
-
-        "Warehouse" : {
-            Columns : ["Warehouse Name", "Total Capacity", "Available Space"],
-            Data: warehouseData
-         },
-
-        "Transfer History" : {
-            Columns: ["Product Type", "Transaction Type", "Destination", "Origin", "Stock in Transit", "Delivery Team"],
-            Data: transHistoryData
+        "Warehouse": {
+            Columns: ["Warehouse_ID", "Warehouse_Location"],
+            Data:  warehouseData
+        },
+        "Transfer History": {
+            Columns: ["movement_id", "item", "movement_type", "movement_date","Quantity", "Origin" ],
+            Data: warehouseMovements
         }
+    };
 
-    }
- 
-
-    const tabs = ["In Transit",  "Warehouse", "Transfer History"];
-    const [activeTab, setActiveTab] = useState("In Transit");
     const activeConfig = stockFlowTableConfigs[activeTab];
-    
 
     return (
         <div className="stockflow">
             <div className="body-content-container">
                 
-              
                 {/* Navigation Tabs */}
                 <nav className="top-0 left-0 flex flex-wrap justify-between space-x-8 w-full p-2">
-
-                    <div className="invNav flex border-b border-gray-200 space-x-8 md:w-auto mt-3 mb-1" >
-                            {tabs.map((tab) => (
-                                <span
-                                    key={tab}
-                                    className={`cursor-pointer text:xs md:text-lg font-semibold transition-colors  ${
-                                        activeTab === tab ? "text-cyan-600 border-b-2 border-cyan-600 " : "text-gray-500"
-                                    }`}
-                                    onClick={() => setActiveTab(tab)}
-                                >
-                                    {tab}
-                                </span>
-                            ))}
-                    </div>           
-                </nav>
-                
-                {/*  */}
-                <section className="w-full h-100 overflow-y-auto rounded-lg grid ">
-                    {/* time and warehouse filter */}
-                    <div className="flex justify-between items-center p-3 rounded-t-lg">
-                        {/* time */}
-                        <h2 className="text-md font-semibold text-gray-600">00 - 00 - 0000 / 00:00 UTC</h2>
-                        {/* Select: Warehouse Filter */}
-                        <select name="stockflow_select/warehouse" id="stockflow_select/warehouse" className={`${activeTab === "Warehouse" ? "visible w-[300px] border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer" : "hidden" }`}>
-                            {/* Select Options */}
-                            <option value="">Select Warehouse</option>
-                            {["Warehouse 1", "Warehouse 2", "Warehouse 3"].map((warehouse)=>(
-                                <option key={warehouse}>{warehouse}</option>
-                            ))}
-                        </select>
+                    <div className="invNav flex border-b border-gray-200 space-x-8 md:w-auto mt-3 mb-1">
+                        {Object.keys(stockFlowTableConfigs).map((tab) => (
+                            <span
+                                key={tab}
+                                className={`cursor-pointer text:xs md:text-lg font-semibold transition-colors ${
+                                    activeTab === tab ? "text-cyan-600 border-b-2 border-cyan-600" : "text-gray-500"
+                                }`}
+                                onClick={() => setActiveTab(tab)}
+                            >
+                                {tab}
+                            </span>
+                        ))}
                     </div>
+                </nav>
 
+                {/* Data Table Section */}
+                <section className="w-full h-100 overflow-y-auto rounded-lg grid">
                     <div className="pcounts-table-container flex-2 border border-gray-300 rounded-lg scroll-container overflow-y-auto m-h-auto p-3">
-                        <table className="w-full table-layout:fixed text-center cursor-pointer">
+                        {loading ? (
+                            <p className="text-center text-gray-600">Loading data...</p>
+                        ) : error ? (
+                            <p className="text-center text-red-600">{error}</p>
+                        ) : (
+                            <table className="w-full table-layout:fixed text-center cursor-pointer">
                                 <thead>
                                     <tr className="border-b border-gray-300">
                                         {activeConfig.Columns.map((header) => (
-                                           <th key={header} className="p-2 text-gray-600">{header}</th>
+                                            <th key={header} className="p-2 text-gray-600">{header}</th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {activeConfig.Data.map((item, index) => (
-                                        <tr key={index} className="border-b border-gray-300">
-                                           {activeConfig.Columns.map((col) => (
-                                            <td key={col} className="p-2">
-                                                {item[col]}
+                                    {activeConfig.Data.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={activeConfig.Columns.length} className="text-gray-500 p-2">
+                                                No data available
                                             </td>
-                                           ))}
                                         </tr>
-                                    ))}
+                                    ) : (
+                                        activeConfig.Data.map((item, index) => (
+                                            <tr key={index} className="border-b border-gray-300">
+                                                {activeConfig.Columns.map((col) => (
+                                                    <td key={col} className="p-2">
+                                                        {item[col.toLowerCase().replace(/\s+/g, "_")]} {/* Convert column names to match API keys */}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))
+                                    )}
                                 </tbody>
                             </table>
-                        </div>
+                        )}
+                    </div>
                 </section>
-                            
-
-                   
-             </div>               
+            </div>               
         </div>
-       
     );
 };
 
 export default BodyContent;
-
-
