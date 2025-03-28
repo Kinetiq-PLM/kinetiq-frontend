@@ -6,7 +6,7 @@ import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 
 import CAMPAIGN_LIST_DATA from "./../../../Sales/temp_data/campaign_list_data";
-import CampaignListModal from "./../CampaignListModal";
+import NewCampaignModal from "../NewCampaignModal";
 
 export default function CampaignListTab() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,6 +17,8 @@ export default function CampaignListTab() {
     queryKey: ["campaigns"],
     queryFn: async () => await GET("crm/campaigns"),
   });
+
+  const [isNewCampaignOpen, setIsNewCampaignOpen] = useState(false);
 
   const campaign_list = CAMPAIGN_LIST_DATA;
 
@@ -80,6 +82,11 @@ export default function CampaignListTab() {
     <section className="h-full">
       {/* Header Section */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+        <NewCampaignModal
+          isOpen={isNewCampaignOpen}
+          onClose={() => setIsNewCampaignOpen(false)}
+        ></NewCampaignModal>
+
         {/* Filters */}
         <div className="flex flex-1/2 items-center space-x-2 gap-2 w-fit flex-wrap">
           {/* Date Filter Dropdown */}
@@ -114,7 +121,11 @@ export default function CampaignListTab() {
         </div>
 
         {/* Campaign Button */}
-        <Button type="primary" className={"w-[200px] py-2"}>
+        <Button
+          type="primary"
+          onClick={() => setIsNewCampaignOpen(true)}
+          className={"w-[200px] py-2"}
+        >
           New Campaign
         </Button>
       </div>

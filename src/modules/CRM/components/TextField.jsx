@@ -26,7 +26,7 @@ const TextField = ({
           className="bg-[#F9FAFA] w-full py-2 px-3 rounded resize-none borde focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          rows="4"
+          rows="8"
           required
         ></textarea>
         {isValidationVisible ? (

@@ -26,7 +26,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00004",
     campaign_name: "New Product Launch",
-    type: "Influencer Marketing",
+    type: "Referral",
     start_date: "2025-05-01",
     end_date: "2025-12-01",
     status: "Planned",
@@ -82,7 +82,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00011",
     campaign_name: "Brand Awareness Push",
-    type: "TV Ads",
+    type: "Referral",
     start_date: "2023-04-01",
     end_date: "2023-10-01",
     status: "Completed",
@@ -90,7 +90,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00012",
     campaign_name: "YouTube Ads Blitz",
-    type: "Video Marketing",
+    type: "Referral",
     start_date: "2025-06-01",
     end_date: "2025-12-01",
     status: "Planned",
@@ -98,7 +98,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00013",
     campaign_name: "Podcast Sponsorship",
-    type: "Audio Marketing",
+    type: "Referral",
     start_date: "2024-03-01",
     end_date: "2024-09-01",
     status: "Active",
@@ -106,7 +106,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00014",
     campaign_name: "Outdoor Billboard Ads",
-    type: "Billboard",
+    type: "Referral",
     start_date: "2023-07-01",
     end_date: "2024-07-01",
     status: "Completed",
@@ -114,7 +114,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00015",
     campaign_name: "B2B Partnerships",
-    type: "Networking",
+    type: "Referral",
     start_date: "2022-05-01",
     end_date: "2025-05-01",
     status: "Active",
@@ -122,7 +122,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00016",
     campaign_name: "University Outreach",
-    type: "Event Marketing",
+    type: "Referral",
     start_date: "2023-09-01",
     end_date: "2024-09-01",
     status: "Planned",
@@ -130,7 +130,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00017",
     campaign_name: "Local Radio Ads",
-    type: "Radio Marketing",
+    type: "SMS",
     start_date: "2023-02-01",
     end_date: "2024-02-01",
     status: "Completed",
@@ -138,7 +138,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00018",
     campaign_name: "E-commerce Upsell Strategy",
-    type: "Personalized Ads",
+    type: "SMS",
     start_date: "2025-01-01",
     end_date: "2025-06-01",
     status: "Planned",
@@ -154,7 +154,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00020",
     campaign_name: "Influencer Takeover",
-    type: "Influencer Marketing",
+    type: "SMS",
     start_date: "2024-10-01",
     end_date: "2025-02-01",
     status: "Planned",

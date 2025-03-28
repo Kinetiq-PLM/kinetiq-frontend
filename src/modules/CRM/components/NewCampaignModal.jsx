@@ -6,45 +6,56 @@ import { useAlert } from "../../Sales/components/Context/AlertContext.jsx";
 
 import Button from "../../Sales/components/Button.jsx";
 import InputField from "../../Sales/components/InputField.jsx";
-import TextField from "./TextField.jsx";
+import DateInputField from "../../Sales/components/DateInputField.jsx";
+import Dropdown from "../../Sales/components/Dropdown.jsx";
 
-const MessageModal = ({ isOpen, onClose, campaign }) => {
+const NewCampaignModal = ({ isOpen, onClose }) => {
   const { showAlert } = useAlert();
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
+  // ========== DATA ==========
+  const campaignTypes = ["Email", "SMS", "Social Media", "Referral"];
+
+  const [campaignName, setCampaignName] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [campaignType, setCampaignType] = useState("");
+  // ========== DATA ==========
+
   const [isValidationVisible, setIsValidationVisible] = useState(false);
 
   const handleConfirm = () => {
-    const validators = [validateMessage, validateSubject];
+    const validators = [
+      validateType,
+      validateName,
+      validateStartDate,
+      validateEndDate,
+    ];
 
     const errorCount = validators.reduce(
       (count, validate) => count + (validate() ? 1 : 0),
       0
     );
-    setIsValidationVisible(true);
+
     if (errorCount === 0) {
       // Send message here
 
-      console.log("Campaign: " + campaign.campaign_name);
-      console.log("Sending message type: " + campaign.type);
-      console.log("Subject: " + subject);
-      console.log("Message: " + message);
-
       // Reset form fields
-      setSubject("");
-      setMessage("");
+      setCampaignName("");
+      setStartDate("");
+      setEndDate("");
+      setCampaignType("");
       setIsValidationVisible(false);
 
       showAlert({
         type: "success",
-        title: "Message sent",
+        title: "Campaign created.",
       });
       onClose();
     } else {
+      setIsValidationVisible(true);
       showAlert({
         type: "error",
         title: "Please complete the form correctly.",
@@ -52,17 +63,59 @@ const MessageModal = ({ isOpen, onClose, campaign }) => {
     }
   };
 
-  const validateSubject = () => {
-    if (!subject.trim()) {
-      return "Subject is required.";
+  const validateName = () => {
+    if (!campaignName.trim()) {
+      return "Campaign name is required.";
     }
     return "";
   };
 
-  const validateMessage = () => {
-    if (!message.trim()) {
-      return "Message is required.";
+  const validateType = () => {
+    if (!campaignType.trim()) {
+      return "Campaign Type is required.";
     }
+    return "";
+  };
+
+  const validateStartDate = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to start of the day
+
+    if (!startDate.trim()) {
+      return "Start date is required.";
+    }
+
+    const start = new Date(startDate);
+    if (isNaN(start.getTime())) {
+      return "Invalid start date format.";
+    }
+
+    return "";
+  };
+
+  const validateEndDate = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to start of the day
+
+    if (!endDate.trim()) {
+      return "End date is required.";
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(end.getTime())) {
+      return "Invalid end date format.";
+    }
+
+    if (end < today) {
+      return "End date cannot be in the past.";
+    }
+
+    if (end < start) {
+      return "End date cannot be earlier than start date.";
+    }
+
     return "";
   };
 
@@ -110,7 +163,7 @@ const MessageModal = ({ isOpen, onClose, campaign }) => {
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            Message Contacts
+            New Campaign
           </h2>
         </div>
 
@@ -128,17 +181,32 @@ const MessageModal = ({ isOpen, onClose, campaign }) => {
         <div className="px-6 mt-4">
           <form action="" className="space-y-4 mb-6">
             <InputField
-              label={"Subject"}
-              value={subject}
-              setValue={setSubject}
-              validation={validateSubject}
+              label={"Campaign Name"}
+              value={campaignName}
+              setValue={setCampaignName}
+              validation={validateName}
               isValidationVisible={isValidationVisible}
             />
-            <TextField
-              label={"Message"}
-              value={message}
-              setValue={setMessage}
-              validation={validateMessage}
+            <Dropdown
+              label="Campaign Type"
+              options={campaignTypes}
+              onChange={setCampaignType}
+              value={campaignType}
+              validation={validateType}
+              isValidationVisible={isValidationVisible}
+            />
+            <DateInputField
+              label={"Starting Date"}
+              value={startDate}
+              setValue={setStartDate}
+              validation={validateStartDate}
+              isValidationVisible={isValidationVisible}
+            />
+            <DateInputField
+              label={"End Date"}
+              value={endDate}
+              setValue={setEndDate}
+              validation={validateEndDate}
               isValidationVisible={isValidationVisible}
             />
           </form>
@@ -151,7 +219,7 @@ const MessageModal = ({ isOpen, onClose, campaign }) => {
                 onClick={handleConfirm}
                 submit={true}
               >
-                Send
+                Create
               </Button>
             </div>
             <div>
@@ -166,4 +234,4 @@ const MessageModal = ({ isOpen, onClose, campaign }) => {
   );
 };
 
-export default MessageModal;
+export default NewCampaignModal;
