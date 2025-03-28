@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../styles/Accounting-Global-Styling.css";
+import "../styles/accounting-styling.css";
 import { accounts, subAccounts } from "./ListOfAccounts";
 import Forms from "../components/Forms";
 import Dropdown from "../components/Dropdown";
