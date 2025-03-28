@@ -53,6 +53,7 @@ const SalesTable = ({
     const newValue = isNaN(editValue) ? editValue : Number(editValue);
 
     // Validate discount
+    console.log(newData[rowIndex].total_price);
     if (
       editingCell.columnKey === "discount" &&
       (newValue < 0 || newValue > newData[rowIndex].total_price)
@@ -93,12 +94,12 @@ const SalesTable = ({
     const updatedData = newData.map((item) => {
       const unitPrice = Number(item.selling_price); // Keep selling_price as a number
       const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
-      const total = unitPrice * item.quantity + tax - item.discount;
+      const total = unitPrice * item.quantity + tax - Number(item.discount);
       return {
         ...item,
-        selling_price: unitPrice.toFixed(2), // Convert to string only for display
-        tax: tax.toFixed(2), // Ensure tax is formatted properly
-        total_price: total.toFixed(2), // Calculate total price
+        selling_price: unitPrice, // Convert to string only for display
+        tax: tax, // Ensure tax is formatted properly
+        total_price: total, // Calculate total price
       };
     });
 
@@ -140,18 +141,9 @@ const SalesTable = ({
       const total = unitPrice * item.quantity + tax - item.discount;
       return {
         ...item,
-        selling_price: Number(unitPrice).toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }), // Convert to string only for display
-        tax: Number(tax).toLocaleString("en-US", {
-          maximumFractionDigits: 2,
-          minimumFractionDigits: 2,
-        }), // Ensure tax is formatted properly
-        total_price: Number(total).toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }), // Calculate total price
+        selling_price: Number(unitPrice), // Convert to string only for display
+        tax: Number(tax),
+        total_price: Number(total),
       };
     });
 
@@ -218,6 +210,15 @@ const SalesTable = ({
                           onClick={(e) => e.stopPropagation()}
                           autoFocus
                         />
+                      ) : typeof row[column.key] === "number" ? (
+                        column.key === "quantity" ? (
+                          row[column.key]
+                        ) : (
+                          row[column.key].toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })
+                        )
                       ) : (
                         row[column.key] ?? "-"
                       )}

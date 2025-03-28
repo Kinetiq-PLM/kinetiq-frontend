@@ -98,7 +98,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
     { key: "quantity", label: "Quantity" },
-    { key: "selling_price", label: "Price" },
+    { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },
@@ -170,7 +170,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     // );
     const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
 
-    console.log(warrantyFee);
     const totalPrice =
       Number(totalBeforeDiscount) -
       Number(totalDiscount) +
@@ -185,16 +184,12 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       quotation_id: q_id,
       total_before_discount: Number(totalBeforeDiscount),
       total_tax: Number(totalTax),
-      discount: totalDiscount,
+      discount: Number(totalDiscount),
       shipping_fee: shippingFee,
       warranty_fee: Number(warrantyFee),
       total_price: Number(totalPrice),
     });
   }, [selectedCustomer, products]);
-
-  useEffect(() => {
-    console.log(quotationInfo);
-  }, [quotationInfo]);
 
   useEffect(() => {
     setQuotationInfo({

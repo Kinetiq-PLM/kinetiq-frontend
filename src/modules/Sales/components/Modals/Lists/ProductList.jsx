@@ -27,7 +27,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
 
   const productsQuery = useQuery({
     queryKey: ["products"],
-    queryFn: async () => await GET("misc/product"),
+    queryFn: async () => await GET("sales/products"),
     enabled: isOpen,
   });
 
