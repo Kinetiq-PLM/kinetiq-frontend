@@ -24,8 +24,7 @@ const BodyContent = () => {
   useEffect(() => {
     const timerId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 300); 
-
+    }, 300);
     return () => {
       clearTimeout(timerId);
     };
@@ -78,7 +77,9 @@ const BodyContent = () => {
           product.item_master_data && product.item_master_data.length > 0
             ? product.item_master_data[0]
             : {};
+  
         return {
+          item_id: product.item_id || "???",
           Name: product.product_name,
           "Total Stock": itemData.total_stock || "000",
           "Ordered Stock": itemData.stock_on_order || "000",
@@ -91,6 +92,8 @@ const BodyContent = () => {
     Assets: {
       columns: ["Name", "Available Stock"],
       data: assetData.map((asset) => ({
+        // Use the nested item object for item_id
+        item_id: asset.item ? asset.item.item_id : "???",
         Name: asset.asset_name || "Asset Name",
         "Available Stock": asset.available_stock || "000",
       })),
@@ -99,24 +102,27 @@ const BodyContent = () => {
     "Raw Materials": {
       columns: ["Name", "Available Stock"],
       data: rawMaterialData.map((mat) => ({
+        // Similarly, use the nested item object
+        item_id: mat.item ? mat.item.item_id : "???",
         Name: mat.material_name || "Raw Material Name",
         "Available Stock": mat.available_stock || "000",
       })),
       loading: loadingRawMats,
     },
+
+  
+
   };
 
   const currentConfig = tableConfigs[activeTab];
 
-
   const search = debouncedSearchTerm.toLowerCase().trim();
   const filteredData = currentConfig.data
-  .filter((item) => {
-    const nameVal = (item.Name || "").toLowerCase();
-    return search === "" || nameVal.startsWith(search);
-  })
-  .sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
-
+    .filter((item) => {
+      const nameVal = (item.Name || "").toLowerCase();
+      return search === "" || nameVal.startsWith(search);
+    })
+    .sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
 
   const toggleModal = () => setShowModal(!showModal);
 
@@ -131,7 +137,7 @@ const BodyContent = () => {
           onSearchChange={setSearchTerm}
         />
 
-
+        {/* Product Table */}
         <InvProductTable
           loading={currentConfig.loading}
           columns={currentConfig.columns}
@@ -153,15 +159,18 @@ const BodyContent = () => {
           <div className="border border-gray-300 rounded-lg p-6 mt-2">
             <div className="grid grid-cols-5 gap-4">
               {selectedItem ? (
-                Object.entries(selectedItem).map(([label, value]) => (
-                  <div key={label}>
-                    <p className="text-cyan-600 font-medium">{label}</p>
-                    <p>{value}</p>
-                  </div>
-                ))
+                Object.entries(selectedItem)
+                  .filter(([label]) => label !== "item_id")
+                  .map(([label, value]) => (
+                    <div key={label}>
+                      <p className="text-cyan-600 font-medium">{label}</p>
+                      <p>{value}</p>
+                    </div>
+                  ))
               ) : (
                 <p>No item selected</p>
               )}
+
             </div>
           </div>
         </div>
@@ -175,7 +184,12 @@ const BodyContent = () => {
         </div>
       </div>
 
-      {showModal && <InvRestockForm onClose={toggleModal} />}
+      {showModal && (
+        <InvRestockForm
+          onClose={toggleModal}
+          selectedItem={selectedItem}
+        />
+      )}
     </div>
   );
 };
