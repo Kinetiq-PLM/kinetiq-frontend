@@ -55,6 +55,36 @@ const BodyContent = () => {
             return;
         }
 
+        if (!newAccount.account_code) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Account Code Required",
+                message: "Please provide an account code.",
+            });
+            return;
+        }
+
+        if (!newAccount.account_name) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Account Name Required",
+                message: "Please provide an account name.",
+            });
+            return;
+        }
+
+        if (!newAccount.account_type) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Account Type Required",
+                message: "Please select an account type.",
+            });
+            return;
+        }
+
         // Check if the account_code already exists
         const accountCodeExists = data.some(row => row[0] === newAccount.account_code);
         if (accountCodeExists) {

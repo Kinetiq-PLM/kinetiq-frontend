@@ -6,6 +6,7 @@ import Dropdown from '../components/Dropdown';
 import Table from '../components/Table';
 import SearchBar from "../../../shared/components/SearchBar";
 import JournalModalInput from '../components/JournalModalInput';
+import NotifModal from '../components/modalNotif/NotifModal';
 
 const Journal = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,11 +53,34 @@ const Journal = () => {
         setJournalForm(prevState => ({ ...prevState, [field]: value }));
     };
 
+    // Emman Paki tuloy ito, para may validation na si journal.
+    const [validation, setValidation] = useState ({
+        isOpen: false,
+        type: "warning",
+        title: "",
+        message: "",
+    });
+
     const handleSubmit = () => {
         // Validation: Ensure all required fields are filled
-        if (!journalForm.journalDate || !journalForm.description || !journalForm.currencyId) {
-            alert("Please fill in all required fields.");
+        if (!journalForm.journalDate || !journalForm.journalId || !journalForm.description || !journalForm.invoiceId || !journalForm.currencyId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "All Fields are Required.",
+                message: "Fill up all the forms.",
+            });
             return;
+        }
+
+        if(!journalForm.journalDate)
+        {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Input the Date",
+                message: "Input the date you created the program.",
+            });
         }
 
         // Prepare the new entry for optimistic update
@@ -105,10 +129,15 @@ const Journal = () => {
             })
             .then(({ ok, status, data }) => {
                 if (ok) {
-                    alert("Journal entry created successfully!");
                     fetchData(); // Sync with server
                     setJournalForm({ journalId: '', journalDate: '', description: '', currencyId: '', invoiceId: '' });
                     closeModal();
+                    setValidation({
+                        isOpen: true,
+                        type: "success",
+                        title: "Journal ID Added",
+                        message: "Journal ID added successfully!",
+                    });
                 } else {
                     console.error('Server error response:', data);
                     throw new Error(data.detail || JSON.stringify(data) || `Failed to create journal entry (Status: ${status})`);
@@ -153,6 +182,16 @@ const Journal = () => {
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
             />
+
+            {validation && (
+                <NotifModal 
+                    isOpen={validation.isOpen}
+                    onClose={ () => {setValidation({ ...validation, isOpen: false })}}
+                    type={validation.type}
+                    title={validation.title}
+                    message={validation.message}
+                />
+            )}
 
         </div>
     );
