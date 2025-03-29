@@ -17,9 +17,7 @@
   display: flex;
   flex-direction: column;
   min-width: 40rem;
-  max-height: 39rem;
-  overflow: hidden;
-  position: relative;
+  min-height: 30rem;
 }
 
 /* Header styling to match the image */
@@ -80,6 +78,7 @@
   margin-right: -0.5rem;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
+  max-height: calc(100% - 8rem);
 }
 
 .servtick .content-scroll-area:hover {
@@ -214,7 +213,7 @@
   width: 100%;
   background-color: white;
   border: 1px solid #e8e8e8;
-  border-radius: 0.25rem;
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
   margin-top: 0.25rem;
@@ -223,18 +222,18 @@
 .servtick .filter-option {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
   font-family: "Inter", sans-serif;
 }
 
 .servtick .filter-option:hover {
-  background-color: #f5f5f5;
+  background-color: #00a8a8;
 }
 
 /* Button styling with Inter semi-bold font */
-.servtick .submit-button,
-.servtick .queue-button {
+.servtick .submit-button {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -248,13 +247,38 @@
   height: 2.5rem;
 }
 
+.servtick .queue-button {
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  transition: 0.3s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+}
+
+.queue-button.clickable {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.queue-button.disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
 .servtick .submit-button:hover,
-.servtick .queue-button:hover {
+.servtick .queue-button.clickable:hover{
   background-color: #098f8f;
 }
 
 .servtick .submit-button:active,
-.servtick .queue-button:active {
+.servtick .queue-button.clickable:active {
   background-color: #087d7d;
 }
 
@@ -262,8 +286,11 @@
   width: 100%;
   margin-bottom: 2rem;
   border-radius: 0.5rem;
-  overflow: hidden;
   border: 1px solid #e0e0e0;
+  max-height: 270px;
+  overflow-y: auto;
+  display: block;
+  position: relative;
 }
 
 /* Table with Inter font */
@@ -271,6 +298,14 @@
   width: 100%;
   border-collapse: collapse;
   font-family: "Inter", sans-serif;
+}
+
+.servtick .tickets-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 3;
 }
 
 .servtick thead {
@@ -305,11 +340,15 @@
   height: 2.5rem;
 }
 
-.servtick .priority-high {
-  color: #ff9800;
+.servtick .priority-medium {
+  color: #ffb341;
 }
 
-.servtick .priority-critical {
+.servtick .priority-high {
+  color: #ff7300;
+}
+
+.servtick .priority-urgent {
   color: #f44336;
 }
 
@@ -440,14 +479,68 @@
 
 /* Dropdown arrow without shading */
 .select-arrow {
+  cursor: pointer;
   position: absolute;
   right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.625rem;
   color: #888;
-  pointer-events: none;
   background: none;
+}
+
+.prod-dropdown-list {
+  top: auto !important;
+  bottom: 100% !important;
+}
+
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  list-style: none;
+  padding: 0;
+  margin: 5px 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border-radius: 7px;
+  z-index: 9999; 
+  display: block !important; 
+}
+
+.dropdown-list li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.dropdown-list li:hover {
+  background: #f0f0f0;
+}
+
+.servtick .dropdown-list::-webkit-scrollbar {
+  width: 8px; 
+}
+
+.servtick .dropdown-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.servtick .dropdown-list:hover::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.servtick .dropdown-list::-webkit-scrollbar-thumb {
+  background: #00a8a8;
+  border-radius: 8px;
+}
+
+.servtick .dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: hsl(180, 100%, 26%);
 }
 
 /* Adjust spacing in modals */

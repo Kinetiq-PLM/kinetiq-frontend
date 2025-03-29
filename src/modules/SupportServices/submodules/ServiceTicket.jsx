@@ -8,6 +8,8 @@ import QueueTicketModal from "../components/QueueTicketModal"
 import ServTickInputField from "../components/ServTickInputField"
 import ServTickTable from "../components/ServTickTable"
 
+import { GET } from "../api/api"
+
 const ServiceTicket = () => {
   // State for form fields
   const [ticketId, setTicketId] = useState("")
@@ -21,6 +23,9 @@ const ServiceTicket = () => {
   const [filterBy, setFilterBy] = useState("")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
 
+  const [selectedTicketStatus, setSelectedTicketStatus] = useState(null);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+
   // Modal states
   const [showSubmitModal, setShowSubmitModal] = useState(false)
   const [showQueueModal, setShowQueueModal] = useState(false)
@@ -30,21 +35,20 @@ const ServiceTicket = () => {
     // Replace with actual API call
     const fetchTickets = async () => {
       try {
-        // const response = await fetch('your-api-endpoint');
-        // const data = await response.json();
-        // setTickets(data);
+        const data = await GET("tickets/");
+        setTickets(data);
 
         // Mock data for demonstration
-        setTickets([
-          { id: "123", customerName: "Paula Manalo", createdAt: "2025-03-20", priority: "High", status: "Open" },
-          {
-            id: "124",
-            customerName: "Samantha Hospital",
-            createdAt: "2025-03-21",
-            priority: "Critical",
-            status: "Open",
-          },
-        ])
+        // setTickets([
+        //   { id: "123", customerName: "Paula Manalo", createdAt: "2025-03-20", priority: "High", status: "Open" },
+        //   {
+        //     id: "124",
+        //     customerName: "Samantha Hospital",
+        //     createdAt: "2025-03-21",
+        //     priority: "Critical",
+        //     status: "Open",
+        //   },
+        // ])
       } catch (error) {
         console.error("Error fetching tickets:", error)
       }
@@ -52,6 +56,31 @@ const ServiceTicket = () => {
 
     fetchTickets()
   }, [])
+
+  // table row clicking func
+  const handleRowClick = async (ticket) => {
+    setSelectedTicket(ticket);
+    try {
+      const data = await GET(`tickets/${ticket.ticket_id}`); // this fetches specific ticket info from clicked ticket row
+      console.log("Fetched data:", data);
+
+      // for null customer_id
+      const customer = data.customer || {};
+
+      setTicketId(data.ticket_id || "");
+      setCustomerId(customer.customer_id || "null"); 
+      setSubject(data.subject || "");
+      setName(customer.name || "Unknown");
+      setDescription(data.description || "");
+      setEmail(customer.email_address || "Unknown");
+      setPhone(customer.phone_number || "Unknown");
+
+      setSelectedTicketStatus(data.status || "");  
+
+    } catch (error) {
+      console.error("Error fetching ticket details:", error);
+    }
+};
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -94,8 +123,10 @@ const ServiceTicket = () => {
     { value: "open", label: "Open" },
     { value: "closed", label: "Closed" },
     { value: "pending", label: "Pending" },
-    { value: "high", label: "High Priority" },
-    { value: "critical", label: "Critical Priority" },
+    { value: "low", label: "Low" },
+    { value: "medium", label: "Medium" },
+    { value: "high", label: "High" },
+    { value: "urgent", label: "Urgent" },
   ]
 
   // Filter tickets based on selected filter
@@ -104,8 +135,10 @@ const ServiceTicket = () => {
     if (filterBy === "open" && ticket.status === "Open") return true
     if (filterBy === "closed" && ticket.status === "Closed") return true
     if (filterBy === "pending" && ticket.status === "Pending") return true
+    if (filterBy === "low" && ticket.priority === "Low") return true
+    if (filterBy === "medium" && ticket.priority === "Medium") return true
     if (filterBy === "high" && ticket.priority === "High") return true
-    if (filterBy === "critical" && ticket.priority === "Critical") return true
+    if (filterBy === "urgent" && ticket.priority === "Urgent") return true
     return false
   })
 
@@ -163,12 +196,17 @@ const ServiceTicket = () => {
               Submit a Ticket
             </button>
           </div>
-
-          {/* Table Component */}
-          <ServTickTable filteredTickets={filteredTickets} />
+          
+          {/*Table Component */}
+          <ServTickTable filteredTickets={filteredTickets} onRowClick={handleRowClick} />
 
           <div className="queue-container">
-            <button type="button" onClick={handleQueueTicket} className="queue-button">
+            <button
+              type="button"
+              onClick={handleQueueTicket}
+              className={`queue-button ${selectedTicketStatus === "Open" ? "clickable" : "disabled"}`}
+              disabled={selectedTicketStatus !== "Open"} // disable if status not open
+            >
               Queue Ticket
             </button>
           </div>
@@ -182,7 +220,7 @@ const ServiceTicket = () => {
         onSubmit={handleSubmitTicket}
       />
 
-      <QueueTicketModal isOpen={showQueueModal} onClose={() => setShowQueueModal(false)} onQueue={handleQueueCall} />
+      <QueueTicketModal isOpen={showQueueModal} onClose={() => setShowQueueModal(false)} onQueue={handleQueueCall} ticket={selectedTicket} />
     </div>
   )
 }

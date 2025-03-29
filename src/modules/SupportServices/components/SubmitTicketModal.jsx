@@ -5,33 +5,119 @@ import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 
+import { GET } from "../api/api"
+import { POST } from "../api/api"
+
 const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
+  const [customers, setCustomers] = useState([]);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [technicians, setTechnicians] = useState([]);
+  const [isDropdownOpenT, setDropdownOpenT] = useState(false);
+  const [isDropdownOpenP, setDropdownOpenP] = useState(false);
+  
   const [customerId, setCustomerId] = useState("")
   const [name, setName] = useState("")
   const [technicianId, setTechnicianId] = useState("")
   const [priority, setPriority] = useState("")
   const [subject, setSubject] = useState("")
   const [description, setDescription] = useState("")
-  const [createdAt, setCreatedAt] = useState("")
+  const [createdAt, setCreatedAt] = useState(() => {
+    return new Date().toISOString().split("T")[0]; // yyyy/mm/dd
+  });
 
-  const handleSubmit = () => {
-    onSubmit({
-      customerId,
-      name,
-      technicianId,
-      priority,
-      subject,
-      description,
-      createdAt,
-    })
-    // Reset form
-    setCustomerId("")
-    setName("")
-    setTechnicianId("")
-    setPriority("")
-    setSubject("")
-    setDescription("")
-    setCreatedAt("")
+  // fetches a list of customers
+  const fetchCustomers = async () => {
+    try {
+      const response = await GET("/customers/");
+      console.log("asdasd", response)
+      setCustomers(response);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+    }
+  };
+
+  const handleToggleDropdown = () => {
+    if (!isDropdownOpen) {
+      fetchCustomers(); 
+    }
+    setDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleSelectCustomer = (customer) => {
+    setCustomerId(customer.customer_id); 
+    setName(customer.name); 
+    setDropdownOpen(false); 
+};
+
+const handleCustomerInput = (input) => {
+  setCustomerId(input); 
+
+  const matchedCustomer = customers.find(customer => customer.customer_id === input);
+
+  if (matchedCustomer) {
+    handleSelectCustomer(matchedCustomer); 
+  } else {
+    setName(""); 
+  }
+};
+
+// fetches a list of techs
+const fetchTechnicians = async () => {
+  try {
+    const response = await GET("/technicians/");
+    console.log("techs", response)
+    setTechnicians(response);
+  } catch (error) {
+    console.error("Error fetching technicians:", error);
+  }
+};
+
+const handleToggleDropdownTech = () => {
+  if (!isDropdownOpenT) {
+    fetchTechnicians(); 
+  }
+  setDropdownOpenT(!isDropdownOpenT);
+};
+
+const handleSelectTechnician = (technician) => {
+  setTechnicianId(technician.employee_id); 
+  setDropdownOpenT(false); 
+};
+
+// handle prio 
+const handlePrioDropdown = () => {
+  setDropdownOpenP((prev) => !prev); 
+};
+
+const handleSelectPriority = (selectedPrio) => {
+  setPriority(selectedPrio); 
+  setDropdownOpenP(false); 
+};
+
+  const handleSubmit = async () => {
+    const newTicket = {
+      customer_id: customerId,  
+      priority: priority,
+      subject: subject,
+      description: description
+    };
+
+    try {
+      const data = await POST("/tickets/", newTicket);
+      console.log("Ticket created successfully:", data);
+  
+      // reset form fields
+      setCustomerId("");
+      setName("");
+      setTechnicianId("");
+      setPriority("");
+      setSubject("");
+      setDescription("");
+      setCreatedAt(new Date().toISOString().split("T")[0]); // reset 2 today
+      onClose()
+    } catch (error) {
+      console.error("Error creating ticket:", error.message);
+    }
   }
 
   if (!isOpen) return null
@@ -62,10 +148,25 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
                     type="text"
                     id="customerId"
                     value={customerId}
-                    onChange={(e) => setCustomerId(e.target.value)}
-                    placeholder="Enter customer ID"
+                    //readOnly
+                    onChange={(e) => handleCustomerInput(e.target.value)}
+                    placeholder="Select customer ID"
                   />
-                  <span className="select-arrow">▼</span>
+                  <span className="select-arrow" onClick={handleToggleDropdown}>▼</span>
+                {/* Dropdown List */}
+                {isDropdownOpen && (
+                  <ul className="dropdown-list">
+                    {customers.length > 0 ? (
+                      customers.map((customer) => (
+                        <li key={customer.customer_id} onClick={() => handleSelectCustomer(customer)}>
+                          {customer.customer_id}
+                        </li>
+                      ))
+                    ) : (
+                      <li>No customers found</li>
+                    )}
+                  </ul>
+                )}    
                 </div>
               </div>
 
@@ -90,20 +191,42 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
                   type="text"
                   id="name"
                   value={name}
+                  readOnly
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter name"
                 />
               </div>
-
+             
+              { /* technician id field should be auto-filled by the one currently logged in but this works for now */}     
               <div className="form-group">
-                <label htmlFor="technicianId">Technician ID</label>
-                <input
-                  type="text"
-                  id="technicianId"
-                  value={technicianId}
-                  onChange={(e) => setTechnicianId(e.target.value)}
-                  placeholder="Enter technician ID"
-                />
+                <label htmlFor="technicianId">
+                  Technician ID <span className="required">*</span>
+                </label>
+                <div className="select-wrapper">
+                  <input
+                    type="text"
+                    id="technicianId"
+                    value={technicianId}
+                    //readOnly
+                    onChange={(e) => setTechnicianId(e.target.value)}
+                    placeholder="Select technician ID"
+                  />
+                  <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
+                    { /* Dropdown List */}
+                    {isDropdownOpenT && (
+                      <ul className="dropdown-list">
+                        {technicians.length > 0 ? (
+                          technicians.map((technician) => (
+                            <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
+                              {technician.employee_id}
+                            </li>
+                          ))
+                        ) : (
+                          <li>No technicians found</li>
+                        )}
+                      </ul>
+                    )}
+                </div>
               </div>
             </div>
 
@@ -115,10 +238,11 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
                     type="text"
                     id="createdAt"
                     value={createdAt}
+                    readOnly
                     onChange={(e) => setCreatedAt(e.target.value)}
                     placeholder="dd/mm/yy"
                   />
-                  <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" />
+                  {/* <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" /> */}
                 </div>
               </div>
 
@@ -131,10 +255,21 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
                     type="text"
                     id="priority"
                     value={priority}
+                    readOnly
                     onChange={(e) => setPriority(e.target.value)}
                     placeholder="Select priority"
                   />
-                  <span className="select-arrow">▼</span>
+                  <span className="select-arrow" onClick={handlePrioDropdown}>▼</span>
+
+                  {isDropdownOpenP && (
+                    <ul className="dropdown-list">
+                      {["Low", "Medium", "High", "Urgent"].map((prio) => (
+                        <li key={prio} onClick={() => handleSelectPriority(prio)}>
+                          {prio}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
             </div>
