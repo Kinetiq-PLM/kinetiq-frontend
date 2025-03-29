@@ -9,39 +9,54 @@ const InvRestockForm = ({ onClose, selectedItem }) => {
 
   useEffect(() => {
     if (selectedItem) {
-      // Use the item_id instead of product_id when populating the form
-      setItemId(selectedItem.item_id || "");
+      setItemId(String(selectedItem.material_id || ""));
     }
   }, [selectedItem]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting Restock Request:", {
-      itemId,
-      quantity,
-      managerId,
-      productDescription,
-    });
-    onClose();
+
+    const newRequest = {
+      request_id: 'REQ-' + Date.now(), 
+      employee_id: managerId,          
+      item_id: itemId,                 
+      purchase_quantity: quantity,
+      purchase_description: productDescription
+    };
+    
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/purchase-requests/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newRequest),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit purchase request");
+      }
+
+      const data = await response.json();
+      console.log("Successfully submitted purchase request:", data);
+      onClose(); 
+    } catch (error) {
+      console.error("Error submitting purchase request:", error);
+    }
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        {/* Header */}
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">Restock Request Form</h2>
-          <button onClick={onClose} className="close-btn">
-            ✕
-          </button>
+          <button onClick={onClose} className="close-btn">✕</button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit}>
-          <label>Product Id</label>
+          <label>Item ID</label>
           <input
             type="text"
-            placeholder="Enter Item Id"
+            placeholder="Enter numeric item_id"
             value={itemId}
             onChange={(e) => setItemId(e.target.value)}
           />
@@ -54,10 +69,10 @@ const InvRestockForm = ({ onClose, selectedItem }) => {
             onChange={(e) => setQuantity(e.target.value)}
           />
 
-          <label>Manager ID / Employee ID</label>
+          <label>Manager (Employee) ID</label>
           <input
-            type="text"
-            placeholder="Enter Manager ID"
+            type="text" 
+            placeholder="Enter Employee ID"
             value={managerId}
             onChange={(e) => setManagerId(e.target.value)}
           />
