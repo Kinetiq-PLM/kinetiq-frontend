@@ -38,14 +38,23 @@ const Table = ({ columns, data, enableCheckbox }) => {
                                     />
                                 </td>
                             )}
-                            {row.map((cell, cellIndex) => (
-                                <td key={cellIndex} >
-                                    {cell}
-                                </td>
-                            ))}
+                            {row.map((cell, cellIndex) => {
+                                // Check if this column is the "Status" column
+                                const isStatusColumn = columns[cellIndex] === "Status";
+
+                                return (
+                                    <td key={cellIndex} className={isStatusColumn ? "status-cell" : ""}>
+                                        <div className={isStatusColumn ? (cell === "Active" ? "status-active" : "status-inactive") : ""}>
+                                            {cell}
+                                        </div>
+                                    </td>
+                                );
+                            })}
+
                         </tr>
                     ))}
                 </tbody>
+
             </table>
         </div>
     );

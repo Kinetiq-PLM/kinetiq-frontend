@@ -1,6 +1,7 @@
 .table-container {
     width: 100%;
-    max-height: 55vh; /* Adjust height as needed */
+    max-height: 55vh;
+    /* Adjust height as needed */
     overflow-y: auto;
     overflow-x: auto;
     position: relative;
@@ -12,7 +13,8 @@
 table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* Ensures columns remain aligned */
+    table-layout: fixed;
+    /* Ensures columns remain aligned */
 }
 
 /* Fix the table header */
@@ -44,11 +46,12 @@ th {
 
 td {
     font-size: 14px;
-    font-weight: 300; 
+    font-weight: 300;
     text-wrap: wrap;
 }
 
-th, td {
+th,
+td {
     white-space: normal;
     word-wrap: break-word;
     overflow: hidden;
@@ -84,20 +87,51 @@ th, td {
 /* Style for checkbox to reduce width when checkbox is enabled */
 .table-container.checkbox-enabled th:first-child,
 .table-container.checkbox-enabled td:first-child {
-    width: 40px; /* Adjust this value to make the checkbox column narrower */
+    width: 40px;
+    /* Adjust this value to make the checkbox column narrower */
     text-align: center;
 }
+
 input[type="checkbox"] {
-    appearance: none; /* Remove default styling */
+    appearance: none;
+    /* Remove default styling */
     width: 16px;
     height: 16px;
     border: 1.5px solid #A4A4A4;
-    background-color: white; /* White background */
-    border-radius: 3px; /* Optional: Rounded corners */
+    background-color: white;
+    /* White background */
+    border-radius: 3px;
+    /* Optional: Rounded corners */
     cursor: pointer;
-  }
-  
-  input[type="checkbox"]:checked {
-    background-color: #A4A4A4; /* Change background when checked */
-  }
-  
+}
+
+input[type="checkbox"]:checked {
+    background-color: #A4A4A4;
+    /* Change background when checked */
+}
+
+.status-active {
+    background-color: #d1fae5;
+    /* Light green */
+    color: #065f46;
+    /* Dark green */
+    border: 2px solid #047857;
+    /* Green border */
+    font-weight: bold;
+    border-radius: 10px;
+    width: fit-content;
+    padding: 1vh 3vh;
+}
+
+.status-inactive {
+    background-color: #fee2e2;
+    /* Light red */
+    color: #b91c1c;
+    /* Dark red */
+    border: 2px solid #dc2626;
+    /* Red border */
+    font-weight: bold;
+    border-radius: 10px;
+    width: fit-content;
+    padding: 1vh 3vh;
+}
