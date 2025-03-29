@@ -227,7 +227,7 @@ const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
                                         type="number"
                                         placeholder="Enter Credit"
                                         value={entry.amount}
-                                        onChange={(e) => handleInputChange(index, 'amount', e.target.value)} // Fixed syntax error
+                                        onChange={(e) => handleInputChange(index, 'amount', e.target.value)}
                                     />
                                 )}
                             </div>

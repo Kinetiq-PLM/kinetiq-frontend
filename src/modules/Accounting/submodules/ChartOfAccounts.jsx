@@ -89,7 +89,7 @@ const BodyContent = () => {
                 </div>
 
                 {/* Table Display */}
-                <Table data={data} columns={columns} enableCheckbox={false} /> {/* ✅ Fixed table rendering */}
+                <Table data={data} columns={columns} enableCheckbox={false} />
             </div>
 
             <CoaModalInput
