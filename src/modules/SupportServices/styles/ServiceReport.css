@@ -161,7 +161,7 @@
   height: 2.75rem;
   box-sizing: border-box;
   width: 100%;
-  color: #666;
+  color: #000000;
 }
 
 .service-report textarea {
@@ -173,7 +173,7 @@
   font-weight: 400;
   box-sizing: border-box;
   width: 100%;
-  color: #666;
+  color: #000000;
   resize: none;
 }
 
