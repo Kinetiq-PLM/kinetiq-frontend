@@ -11,6 +11,7 @@ const GeneralLedgerAccounts = () => {
     fetch('http://127.0.0.1:8000/api/general-ledger-accounts/')
       .then(response => response.json())
       .then(result => {
+
         console.log('API Response (fetchData):', result);
         if (result.length > 0) {
           console.log('Keys in first entry:', Object.keys(result[0]));
@@ -19,6 +20,7 @@ const GeneralLedgerAccounts = () => {
         } else {
           console.log('No data returned from API - Did JournalEntry save?');
         }
+        
         setData(result.map(entry => {
           const row = [
             entry.gl_account_id || "-",
