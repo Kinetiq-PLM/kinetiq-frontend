@@ -161,12 +161,14 @@ const BodyContent = () => {
             <h2 className="text-lg font-semibold mt-6">
               Selected Item Details
             </h2>
-            <button
-              onClick={toggleModal}
-              className="mt-4 bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
-            >
-              Restock Request
-            </button>
+            {(activeTab === "Assets" || activeTab === "Raw Materials") && (
+              <button
+                onClick={toggleModal}
+                className="mt-4 bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
+              >
+                Restock Request
+              </button>
+            )}
           </div>
 
           <div className="border border-gray-300 rounded-lg p-6 mt-2">
@@ -218,7 +220,11 @@ const BodyContent = () => {
       </div>
 
       {showModal && (
-        <InvRestockForm onClose={toggleModal} selectedItem={selectedItem} />
+        <InvRestockForm
+          onClose={toggleModal}
+          selectedItem={selectedItem}
+          activeTab={activeTab} 
+        />
       )}
     </div>
   );
