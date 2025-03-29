@@ -22,7 +22,7 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
   const [subject, setSubject] = useState("")
   const [description, setDescription] = useState("")
   const [createdAt, setCreatedAt] = useState(() => {
-    return new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
+    return new Date().toISOString().split("T")[0]; // yyyy/mm/dd
   });
 
   // fetches a list of customers
@@ -73,7 +73,7 @@ const fetchTechnicians = async () => {
 };
 
 const handleToggleDropdownTech = () => {
-  if (!isDropdownOpen) {
+  if (!isDropdownOpenT) {
     fetchTechnicians(); 
   }
   setDropdownOpenT(!isDropdownOpenT);
@@ -114,6 +114,7 @@ const handleSelectPriority = (selectedPrio) => {
       setSubject("");
       setDescription("");
       setCreatedAt(new Date().toISOString().split("T")[0]); // reset 2 today
+      onClose()
     } catch (error) {
       console.error("Error creating ticket:", error.message);
     }
@@ -207,7 +208,7 @@ const handleSelectPriority = (selectedPrio) => {
                     id="technicianId"
                     value={technicianId}
                     //readOnly
-                    onChange={(e) => setSubject(e.target.value)}
+                    onChange={(e) => setTechnicianId(e.target.value)}
                     placeholder="Select technician ID"
                   />
                   <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>

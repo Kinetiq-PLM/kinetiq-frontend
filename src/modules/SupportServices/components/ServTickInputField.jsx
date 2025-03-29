@@ -68,7 +68,7 @@ const ServTickInputField = ({
               onChange={(e) => setCustomerId(e.target.value)}
               placeholder="Enter customer ID"
             />
-            <span className="select-arrow">▼</span>
+            {/* <span className="select-arrow">▼</span> */}
           </div>
         </div>
 
