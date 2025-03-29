@@ -77,12 +77,28 @@ const BodyContent = () => {
                 setData(prevData => [...prevData, [addedAccount.account_code, addedAccount.account_name, addedAccount.account_type]]);
                 setNewAccount({ account_code: "", account_name: "", account_type: "" });
                 closeModal(); // ✅ Close modal after adding account
+                setNotif({
+                    isOpen: true,
+                    type: "success",
+                    title: "Account Added",
+                    message: "Successfully created account",
+                });
             } else {
-                alert("Failed to save data. Please try again.");
+                setNotif({
+                    isOpen: true,
+                    type: "error",
+                    title: "Adding Account failed",
+                    message: "Creating account failed",
+                });
             }
         } catch (error) {
             console.error("Error submitting data:", error.response ? error.response.data : error);
-            alert("An error occurred. Please check your connection.");
+            setNotif({
+                isOpen: true,
+                type: "warning",
+                title: "Check Connection!",
+                message: "Kindly Check your connection",
+            });
         }
     };
 
