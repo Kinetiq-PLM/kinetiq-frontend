@@ -452,14 +452,63 @@
 
 /* Dropdown arrow without shading */
 .select-arrow {
+  cursor: pointer;
   position: absolute;
   right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.625rem;
   color: #888;
-  pointer-events: none;
   background: none;
+}
+
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  list-style: none;
+  padding: 0;
+  margin: 5px 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border-radius: 7px;
+  z-index: 9999; 
+  display: block !important; 
+}
+
+.dropdown-list li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.dropdown-list li:hover {
+  background: #f0f0f0;
+}
+
+.servtick .dropdown-list::-webkit-scrollbar {
+  width: 8px; 
+}
+
+.servtick .dropdown-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.servtick .dropdown-list:hover::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.servtick .dropdown-list::-webkit-scrollbar-thumb {
+  background: #00a8a8;
+  border-radius: 8px;
+}
+
+.servtick .dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: hsl(180, 100%, 26%);
 }
 
 /* Adjust spacing in modals */
