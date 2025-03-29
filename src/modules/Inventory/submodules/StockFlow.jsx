@@ -6,7 +6,7 @@ const BodyContent = () => {
     const[warehouseData, setWarehouseData] = useState([]); // State to store warehouse data
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [activeTab, setActiveTab] = useState("In Transit");
+    const [activeTab, setActiveTab] = useState("Transfer History"); // State to manage active tab
 
     // Fetch data from Warehouse Transfers Django API
     useEffect(() => {
@@ -51,18 +51,15 @@ const BodyContent = () => {
 
     // Table Configurations per Active Tab
     const stockFlowTableConfigs = {
-        "In Transit": { 
-            Columns: ["Item", "Transaction Type", "Destination", "Origin", "Quantity"],
+        "Transfer History": {
+            Columns: ["movement_id", "item", "movement_type", "movement_date","Quantity", "Origin" ],
             Data: warehouseMovements
         },
         "Warehouse": {
             Columns: ["Warehouse_ID", "Warehouse_Location"],
             Data:  warehouseData
         },
-        "Transfer History": {
-            Columns: ["movement_id", "item", "movement_type", "movement_date","Quantity", "Origin" ],
-            Data: warehouseMovements
-        }
+        
     };
 
     const activeConfig = stockFlowTableConfigs[activeTab];
