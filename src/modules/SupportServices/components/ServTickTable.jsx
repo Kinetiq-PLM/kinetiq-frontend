@@ -1,4 +1,4 @@
-const ServTickTable = ({ filteredTickets }) => {
+const ServTickTable = ({ filteredTickets, onRowClick }) => {
   return (
     <div className="table-container">
       <table className="tickets-table">
@@ -13,34 +13,23 @@ const ServTickTable = ({ filteredTickets }) => {
         </thead>
         <tbody>
           {filteredTickets.map((ticket, index) => (
-            <tr key={ticket.id} className={index % 2 === 0 ? "" : "alternate-row"}>
-              <td>{ticket.id}</td>
-              <td>{ticket.customerName}</td>
-              <td>{ticket.createdAt}</td>
+            <tr 
+              key={ticket.id || `ticket-${index}`} 
+              className={index % 2 === 0 ? "" : "alternate-row"} 
+              onClick={() => onRowClick(ticket)} // makes table row clickable, function update the state fields
+              style={{ cursor: "pointer" }} 
+            >
+              <td>{ticket.ticket_id}</td>
+              <td>{ticket.customer ? ticket.customer.name : "Unknown"}</td>
+              <td>{ticket.created_at}</td>
               <td className={`priority-${ticket.priority.toLowerCase()}`}>{ticket.priority}</td>
               <td>{ticket.status}</td>
             </tr>
           ))}
-          {/* Empty rows to match the design */}
-          {Array(5 - filteredTickets.length)
-            .fill()
-            .map((_, index) => (
-              <tr
-                key={`empty-${index}`}
-                className={`empty-row ${(index + filteredTickets.length) % 2 === 0 ? "" : "alternate-row"}`}
-              >
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-            ))}
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
-export default ServTickTable
-
+export default ServTickTable;

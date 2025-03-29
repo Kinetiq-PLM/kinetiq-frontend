@@ -8,6 +8,8 @@ import QueueTicketModal from "../components/QueueTicketModal"
 import ServTickInputField from "../components/ServTickInputField"
 import ServTickTable from "../components/ServTickTable"
 
+import { GET } from "../api/api"
+
 const ServiceTicket = () => {
   // State for form fields
   const [ticketId, setTicketId] = useState("")
@@ -30,21 +32,20 @@ const ServiceTicket = () => {
     // Replace with actual API call
     const fetchTickets = async () => {
       try {
-        // const response = await fetch('your-api-endpoint');
-        // const data = await response.json();
-        // setTickets(data);
+        const data = await GET("tickets/");
+        setTickets(data);
 
         // Mock data for demonstration
-        setTickets([
-          { id: "123", customerName: "Paula Manalo", createdAt: "2025-03-20", priority: "High", status: "Open" },
-          {
-            id: "124",
-            customerName: "Samantha Hospital",
-            createdAt: "2025-03-21",
-            priority: "Critical",
-            status: "Open",
-          },
-        ])
+        // setTickets([
+        //   { id: "123", customerName: "Paula Manalo", createdAt: "2025-03-20", priority: "High", status: "Open" },
+        //   {
+        //     id: "124",
+        //     customerName: "Samantha Hospital",
+        //     createdAt: "2025-03-21",
+        //     priority: "Critical",
+        //     status: "Open",
+        //   },
+        // ])
       } catch (error) {
         console.error("Error fetching tickets:", error)
       }
@@ -52,6 +53,28 @@ const ServiceTicket = () => {
 
     fetchTickets()
   }, [])
+
+  // table row clicking func
+  const handleRowClick = async (ticket) => {
+    try {
+      const data = await GET(`tickets/${ticket.ticket_id}`); // this fetches specific ticket info from clicked ticket row
+      console.log("Fetched data:", data);
+
+      // for null customer_id
+      const customer = data.customer || {};
+
+      setTicketId(data.ticket_id || "");
+      setCustomerId(customer.customer_id || "null"); 
+      setSubject(data.subject || "");
+      setName(customer.name || "Unknown");
+      setDescription(data.description || "");
+      setEmail(customer.email_address || "Unknown");
+      setPhone(customer.phone_number || "Unknown");
+
+    } catch (error) {
+      console.error("Error fetching ticket details:", error);
+    }
+};
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -163,9 +186,9 @@ const ServiceTicket = () => {
               Submit a Ticket
             </button>
           </div>
-
-          {/* Table Component */}
-          <ServTickTable filteredTickets={filteredTickets} />
+          
+          {/*Table Component */}
+          <ServTickTable filteredTickets={filteredTickets} onRowClick={handleRowClick} />
 
           <div className="queue-container">
             <button type="button" onClick={handleQueueTicket} className="queue-button">
