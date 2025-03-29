@@ -5,7 +5,7 @@ const InvRestockForm = ({ onClose, selectedItem }) => {
   const [itemId, setItemId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [managerId, setManagerId] = useState("");
-  const [warehouse, setWarehouse] = useState("");
+  const [productDescription, setProductDescription] = useState("");
 
   useEffect(() => {
     if (selectedItem) {
@@ -13,7 +13,6 @@ const InvRestockForm = ({ onClose, selectedItem }) => {
       setItemId(selectedItem.item_id || "");
     }
   }, [selectedItem]);
-  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,7 +20,7 @@ const InvRestockForm = ({ onClose, selectedItem }) => {
       itemId,
       quantity,
       managerId,
-      warehouse,
+      productDescription,
     });
     onClose();
   };
@@ -32,7 +31,9 @@ const InvRestockForm = ({ onClose, selectedItem }) => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">Restock Request Form</h2>
-          <button onClick={onClose} className="close-btn">✕</button>
+          <button onClick={onClose} className="close-btn">
+            ✕
+          </button>
         </div>
 
         {/* Form */}
@@ -61,15 +62,13 @@ const InvRestockForm = ({ onClose, selectedItem }) => {
             onChange={(e) => setManagerId(e.target.value)}
           />
 
-          <label>Warehouse Destination</label>
-          <select
-            value={warehouse}
-            onChange={(e) => setWarehouse(e.target.value)}
-          >
-            <option value="">Please Select Warehouse</option>
-            <option value="Warehouse A">Warehouse A</option>
-            <option value="Warehouse B">Warehouse B</option>
-          </select>
+          <label>Product Description</label>
+          <textarea
+            placeholder="Enter product description"
+            value={productDescription}
+            onChange={(e) => setProductDescription(e.target.value)}
+            rows="4"
+          />
 
           <div className="form-actions">
             <button type="button" onClick={onClose} className="clear-btn">
