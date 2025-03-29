@@ -105,6 +105,7 @@ function App() {
     },
     "Support & Services": {
       "Service Ticket": "ServiceTicket",
+      "Service Call": "ServiceCall",
     },
     "Inventory": {
       "Stock Levels": "StockLevels",
