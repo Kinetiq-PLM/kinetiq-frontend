@@ -7,6 +7,7 @@ import Button from "../components/Button";
 import Dropdown from "../components/Dropdown";
 import Table from "../components/Table";
 import CoaModalInput from "../components/CoaModalInput";
+import NotifModal from "../components/modalNotif/NotifModal";
 
 const BodyContent = () => {
     const columns = ["Account code", "Account name", "Account type"];
@@ -36,16 +37,33 @@ const BodyContent = () => {
         setNewAccount(prev => ({ ...prev, [field]: value }));
     };
 
+    const [notif, setNotif] = useState({
+        isOpen: false,
+        type: "warning",
+        title: "",
+        message: "",
+    });
+
     const handleSubmit = async () => {
         if (!newAccount.account_code || !newAccount.account_name || !newAccount.account_type) {
-            alert("All fields are required.");
+            setNotif({
+                isOpen: true,
+                type: "warning",
+                title: "All Fields are Required.",
+                message: "Fill up all the forms.",
+            });
             return;
         }
 
         // Check if the account_code already exists
         const accountCodeExists = data.some(row => row[0] === newAccount.account_code);
         if (accountCodeExists) {
-            alert("Account code already exists.");
+            setNotif({
+                isOpen: true,
+                type: "warning",
+                title: "Account Already Exist",
+                message: "The account you're creating is already created.",
+            });
             return;
         }
 
@@ -99,6 +117,16 @@ const BodyContent = () => {
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
             />
+
+            {notif.isOpen && (
+                <NotifModal
+                    isOpen={notif.isOpen}
+                    onClose={() => setNotif({ ...notif, isOpen: false })}
+                    type={notif.type}
+                    title={notif.title}
+                    message={notif.message}
+                />
+            )}
         </div>
     );
 };
