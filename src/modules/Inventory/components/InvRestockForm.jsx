@@ -2,21 +2,23 @@ import React, { useState, useEffect } from "react";
 import "../styles/InvRestockForm.css";
 
 const InvRestockForm = ({ onClose, selectedItem }) => {
-  const [productId, setProductId] = useState("");
+  const [itemId, setItemId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [managerId, setManagerId] = useState("");
   const [warehouse, setWarehouse] = useState("");
 
   useEffect(() => {
     if (selectedItem) {
-      setProductId(selectedItem.item_id || "");
+      // Use the item_id instead of product_id when populating the form
+      setItemId(selectedItem.item_id || "");
     }
   }, [selectedItem]);
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Submitting Restock Request:", {
-      productId,
+      itemId,
       quantity,
       managerId,
       warehouse,
@@ -38,9 +40,9 @@ const InvRestockForm = ({ onClose, selectedItem }) => {
           <label>Product Id</label>
           <input
             type="text"
-            placeholder="Enter Product Id"
-            value={productId}
-            onChange={(e) => setProductId(e.target.value)}
+            placeholder="Enter Item Id"
+            value={itemId}
+            onChange={(e) => setItemId(e.target.value)}
           />
 
           <label>Request Quantity</label>

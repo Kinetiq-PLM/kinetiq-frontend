@@ -71,47 +71,59 @@ const BodyContent = () => {
 
   const tableConfigs = {
     Products: {
-      columns: ["Name", "Total Stock", "Ordered Stock", "Commited Stock", "Available Stock"],
+      columns: [
+        "Name",
+        "Item ID",
+        "Total Stock",
+        "Ordered Stock",
+        "Commited Stock",
+        "Available Stock"
+      ],
       data: productData.map((product) => {
-        const itemData =
-          product.item_master_data && product.item_master_data.length > 0
-            ? product.item_master_data[0]
-            : {};
-  
+        const itemId = product.admin_item?.item_id || product.item || "???";
+        const inventoryData = product.admin_item || {};
+
         return {
-          item_id: product.item_id || "???",
+          product_id: product.product_id || "???",
+          item_id: itemId,
           Name: product.product_name,
-          "Total Stock": itemData.total_stock || "000",
-          "Ordered Stock": itemData.stock_on_order || "000",
-          "Commited Stock": itemData.stock_committed || "000",
-          "Available Stock": itemData.available_stock || "000",
+          "Item ID": itemId,
+          "Total Stock": inventoryData.total_stock || "000",
+          "Ordered Stock": inventoryData.stock_on_order || "000",
+          "Commited Stock": inventoryData.stock_committed || "000",
+          "Available Stock": inventoryData.available_stock || "000",
         };
       }),
       loading: loadingProducts,
     },
+    
     Assets: {
-      columns: ["Name", "Available Stock"],
+      columns: ["Name", "Item ID", "Serial No", "Purchase Date", "Available Stock"],
       data: assetData.map((asset) => ({
-        // Use the nested item object for item_id
-        item_id: asset.item ? asset.item.item_id : "???",
+        item_id: asset.item_id || "???",
+        asset_id: asset.asset_id || "???",
         Name: asset.asset_name || "Asset Name",
+        "Item ID": asset.item_id || "???",
+        "Serial No": asset.serial_no || "N/A",
+        "Purchase Date": asset.purchase_date || "N/A",
         "Available Stock": asset.available_stock || "000",
       })),
       loading: loadingAssets,
     },
+    
     "Raw Materials": {
-      columns: ["Name", "Available Stock"],
+      columns: ["Name", "Item ID", "Description", "Unit", "Available Stock"],
       data: rawMaterialData.map((mat) => ({
-        // Similarly, use the nested item object
-        item_id: mat.item ? mat.item.item_id : "???",
+        item_id: mat.item_id || "???",
+        material_id: mat.material_id || "???",
         Name: mat.material_name || "Raw Material Name",
+        "Item ID": mat.item_id || "???",
+        "Description": mat.description || "No description available",
+        "Unit": mat.unit_of_measure || "N/A",
         "Available Stock": mat.available_stock || "000",
       })),
       loading: loadingRawMats,
     },
-
-  
-
   };
 
   const currentConfig = tableConfigs[activeTab];
@@ -129,7 +141,6 @@ const BodyContent = () => {
   return (
     <div className={`inv ${showModal ? "blurred" : ""}`}>
       <div className="body-content-container flex">
-
         <InvNav
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -147,7 +158,9 @@ const BodyContent = () => {
 
         <div className="w-full hidden md:block">
           <div className="flex justify-between items-center p-3 h-15">
-            <h2 className="text-lg font-semibold mt-6">Selected Item Details</h2>
+            <h2 className="text-lg font-semibold mt-6">
+              Selected Item Details
+            </h2>
             <button
               onClick={toggleModal}
               className="mt-4 bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
@@ -159,18 +172,38 @@ const BodyContent = () => {
           <div className="border border-gray-300 rounded-lg p-6 mt-2">
             <div className="grid grid-cols-5 gap-4">
               {selectedItem ? (
-                Object.entries(selectedItem)
-                  .filter(([label]) => label !== "item_id")
-                  .map(([label, value]) => (
-                    <div key={label}>
-                      <p className="text-cyan-600 font-medium">{label}</p>
-                      <p>{value}</p>
+                <>
+                  {activeTab === "Products" && (
+                    <div>
+                      <p className="text-cyan-600 font-medium">Product ID</p>
+                      <p>{selectedItem.product_id || "N/A"}</p>
                     </div>
-                  ))
+                  )}
+                  {activeTab === "Assets" && (
+                    <div>
+                      <p className="text-cyan-600 font-medium">Asset ID</p>
+                      <p>{selectedItem.asset_id || "N/A"}</p>
+                    </div>
+                  )}
+                  {activeTab === "Raw Materials" && (
+                    <div>
+                      <p className="text-cyan-600 font-medium">Material ID</p>
+                      <p>{selectedItem.material_id || "N/A"}</p>
+                    </div>
+                  )}
+                  {Object.entries(selectedItem)
+                    // Hide item_id from display (but keep it for restock)
+                    .filter(([key]) => !["product_id", "asset_id", "material_id", "item_id"].includes(key))
+                    .map(([label, value]) => (
+                      <div key={label}>
+                        <p className="text-cyan-600 font-medium">{label}</p>
+                        <p>{value}</p>
+                      </div>
+                    ))}
+                </>
               ) : (
                 <p>No item selected</p>
               )}
-
             </div>
           </div>
         </div>
@@ -185,10 +218,7 @@ const BodyContent = () => {
       </div>
 
       {showModal && (
-        <InvRestockForm
-          onClose={toggleModal}
-          selectedItem={selectedItem}
-        />
+        <InvRestockForm onClose={toggleModal} selectedItem={selectedItem} />
       )}
     </div>
   );
