@@ -36,7 +36,7 @@ const Information = ({ label, value = "" }) => {
 };
 
 const PriorityDropbar = ({ label, setTicketInfo }) => {
-  const priorityType = ["1", "2", "3", "4", "5"];
+  const priorityType = ["Low", "Medium", "High", "Urgent"];
 
   const [priority, setPriority] = useState();
 
@@ -70,7 +70,7 @@ const PriorityDropbar = ({ label, setTicketInfo }) => {
   );
 };
 const StatusDropbar = ({ label, setTicketInfo }) => {
-  const statusType = ["Yes", "No", "HAHA"];
+  const statusType = ["Open", "In Progress", "Closed"];
 
   const [status, setStatus] = useState();
 
@@ -134,7 +134,7 @@ const TicketInfo = ({
           customerListModal={customerListModal}
         />
         <Information label={"Name"} value={customer.name} />
-        <Information label={"Email"} value={customer.country} />
+        <Information label={"Country"} value={customer.country} />
         <Information label={"Number"} value={customer.phone_number} />
       </div>
       <div className="w-full hidden xl:block"></div>
