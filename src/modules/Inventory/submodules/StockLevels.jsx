@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import "../styles/PCounts.css";
 
 const BodyContent = () => {
-    const [pcounts, setPcounts] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [assets, setAssets] = useState([]);
+    const [rawMaterials, setRawMaterials] = useState([]);
+
+
     const [loading, setLoading] = useState(true);
     const [selectedStatus, setSelectedStatus] = useState("");
     const [selectedDate, setSelectedDate] = useState("");
@@ -18,12 +22,12 @@ const BodyContent = () => {
 
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/depreciation-report/")
+        fetch("http://127.0.0.1:8000/api/product-depreciation-report/")
             .then((res) => res.json())
             .then((data) => {
-                setPcounts(data);
+                setProducts(data);
                 setLoading(false);
-                console.log("Fetched depreication reports:", data);
+                console.log("Fetched products depreication reports:", data);
             })
             .catch((err) => {
                 console.error("Error fetching cyclic counts:", err);
@@ -31,37 +35,51 @@ const BodyContent = () => {
             });
     }, []);
 
-    const tabConfig = {
-        "Raw Materials": "material_id",
-        "Assets": "asset_id",
-        "Products": "productdocu_id",
-    }
-  
-   
-    const fieldName = tabConfig[activeTab];
-    console.log("Field to filter by:", fieldName)
+    // assets fetching
+    useEffect(() => {
+        fetch("http://127.0.0.1:8000/api/assets-depreciation-report/")
+            .then((res) => res.json())
+            .then((data) => {
+                setAssets(data);
+                setLoading(false);
+                console.log("Fetched Assets depreication reports:", data);
+            })
+            .catch((err) => {
+                console.error("Error fetching cyclic counts:", err);
+                setLoading(false);
+            });
+    }, []);
 
-    // Filter data based on selected Tab
-    const filteredTabConfig = pcounts.filter((item) => item[fieldName] !== null);
-    console.log("Filtered data based on selected tab:", filteredTabConfig);
-    
 
-    // const filterByDateRange = (data, range) => {
-    //     const now = new Date();
-    //     return data.filter((item) => {
-    //         const period = item.time_period?.toLowerCase();
-    //         if (!period) return false;
+    // raw materials fetching
+    useEffect(() => {
+        fetch("http://127.0.0.1:8000/api/raw-material-depreciation-report/")
+            .then((res) => res.json())
+            .then((data) => {
+                setRawMaterials(data);
+                setLoading(false);
+                console.log("Fetched raw materials depreication reports:", data);
+            })
+            .catch((err) => {
+                console.error("Error fetching cyclic counts:", err);
+                setLoading(false);
+            });
+    }, []);
 
-    //         switch (range) {
-    //             case "Last 24 Hours": return period === "daily";
-    //             case "Last Week": return period === "weekly";
-    //             case "Last 30 Days": return period === "monthly";
-    //             case "Last 6 Months": return period === "quarterly" || period === "biannually";
-    //             default: return true;
-    //         }
-    //     });
-    // };
 
+    // Filtered Tab Config
+    const filteredTabConfig = (() => {
+        switch (activeTab) {
+            case "Products": 
+                return products;
+            case "Assets":
+                return assets;
+            case "Raw Materials":
+                return rawMaterials;
+            default:
+                return products; // Default to products if no tab is active
+        }
+    })();
 
     const filterByDateRange = (data, range) => {
         const now = new Date(); // Get current date and time
@@ -197,10 +215,10 @@ const BodyContent = () => {
                                     {[
                                         { label: "Selected Item", value: selectedRow?.product_name || "N/A" },
                                         { label: "Identification", value: selectedRow?.item_actually_counted ?? "-" },
-                                        { label: "Expiry Date", value: selectedRow?.employee || "Unassigned" },
+                                        { label: "Expiry Date", value: selectedRow?.expiry_date || "Unassigned" },
                                         {label: "Quantity", value: selectedRow?.quantity || "-" },
                                         { label: "Status", value: selectedRow?.status || "-" },
-                                        { label: "Reported Date", value: selectedRow?.time_period || "-" },
+                                        { label: "Reported Date", value: selectedRow?.reported_date || "-" },
                                         
                                     ].map(({ label, value }) => (
                                         <div key={label} className="mb-2">
