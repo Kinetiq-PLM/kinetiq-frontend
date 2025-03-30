@@ -59,7 +59,7 @@ const BodyContent = () => {
             setValidation({
                 isOpen: true,
                 type: "warning",
-                title: "Account Code Required",
+                title: "Missing Account Code",
                 message: "Please provide an account code.",
             });
             return;
@@ -69,7 +69,7 @@ const BodyContent = () => {
             setValidation({
                 isOpen: true,
                 type: "warning",
-                title: "Account Name Required",
+                title: "Missing Account Name",
                 message: "Please provide an account name.",
             });
             return;
@@ -79,7 +79,7 @@ const BodyContent = () => {
             setValidation({
                 isOpen: true,
                 type: "warning",
-                title: "Account Type Required",
+                title: "Missing Account Type",
                 message: "Please select an account type.",
             });
             return;
