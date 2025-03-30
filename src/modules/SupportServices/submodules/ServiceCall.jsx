@@ -9,49 +9,46 @@ import GeneralWithContractModal from "../components/ServiceCall/GeneralWithContr
 import ResolutionModal from "../components/ServiceCall/ResolutionModal"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 
+import { GET } from "../api/api"
+import { PATCH } from "../api/api"
+
 const ServiceCall = () => {
   // State for service calls
   const [serviceCalls, setServiceCalls] = useState([])
   const [filterBy, setFilterBy] = useState("")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Modal states
-  const [showNoContractModal, setShowNoContractModal] = useState(false)
   const [showWithContractModal, setShowWithContractModal] = useState(false)
   const [showResolutionModal, setShowResolutionModal] = useState(false)
   const [selectedCall, setSelectedCall] = useState(null)
-  const [lastGeneralModalType, setLastGeneralModalType] = useState(null) // Track which general modal was last open
 
   // Fetch service calls from API (mock function)
   useEffect(() => {
-    // Replace with actual API call
     const fetchServiceCalls = async () => {
       try {
-        // Mock data for demonstration
-        setServiceCalls([
-          {
-            callId: "123",
-            ticketId: "456",
-            customerName: "Paula Manalo",
-            priority: "High",
-            status: "Open",
-          },
-          {
-            callId: "124",
-            ticketId: "789",
-            customerName: "Samantha Hospital",
-            priority: "Critical",
-            status: "Open",
-          },
-        ])
+        const data = await GET("service-calls/");
+        setServiceCalls(data);
       } catch (error) {
         console.error("Error fetching service calls:", error)
       }
     }
 
     fetchServiceCalls()
-  }, [])
+  }, [refreshTrigger])
+
+  // table row clicking func
+  const handleRowClick = (call) => {
+    setSelectedCall(call)
+  };
+
+  const handleUpdateClick = () => {
+    if (selectedCall) {
+      setShowWithContractModal(true); // Open modal
+    }
+  }
 
   const handleFilterChange = (value) => {
     setFilterBy(value)
@@ -60,33 +57,29 @@ const ServiceCall = () => {
 
   const handleViewDetails = (call) => {
     setSelectedCall(call)
-    // Determine which modal to show based on contract status
-    // For demo purposes, we'll use a simple rule: even callIds have contracts
-    if (Number.parseInt(call.callId) % 2 === 0) {
-      setShowWithContractModal(true)
-      setLastGeneralModalType("withContract")
-    } else {
-      setShowNoContractModal(true)
-      setLastGeneralModalType("noContract")
-    }
+    setShowWithContractModal(true)
   }
 
-  const handleUpdate = (callData) => {
-    console.log("Updating service call:", callData)
-    // Here you would typically make an API call to update the call
+  const handleUpdate = async (updatedData) => {
+    const serviceCallId = updatedData.service_call_id;
+    if (!serviceCallId) {
+      console.error("Error: service_call_id is undefined");
+      return;
+    }
+    console.log("Updating service call with:", updatedData);
 
-    // Close all modals
-    setShowNoContractModal(false)
-    setShowWithContractModal(false)
-    setShowResolutionModal(false)
-
-    // Refresh the call list
-    // fetchServiceCalls()
+    try {
+      await PATCH(`/service-calls/${serviceCallId}/update/`, updatedData);
+      setShowWithContractModal(false);
+      setShowResolutionModal(false);
+      setRefreshTrigger((prev) => prev + 1);
+  } catch (error) {
+      console.error("Error updating service call:", error.message);
+  }
   }
 
   const handleShowResolution = () => {
     // Close the current modal and open the resolution modal
-    setShowNoContractModal(false)
     setShowWithContractModal(false)
     setShowResolutionModal(true)
   }
@@ -94,39 +87,41 @@ const ServiceCall = () => {
   const handleReturnToGeneral = () => {
     // Close resolution modal and reopen the appropriate general modal
     setShowResolutionModal(false)
-    if (lastGeneralModalType === "withContract") {
-      setShowWithContractModal(true)
-    } else {
-      setShowNoContractModal(true)
-    }
+    setShowWithContractModal(true)
   }
 
   const filterOptions = [
     { value: "all", label: "All" },
     { value: "open", label: "Open" },
     { value: "closed", label: "Closed" },
-    { value: "high", label: "High Priority" },
-    { value: "critical", label: "Critical Priority" },
+    { value: "pending", label: "Pending" },
+    { value: "low", label: "Low" },
+    { value: "medium", label: "Medium" },
+    { value: "high", label: "High" },
+    { value: "urgent", label: "Urgent" },
   ]
 
   // Filter service calls based on selected filter and search query
   const filteredCalls = serviceCalls.filter((call) => {
     // Filter by status/priority
     let matchesFilter = true
-    if (filterBy === "open" && call.status !== "Open") matchesFilter = false
-    if (filterBy === "closed" && call.status !== "Closed") matchesFilter = false
-    if (filterBy === "high" && call.priority !== "High") matchesFilter = false
-    if (filterBy === "critical" && call.priority !== "Critical") matchesFilter = false
+    if (filterBy === "open" && call.call_status !== "Open") matchesFilter = false
+    if (filterBy === "closed" && call.call_status !== "Closed") matchesFilter = false
+    if (filterBy === "pending" && call.call_status !== "Pending") matchesFilter = false
+    if (filterBy === "low" && call.priority_level !== "Low") matchesFilter = false
+    if (filterBy === "medium" && call.priority_level !== "Medium") matchesFilter = false
+    if (filterBy === "high" && call.priority_level !== "High") matchesFilter = false
+    if (filterBy === "urgent" && call.priority_level !== "Urgent") matchesFilter = false
 
     // Filter by search query
     let matchesSearch = true
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       matchesSearch =
-        call.callId.toLowerCase().includes(query) ||
-        call.ticketId.toLowerCase().includes(query) ||
-        call.customerName.toLowerCase().includes(query)
-    }
+        (call.service_call_id?.toString().toLowerCase().includes(query) ?? false) ||  
+        (call.service_ticket?.ticket_id?.toLowerCase().includes(query) ?? false) ||  
+        (call.customer?.name?.toLowerCase().includes(query) ?? false);  
+      }
 
     return matchesFilter && matchesSearch
   })
@@ -176,24 +171,20 @@ const ServiceCall = () => {
           </div>
 
           {/* Table Component */}
-          <Table serviceCalls={filteredCalls} onViewDetails={handleViewDetails} />
+          <Table serviceCalls={filteredCalls} onRowClick={handleRowClick} onViewDetails={handleViewDetails} />
 
           <div className="update-container">
-            <button type="button" className="update-button">
+            <button 
+              type="button" 
+              className={`update-button ${selectedCall ? "clickable" : "disabled"}`}
+              onClick={handleUpdateClick} 
+              disabled={!selectedCall}
+            >
               Update
             </button>
           </div>
         </div>
       </div>
-
-      {/* Modals */}
-      <GeneralNoContractModal
-        isOpen={showNoContractModal}
-        onClose={() => setShowNoContractModal(false)}
-        onUpdate={handleUpdate}
-        onShowResolution={handleShowResolution}
-        callData={selectedCall}
-      />
 
       <GeneralWithContractModal
         isOpen={showWithContractModal}

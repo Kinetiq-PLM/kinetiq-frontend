@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 
@@ -9,11 +9,17 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, callData })
   const [wasResolved, setWasResolved] = useState("")
   const [activeTab, setActiveTab] = useState("resolution")
 
+  useEffect(() => {
+    if (callData) {
+      console.log("asdasd", callData)
+      // Reset all fields to empty to show placeholders
+      setResolutionDetails(callData.resolution || "")
+    }
+  }, [callData])
+
   const handleSubmit = () => {
     onUpdate({
-      ...callData,
-      resolutionDetails,
-      wasResolved,
+      resolution: resolutionDetails
     })
   }
 
@@ -60,32 +66,35 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, callData })
         </div>
 
         <div className="resolution-footer">
-          <div className="resolution-footer-left">
-            <div className="form-group">
-              <label htmlFor="wasResolved">Was it resolved?</label>
-              <div className="select-wrapper">
-                <input
-                  type="text"
-                  id="wasResolved"
-                  value={wasResolved}
-                  onChange={(e) => setWasResolved(e.target.value)}
-                  placeholder="Select"
-                />
-                <span className="select-arrow">▼</span>
+          <label htmlFor="wasResolved">Was it resolved?</label>
+          <div className="form-group">
+            <div className="resolution-footer-left">
+                <div className="select-wrapper">
+                  <input
+                    type="text"
+                    id="wasResolved"
+                    value={wasResolved}
+                    onChange={(e) => setWasResolved(e.target.value)}
+                    placeholder="Select"
+                  />
+                  <span className="select-arrow">▼</span>
+                </div>
+                <button className="service-request-button" onClick={() => {}}>
+                Service Request
+              </button>
               </div>
-            </div>
-            <button className="service-request-button" onClick={() => {}}>
-              Service Request
-            </button>
+              <div className="resolution-footer-right">
+                <button className="cancel-button" onClick={onClose}>
+                  Cancel
+                </button>
+                <button className="update-modal-button" onClick={handleSubmit}>
+                  Update
+                </button>
+              </div>
+            
+            
           </div>
-          <div className="resolution-footer-right">
-            <button className="cancel-button" onClick={onClose}>
-              Cancel
-            </button>
-            <button className="update-modal-button" onClick={handleSubmit}>
-              Update
-            </button>
-          </div>
+          
         </div>
       </div>
     </div>

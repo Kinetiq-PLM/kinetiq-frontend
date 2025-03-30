@@ -1,6 +1,6 @@
 "use client"
 
-const Table = ({ serviceCalls, onViewDetails }) => {
+const Table = ({ serviceCalls, onRowClick, onViewDetails }) => {
   return (
     <div className="table-container">
       <table className="service-calls-table">
@@ -16,35 +16,24 @@ const Table = ({ serviceCalls, onViewDetails }) => {
         </thead>
         <tbody>
           {serviceCalls.map((call, index) => (
-            <tr key={call.callId} className={index % 2 === 0 ? "" : "alternate-row"}>
-              <td>{call.callId}</td>
-              <td>{call.ticketId}</td>
-              <td>{call.customerName}</td>
-              <td className={`priority-${call.priority.toLowerCase()}`}>{call.priority}</td>
-              <td>{call.status}</td>
-              <td>
-                <button className="view-button" onClick={() => onViewDetails(call)}>
-                  View
-                </button>
-              </td>
+            <tr 
+              key={call.id || `ticket-${index}`} 
+              className={index % 2 === 0 ? "" : "alternate-row"}
+              onClick={() => onRowClick(call)} // makes table row clickable, function update the state fields
+              style={{ cursor: "pointer" }} 
+            >
+                <td>{call.service_call_id}</td>
+                <td>{call.service_ticket  ? call.service_ticket.ticket_id : "Null"}</td>
+                <td>{call.customer ? call.customer.name : "Unknown"}</td>
+                <td className={`priority-${call.priority_level.toLowerCase()}`}>{call.priority_level}</td>
+                <td>{call.call_status}</td>
+                <td>
+                  <button className="view-button" onClick={() => onViewDetails(call)}>
+                    View
+                  </button>
+                </td>
             </tr>
           ))}
-          {/* Empty rows to match the design - reduced number */}
-          {Array(5 - serviceCalls.length)
-            .fill()
-            .map((_, index) => (
-              <tr
-                key={`empty-${index}`}
-                className={`empty-row ${(index + serviceCalls.length) % 2 === 0 ? "" : "alternate-row"}`}
-              >
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-            ))}
         </tbody>
       </table>
     </div>

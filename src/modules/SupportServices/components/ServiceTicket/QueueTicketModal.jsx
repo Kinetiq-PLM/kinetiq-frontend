@@ -4,8 +4,7 @@ import { useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 
-import { GET } from "../api/api"
-import { POST } from "../api/api"
+import { GET } from "../../api/api"
 
 const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   console.log("aaaa tx data", ticket)
@@ -34,31 +33,23 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   }, [ticket]);
 
   const handleQueue = async () => {
-    const newCall = {
-      service_ticket: ticketId,  
-      product: productId,
-      customer: customerId,
+    onQueue({
+      service_ticket_id: ticketId,  
+      product_id: productId,
+      customer_id: customerId,
       technician: technicianId,
       call_type: callType
-    };
+    })
 
-    try {
-      const data = await POST("/queue-call/", newCall);
-      console.log("Service call created successfully:", data);
-  
-      // reset form
-      setTicketId("")
-      setCustomerId("")
-      setName("")
-      setEmailAddress("")
-      setProductId("")
-      setTechnicianId("")
-      setTechnicianName("")
-      setCallType("")
-      onClose()
-    } catch (error) {
-      console.error("Error creating service call:", error.message);
-    }
+    // reset form
+    setTicketId("")
+    setCustomerId("")
+    setName("")
+    setEmailAddress("")
+    setProductId("")
+    setTechnicianId("")
+    setTechnicianName("")
+    setCallType("")
   }
 
   // fetches a list of techs
@@ -221,7 +212,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
                             </li>
                           ))
                         ) : (
-                          <li>No productsfound</li>
+                          <li>No products found</li>
                         )}
                       </ul>
                     )}

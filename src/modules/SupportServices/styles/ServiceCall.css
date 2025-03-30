@@ -17,9 +17,7 @@
   display: flex;
   flex-direction: column;
   min-width: 40rem;
-  max-height: 39rem;
-  overflow: hidden;
-  position: relative;
+  min-height: 30rem;
 }
 
 /* Header styling to match the image */
@@ -80,6 +78,7 @@
   margin-right: -0.5rem;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
+  max-height: calc(100% - 8rem);
 }
 
 .servcall .content-scroll-area:hover {
@@ -121,17 +120,34 @@
   position: relative;
   width: auto;
   display: inline-block;
+  border: 1px solid #cdd5d8; 
+  border-radius: 8px; 
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.servcall .search-container:hover {
+  border: 1px solid #00a8a8;
+  box-shadow: 0 0 10px rgba(22, 218, 218, 0.5);
+}
+
+.servcall .search-container:focus-within {
+  border: 1px solid #00a8a8;
+  box-shadow: 0 0 10px rgba(22, 218, 218, 0.5);
+}
+
+.servcall .search-container input:focus {
+  outline: none;
 }
 
 .servcall .search-input {
   padding: 0.625rem 0.625rem 0.625rem 2rem; /* Add padding for icon */
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 8px;
   font-size: 0.875rem;
   font-family: "Poppins", sans-serif;
   background-color: #f5f5f5;
   width: auto;
-  min-width: 280px;
+  min-width: 350px;
 }
 
 .servcall .search-input:focus {
@@ -157,7 +173,7 @@
 /* Update Filter by button styling */
 .servcall .filter-button {
   background-color: white;
-  border: 1px solid #e8e8e8;
+  border: 1px solid #cdd5d8;
   border-radius: 0.5rem;
   padding: 0.625rem 0.875rem;
   font-size: 0.875rem; /* Smaller font size */
@@ -170,6 +186,12 @@
   font-weight: 500; /* Medium weight */
   box-shadow: none;
   width: auto; /* Only as wide as needed */
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.servcall .filter-button:hover {
+  border: 1px solid #00a8a8;
+  box-shadow: 0 0 10px rgba(22, 218, 218, 0.5);
 }
 
 .servcall .filter-button .arrow {
@@ -194,21 +216,25 @@
 .servcall .filter-option {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
   font-family: "Inter", sans-serif;
 }
 
 .servcall .filter-option:hover {
-  background-color: #f5f5f5;
+  background-color: #00a8a8;
 }
 
 .servcall .table-container {
   width: 100%;
   margin-bottom: 2rem;
   border-radius: 0.5rem;
-  overflow: hidden;
   border: 1px solid #e0e0e0;
+  max-height: 52vh;
+  overflow-y: auto;
+  display: block;
+  position: relative;
 }
 
 /* Table with Inter font */
@@ -216,6 +242,14 @@
   width: 100%;
   border-collapse: collapse;
   font-family: "Inter", sans-serif;
+}
+
+.servcall .service-calls-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 3;
 }
 
 .servcall thead {
@@ -238,8 +272,13 @@
   text-align: center;
 }
 
-.servcall tbody tr.alternate-row {
+.servcall tbody tr {
   background-color: #eff8f9;
+  transition: background-color 0.3s ease;
+}
+
+.servcall tbody tr:hover {
+  background-color: #bee2e2;
 }
 
 .servcall tbody tr:last-child td {
@@ -250,11 +289,15 @@
   height: 2.5rem;
 }
 
-.servcall .priority-high {
-  color: #ff9800;
+.servcall .priority-medium {
+  color: #ffb341;
 }
 
-.servcall .priority-critical {
+.servcall .priority-high {
+  color: #ff7300;
+}
+
+.servcall .priority-urgent {
   color: #f44336;
 }
 
@@ -266,24 +309,35 @@
 }
 
 .servcall .update-button {
-  background-color: #00a8a8;
-  color: white;
-  border: none;
   border-radius: 0.5rem;
   padding: 0.625rem 1.75rem;
   font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  transition: 0.3s;
   font-family: "Inter", sans-serif;
   font-weight: 600;
   height: 2.5rem;
 }
 
-.servcall .update-button:hover {
+.servcall .update-button.clickable {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.servcall .update-button.disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
+.servcall .update-button.clickable:hover {
   background-color: #098f8f;
 }
 
-.servcall .update-button:active {
+.servcall .update-button.clickable:active {
   background-color: #087d7d;
 }
 
@@ -305,7 +359,7 @@
 }
 
 /* Modal Styles */
-.modal-overlay {
+.servcall .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -319,7 +373,7 @@
 }
 
 /* Increase modal size */
-.modal-container {
+.servcall .modal-container {
   background-color: white;
   border-radius: 0.5rem;
   width: 100%;
@@ -329,12 +383,12 @@
   flex-direction: column;
 }
 
-.service-call-modal {
+.servcall .service-call-modal {
   max-width: 750px; /* Increased from 650px */
 }
 
 /* Modal header with logo */
-.modal-header {
+.servcall .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -343,19 +397,19 @@
 }
 
 /* Modal header with logo and line */
-.modal-header-left {
+.servcall .modal-header-left {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.modal-header-icon {
+.servcall .modal-header-icon {
   width: 1.75rem;
   height: 1.75rem;
   color: #00a8a8;
 }
 
-.modal-header h2 {
+.servcall .modal-header h2 {
   margin: 0;
   font-size: 1.25rem; /* Smaller font size */
   font-weight: 600;
@@ -364,7 +418,7 @@
 }
 
 /* Header divider */
-.modal-header-divider {
+.servcall .modal-header-divider {
   height: 2px;
   background-color: #00a8a8;
   width: 100%;
@@ -372,41 +426,58 @@
 }
 
 /* Larger exit icon */
-.close-button {
+.servcall .close-button {
   background: none;
   border: none;
   cursor: pointer;
   padding: 0.25rem;
 }
 
-.close-button img {
+.servcall .close-button img {
   width: 1.5rem;
   height: 1.5rem;
 }
 
 /* Tabs styling */
-.modal-tabs {
+.servcall .modal-tabs {
   display: flex;
   border-bottom: 1px solid #e0e0e0;
   margin-top: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 45px;
 }
 
-.modal-tab {
+.servcall .modal-tab {
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
   font-weight: 500;
   color: #666;
+  transition: background-color 0.3s ease, color 0.3s ease;
   cursor: pointer;
   border-bottom: 2px solid transparent;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   font-family: "Inter", sans-serif;
 }
 
-.modal-tab.active {
+.servcall .modal-tab:hover {
+  background-color: #00a8a8;
+  color: #fff1f1;
+}
+
+.servcall .modal-tab.active {
   color: #00a8a8;
+  transition: background-color 0.3s ease, color 0.3s ease;
   border-bottom: 2px solid #00a8a8;
 }
 
-.modal-content {
+.servcall .modal-tab.active:hover {
+  background-color: #00a8a8;
+  color: #fff1f1;
+}
+
+.servcall .modal-content {
   padding: 1.5rem;
   flex: 1;
   overflow-y: auto;
@@ -415,83 +486,83 @@
   scrollbar-color: transparent transparent;
 }
 
-.modal-content:hover {
+.servcall .modal-content:hover {
   scrollbar-color: #00a8a8 #f0f0f0;
 }
 
 /* Custom scrollbar for Webkit browsers */
-.modal-content::-webkit-scrollbar {
+.servcall .modal-content::-webkit-scrollbar {
   width: 8px;
 }
 
-.modal-content::-webkit-scrollbar-track {
+.servcall .modal-content::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.modal-content:hover::-webkit-scrollbar-track {
+.servcall .modal-content:hover::-webkit-scrollbar-track {
   background: #f0f0f0;
   border-radius: 4px;
 }
 
-.modal-content::-webkit-scrollbar-thumb {
+.servcall .modal-content::-webkit-scrollbar-thumb {
   background-color: transparent;
   border-radius: 4px;
 }
 
-.modal-content:hover::-webkit-scrollbar-thumb {
+.servcall .modal-content:hover::-webkit-scrollbar-thumb {
   background-color: #00a8a8;
 }
 
-.modal-form {
+.servcall .modal-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
-.form-row {
+.servcall .form-row {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
 }
 
 /* Special row for aligned fields */
-.aligned-row {
+.servcall .aligned-row {
   align-items: stretch;
   display: flex;
   width: 100%;
 }
 
-.aligned-row .form-group:first-child {
+.servcall .aligned-row .form-group:first-child {
   width: 48%; /* Fixed width for the left column */
   flex: 0 0 48%;
 }
 
-.aligned-row .form-group:last-child {
+.servcall .aligned-row .form-group:last-child {
   width: 48%; /* Fixed width for the right column */
   flex: 0 0 48%;
   margin-left: auto;
 }
 
-.form-row .form-group {
+.servcall .form-row .form-group {
   flex: 1;
 }
 
-.form-group {
+.servcall .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
 }
 
-.form-group label {
+.servcall .form-group label {
   font-size: 0.75rem;
   color: #00a8a8;
   font-family: "Poppins", sans-serif;
   font-weight: 500;
 }
 
-.form-group input,
-.form-group textarea,
-.form-group select {
+.servcall .form-group input,
+.servcall .form-group textarea,
+.servcall .form-group select {
   padding: 0.625rem;
   border: 1px solid #e0e0e0;
   border-radius: 0.25rem;
@@ -504,33 +575,89 @@
   color: #333;
 }
 
-.form-group input::placeholder,
-.form-group textarea::placeholder {
+.servcall .form-group input::placeholder,
+.servcall .form-group textarea::placeholder {
   color: #999;
   opacity: 1;
 }
 
-.form-group textarea {
+.servcall .form-group textarea {
   height: 5.5rem;
   resize: none;
 }
 
-.select-wrapper {
+.servcall .select-wrapper {
   position: relative;
 }
 
-.select-wrapper .select-arrow {
+.servcall .select-arrow {
+  cursor: pointer;
   position: absolute;
   right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.625rem;
   color: #888;
-  pointer-events: none;
+  background: none;
+}
+
+.servcall .prio-dropdown-list,
+.servcall .type-dropdown-list{
+  top: auto !important;
+  bottom: 100% !important;
+}
+
+.servcall .dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  list-style: none;
+  padding: 0;
+  margin: 5px 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border-radius: 7px;
+  z-index: 9999; 
+  display: block !important; 
+}
+
+.servcall .dropdown-list li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.servcall .dropdown-list li:hover {
+  background: #f0f0f0;
+}
+
+.servcall .dropdown-list::-webkit-scrollbar {
+  width: 8px; 
+}
+
+.servcall .dropdown-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.servcall .dropdown-list:hover::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.servcall .dropdown-list::-webkit-scrollbar-thumb {
+  background: #00a8a8;
+  border-radius: 8px;
+}
+
+.servcall .dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: hsl(180, 100%, 26%);
 }
 
 /* Date input with calendar icon */
-.date-input-wrapper {
+.servcall .date-input-wrapper {
   position: relative;
 }
 
@@ -538,7 +665,7 @@
   padding-right: 2.5rem; /* Make room for the calendar icon */
 }
 
-.calendar-icon {
+.servcall .calendar-icon {
   position: absolute;
   right: 0.75rem;
   top: 50%;
@@ -548,7 +675,7 @@
   pointer-events: none;
 }
 
-.modal-footer {
+.servcall .modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
@@ -556,9 +683,10 @@
   border-top: 1px solid #e0e0e0;
 }
 
-.cancel-button {
+.servcall .cancel-button {
   background-color: white;
   color: #00a8a8;
+  transition: background-color 0.3s ease, color 0.3s ease;
   border: 1px solid #00a8a8;
   border-radius: 0.5rem;
   padding: 0.625rem 1.75rem;
@@ -571,11 +699,12 @@
   min-width: 7rem;
 }
 
-.cancel-button:hover {
-  background-color: #e4fdfb;
+.servcall .cancel-button:hover {
+  background-color: #00a8a8;
+  color: white;
 }
 
-.update-modal-button {
+.servcall .update-modal-button {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -590,12 +719,12 @@
   min-width: 7rem;
 }
 
-.update-modal-button:hover {
+.servcall .update-modal-button:hover {
   background-color: #098f8f;
 }
 
 /* Fix service request button to ensure text is visible */
-.service-request-button {
+.servcall .service-request-button {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -608,19 +737,18 @@
   font-weight: 600;
   height: 2.5rem;
   width: auto;
-  min-width: 12rem; /* Ensure minimum width */
   white-space: nowrap;
   text-align: center;
 }
 
-.service-request-button:hover {
+.servcall .service-request-button:hover {
   background-color: #098f8f;
 }
 
 /* Resolution textarea */
-.resolution-textarea {
+.servcall .resolution-textarea {
   width: 100%;
-  height: 200px;
+  height: 300px;
   padding: 0.75rem;
   border: 1px solid #00a8a8;
   border-radius: 0.25rem;
@@ -629,13 +757,13 @@
   resize: none;
 }
 
-.resolution-textarea::placeholder {
+.servcall .resolution-textarea::placeholder {
   color: #999;
   opacity: 1;
 }
 
 /* Divider in general modals */
-.form-divider {
+.servcall .form-divider {
   height: 1px;
   background-color: #00a8a8;
   width: 100%;
@@ -643,38 +771,49 @@
 }
 
 /* Ensure resolution footer stays within container with more spacing */
-.resolution-footer {
+.servcall .resolution-footer {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border-top: 1px solid #e0e0e0;
+  gap: 5px
+}
+
+.servcall .resolution-footer-left {
+  display: flex;
+  gap: 5px
+}
+
+.servcall .resolution-footer label{
+  color:#00a8a8;
+  font-size: 0.875rem;
+  font-weight: bold;
+  font-family: "Inter", sans-serif;
+}
+
+.servcall .resolution-footer-right {
+  display: flex;
+  gap: 12px; /* Increased gap between buttons */
+}
+
+.servcall .resolution-footer .form-group {
   display: flex;
   justify-content: space-between;
-  padding: 1.5rem 2rem;
-  border-top: 1px solid #e0e0e0;
   align-items: center;
-}
-
-.resolution-footer-left {
-  display: flex;
-  align-items: center;
-  gap: 3rem; /* Increased from 2rem for more spacing */
-}
-
-.resolution-footer-right {
-  display: flex;
-  gap: 1.5rem; /* Increased gap between buttons */
-}
-
-.resolution-footer .form-group {
+  flex-direction: row;
   margin: 0;
   min-width: 180px; /* Increased width */
+  gap: 10px;
 }
 
 /* Input focus color */
 .servcall input:focus,
 .servcall textarea:focus,
 .servcall select:focus,
-.modal-form input:focus,
-.modal-form textarea:focus,
-.modal-form select:focus,
-.resolution-textarea:focus {
+.servcall .modal-form input:focus,
+.servcall .modal-form textarea:focus,
+.servcall .modal-form select:focus,
+.servcall .resolution-textarea:focus {
   outline: none;
   border-color: #00a8a8;
   box-shadow: 0 0 0 1px #00a8a8;
@@ -688,7 +827,7 @@
     padding: 1.25rem;
   }
 
-  .modal-container {
+  .servcall .modal-container {
     max-width: 90%;
   }
 }
@@ -721,7 +860,7 @@
     min-width: 600px;
   }
 
-  .form-row {
+  .servcall .form-row {
     flex-direction: column;
     gap: 1.25rem;
   }
@@ -742,9 +881,9 @@
     width: 100%;
   }
 
-  .modal-header,
-  .modal-content,
-  .modal-footer {
+  .servcall .modal-header,
+  .servcall .modal-content,
+  .servcall .modal-footer {
     padding: 1rem;
   }
 }
