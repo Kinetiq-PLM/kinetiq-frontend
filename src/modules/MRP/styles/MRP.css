@@ -55,8 +55,8 @@
 
 .mrp .MRPIcon3{
   background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon3.png);
-  width: 20;
-  height: 20;
+  width: 30;
+  height: 30;
   background-repeat: no-repeat;
 }
 
@@ -78,5 +78,16 @@
   background-image: url(/public/icons/module-icons/MRP-icons/MRPclose.png);
   width: 26;
   height: 26;
+  background-repeat: no-repeat;
+}
+
+.mrp .MRPIcon6{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon6.png);
+  background-repeat: no-repeat;
+}
+
+
+.mrp .MRPIcon7{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon7.png);
   background-repeat: no-repeat;
 }
