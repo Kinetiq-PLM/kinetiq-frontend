@@ -4,11 +4,10 @@
   max-height: 40vh;
   border-collapse: collapse;
   margin-top: 20px;
-  overflow-y: auto; /* Enables vertical scrolling */
-  display: block; /* Makes overflow work properly */
+  overflow-y: auto; 
+  display: block; 
 }
 
-/* Scrollbar Styling */
 .JournalEntry .journal-table::-webkit-scrollbar {
   width: 4px;
   height: 10px;
@@ -42,7 +41,6 @@
   z-index: 10;
 }
 
-/* Ensure rows stay inside scrollable container */
 .JournalEntry .table-row,
 .totals-row,
 .totals-row2 {
