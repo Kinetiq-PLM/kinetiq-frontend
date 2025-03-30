@@ -3,7 +3,7 @@ import "./styles/SupportServices.css";
 
 const BodyContent = () => {
     return (
-        <div className="serv">
+        <div className="serv serv-main">
             <div className="body-content-container">
                 <p>Hello Support & Servicesles Module!</p>
                 <p>Fill this container with your elements, change the display if need be.</p>

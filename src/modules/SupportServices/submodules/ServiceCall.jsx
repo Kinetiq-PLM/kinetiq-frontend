@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import "../styles/ServiceCall.css"
+import "../styles/SupportServices.css"
 import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 import Table from "../components/ServiceCall/Table"
 import ServiceRequestModal from "../components/ServiceCall/ServiceRequestModal"
@@ -154,7 +155,7 @@ const ServiceCall = () => {
   })
 
   return (
-    <div className="servcall">
+    <div className="serv servcall">
       <div className="body-content-container">
         <div className="header">
           <div className="icon-container">

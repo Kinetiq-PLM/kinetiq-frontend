@@ -2,10 +2,14 @@
 
 import { useState, useEffect } from "react"
 import "../styles/ServiceRequest.css"
+import "../styles/SupportServices.css"
 import ServiceRequestIcon from "/icons/SupportServices/ServiceRequestIcon.png"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 import Table from "../components/ServiceRequest/Table"
 import UpdateViewModal from "../components/ServiceRequest/UpdateViewModal"
+
+import { GET } from "../api/api"
+import { PATCH } from "../api/api"
 
 const ServiceRequest = () => {
   const [requests, setRequests] = useState([])
@@ -15,45 +19,34 @@ const ServiceRequest = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState(null)
 
-  // Fetch service requests from API (mock function)
-  useEffect(() => {
-    // Replace with actual API call
-    const fetchRequests = async () => {
-      try {
-        // Mock data for demonstration
-        setRequests([
-          {
-            id: "123",
-            callId: "456",
-            requestDate: "dd/mm/yy",
-            customerName: "Paula Manalo",
-            type: "Repair",
-            status: "Pending",
-          },
-          {
-            id: "124",
-            callId: "789",
-            requestDate: "dd/mm/yy",
-            customerName: "Samantha Hospital",
-            type: "Installation",
-            status: "Approved",
-          },
-        ])
-      } catch (error) {
-        console.error("Error fetching service requests:", error)
-      }
+  const fetchRequests = async () => {
+    try {
+      const data = await GET("service-requests/");
+      setRequests(data);
+    } catch (error) {
+      console.error("Error fetching requests:", error)
     }
+  }
 
-    fetchRequests()
-  }, [])
+  // Fetch tickets from API (mock function)
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  // table row clicking func
+  const handleRowClick = (request) => {
+    setSelectedRequest(request)
+  };
+
+  const handleUpdateClick = () => {
+    if (selectedRequest) {
+      setShowUpdateModal(true); // Open modal
+    }
+  }
 
   const handleFilterChange = (value) => {
     setFilterBy(value)
     setShowFilterOptions(false)
-  }
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value)
   }
 
   const handleViewRequest = (request) => {
@@ -61,33 +54,64 @@ const ServiceRequest = () => {
     setShowUpdateModal(true)
   }
 
-  const handleUpdateRequest = (updatedRequest) => {
-    // Here will make an API call to update the request
+  const handleUpdateRequest = async (updatedRequest) => {
+    const requestId = updatedRequest.service_request_id;
+    if (!requestId) {
+      console.error("Error: service_request_id is undefined");
+      return;
+    }
     console.log("Updating request:", updatedRequest)
 
-    // Update the local state
-    const updatedRequests = requests.map((req) => (req.id === updatedRequest.id ? updatedRequest : req))
-    setRequests(updatedRequests)
-    setShowUpdateModal(false)
+    try {
+      await PATCH(`/service-requests/${requestId}/update/`, updatedRequest);
+      setShowUpdateModal(false);
+      fetchRequests();
+    } catch (error) {
+        console.error("Error updating service request:", error.message);
+    }
   }
+
+  const filterOptions = [
+    { value: "all", label: "All" },
+    { value: "pending", label: "Pending" },
+    { value: "approved", label: "Approved" },
+    { value: "rejected", label: "Rejected" },
+    { value: "in progress", label: "In Progress" },
+    { value: "repair", label: "Repair" },
+    { value: "installation", label: "Installation" },
+    { value: "maintenance", label: "Maintenance" },
+    { value: "renewal", label: "Renewal" },
+    { value: "other", label: "Other" },
+  ]
 
   // Filter requests based on search query and selected filter
   const filteredRequests = requests.filter((request) => {
     const matchesSearch =
       searchQuery === "" ||
-      request.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.customerName.toLowerCase().includes(searchQuery.toLowerCase())
-
-    if (!filterBy || filterBy === "all") return matchesSearch
-    if (filterBy === "pending" && request.status === "Pending") return matchesSearch
-    if (filterBy === "approved" && request.status === "Approved") return matchesSearch
-    if (filterBy === "repair" && request.type === "Repair") return matchesSearch
-    if (filterBy === "installation" && request.type === "Installation") return matchesSearch
-    return false
-  })
+      (request.service_request_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+      (request.service_call?.service_call_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+      (request.customer?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
+  
+    if (!filterBy || filterBy === "all") return matchesSearch;
+  
+    const matchesStatus = 
+      (filterBy === "pending" && request.request_status === "Pending") ||
+      (filterBy === "approved" && request.request_status === "Approved") ||
+      (filterBy === "rejected" && request.request_status === "Rejected") ||
+      (filterBy === "in progress" && request.request_status === "In Progress");
+  
+    const matchesType = 
+      (filterBy === "repair" && request.request_type === "Repair") ||
+      (filterBy === "installation" && request.request_type === "Installation") ||
+      (filterBy === "maintenance" && request.request_type === "Maintenance") ||
+      (filterBy === "renewal" && request.request_type === "Renewal") ||
+      (filterBy === "other" && request.request_type === "Other");
+  
+    return matchesSearch && (matchesStatus || matchesType);
+  });
 
   return (
-    <div className="servrequ">
+    <div className="serv servrequ">
       <div className="body-content-container">
         <div className="header">
           <div className="icon-container">
@@ -108,7 +132,7 @@ const ServiceRequest = () => {
                 type="text"
                 placeholder="Search or type a command (Ctrl + G)"
                 value={searchQuery}
-                onChange={handleSearch}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-input"
               />
               <img src={SearchIcon || "/placeholder.svg?height=16&width=16"} alt="Search" className="search-icon" />
@@ -121,31 +145,26 @@ const ServiceRequest = () => {
               </button>
               {showFilterOptions && (
                 <div className="filter-options">
-                  <div className="filter-option" onClick={() => handleFilterChange("all")}>
-                    All
-                  </div>
-                  <div className="filter-option" onClick={() => handleFilterChange("pending")}>
-                    Pending
-                  </div>
-                  <div className="filter-option" onClick={() => handleFilterChange("approved")}>
-                    Approved
-                  </div>
-                  <div className="filter-option" onClick={() => handleFilterChange("repair")}>
-                    Repair
-                  </div>
-                  <div className="filter-option" onClick={() => handleFilterChange("installation")}>
-                    Installation
-                  </div>
+                  {filterOptions.map((option) => (
+                    <div key={option.value} className="filter-option" onClick={() => handleFilterChange(option.value)}>
+                      {option.label}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
           </div>
 
           {/* Table Component */}
-          <Table requests={filteredRequests} onViewRequest={handleViewRequest} />
+          <Table requests={filteredRequests} onRowClick={handleRowClick}  onViewRequest={handleViewRequest} />
 
           <div className="update-container">
-            <button type="button" className="update-button">
+            <button 
+              type="button" 
+              className={`update-button ${selectedRequest ? "clickable" : "disabled"}`}
+              onClick={handleUpdateClick} 
+              disabled={!selectedRequest}
+            >
               Update
             </button>
           </div>

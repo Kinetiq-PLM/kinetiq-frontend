@@ -1,6 +1,6 @@
 "use client"
 
-const Table = ({ requests, onViewRequest }) => {
+const Table = ({ requests, onRowClick, onViewRequest }) => {
   return (
     <div className="table-container">
       <table className="requests-table">
@@ -17,13 +17,18 @@ const Table = ({ requests, onViewRequest }) => {
         </thead>
         <tbody>
           {requests.map((request, index) => (
-            <tr key={request.id} className={index % 2 === 0 ? "" : "alternate-row"}>
-              <td>{request.id}</td>
-              <td>{request.callId}</td>
-              <td>{request.requestDate}</td>
-              <td>{request.customerName}</td>
-              <td>{request.type}</td>
-              <td>{request.status}</td>
+            <tr 
+              key={request.id || `request-${index}`} 
+              className={index % 2 === 0 ? "" : "alternate-row"} 
+              onClick={() => onRowClick(request)} // makes table row clickable, function update the state fields
+              style={{ cursor: "pointer" }} 
+            >
+              <td>{request.service_request_id}</td>
+              <td>{request.service_call ? request.service_call.service_call_id : "Null"}</td>
+              <td>{request.request_date ? request.request_date: "Null"}</td>
+              <td>{request.customer ? request.customer.name : "Unknown"}</td>
+              <td>{request.request_type}</td>
+              <td>{request.request_status}</td>
               <td>
                 <button className="view-button" onClick={() => onViewRequest(request)}>
                   View
@@ -31,23 +36,6 @@ const Table = ({ requests, onViewRequest }) => {
               </td>
             </tr>
           ))}
-    
-          {Array(5 - requests.length)
-            .fill()
-            .map((_, index) => (
-              <tr
-                key={`empty-${index}`}
-                className={`empty-row ${(index + requests.length) % 2 === 0 ? "" : "alternate-row"}`}
-              >
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-            ))}
         </tbody>
       </table>
     </div>

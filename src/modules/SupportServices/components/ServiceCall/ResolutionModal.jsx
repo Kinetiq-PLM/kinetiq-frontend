@@ -6,7 +6,7 @@ import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 
 const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, onShowRequest, callData }) => {
   const [resolutionDetails, setResolutionDetails] = useState("")
-  const [wasResolved, setWasResolved] = useState("")
+  const [wasResolved, setWasResolved] = useState("No")
   const [activeTab, setActiveTab] = useState("resolution")
   const [isResolvedDD, setOpenResolvedDD] = useState(false);
 
@@ -101,9 +101,9 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, onShowReque
                   )}
                 </div>
                 <button 
-                  className={`service-request-button ${wasResolved === "No" ? "disabled" : ""}`} 
+                  className={`service-request-button ${wasResolved === "Yes" ? "disabled" : ""}`} 
                   onClick={onShowRequest}
-                  disabled={wasResolved === "No"}
+                  disabled={wasResolved === "Yes"}
                 >
                 Service Request
               </button>
