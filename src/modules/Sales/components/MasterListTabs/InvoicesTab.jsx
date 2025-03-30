@@ -5,6 +5,8 @@ import Button from "../Button";
 import INVOICE_LIST_DATA from "../../temp_data/invoice_list_data";
 import { GET } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
+import { BASE_API_URL } from "../../api/api";
+
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
@@ -22,6 +24,7 @@ export default function BlanketAgreementsTab({
     { key: "invoice_status", label: "Status" },
     { key: "payment_status", label: "Payment Status" },
     { key: "due_date", label: "Due Date" },
+    { key: "document", label: "Document" },
   ];
 
   const [invoiceList, setInvoiceList] = useState([]);
@@ -84,6 +87,7 @@ export default function BlanketAgreementsTab({
         invoice_status: invoice.invoice_status,
         payment_status: invoice.payment_status,
         due_date: invoice.due_date,
+        document: `${BASE_API_URL}sales/invoice/${invoice.invoice_id}/document`,
       }));
       setInvoiceList(data);
     }

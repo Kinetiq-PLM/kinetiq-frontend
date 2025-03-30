@@ -1,4 +1,4 @@
-const BASE_API_URL = "http://localhost:8000/api/";
+export const BASE_API_URL = "http://localhost:8000/api/";
 
 export async function GET(endpoint) {
   const res = await fetch(BASE_API_URL + endpoint, {

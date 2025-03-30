@@ -38,11 +38,26 @@ const Table = ({ columns, data, onSelect = () => {}, minWidth = false }) => {
                 }`}
                 onClick={() => handleRowClick(row)}
               >
-                {columns.map((column, colIndex) => (
-                  <td key={colIndex} className="px-4 py-3 text-center">
-                    {row[column.key] ?? "-"}
-                  </td>
-                ))}
+                {columns.map((column, colIndex) => {
+                  if (column.key !== "document") {
+                    return (
+                      <td key={colIndex} className="px-4 py-3 text-center">
+                        {row[column.key] ?? "-"}
+                      </td>
+                    );
+                  } else {
+                    return (
+                      <td key={colIndex} className="px-4 py-3 text-center">
+                        <a
+                          href={row[column.key]}
+                          className="underline text-[#00a8a8]"
+                        >
+                          View
+                        </a>
+                      </td>
+                    );
+                  }
+                })}
               </tr>
             );
           })}

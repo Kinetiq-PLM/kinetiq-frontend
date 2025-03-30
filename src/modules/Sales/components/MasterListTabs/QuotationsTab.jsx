@@ -5,6 +5,7 @@ import Button from "../Button";
 import QUOTATION_LIST_DATA from "../../temp_data/quotation_list_data";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../api/api";
+import { BASE_API_URL } from "../../api/api";
 
 export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,6 +28,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
     { key: "total_price", label: "Total Price" },
     { key: "salesrep", label: "Sales Representative" }, // name of salesrep if available
     { key: "date_issued", label: "Date Issued" },
+    { key: "document", label: "Document" },
   ];
 
   const dateFilters = [
@@ -62,6 +64,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),
         date_issued: new Date(quote.date_issued).toLocaleString(),
+        document: `${BASE_API_URL}sales/quotation/${quote.quotation_id}/document`,
       }));
       setQuotationList(data);
     } else if (quotationQuery.status === "error") {

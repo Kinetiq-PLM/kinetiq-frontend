@@ -4,7 +4,7 @@ import Dropdown from "../Dropdown";
 import Button from "../Button";
 import DELIVERY_LIST_DATA from "../../temp_data/deliveries_list_data";
 import { useQuery } from "@tanstack/react-query";
-import { GET } from "../../api/api";
+import { GET, BASE_API_URL } from "../../api/api";
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
@@ -26,6 +26,7 @@ export default function BlanketAgreementsTab({
     { key: "total_price", label: "Total Price" },
     { key: "shipping_date", label: "Shipping Date" },
     { key: "estimated_delivery", label: "Estimated Delivery" },
+    { key: "document", label: "Document" },
   ];
 
   const deliveryQuery = useQuery({
@@ -93,6 +94,7 @@ export default function BlanketAgreementsTab({
         estimated_delivery: new Date(
           delivery.estimated_delivery
         ).toLocaleString(),
+        document: `${BASE_API_URL}sales/delivery/${delivery.shipping_id}/document`,
       }));
       setDeliveryList(data);
     }
