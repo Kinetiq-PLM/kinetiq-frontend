@@ -55,6 +55,16 @@ const BodyContent = () => {
             return;
         }
 
+        if (!newAccount.account_type) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Account Type",
+                message: "Please select an account type.",
+            });
+            return;
+        }
+
         if (!newAccount.account_code) {
             setValidation({
                 isOpen: true,
@@ -71,16 +81,6 @@ const BodyContent = () => {
                 type: "warning",
                 title: "Missing Account Name",
                 message: "Please provide an account name.",
-            });
-            return;
-        }
-
-        if (!newAccount.account_type) {
-            setValidation({
-                isOpen: true,
-                type: "warning",
-                title: "Missing Account Type",
-                message: "Please select an account type.",
             });
             return;
         }
