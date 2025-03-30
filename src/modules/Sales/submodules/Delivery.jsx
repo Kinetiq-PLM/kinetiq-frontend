@@ -21,6 +21,7 @@ import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
 import { GET, POST } from "../api/api.jsx";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import generateRandomID from "../components/GenerateID.jsx";
 
 const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
@@ -129,7 +130,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const deliveryMutation = useMutation({
     mutationFn: async (data) => await POST("sales/delivery/", data),
     onSuccess: (data, variables, context) => {
-      setOrderInfo({ ...deliveryInfo, delivery_id: data.shipping_id });
+      setDeliveryInfo({ ...deliveryInfo, delivery_id: data.shipping_id });
     },
   });
 
@@ -169,9 +170,34 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       });
       return;
     }
-
-    console.log(deliveryInfo);
-
+    const order_id = selectedOrder ? selectedOrder.order_id : null;
+    const request = {
+      shipping_data: {
+        order_id,
+        shipping_method: "Standard", // drop down needed
+        tracking_num: generateRandomID("TRK"),
+        estimated_delivery: deliveryDate,
+        delivery_status: "Pending",
+        items: products.map((product) => ({
+          product: product.product_id,
+          quantity: parseInt(product.quantity),
+          unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
+          total_price: Number(parseFloat(product.total_price).toFixed(2)),
+          discount: Number(parseFloat(product.discount).toFixed(2)),
+          tax_amount: Number(parseFloat(product.tax).toFixed(2)),
+        })),
+      },
+      statement_data: {
+        customer: selectedCustomer.customer_id,
+        salesrep: selectedEmployee.employee_id,
+        type: "Non-Project-Based", // make a variable
+        total_amount: Number(parseFloat(deliveryInfo.total_price).toFixed(2)),
+        discount: Number(parseFloat(deliveryInfo.discount).toFixed(2)),
+        total_tax: Number(parseFloat(deliveryInfo.total_tax).toFixed(2)),
+      },
+    };
+    console.log(request);
+    deliveryMutation.mutate(request);
     // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
     setSubmitted(true);
     showAlert({
@@ -262,6 +288,10 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       selectedBlanketAgreement
     ) {
       setDeliveryInfo(selectedBlanketAgreement);
+      copyFromMutation.mutate({
+        transferID: selectedBlanketAgreement.agreement_id,
+        transferOperation: "agreement",
+      });
       setCopyFromModal("");
       setSelectedBlanketAgreement(null);
       // fill out fields HERE
@@ -392,6 +422,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsOrderListOpen(false)}
           setOrder={setSelectedOrder}
         ></OrderListModal>
+
         <EmployeeListModal
           isOpen={isEmployeeListOpen}
           onClose={() => setIsEmployeeListOpen(false)}
@@ -410,7 +441,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
             customer={selectedCustomer}
             customerListModal={setIsCustomerListOpen}
             setCustomerInfo={setDeliveryInfo}
-            operationID={deliveryInfo.order_id}
+            operationID={deliveryInfo.delivery_id}
             setDeliveryDate={setDeliveryDate}
             setAddress={setAddress}
           />
@@ -440,9 +471,21 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
             </div>
 
             {/* Employee ID Input */}
-            <div className="flex items-center gap-2">
-              <p className="text-gray-700 text-sm">Employee ID</p>
-              <div className="border border-gray-400 flex-1 p-1 h-[30px] max-w-[250px] bg-gray-200 rounded"></div>
+            <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+              <p className="">Employee ID</p>
+              <div
+                className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
+                onClick={() => setIsEmployeeListOpen(true)}
+              >
+                <p className="text-sm">
+                  {selectedEmployee ? selectedEmployee.employee_id : ""}
+                </p>
+                <img
+                  src="/icons/information-icon.svg"
+                  className="h-[15px]"
+                  alt="info icon"
+                />
+              </div>
             </div>
 
             {/* Submit Button Aligned Right */}
