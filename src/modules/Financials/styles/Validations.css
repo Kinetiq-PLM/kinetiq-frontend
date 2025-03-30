@@ -1,0 +1,401 @@
+/* REMINDER! All of your elements must use your unique namespace '.admin' at the start to avoid leaking */
+.valid {
+  display: flex;
+  width: 100%;
+  height: 100vh; 
+}
+
+.valid .body-content-container {
+  width: 100%;
+  height: 100vh;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
+.valid .tabs {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  background-color: white;
+  padding: 8px;
+  border-radius: 6px;
+  position: relative;
+  z-index: 50;
+  align-self: start;
+  margin-left: 15px;
+}
+
+.valid .tabs button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border-bottom: 2px solid gainsboro;
+}
+
+.valid .tabs button:hover {
+  color: #14b8a6;
+  border-bottom: 2px solid #14b8a6;
+}
+
+.valid .tabs .active {
+  color: #14b8a6;
+  border-bottom: 2px solid #14b8a6;
+}
+
+.valid .tab-navigation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.valid .tab-navigation button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  color: #6b7280;
+}
+
+.valid .tab-navigation button:hover {
+  background-color: #e5e7eb;
+}
+
+.valid .tab-navigation .disabled {
+  background-color: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.valid .content-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.valid .infocard-validation-table {
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 85vw;
+  margin: 20px auto 40px auto;
+}
+
+.valid .validation-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 100%;
+  border-radius: 20px;
+  font-size: clamp(12px, 2vw, 14px);
+}
+
+.valid .validation-table th,
+.valid .validation-table td {
+  padding: 15px;
+  text-align: center;
+}
+
+.valid .validation-table th {
+  background-color: #9AB2B1;
+  padding: 17px;
+  color: white;
+}
+
+.valid .validation-table tbody tr:nth-child(even) {
+  background-color: #FBFCFC;
+}
+
+.valid .validation-table tbody tr:nth-child(odd) {
+  background-color: #D7E0E0;
+}
+
+.valid .validation-table th:nth-child(1),
+.valid .validation-table td:nth-child(1),
+.valid .validation-table th:nth-child(2),
+.valid .validation-table td:nth-child(2),
+.valid .validation-table th:nth-child(3),
+.valid .validation-table td:nth-child(3),
+.valid .validation-table th:nth-child(4),
+.valid .validation-table td:nth-child(4) {
+  min-width: 80px;
+  width: auto;
+}
+
+.valid .filter-infocard {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 13px;
+  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+  margin: 20px auto;
+  padding: 20px;
+  width: 100%;
+  max-width: 85vw;
+}
+
+.valid .filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: clamp(11px, 2vw, 14px);
+  justify-content: space-between;
+}
+
+.valid .filter-group {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.valid .search {
+  width: 100%;
+  max-width: 300px;
+  margin-left: 20px;
+  margin-right: 25px;
+}
+
+.valid .filter-controls select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.valid .filter-controls input,
+.valid .filter-controls select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  flex: 1;
+  min-width: 80px;
+}
+
+.valid .table-infocard {
+  background-color: white;
+  border-radius: 13px;
+  margin: 20px auto;
+  width: 100%;
+  padding: 6px;
+  font-size: clamp(12px, 2vw, 14px);
+}
+
+.valid .validation-table-2 {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.valid .validation-table-2 th,
+.valid .validation-table-2 td {
+  padding: 12px;
+  text-align: left;
+}
+
+.valid .validation-table-2 thead th {
+  color: black;
+}
+
+.valid .validation-table-2 tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.valid .validation-table-2 tbody tr:last-child {
+  border-bottom: none;
+}
+
+.valid .validation-table-2 .row-wrapper {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.valid .validation-table-2 .row-wrapper:last-child {
+  margin-bottom: 0;
+}
+
+.valid .validation-table-2 td:nth-child(1) {
+  width: 5%;
+  text-align: center;
+}
+
+.valid .validation-table-2 td input[type="checkbox"] {
+  vertical-align: middle;
+}
+
+.valid .validation-table-2 td:nth-child(2),
+.valid .validation-table-2 td:nth-child(3),
+.valid .validation-table-2 td:nth-child(4),
+.valid .validation-table-2 td:nth-child(5),
+.valid .validation-table-2 td:nth-child(6),
+.valid .validation-table-2 td:nth-child(8) {
+  width: 16%;
+  min-width: 80px;
+}
+
+.valid .validation-table-2 td:nth-child(9) {
+  width: 15%;
+  text-align: center;
+}
+
+.valid .status-label {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: clamp(12px, 2vw, 14px);
+  font-weight: 500;
+  display: inline-block;
+}
+
+.valid .status-label.approved {
+  background-color: #C9E7E5;
+}
+
+.valid .status-label.pending {
+  background-color: #F5E1AC;
+  padding: 5px 15px;
+}
+
+@media (max-width: 768px) {
+  .valid .search,
+  .valid .filter-controls select,
+  .valid .filter-controls input {
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .valid .table-infocard {
+    overflow-x: auto;
+  }
+}
+
+.valid .infocard-validation-table {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .valid .infocard-validation-table,
+  .valid .filter-infocard {
+    max-width: 95%; 
+    margin: 10px auto 20px auto; 
+    padding: 10px; 
+  }
+
+  .valid .validation-table th,
+  .valid .validation-table td,
+  .valid .validation-table-2 th,
+  .valid .validation-table-2 td {
+    padding: 8px; 
+  }
+
+  .valid .filter-controls {
+    flex-direction: column; 
+    align-items: stretch; 
+  }
+
+  .valid .search,
+  .valid .filter-controls select,
+  .valid .filter-controls input {
+    max-width: 100%;
+    margin: 5px 0;
+  }
+
+  .valid .filter-group {
+    flex-direction: column; 
+    margin-left: 0; 
+  }
+
+  .valid .validation-table-2 td:nth-child(2),
+  .valid .validation-table-2 td:nth-child(3),
+  .valid .validation-table-2 td:nth-child(4),
+  .valid .validation-table-2 td:nth-child(5),
+  .valid .validation-table-2 td:nth-child(6),
+  .valid .validation-table-2 td:nth-child(7),
+  .valid .validation-table-2 td:nth-child(8) {
+    min-width: 50px; 
+  }
+
+  .valid .validation-table th:nth-child(1),
+  .valid .validation-table td:nth-child(1),
+  .valid .validation-table th:nth-child(2),
+  .valid .validation-table td:nth-child(2),
+  .valid .validation-table th:nth-child(3),
+  .valid .validation-table td:nth-child(3),
+  .valid .validation-table th:nth-child(4),
+  .valid .validation-table td:nth-child(4) {
+    min-width: 50px;
+  }
+}
+
+
+.valid .validation-table-2 td:nth-child(1) {
+    width: 3%; 
+}
+
+.valid .validation-table-2 td:nth-child(2),
+.valid .validation-table-2 td:nth-child(3),
+.valid .validation-table-2 td:nth-child(4),
+.valid .validation-table-2 td:nth-child(5),
+.valid .validation-table-2 td:nth-child(6),
+.valid .validation-table-2 td:nth-child(7),
+.valid .validation-table-2 td:nth-child(8),
+.valid .validation-table-2 td:nth-child(9) {
+    width: 11%; 
+    min-width: 70px; 
+}
+
+.valid .validation-table-2 td:nth-child(9) {
+    text-align: center; 
+}
+
+@media (max-width: 768px) {
+  .valid .validation-table-2 td:nth-child(2),
+  .valid .validation-table-2 td:nth-child(3),
+  .valid .validation-table-2 td:nth-child(4),
+  .valid .validation-table-2 td:nth-child(5),
+  .valid .validation-table-2 td:nth-child(6),
+  .valid .validation-table-2 td:nth-child(7),
+  .valid .validation-table-2 td:nth-child(8),
+  .valid .validation-table-2 td:nth-child(9) {
+    width: auto; 
+    min-width: 50px; 
+    padding: 8px; 
+    font-size: 12px; 
+  }
+}
+
+@media (max-width: 480px) {
+    .valid .validation-table-2 td:nth-child(2),
+    .valid .validation-table-2 td:nth-child(3),
+    .valid .validation-table-2 td:nth-child(4),
+    .valid .validation-table-2 td:nth-child(5),
+    .valid .validation-table-2 td:nth-child(6),
+    .valid .validation-table-2 td:nth-child(7),
+    .valid .validation-table-2 td:nth-child(8),
+    .valid .validation-table-2 td:nth-child(9) {
+        min-width: 40px; 
+        padding: 6px; 
+        font-size: 10px; 
+    }
+}

@@ -1,0 +1,384 @@
+/* REMINDER! All of your elements must use your unique namespace '.admin' at the start to avoid leaking */
+.approvals {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+}
+
+.approvals .body-content-container {
+  width: 100%;
+  height: 100vh;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
+.approvals .tabs {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  background-color: white;
+  padding: 8px;
+  border-radius: 6px;
+  position: relative;
+  z-index: 50;
+  align-self: start;
+  margin-left: 15px;
+}
+
+.approvals .tabs button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border-bottom: 2px solid gainsboro;
+}
+
+.approvals .tabs button:hover {
+  color: #14b8a6;
+  border-bottom: 2px solid #14b8a6;
+}
+
+.approvals .tabs .active {
+  color: #14b8a6;
+  border-bottom: 2px solid #14b8a6;
+}
+
+.approvals .tab-navigation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.approvals .tab-navigation button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  color: #6b7280;
+}
+
+.approvals .tab-navigation button:hover {
+  background-color: #e5e7eb;
+}
+
+.approvals .tab-navigation .disabled {
+  background-color: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.approvals .content-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.approvals .filter-infocard {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 13px;
+  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+  margin: 20px auto;
+  padding: 20px;
+  width: 100%;
+  max-width: 85vw;
+}
+
+.approvals .filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: clamp(11px, 2vw, 14px);
+  justify-content: space-between;
+}
+
+.approvals .filter-group {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.approvals .search {
+  width: 100%;
+  max-width: 300px;
+  margin-left: 20px;
+  margin-right: 25px;
+}
+
+.approvals .filter-controls select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.approvals .filter-controls input,
+.approvals .filter-controls select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  flex: 1;
+  min-width: 80px;
+}
+
+.approvals .table-infocard {
+  background-color: white;
+  border-radius: 13px;
+  margin: 20px auto;
+  width: 100%;
+  padding: 6px;
+  font-size: clamp(12px, 2vw, 14px);
+}
+
+.approvals .approval-table-2 {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.approvals .approval-table-2 th,
+.approvals .approval-table-2 td {
+  padding: 12px;
+  text-align: left;
+}
+
+.approvals .approval-table-2 thead th {
+  color: black;
+}
+
+.approvals .approval-table-2 tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.approvals .approval-table-2 tbody tr:last-child {
+  border-bottom: none;
+}
+
+.approvals .approval-table-2 .row-wrapper {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.approvals .approval-table-2 .row-wrapper:last-child {
+  margin-bottom: 0;
+}
+
+.approvals .approval-table-2 td:nth-child(1) {
+  width: 5%;
+  text-align: center;
+}
+
+.approvals .approval-table-2 td input[type="checkbox"] {
+  vertical-align: middle;
+}
+
+.approvals .approval-table-2 td:nth-child(2),
+.approvals .approval-table-2 td:nth-child(3),
+.approvals .approval-table-2 td:nth-child(4),
+.approvals .approval-table-2 td:nth-child(5),
+.approvals .approval-table-2 td:nth-child(6),
+.approvals .approval-table-2 td:nth-child(7) {
+  width: 16%;
+  min-width: 80px;
+}
+
+.approvals .approval-table-2 td:nth-child(8) {
+  width: 15%;
+  text-align: center;
+}
+
+.approvals .status-label {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: clamp(12px, 2vw, 14px);
+  font-weight: 500;
+  display: inline-block;
+}
+
+.approvals .status-label.approved {
+  background-color: #C9E7E5;
+}
+
+.approvals .status-label.pending {
+  background-color: #F5E1AC;
+  padding: 5px 15px;
+}
+
+@media (max-width: 768px) {
+  .approvals .search,
+  .approvals .filter-controls select,
+  .approvals .filter-controls input {
+      max-width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .approvals .table-infocard {
+      overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) { 
+  .approvals .filter-infocard {
+      max-width: 95%; 
+      margin: 10px auto 20px auto;
+      padding: 10px; 
+  }
+
+  .approvals .approval-table-2 th,
+  .approvals .approval-table-2 td {
+      padding: 8px; 
+  }
+
+  .approvals .filter-controls {
+      flex-direction: column; 
+      align-items: stretch; 
+  }
+
+  .approvals .search,
+  .approvals .filter-controls select,
+  .approvals .filter-controls input {
+      max-width: 100%; 
+      margin: 5px 0; 
+  }
+
+  .approvals .filter-group {
+      flex-direction: column; 
+      margin-left: 0; 
+  }
+
+  .approvals .approval-table-2 td:nth-child(2),
+  .approvals .approval-table-2 td:nth-child(3),
+  .approvals .approval-table-2 td:nth-child(4),
+  .approvals .approval-table-2 td:nth-child(5),
+  .approvals .approval-table-2 td:nth-child(6),
+  .approvals .approval-table-2 td:nth-child(7) {
+      min-width: 50px; 
+  }
+}
+
+.approvals .down-table-infocard {
+  background-color: #9AB2B1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 13px;
+  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+  margin: 20px auto;
+  width: 100%; 
+  max-width: 85vw;
+  padding: 6px;
+  font-size: clamp(12px, 2vw, 14px);
+}
+
+.approvals .down-title th {
+  padding: 15px 15px;
+  text-align: left;
+  text-indent: 20px;
+}
+
+.approvals .down-title thead th {
+  color: rgb(255, 255, 255);
+  font-size: 22px;
+}
+
+.approvals .down-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.approvals .down-table th,
+.approvals .down-table td {
+  padding: 12px;
+  text-align: left;
+}
+
+.approvals .down-table thead th {
+  color: black;
+}
+
+.approvals .down-table tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.approvals .down-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.approvals .down-table .row-wrapper {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.approvals .down-table .row-wrapper:last-child {
+  margin-bottom: 0;
+}
+
+.approvals .down-table td:nth-child(1) {
+  width: 5%;
+  text-align: center;
+}
+
+.approvals .down-table td input[type="checkbox"] {
+  vertical-align: middle;
+}
+
+.approvals .down-table td:nth-child(2),
+.approvals .down-table td:nth-child(3),
+.approvals .down-table td:nth-child(4),
+.approvals .down-table td:nth-child(5),
+.approvals .down-table td:nth-child(6),
+.approvals .down-table td:nth-child(7) {
+  width: 16%;
+  min-width: 80px;
+}
+
+.approvals .down-table td:nth-child(8) {
+  width: 15%;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .approvals .down-table th,
+  .approvals .down-table td {
+      padding: 8px;
+  }
+
+  .approvals .down-table td:nth-child(2),
+  .approvals .down-table td:nth-child(3),
+  .approvals .down-table td:nth-child(4),
+  .approvals .down-table td:nth-child(5),
+  .approvals .down-table td:nth-child(6),
+  .approvals .down-table td:nth-child(7) {
+      min-width: 50px;
+  }
+}
+
+@media (max-width: 768px){
+  .approvals .down-table-infocard {
+      overflow-x: auto;
+  }
+}

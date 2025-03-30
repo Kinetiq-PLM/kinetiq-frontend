@@ -1,0 +1,317 @@
+.finance {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.finance .body-content-container {
+  width: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.finance .budget-balance-card,
+.finance .cash-flow-card,
+.finance .chart-container,
+.finance .info-card-income-statement {
+  margin: 20px auto;
+  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+.finance .budget-balance-card {
+  height: 500px;
+  max-width: 850px;
+}
+
+.finance .cash-flow-card {
+  height: 100%;
+  max-width: 850px;
+}
+
+.finance .chart-container{
+  
+  overflow-x: scroll;
+}
+
+.finance .chart-container,
+.finance .info-card-income-statement {
+  height: 600px;
+  max-width: 850px;
+  overflow-x: auto;
+
+}
+
+.finance .all-reports-4 {
+  max-width: 1100px;
+  overflow-x: auto;
+}
+
+.finance .budget-balance-select {
+  padding: 5px 15px;
+  border-radius: 5px;
+  border: 0.5px solid #ccc;
+  margin-right: 0px;
+  margin-top: 20px;
+}
+
+.finance .budget-balance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.finance .budget-balance-title {
+  font-size: 2.2em;
+  text-indent: 50px;
+  margin-top: 50px;
+}
+
+.finance .budget-balance-select {
+  padding: 7px 30px;
+  border-radius: 5px;
+  border: 0.5px solid #ccc;
+  margin-right: 50px;
+  margin-top: 50px;
+}
+
+.finance .budget-balance-select:hover {
+  border-color: #00a8a8;
+}
+
+.finance .budget-balance-content {
+  padding: 20px;
+}
+
+.finance .total-balance {
+  margin-bottom: 0px;
+  margin-top: 40px;
+  text-indent: 50px;
+}
+
+.finance .earned-last-month,
+.finance .total-bonus {
+  margin-bottom: 10px;
+  margin-top: 15px;
+  text-indent: 50px;
+}
+
+.finance .total-balance-label,
+.finance .earned-last-month-label,
+.finance .total-bonus-label {
+  margin-right: 5px;
+  font-size: 1.5em;
+}
+
+.finance .total-balance-amount {
+  font-size: 3.5em;
+  font-weight: 500;
+  top: -40px;
+  text-indent: 50px;
+}
+
+.finance .cents {
+  font-size: 0.6em;
+  color: #6b7280;
+}
+
+.finance .earned-last-month-amount,
+.finance .total-bonus-amount {
+  font-size: 2.1em;
+  margin-left: 20px;
+  color: #008080;
+}
+
+.finance .infocard-cash-flow {
+  width: 100%;
+}
+
+.finance .cash-flow-container {
+  margin-bottom: 20px;
+}
+
+.finance .summary-numbers {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.finance .chart-title,
+.finance .all-reports-chart-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 20px;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.finance .income-statement-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  table-layout: fixed;
+  overflow: hidden;
+}
+
+.finance .income-statement-table th,
+.finance .income-statement-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.finance .income-statement-table thead tr {
+  background-color: #469fc2;
+  color: white;
+}
+
+.finance .income-statement-table tbody th {
+  background-color: #6CB3D0;
+  color: white;
+}
+
+.finance .even-row,
+.finance .income-statement-table tbody tr:nth-child(even) {
+  background-color: #f1f7f7;
+}
+
+.finance .odd-row,
+.finance .income-statement-table tbody tr:nth-child(odd) {
+  background-color: #f1f7f7;
+}
+
+.finance .income-statement-table tbody tr:hover {
+  background-color: #d2ebeb;
+}
+
+@media (min-width: 768px) {
+  .finance .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 15px;
+  }
+
+  .finance .budget-balance-card {
+    grid-column: 1/2;
+    grid-row: 1/2;
+  }
+
+  .finance .cash-flow-card {
+    grid-column: 2/3;
+    grid-row: 1/2;
+  }
+
+  .finance .chart-container {
+    grid-column: 1/2;
+    grid-row: 2/3;
+  }
+
+  .finance .info-card-income-statement {
+    grid-column: 2/3;
+    grid-row: 2/3;
+  }
+}
+
+
+
+@media (max-width: 767px) {
+  .finance .body-content-container {
+    padding: 10px;
+    overflow-x: hidden;
+  }
+
+  .finance .content-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(5, auto);
+  }
+
+  .finance .budget-balance-card {
+    grid-row: 1/2;
+    height: auto; 
+  }
+
+  .finance .cash-flow-card {
+    grid-row: 2/3;
+    height: 500px; 
+  }
+
+  .finance .chart-container {
+    grid-row: 3/4;
+    height: 500px; 
+    overflow-x: scroll; 
+  }
+
+
+  .finance .info-card-income-statement {
+    grid-row: 4/5;
+    height: auto; 
+  }
+
+  .finance .all-reports-4 {
+    grid-row: 5/6;
+    height: auto; 
+  }
+
+  .finance .budget-balance-card,
+  .finance .cash-flow-card,
+  .finance .chart-container,
+  .finance .info-card-income-statement,
+  .finance .all-reports-4 {
+    width: 350px;
+    max-width: 500px;
+    margin: 20px auto;
+  }
+
+  .finance .budget-balance-title {
+    font-size: 1.1em;
+    padding: 10px 10px;
+    margin-left: 20px;
+    text-indent: -20px  
+  }
+
+  .finance .budget-balance-select {
+    font-size: 1em; 
+    padding: 5px 5px;
+    margin-right: 10px;
+  }
+  
+  .finance .total-balance{
+    margin-top: -10px;
+  }
+
+  .finance .total-balance-label,
+  .finance .earned-last-month-label,
+  .finance .total-bonus-label {
+    font-size: 1em; 
+    text-indent: -50px;
+    margin-left: -50px;
+    margin-right: -10px; 
+  }
+
+  .finance .total-balance-amount {
+    font-size: 2em;
+    margin-left: -30px; 
+  }
+
+  .finance .earned-last-month-amount,
+  .finance .total-bonus-amount {
+    font-size: 1em;
+    text-indent: 20px;
+  }
+  
+.finance .income-statement-table tbody{
+  font-size: 13px;
+}
+}

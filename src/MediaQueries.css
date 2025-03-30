@@ -1,0 +1,12 @@
+@media (max-width: 1000px) { 
+    .header-profile-name {
+      display: none;
+    }
+  }
+
+  @media (max-width: 850px) {
+    .header-module-name {
+      display: none;
+    }
+  }
+  
