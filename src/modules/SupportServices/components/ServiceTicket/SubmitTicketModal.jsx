@@ -5,8 +5,7 @@ import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 
-import { GET } from "../api/api"
-import { POST } from "../api/api"
+import { GET } from "../../api/api"
 
 const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
   const [customers, setCustomers] = useState([]);
@@ -95,29 +94,19 @@ const handleSelectPriority = (selectedPrio) => {
 };
 
   const handleSubmit = async () => {
-    const newTicket = {
+    onSubmit({
       customer_id: customerId,  
       priority: priority,
       subject: subject,
       description: description
-    };
-
-    try {
-      const data = await POST("/tickets/", newTicket);
-      console.log("Ticket created successfully:", data);
-  
-      // reset form fields
-      setCustomerId("");
-      setName("");
-      setTechnicianId("");
-      setPriority("");
-      setSubject("");
-      setDescription("");
-      setCreatedAt(new Date().toISOString().split("T")[0]); // reset 2 today
-      onClose()
-    } catch (error) {
-      console.error("Error creating ticket:", error.message);
-    }
+    })
+    setCustomerId("");
+    setName("");
+    setTechnicianId("");
+    setPriority("");
+    setSubject("");
+    setDescription("");
+    setCreatedAt(new Date().toISOString().split("T")[0]); // reset 2 today
   }
 
   if (!isOpen) return null

@@ -200,6 +200,11 @@
   width: auto; /* Only as wide as needed */
 }
 
+.servtick .filter-button:hover {
+  border: 1px solid #00a8a8;
+  box-shadow: 0 0 10px rgba(22, 218, 218, 0.5);
+}
+
 .servtick .filter-button .arrow {
   font-size: 0.625rem;
   margin-left: 0.25rem; /* Reduced spacing */
@@ -229,7 +234,7 @@
 }
 
 .servtick .filter-option:hover {
-  background-color: #00a8a8;
+  background-color: #bee2e2;
 }
 
 /* Button styling with Inter semi-bold font */
@@ -257,7 +262,7 @@
   height: 2.5rem;
 }
 
-.queue-button.clickable {
+.servtick .queue-button.clickable {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -265,7 +270,7 @@
   transition: background-color 0.2s;
 }
 
-.queue-button.disabled {
+.servtick .queue-button.disabled {
   background-color: white;
   color: #00a8a8;
   border: 1px solid #00a8a8;
@@ -328,8 +333,13 @@
   text-align: center;
 }
 
-.servtick tbody tr.alternate-row {
+.servtick tbody tr {
   background-color: #eff8f9;
+  transition: background-color 0.3s ease;
+}
+
+.servtick tbody tr:hover {
+  background-color: #bee2e2;
 }
 
 .servtick tbody tr:last-child td {
@@ -360,7 +370,7 @@
 }
 
 /* Modal Styles */
-.modal-overlay {
+.servtick .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -373,7 +383,7 @@
   z-index: 1000;
 }
 
-.modal-container {
+.servtick .modal-container {
   background-color: white;
   border-radius: 0.5rem;
   width: 100%;
@@ -383,16 +393,16 @@
   flex-direction: column;
 }
 
-.submit-ticket-modal {
+.servtick .submit-ticket-modal {
   max-width: 700px;
 }
 
-.queue-ticket-modal {
+.servtick .queue-ticket-modal {
   max-width: 800px;
 }
 
 /* Modal header with logo */
-.modal-header {
+.servtick .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -400,20 +410,20 @@
   border-bottom: none;
 }
 
-.modal-header-left {
+.servtick .modal-header-left {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.modal-header-icon {
+.servtick .modal-header-icon {
   width: 1.75rem;
   height: 1.75rem;
   color: #00a8a8;
   margin-top: 0.125rem; 
 }
 
-.modal-header h2 {
+.servtick .modal-header h2 {
   margin: 0;
   font-size: 1.25rem; /* Smaller font size */
   font-weight: 600;
@@ -422,63 +432,63 @@
 }
 
 /* Larger exit icon */
-.close-button {
+.servtick .close-button {
   background: none;
   border: none;
   cursor: pointer;
   padding: 0.25rem;
 }
 
-.close-button img {
+.servtick .close-button img {
   width: 1.5rem;
   height: 1.5rem;
 }
 
 /* Colored line below modal title */
-.modal-header-divider {
+.servtick .modal-header-divider {
   height: 2px;
   background-color: #00a8a8;
   width: 100%;
   margin: 0;
 }
 
-.modal-content {
+.servtick .modal-content {
   padding: 1.5rem;
   flex: 1;
   overflow-y: auto;
 }
 
-.modal-form {
+.servtick .modal-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
-.modal-form.two-column {
+.servtick .modal-form.two-column {
   flex-direction: row;
   gap: 2rem;
 }
 
-.form-row {
+.servtick .form-row {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
 }
 
-.form-row .form-group {
+.servtick .form-row .form-group {
   flex: 1;
 }
 
-.required {
+.servtick .required {
   color: #f44336;
 }
 
-.select-wrapper {
+.servtick .select-wrapper {
   position: relative;
 }
 
 /* Dropdown arrow without shading */
-.select-arrow {
+.servtick .select-arrow {
   cursor: pointer;
   position: absolute;
   right: 0.75rem;
@@ -489,12 +499,12 @@
   background: none;
 }
 
-.prod-dropdown-list {
+.servtick .prod-dropdown-list {
   top: auto !important;
   bottom: 100% !important;
 }
 
-.dropdown-list {
+.servtick .dropdown-list {
   position: absolute;
   top: 100%;
   left: 0;
@@ -511,14 +521,16 @@
   display: block !important; 
 }
 
-.dropdown-list li {
+.servtick .dropdown-list li {
   padding: 10px;
   cursor: pointer;
   font-size: 0.75rem;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
 }
 
-.dropdown-list li:hover {
-  background: #f0f0f0;
+.servtick .dropdown-list li:hover {
+  background: #bee2e2;
 }
 
 .servtick .dropdown-list::-webkit-scrollbar {
@@ -544,7 +556,7 @@
 }
 
 /* Adjust spacing in modals */
-.column-header {
+.servtick .column-header {
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
   font-weight: 600;
@@ -553,7 +565,7 @@
 }
 
 /* Improved notification message */
-.notification-message {
+.servtick .notification-message {
   margin-top: 1rem;
   padding: 0;
   color: #00a8a8;
@@ -563,7 +575,7 @@
   font-family: "Inter", sans-serif;
 }
 
-.modal-footer {
+.servtick .modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
@@ -572,9 +584,10 @@
 }
 
 /* Cancel button matching other buttons */
-.cancel-button {
+.servtick .cancel-button {
   background-color: white;
   color: #00a8a8;
+  transition: background-color 0.3s ease, color 0.3s ease;
   border: 1px solid #00a8a8;
   border-radius: 0.5rem;
   padding: 0.625rem 1.75rem;
@@ -587,15 +600,17 @@
   min-width: 7rem;
 }
 
-.cancel-button:hover {
-  background-color: #e4fdfb;
+.servtick .cancel-button:hover {
+  background-color: #00a8a8;
+  color: white;
 }
 
-.cancel-button:active {
-  background-color: #c9e7e5;
+.servtick .cancel-button:active {
+  background-color: #006666;
+  color: white;
 }
 
-.queue-button {
+.servtick .queue-button {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -610,25 +625,25 @@
   min-width: 7rem;
 }
 
-.queue-button:hover {
+.servtick .queue-button:hover {
   background-color: #098f8f;
 }
 
-.queue-button:active {
+.servtick .queue-button:active {
   background-color: #087d7d;
 }
 
 /* Modal form labels and placeholders */
-.modal-form label {
+.servtick .modal-form label {
   font-size: 0.75rem;
   color: #00a8a8;
   font-family: "Poppins", sans-serif;
   font-weight: 500; /* Medium weight */
 }
 
-.modal-form input,
-.modal-form textarea,
-.modal-form select {
+.servtick .modal-form input,
+.servtick .modal-form textarea,
+.servtick .modal-form select {
   padding: 0.625rem;
   border: 1px solid #e0e0e0;
   border-radius: 0.25rem;
@@ -640,21 +655,21 @@
   width: 100%;
 }
 
-.modal-form textarea {
+.servtick .modal-form textarea {
   height: 5.5rem;
 }
 
 /* Even smaller calendar icon */
-.date-input-wrapper {
+.servtick .date-input-wrapper {
   position: relative;
   width: 100%;
 }
 
-.date-input-wrapper input {
+.servtick .date-input-wrapper input {
   padding-right: 2.5rem;
 }
 
-.calendar-icon {
+.servtick .calendar-icon {
   position: absolute;
   right: 0.75rem;
   top: 50%;
@@ -676,11 +691,11 @@
     padding: 1.25rem;
   }
 
-  .modal-container {
+  .servtick .modal-container {
     max-width: 90%;
   }
 
-  .modal-form.two-column {
+  .servtick .modal-form.two-column {
     flex-direction: column;
     gap: 1.5rem;
   }
@@ -714,7 +729,7 @@
     min-width: 600px;
   }
 
-  .form-row {
+  .servtick .form-row {
     flex-direction: column;
     gap: 1.25rem;
   }
@@ -739,9 +754,9 @@
     width: 100%;
   }
 
-  .modal-header,
-  .modal-content,
-  .modal-footer {
+  .servtick .modal-header,
+  .servtick .modal-content,
+  .servtick .modal-footer {
     padding: 1rem;
   }
 }

@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react"
 import "../styles/ServiceTicket.css"
 import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
-import SubmitTicketModal from "../components/SubmitTicketModal"
-import QueueTicketModal from "../components/QueueTicketModal"
-import ServTickInputField from "../components/ServTickInputField"
-import ServTickTable from "../components/ServTickTable"
+import SubmitTicketModal from "../components/ServiceTicket/SubmitTicketModal"
+import QueueTicketModal from "../components/ServiceTicket/QueueTicketModal"
+import ServTickInputField from "../components/ServiceTicket/ServTickInputField"
+import ServTickTable from "../components/ServiceTicket/ServTickTable"
 
 import { GET } from "../api/api"
+import { POST } from "../api/api"
 
 const ServiceTicket = () => {
   // State for form fields
@@ -30,32 +31,19 @@ const ServiceTicket = () => {
   const [showSubmitModal, setShowSubmitModal] = useState(false)
   const [showQueueModal, setShowQueueModal] = useState(false)
 
+  const fetchTickets = async () => {
+    try {
+      const data = await GET("tickets/");
+      setTickets(data);
+    } catch (error) {
+      console.error("Error fetching tickets:", error)
+    }
+  }
+
   // Fetch tickets from API (mock function)
   useEffect(() => {
-    // Replace with actual API call
-    const fetchTickets = async () => {
-      try {
-        const data = await GET("tickets/");
-        setTickets(data);
-
-        // Mock data for demonstration
-        // setTickets([
-        //   { id: "123", customerName: "Paula Manalo", createdAt: "2025-03-20", priority: "High", status: "Open" },
-        //   {
-        //     id: "124",
-        //     customerName: "Samantha Hospital",
-        //     createdAt: "2025-03-21",
-        //     priority: "Critical",
-        //     status: "Open",
-        //   },
-        // ])
-      } catch (error) {
-        console.error("Error fetching tickets:", error)
-      }
-    }
-
-    fetchTickets()
-  }, [])
+    fetchTickets();
+  }, []);
 
   // table row clicking func
   const handleRowClick = async (ticket) => {
@@ -89,15 +77,16 @@ const ServiceTicket = () => {
   }
 
   // Handle submit from modal
-  const handleSubmitTicket = (ticketData) => {
+  const handleSubmitTicket = async (ticketData) => {
     console.log("Submitting ticket:", ticketData)
-
-    // Here you would typically make an API call to submit the ticket
-    // For now, we'll just close the modal
-    setShowSubmitModal(false)
-
-    // Optionally refresh the ticket list
-    // fetchTickets()
+    try {
+        const data = await POST("/tickets/", ticketData);
+        console.log("Ticket created successfully:", data);
+        setShowSubmitModal(false);
+        fetchTickets();
+    } catch (error) {
+        console.error("Error submitting ticket:", error.message);
+    }
   }
 
   const handleQueueTicket = () => {
@@ -105,12 +94,16 @@ const ServiceTicket = () => {
   }
 
   // Handle queue from modal
-  const handleQueueCall = (queueData) => {
+  const handleQueueCall = async (queueData) => {
     console.log("Queueing ticket:", queueData)
 
-    // Here you would typically make an API call to queue the ticket
-    // For now, we'll just close the modal
-    setShowQueueModal(false)
+    try {
+      const data = await POST("/queue-call/", queueData);
+      console.log("Service call created successfully:", data);
+      setShowQueueModal(false);
+    } catch (error) {
+      console.error("Error creating service call:", error.message);
+    }
   }
 
   const handleFilterChange = (value) => {
