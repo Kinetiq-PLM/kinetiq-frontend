@@ -45,7 +45,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
 
   const [selectedProduct, setSelectedProduct] = useState();
   const [selectedCustomer, setSelectedCustomer] = useState("");
-
+  const [orderID, setOrderID] = useState("");
   // Modals
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
@@ -101,7 +101,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const orderMutation = useMutation({
     mutationFn: async (data) => await POST("sales/order/", data),
     onSuccess: (data, variables, context) => {
-      setOrderInfo({ ...orderInfo, order_id: data.order_id });
+      setOrderID(data.order_id);
     },
   });
 
@@ -122,7 +122,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const [orderInfo, setOrderInfo] = useState({
     customer_id: "",
     quotation_id: "",
-    order_id: "",
     selected_products: products,
     selected_address: "",
     selected_delivery_date: "",
@@ -252,7 +251,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   // For copy to feature
   useEffect(() => {
     if (copyToModal === "Delivery") {
-      localStorage.setItem("TransferID", JSON.stringify(orderInfo.order_id));
+      localStorage.setItem("TransferID", JSON.stringify(orderID));
       localStorage.setItem("TransferOperation", JSON.stringify("order"));
       console.log("Saved to local storage: operation and ID");
       loadSubModule("Delivery");
@@ -378,7 +377,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
             customer={selectedCustomer}
             customerListModal={setIsCustomerListOpen}
             setCustomerInfo={setOrderInfo}
-            operationID={orderInfo.order_id}
+            operationID={orderID}
             setDeliveryDate={setDeliveryDate}
             setAddress={setAddress}
           />

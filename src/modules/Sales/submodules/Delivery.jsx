@@ -36,7 +36,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   // remove local storage after use
 
   const [submitted, setSubmitted] = useState(false);
-
   const [copyFromModal, setCopyFromModal] = useState(""); // variable to set what list will be shown
   // show list modal
   // replace current info with selected info
@@ -48,6 +47,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const [selectedCustomer, setSelectedCustomer] = useState("");
 
   // Modals
+  const [deliveryID, setDeliveryID] = useState("");
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
@@ -78,7 +78,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
 
   const [deliveryInfo, setDeliveryInfo] = useState({
     customer_id: "",
-    shipping_id: "",
     order_id: "",
     selected_products: products,
     selected_address: "",
@@ -129,7 +128,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const deliveryMutation = useMutation({
     mutationFn: async (data) => await POST("sales/delivery/", data),
     onSuccess: (data, variables, context) => {
-      setDeliveryInfo({ ...deliveryInfo, delivery_id: data.shipping_id });
+      setDeliveryID(data.shipping_id);
     },
   });
 
@@ -300,19 +299,13 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   // For copy to feature
   useEffect(() => {
     if (copyToModal === "Returns") {
-      localStorage.setItem(
-        "TransferID",
-        JSON.stringify(deliveryInfo.shipping_id)
-      );
+      localStorage.setItem("TransferID", JSON.stringify(deliveryID));
       localStorage.setItem("TransferOperation", JSON.stringify("order"));
       console.log("Saved to local storage: operation and ID");
       loadSubModule("Returns");
       setActiveSubModule("Returns");
     } else if (copyToModal === "Invoice") {
-      localStorage.setItem(
-        "TransferID",
-        JSON.stringify(deliveryInfo.shipping_id)
-      );
+      localStorage.setItem("TransferID", JSON.stringify(deliveryID));
       localStorage.setItem("TransferOperation", JSON.stringify("order"));
       console.log("Saved to local storage: operation and ID");
       loadSubModule("Invoice");
@@ -440,7 +433,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
             customer={selectedCustomer}
             customerListModal={setIsCustomerListOpen}
             setCustomerInfo={setDeliveryInfo}
-            operationID={deliveryInfo.delivery_id}
+            operationID={deliveryID}
             setDeliveryDate={setDeliveryDate}
             setAddress={setAddress}
           />

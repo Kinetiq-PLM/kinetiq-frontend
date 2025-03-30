@@ -76,16 +76,24 @@ export default function BlanketAgreementsTab({
     if (deliveryQuery.status === "success") {
       const data = deliveryQuery.data.map((delivery) => ({
         shipping_id: delivery.shipping_id,
-        customer_id: delivery.order.statement.customer.customer_id,
-        order_id: delivery.order.order_id,
+        customer_id: delivery.order
+          ? delivery.order.statement.customer.customer_id
+          : delivery.statement.customer.customer_id,
+        order_id: delivery.order ? delivery.order.order_id : null,
         tracking_num: delivery.tracking_num,
         shipping_method: delivery.shipping_method,
-        customer_name: delivery.order.statement.customer.name,
+        customer_name: delivery.order
+          ? delivery.order.statement.customer.name
+          : delivery.statement.customer.name,
         delivery_status: delivery.delivery_status,
-        address: `${delivery.order.statement.customer.address_line1} ${delivery.order.statement.customer.address_line2}`,
+        address: delivery.order
+          ? `${delivery.order.statement.customer.address_line1} ${delivery.order.statement.customer.address_line2}`
+          : `${delivery.statement.customer.address_line1} ${delivery.statement.customer.address_line2}`,
         type: delivery.order.statement.type,
         total_price: Number(
-          delivery.order.statement.total_amount
+          delivery.order
+            ? delivery.order.statement.total_amount
+            : delivery.statement.total_amount
         ).toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
