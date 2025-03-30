@@ -4,7 +4,10 @@ import "../styles/Index.css";
 import Heading from "../../Sales/components/Heading";
 import Button from "../../Sales/components/Button";
 import Table from "../../Sales/components/Table";
-import { AlertProvider } from "../../Sales/components/Context/AlertContext";
+import {
+  AlertProvider,
+  useAlert,
+} from "../../Sales/components/Context/AlertContext";
 import TicketInfo from "../components/TicketInfo";
 import InputField from "./../../Sales/components/InputField";
 import TextField from "./../components/TextField";
@@ -12,14 +15,7 @@ import CustomerListModal from "./../../Sales/components/Modals/Lists/CustomerLis
 import NewCustomerModal from "./../../Sales/components/Modals/NewCustomer";
 
 const Ticket = ({ loadSubModule, setActiveSubModule }) => {
-  // ========== STOP HERE ==========
-  //
-  // wait lang raffy wag mo muna
-  // integrate to ayusin ko pa onti,
-  // pag wala na tong comment na to
-  // saka mo na integrate HHAHAHAH
-  //
-  // ========== STOP HERE ==========
+  const { showAlert } = useAlert();
 
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
@@ -30,16 +26,14 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
   const [description, setDescription] = useState("");
 
   const [ticketInfo, setTicketInfo] = useState({
-    // Customer information
     customer_id: "",
     ticket_id: "",
-    selected_products: [],
-    selected_address: "",
-    selected_delivery_date: "",
-    total_before_discount: 0,
+    subject: subject,
+    description: description,
+    status: "",
+    priority: "",
     created_at: new Date().toISOString().split("T")[0],
   });
-  const [address, setAddress] = useState("");
 
   useEffect(() => {
     setTicketInfo((prev) => ({
@@ -47,6 +41,27 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
       customer_id: selectedCustomer.customer_id,
     }));
   }, [selectedCustomer]);
+
+  const handleSubmit = () => {
+    if (ticketInfo.priority === "") {
+      showAlert({
+        type: "error",
+        message: "Please select a priority.",
+      });
+      return;
+    } else if (ticketInfo.status === "") {
+      showAlert({
+        type: "error",
+        message: "Please select a status.",
+      });
+      return;
+    } else {
+      showAlert({
+        type: "success",
+        message: "Ticket created successfully.",
+      });
+    }
+  };
 
   return (
     <div className="ticket">
@@ -57,8 +72,8 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
           customerListModal={setIsCustomerListOpen}
           setTicketInfo={setTicketInfo}
           operationID={ticketInfo.ticket_id}
-          setAddress={setAddress}
           date={ticketInfo.created_at}
+          ticket={ticketInfo}
         />
         <CustomerListModal
           isOpen={isCustomerListOpen}
@@ -89,7 +104,13 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
             />
           </div>
 
-          <Button type="primary">Submit</Button>
+          <Button
+            type="primary"
+            onClick={handleSubmit}
+            disabled={subject && description ? false : true}
+          >
+            Submit
+          </Button>
         </main>
       </div>
     </div>

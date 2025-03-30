@@ -35,52 +35,78 @@ const Information = ({ label, value = "" }) => {
   );
 };
 
-const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
-  const [address, setAddress] = useState(
-    customer.address_line1 || customer.address_line2 || ""
-  );
+const PriorityDropbar = ({ label, setTicketInfo }) => {
+  const priorityType = ["1", "2", "3", "4", "5"];
 
-  const addresses = [customer.address_line1, customer.address_line2].filter(
-    Boolean
-  );
+  const [priority, setPriority] = useState();
 
-  const handleAddressChange = (event) => {
-    const selectedAddress = event.target.value;
-    setAddress(selectedAddress);
-    setCustomerAddress(selectedAddress);
+  const handlePriorityChange = (event) => {
+    setPriority(event.target.value);
+    setTicketInfo((prev) => ({
+      ...prev,
+      priority: event.target.value,
+    }));
+    // console.log("Priority: ", event.target.value);
   };
-
-  useEffect(() => {
-    setAddress(customer.address_line1);
-    setCustomerAddress(customer.address_line1);
-  }, [customer]);
 
   return (
     <div className="flex justify-between mb-2 w-full">
       <p className="flex-1 text-sm">{label}</p>
-      {customer ? (
-        <select
-          className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white rounded cursor-pointer text-sm"
-          onChange={handleAddressChange}
-          value={address || ""}
-        >
-          {addresses.map((addr, index) => (
-            <option key={index} value={addr}>
-              {addr}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <div
-          className={`border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-[#f7f7f7]`}
-        ></div>
-      )}
+      <select
+        className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white rounded cursor-pointer text-sm"
+        onChange={handlePriorityChange}
+        value={priority || ""}
+      >
+        <option value="" disabled defaultValue={true}>
+          Select priority
+        </option>
+        {priorityType.map((addr, index) => (
+          <option key={index} value={addr}>
+            {addr}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
+const StatusDropbar = ({ label, setTicketInfo }) => {
+  const statusType = ["Yes", "No", "HAHA"];
+
+  const [status, setStatus] = useState();
+
+  const handlePriorityChange = (event) => {
+    setStatus(event.target.value);
+    setTicketInfo((prev) => ({
+      ...prev,
+      status: event.target.value,
+    }));
+    // console.log("Priority: ", event.target.value);
+  };
+
+  return (
+    <div className="flex justify-between mb-2 w-full">
+      <p className="flex-1 text-sm">{label}</p>
+      <select
+        className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white rounded cursor-pointer text-sm"
+        onChange={handlePriorityChange}
+        value={status || ""}
+      >
+        <option value="" disabled defaultValue={true}>
+          Select status
+        </option>
+        {statusType.map((addr, index) => (
+          <option key={index} value={addr}>
+            {addr}
+          </option>
+        ))}
+      </select>
     </div>
   );
 };
 
 const TicketInfo = ({
   type,
+  ticket,
   customer,
   date,
   customerListModal,
@@ -114,16 +140,13 @@ const TicketInfo = ({
       <div className="w-full hidden xl:block"></div>
       <div className="h-full w-full flex flex-col items-center">
         <Information label={`${type} ID`} value={operationID} />
-        <AddressDropbar
+        {/* <PriorityDropbar
           label={"Status"}
           customer={customer}
           setCustomerAddress={setAddress}
-        />
-        <AddressDropbar
-          label={"Priority"}
-          customer={customer}
-          setCustomerAddress={setAddress}
-        />
+        /> */}
+        <PriorityDropbar label={"Priority"} setTicketInfo={setTicketInfo} />
+        <StatusDropbar label={"Status"} setTicketInfo={setTicketInfo} />
         <Information label={"Date"} value={date} />
       </div>
     </section>
