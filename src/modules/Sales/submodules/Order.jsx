@@ -75,6 +75,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
         total_price: Number(item.total_price),
       }));
       setProducts(prods);
+      setSelectedQuotation(data.quotation);
       setSelectedCustomer(data.statement.customer);
       setSelectedEmployee(data.statement.salesrep);
       localStorage.removeItem("TransferID");
@@ -210,8 +211,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   useEffect(() => {
     if (copyFromModal === "Quotation" && selectedQuotation) {
       setCopyFromModal("");
-      console.log("copy from");
-      console.log(selectedQuotation);
       setOrderInfo((prev) => ({
         ...prev,
         quotation_id: selectedQuotation.quotation_id,
@@ -252,12 +251,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     const transferOperation = localStorage.getItem("TransferOperation");
 
     if (transferID && transferOperation) {
-      // SEARCH DB FOR TRANSFERID with TRANSFEROPERATION
-      // FILL DETAILS WITH DATA
-
-      console.log("Searching for ID: ", transferID);
-      console.log("At Operation: ", transferOperation);
-
       copyFromMutation.mutate({
         transferOperation: JSON.parse(transferOperation),
         transferID: JSON.parse(transferID),
