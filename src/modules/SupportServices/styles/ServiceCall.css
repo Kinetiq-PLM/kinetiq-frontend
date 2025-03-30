@@ -1,0 +1,922 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.servcall {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  font-family: "Poppins", sans-serif;
+}
+
+.servcall .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+/* Header styling to match the image */
+.servcall .header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.servcall .icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.servcall .icon-container img {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #00a8a8;
+  margin-top: 0.125rem;
+}
+
+.servcall .title-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.servcall .title-container h2 {
+  margin: 0;
+  color: #000000;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  line-height: 1.2;
+}
+
+.servcall .title-container .subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+  font-style: italic;
+  font-family: "Inter", sans-serif;
+}
+
+.servcall .divider {
+  height: 2px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 0.5rem 0 1.5rem 0;
+}
+
+/* Hide scrollbar arrows unless hovered */
+.servcall .content-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-right: -0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  max-height: calc(100% - 8rem);
+}
+
+.servcall .content-scroll-area:hover {
+  scrollbar-color: #00a8a8 #f0f0f0;
+}
+
+/* Custom scrollbar for Webkit browsers */
+.servcall .content-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.servcall .content-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.servcall .content-scroll-area:hover::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.servcall .content-scroll-area::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+.servcall .content-scroll-area:hover::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+}
+
+.servcall .search-filter-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Search bar styling with icon */
+.servcall .search-container {
+  position: relative;
+  width: auto;
+  display: inline-block;
+  border: 1px solid #cdd5d8; 
+  border-radius: 8px; 
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.servcall .search-container:hover {
+  border: 1px solid #00a8a8;
+  box-shadow: 0 0 10px rgba(22, 218, 218, 0.5);
+}
+
+.servcall .search-container:focus-within {
+  border: 1px solid #00a8a8;
+  box-shadow: 0 0 10px rgba(22, 218, 218, 0.5);
+}
+
+.servcall .search-container input:focus {
+  outline: none;
+}
+
+.servcall .search-input {
+  padding: 0.625rem 0.625rem 0.625rem 2rem; /* Add padding for icon */
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: "Poppins", sans-serif;
+  background-color: #f5f5f5;
+  width: auto;
+  min-width: 350px;
+}
+
+.servcall .search-input:focus {
+  outline: none;
+  border: none;
+  background-color: #f5f5f5;
+  box-shadow: none;
+}
+
+.servcall .search-icon {
+  position: absolute;
+  left: 0.625rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+}
+
+.servcall .filter-dropdown {
+  position: relative;
+}
+
+/* Update Filter by button styling */
+.servcall .filter-button {
+  background-color: white;
+  border: 1px solid #cdd5d8;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem; /* Smaller font size */
+  color: #888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "Inter", sans-serif;
+  font-weight: 500; /* Medium weight */
+  box-shadow: none;
+  width: auto; /* Only as wide as needed */
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.servcall .filter-button:hover {
+  border: 1px solid #00a8a8;
+  box-shadow: 0 0 10px rgba(22, 218, 218, 0.5);
+}
+
+.servcall .filter-button .arrow {
+  font-size: 0.625rem;
+  margin-left: 0.25rem; /* Reduced spacing */
+  color: #888;
+}
+
+.servcall .filter-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 0.25rem;
+}
+
+.servcall .filter-option {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+}
+
+.servcall .filter-option:hover {
+  background-color: #bee2e2;
+}
+
+.servcall .table-container {
+  width: 100%;
+  margin-bottom: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  max-height: 52vh;
+  overflow-y: auto;
+  display: block;
+  position: relative;
+}
+
+/* Table with Inter font */
+.servcall .service-calls-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inter", sans-serif;
+}
+
+.servcall .service-calls-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 3;
+}
+
+.servcall thead {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.servcall th {
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.servcall td {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+}
+
+.servcall tbody tr {
+  background-color: #eff8f9;
+  transition: background-color 0.3s ease;
+}
+
+.servcall tbody tr:hover {
+  background-color: #bee2e2;
+}
+
+.servcall tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.servcall .empty-row td {
+  height: 2.5rem;
+}
+
+.servcall .priority-medium {
+  color: #ffb341;
+}
+
+.servcall .priority-high {
+  color: #ff7300;
+}
+
+.servcall .priority-urgent {
+  color: #f44336;
+}
+
+.servcall .update-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding: 0 0.25rem;
+}
+
+.servcall .update-button {
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  transition: 0.3s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+}
+
+.servcall .update-button.clickable {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.servcall .update-button.disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
+.servcall .update-button.clickable:hover {
+  background-color: #098f8f;
+}
+
+.servcall .update-button.clickable:active {
+  background-color: #087d7d;
+}
+
+.servcall .view-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+}
+
+.servcall .view-button:hover {
+  background-color: #098f8f;
+}
+
+/* Modal Styles */
+.servcall .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Increase modal size */
+.servcall .modal-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 800px; /* Increased from 700px */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.servcall .service-call-modal {
+  max-width: 750px; /* Increased from 650px */
+}
+
+/* Modal header with logo */
+.servcall .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: none;
+}
+
+/* Modal header with logo and line */
+.servcall .modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.servcall .modal-header-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #00a8a8;
+}
+
+.servcall .modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem; /* Smaller font size */
+  font-weight: 600;
+  color: #000;
+  font-family: "Inter", sans-serif;
+}
+
+/* Header divider */
+.servcall .modal-header-divider {
+  height: 2px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 0;
+}
+
+/* Larger exit icon */
+.servcall .close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.servcall .close-button img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* Tabs styling */
+.servcall .modal-tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-top: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 45px;
+}
+
+.servcall .modal-tab {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #666;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  font-family: "Inter", sans-serif;
+}
+
+.servcall .modal-tab:hover {
+  background-color: #00a8a8;
+  color: #fff1f1;
+}
+
+.servcall .modal-tab.active {
+  color: #00a8a8;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-bottom: 2px solid #00a8a8;
+}
+
+.servcall .modal-tab.active:hover {
+  background-color: #00a8a8;
+  color: #fff1f1;
+}
+
+.servcall .modal-content {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 60vh; /* Limit height to prevent overflow */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.servcall .modal-content:hover {
+  scrollbar-color: #00a8a8 #f0f0f0;
+}
+
+/* Custom scrollbar for Webkit browsers */
+.servcall .modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.servcall .modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.servcall .modal-content:hover::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.servcall .modal-content::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+.servcall .modal-content:hover::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+}
+
+.servcall .modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.servcall .form-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+/* Special row for aligned fields */
+.servcall .aligned-row {
+  align-items: stretch;
+  display: flex;
+  width: 100%;
+}
+
+.servcall .aligned-row .form-group:first-child {
+  width: 48%; /* Fixed width for the left column */
+  flex: 0 0 48%;
+}
+
+.servcall .aligned-row .form-group:last-child {
+  width: 48%; /* Fixed width for the right column */
+  flex: 0 0 48%;
+  margin-left: auto;
+}
+
+.servcall .form-row .form-group {
+  flex: 1;
+}
+
+.servcall .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+
+
+.servcall .form-group label {
+  font-size: 0.75rem;
+  color: #00a8a8;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+}
+
+.servcall .form-group input,
+.servcall .form-group textarea,
+.servcall .form-group select {
+  padding: 0.625rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  height: 2.5rem;
+  box-sizing: border-box;
+  width: 100%;
+  color: #333;
+}
+
+.servcall .form-group.req-desc textarea {
+  height: 10rem !important;
+}
+
+.servcall .form-group input::placeholder,
+.servcall .form-group textarea::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+.servcall .form-group textarea {
+  height: 5.5rem;
+  resize: none;
+}
+
+.servcall .select-wrapper {
+  position: relative;
+}
+
+.servcall .select-arrow {
+  cursor: pointer;
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.625rem;
+  color: #888;
+  background: none;
+}
+
+.servcall .prio-dropdown-list,
+.servcall .type-dropdown-list{
+  top: auto !important;
+  bottom: 100% !important;
+}
+
+.servcall .dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  list-style: none;
+  padding: 0;
+  margin: 5px 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border-radius: 7px;
+  z-index: 9999; 
+  display: block !important; 
+}
+
+.servcall .dropdown-list li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.servcall .dropdown-list li:hover {
+  background-color: #bee2e2;
+}
+
+.servcall .dropdown-list::-webkit-scrollbar {
+  width: 8px; 
+}
+
+.servcall .dropdown-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.servcall .dropdown-list:hover::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.servcall .dropdown-list::-webkit-scrollbar-thumb {
+  background: #00a8a8;
+  border-radius: 8px;
+}
+
+.servcall .dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: hsl(180, 100%, 26%);
+}
+
+/* Date input with calendar icon */
+.servcall .date-input-wrapper {
+  position: relative;
+}
+
+.date-input-wrapper input {
+  padding-right: 2.5rem; /* Make room for the calendar icon */
+}
+
+.servcall .calendar-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.875rem; /* Reduced from 1rem */
+  height: 0.875rem; /* Reduced from 1rem */
+  pointer-events: none;
+}
+
+.servcall .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.servcall .cancel-button {
+  background-color: white;
+  color: #00a8a8;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border: 1px solid #00a8a8;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  min-width: 7rem;
+}
+
+.servcall .cancel-button:hover {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.servcall .update-modal-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  min-width: 7rem;
+}
+
+.servcall .update-modal-button:hover {
+  background-color: #098f8f;
+}
+
+/* Fix service request button to ensure text is visible */
+.servcall .service-request-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  min-width: 7rem;
+}
+
+.servcall .service-request-button.clickable {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.servcall .service-request-button.disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
+.servcall .service-request-button.clickable:hover{
+  background-color: #098f8f;
+}
+
+.servcall .service-request-button.clickable:active {
+  background-color: #087d7d;
+}
+
+.servcall .service-request-button:hover {
+  background-color: #098f8f;
+}
+
+.servcall .service-request-button:active {
+  background-color: #087d7d;
+}
+
+/* Resolution textarea */
+.servcall .resolution-textarea {
+  width: 100%;
+  height: 300px;
+  padding: 0.75rem;
+  border: 1px solid #00a8a8;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: "Poppins", sans-serif;
+  resize: none;
+}
+
+.servcall .resolution-textarea::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+/* Divider in general modals */
+.servcall .form-divider {
+  height: 1px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+/* Ensure resolution footer stays within container with more spacing */
+.servcall .resolution-footer {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border-top: 1px solid #e0e0e0;
+  gap: 5px
+}
+
+.servcall .resolution-footer-left {
+  display: flex;
+  gap: 5px
+}
+
+.servcall .resolution-footer label{
+  color:#00a8a8;
+  font-size: 0.875rem;
+  font-weight: bold;
+  font-family: "Inter", sans-serif;
+}
+
+.servcall .resolution-footer-right {
+  display: flex;
+  gap: 12px; /* Increased gap between buttons */
+}
+
+.servcall .resolution-footer .form-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  margin: 0;
+  min-width: 180px; /* Increased width */
+  gap: 10px;
+}
+
+/* Input focus color */
+.servcall input:focus,
+.servcall textarea:focus,
+.servcall select:focus,
+.servcall .modal-form input:focus,
+.servcall .modal-form textarea:focus,
+.servcall .modal-form select:focus,
+.servcall .resolution-textarea:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 1px #00a8a8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .servcall .body-content-container {
+    min-width: auto;
+    max-height: none;
+    padding: 1.25rem;
+  }
+
+  .servcall .modal-container {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .servcall .search-filter-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .servcall .search-container {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .servcall .search-input {
+    width: 100%;
+  }
+
+  .servcall .filter-dropdown {
+    width: 100%;
+  }
+
+  .servcall .table-container {
+    overflow-x: auto;
+  }
+
+  .servcall .service-calls-table {
+    min-width: 600px;
+  }
+
+  .servcall .form-row {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .servcall .body-content-container {
+    padding: 1rem;
+  }
+
+  .servcall .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .servcall .title-container {
+    width: 100%;
+  }
+
+  .servcall .modal-header,
+  .servcall .modal-content,
+  .servcall .modal-footer {
+    padding: 1rem;
+  }
+}
+
