@@ -69,8 +69,8 @@ export default function OpportunitiesTab({
 
   const handleRedirect = () => {
     setActiveModule("CRM");
-    setActiveSubModule("Marketing", "CRM");
-    loadSubModule("Marketing", "CRM");
+    setActiveSubModule("Opportunity", "CRM");
+    loadSubModule("Opportunity", "CRM");
   };
 
   useEffect(() => {

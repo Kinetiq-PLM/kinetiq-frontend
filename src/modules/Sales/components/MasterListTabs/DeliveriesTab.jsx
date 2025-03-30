@@ -67,8 +67,8 @@ export default function BlanketAgreementsTab({
   });
 
   const handleRedirect = () => {
-    loadSubModule("Quotation");
-    setActiveSubModule("Quotation");
+    loadSubModule("Delivery");
+    setActiveSubModule("Delivery");
   };
 
   useEffect(() => {

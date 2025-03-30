@@ -67,8 +67,8 @@ export default function BlanketAgreementsTab({
   });
 
   const handleRedirect = () => {
-    loadSubModule("Quotation");
-    setActiveSubModule("Quotation");
+    loadSubModule("Blanket Agreement");
+    setActiveSubModule("Blanket Agreement");
   };
   useEffect(() => {
     if (agreementQuery.status === "success") {
