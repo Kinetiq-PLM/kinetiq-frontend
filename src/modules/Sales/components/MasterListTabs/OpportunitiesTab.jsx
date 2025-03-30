@@ -84,7 +84,7 @@ export default function OpportunitiesTab({
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }),
-        salesrep: opp.salesrep.employee_id,
+        salesrep: `${opp.salesrep.first_name} ${opp.salesrep.last_name}`,
         stage: opp.stage,
         expected_closed_date: new Date(
           opp.expected_closed_date
