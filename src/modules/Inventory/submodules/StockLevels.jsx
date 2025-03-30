@@ -8,6 +8,15 @@ const BodyContent = () => {
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedRow, setSelectedRow] = useState(null); 
 
+    // Tab Management
+    const tabs = ["Products", "Assets", "Raw Materials"];
+    const [activeTab, setActiveTab] = useState(tabs[0]);    
+    const onTabChange = (tab) => {
+        setActiveTab(tab);
+        setSelectedRow(null); // Reset selected row when tab changes
+    }
+
+
     useEffect(() => {
         fetch("http://127.0.0.1:8000/api/depreciation-report/")
             .then((res) => res.json())
@@ -22,36 +31,72 @@ const BodyContent = () => {
             });
     }, []);
 
-    const filterByDateRange = (data, range) => {
-        const now = new Date();
-        return data.filter((item) => {
-            const period = item.time_period?.toLowerCase();
-            if (!period) return false;
+    const tabConfig = {
+        "Raw Materials": "raw_material_id",
+        "Assets": "asset_id",
+        "Products": "productdocu_id",
+    }
+    console.log("Tab Config:", tabConfig[activeTab]);
+    
+   
+    const fieldName = tabConfig[activeTab];
+    console.log("Field to filter by:", fieldName)
 
+    // Filter data based on selected Tab
+    const filteredTabConfig = pcounts.filter((item) => item[fieldName] !== null);
+    
+    
+
+    // const filterByDateRange = (data, range) => {
+    //     const now = new Date();
+    //     return data.filter((item) => {
+    //         const period = item.time_period?.toLowerCase();
+    //         if (!period) return false;
+
+    //         switch (range) {
+    //             case "Last 24 Hours": return period === "daily";
+    //             case "Last Week": return period === "weekly";
+    //             case "Last 30 Days": return period === "monthly";
+    //             case "Last 6 Months": return period === "quarterly" || period === "biannually";
+    //             default: return true;
+    //         }
+    //     });
+    // };
+
+
+    const filterByDateRange = (data, range) => {
+        const now = new Date(); // Get current date and time
+    
+        return data.filter((item) => {
+            if (!item.time_period) return false; // Skip if time_period is missing
+    
+            const itemDate = new Date(item.time_period); // Convert string to Date object
+            if (isNaN(itemDate)) return false; // Skip invalid dates
+    
             switch (range) {
-                case "Last 24 Hours": return period === "daily";
-                case "Last Week": return period === "weekly";
-                case "Last 30 Days": return period === "monthly";
-                case "Last 6 Months": return period === "quarterly" || period === "biannually";
-                default: return true;
+                case "Next 30 Days":
+                    return itemDate >= now && itemDate <= new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30);
+                
+                case "Next 6 Months":
+                    return itemDate >= now && itemDate <= new Date(now.getFullYear(), now.getMonth() + 6, now.getDate());
+    
+                case "Within This Year":
+                    return itemDate.getFullYear() === now.getFullYear();
+    
+                default:
+                    return true; // No filtering applied if range is not recognized
             }
         });
     };
+    
 
-    const filteredData = pcounts.filter((item) => {
+    const filteredData = filteredTabConfig.filter((item) => {
         const statusMatch = selectedStatus ? item.status?.toLowerCase() === selectedStatus.toLowerCase() : true;
         const dateMatch = selectedDate ? filterByDateRange([item], selectedDate).length > 0 : true;
         return statusMatch && dateMatch;
     });
 
-    // Tab Management
-    const tabs = ["Products", "Assets", "Raw Materials"];
-    const [activeTab, setActiveTab] = useState(tabs[0]);    
-    const onTabChange = (tab) => {
-        setActiveTab(tab);
-        setSelectedRow(null); // Reset selected row when tab changes
-    }
-
+    
 
     return (
         <div className="pcounts">
@@ -103,11 +148,16 @@ const BodyContent = () => {
                                                 className="border-b border-gray-300 hover:bg-gray-100"
                                                 onClick={() => setSelectedRow(item)} // ← Set selected row
                                             >
-                                                <td className="p-2">{item.product_name || "N/A"}</td>
+                                                <td className="p-2">{
+                                                item.productdocu_id !== null ? item.productdocu_id : 
+                                                item.raw_material_id != null ? item.raw_material_id : 
+                                                item.asset_id != null ? item.asset_id : 
+                                                "N/A"
+                                                }</td>
                                                 <td className="p-2">{item.item_actually_counted ?? "-"}</td>
-                                                <td className="p-2">{item.time_period || "-"}</td>
+                                                <td className="p-2">{item.expiry_date || "-"}</td>
                                                 <td className="p-2">{item.employee || "Unassigned"}</td>
-                                                <td className={`p-2 ${item.status === 'Verified' ? 'text-green-600' : 'text-yellow-600'}`}>
+                                                <td className={`p-2 ${item.status === 'Approved' ? 'text-green-600' : 'text-yellow-800'}`}>
                                                     {item.status}
                                                 </td>
                                             </tr>
@@ -129,7 +179,7 @@ const BodyContent = () => {
                                 onChange={(e) => setSelectedStatus(e.target.value)}
                             >
                                 <option value="">Filter Status Status</option>
-                                {["Completed", "Open", "In Progress", "Closed"].map((s) => (
+                                {["Pending", "Approved"].map((s) => (
                                     <option key={s} value={s}>{s}</option>
                                 ))}
                             </select>
@@ -141,7 +191,7 @@ const BodyContent = () => {
                                 onChange={(e) => setSelectedDate(e.target.value)}
                             >
                                 <option value="">Filter Deprecation Date</option>
-                                {["Last 24 Hours", "Last Week", "Last 30 Days", "Last 6 Months"].map((d) => (
+                                {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
                                     <option key={d} value={d}>{d}</option>
                                 ))}
                             </select>
