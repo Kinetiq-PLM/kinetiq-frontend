@@ -151,10 +151,13 @@ const BodyContent = () => {
                                 <p className="text-gray-600 font-bold text-center"> Item Details</p>
                                 <div className="w-60 border border-gray-300 rounded-lg p-3">
                                     {[
-                                        { label: "Selected Product", value: selectedRow?.product_name || "N/A" },
-                                        { label: "Total Quantity Checked", value: selectedRow?.item_actually_counted ?? "-" },
-                                        { label: "Manager in Supervision", value: selectedRow?.employee || "Unassigned" },
-                                        { label: "Date Checked", value: selectedRow?.time_period || "-" }
+                                        { label: "Selected Item", value: selectedRow?.product_name || "N/A" },
+                                        { label: "Identification", value: selectedRow?.item_actually_counted ?? "-" },
+                                        { label: "Expiry Date", value: selectedRow?.employee || "Unassigned" },
+                                        {label: "Quantity", value: selectedRow?.quantity || "-" },
+                                        { label: "Status", value: selectedRow?.status || "-" },
+                                        { label: "Reported Date", value: selectedRow?.time_period || "-" },
+                                        
                                     ].map(({ label, value }) => (
                                         <div key={label} className="mb-2">
                                             <h4 className="text-cyan-600 text-sm font-semibold">{label}</h4>
