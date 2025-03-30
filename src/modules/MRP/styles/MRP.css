@@ -91,3 +91,12 @@
   background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon7.png);
   background-repeat: no-repeat;
 }
+
+.mrp .material:hover{
+  transform: scale(1.1);
+}
+
+.mrp .bills:hover{
+  transform: scale(1.1);
+  
+}
