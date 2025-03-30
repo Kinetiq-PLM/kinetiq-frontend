@@ -6,11 +6,14 @@ import Button from "../../Sales/components/Button";
 import Table from "../../Sales/components/Table";
 import { AlertProvider } from "../../Sales/components/Context/AlertContext";
 import OpportunityInfo from "../components/OpportunityInfo";
+import NewCustomerModal from "./../../Sales/components/Modals/NewCustomer";
+import CustomerListModal from "./../../Sales/components/Modals/Lists/CustomerList";
 
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+const Opportunity = ({ loadSubModule, setActiveSubModule }) => {
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
-  const [quotationInfo, setQuotationInfo] = useState({
+  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+  const [opportunityInfo, setOpportunityInfo] = useState({
     // Customer information
     customer_id: "",
     quotation_id: "",
@@ -31,6 +34,16 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   return (
     <div className="opportunity">
       <div className="body-content-container">
+        <CustomerListModal
+          isOpen={isCustomerListOpen}
+          onClose={() => setIsCustomerListOpen(false)}
+          newCustomerModal={setIsNewCustomerModalOpen}
+          setCustomer={setSelectedCustomer}
+        ></CustomerListModal>
+        <NewCustomerModal
+          isOpen={isNewCustomerModalOpen}
+          onClose={() => setIsNewCustomerModalOpen(false)}
+        ></NewCustomerModal>
         <Heading
           Title="Opportunity"
           SubTitle="Tracking and nurturing sales opportunities to drive business success."
@@ -40,14 +53,25 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
             type={"Quotation"}
             customer={selectedCustomer}
             customerListModal={setIsCustomerListOpen}
-            setCustomerInfo={setQuotationInfo}
-            operationID={quotationInfo.quotation_id}
+            setCustomerInfo={setOpportunityInfo}
+            operationID={opportunityInfo.quotation_id}
             setDeliveryDate={setDeliveryDate}
             setAddress={setAddress}
           />
         </main>
       </div>
     </div>
+  );
+};
+
+const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+  return (
+    <AlertProvider>
+      <Opportunity
+        loadSubModule={loadSubModule}
+        setActiveSubModule={setActiveSubModule}
+      />
+    </AlertProvider>
   );
 };
 

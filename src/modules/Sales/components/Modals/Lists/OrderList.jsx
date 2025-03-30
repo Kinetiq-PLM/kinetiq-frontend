@@ -35,7 +35,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
       onClose();
       showAlert({
         type: "success",
-        title: "Order Selected",
+        title: "Copied from Order.",
       });
       setSelectedOrder(null);
     }

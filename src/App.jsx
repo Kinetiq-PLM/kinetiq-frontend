@@ -112,7 +112,7 @@ function App() {
       "Blanket Agreement": "BlanketAgreement",
       "Master List": "MasterList",
       Reporting: "Reporting",
-      Returns: "Returns",
+      Return: "Return",
     },
     CRM: {
       Ticket: "Ticket",
