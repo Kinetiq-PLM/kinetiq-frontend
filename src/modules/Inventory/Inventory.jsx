@@ -76,12 +76,12 @@ const BodyContent = () => {
         "Item ID",
         "Total Stock",
         "Ordered Stock",
-        "Commited Stock",
+        "Committed Stock", 
         "Available Stock"
       ],
       data: productData.map((product) => {
-        const itemId = product.admin_item?.item_id || product.item || "???";
-        const inventoryData = product.admin_item || {};
+        const itemId = product.inventory_data?.item_id || product.item_id || "???";
+        const inventoryData = product.inventory_data || {};
 
         return {
           product_id: product.product_id || "???",
@@ -89,14 +89,15 @@ const BodyContent = () => {
           Name: product.product_name,
           "Item ID": itemId,
           "Total Stock": inventoryData.total_stock || "000",
-          "Ordered Stock": inventoryData.stock_on_order || "000",
-          "Commited Stock": inventoryData.stock_committed || "000",
+          "Ordered Stock": inventoryData.stock_on_order || "000", 
+          "Committed Stock": inventoryData.stock_committed || "000", 
           "Available Stock": inventoryData.available_stock || "000",
         };
       }),
       loading: loadingProducts,
     },
     
+    // Rest remains the same
     Assets: {
       columns: ["Name", "Item ID", "Serial No", "Purchase Date", "Available Stock"],
       data: assetData.map((asset) => ({
@@ -194,7 +195,6 @@ const BodyContent = () => {
                     </div>
                   )}
                   {Object.entries(selectedItem)
-                    // Hide item_id from display (but keep it for restock)
                     .filter(([key]) => !["product_id", "asset_id", "material_id", "item_id"].includes(key))
                     .map(([label, value]) => (
                       <div key={label}>
