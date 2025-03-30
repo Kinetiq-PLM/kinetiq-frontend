@@ -53,7 +53,6 @@ const Journal = () => {
         setJournalForm(prevState => ({ ...prevState, [field]: value }));
     };
 
-    // Emman Paki tuloy ito, para may validation na si journal.
     const [validation, setValidation] = useState ({
         isOpen: false,
         type: "warning",
@@ -63,7 +62,7 @@ const Journal = () => {
 
     const handleSubmit = () => {
         // Validation: Ensure all required fields are filled
-        if (!journalForm.journalDate || !journalForm.journalId || !journalForm.description || !journalForm.invoiceId || !journalForm.currencyId) {
+        if (!journalForm.journalDate && !journalForm.journalId && !journalForm.description && !journalForm.invoiceId && !journalForm.currencyId) {
             setValidation({
                 isOpen: true,
                 type: "warning",
@@ -73,37 +72,55 @@ const Journal = () => {
             return;
         }
 
-        if(!journalForm.journalDate)
-        {
+        if (!journalForm.journalDate) {
             setValidation({
                 isOpen: true,
                 type: "warning",
-                title: "Input the Date",
-                message: "Input the date you created the program.",
+                title: "Missing Journal Date",
+                message: "Please enter the journal date.",
             });
+            return;
         }
 
-        // Prepare the new entry for optimistic update
-        const newEntry = {
-            journal_id: journalForm.journalId, // Use the user-entered Journal ID
-            journal_date: journalForm.journalDate,
-            description: journalForm.description,
-            total_debit: '0.00', // Still send 0.00 to API
-            total_credit: '0.00', // Still send 0.00 to API
-            invoice_id: journalForm.invoiceId || null, // Keep it a string or null
-            currency_id: journalForm.currencyId // Keep it a string
-        };
+        if (!journalForm.journalId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Journal ID",
+                message: "Please provide a valid journal ID.",
+            });
+            return;
+        }
 
-        // Optimistically update the table (display '-' instead of 0.00)
-        setData(prevData => [...prevData, [
-            newEntry.journal_id || '-',
-            newEntry.journal_date || '-',
-            newEntry.description || '-',
-            newEntry.total_debit === 0 ? '-' : newEntry.total_debit, // Display '-' if 0.00
-            newEntry.total_credit === 0 ? '-' : newEntry.total_credit, // Display '-' if 0.00
-            newEntry.invoice_id || '-',
-            newEntry.currency_id || '-'
-        ]]);
+        if (!journalForm.description) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Description",
+                message: "Please enter a description for the journal entry.",
+            });
+            return;
+        }
+
+        if (!journalForm.invoiceId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Invoice ID",
+                message: "Please link the journal entry to an invoice ID.",
+            });
+            return;
+        }
+
+        if (!journalForm.currencyId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Currency",
+                message: "Please select a currency for the journal entry.",
+            });
+            return;
+        }
 
         // Log the payload for debugging
         const payload = {
@@ -140,14 +157,22 @@ const Journal = () => {
                     });
                 } else {
                     console.error('Server error response:', data);
-                    throw new Error(data.detail || JSON.stringify(data) || `Failed to create journal entry (Status: ${status})`);
+                    setValidation({
+                        isOpen: true,
+                        type: "error",
+                        title: "Server Error: Adding Account failed",
+                        message: "Creating account failed",
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error submitting data:', error.message);
-                alert(`Error: ${error.message}`);
-                // Rollback optimistic update on error
-                setData(prevData => prevData.filter(row => row[0] !== newEntry.journal_id));
+                setValidation({
+                    isOpen: true,
+                    type: "error",
+                    title: "Check Connection!",
+                    message: "Kindly check your connection to the database.",
+                });
             });
     };
 

@@ -117,7 +117,7 @@ const BodyContent = () => {
                 setValidation({
                     isOpen: true,
                     type: "error",
-                    title: "Adding Account failed",
+                    title: "Server Error: Adding Account failed",
                     message: "Creating account failed",
                 });
             }
@@ -127,7 +127,7 @@ const BodyContent = () => {
                 isOpen: true,
                 type: "error",
                 title: "Check Connection!",
-                message: "Kindly Check your connection to the database.",
+                message: "Kindly check your connection to the database.",
             });
         }
     };
