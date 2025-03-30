@@ -97,7 +97,6 @@ const BodyContent = () => {
       loading: loadingProducts,
     },
     
-    // Rest remains the same
     Assets: {
       columns: ["Name", "Item ID", "Serial No", "Purchase Date", "Available Stock"],
       data: assetData.map((asset) => ({
@@ -107,7 +106,7 @@ const BodyContent = () => {
         "Item ID": asset.item_id || "???",
         "Serial No": asset.serial_no || "N/A",
         "Purchase Date": asset.purchase_date || "N/A",
-        "Available Stock": asset.available_stock || "000",
+        "Available Stock": asset.inventory_data?.available_stock || "000",
       })),
       loading: loadingAssets,
     },
@@ -121,7 +120,7 @@ const BodyContent = () => {
         "Item ID": mat.item_id || "???",
         "Description": mat.description || "No description available",
         "Unit": mat.unit_of_measure || "N/A",
-        "Available Stock": mat.available_stock || "000",
+        "Available Stock": mat.inventory_data?.available_stock || "000",
       })),
       loading: loadingRawMats,
     },
