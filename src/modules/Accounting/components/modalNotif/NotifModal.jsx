@@ -9,7 +9,7 @@ const NotifModal = ({ isOpen, onClose, type = "success", title, message }) => {
             const timer = setTimeout(() => {
                 setShowModal(false);
                 if (onClose) onClose();
-            }, 1500);
+            }, 1000);
             return () => clearTimeout(timer);
         }
     }, [isOpen, onClose]);
