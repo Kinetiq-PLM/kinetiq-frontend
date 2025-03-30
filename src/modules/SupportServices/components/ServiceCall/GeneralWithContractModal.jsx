@@ -6,7 +6,6 @@ import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 
 import { GET } from "../../api/api"
-import { POST } from "../../api/api"
 
 const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution, callData }) => {
   const [customerId, setCustomerId] = useState("")

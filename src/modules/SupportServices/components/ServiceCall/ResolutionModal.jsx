@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 
-const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, callData }) => {
+const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, onShowRequest, callData }) => {
   const [resolutionDetails, setResolutionDetails] = useState("")
   const [wasResolved, setWasResolved] = useState("")
   const [activeTab, setActiveTab] = useState("resolution")
@@ -102,7 +102,7 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, callData })
                 </div>
                 <button 
                   className={`service-request-button ${wasResolved === "No" ? "disabled" : ""}`} 
-                  onClick={() => {}}
+                  onClick={onShowRequest}
                   disabled={wasResolved === "No"}
                 >
                 Service Request

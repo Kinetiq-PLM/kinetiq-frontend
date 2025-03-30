@@ -4,13 +4,14 @@ import { useState, useEffect } from "react"
 import "../styles/ServiceCall.css"
 import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 import Table from "../components/ServiceCall/Table"
-import GeneralNoContractModal from "../components/ServiceCall/GeneralNoContractModal"
+import ServiceRequestModal from "../components/ServiceCall/ServiceRequestModal"
 import GeneralWithContractModal from "../components/ServiceCall/GeneralWithContractModal"
 import ResolutionModal from "../components/ServiceCall/ResolutionModal"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 
 import { GET } from "../api/api"
 import { PATCH } from "../api/api"
+import { POST } from "../api/api"
 
 const ServiceCall = () => {
   // State for service calls
@@ -18,26 +19,26 @@ const ServiceCall = () => {
   const [filterBy, setFilterBy] = useState("")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Modal states
   const [showWithContractModal, setShowWithContractModal] = useState(false)
   const [showResolutionModal, setShowResolutionModal] = useState(false)
+  const [showRequestModal, setShowRequestModal] = useState(false)
   const [selectedCall, setSelectedCall] = useState(null)
 
   // Fetch service calls from API (mock function)
-  useEffect(() => {
-    const fetchServiceCalls = async () => {
-      try {
-        const data = await GET("service-calls/");
-        setServiceCalls(data);
-      } catch (error) {
-        console.error("Error fetching service calls:", error)
-      }
+  const fetchServiceCalls = async () => {
+    try {
+      const data = await GET("service-calls/");
+      setServiceCalls(data);
+    } catch (error) {
+      console.error("Error fetching service calls:", error)
     }
+  }
 
-    fetchServiceCalls()
-  }, [refreshTrigger])
+  useEffect(() => {
+    fetchServiceCalls();
+  }, []);
 
   // table row clicking func
   const handleRowClick = (call) => {
@@ -72,7 +73,7 @@ const ServiceCall = () => {
       await PATCH(`/service-calls/${serviceCallId}/update/`, updatedData);
       setShowWithContractModal(false);
       setShowResolutionModal(false);
-      setRefreshTrigger((prev) => prev + 1);
+      fetchServiceCalls();
   } catch (error) {
       console.error("Error updating service call:", error.message);
   }
@@ -88,6 +89,32 @@ const ServiceCall = () => {
     // Close resolution modal and reopen the appropriate general modal
     setShowResolutionModal(false)
     setShowWithContractModal(true)
+  }
+
+  const handleOpenReq = () => {
+    setShowResolutionModal(false)
+    setShowWithContractModal(false);
+    setShowRequestModal(true);
+  }
+
+  const closeReqModal = () => {
+    setShowRequestModal(false);
+    setShowResolutionModal(true);
+  }
+
+  const handleSubmitReq = async (reqData) => {
+    // submit req
+    console.log("Queueing ticket:", reqData)
+
+    try {
+      const data = await POST("/create-request/", reqData);
+      console.log("Service request created successfully:", data);
+      setShowRequestModal(false);
+      setShowResolutionModal(true);
+      fetchServiceCalls();
+    } catch (error) {
+      console.error("Error creating service request:", error.message);
+    }
   }
 
   const filterOptions = [
@@ -199,6 +226,14 @@ const ServiceCall = () => {
         onClose={() => setShowResolutionModal(false)}
         onUpdate={handleUpdate}
         onShowGeneral={handleReturnToGeneral}
+        onShowRequest={handleOpenReq}
+        callData={selectedCall}
+      />
+
+      <ServiceRequestModal
+        isOpen={showRequestModal}
+        onClose={closeReqModal}
+        onSubmit={handleSubmitReq}
         callData={selectedCall}
       />
     </div>

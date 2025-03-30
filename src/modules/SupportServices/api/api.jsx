@@ -5,7 +5,7 @@ export async function GET(endpoint) {
     method: "GET",
   });
 
-  if (!res.ok) throw new Error(`GET request failed: ${res.status}`);
+  if (!res.ok) throw new Error(`GET request failed: ${res.status}`); // catch errors
 
   return await res.json();
 }
@@ -32,7 +32,7 @@ export async function PATCH(endpoint, data) {
     headers: { "Content-Type": "application/json" },
   });
 
-  if (!res.ok) throw new Error(`PATCH request failed: ${res.status}`);
+  if (!res.ok) throw new Error(`PATCH request failed: ${res.status}`); // catch errors
 
   return await res.json();
 }

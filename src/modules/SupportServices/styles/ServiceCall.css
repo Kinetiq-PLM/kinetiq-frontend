@@ -553,6 +553,8 @@
   gap: 0.375rem;
 }
 
+
+
 .servcall .form-group label {
   font-size: 0.75rem;
   color: #00a8a8;
@@ -573,6 +575,10 @@
   box-sizing: border-box;
   width: 100%;
   color: #333;
+}
+
+.servcall .form-group.req-desc textarea {
+  height: 10rem !important;
 }
 
 .servcall .form-group input::placeholder,
