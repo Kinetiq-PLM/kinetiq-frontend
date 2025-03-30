@@ -3,192 +3,208 @@
 import { useState, useEffect } from "react"
 import "../styles/ServiceContract.css"
 import ServiceContractIcon from "/icons/SupportServices/ServiceContractIcon.png"
+import Table from "../components/ServiceContract/Table"
+import UpdateViewModal from "../components/ServiceContract/UpdateViewModal"
+import CreateContractModal from "../components/ServiceContract/CreateContractModal"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 
 const ServiceContract = () => {
-  // State for search and filter
+  // State for contracts
+  const [contracts, setContracts] = useState([])
+  const [showUpdateModal, setShowUpdateModal] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [selectedContract, setSelectedContract] = useState(null)
   const [searchQuery, setSearchQuery] = useState("")
-  const [filterBy, setFilterBy] = useState("")
+  const [filterOption, setFilterOption] = useState("Filter by")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
-  const [serviceContracts, setServiceContracts] = useState([])
 
-  // Fetch service contracts from API (mock function)
+  // Fetch contracts from API (mock function)
   useEffect(() => {
     // Replace with actual API call
-    const fetchServiceContracts = async () => {
+    const fetchContracts = async () => {
       try {
-        // Mock data for demo
-        setServiceContracts([
+        // Updated mock data
+        setContracts([
           {
-            contractId: "123",
-            customerId: "456",
-            customerName: "JM Fernandez",
-            startDate: "dd/mm/yy",
-            endDate: "dd/mm/yy",
+            id: "SC-001",
+            customerName: "ABC Corporation",
+            productName: "Medical Scanner X1",
+            startDate: "01/05/23",
+            endDate: "01/05/24",
+            status: "Active",
+          },
+          {
+            id: "SC-002",
+            customerName: "City Hospital",
+            productName: "Patient Monitor Pro",
+            startDate: "15/03/23",
+            endDate: "15/03/25",
+            status: "Active",
+          },
+          {
+            id: "SC-003",
+            customerName: "Metro Clinic",
+            productName: "Diagnostic System",
+            startDate: "10/06/23",
+            endDate: "10/06/24",
             status: "Pending",
           },
           {
-            contractId: "124",
-            customerId: "789",
-            customerName: "Xairyl Sison",
-            startDate: "dd/mm/yy",
-            endDate: "dd/mm/yy",
-            status: "Approved",
+            id: "SC-004",
+            customerName: "Health Center Inc.",
+            productName: "Laboratory Equipment",
+            startDate: "22/04/23",
+            endDate: "22/04/24",
+            status: "Expired",
           },
         ])
       } catch (error) {
-        console.error("Error fetching service contracts:", error)
+        console.error("Error fetching contracts:", error)
       }
     }
 
-    fetchServiceContracts()
+    fetchContracts()
   }, [])
 
-  const handleFilterChange = (value) => {
-    setFilterBy(value)
+  // Handle view contract
+  const handleViewContract = (contract) => {
+    setSelectedContract(contract)
+    setShowUpdateModal(true)
+  }
+
+  // Handle add new contract
+  const handleAddContract = () => {
+    setShowCreateModal(true)
+  }
+
+  // Handle update contract
+  const handleUpdateContract = (contractData) => {
+    console.log("Updating contract:", contractData)
+
+    // Here you would typically make an API call to update the contract
+    setShowUpdateModal(false)
+
+    // Optionally refresh the contract list
+    // fetchContracts()
+  }
+
+  // Handle create contract
+  const handleCreateContract = (contractData) => {
+    console.log("Creating contract:", contractData)
+
+    // Here you would typically make an API call to create the contract
+    setShowCreateModal(false)
+
+    // Optionally refresh the contract list
+    // fetchContracts()
+  }
+
+  // Handle filter selection
+  const handleFilterSelect = (option) => {
+    setFilterOption(option)
     setShowFilterOptions(false)
   }
 
-  const filterOptions = [
-    { value: "all", label: "All" },
-    { value: "pending", label: "Pending" },
-    { value: "approved", label: "Approved" },
-    { value: "rejected", label: "Rejected" },
-  ]
+  // Filter contracts based on search query and filter option
+  const filteredContracts = contracts.filter((contract) => {
+    // First apply the status filter if it's not "Filter by" or "All"
+    if (filterOption !== "Filter by" && filterOption !== "All") {
+      if (contract.status !== filterOption) {
+        return false
+      }
+    }
 
-  // Filter service contracts based on selected filter
-  const filteredServiceContracts = serviceContracts.filter((contract) => {
-    if (!filterBy || filterBy === "all") return true
-    if (filterBy === "pending" && contract.status === "Pending") return true
-    if (filterBy === "approved" && contract.status === "Approved") return true
-    if (filterBy === "rejected" && contract.status === "Rejected") return true
-    return false
+    // Then apply the search query filter
+    if (!searchQuery) return true
+
+    return (
+      contract.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      contract.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      contract.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      contract.status.toLowerCase().includes(searchQuery.toLowerCase())
+    )
   })
-
-  const handleViewDetails = (contractId) => {
-    console.log(`View details for contract ID: ${contractId}`)
-    // Implement the view details functionality
-  }
-
-  const handleAdd = () => {
-    console.log("Add button clicked")
-    // Implement the add functionality
-  }
-
-  const handleUpdate = () => {
-    console.log("Update button clicked")
-    // Implement the update functionality
-  }
 
   return (
     <div className="servcont">
-      <div className="servcont-container">
-        <div className="servcont-header">
-          <div className="servcont-title">
-            <div className="servcont-icon">
-              <img src={ServiceContractIcon || "/placeholder.svg?height=24&width=24"} alt="Service Contracts" />
-            </div>
-            <div>
-              <h1>Service Contract</h1>
-              <p>Review and update service contracts</p>
-            </div>
+      <div className="body-content-container">
+        <div className="header">
+          <div className="icon-container">
+            <img src={ServiceContractIcon || "/placeholder.svg?height=24&width=24"} alt="Service Contract" />
           </div>
-          <div className="servcont-divider"></div>
+          <div className="title-container">
+            <h2>Service Contract</h2>
+            <p className="subtitle">Review and update service contracts</p>
+          </div>
         </div>
 
-        <div className="servcont-content">
-          <div className="servcont-search-filter">
-            <div className="servcont-search">
+        <div className="divider"></div>
+
+        <div className="content-scroll-area">
+          <div className="search-container">
+            <div className="search-input-wrapper">
+              <img src={SearchIcon || "/placeholder.svg?height=16&width=16"} alt="Search" className="search-icon" />
               <input
                 type="text"
                 placeholder="Search or type a command (Ctrl + G)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <img
-                src={SearchIcon || "/placeholder.svg?height=16&width=16"}
-                alt="Search"
-                className="servcont-search-icon"
+                className="search-input"
               />
             </div>
-            <div className="servcont-filter">
-              <button className="servcont-filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-                Filter by {filterBy ? `: ${filterOptions.find((opt) => opt.value === filterBy)?.label}` : ""}
-                <span className="servcont-chevron">▼</span>
+            <div className="filter-dropdown">
+              <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
+                {filterOption}
+                <span className="arrow">▼</span>
               </button>
-              {showFilterOptions && (
-                <div className="servcont-filter-options">
-                  {filterOptions.map((option) => (
-                    <div
-                      key={option.value}
-                      className="servcont-filter-option"
-                      onClick={() => handleFilterChange(option.value)}
-                    >
-                      {option.label}
-                    </div>
-                  ))}
+              <div className={`filter-options ${showFilterOptions ? "show" : ""}`}>
+                <div className="filter-option" onClick={() => handleFilterSelect("Active")}>
+                  Active
                 </div>
-              )}
+                <div className="filter-option" onClick={() => handleFilterSelect("Pending")}>
+                  Pending
+                </div>
+                <div className="filter-option" onClick={() => handleFilterSelect("Expired")}>
+                  Expired
+                </div>
+                <div className="filter-option" onClick={() => handleFilterSelect("All")}>
+                  All
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="servcont-table-container">
-            <table className="servcont-table">
-              <thead>
-                <tr>
-                  <th>Contract ID</th>
-                  <th>Customer ID</th>
-                  <th>Customer Name</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
-                  <th>Status</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredServiceContracts.map((contract) => (
-                  <tr key={contract.contractId}>
-                    <td>{contract.contractId}</td>
-                    <td>{contract.customerId}</td>
-                    <td>{contract.customerName}</td>
-                    <td>{contract.startDate}</td>
-                    <td>{contract.endDate}</td>
-                    <td>{contract.status}</td>
-                    <td>
-                      <button className="servcont-view-button" onClick={() => handleViewDetails(contract.contractId)}>
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {/* Empty rows to fill the table */}
-                {Array(10 - filteredServiceContracts.length)
-                  .fill()
-                  .map((_, index) => (
-                    <tr key={`empty-${index}`} className="servcont-empty-row">
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+          {/* Table Component */}
+          <Table contracts={filteredContracts} onViewContract={handleViewContract} />
 
-          <div className="servcont-actions">
-            <button className="servcont-add-button" onClick={handleAdd}>
-              Add
-            </button>
-            <button className="servcont-update-button" onClick={handleUpdate}>
+          <div className="buttons-container">
+            <button className="update-button" onClick={() => setShowUpdateModal(true)}>
               Update
+            </button>
+            <button className="add-button" onClick={handleAddContract}>
+              Add
             </button>
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {showUpdateModal && (
+        <UpdateViewModal
+          isOpen={showUpdateModal}
+          onClose={() => setShowUpdateModal(false)}
+          onUpdate={handleUpdateContract}
+          contract={selectedContract}
+        />
+      )}
+
+      {showCreateModal && (
+        <CreateContractModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onCreate={handleCreateContract}
+        />
+      )}
     </div>
   )
 }
