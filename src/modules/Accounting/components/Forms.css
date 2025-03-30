@@ -1,44 +1,80 @@
 .input-container {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  label {
-    font-size: 12px;
-    color: #646464; /* Gray text for label */
-    margin-bottom: 5px;
-  }
-  
-  .input-component {
-    width: 100%;
-    padding: 10px 12px;
-    border: none;
-    background-color: white;
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
-    border: 1.5px solid #A4A4A4;
-    font-size: 14px;
-    color: black;
-    border-radius: 5px;
-    outline: none;
-  }
-
-  /* Customize number input spinner buttons */
-.input-component[type="number"]::-webkit-inner-spin-button,
-.input-component[type="number"]::-webkit-outer-spin-button {
-    background: white; /* Change background color */
-    color: black; /* Change arrow color */
-    border-radius: 3px; /* Optional: round the corners */
-    width: 16px; /* Adjust size */
-    height: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Ensure the input itself has a white background */
-.input-component[type="number"] {
-    background: white;
-    color: black;
+label {
+  font-size: 12px;
+  color: #646464; /* Gray text for label */
+  margin-bottom: 5px;
+}
+
+.input-component {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background-color: white;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid #A4A4A4;
+  font-size: 14px;
+  color: black;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.input-component:focus {
+  border-color: #006767;
+  box-shadow: 0px 2px 4px rgba(0, 103, 103, 0.2);
+}
+
+/* Customize number input spinner buttons */
+.input-component[type="number"]::-webkit-inner-spin-button,
+.input-component[type="number"]::-webkit-outer-spin-button {
+  background: white;
+  color: black;
+  border-radius: 3px;
+  width: 16px;
+  height: 16px;
 }
 
 .input-component::placeholder {
   color: #969696;
 }
 
+/* ─────────── Responsive Design ─────────── */
+
+/* Mobile (small) ≤ 480px */
+@media (max-width: 480px) {
+  label {
+    font-size: 10px;
+  }
+  .input-component {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+}
+
+/* Mobile (large) ≤ 768px */
+@media (max-width: 768px) {
+  .input-component {
+    font-size: 13px;
+    padding: 7px 9px;
+  }
+}
+
+/* Tablet 769px – 1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .input-component {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+}
+
+/* Small Desktop 1025px – 1280px */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .input-component {
+    font-size: 15px;
+    padding: 8px 10px;
+  }
+}

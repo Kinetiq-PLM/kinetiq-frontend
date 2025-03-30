@@ -144,15 +144,15 @@ const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
 
                 <div className="parent-component-container">
 
-                    <div className="component-container">
+                    <div className="parent-component-container">
 
                         <div className="flex flex-col w-80">
                             <Forms
                                 type="text"
-                                formName="Entry Line ID*"
-                                placeholder="Enter Entry Line ID"
-                                value={journalForm.entryLineId}
-                                onChange={(e) => setJournalForm({ ...journalForm, entryLineId: e.target.value })}
+                                formName="Journal ID*"
+                                placeholder="Enter Journal ID"
+                                value={journalForm.journalID}
+                                onChange={(e) => setJournalForm({ ...journalForm, journalID: e.target.value })}
                             />
                             <Forms
                                 type="text"
@@ -227,7 +227,7 @@ const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
                                         type="number"
                                         placeholder="Enter Credit"
                                         value={entry.amount}
-                                        onChange={(e) => handleInputChange(index, 'amount', e.target.value)}
+                                        onChange={(e) => handleInputChange(index, 'amount', e.target.value)} // Fixed syntax error
                                     />
                                 )}
                             </div>
