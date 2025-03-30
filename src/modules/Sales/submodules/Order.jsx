@@ -161,10 +161,12 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
 
     // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
     setSubmitted(true);
-
+    const quotation_id = selectedQuotation
+      ? selectedQuotation.quotation_id
+      : null;
     const request = {
       order_data: {
-        quotation_id: selectedQuotation.quotation_id,
+        quotation_id,
         order_date: new Date().toISOString(),
         order_status: "Pending",
         order_total_amount: orderInfo.total_price,
