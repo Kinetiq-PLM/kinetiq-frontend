@@ -136,7 +136,7 @@ const ServiceTicket = () => {
   })
 
   return (
-    <div className="servtick">
+    <div className="serv servtick">
       <div className="body-content-container">
         <div className="header">
           <div className="icon-container">

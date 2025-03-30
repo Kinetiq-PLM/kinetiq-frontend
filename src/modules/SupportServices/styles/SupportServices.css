@@ -1,11 +1,5 @@
 /* REMINDER! All of your elements must use your unique namespace '.serv' at the start to avoid leaking */
-.serv {
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
-
-.serv .body-content-container {
+.serv-main .body-content-container {
     width: 100%;
     height: 100%;
     border-radius: 0.5rem;
@@ -19,3 +13,576 @@
     min-width: 40rem;
     min-height: 30rem;
   }
+
+.serv  {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  font-family: "Poppins", sans-serif;
+}
+
+.serv .header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+  
+.serv .icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.serv .icon-container img {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #00a8a8;
+  margin-top: 0.125rem;
+}
+
+.serv .title-container {
+  display: flex;
+  flex-direction: column;
+} 
+
+.serv .title-container h2 {
+  margin: 0;
+  color: #000000;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.serv .title-container .subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.serv .divider {
+  height: 2px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 0.5rem 0 1.5rem 0;
+}
+
+.serv .content-scroll-area:hover {
+  scrollbar-color: #00a8a8 #f0f0f0;
+}
+
+/* Custom scrollbar for Webkit browsers */
+.serv .content-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.serv .content-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.serv .content-scroll-area:hover::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.serv .content-scroll-area::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+.serv .content-scroll-area:hover::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+}
+
+.serv .search-filter-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Search bar styling with icon */
+.serv .search-container {
+  position: relative;
+  width: auto;
+  display: inline-block;
+  border: 1px solid #cdd5d8; 
+  border-radius: 8px; 
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.serv .search-container:hover {
+  border: 1px solid #00a8a8;
+  box-shadow: 0 0 10px rgba(22, 218, 218, 0.5);
+}
+
+.serv .search-container:focus-within {
+  border: 1px solid #00a8a8;
+  box-shadow: 0 0 10px rgba(22, 218, 218, 0.5);
+}
+
+.serv .search-container input:focus {
+  outline: none;
+}
+
+.serv .search-input {
+  padding: 0.625rem 0.625rem 0.625rem 2rem; /* Add padding for icon */
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: "Poppins", sans-serif;
+  background-color: #f5f5f5;
+  width: auto;
+  min-width: 350px;
+}
+
+.serv .search-input:focus {
+  outline: none;
+  border: none;
+  background-color: #f5f5f5;
+  box-shadow: none;
+}
+
+.serv .search-icon {
+  position: absolute;
+  left: 0.625rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+}
+
+.serv .filter-dropdown {
+  position: relative;
+}
+
+/* Update Filter by button styling */
+.serv .filter-button {
+  background-color: white;
+  border: 1px solid #cdd5d8;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem; /* Smaller font size */
+  color: #888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500; /* Medium weight */
+  box-shadow: none;
+  width: auto; /* Only as wide as needed */
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.serv .filter-button:hover {
+  border: 1px solid #00a8a8;
+  box-shadow: 0 0 10px rgba(22, 218, 218, 0.5);
+}
+
+.serv .filter-button .arrow {
+  font-size: 0.625rem;
+  margin-left: 0.25rem;
+  color: #858585;
+}
+
+.serv .filter-option {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Poppins", sans-serif;
+}
+
+.serv .filter-option:hover {
+  background-color: #bee2e2;
+}
+
+/* Table styles */
+.serv .table-container {
+  width: 100%;
+  margin-bottom: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  max-height: 52vh;
+  overflow-y: auto;
+  display: block;
+  position: relative;
+}
+
+.serv .update-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding: 0 0.25rem;
+}
+
+.serv .update-button {
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  transition: 0.3s;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+}
+
+.serv .update-button.clickable {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.serv .update-button.disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
+.serv .update-button.clickable:hover {
+  background-color: #098f8f;
+}
+
+.serv .update-button.clickable:active {
+  background-color: #087d7d;
+}
+
+.serv .view-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: 500;
+}
+
+.serv .view-button:hover {
+  background-color: #098f8f;
+}
+
+/* Modal Styles */
+.serv .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal header */
+.serv .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: none;
+}
+
+/* Modal header with logo and line */
+.serv .modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.serv .modal-header-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #00a8a8;
+}
+
+.serv .modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
+}
+
+/* Larger exit icon */
+.serv .close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.serv .close-button img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.serv .modal-header-divider {
+  height: 2px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 0;
+}
+
+.serv .modal-content:hover {
+  scrollbar-color: #00a8a8 #f0f0f0;
+}
+
+/* Custom scrollbar for Webkit browsers */
+.serv .modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.serv .modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.serv .modal-content:hover::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.serv .modal-content::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+.serv .modal-content:hover::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+}
+
+.serv .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+
+.serv .required {
+  color: #f44336;
+}
+
+.serv .form-group label {
+  font-size: 0.75rem;
+  color: #00a8a8;
+  font-weight: 500;
+}
+
+.serv .form-group input,
+.serv .form-group textarea,
+.serv .form-group select {
+  padding: 0.625rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  height: 2.5rem;
+  box-sizing: border-box;
+  width: 100%;
+  color: #333;
+}
+
+.serv .select-wrapper {
+  position: relative;
+}
+
+.serv .select-arrow {
+  cursor: pointer;
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.625rem;
+  color: #888;
+  background: none;
+}
+
+.serv .dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  list-style: none;
+  padding: 0;
+  margin: 5px 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border-radius: 7px;
+  z-index: 9999; 
+  display: block !important; 
+}
+.serv .dropdown-list li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.serv .dropdown-list li:hover {
+  background-color: #bee2e2;
+}
+
+.serv .dropdown-list::-webkit-scrollbar {
+  width: 8px; 
+}
+
+.serv .dropdown-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.serv .dropdown-list:hover::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.serv .dropdown-list::-webkit-scrollbar-thumb {
+  background: #00a8a8;
+  border-radius: 8px;
+}
+
+.serv .dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: hsl(180, 100%, 26%);
+}
+
+.serv .date-input-wrapper {
+  position: relative;
+}
+
+.serv .date-input-wrapper input {
+  padding-right: 2.5rem;
+}
+
+.serv .calendar-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+}
+
+.serv .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.serv .cancel-button {
+  background-color: white;
+  color: #00a8a8;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border: 1px solid #00a8a8;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  min-width: 7rem;
+}
+
+.serv .cancel-button:hover {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.serv.cancel-button:active {
+  background-color: #006666;
+  color: white;
+}
+
+.serv .update-modal-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  min-width: 7rem;
+}
+
+.serv .update-modal-button:hover {
+  background-color: #098f8f;
+}
+
+.serv .alert-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.serv .alert-modal-content {
+  display: flex;
+  flex-direction: column; 
+  gap: 20px;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.serv .alert-okay-button {
+  background-color: #00a8a8;
+  color: white;
+  border: 1px solid #00a8a8;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+
+  min-width: 7rem;
+  width: auto; 
+  max-width: fit-content; 
+  display: inline-block; 
+  align-self: center;
+  box-sizing: border-box; 
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.serv .alert-okay-button:hover {
+  transform: scale(1.05); 
+  background-color: #008888;
+}
+
+.serv .alert-okay-button:active {
+  background-color: #006666;
+  color: white;
+}
+
+.serv .alert-modal-content h2 {
+  font-weight: bold;
+  font-size: 25px;
+  color: #00a8a8;
+}
+
+.serv .alert-modal-content p {
+  font-size: 15px;
+}

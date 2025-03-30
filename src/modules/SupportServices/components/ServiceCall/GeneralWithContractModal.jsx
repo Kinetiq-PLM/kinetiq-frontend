@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
-import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 
 import { GET } from "../../api/api"
 

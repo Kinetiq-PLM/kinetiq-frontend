@@ -20,6 +20,7 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
   const [technicians, setTechnicians] = useState([]);
   const [isTechDropdown, setOpenTechDD] = useState(false);
   const [isOpenTypeDD, setOpenTypeDD] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   // Update form when callData changes
   useEffect(() => {
@@ -35,12 +36,20 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
   }, [callData])
 
   const handleSubmitReq = () => {
+    if (callData?.call_status === "Closed") {
+        setShowModal(true);
+        return; // Stop execution
+    }
+    
+    const today = new Date().toISOString().split("T")[0];
+
     onSubmit({
       service_call_id: callId,
       customer_id: customerId,
       technician_id: technicianId,
       request_type: requestType,
       request_status: "Pending",
+      request_date: today,
       request_description: requestDescription,
     })
     // reset form
@@ -56,15 +65,15 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
   }
 
   // fetches a list of techs
-const fetchTechnicians = async () => {
-    try {
-      const response = await GET("/technicians/");
-      console.log("techs", response)
-      setTechnicians(response);
-    } catch (error) {
-      console.error("Error fetching technicians:", error);
-    }
-  };
+  const fetchTechnicians = async () => {
+      try {
+        const response = await GET("/technicians/");
+        console.log("techs", response)
+        setTechnicians(response);
+      } catch (error) {
+        console.error("Error fetching technicians:", error);
+      }
+    };
   
   const handleToggleDropdownTech = () => {
     if (!isTechDropdown) {
@@ -274,6 +283,16 @@ const fetchTechnicians = async () => {
           </button>
         </div>
       </div>
+
+      {showModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>⚠  WARNING</h2>
+            <p>Service call already has an existing service request.</p>
+            <button className="alert-okay-button" onClick={() => setShowModal(false)}>OK</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
