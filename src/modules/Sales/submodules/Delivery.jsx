@@ -2,7 +2,6 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { TAX_RATE } from "../temp_data/sales_data";
 import "../styles/Index.css";
-
 import {
   AlertProvider,
   useAlert,
@@ -12,6 +11,7 @@ import CustomerListModal from "../components/Modals/Lists/CustomerList";
 import ProductListModal from "../components/Modals/Lists/ProductList";
 import OrderListModal from "./../components/Modals/Lists/OrderList";
 import BlanketAgreementListModal from "../components/Modals/Lists/BlanketAgreementList";
+import EmployeeListModal from "../components/Modals/Lists/EmployeeListModal.jsx";
 
 import NewCustomerModal from "../components/Modals/NewCustomer";
 import SalesTable from "../components/SalesTable";
@@ -19,6 +19,8 @@ import SalesInfo from "../components/SalesInfo";
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
+import { GET, POST } from "../api/api.jsx";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
@@ -48,6 +50,8 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState("");
+  const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
 
   const [isOrderListOpen, setIsOrderListOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -63,7 +67,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     { key: "product_name", label: "Product Name", editable: false },
     { key: "project_type", label: "Project Type", editable: false },
     { key: "quantity", label: "Quantity" },
-    { key: "markup_price", label: "Price" },
+    { key: "selling_price", label: "Price" },
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },
@@ -86,6 +90,47 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     shipping_fee: 0,
     warranty_fee: 0,
     total_price: 0,
+  });
+
+  const copyFromMutation = useMutation({
+    mutationFn: async (data) =>
+      await GET(`sales/${data.transferOperation}/${data.transferID}`),
+    onSuccess: async (data, variables, context) => {
+      const prods = await Promise.all(
+        data.statement.items.map(async (item) => {
+          const price = (
+            await GET(`sales/products?admin_product=${item.product.product_id}`)
+          )[0];
+
+          return {
+            product_id: item.product.product_id,
+            product_name: item.product.product_name,
+            quantity: Number(item.quantity),
+            selling_price: Number(price.selling_price),
+            discount: Number(item.discount),
+            tax: Number(item.tax_amount),
+            total_price: Number(item.total_price),
+          };
+        })
+      );
+      console.log(prods);
+      setProducts(prods);
+      setSelectedOrder(data);
+      setSelectedCustomer(data.statement.customer);
+      setSelectedEmployee(data.statement.salesrep);
+      localStorage.removeItem("TransferID");
+      localStorage.removeItem("TransferOperation");
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const deliveryMutation = useMutation({
+    mutationFn: async (data) => await POST("sales/delivery/", data),
+    onSuccess: (data, variables, context) => {
+      setOrderInfo({ ...deliveryInfo, delivery_id: data.shipping_id });
+    },
   });
 
   const handleDelete = () => {
@@ -131,7 +176,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     setSubmitted(true);
     showAlert({
       type: "success",
-      title: "Order Submitted",
+      title: "Delivery Submitted",
     });
   };
 
@@ -159,7 +204,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     const warrantyFee = products.reduce(
       (acc, product) =>
         acc +
-        ((product.markup_price - product.unit_price) *
+        ((product.markup_price - product.selling_price) *
           product.quantity *
           product.warranty_period) /
           12,
@@ -195,13 +240,21 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     };
 
     modalActions[copyFromModal]?.(true);
-    setCopyFromModal("");
+    // setCopyFromModal("");
   }, [copyFromModal]);
 
   useEffect(() => {
+    console.log(copyFromModal);
     if (copyFromModal === "Order" && selectedOrder) {
-      setDeliveryInfo(selectedOrder);
       setCopyFromModal("");
+      setDeliveryInfo((prev) => ({
+        ...prev,
+        order_id: selectedOrder.order_id,
+      }));
+      copyFromMutation.mutate({
+        transferID: selectedOrder.order_id,
+        transferOperation: "order",
+      });
       setSelectedOrder(null);
       // fill out fields HERE
     } else if (
@@ -244,32 +297,72 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     const transferOperation = localStorage.getItem("TransferOperation");
 
     if (transferID && transferOperation) {
-      // SEARCH DB FOR TRANSFERID with TRANSFEROPERATION
-      // FILL DETAILS WITH DATA
-      console.log("Searching for ID: ", transferID);
-      console.log("At Operation: ", transferOperation);
-      localStorage.removeItem("TransferID");
-      localStorage.removeItem("TransferOperation");
+      copyFromMutation.mutate({
+        transferOperation: JSON.parse(transferOperation),
+        transferID: JSON.parse(transferID),
+      });
     }
   }, []);
 
   useEffect(() => {
-    transferData();
-  }, [selectedCustomer, products]);
+    if (!selectedCustomer || products.length === 0) return;
+    const totalBeforeDiscount = products.reduce(
+      (acc, product) => acc + product.selling_price * product.quantity,
+      0
+    );
+
+    const totalTax = Number(
+      products.reduce(
+        (acc, product) =>
+          acc + TAX_RATE * (product.selling_price * product.quantity),
+        0
+      )
+    ).toFixed(2);
+
+    const totalDiscount = products.reduce(
+      (acc, product) => acc + product.discount,
+      0
+    );
+
+    const shippingFee = products.length * 100;
+    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
+    const totalPrice =
+      Number(totalBeforeDiscount) -
+      Number(totalDiscount) +
+      Number(totalTax) +
+      Number(shippingFee) +
+      Number(warrantyFee);
+    const delivery = {
+      ...deliveryInfo,
+      customer_id: selectedCustomer.customer_id,
+      selected_products: [...products],
+      total_before_discount: Number(totalBeforeDiscount),
+      selected_delivery_date:
+        deliveryInfo.selected_delivery_date || new Date().toISOString(),
+      selected_address: selectedCustomer.address_line1,
+      total_tax: Number(totalTax),
+      discount: Number(totalDiscount),
+      shipping_fee: Number(shippingFee),
+      warranty_fee: Number(warrantyFee),
+      total_price: Number(totalPrice),
+    };
+
+    setDeliveryInfo(delivery);
+  }, [products, selectedCustomer]);
 
   useEffect(() => {
     setDeliveryInfo({
       ...deliveryInfo,
       selected_address: address,
     });
-  }, [selectedCustomer, address]);
+  }, [address]);
 
   useEffect(() => {
     setDeliveryInfo({
       ...deliveryInfo,
       selected_delivery_date: deliveryDate,
     });
-  }, [selectedCustomer, deliveryDate]);
+  }, [deliveryDate]);
 
   return (
     <div className="delivery">
@@ -299,6 +392,11 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsOrderListOpen(false)}
           setOrder={setSelectedOrder}
         ></OrderListModal>
+        <EmployeeListModal
+          isOpen={isEmployeeListOpen}
+          onClose={() => setIsEmployeeListOpen(false)}
+          setEmployee={setSelectedEmployee}
+        ></EmployeeListModal>
 
         <BlanketAgreementListModal
           isOpen={isBlanketAgreementListOpen}
@@ -359,27 +457,48 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           <div className="w-full flex flex-col gap-3 mt-4 lg:mt-0">
             <InfoField
               label={"Total Before Discount"}
-              value={deliveryInfo.total_before_discount}
+              value={Number(deliveryInfo.total_before_discount).toLocaleString(
+                "en-US",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}
             />
             <InfoField
               label={"Discount"}
-              value={Number(deliveryInfo.discount).toFixed(2)}
+              value={Number(deliveryInfo.discount).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <InfoField
               label={"Shipping"}
-              value={Number(deliveryInfo.shipping_fee).toFixed(2)}
+              value={Number(deliveryInfo.shipping_fee).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <InfoField
               label={"Warranty"}
-              value={Number(deliveryInfo.warranty_fee).toFixed(2)}
+              value={Number(deliveryInfo.warranty_fee).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <InfoField
               label={"Tax"}
-              value={Number(deliveryInfo.total_tax).toFixed(2)}
+              value={Number(deliveryInfo.total_tax).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <InfoField
               label={"Total"}
-              value={Number(deliveryInfo.total_price).toFixed(2)}
+              value={Number(deliveryInfo.total_price).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             />
             <div className="flex justify-center md:justify-end gap-2">
               <SalesDropup
