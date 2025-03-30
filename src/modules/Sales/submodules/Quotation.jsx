@@ -97,6 +97,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
+    { key: "project_type", label: "Project Type", editable: false },
     { key: "quantity", label: "Quantity" },
     { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },

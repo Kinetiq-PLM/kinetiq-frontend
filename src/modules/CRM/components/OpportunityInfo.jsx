@@ -4,7 +4,7 @@ import { useState } from "react";
 const InputCustomer = ({ label, value = "", customerListModal }) => {
   return (
     <div className="flex justify-between mb-2 w-full">
-      <p className="flex-1">{label}</p>
+      <p className="flex-1 text-sm">{label}</p>
       <div
         className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
         onClick={() => customerListModal(true)}
@@ -22,7 +22,7 @@ const InputCustomer = ({ label, value = "", customerListModal }) => {
 const Information = ({ label, value = "" }) => {
   return (
     <div className="flex justify-between mb-2 w-full">
-      <p className="flex-1">{label}</p>
+      <p className="flex-1 text-sm">{label}</p>
       <div
         className={`border border-[#9a9a9a] flex-1 p-1 h-[30px] rounded ${
           value === "" ? "bg-[#f7f7f7]" : ""

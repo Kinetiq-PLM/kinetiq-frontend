@@ -97,6 +97,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
+    { key: "project_type", label: "Project Type", editable: false },
     { key: "quantity", label: "Quantity" },
     { key: "selling_price", label: "Price" },
     { key: "tax", label: "Tax", editable: false },
@@ -201,11 +202,15 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
 
   // For copy from feature
   useEffect(() => {
-    if (copyFromModal === "Quotation") {
-      setIsQuotationListOpen(true);
-    } else if (copyFromModal === "Blanket Agreement") {
-      setIsBlanketAgreementListOpen(true);
-    }
+    if (!copyFromModal) return;
+
+    const modalActions = {
+      Quotation: setIsQuotationListOpen,
+      "Blanket Agreement": setIsBlanketAgreementListOpen,
+    };
+
+    modalActions[copyFromModal]?.(true);
+    setCopyFromModal("");
   }, [copyFromModal]);
 
   useEffect(() => {
@@ -468,8 +473,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
                 placeholder="Copy From"
                 options={copyFromOptions}
                 disabled={!copyFromOptions}
-                loadSubModule={loadSubModule}
-                setActiveSubModule={setActiveSubModule}
                 setOption={setCopyFromModal}
               />
               <SalesDropup
@@ -477,8 +480,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
                 placeholder="Copy To"
                 options={copyToOptions}
                 disabled={!submitted}
-                loadSubModule={loadSubModule}
-                setActiveSubModule={setActiveSubModule}
                 setOption={setCopyToModal}
               />
             </div>
