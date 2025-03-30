@@ -234,7 +234,7 @@
 }
 
 .servtick .filter-option:hover {
-  background-color: #00a8a8;
+  background-color: #bee2e2;
 }
 
 /* Button styling with Inter semi-bold font */
@@ -525,10 +525,12 @@
   padding: 10px;
   cursor: pointer;
   font-size: 0.75rem;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
 }
 
 .servtick .dropdown-list li:hover {
-  background: #f0f0f0;
+  background: #bee2e2;
 }
 
 .servtick .dropdown-list::-webkit-scrollbar {

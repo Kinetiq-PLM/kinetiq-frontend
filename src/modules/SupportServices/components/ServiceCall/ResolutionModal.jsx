@@ -8,6 +8,7 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, callData })
   const [resolutionDetails, setResolutionDetails] = useState("")
   const [wasResolved, setWasResolved] = useState("")
   const [activeTab, setActiveTab] = useState("resolution")
+  const [isResolvedDD, setOpenResolvedDD] = useState(false);
 
   useEffect(() => {
     if (callData) {
@@ -22,6 +23,16 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, callData })
       resolution: resolutionDetails
     })
   }
+
+  // handle status
+  const handleResolvedDropdown = () => {
+    setOpenResolvedDD((prev) => !prev); 
+  };
+
+  const handleSelectResolved = (selectedResolved) => {
+    setWasResolved(selectedResolved); 
+    setOpenResolvedDD(false); 
+  };
 
   if (!isOpen) return null
 
@@ -74,12 +85,26 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, callData })
                     type="text"
                     id="wasResolved"
                     value={wasResolved}
+                    readOnly
                     onChange={(e) => setWasResolved(e.target.value)}
                     placeholder="Select"
                   />
-                  <span className="select-arrow">▼</span>
+                  <span className="select-arrow" onClick={handleResolvedDropdown}>▼</span>
+                  {isResolvedDD && (
+                    <ul className="dropdown-list">
+                      {["Yes", "No"].map((res) => (
+                        <li key={res} onClick={() => handleSelectResolved(res)}>
+                          {res}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-                <button className="service-request-button" onClick={() => {}}>
+                <button 
+                  className={`service-request-button ${wasResolved === "No" ? "disabled" : ""}`} 
+                  onClick={() => {}}
+                  disabled={wasResolved === "No"}
+                >
                 Service Request
               </button>
               </div>
@@ -90,9 +115,7 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, callData })
                 <button className="update-modal-button" onClick={handleSubmit}>
                   Update
                 </button>
-              </div>
-            
-            
+              </div>                   
           </div>
           
         </div>

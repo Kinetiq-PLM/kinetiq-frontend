@@ -223,7 +223,7 @@
 }
 
 .servcall .filter-option:hover {
-  background-color: #00a8a8;
+  background-color: #bee2e2;
 }
 
 .servcall .table-container {
@@ -627,11 +627,12 @@
 .servcall .dropdown-list li {
   padding: 10px;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
 }
 
 .servcall .dropdown-list li:hover {
-  background: #f0f0f0;
+  background-color: #bee2e2;
 }
 
 .servcall .dropdown-list::-webkit-scrollbar {
@@ -729,20 +730,45 @@
   color: white;
   border: none;
   border-radius: 0.5rem;
-  padding: 0.625rem 2rem; /* Increased padding */
+  padding: 0.625rem 1.75rem;
   font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.2s;
   font-family: "Inter", sans-serif;
   font-weight: 600;
   height: 2.5rem;
-  width: auto;
-  white-space: nowrap;
-  text-align: center;
+  min-width: 7rem;
+}
+
+.servcall .service-request-button.clickable {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.servcall .service-request-button.disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
+.servcall .service-request-button.clickable:hover{
+  background-color: #098f8f;
+}
+
+.servcall .service-request-button.clickable:active {
+  background-color: #087d7d;
 }
 
 .servcall .service-request-button:hover {
   background-color: #098f8f;
+}
+
+.servcall .service-request-button:active {
+  background-color: #087d7d;
 }
 
 /* Resolution textarea */
