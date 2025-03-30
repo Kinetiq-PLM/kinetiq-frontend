@@ -32,19 +32,18 @@ const BodyContent = () => {
     }, []);
 
     const tabConfig = {
-        "Raw Materials": "raw_material_id",
+        "Raw Materials": "material_id",
         "Assets": "asset_id",
         "Products": "productdocu_id",
     }
-    console.log("Tab Config:", tabConfig[activeTab]);
-    
+  
    
     const fieldName = tabConfig[activeTab];
     console.log("Field to filter by:", fieldName)
 
     // Filter data based on selected Tab
     const filteredTabConfig = pcounts.filter((item) => item[fieldName] !== null);
-    
+    console.log("Filtered data based on selected tab:", filteredTabConfig);
     
 
     // const filterByDateRange = (data, range) => {
@@ -148,12 +147,7 @@ const BodyContent = () => {
                                                 className="border-b border-gray-300 hover:bg-gray-100"
                                                 onClick={() => setSelectedRow(item)} // ← Set selected row
                                             >
-                                                <td className="p-2">{
-                                                item.productdocu_id !== null ? item.productdocu_id : 
-                                                item.raw_material_id != null ? item.raw_material_id : 
-                                                item.asset_id != null ? item.asset_id : 
-                                                "N/A"
-                                                }</td>
+                                                <td className="p-2">{item.product_name || "N/A"}</td>
                                                 <td className="p-2">{item.item_actually_counted ?? "-"}</td>
                                                 <td className="p-2">{item.expiry_date || "-"}</td>
                                                 <td className="p-2">{item.employee || "Unassigned"}</td>
