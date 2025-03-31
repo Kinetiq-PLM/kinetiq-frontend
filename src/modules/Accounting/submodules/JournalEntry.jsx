@@ -1,21 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../styles/JournalEntry.css';
 import '../styles/accounting-styling.css';
 import Button from '../components/Button';
 import Forms from '../components/Forms';
+import NotifModal from '../components/modalNotif/NotifModal'; // Import NotifModal
 
-const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
+const JournalEntry = () => {
     const [journalForm, setJournalForm] = useState({
-        entryLineId: '',
+        journalId: '',
         transactions: [{ type: 'debit', glAccountId: '', amount: '' }],
-        description: journalDescription || '',
+        description: '',
     });
     const [totalDebit, setTotalDebit] = useState(0);
     const [totalCredit, setTotalCredit] = useState(0);
 
-    useEffect(() => {
-        setJournalForm((prev) => ({ ...prev, description: journalDescription || '' }));
-    }, [journalDescription]);
+    // New state for modal notification
+    const [validation, setValidation] = useState({
+        isOpen: false,
+        type: "warning",
+        title: "",
+        message: "",
+    });
 
     const handleInputChange = (index, field, value) => {
         setJournalForm((prevState) => {
@@ -58,78 +63,84 @@ const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
     };
 
     const handleSubmit = async () => {
-        if (!journalForm.entryLineId || !journalForm.description) {
-            alert('Please fill in all required fields: Entry Line ID and Description.');
+        if (!journalForm.journalId || !journalForm.description) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Required Fields",
+                message: "Please fill in all required fields: Journal ID and Description.",
+            });
             return;
         }
         if (journalForm.transactions.length < 2) {
-            alert('A journal entry requires at least one debit and one credit transaction.');
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Insufficient Transactions",
+                message: "A journal entry requires at least one debit and one credit transaction.",
+            });
             return;
         }
         if (totalDebit !== totalCredit || totalDebit === 0) {
-            alert('Total Debit must equal Total Credit and cannot be zero.');
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Unbalanced Entry",
+                message: "Total Debit must equal Total Credit and cannot be zero.",
+            });
             return;
         }
 
-        const requests = journalForm.transactions.map((transaction, index) => {
-            const entryLineId = `${journalForm.entryLineId}-${index}-${String(Date.now())}`; // Updated to full timestamp
-            const payload = {
-                entry_line_id: entryLineId, // Matches max_length=255
-                journal_id: journalId || '10001', // String, matches CharField
-                gl_account_id: transaction.glAccountId || null, // String, no parseInt
-                debit_amount: transaction.type === 'debit' ? parseFloat(transaction.amount).toFixed(2) : '0.00',
-                credit_amount: transaction.type === 'credit' ? parseFloat(transaction.amount).toFixed(2) : '0.00',
+        const payload = {
+            total_debit: totalDebit.toFixed(2),
+            total_credit: totalCredit.toFixed(2),
+            description: journalForm.description,
+            transactions: journalForm.transactions.map((t, index) => ({
+                entry_line_id: `${journalForm.journalId}-${index}-${Date.now()}`,
+                gl_account_id: t.glAccountId || null,
+                debit_amount: t.type === 'debit' ? parseFloat(t.amount).toFixed(2) : '0.00',
+                credit_amount: t.type === 'credit' ? parseFloat(t.amount).toFixed(2) : '0.00',
                 description: journalForm.description || null,
-            };
-            console.log('Submitting payload:', payload); // Debug
-            return fetch('http://127.0.0.1:8000/api/journal-entry-lines/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            }).then((response) => {
-                if (!response.ok) {
-                    return response.json().then((data) => {
-                        throw new Error(JSON.stringify(data) || `HTTP Error ${response.status}`);
-                    });
-                }
-                return response.json().then(data => {
-                    console.log('POST response:', data); // Debug
-                    return data;
-                });
-            });
-        });
+            })),
+        };
+        console.log('Submitting payload to PATCH /journal-entries:', payload);
 
         try {
-            await Promise.all(requests);
-            const updatePayload = {
-                total_debit: totalDebit.toFixed(2),
-                total_credit: totalCredit.toFixed(2),
-            };
-            const updateResponse = await fetch(`http://127.0.0.1:8000/api/journal-entries/${journalId || '10001'}/`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/journal-entries/${journalForm.journalId}/`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatePayload),
+                body: JSON.stringify(payload),
             });
 
-            if (!updateResponse.ok) {
-                throw new Error(`Failed to update journal totals: ${updateResponse.status}`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to update journal: ${response.status} - ${errorText}`);
             }
 
-            alert('Journal entry lines created successfully!');
+            const data = await response.json();
+            console.log('PATCH response:', data);
+
+            setValidation({
+                isOpen: true,
+                type: "success",
+                title: "Journal Entry Updated",
+                message: "Journal entry updated successfully!",
+            });
             setJournalForm({
-                entryLineId: '',
+                journalId: '',
                 transactions: [{ type: 'debit', glAccountId: '', amount: '' }],
-                description: journalDescription || '',
+                description: '',
             });
             setTotalDebit(0);
             setTotalCredit(0);
-
-            if (onEntryCreated) {
-                onEntryCreated();
-            }
         } catch (error) {
             console.error('Error submitting data:', error);
-            alert(`Error: ${error.message}`);
+            setValidation({
+                isOpen: true,
+                type: "error",
+                title: "Error Updating Journal Entry",
+                message: error.message,
+            });
         }
     };
 
@@ -141,18 +152,15 @@ const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
                     <h2 className="subModule-subTitle">Enter debit and credit details for transactions.</h2>
                 </div>
 
-
                 <div className="parent-component-container">
-
-                    <div className="parent-component-container">
-
+                    <div className="component-container">
                         <div className="flex flex-col w-80">
                             <Forms
                                 type="text"
                                 formName="Journal ID*"
                                 placeholder="Enter Journal ID"
-                                value={journalForm.journalID}
-                                onChange={(e) => setJournalForm({ ...journalForm, journalID: e.target.value })}
+                                value={journalForm.journalId}
+                                onChange={(e) => setJournalForm({ ...journalForm, journalId: e.target.value })}
                             />
                             <Forms
                                 type="text"
@@ -162,7 +170,6 @@ const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
                                 onChange={(e) => setJournalForm({ ...journalForm, description: e.target.value })}
                             />
                         </div>
-
                         <div className="component-container">
                             <Button name="+ Add debit" variant="standard2" onclick={() => addEntry('debit')} />
                             <Button name="+ Add credit" variant="standard2" onclick={() => addEntry('credit')} />
@@ -176,17 +183,15 @@ const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
                             variant="standard2"
                             onclick={() =>
                                 setJournalForm({
-                                    entryLineId: '',
+                                    journalId: '',
                                     transactions: [{ type: 'debit', glAccountId: '', amount: '' }],
-                                    description: journalDescription || '',
+                                    description: '',
                                 })
                             }
                         />
                     </div>
                 </div>
 
-
-                {/* Table Part */}
                 <div className="journal-table">
                     <div className="table-header">
                         <div className="column account-column">Accounts Affected</div>
@@ -209,7 +214,6 @@ const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
                                     onChange={(e) => handleInputChange(index, 'glAccountId', e.target.value)}
                                 />
                             </div>
-
                             <div className="column debit-column">
                                 {entry.type === 'debit' && (
                                     <Forms
@@ -220,14 +224,13 @@ const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
                                     />
                                 )}
                             </div>
-
                             <div className="column credit-column">
                                 {entry.type === 'credit' && (
                                     <Forms
                                         type="number"
                                         placeholder="Enter Credit"
                                         value={entry.amount}
-                                        onChange={(e) => handleInputChange(index, 'amount', e.target.value)} // Fixed syntax error
+                                        onChange={(e) => handleInputChange(index, 'amount', e.target.value)}
                                     />
                                 )}
                             </div>
@@ -243,6 +246,17 @@ const JournalEntry = ({ journalId, journalDescription, onEntryCreated }) => {
                         <div className="column credit-column">{totalCredit.toFixed(2)}</div>
                     </div>
                 </div>
+
+                {/* Add NotifModal for feedback */}
+                {validation.isOpen && (
+                    <NotifModal
+                        isOpen={validation.isOpen}
+                        onClose={() => setValidation({ ...validation, isOpen: false })}
+                        type={validation.type}
+                        title={validation.title}
+                        message={validation.message}
+                    />
+                )}
             </div>
         </div>
     );

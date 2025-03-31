@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/accounting-styling.css';
-import { sortingChoices } from './ListOfAccounts';
 import Button from '../components/Button';
 import Dropdown from '../components/Dropdown';
 import Table from '../components/Table';
-import SearchBar from "../../../shared/components/SearchBar";
 import JournalModalInput from '../components/JournalModalInput';
 import NotifModal from '../components/modalNotif/NotifModal';
+import Search from '../components/Search';
 
 const Journal = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,19 +18,20 @@ const Journal = () => {
     });
     const columns = ["Journal Id", "Journal Date", "Description", "Debit", "Credit", "Invoice Id", "Currency Id"];
     const [data, setData] = useState([]);
+    const [searching, setSearching] = useState("");
+    const [sortOrder, setSortOrder] = useState("asc");
 
-    // Reusable function to format API data
+
     const formatData = (result) => result.map(entry => [
         entry.journal_id || entry.id || '-',
         entry.journal_date || entry.date || '-',
         entry.description || '-',
-        entry.total_debit === 0 ? '-' : entry.total_debit, // Display '-' if 0.00
-        entry.total_credit === 0 ? '-' : entry.total_credit, // Display '-' if 0.00
+        entry.total_debit || 0, // Keep as numeric
+        entry.total_credit || 0, // Keep as numeric
         entry.invoice_id || '-',
         entry.currency_id || '-'
     ]);
 
-    // Reusable function to fetch data
     const fetchData = () => {
         fetch('http://127.0.0.1:8000/api/journal-entries/')
             .then(response => response.json())
@@ -53,7 +53,7 @@ const Journal = () => {
         setJournalForm(prevState => ({ ...prevState, [field]: value }));
     };
 
-    const [validation, setValidation] = useState ({
+    const [validation, setValidation] = useState({
         isOpen: false,
         type: "warning",
         title: "",
@@ -61,76 +61,24 @@ const Journal = () => {
     });
 
     const handleSubmit = () => {
-        // Validation: Ensure all required fields are filled
-        if (!journalForm.journalDate && !journalForm.journalId && !journalForm.description && !journalForm.invoiceId && !journalForm.currencyId) {
+        if (!journalForm.journalDate || !journalForm.journalId || !journalForm.description || !journalForm.invoiceId || !journalForm.currencyId) {
             setValidation({
                 isOpen: true,
                 type: "warning",
-                title: "All Fields are Required.",
-                message: "Fill up all the forms.",
+                title: "Missing Required Fields",
+                message: "Please fill in all required fields.",
             });
             return;
         }
 
-        if (!journalForm.journalDate) {
-            setValidation({
-                isOpen: true,
-                type: "warning",
-                title: "Missing Journal Date",
-                message: "Please enter the journal date.",
-            });
-            return;
-        }
-
-        if (!journalForm.journalId) {
-            setValidation({
-                isOpen: true,
-                type: "warning",
-                title: "Missing Journal ID",
-                message: "Please provide a valid journal ID.",
-            });
-            return;
-        }
-
-        if (!journalForm.description) {
-            setValidation({
-                isOpen: true,
-                type: "warning",
-                title: "Missing Description",
-                message: "Please enter a description for the journal entry.",
-            });
-            return;
-        }
-
-        if (!journalForm.invoiceId) {
-            setValidation({
-                isOpen: true,
-                type: "warning",
-                title: "Missing Invoice ID",
-                message: "Please link the journal entry to an invoice ID.",
-            });
-            return;
-        }
-
-        if (!journalForm.currencyId) {
-            setValidation({
-                isOpen: true,
-                type: "warning",
-                title: "Missing Currency",
-                message: "Please select a currency for the journal entry.",
-            });
-            return;
-        }
-
-        // Log the payload for debugging
         const payload = {
-            journal_id: journalForm.journalId, // Include the user-entered Journal ID
+            journal_id: journalForm.journalId,
             journal_date: journalForm.journalDate,
             description: journalForm.description,
-            total_debit: "0.00", // Required field, must send 0.00 to API
-            total_credit: "0.00", // Required field, must send 0.00 to API
-            invoice_id: journalForm.invoiceId || null, // Keep it a string or null
-            currency_id: journalForm.currencyId // Keep it a string
+            total_debit: "0.00",
+            total_credit: "0.00",
+            invoice_id: journalForm.invoiceId || null,
+            currency_id: journalForm.currencyId
         };
         console.log('Submitting payload:', payload);
 
@@ -139,14 +87,10 @@ const Journal = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         })
-            .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
-                return response.json().then(data => ({ ok: response.ok, status: response.status, data }));
-            })
-            .then(({ ok, status, data }) => {
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
                 if (ok) {
-                    fetchData(); // Sync with server
+                    fetchData();
                     setJournalForm({ journalId: '', journalDate: '', description: '', currencyId: '', invoiceId: '' });
                     closeModal();
                     setValidation({
@@ -156,25 +100,51 @@ const Journal = () => {
                         message: "Journal ID added successfully!",
                     });
                 } else {
-                    console.error('Server error response:', data);
-                    setValidation({
-                        isOpen: true,
-                        type: "error",
-                        title: "Server Error: Adding Account failed",
-                        message: "Creating account failed",
-                    });
+                    throw new Error(data.detail || 'Failed to create journal');
                 }
             })
             .catch(error => {
-                console.error('Error submitting data:', error.message);
+                console.error('Error submitting data:', error);
                 setValidation({
                     isOpen: true,
                     type: "error",
-                    title: "Check Connection!",
-                    message: "Kindly check your connection to the database.",
+                    title: "Error Adding Journal",
+                    message: error.message,
                 });
             });
     };
+
+    // Function to handle sorting (applies to both debit and credit columns)
+    const handleSort = () => {
+        const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
+        setSortOrder(newSortOrder);
+
+        const sortedData = [...data].sort((a, b) => {
+            const debitA = parseFloat(a[3]) || 0;
+            const debitB = parseFloat(b[3]) || 0;
+            const creditA = parseFloat(a[4]) || 0;
+            const creditB = parseFloat(b[4]) || 0;
+
+            const sortByDebit = debitA - debitB;
+            const sortByCredit = creditA - creditB;
+
+            if (newSortOrder === "asc") {
+                return sortByDebit !== 0 ? sortByDebit : sortByCredit;
+            } else {
+                return sortByDebit !== 0 ? -sortByDebit : -sortByCredit;
+            }
+        });
+
+        setData(sortedData);
+    };
+
+    const filteredData = data.filter(row =>
+        [row[0], row[1], row[2], row[5], row[6]]
+            .filter(Boolean) // Remove null/undefined values
+            .join(" ")
+            .toLowerCase()
+            .includes(searching.toLowerCase())
+    );
 
     return (
         <div className='Journal'>
@@ -185,19 +155,17 @@ const Journal = () => {
                 </div>
 
                 <div className="parent-component-container">
-
                     <div className="component-container">
-                        <Dropdown options={sortingChoices} style="selection" defaultOption="Sort ID.." />
-                        <SearchBar />
+                        <Dropdown options={["Ascending", "Descending"]} style="selection" defaultOption="Sort Debit Credit.." onChange={handleSort} />
+                        <Search type="text" placeholder="Search.. " value={searching} onChange={(e) => setSearching(e.target.value)} />
                     </div>
 
                     <div className='component-container'>
                         <Button name="Create Journal ID" variant="standard2" onclick={openModal} />
                     </div>
-
                 </div>
 
-                <Table data={data} columns={columns} />
+                <Table data={filteredData} columns={columns} enableCheckbox={false} />
             </div>
 
             <JournalModalInput
@@ -208,16 +176,15 @@ const Journal = () => {
                 handleSubmit={handleSubmit}
             />
 
-            {validation && (
-                <NotifModal 
+            {validation.isOpen && (
+                <NotifModal
                     isOpen={validation.isOpen}
-                    onClose={ () => {setValidation({ ...validation, isOpen: false })}}
+                    onClose={() => setValidation({ ...validation, isOpen: false })}
                     type={validation.type}
                     title={validation.title}
                     message={validation.message}
                 />
             )}
-
         </div>
     );
 };
