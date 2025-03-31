@@ -26,7 +26,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
       await GET(`sales/reporting/operations?period=${salesPeriod}`),
   });
 
-  const profitOptions = ["Day", "Month", "Year", "Max"];
+  const profitOptions = ["day", "month", "year", "all"];
 
   useEffect(() => {
     if (profitQuery.status === "success") {
@@ -51,7 +51,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
     }
   }, [salesQuery.data]);
   return (
-    <div className="reporting flex flex-col gap-4">
+    <div className="reporting flex flex-col gap-4 overflow-y-auto">
       <div className="bg-white rounded-lg p-8 w-full shadow">
         <Heading
           Title="Reporting"
@@ -63,8 +63,9 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
             Profit Report
           </h1>
-          <div className="w-full h-full">
+          <div className="justify-center items-center">
             <LineChart
+              height={400}
               dataset={profitReportData}
               xAxis={[
                 {
@@ -96,7 +97,8 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                           : "text-gray-500"
                       }`}
                     >
-                      {option}
+                      {String(option).charAt(0).toUpperCase() +
+                        String(option).slice(1)}
                     </span>
                   </label>
                 );
@@ -108,6 +110,20 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
             Sales Report
           </h1>
+          <div className="justify-center items-center">
+            <LineChart
+              height={400}
+              dataset={salesReportData}
+              xAxis={[
+                {
+                  dataKey: "date",
+                  scaleType: "time",
+                  valueFormatter: (value) => value.toLocaleDateString(),
+                },
+              ]}
+              series={[{ dataKey: "profit" }]}
+            />
+          </div>
         </div>
       </div>
     </div>
