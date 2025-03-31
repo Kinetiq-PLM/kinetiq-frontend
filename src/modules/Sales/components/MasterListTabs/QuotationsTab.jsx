@@ -27,6 +27,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
     { key: "type", label: "Type" },
     { key: "total_price", label: "Total Price" },
     { key: "salesrep", label: "Sales Representative" }, // name of salesrep if available
+    { key: "status", label: "Status" },
     { key: "date_issued", label: "Date Issued" },
     { key: "document", label: "Document" },
   ];
@@ -58,6 +59,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
         customer_name: quote.statement.customer.name,
         address: `${quote.statement.customer.address_line1} ${quote.statement.customer.address_line2}`,
         type: quote.statement.type,
+        status: quote.status,
         salesrep: `${quote.statement.salesrep.first_name} ${quote.statement.salesrep.last_name}`,
         total_price: Number(quote.statement.total_amount).toLocaleString(
           "en-US",
