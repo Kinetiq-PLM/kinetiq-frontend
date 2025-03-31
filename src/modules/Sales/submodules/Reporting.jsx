@@ -105,7 +105,16 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
             Profit Report
           </h1>
-          <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2 p-4">
+          <div className="justify-center items-center border-[#f3f4f6] rounded-lg border-2 p-4">
+            <div className="flex flex-col gap-2 px-4">
+              <span>Gross Profits</span>
+              <span className="text-3xl">
+                {totalProfit.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+            </div>
             <LineChart
               height={500}
               dataset={profitReportData}
