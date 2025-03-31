@@ -172,7 +172,7 @@ const ServiceTicket = () => {
           <div className="filter-submit-container">
             <div className="filter-dropdown">
               <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-                Filter by
+              {filterOptions.find(opt => opt.value === filterBy)?.label || "Filter by"}
                 <span className="arrow">▼</span>
               </button>
               {showFilterOptions && (

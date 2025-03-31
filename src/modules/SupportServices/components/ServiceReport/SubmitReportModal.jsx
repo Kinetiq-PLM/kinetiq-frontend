@@ -4,27 +4,64 @@ import { useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceReportIcon from "/icons/SupportServices/ServiceReportIcon.png"
 
-const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
-  const [ticketId, setTicketId] = useState("")
-  const [requestId, setRequestId] = useState("")
-  const [requestType, setRequestType] = useState("")
-  const [renewalId, setRenewalId] = useState("")
-  const [billingId, setBillingId] = useState("")
-  const [description, setDescription] = useState("")
-  const [status, setStatus] = useState("")
+import { GET } from "../api/api"
 
-  // Update form when report changes
-  useEffect(() => {
-    if (report) {
-      setTicketId(report.ticketId || "")
-      setRequestId(report.requestId || "")
-      setRequestType(report.requestType || "")
-      setRenewalId(report.renewalId || "")
-      setBillingId(report.billingId || "")
-      setDescription(report.description || "")
-      setStatus(report.status || "")
+const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
+  const [tickets, setTickets] = useState([]);
+  const [isTixDropdown, setOpenTixDD] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    ticketId: "",
+    requestId: "",
+    requestType: "",
+    renewalId: "",
+    billingId: "",
+    technicianName: "",
+    description: "",
+    reportStatus: ""
+  })
+
+  const fetchTickets = async () => {
+    try {
+      const data = await GET("tickets/");
+      setTickets(data);
+    } catch (error) {
+      console.error("Error fetching tickets:", error)
     }
-  }, [report])
+  }
+
+  const handleToggleTickets = () => {
+    if (!isTixDropdown) {
+      fetchTickets(); 
+    }
+    setOpenTixDD(!isTixDropdown);
+  };
+
+  const handleSelectTix = (ticket) => {
+    
+
+    setFormData((prev) => ({
+      ...prev,
+      ticketId: statementItem.statement_item_id || "",
+      requestId: statementItem.product?.product_id || "",
+      requestType: statementItem.product?.product_name || "",
+    }));
+    if (statementItem.additional_service) {
+      fetchAddServices(statementItem.additional_service);
+    } else {
+      console.log("No additional service ID found.");
+      setAdditionalServices([{}]); 
+    }
+    setOpenSTMDD(false);
+  };
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  }
 
   const handleSubmit = () => {
     onSubmit({
@@ -34,7 +71,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
       renewalId,
       billingId,
       description,
-      status,
+      reportStatus,
     })
   }
 
@@ -42,13 +79,13 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-container submit-report-modal">
+      <div className="modal-container">
         <div className="modal-header">
-          <div className="modal-title">
+          <div className="modal-header-left">
             <img
               src={ServiceReportIcon || "/placeholder.svg?height=24&width=24"}
               alt="Service Report"
-              className="modal-icon"
+              className="modal-header-icon"
             />
             <h2>Submit Report</h2>
           </div>
@@ -56,7 +93,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
             <img src={ExitIcon || "/placeholder.svg?height=16&width=16"} alt="Close" />
           </button>
         </div>
-        <div className="modal-divider"></div>
+        <div className="modal-header-divider"></div>
 
         <div className="modal-content">
           <div className="modal-form">
@@ -68,8 +105,8 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
                     <input
                       type="text"
                       id="ticketId"
-                      value={ticketId}
-                      onChange={(e) => setTicketId(e.target.value)}
+                      value={formData.ticketId}
+                      onChange={handleChange}
                       placeholder="Enter ticket ID"
                     />
                     <span className="select-arrow">▼</span>
@@ -81,8 +118,9 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
                   <input
                     type="text"
                     id="requestId"
-                    value={requestId}
-                    onChange={(e) => setRequestId(e.target.value)}
+                    readOnly
+                    value={formData.requestId}
+                    onChange={handleChange}
                     placeholder="Enter request ID"
                   />
                 </div>
@@ -92,8 +130,9 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
                   <input
                     type="text"
                     id="requestType"
-                    value={requestType}
-                    onChange={(e) => setRequestType(e.target.value)}
+                    readOnly
+                    value={formData.requestType}
+                    onChange={handleChange}
                     placeholder="Enter request type"
                   />
                 </div>
@@ -104,8 +143,9 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
                     <input
                       type="text"
                       id="renewalId"
-                      value={renewalId}
-                      onChange={(e) => setRenewalId(e.target.value)}
+                      readOnly
+                      value={formData.renewalId}
+                      onChange={handleChange}
                       placeholder="Enter renewal ID"
                     />
                     <span className="select-arrow">▼</span>
@@ -117,8 +157,9 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
                   <input
                     type="text"
                     id="billingId"
-                    value={billingId}
-                    onChange={(e) => setBillingId(e.target.value)}
+                    readOnly
+                    value={formData.billingId}
+                    onChange={handleChange}
                     placeholder="Enter billing ID"
                   />
                 </div>
@@ -126,14 +167,13 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
 
               <div className="form-column">
                 <div className="form-group description-group">
-                  <label htmlFor="submitDescription">Description</label>
+                  <label htmlFor="description">Description</label>
                   <div className="textarea-container">
                     <textarea
-                      id="submitDescription"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+                      id="description"
+                      value={formData.description}
+                      onChange={handleChange}
                       placeholder="Enter description"
-                      rows={4}
                       className="description-textarea"
                     />
                     <div className="custom-scrollbar-container">
@@ -152,8 +192,9 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
                     <input
                       type="text"
                       id="reportStatus"
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
+                      readOnly
+                      value={formData.reportStatus}
+                      onChange={handleChange}
                       placeholder="Select status"
                     />
                     <span className="select-arrow">▼</span>
@@ -168,7 +209,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, report }) => {
           <button className="cancel-button" onClick={onClose}>
             Cancel
           </button>
-          <button className="action-button" onClick={handleSubmit}>
+          <button className="update-modal-button" onClick={handleSubmit}>
             Submit
           </button>
         </div>

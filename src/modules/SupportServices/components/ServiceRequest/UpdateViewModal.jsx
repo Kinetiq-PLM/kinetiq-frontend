@@ -165,7 +165,9 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
       <div className="modal-container">
         <div className="modal-header">
           <div className="modal-header-left">
-            <img src={ServiceRequestIcon || "/placeholder.svg"} alt="Service Request" className="modal-header-icon" />
+            <img src={ServiceRequestIcon || "/placeholder.svg"} 
+            alt="Service Request" 
+            className="modal-header-icon" />
             <h2>Service Request</h2>
           </div>
           <button className="close-button" onClick={onClose}>

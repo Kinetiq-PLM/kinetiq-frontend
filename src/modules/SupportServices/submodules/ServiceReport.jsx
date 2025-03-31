@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import "../styles/ServiceReport.css"
+import "../styles/SupportServices.css"
 import ServiceReportIcon from "/icons/SupportServices/ServiceReportIcon.png"
 import CalendarFilterIcon from "/icons/SupportServices/CalendarFilterIcon.png"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
@@ -9,6 +10,8 @@ import Table from "../components/ServiceReport/Table"
 import InputField from "../components/ServiceReport/InputField"
 import UpdateReportModal from "../components/ServiceReport/UpdateReportModal"
 import SubmitReportModal from "../components/ServiceReport/SubmitReportModal"
+
+import { GET } from "../api/api"
 
 const ServiceReport = () => {
   // State for form fields
@@ -20,76 +23,52 @@ const ServiceReport = () => {
   const [renewalId, setRenewalId] = useState("")
   const [billingId, setBillingId] = useState("")
   const [reports, setReports] = useState([])
-  const [filterPeriod, setFilterPeriod] = useState("Last 30 days")
+  const [filterPeriod, setFilterPeriod] = useState("All Time")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
   const [showFilterByOptions, setShowFilterByOptions] = useState(false)
   const [filterBy, setFilterBy] = useState("Filter by")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedTicketStatus, setSelectedTicketStatus] = useState(null);
 
   // Modal states
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showSubmitModal, setShowSubmitModal] = useState(false)
   const [selectedReport, setSelectedReport] = useState(null)
 
-  // Fetch reports from API (mock function)
-  useEffect(() => {
-    // Replace with actual API call
-    const fetchReports = async () => {
-      try {
-        // Mock data for demonstration
-        setReports([
-          {
-            reportId: "SR-2023-001",
-            ticketId: "TK-4872",
-            requestId: "REQ-9283",
-            callId: "CALL-5621",
-            technicianName: "Edrill Baylan",
-            submissionDate: "2025-03-20",
-            status: "Submitted",
-          },
-          {
-            reportId: "SR-2023-002",
-            ticketId: "TK-4873",
-            requestId: "REQ-9284",
-            callId: "CALL-5622",
-            technicianName: "Nicole Jokic",
-            submissionDate: "2025-03-21",
-            status: "Submitted",
-          },
-          {
-            reportId: "SR-2023-003",
-            ticketId: "TK-4875",
-            requestId: "REQ-9286",
-            callId: "CALL-5624",
-            technicianName: "Michael Chen",
-            submissionDate: "2025-03-22",
-            status: "Draft",
-          },
-          {
-            reportId: "SR-2023-004",
-            ticketId: "TK-4878",
-            requestId: "REQ-9290",
-            callId: "CALL-5628",
-            technicianName: "Sarah Johnson",
-            submissionDate: "2025-03-23",
-            status: "Pending",
-          },
-          {
-            reportId: "SR-2023-005",
-            ticketId: "TK-4880",
-            requestId: "REQ-9292",
-            callId: "CALL-5630",
-            technicianName: "David Rodriguez",
-            submissionDate: "2025-03-24",
-            status: "Submitted",
-          },
-        ])
-      } catch (error) {
-        console.error("Error fetching reports:", error)
-      }
+  const fetchReports = async () => {
+    try {
+      const data = await GET("service-reports/");
+      setReports(data);
+    } catch (error) {
+      console.error("Error fetching reports:", error)
     }
+  }
 
-    fetchReports()
-  }, [])
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  // table row clicking func
+  const handleRowClick = async (report) => {
+    setSelectedReport(report);
+    try {
+      const data = await GET(`service-reports/${report.report_id}`); 
+      console.log("Fetched data:", data);
+
+      setTicketSubject(data.service_ticket?.ticketSubject || "");
+      setDescription(data.description || ""); 
+      setRequestType(data.request_type || "");
+      setCustomerId(data.service_ticket?.customer?.customer_id || "");
+      setRenewalId(data.renewal?.renewal_id || "");
+      setName(data.service_ticket?.customer?.name || "");
+      setBillingId(data.service_billing?.service_billing_id || "");
+
+      setSelectedTicketStatus(data.service_ticket?.status || "");
+
+    } catch (error) {
+      console.error("Error fetching report details:", error);
+    }
+};
 
   // Handle update report
   const handleUpdate = () => {
@@ -148,26 +127,68 @@ const ServiceReport = () => {
     setShowFilterByOptions(false)
   }
 
+  const isWithinDays = (date, days) => {
+    const reportDate = new Date(date);
+    const today = new Date();
+    const pastDate = new Date();
+    pastDate.setDate(today.getDate() - days);
+    return reportDate >= pastDate && reportDate <= today;
+  };
+
+  const filterOptions = [
+    { value: "all", label: "All" },
+    { value: "submitted", label: "Submitted" },
+    { value: "draft", label: "Draft" },
+    { value: "reviewed", label: "Reviewed" }
+  ]
+
+  const filteredReports = reports.filter((report) => {
+    const matchesSearch =
+    searchQuery === "" ||
+    report.report_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+    report.service_ticket?.ticket_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+    report.service_request?.service_request_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    report.service_call?.service_call_id?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (`${report.technician?.first_name ?? ""} ${report.technician?.last_name ?? ""}`
+    .toLowerCase()
+    .includes(searchQuery.toLowerCase()));
+
+    if (filterBy !== "all") {
+      if (filterBy === "submitted" && report.report_status !== "Submitted") return false;
+      if (filterBy === "draft" && report.report_status !== "Draft") return false;
+      if (filterBy === "reviewed" && report.report_status !== "Reviewed") return false;
+    }
+
+    if (filterPeriod !== "All Time") {
+      if (filterPeriod === "Last 7 days" && !isWithinDays(report.submission_date, 7)) return false;
+      if (filterPeriod === "Last 30 days" && !isWithinDays(report.submission_date, 30)) return false;
+      if (filterPeriod === "Last 90 days" && !isWithinDays(report.submission_date, 90)) return false;
+    }
+  
+    return matchesSearch;
+  });
+
+  
+
   return (
-    <div className="service-report">
-      <div className="report-container">
-        <div className="report-header">
-          <div className="header-icon-title">
+    <div className="serv service-report">
+      <div className="body-content-container">
+        <div className="header">
+          <div className="icon-container">
             <img
               src={ServiceReportIcon || "/placeholder.svg?height=24&width=24"}
               alt="Service Report"
-              className="header-icon"
             />
-            <div className="header-title">
+          </div>  
+          <div className="title-container">
               <h2>Service Report</h2>
               <p className="subtitle">Comprehensive Record of Completed Service Tasks and Actions</p>
-            </div>
           </div>
         </div>
 
-        <div className="report-divider"></div>
+        <div className="divider"></div>
 
-        <div className="report-content">
+        <div className="content-scroll-area">
           {/* Input Fields Component */}
           <InputField
             ticketSubject={ticketSubject}
@@ -186,12 +207,18 @@ const ServiceReport = () => {
             setBillingId={setBillingId}
           />
 
-          <div className="filter-container">
-            <div className="search-box">
+          <div className="search-filter-container">
+            <div className="search-container">
               <img src={SearchIcon || "/placeholder.svg?height=16&width=16"} alt="Search" className="search-icon" />
-              <input type="text" placeholder="Search or type a command (Ctrl + G)" />
+              <input
+                type="text"
+                placeholder="Search or type a command (Ctrl + G)"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
             </div>
-
+            <div className="right-filters">
             <div className="filter-dropdown">
               <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
                 <img
@@ -204,55 +231,55 @@ const ServiceReport = () => {
               </button>
               {showFilterOptions && (
                 <div className="filter-options">
-                  <div className="filter-option" onClick={() => handleFilterChange("Last 7 days")}>
-                    Last 7 days
-                  </div>
-                  <div className="filter-option" onClick={() => handleFilterChange("Last 30 days")}>
-                    Last 30 days
-                  </div>
-                  <div className="filter-option" onClick={() => handleFilterChange("Last 90 days")}>
-                    Last 90 days
-                  </div>
+                  <div className="filter-option" onClick={() => handleFilterChange("All Time")}>All Time</div>
+                  <div className="filter-option" onClick={() => handleFilterChange("Last 7 days")}>Last 7 days</div>
+                  <div className="filter-option" onClick={() => handleFilterChange("Last 30 days")}>Last 30 days</div>
+                  <div className="filter-option" onClick={() => handleFilterChange("Last 90 days")}>Last 90 days</div>
                 </div>
               )}
             </div>
 
             <div className="filter-dropdown">
               <button className="filter-button" onClick={() => setShowFilterByOptions(!showFilterByOptions)}>
-                {filterBy}
+              {filterOptions.find(opt => opt.value === filterBy)?.label || "Filter by"}
                 <span className="arrow">▼</span>
               </button>
               {showFilterByOptions && (
                 <div className="filter-options">
-                  <div className="filter-option" onClick={() => handleFilterByChange("All Reports")}>
-                    All Reports
-                  </div>
-                  <div className="filter-option" onClick={() => handleFilterByChange("Submitted")}>
-                    Submitted
-                  </div>
-                  <div className="filter-option" onClick={() => handleFilterByChange("Draft")}>
-                    Draft
-                  </div>
-                  <div className="filter-option" onClick={() => handleFilterByChange("Pending")}>
-                    Pending
-                  </div>
+                  {filterOptions.map((option) => (
+                    <div key={option.value} className="filter-option" onClick={() => handleFilterByChange(option.value)}>
+                      {option.label}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
+            </div>
+            
           </div>
 
           {/* Table Component */}
-          <Table reports={reports} />
+          <Table reports={filteredReports} onRowClick={handleRowClick}  />
 
           <div className="action-buttons">
-            <button className="close-ticket-button" onClick={handleCloseTicket}>
+          <button
+              type="button"
+              onClick={handleCloseTicket}
+              className={`close-ticket-button ${selectedReport ? "clickable" : "disabled"}`}
+              disabled={!selectedReport}
+            >
               Close Ticket
             </button>
             <div className="right-buttons">
-              <button className="action-button" onClick={handleUpdate}>
+              <button 
+                type="button" 
+                className={`update-button ${selectedReport ? "clickable" : "disabled"}`}
+                onClick={handleUpdate} 
+                disabled={!selectedReport}
+              >
                 Update
               </button>
-              <button className="action-button" onClick={handleSubmit}>
+              <button className="add-button" onClick={handleSubmit}>
                 Submit Report
               </button>
             </div>
