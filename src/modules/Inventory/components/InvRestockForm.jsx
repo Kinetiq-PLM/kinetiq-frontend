@@ -6,8 +6,6 @@ const InvRestockForm = ({ onClose, selectedItem, activeTab }) => {
   const [employeeId, setEmployeeId] = useState("");
   const [purchaseDescription, setPurchaseDescription] = useState("");
   const [purchaseItem, setPurchaseItem] = useState("");
-  const [validDate, setValidDate] = useState("");
-  const [requiredDate, setRequiredDate] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -29,13 +27,12 @@ const InvRestockForm = ({ onClose, selectedItem, activeTab }) => {
     }
   }, [selectedItem, activeTab]);
   
-
   const handleClear = () => {
     setQuantity("");
     setEmployeeId("");
     setPurchaseDescription("");
     if (selectedItem) {
-      setPurchaseItem(activeTab === "Assets" ? selectedItem.Name : selectedItem.Name);
+      setPurchaseItem(selectedItem.Name);
     } else {
       setPurchaseItem("");
     }
@@ -60,10 +57,10 @@ const InvRestockForm = ({ onClose, selectedItem, activeTab }) => {
   
     const requestData = {
       request_id: "REQ-" + Date.now(), 
-      employee_id: employeeId,                   // use employeeId state
-      item_id: purchaseItem,                     // use purchaseItem state (you may want to store the original ID here)
+      employee_id: employeeId,
+      item_id: purchaseItem,
       purchase_quantity: quantity,
-      purchase_description: purchaseDescription  // use purchaseDescription state
+      purchase_description: purchaseDescription
     };
   
     if (activeTab === "Assets") {
@@ -113,7 +110,6 @@ const InvRestockForm = ({ onClose, selectedItem, activeTab }) => {
       setErrorMessage(error.message || "An unexpected error occurred.");
     }
   };
-  
 
   return (
     <div className="modal-overlay">
@@ -169,25 +165,6 @@ const InvRestockForm = ({ onClose, selectedItem, activeTab }) => {
             onChange={(e) => setPurchaseDescription(e.target.value)}
             rows="4"
           />
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label>Valid Date</label>
-              <input
-                type="date"
-                value={validDate}
-                onChange={(e) => setValidDate(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Required Date</label>
-              <input
-                type="date"
-                value={requiredDate}
-                onChange={(e) => setRequiredDate(e.target.value)}
-              />
-            </div>
-          </div>
 
           <div className="form-actions">
             <button
