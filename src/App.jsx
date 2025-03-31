@@ -98,19 +98,19 @@ function App() {
       "Financial Reports": "FinancialReports",
     },
     Purchasing: {
-      "Purchase Orders": "PurchaseOrders",
       "Purchase Request List": "PurchaseReqList",
-      "Purchase Request Form": "PurchaseReqForm",
-      "Purchase Order Status": "PurchaseOrdStat",
       "Puchase Quotation List": "PurchaseQuot",
+      "Purchase Orders": "PurchaseOrders",
+      "Purchase Order Status": "PurchaseOrdStat",
       "A/P Invoice": "PurchaseAPInvoice",
       "Credit Memo": "PurchaseCredMemo",
       "Vendor Application Form": "VendorAppForm",
-      "Purchase Quotation Form": "PurchForQuotForm",
     },
     Operations: {
       "Workflow Automation": "WorkflowAutomation",
       "Operational Analytics": "OperationalAnalytics",
+      "Goods Tracking": "GoodsTracking",
+      "Goods Receipt PO": "GoodsReceiptPO",
     },
     Sales: {
       Quotation: "Quotation",

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/PurchForQuotForm.css";
 
-const PurchForQuotForm = () => {
+const PurchForQuotForm = ({ onClose }) => {
     const [formData, setFormData] = useState({
         partnerCode: "0035",
         documentNumber: "RFQ0000",
@@ -31,11 +31,15 @@ const PurchForQuotForm = () => {
         }));
     };
 
+    const handleBack = () => {
+        onClose();
+    };
+
     return (
         <div className="purchquoteform">
             <div className="body-content-container">
                 <div className="purchquoteform-header">
-                    <button className="purchquoteform-back">← Back</button>
+                    <button className="purchquoteform-back" onClick={handleBack}>← Back</button>
                     <h2 className="purchquoteform-title">Request For Quotation Form</h2>
                     <button className="purchquoteform-send">Send To</button>
                 </div>

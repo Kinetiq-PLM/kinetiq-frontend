@@ -13,8 +13,6 @@
     box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     min-width: 40rem;
     min-height: 30rem;
 }
@@ -26,6 +24,12 @@
     margin-bottom: 1rem;
     gap: 1rem;
     width: 100%;
+}
+
+.purchquote .purchquote-header-left {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
 }
 
 .purchquote .purchquote-back {
@@ -123,33 +127,33 @@
 .purchquote .purchquote-content {
     flex: 1;
     background: white;
-    border: 1px solid #eee;
+    border: 1px solid #D2D2D2;
     border-radius: 0.5rem;
     padding: 1rem;
     margin: 1rem 0;
     display: flex;
     flex-direction: column;
     width: 100%;
+    overflow: auto;
+    max-height: calc(100vh - 20rem);
 }
 
 .purchquote .purchquote-table {
-    flex: 1;
-    border-radius: 0.25rem;
-    overflow: hidden;
+    width: 100%;
+    min-width: 800px;
 }
 
 .purchquote .purchquote-table-header {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 1;
     display: grid;
     grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
     padding: 1rem;
-    background-color: #f8f9fa;
     border-bottom: 1px solid #eee;
     font-weight: 500;
-}
-
-.purchquote .purchquote-table-header > div {
-    text-align: center;
 }
 
 .purchquote .purchquote-table-rows {
@@ -205,26 +209,75 @@
     color: #f57c00;
 }
 
-.purchquote .purchquote-footer {
-    display: flex;
-    justify-content: center;
-    padding: 1rem 0;
-    width: 100%;
-}
-
-.purchquote .purchquote-compare {
+.purchquote .purchquote-new-form,
+.purchquote .purchquote-compare,
+.purchquote .purchquote-send-to {
     padding: 0.5rem 1.5rem;
-    border: none;
     border-radius: 0.25rem;
-    background-color: #00bcd4;
-    color: white;
-    font-size: 0.85rem;
+    border: none;
     cursor: pointer;
+    font-size: 0.9rem;
     transition: background-color 0.2s ease;
 }
 
-.purchquote .purchquote-compare:hover {
+.purchquote .purchquote-new-form {
     background-color: #00A8A8;
+    color: white;
+}
+
+.purchquote .purchquote-new-form:hover {
+    background-color: #008080;
+}
+
+.purchquote .purchquote-compare {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.purchquote .purchquote-compare:hover {
+    background-color: #d0d0d0;
+}
+
+.purchquote .purchquote-send-to {
+    background-color: #00A8A8;
+    color: white;
+}
+
+.purchquote .purchquote-send-to:hover {
+    background-color: #008080;
+}
+
+.purchquote .purchquote-footer {
+    position: relative;
+    width: 100%;
+    height: 3.5rem;
+    margin-top: 1rem;
+    padding: 0 1rem;
+}
+
+.purchquote .purchquote-new-form {
+    position: absolute;
+    left: 1rem;
+    bottom: 0;
+}
+
+.purchquote .purchquote-compare {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+}
+
+.purchquote .purchquote-send-to {
+    position: absolute;
+    right: 1rem;
+    bottom: 0;
+}
+
+.purchquote .purchquote-footer-right {
+    display: flex;
+    gap: 1rem;
+    justify-self: end;
 }
 
 .status-pending {

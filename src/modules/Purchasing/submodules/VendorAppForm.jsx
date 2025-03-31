@@ -23,7 +23,7 @@ const VendorAppForm = () => {
         dateRequested: ""
     });
 
-    const [organizationType, setOrganizationType] = useState("");
+    const [organizationType] = useState("");
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;

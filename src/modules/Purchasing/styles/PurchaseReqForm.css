@@ -115,7 +115,7 @@
 .table-container {
     width: calc(100% - 3rem);
     margin: 0 1.5rem;
-    border: 1px solid #eee;
+    border: 1px solid #D2D2D2;
     border-radius: 0.5rem;
     overflow: hidden;
 }

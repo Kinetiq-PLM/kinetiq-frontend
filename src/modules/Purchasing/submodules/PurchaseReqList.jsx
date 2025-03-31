@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import "../styles/PurchaseReqList.css";
+import PurchaseReqForm from "./PurchaseReqForm";
 
 const PurchaseReqListBody = () => {
     // State for search input
     const [searchTerm, setSearchTerm] = useState("");
+    const [showNewForm, setShowNewForm] = useState(false);
 
     // Sample purchase request data
     const purchaseRequests = [
@@ -27,8 +29,7 @@ const PurchaseReqListBody = () => {
     };
 
     const handleNewRequest = () => {
-        // Add new request logic here
-        console.log("New request button clicked");
+        setShowNewForm(true);
     };
 
     const handleRequestClick = (request) => {
@@ -60,60 +61,68 @@ const PurchaseReqListBody = () => {
 
     return (
         <div className="purchreq">
-            <div className="purchreq-body-content-container">
-                
-                {/* Header section */}
-                <div className="purchreq-header">
-                    <button className="purchreq-back-btn" onClick={handleBack}>← Back</button>
-                    <input
-                        type="text"
-                        className="purchreq-search"
-                        placeholder="Search by PR No., Name, Department, or Date..."
-                        value={searchTerm}
-                        onChange={handleSearch}
-                    />
-                </div>
+            {showNewForm ? (
+                <PurchaseReqForm onClose={() => setShowNewForm(false)} />
+            ) : (
+                <div className="purchreq-body-content-container">
+                    
+                    {/* Header section */}
+                    <div className="purchreq-header">
+                        <button className="purchreq-back-btn" onClick={handleBack}>← Back</button>
+                        <input
+                            type="text"
+                            className="purchreq-search"
+                            placeholder="Search by PR No., Name, Department, or Date..."
+                            value={searchTerm}
+                            onChange={handleSearch}
+                        />
+                    </div>
 
-                {/* Table container */}
-                <div className="purchreq-table-container">
-                    <table className="purchreq-table">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" onClick={handleCheckboxClick} /></th>
-                                <th>PR No.</th>
-                                <th>Name</th>
-                                <th>Department</th>
-                                <th>Document Date</th>
-                                <th>Valid Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredRequests.length > 0 ? (
-                                filteredRequests.map((request, index) => (
-                                    <tr key={index} onClick={() => handleRequestClick(request)}>
-                                        <td><input type="checkbox" onClick={handleCheckboxClick} /></td>
-                                        <td>{request.id}</td>
-                                        <td>{request.name}</td>
-                                        <td>{request.department}</td>
-                                        <td>{request.documentDate}</td>
-                                        <td>{request.validDate}</td>
-                                    </tr>
-                                ))
-                            ) : (
-                                /* Display message when no results found */
+                    {/* Table container */}
+                    <div className="purchreq-table-container">
+                        <table className="purchreq-table">
+                            <thead>
                                 <tr>
-                                    <td colSpan="6" className="purchreq-no-results">
-                                        No results found
-                                    </td>
+                                    <th><input type="checkbox" onClick={handleCheckboxClick} /></th>
+                                    <th>PR No.</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Document Date</th>
+                                    <th>Valid Date</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {filteredRequests.length > 0 ? (
+                                    filteredRequests.map((request, index) => (
+                                        <tr key={index} onClick={() => handleRequestClick(request)}>
+                                            <td><input type="checkbox" onClick={handleCheckboxClick} /></td>
+                                            <td>{request.id}</td>
+                                            <td>{request.name}</td>
+                                            <td>{request.department}</td>
+                                            <td>{request.documentDate}</td>
+                                            <td>{request.validDate}</td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    /* Display message when no results found */
+                                    <tr>
+                                        <td colSpan="6" className="purchreq-no-results">
+                                            No results found
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
 
-                {/* Load More Button */}
-                <button className="purchreq-load-more" onClick={handleLoadMore}>Load more</button>
-            </div>
+                    {/* Button Container */}
+                    <div className="purchreq-button-container">
+                        <button className="purchreq-new-form" onClick={handleNewRequest}>New Form</button>
+                        <button className="purchreq-load-more" onClick={handleLoadMore}>Load more</button>
+                        <button className="purchreq-send-to">Send to</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

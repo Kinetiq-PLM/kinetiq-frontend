@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/PurchaseReqForm.css";
 
-const PurchaseReqForm = () => {
+const PurchaseReqForm = ({ onClose }) => {
     const [formData, setFormData] = useState({
         name: "",
         department: "",
@@ -21,8 +21,7 @@ const PurchaseReqForm = () => {
     };
 
     const handleBack = () => {
-        // Add navigation logic here
-        console.log("Back button clicked");
+        onClose();
     };
 
     const handleSubmit = () => {
@@ -31,8 +30,7 @@ const PurchaseReqForm = () => {
     };
 
     const handleCancel = () => {
-        // Add cancel logic here
-        console.log("Form cancelled");
+        onClose();
     };
 
     return (
