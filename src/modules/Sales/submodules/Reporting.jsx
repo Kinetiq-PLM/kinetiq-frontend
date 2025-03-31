@@ -63,6 +63,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
         quotations: sale.quotations,
         orders: sale.orders,
         invoices: sale.invoices,
+        deliveries: sale.deliveries,
       }));
       setSalesReportData(data);
       setTotalOperations(salesQuery.data.total);
