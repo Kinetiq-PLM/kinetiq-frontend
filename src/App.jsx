@@ -95,6 +95,7 @@ function App() {
       "General Ledger Accounts": "GeneralLedgerAccounts",
       "Accounts Payable": "AccountsPayable",
       "Accounts Receivable": "AccountsReceivable",
+      "Official Receipts": "OfficialReceipts",
     },
     Financials: {
       Budgeting: "Budgeting",
