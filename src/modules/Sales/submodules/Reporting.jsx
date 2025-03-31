@@ -92,7 +92,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
 
   return (
     <div className="reporting flex flex-col gap-4 overflow-y-auto">
-      <div className="bg-white rounded-lg p-8 w-auto shadow ">
+      <div className="bg-white rounded-lg p-4 w-auto shadow ">
         <Heading
           Title="Reporting"
           SubTitle="Compilation of usable data to further improve business."
@@ -101,12 +101,10 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
       {/* FIRST ROW */}
       <div className="flex gap-4">
         {/* PROFIT REPORT */}
-        <div className="bg-white rounded-lg p-8 flex-2/5 shadow flex flex-col gap-4">
-          <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
-            Profit Report
-          </h1>
+        <div className="bg-white rounded-lg p-6 flex-2/5 shadow flex flex-col gap-4">
+          <h1 className="font-bold text-2xl text-[#1c1c1c]">Profit Report</h1>
           <div className="justify-center items-center border-[#f3f4f6] rounded-lg border-2 p-4">
-            <div className="flex flex-col gap-2 px-4">
+            <div className="flex flex-col gap-2 px-4 font-medium">
               <span>Gross Profits</span>
               <span className="text-3xl">
                 {totalProfit.toLocaleString("en-US", {
@@ -116,7 +114,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               </span>
             </div>
             <LineChart
-              height={500}
+              height={400}
               dataset={profitReportData}
               xAxis={[
                 {
@@ -126,7 +124,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                 },
               ]}
               series={[{ dataKey: "profit" }]}
-              margin={{ top: 50, bottom: 50, left: 70, right: 50 }}
+              margin={{ top: 35, bottom: 50, left: 70, right: 50 }}
             />
             <div className="flex justify-center ">
               <form className="bg-[#f3f4f6] py-3 px-2 rounded-lg">
@@ -159,11 +157,11 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           </div>
         </div>
         {/* SALES REPORT */}
-        <div className="bg-white rounded-lg p-8 w-full flex-3/5 shadow flex flex-col gap-4">
+        <div className="bg-white rounded-lg p-6 w-full flex-3/5 shadow flex flex-col gap-4">
           <h1 className="font-bold text-2xl text-[#1c1c1c]">Sales Report</h1>
           <div className="justify-center items-center border-[#f3f4f6] rounded-lg border-2 p-4">
             <div className="flex justify-between px-4 mb-4 items-center">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 font-medium">
                 <span>Sales Operations</span>
                 <span className="text-3xl">{totalOperations}</span>
               </div>
@@ -194,7 +192,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               </form>
             </div>
             <LineChart
-              height={500}
+              height={425}
               dataset={salesReportData}
               xAxis={[
                 {
@@ -238,7 +236,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
 
       {/* SECOND ROW */}
       <div className="flex gap-4">
-        <div className="bg-white rounded-lg p-8 flex-2/5 shadow flex flex-col gap-4">
+        <div className="bg-white rounded-lg p-6 flex-2/5 shadow flex flex-col gap-4">
           <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
             Customer Report
           </h1>
@@ -261,7 +259,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           </div>
         </div>
         {/*  PRODUCT REPORT */}
-        <div className="bg-white rounded-lg p-8 flex-2/5 shadow flex flex-col gap-4">
+        <div className="bg-white rounded-lg p-6 flex-2/5 shadow flex flex-col gap-4">
           <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
             Product Report
           </h1>
