@@ -117,6 +117,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                 },
               ]}
               series={[{ dataKey: "profit" }]}
+              margin={{ top: 50, bottom: 50, left: 70, right: 50 }}
             />
             <div className="flex justify-center ">
               <form className="bg-[#f3f4f6] py-3 px-2 rounded-lg">
