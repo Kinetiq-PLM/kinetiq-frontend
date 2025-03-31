@@ -92,7 +92,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   }, [salesPeriod]);
 
   return (
-    <div className="reporting flex flex-col gap-4 overflow-y-auto">
+    <div className="reporting flex flex-col gap-4 overflow-y-auto w-full">
       <div className="bg-white rounded-lg p-4 w-auto shadow ">
         <Heading
           Title="Reporting"
@@ -115,7 +115,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               </span>
             </div>
             <LineChart
-              height={400}
+              height={325}
               dataset={profitReportData}
               xAxis={[
                 {
@@ -125,10 +125,10 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                 },
               ]}
               series={[{ dataKey: "profit" }]}
-              margin={{ top: 35, bottom: 50, left: 70, right: 50 }}
+              margin={{ top: 35, bottom: 45, left: 70, right: 50 }}
             />
             <div className="flex justify-center ">
-              <form className="bg-[#f3f4f6] py-3 px-2 rounded-lg">
+              <form className="bg-[#f3f4f6] p-2 rounded-lg">
                 {options.map((option) => {
                   return (
                     <label key={option}>
@@ -141,7 +141,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                         onChange={() => setProfitPeriod(option)}
                       />
                       <span
-                        className={`px-10 py-2 rounded-md cursor-pointer ${
+                        className={`px-4 py-1 rounded-md cursor-pointer ${
                           profitPeriod === option
                             ? "bg-white text-black font-medium shadow"
                             : "text-gray-500"
@@ -166,7 +166,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                 <span>Sales Operations</span>
                 <span className="text-3xl">{totalOperations}</span>
               </div>
-              <form className="bg-[#f3f4f6] px-1 py-3 rounded-lg">
+              <form className="bg-[#f3f4f6] p-2 rounded-lg">
                 {salesOptions.map((option) => {
                   return (
                     <label key={option.label}>
@@ -179,7 +179,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                         onChange={() => setSalesPeriod(option.value)}
                       />
                       <span
-                        className={`px-5 py-2 rounded-md cursor-pointer ${
+                        className={`px-4 py-1 rounded-md cursor-pointer ${
                           salesPeriod === option.value
                             ? "bg-white text-black font-medium shadow"
                             : "text-gray-500"
@@ -193,7 +193,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               </form>
             </div>
             <LineChart
-              height={425}
+              height={350}
               dataset={salesReportData}
               xAxis={[
                 {
@@ -243,7 +243,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           </h1>
           <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
             <BarChart
-              height={500}
+              height={475}
               dataset={customerReportData}
               xAxis={[
                 {
@@ -267,7 +267,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
             <PieChart
               colors={colors}
-              height={500}
+              height={475}
               series={[
                 {
                   data: productReportData.map((data, index) => ({
@@ -275,6 +275,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                     label: data.product,
                     color: colors[index],
                   })),
+                  outerRadius: 165,
                 },
               ]}
               slotProps={{
@@ -283,7 +284,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                   position: { vertical: "bottom", horizontal: "middle" }, // Move to the bottom center
                 },
               }}
-              margin={{ top: 20, bottom: 60, left: 50, right: 50 }}
+              margin={{ top: 20, bottom: 70, left: 50, right: 50 }}
             />
           </div>
         </div>
@@ -292,7 +293,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           <div className="flex flex-col gap-4 font-medium text-sm">
             <div className="bg-white rounded-lg p-4 flex flex-col gap-2">
               <span>Gross Profits</span>
-              <span className="text-2xl">
+              <span className="text-xl">
                 {totalProfit.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -301,13 +302,13 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
             </div>
             <div className="bg-white rounded-lg p-4 flex flex-col">
               <span>Sold</span>
-              <span className="text-2xl">
+              <span className="text-xl">
                 {totalSold.toLocaleString("en-US")}
               </span>
             </div>
             <div className="bg-white rounded-lg p-4 flex flex-col">
               <span>Top Customers</span>
-              <span className="text-2xl">
+              <span className="text-xl">
                 {customerReportData.length > 0
                   ? customerReportData[0].customer
                   : ""}
