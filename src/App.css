@@ -286,7 +286,6 @@ img {
   border-radius: 0.5rem;
 }
 
-
 .sidebar-submodule-empty-container {
   max-height: 0;
   overflow: hidden;
@@ -334,7 +333,6 @@ img {
   height: 1.5rem;
   width: 1.5rem;
 }
-
 
 /* main content area that takes up the remaining space */
 .header-body-container {
