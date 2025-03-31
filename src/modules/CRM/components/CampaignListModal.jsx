@@ -18,8 +18,8 @@ const CampaignListModal = ({ isOpen, onClose, setCampaign }) => {
   const [filteredData, setFilteredData] = useState([]);
   const [campaignList, setCampaignList] = useState([]);
   const campaignQuery = useQuery({
-    queryKey: ["campaigns"],
-    queryFn: async () => await GET("crm/campaigns"),
+    queryKey: ["campaignList"],
+    queryFn: async () => await GET("crm/campaigns?status=Active,Planned"),
     enabled: isOpen,
   });
   const modalRef = useRef(null);
