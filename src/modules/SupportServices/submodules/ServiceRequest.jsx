@@ -28,7 +28,6 @@ const ServiceRequest = () => {
     }
   }
 
-  // Fetch tickets from API (mock function)
   useEffect(() => {
     fetchRequests();
   }, []);

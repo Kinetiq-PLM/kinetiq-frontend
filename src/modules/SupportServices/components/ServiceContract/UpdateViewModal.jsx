@@ -1,61 +1,178 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 import ServiceContractIcon from "/icons/SupportServices/ServiceContractIcon.png"
 
+import { GET } from "../../api/api"
+
 const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
-  const [contractId, setContractId] = useState("")
-  const [productId, setProductId] = useState("")
-  const [productName, setProductName] = useState("")
-  const [productQuantity, setProductQuantity] = useState("")
-  const [customerId, setCustomerId] = useState("")
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [name, setName] = useState("")
-  const [emailAddress, setEmailAddress] = useState("")
-  const [dateIssued, setDateIssued] = useState("")
-  const [terminationDate, setTerminationDate] = useState("")
-  const [approvedBy, setApprovedBy] = useState("")
-  const [approvedRemarks, setApprovedRemarks] = useState("")
-  const [approvalDate, setApprovalDate] = useState("")
-  const [contractStatus, setContractStatus] = useState("")
-  const [contractDescription, setContractDescription] = useState("")
-  const [contractDescription2, setContractDescription2] = useState("")
-  const [renewalChecked, setRenewalChecked] = useState(false)
-  const [renewalId, setRenewalId] = useState("")
-  const [renewalDate, setRenewalDate] = useState("")
-  const [renewalEndDate, setRenewalEndDate] = useState("")
-  const [additionalServices, setAdditionalServices] = useState([
-    { id: "123", type: "Maintenance", dateIssued: "01/01/2023", duration: "1 year", status: "Active" },
-    { id: "1234", type: "Priority Service", dateIssued: "01/01/2023", duration: "6 months", status: "Active" },
-    { id: "543", type: "Extended Warranty", dateIssued: "01/01/2023", duration: "2 years", status: "Active" },
-  ])
+  const [additionalServices, setAdditionalServices] = useState([{}]);
+  const [isOpenStatusDD, setOpenStatusDD] = useState(false);
+  const [renewals, setRenewals] = useState([]);
+  const [isRenewalDropdown, setOpenRenewalDD] = useState(false);
+  const [isRenewalChecked, setIsRenewalChecked] = useState(false);
+
+  const [formData, setFormData] = useState({
+    contractId: "",
+    productId: "",
+    productName: "",
+    productQuantity: "",
+    customerId: "",
+    phoneNumber: "",
+    name: "",
+    emailAddress: "",
+    dateIssued: "",
+    terminationDate: "",
+    approvedBy: "",
+    approvedRemarks: "",
+    approvalDate: "",
+    contractStatus: "",
+    contractDescription: "",
+    contractDescription2: "",
+    renewalId: "",
+    renewalDate: "",
+    renewalEndDate: "",
+    additionalServiceId: "",
+  });
+
+  useEffect(() => {
+    if (contract) {
+      console.log("contract: ", contract)
+      setFormData({
+        contractId: contract.contract_id || "",
+        productId: contract.product?.product_id || "",
+        productName: contract.product?.product_name  || "",
+        productQuantity: contract.product_quantity || "",
+        customerId: contract.customer?.customer_id || "",
+        phoneNumber: contract.customer?.phone_number || "",
+        name: contract.customer?.name || "",
+        emailAddress: contract.customer?.email_address  || "",
+        dateIssued: contract.date_issued || "",
+        terminationDate: contract.end_date || "",
+        contractStatus: contract.contract_status || "",
+        contractDescription: contract.contract_description || "",
+        renewalId: contract.renewal?.renewal_id || "",
+        renewalDate: contract.renewal?.renewal_warranty_start || "",
+        renewalEndDate: contract.renewal?.renewal_warranty_end  || "",
+        additionalServiceId: contract.additional_service?.additional_service_id  || ""
+      });
+      fetchAddServices(contract.additional_service?.additional_service_id);
+    }
+  }, [contract]);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+
+    if (id === "renewalId") {
+      const matchedRenewal = renewals.find(
+        (renewal) => renewal.renewal_id === value
+      );
+  
+      setFormData((prev) => ({
+        ...prev,
+        renewalId: value,
+        renewalDate: matchedRenewal
+          ? matchedRenewal.renewal_warranty_start
+          : "",
+        renewalEndDate: matchedRenewal
+          ? matchedRenewal.renewal_warranty_end
+          : "",
+      }));
+    }
+  };
+
+  // fetches additional services
+  const fetchAddServices = async (additionalServiceId) => {
+    try {
+      console.log("Fetching additional services for ID:", additionalServiceId);
+      if (!additionalServiceId) return; 
+
+      const response = await GET(`contracts/${additionalServiceId}/`);
+      console.log("Fetched additional services:", response);
+      setAdditionalServices(response);
+    } catch (error) {
+      console.error("Error fetching additional services:", error);
+    }
+};
+
+const handleToggleDropdownStatus = () => {
+  setOpenStatusDD(!isOpenStatusDD);
+};
+
+const handleSelectStatus = (status) => {
+  setFormData((prev) => ({
+    ...prev,
+    contractStatus: status,
+  }));
+  setOpenStatusDD(false); 
+};
+
+// fetches a list of renewals
+const fetchRenewals = async () => {
+  try {
+    const response = await GET(`/renewals/${productId.value}/${customerId.value}/`); 
+    console.log("renewals", response)
+    setRenewals(response);
+  } catch (error) {
+    console.error("Error fetching renewals:", error);
+  }
+}
+
+const handleToggleDDRenewals = () => {
+  if (!isRenewalDropdown) {
+    fetchRenewals(); 
+  }
+  setOpenRenewalDD(!isRenewalDropdown);
+};
+
+const handleSelectRenewal = (renewal) => {
+  setFormData((prev) => ({
+    ...prev,
+    renewalId: renewal.renewal_id,
+    renewalDate: renewal.renewal_warranty_start,
+    renewalEndDate: renewal.renewal_warranty_end,
+  }));
+  setOpenRenewalDD(false);
+};
+
+const handleRenewalCheckbox = () => {
+  setIsRenewalChecked((prev) => !prev);
+};
 
   const handleUpdate = () => {
     onUpdate({
-      contractId,
-      productId,
-      productName,
-      productQuantity,
-      customerId,
-      phoneNumber,
-      name,
-      emailAddress,
-      dateIssued,
-      terminationDate,
-      approvedBy,
-      approvedRemarks,
-      approvalDate,
-      contractStatus,
-      contractDescription,
-      contractDescription2,
-      renewalChecked,
-      renewalId,
-      renewalDate,
-      renewalEndDate,
-      additionalServices,
+      ...contract,
+      contract_id: formData.contractId,
+      contract_status: formData.contractStatus,
+      renewal_id: formData.renewalId,
+      contract_description: formData.contractDescription
     })
+
+    // reset form
+  setFormData({
+    contractId: "",
+    productId: "",
+    productName: "",
+    productQuantity: "",
+    customerId: "",
+    phoneNumber: "",
+    name: "",
+    emailAddress: "",
+    dateIssued: "",
+    terminationDate: "",
+    contractStatus: "",
+    contractDescription: "",
+    renewalId: "",
+    renewalDate: "",
+    renewalEndDate: "",
+  });
+  setIsRenewalChecked(false);
   }
 
   if (!isOpen) return null
@@ -81,8 +198,9 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                 <input
                   type="text"
                   id="contractId"
-                  value={contractId}
-                  onChange={(e) => setContractId(e.target.value)}
+                  value={formData.contractId}
+                  readOnly
+                  onChange={handleChange}
                   placeholder="Enter contract ID"
                 />
               </div>
@@ -92,8 +210,9 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                 <input
                   type="text"
                   id="productId"
-                  value={productId}
-                  onChange={(e) => setProductId(e.target.value)}
+                  value={formData.productId}
+                  readOnly
+                  onChange={handleChange} 
                   placeholder="Enter product ID"
                 />
               </div>
@@ -105,8 +224,9 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                 <input
                   type="text"
                   id="productName"
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
+                  value={formData.productName}
+                  readOnly
+                  onChange={handleChange} 
                   placeholder="Enter product name"
                 />
               </div>
@@ -116,8 +236,9 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                 <input
                   type="text"
                   id="productQuantity"
-                  value={productQuantity}
-                  onChange={(e) => setProductQuantity(e.target.value)}
+                  value={formData.productQuantity}
+                  readOnly
+                  onChange={handleChange} 
                   placeholder="Enter product quantity"
                 />
               </div>
@@ -129,8 +250,9 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                 <input
                   type="text"
                   id="customerId"
-                  value={customerId}
-                  onChange={(e) => setCustomerId(e.target.value)}
+                  value={formData.customerId}
+                  readOnly
+                  onChange={handleChange} 
                   placeholder="Enter customer ID"
                 />
               </div>
@@ -140,8 +262,9 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                 <input
                   type="text"
                   id="phoneNumber"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  value={formData.phoneNumber}
+                  readOnly
+                  onChange={handleChange} 
                   placeholder="Enter phone number"
                 />
               </div>
@@ -153,8 +276,9 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                 <input
                   type="text"
                   id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={formData.name}
+                  readOnly
+                  onChange={handleChange} 
                   placeholder="Enter name"
                 />
               </div>
@@ -164,8 +288,9 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                 <input
                   type="email"
                   id="emailAddress"
-                  value={emailAddress}
-                  onChange={(e) => setEmailAddress(e.target.value)}
+                  value={formData.emailAddress}
+                  readOnly
+                  onChange={handleChange} 
                   placeholder="Enter email address"
                 />
               </div>
@@ -185,15 +310,21 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {additionalServices.map((service) => (
-                      <tr key={service.id}>
-                        <td>{service.id}</td>
-                        <td>{service.type}</td>
-                        <td>{service.dateIssued}</td>
-                        <td>{service.duration}</td>
-                        <td>{service.status}</td>
+                    {additionalServices.length > 0 ? (
+                      additionalServices.map((service, index) => (
+                        <tr key={index}>
+                          <td>{service.additional_service}</td>
+                          <td>{service.service_type}</td>
+                          <td>{service.date_start}</td>
+                          <td>{service.duration}</td>
+                          <td>{service.status}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" style={{ textAlign: "center" }}>No additional services available</td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -206,11 +337,12 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                   <input
                     type="text"
                     id="dateIssued"
-                    value={dateIssued}
-                    onChange={(e) => setDateIssued(e.target.value)}
+                    value={formData.dateIssued}
+                    readOnly
+                    onChange={handleChange} 
                     placeholder="dd/mm/yy"
                   />
-                  <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" />
+                  {/* <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" /> */}
                 </div>
               </div>
 
@@ -220,37 +352,12 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                   <input
                     type="text"
                     id="terminationDate"
-                    value={terminationDate}
-                    onChange={(e) => setTerminationDate(e.target.value)}
+                    value={formData.dateIssued}
+                    readOnly
+                    onChange={handleChange} 
                     placeholder="dd/mm/yy"
                   />
-                  <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" />
-                </div>
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="contractDescription">Contract Description</label>
-                <textarea
-                  id="contractDescription"
-                  value={contractDescription}
-                  onChange={(e) => setContractDescription(e.target.value)}
-                  placeholder="Enter contract description"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="contractStatus">Contract Status</label>
-                <div className="select-wrapper">
-                  <input
-                    type="text"
-                    id="contractStatus"
-                    value={contractStatus}
-                    onChange={(e) => setContractStatus(e.target.value)}
-                    placeholder="Select status"
-                  />
-                  <span className="select-arrow">▼</span>
+                  {/* <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" /> */}
                 </div>
               </div>
             </div>
@@ -260,16 +367,26 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
             <div className="form-row" style={{ alignItems: "stretch" }}>
               <div className="form-column" style={{ flex: 1 }}>
                 <div className="form-group">
-                  <label htmlFor="contractStatus2">Contract Status</label>
+                  <label htmlFor="contractStatus">Contract Status</label>
                   <div className="select-wrapper">
                     <input
                       type="text"
-                      id="contractStatus2"
-                      value={contractStatus}
-                      onChange={(e) => setContractStatus(e.target.value)}
+                      id="contractStatus"
+                      value={formData.contractStatus}
+                      readOnly
+                      onChange={handleChange} 
                       placeholder="Select status"
                     />
-                    <span className="select-arrow">▼</span>
+                    <span className="select-arrow" onClick={handleToggleDropdownStatus}>▼</span>
+                    {isOpenStatusDD && (
+                    <ul className="dropdown-list">
+                      {["Pending", "Active", "Expired", "Terminated"].map((status) => (
+                        <li key={status} onClick={() => handleSelectStatus(status)}>
+                          {status}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   </div>
                 </div>
 
@@ -277,21 +394,38 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                   <input
                     type="checkbox"
                     id="renewal"
-                    checked={renewalChecked}
-                    onChange={(e) => setRenewalChecked(e.target.checked)}
+                    checked={isRenewalChecked}
+                    onChange={handleRenewalCheckbox}
                   />
                   <label htmlFor="renewal">Renewal</label>
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="renewalId">Renewal ID</label>
-                  <input
-                    type="text"
-                    id="renewalId"
-                    value={renewalId}
-                    onChange={(e) => setRenewalId(e.target.value)}
-                    placeholder="Enter renewal ID"
-                  />
+                  <div className="select-wrapper">
+                    <input
+                      type="text"
+                      id="renewalId"
+                      value={formData.renewalId}
+                      onChange={handleChange}
+                      placeholder="Select renewal ID"
+                      disabled={!isRenewalChecked}
+                    />
+                    <span className="select-arrow" onClick={handleToggleDDRenewals}>▼</span>
+                    {isRenewalDropdown && (
+                        <ul className="dropdown-list">
+                          {renewals.length > 0 ? (
+                            renewals.map((renewal) => (
+                              <li key={renewal.renewal_id} onClick={() => handleSelectRenewal(renewal)}>
+                                {renewal.renewal_id}
+                              </li>
+                            ))
+                          ) : (
+                            <li>No renewal ID found</li>
+                          )}
+                        </ul>
+                      )}
+                  </div>    
                 </div>
 
                 <div className="form-group">
@@ -300,11 +434,13 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                     <input
                       type="text"
                       id="renewalDate"
-                      value={renewalDate}
-                      onChange={(e) => setRenewalDate(e.target.value)}
+                      readOnly
+                      value={formData.renewalDate}
+                      onChange={handleChange}
                       placeholder="dd/mm/yy"
+                      disabled={!isRenewalChecked}
                     />
-                    <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" />
+                    {/* <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" /> */}
                   </div>
                 </div>
 
@@ -314,21 +450,23 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
                     <input
                       type="text"
                       id="renewalEndDate"
-                      value={renewalEndDate}
-                      onChange={(e) => setRenewalEndDate(e.target.value)}
+                      readOnly
+                      value={formData.renewalEndDate}
+                      onChange={handleChange}
                       placeholder="dd/mm/yy"
+                      disabled={!isRenewalChecked}
                     />
-                    <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" />
+                    {/* <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" /> */}
                   </div>
                 </div>
               </div>
 
               <div className="form-group" style={{ flex: 1 }}>
-                <label htmlFor="contractDescription2">Contract Description</label>
+                <label htmlFor="contractDescription">Contract Description</label>
                 <textarea
-                  id="contractDescription2"
-                  value={contractDescription2}
-                  onChange={(e) => setContractDescription2(e.target.value)}
+                  id="contractDescription"
+                  value={formData.contractDescription}
+                  onChange={handleChange}
                   placeholder="Enter contract description"
                   style={{ height: "calc(100% - 1.5rem)" }}
                 />
