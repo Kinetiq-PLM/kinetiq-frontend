@@ -159,7 +159,7 @@ const Journal = () => {
                     isOpen: true,
                     type: "error",
                     title: "Error Adding Journal",
-                    message: error.message,
+                    message: "Check you database connection.",
                 });
             });
     };
