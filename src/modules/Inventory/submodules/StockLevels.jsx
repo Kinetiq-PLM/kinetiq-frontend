@@ -8,8 +8,12 @@ const BodyContent = () => {
 
 
     const [loading, setLoading] = useState(true);
+
+    // State for selected status and date
     const [selectedStatus, setSelectedStatus] = useState("");
     const [selectedDate, setSelectedDate] = useState("");
+
+    // State for selected row
     const [selectedRow, setSelectedRow] = useState(null); 
 
     // Tab Management
@@ -17,9 +21,12 @@ const BodyContent = () => {
     const [activeTab, setActiveTab] = useState(tabs[0]);    
     const onTabChange = (tab) => {
         setActiveTab(tab);
-        setSelectedRow(null); // Reset selected row when tab changes
+        setSelectedRow(null); 
+        setSelectedStatus("")
+        setSelectedDate("")// Reset selected row when tab changes
     }
 
+    
 
     useEffect(() => {
         fetch("http://127.0.0.1:8000/api/product-depreciation-report/")
@@ -103,17 +110,20 @@ const BodyContent = () => {
         },
     }
 
+    // Current Config
     const currentConfig = tableConfig[activeTab];
+
     const currentData = currentConfig.data || [];
+    console.log("Current Config:", currentConfig);
 
     
     const filterByDateRange = (data, range) => {
         const now = new Date(); // Get current date and time
     
         return data.filter((item) => {
-            if (!item.time_period) return false; // Skip if time_period is missing
+            if (!item["Expiry Date"]) return false;
     
-            const itemDate = new Date(item.time_period); // Convert string to Date object
+            const itemDate = new Date(item["Expiry Date"]); // Convert string to Date object
             if (isNaN(itemDate)) return false; // Skip invalid dates
     
             switch (range) {
@@ -134,7 +144,8 @@ const BodyContent = () => {
     
 
     const filteredData = currentData.filter((item) => {
-        const statusMatch = selectedStatus ? item.status?.toLowerCase() === selectedStatus.toLowerCase() : true;
+        const statusMatch = selectedStatus ? item["Status"]?.toLowerCase() === selectedStatus.toLowerCase() : true;
+        console.log("Status Match:", statusMatch, "item status:", item.status, "selected status from filter:",selectedStatus);
         const dateMatch = selectedDate ? filterByDateRange([item], selectedDate).length > 0 : true;
         return statusMatch && dateMatch;
     });
