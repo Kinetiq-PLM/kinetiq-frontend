@@ -41,7 +41,6 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
     mutationFn: async (data) => await POST("sales/customer/", data),
     onSuccess: (data, variables, context) => {
       queryClient.setQueryData(["customers"], (oldCustomers) => {
-        console.log(oldCustomers, data);
         return [...oldCustomers, data];
       });
     },
@@ -86,6 +85,7 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
         address_line2: secondaryAddress,
         customer_type: customerType,
         status: "Active",
+        contact_person: contactPerson,
         debt: 0,
       };
       customerMutation.mutate(request);
