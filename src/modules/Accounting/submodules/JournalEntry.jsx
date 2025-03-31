@@ -63,12 +63,32 @@ const JournalEntry = () => {
     };
 
     const handleSubmit = async () => {
-        if (!journalForm.journalId || !journalForm.description) {
+        if (!journalForm.journalId && !journalForm.description) {
             setValidation({
                 isOpen: true,
                 type: "warning",
                 title: "Missing Required Fields",
                 message: "Please fill in all required fields: Journal ID and Description.",
+            });
+            return;
+        }
+
+        if (!journalForm.journalId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Journal ID",
+                message: "Please fill in Journal ID.",
+            });
+            return;
+        }
+
+        if (!journalForm.description) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Description",
+                message: "Please fill in Description.",
             });
             return;
         }

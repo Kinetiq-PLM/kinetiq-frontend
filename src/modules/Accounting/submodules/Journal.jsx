@@ -61,12 +61,62 @@ const Journal = () => {
     });
 
     const handleSubmit = () => {
-        if (!journalForm.journalDate || !journalForm.journalId || !journalForm.description || !journalForm.invoiceId || !journalForm.currencyId) {
+        if (!journalForm.journalDate && !journalForm.journalId && !journalForm.description && !journalForm.invoiceId && !journalForm.currencyId) {
             setValidation({
                 isOpen: true,
                 type: "warning",
                 title: "Missing Required Fields",
                 message: "Please fill in all required fields.",
+            });
+            return;
+        }
+
+        if(!journalForm.journalDate) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Journal Date",
+                message: "Please set the journal date.",
+            });
+            return;
+        }
+
+        if(!journalForm.journalId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Journal ID",
+                message: "Please fill in journal ID.",
+            });
+            return;
+        }
+
+        if(!journalForm.description) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Description",
+                message: "Please fill in description.",
+            });
+            return;
+        }
+
+        if(!journalForm.invoiceId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Invoice ID",
+                message: "Please fill in invoice ID.",
+            });
+            return;
+        }
+
+        if(!journalForm.currencyId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Currency ID",
+                message: "Please fill in currency ID.",
             });
             return;
         }

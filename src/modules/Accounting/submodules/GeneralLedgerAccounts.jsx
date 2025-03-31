@@ -42,9 +42,9 @@ const GeneralLedgerAccounts = () => {
   };
 
   const handleStatusFilter = (status) => {
-    setStatusFilter(status);
+    setStatusFilter(status === "" ? "All" : status);
   };
-
+  
   const filteredData = data.filter(row => {
     const matchesSearch = [row[0], row[1], row[2], row[3], row[4]]
       .filter(Boolean)
@@ -52,7 +52,8 @@ const GeneralLedgerAccounts = () => {
       .toLowerCase()
       .includes(searching.toLowerCase());
 
-    const matchesStatus = statusFilter === "All" || row[4] === statusFilter;
+    const matchesStatus = statusFilter === "All" || statusFilter === "" || row[4].toLowerCase() === statusFilter.toLowerCase();
+    
     return matchesSearch && matchesStatus;
   });
 
