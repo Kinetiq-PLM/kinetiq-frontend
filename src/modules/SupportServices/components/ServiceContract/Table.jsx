@@ -1,9 +1,8 @@
 "use client"
 
-const Table = ({ contracts, onViewContract }) => {
+const Table = ({ contracts, onRowClick, onViewContract }) => {
   return (
     <div className="table-container">
-      <div style={{ overflowX: "auto" }}>
         <table className="contracts-table">
           <thead>
             <tr>
@@ -17,14 +16,19 @@ const Table = ({ contracts, onViewContract }) => {
             </tr>
           </thead>
           <tbody>
-            {contracts.map((contract) => (
-              <tr key={contract.id}>
-                <td>{contract.id}</td>
-                <td>{contract.customerName}</td>
-                <td>{contract.productName}</td>
-                <td>{contract.startDate}</td>
-                <td>{contract.endDate}</td>
-                <td>{contract.status}</td>
+            {contracts.map((contract, index) => (
+              <tr 
+                key={contract.id || `contract-${index}`} 
+                className={index % 2 === 0 ? "" : "alternate-row"} 
+                onClick={() => onRowClick(contract)} 
+                style={{ cursor: "pointer" }} 
+              >
+                <td>{contract.contract_id}</td>
+                <td>{contract.customer ? contract.customer.name : "Unknown"}</td>
+                <td>{contract.product ? contract.product.product_name : "Unknown"}</td>
+                <td>{contract.date_issued}</td>
+                <td>{contract.end_date}</td>
+                <td>{contract.contract_status}</td>
                 <td>
                   <button className="view-button" onClick={() => onViewContract(contract)}>
                     View
@@ -32,23 +36,8 @@ const Table = ({ contracts, onViewContract }) => {
                 </td>
               </tr>
             ))}
-            {/* Empty rows to match the design */}
-            {Array(5 - contracts.length)
-              .fill()
-              .map((_, index) => (
-                <tr key={`empty-${index}`} className="empty-row">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              ))}
           </tbody>
         </table>
-      </div>
     </div>
   )
 }

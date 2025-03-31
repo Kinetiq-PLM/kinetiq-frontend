@@ -1,45 +1,156 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 import ServiceContractIcon from "/icons/SupportServices/ServiceContractIcon.png"
 
+import { GET } from "../../api/api"
+
 const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
-  const [contractId, setContractId] = useState("")
-  const [productId, setProductId] = useState("")
-  const [productName, setProductName] = useState("")
-  const [productQuantity, setProductQuantity] = useState("")
-  const [customerId, setCustomerId] = useState("")
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [name, setName] = useState("")
-  const [emailAddress, setEmailAddress] = useState("")
-  const [dateIssued, setDateIssued] = useState("")
-  const [terminationDate, setTerminationDate] = useState("")
-  const [contractDescription, setContractDescription] = useState("")
-  const [contractStatus, setContractStatus] = useState("")
-  const [additionalServices, setAdditionalServices] = useState([
-    { id: "123", type: "Maintenance", dateIssued: "01/01/2023", duration: "1 year", status: "Active" },
-    { id: "1234", type: "Priority Service", dateIssued: "01/01/2023", duration: "6 months", status: "Active" },
-    { id: "543", type: "Extended Warranty", dateIssued: "01/01/2023", duration: "2 years", status: "Active" },
-  ])
+  const today = new Date().toISOString().split("T")[0];
+  const [additionalServices, setAdditionalServices] = useState([{}]);
+  const [isOpenStatusDD, setOpenStatusDD] = useState(false);
+  const [statementItems, setStatementItems] = useState([]);
+  const [isSTMDropdown, setOpenSTMDD] = useState(false);
+  const [formData, setFormData] = useState({
+    statementId: "",
+    productId: "",
+    productName: "",
+    productQuantity: "",
+    customerId: "",
+    phoneNumber: "",
+    name: "",
+    emailAddress: "",
+    dateIssued: today,
+    terminationDate: "",
+    contractDescription: "",
+    contractStatus: "",
+    additionalServiceId: "",
+  });
+
+  useEffect(() => {
+    fetchStatementItems(); 
+  }, []);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+
+    if (id === "statementId") {
+      const matchedStatement = statementItems.find(
+        (statementItem) => statementItem.statement_item_id === value
+      );
+  
+      setFormData((prev) => ({
+        ...prev,
+        statementId: value,
+        productId: matchedStatement?.product?.product_id || "",
+        productName: matchedStatement?.product?.product_name || "",
+        productQuantity: matchedStatement?.quantity || "",
+        customerId: matchedStatement?.statement?.customer?.customer_id || "",
+        phoneNumber: matchedStatement?.statement?.customer?.phone_number || "",
+        emailAddress: matchedStatement?.statement?.customer?.email_address || "",
+        name: matchedStatement?.statement?.customer?.name || "",
+        additionalServiceId: matchedStatement?.additional_service || ""
+      }));
+    }
+  };
+
+  // fetches additional services
+  const fetchStatementItems = async () => {
+    try {
+    const response = await GET(`/statement-items/`); 
+    //console.log("statement-items", response)
+    setStatementItems(response);
+  } catch (error) {
+    console.error("Error fetching statement items:", error);
+  }
+};
+
+const handleToggleDDRenewals = () => {
+  if (!isSTMDropdown) {
+    fetchStatementItems(); 
+  }
+  setOpenSTMDD(!isSTMDropdown);
+};
+
+const handleSelectSTM = (statementItem) => {
+  setFormData((prev) => ({
+    ...prev,
+    statementId: statementItem.statement_item_id || "",
+    productId: statementItem.product?.product_id || "",
+    productName: statementItem.product?.product_name || "",
+    productQuantity: statementItem.quantity || "",
+    customerId: statementItem.statement?.customer?.customer_id || "",
+    phoneNumber: statementItem?.statement?.customer?.phone_number || "",
+    emailAddress: statementItem?.statement?.customer?.email_address || "",
+    name: statementItem?.statement?.customer?.name || "",
+    additionalServiceId: statementItem?.additional_service || ""
+  }));
+  if (statementItem.additional_service) {
+    fetchAddServices(statementItem.additional_service);
+  } else {
+    console.log("No additional service ID found.");
+    setAdditionalServices([{}]); 
+  }
+  setOpenSTMDD(false);
+};
+
+const fetchAddServices = async (additionalServiceId) => {
+  try {
+    console.log("Fetching additional services for ID:", additionalServiceId);
+    if (!additionalServiceId) return; 
+
+    const response = await GET(`contracts/${additionalServiceId}/`);
+    console.log("Fetched additional services:", response);
+    setAdditionalServices(response);
+  } catch (error) {
+    console.error("Error fetching additional services:", error);
+  }
+};
+
+const handleToggleDropdownStatus = () => {
+  setOpenStatusDD(!isOpenStatusDD);
+};
+
+const handleSelectStatus = (status) => {
+  setFormData((prev) => ({
+    ...prev,
+    contractStatus: status,
+  }));
+  setOpenStatusDD(false); 
+};
 
   const handleCreate = () => {
     onCreate({
-      contractId,
-      productId,
-      productName,
-      productQuantity,
-      customerId,
-      phoneNumber,
-      name,
-      emailAddress,
-      dateIssued,
-      terminationDate,
-      contractDescription,
-      contractStatus,
-      additionalServices,
+      statement_item_id: formData.statementId,
+      customer_id: formData.customerId,
+      renewal_id: formData.add,
+      contract_description: formData.contractDescription,
+      additional_service_id: formData.additionalServiceId,
+      contract_description: formData.contractDescription,
+      product_id: formData.productId,
+      contract_status: formData.contractStatus,
+      product_quantity: formData.productQuantity,
     })
+    setFormData({
+      statementId: "",
+      productId: "",
+      productName: "",
+      productQuantity: "",
+      customerId: "",
+      phoneNumber: "",
+      name: "",
+      emailAddress: "",
+      dateIssued: "",
+      terminationDate: "",
+      contractDescription: "",
+      contractStatus: "",
+    });
   }
 
   if (!isOpen) return null
@@ -61,23 +172,39 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
           <div className="modal-form">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="contractId">Sales Order ID</label>
+                <label htmlFor="statementId">Sales Statement ID</label>
+                <div className="select-wrapper">
                 <input
                   type="text"
-                  id="contractId"
-                  value={contractId}
-                  onChange={(e) => setContractId(e.target.value)}
-                  placeholder="Enter sales order ID"
+                  id="statementId"
+                  value={formData.statementId}
+                  onChange={handleChange}
+                  placeholder="Enter sales statement ID"
                 />
+                <span className="select-arrow" onClick={handleToggleDDRenewals}>▼</span>
+                  {isSTMDropdown && (
+                    <ul className="dropdown-list">
+                      {statementItems.length > 0 ? (
+                        statementItems.map((statementItem) => (
+                              <li key={statementItem.statement_item_id} onClick={() => handleSelectSTM(statementItem)}>
+                                {statementItem.statement_item_id}
+                              </li>
+                            ))
+                          ) : (
+                            <li>No statement item ID found</li>
+                          )}
+                        </ul>
+                  )}
+                </div>
               </div>
-
               <div className="form-group">
                 <label htmlFor="productId">Product ID</label>
                 <input
                   type="text"
                   id="productId"
-                  value={productId}
-                  onChange={(e) => setProductId(e.target.value)}
+                  readOnly
+                  value={formData.productId}
+                  onChange={handleChange}
                   placeholder="Enter product ID"
                 />
               </div>
@@ -89,8 +216,9 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
                 <input
                   type="text"
                   id="productName"
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
+                  readOnly
+                  value={formData.productName}
+                  onChange={handleChange}
                   placeholder="Enter product name"
                 />
               </div>
@@ -100,8 +228,9 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
                 <input
                   type="text"
                   id="productQuantity"
-                  value={productQuantity}
-                  onChange={(e) => setProductQuantity(e.target.value)}
+                  readOnly
+                  value={formData.productQuantity}
+                  onChange={handleChange}
                   placeholder="Enter product quantity"
                 />
               </div>
@@ -109,14 +238,15 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
 
             <div className="form-divider"></div>
 
-            <div className="form-row">
+             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="customerId">Customer ID</label>
                 <input
                   type="text"
                   id="customerId"
-                  value={customerId}
-                  onChange={(e) => setCustomerId(e.target.value)}
+                  readOnly
+                  value={formData.customerId}
+                  onChange={handleChange}
                   placeholder="Enter customer ID"
                 />
               </div>
@@ -126,8 +256,9 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
                 <input
                   type="text"
                   id="phoneNumber"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  readOnly
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
                   placeholder="Enter phone number"
                 />
               </div>
@@ -139,8 +270,9 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
                 <input
                   type="text"
                   id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  readOnly
+                  value={formData.name}
+                  onChange={handleChange}
                   placeholder="Enter name"
                 />
               </div>
@@ -150,8 +282,9 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
                 <input
                   type="email"
                   id="emailAddress"
-                  value={emailAddress}
-                  onChange={(e) => setEmailAddress(e.target.value)}
+                  readOnly
+                  value={formData.emailAddress}
+                  onChange={handleChange}
                   placeholder="Enter email address"
                 />
               </div>
@@ -171,13 +304,24 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {additionalServices.map((service) => (
-                      <tr key={service.id}>
-                        <td>{service.id}</td>
-                        <td>{service.type}</td>
-                        <td>{service.dateIssued}</td>
-                        <td>{service.duration}</td>
-                        <td>{service.status}</td>
+                  {additionalServices.length > 0
+                      ? additionalServices.slice(0, 3).map((service, index) => (
+                          <tr key={index}>
+                            <td>{service.additional_service || ""}</td>
+                            <td>{service.service_type || ""}</td>
+                            <td>{service.date_start || ""}</td>
+                            <td>{service.duration || ""}</td>
+                            <td>{service.status || ""}</td>
+                          </tr>
+                        ))
+                      : null}
+                    {Array.from({ length: 3 - additionalServices.length }).map((_, index) => (
+                      <tr key={`empty-${index}`}>
+                        <td colSpan="5" style={{ textAlign: "center", color: "#888" }}>
+                          {index === 0 && additionalServices.length === 0
+                            ? "No additional services available"
+                            : ""}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -187,41 +331,11 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="dateIssued">Date Issued</label>
-                <div className="date-input-wrapper">
-                  <input
-                    type="text"
-                    id="dateIssued"
-                    value={dateIssued}
-                    onChange={(e) => setDateIssued(e.target.value)}
-                    placeholder="dd/mm/yy"
-                  />
-                  <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="terminationDate">Termination Date</label>
-                <div className="date-input-wrapper">
-                  <input
-                    type="text"
-                    id="terminationDate"
-                    value={terminationDate}
-                    onChange={(e) => setTerminationDate(e.target.value)}
-                    placeholder="dd/mm/yy"
-                  />
-                  <img src={CalendarInputIcon || "/placeholder.svg"} alt="Calendar" className="calendar-icon" />
-                </div>
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
                 <label htmlFor="contractDescription">Contract Description</label>
                 <textarea
                   id="contractDescription"
-                  value={contractDescription}
-                  onChange={(e) => setContractDescription(e.target.value)}
+                  alue={formData.contractDescription}
+                  onChange={handleChange}
                   placeholder="Enter contract description"
                 />
               </div>
@@ -232,11 +346,21 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
                   <input
                     type="text"
                     id="contractStatus"
-                    value={contractStatus}
-                    onChange={(e) => setContractStatus(e.target.value)}
+                    value={formData.contractStatus}
+                    onChange={handleChange}
+                    readOnly
                     placeholder="Select status"
                   />
-                  <span className="select-arrow">▼</span>
+                  <span className="select-arrow" onClick={handleToggleDropdownStatus}>▼</span>
+                  {isOpenStatusDD && (
+                    <ul className="dropdown-list">
+                      {["Pending", "Active", "Expired", "Terminated"].map((status) => (
+                        <li key={status} onClick={() => handleSelectStatus(status)}>
+                          {status}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
             </div>

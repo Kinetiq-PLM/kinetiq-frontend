@@ -139,6 +139,23 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
       request_description: formData.requestDescription,
       request_remarks: formData.requestRemarks,
     })
+
+    // reset form
+    setFormData({
+      id: "",
+      callId: "",
+      customerId: "",
+      name: "",
+      technicianId: "",
+      technicianName: "",
+      requestDate: "",
+      phoneNumber: "",
+      emailAddress: "",
+      requestType: "",
+      requestStatus: "",
+      requestDescription: "",
+      requestRemarks: "",
+  });
   }
 
   if (!isOpen || !request) return null
