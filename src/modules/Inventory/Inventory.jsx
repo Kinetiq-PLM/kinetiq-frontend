@@ -21,6 +21,11 @@ const BodyContent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
+  // Refresh states for API refetching
+  const [refreshProducts, setRefreshProducts] = useState(0);
+  const [refreshAssets, setRefreshAssets] = useState(0);
+  const [refreshRawMats, setRefreshRawMats] = useState(0);
+
   useEffect(() => {
     const timerId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -41,7 +46,7 @@ const BodyContent = () => {
         console.error("Error fetching products:", err);
         setLoadingProducts(false);
       });
-  }, []);
+  }, [refreshProducts]);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/assets/")
@@ -54,7 +59,7 @@ const BodyContent = () => {
         console.error("Error fetching assets:", err);
         setLoadingAssets(false);
       });
-  }, []);
+  }, [refreshAssets]);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/raw-materials/")
@@ -67,7 +72,18 @@ const BodyContent = () => {
         console.error("Error fetching raw materials:", err);
         setLoadingRawMats(false);
       });
-  }, []);
+  }, [refreshRawMats]);
+
+  const refreshInventory = () => {
+    // Refresh data based on active tab
+    if (activeTab === "Products") {
+      setRefreshProducts(prev => prev + 1);
+    } else if (activeTab === "Assets") {
+      setRefreshAssets(prev => prev + 1);
+    } else if (activeTab === "Raw Materials") {
+      setRefreshRawMats(prev => prev + 1);
+    }
+  };
 
   const tableConfigs = {
     Products: {
@@ -220,7 +236,10 @@ const BodyContent = () => {
 
       {showModal && (
         <InvRestockForm
-          onClose={toggleModal}
+          onClose={() => {
+            toggleModal();
+            refreshInventory();
+          }}
           selectedItem={selectedItem}
           activeTab={activeTab} 
         />
