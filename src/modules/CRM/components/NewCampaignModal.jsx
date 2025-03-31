@@ -17,7 +17,7 @@ const NewCampaignModal = ({ isOpen, onClose }) => {
   const closeButtonRef = useRef(null);
 
   // ========== DATA ==========
-  const campaignTypes = ["Email", "Advertisement", "Social Media", "Referral"];
+  const campaignTypes = ["Email", "SMS", "Referral"];
 
   const [campaignName, setCampaignName] = useState("");
   const [startDate, setStartDate] = useState("");
