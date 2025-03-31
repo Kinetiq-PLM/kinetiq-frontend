@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import "../styles/Index.css";
 import Heading from "../components/Heading";
-import { LineChart } from "@mui/x-charts";
+import { BarChart, LineChart, PieChart } from "@mui/x-charts";
 import { GET } from "../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -13,6 +13,9 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   const [productReportData, setProductReportData] = useState([]);
   const [profitPeriod, setProfitPeriod] = useState("day"); // day, month, year, all
   const [salesPeriod, setSalesPeriod] = useState("day"); // day, month, year, all
+  const [totalProfit, setTotalProfit] = useState(0);
+  const [totalSold, setTotalSold] = useState(0);
+  const [totalOperations, setTotalOperations] = useState(0);
 
   const profitQuery = useQuery({
     queryKey: ["profits"],
@@ -25,17 +28,31 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
     queryFn: async () =>
       await GET(`sales/reporting/operations?period=${salesPeriod}`),
   });
-
-  const profitOptions = ["day", "month", "year", "all"];
+  const customerQuery = useQuery({
+    queryKey: ["customers"],
+    queryFn: async () => await GET(`sales/reporting/top-customers`),
+  });
+  const productQuery = useQuery({
+    queryKey: ["productReport"],
+    queryFn: async () => await GET(`sales/reporting/top-products`),
+  });
+  const colors = ["#c084fc", "#2563eb", "#fb923c", "#22c55e"];
+  const options = ["day", "month", "year", "all"];
+  const salesOptions = [
+    { label: "1D", value: "day" },
+    { label: "1M", value: "month" },
+    { label: "1Y", value: "year" },
+    { label: "All", value: "all" },
+  ];
 
   useEffect(() => {
     if (profitQuery.status === "success") {
-      setProfitReportData(
-        profitQuery.data.profit_data.map((item) => ({
-          ...item,
-          date: new Date(item.date),
-        }))
-      );
+      const data = profitQuery.data.profit_data.map((item) => ({
+        ...item,
+        date: new Date(item.date),
+      }));
+      setProfitReportData(data);
+      setTotalProfit(profitQuery.data.total_profit);
     }
   }, [profitQuery.data]);
 
@@ -48,24 +65,49 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
         invoices: sale.invoices,
       }));
       setSalesReportData(data);
+      setTotalOperations(salesQuery.data.total);
     }
   }, [salesQuery.data]);
+  useEffect(() => {
+    if (customerQuery.status === "success") {
+      const data = customerQuery.data.top_customers;
+      setCustomerReportData(data);
+    }
+  }, [customerQuery.data]);
+  useEffect(() => {
+    if (productQuery.status === "success") {
+      const data = productQuery.data.top_products;
+      setProductReportData(data);
+      setTotalSold(productQuery.data.total_sold);
+    }
+  }, [productQuery.data]);
+
+  useEffect(() => {
+    profitQuery.refetch();
+  }, [profitPeriod]);
+
+  useEffect(() => {
+    salesQuery.refetch();
+  }, [salesPeriod]);
+
   return (
     <div className="reporting flex flex-col gap-4 overflow-y-auto">
-      <div className="bg-white rounded-lg p-8 w-full shadow">
+      <div className="bg-white rounded-lg p-8 w-auto shadow ">
         <Heading
           Title="Reporting"
           SubTitle="Compilation of usable data to further improve business."
         />
       </div>
+      {/* FIRST ROW */}
       <div className="flex gap-4">
-        <div className="bg-white rounded-lg p-8 flex-2/5 shadow flex flex-col gap-2">
+        {/* PROFIT REPORT */}
+        <div className="bg-white rounded-lg p-8 flex-2/5 shadow flex flex-col gap-4">
           <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
             Profit Report
           </h1>
-          <div className="justify-center items-center">
+          <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2 p-4">
             <LineChart
-              height={400}
+              height={500}
               dataset={profitReportData}
               xAxis={[
                 {
@@ -76,43 +118,73 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               ]}
               series={[{ dataKey: "profit" }]}
             />
-          </div>
-          <div className="flex justify-center bg-[#f3f4f6] py-3 rounded-lg">
-            <form>
-              {profitOptions.map((option) => {
-                return (
-                  <label key={option}>
-                    <input
-                      type="radio"
-                      name="time_range"
-                      value={option}
-                      className="hidden"
-                      checked={profitPeriod === option}
-                      onChange={() => setProfitPeriod(option)}
-                    />
-                    <span
-                      className={`px-10 py-2 rounded-md cursor-pointer ${
-                        profitPeriod === option
-                          ? "bg-white text-black font-medium shadow"
-                          : "text-gray-500"
-                      }`}
-                    >
-                      {String(option).charAt(0).toUpperCase() +
-                        String(option).slice(1)}
-                    </span>
-                  </label>
-                );
-              })}
-            </form>
+            <div className="flex justify-center ">
+              <form className="bg-[#f3f4f6] py-3 px-2 rounded-lg">
+                {options.map((option) => {
+                  return (
+                    <label key={option}>
+                      <input
+                        type="radio"
+                        name="time_range"
+                        value={option}
+                        className="hidden"
+                        checked={profitPeriod === option}
+                        onChange={() => setProfitPeriod(option)}
+                      />
+                      <span
+                        className={`px-10 py-2 rounded-md cursor-pointer ${
+                          profitPeriod === option
+                            ? "bg-white text-black font-medium shadow"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {String(option).charAt(0).toUpperCase() +
+                          String(option).slice(1)}
+                      </span>
+                    </label>
+                  );
+                })}
+              </form>
+            </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg p-8 w-full flex-3/5 shadow">
-          <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
-            Sales Report
-          </h1>
-          <div className="justify-center items-center">
+        {/* SALES REPORT */}
+        <div className="bg-white rounded-lg p-8 w-full flex-3/5 shadow flex flex-col gap-4">
+          <h1 className="font-bold text-2xl text-[#1c1c1c]">Sales Report</h1>
+          <div className="justify-center items-center border-[#f3f4f6] rounded-lg border-2 p-4">
+            <div className="flex justify-between px-4 mb-4 items-center">
+              <div className="flex flex-col gap-2">
+                <span>Sales Operations</span>
+                <span className="text-3xl">{totalOperations}</span>
+              </div>
+              <form className="bg-[#f3f4f6] px-1 py-3 rounded-lg">
+                {salesOptions.map((option) => {
+                  return (
+                    <label key={option.label}>
+                      <input
+                        type="radio"
+                        name="time_range"
+                        value={option.value}
+                        className="hidden"
+                        checked={salesPeriod === option.value}
+                        onChange={() => setSalesPeriod(option.value)}
+                      />
+                      <span
+                        className={`px-5 py-2 rounded-md cursor-pointer ${
+                          salesPeriod === option.value
+                            ? "bg-white text-black font-medium shadow"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {option.label}
+                      </span>
+                    </label>
+                  );
+                })}
+              </form>
+            </div>
             <LineChart
-              height={400}
+              height={500}
               dataset={salesReportData}
               xAxis={[
                 {
@@ -121,8 +193,117 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                   valueFormatter: (value) => value.toLocaleDateString(),
                 },
               ]}
-              series={[{ dataKey: "profit" }]}
+              series={[
+                {
+                  dataKey: "quotations",
+                  label: "Quotations",
+                  color: "#c084fc",
+                },
+                { dataKey: "orders", label: "Orders", color: "#fb923c" },
+                {
+                  dataKey: "invoices",
+                  label: "Invoices",
+                  color: "#22c55e",
+                },
+                {
+                  dataKey: "deliveries",
+                  label: "Deliveries",
+                  color: "#2563eb",
+                },
+              ]}
+              margin={{ top: 20, bottom: 80, left: 50, right: 50 }}
+              slotProps={{
+                legend: {
+                  direction: "row", // Align items in a row
+                  position: { vertical: "bottom", horizontal: "middle" }, // Move to the bottom center
+                  marker: {
+                    shape: "circle", // Makes legend markers circular
+                  },
+                },
+              }}
             />
+          </div>
+        </div>
+      </div>
+
+      {/* SECOND ROW */}
+      <div className="flex gap-4">
+        <div className="bg-white rounded-lg p-8 flex-2/5 shadow flex flex-col gap-4">
+          <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
+            Customer Report
+          </h1>
+          <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
+            <BarChart
+              height={500}
+              dataset={customerReportData}
+              xAxis={[
+                {
+                  dataKey: "customer",
+                  scaleType: "band",
+                },
+              ]}
+              series={[
+                {
+                  dataKey: "percentage",
+                },
+              ]}
+            />
+          </div>
+        </div>
+        {/*  PRODUCT REPORT */}
+        <div className="bg-white rounded-lg p-8 flex-2/5 shadow flex flex-col gap-4">
+          <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
+            Product Report
+          </h1>
+          <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
+            <PieChart
+              colors={colors}
+              height={500}
+              series={[
+                {
+                  data: productReportData.map((data, index) => ({
+                    value: data.percentage,
+                    label: data.product,
+                    color: colors[index],
+                  })),
+                },
+              ]}
+              slotProps={{
+                legend: {
+                  direction: "row", // Align items in a row
+                  position: { vertical: "bottom", horizontal: "middle" }, // Move to the bottom center
+                },
+              }}
+              margin={{ top: 20, bottom: 60, left: 50, right: 50 }}
+            />
+          </div>
+        </div>
+
+        <div className="flex-1/5">
+          <div className="flex flex-col gap-4 font-medium text-sm">
+            <div className="bg-white rounded-lg p-4 flex flex-col gap-2">
+              <span>Gross Profits</span>
+              <span className="text-2xl">
+                {totalProfit.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+            </div>
+            <div className="bg-white rounded-lg p-4 flex flex-col">
+              <span>Sold</span>
+              <span className="text-2xl">
+                {totalSold.toLocaleString("en-US")}
+              </span>
+            </div>
+            <div className="bg-white rounded-lg p-4 flex flex-col">
+              <span>Top Customers</span>
+              <span className="text-2xl">
+                {customerReportData.length > 0
+                  ? customerReportData[0].customer
+                  : ""}
+              </span>
+            </div>
           </div>
         </div>
       </div>
