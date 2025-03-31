@@ -10,6 +10,7 @@ import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 
 import { GET } from "../api/api"
 import { PATCH } from "../api/api"
+import { POST } from "../api/api"
 
 const ServiceContract = () => {
   // State for contracts
@@ -106,14 +107,16 @@ const ServiceContract = () => {
   }
 
   // Handle create contract
-  const handleCreateContract = (contractData) => {
+  const handleCreateContract = async (contractData) => {
     console.log("Creating contract:", contractData)
-
-    // Here you would typically make an API call to create the contract
-    setShowCreateModal(false)
-
-    // Optionally refresh the contract list
-    // fetchContracts()
+    try {
+      const data = await POST("/service-contracts/", contractData);
+      console.log("Contract created successfully:", data);
+      setShowCreateModal(false);
+      fetchContracts();
+    } catch (error) {
+        console.error("Error submitting contract:", error.message);
+    }
   }
 
 
