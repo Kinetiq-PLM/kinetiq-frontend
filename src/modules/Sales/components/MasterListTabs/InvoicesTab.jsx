@@ -7,23 +7,19 @@ import { GET } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_API_URL } from "../../api/api";
 
-export default function BlanketAgreementsTab({
-  loadSubModule,
-  setActiveSubModule,
-}) {
+export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
 
   const columns = [
     { key: "invoice_id", label: "Invoice ID" },
+    { key: "delivery_note_id", label: "Delivery ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "invoice_date", label: "Invoice Date" },
-    { key: "total_price", label: "Total Price" },
-    { key: "invoice_status", label: "Status" },
+    { key: "total_amount", label: "Total Price" },
     { key: "payment_status", label: "Payment Status" },
-    { key: "due_date", label: "Due Date" },
     { key: "document", label: "Document" },
   ];
 
@@ -73,14 +69,14 @@ export default function BlanketAgreementsTab({
 
   useEffect(() => {
     if (invoiceQuery.status === "success") {
+      console.log(invoiceQuery.data);
       const data = invoiceQuery.data.map((invoice) => ({
         invoice_id: invoice.invoice_id,
-        customer_id: invoice.order.statement.customer.customer_id,
-        customer_name: invoice.order.statement.customer.name,
+        delivery_note_id: invoice.delivery_note.delivery_note_id,
+        customer_id: invoice.delivery_note.statement.customer.customer_id,
+        customer_name: invoice.delivery_note.statement.customer.name,
         invoice_date: new Date(invoice.invoice_date).toLocaleString(),
-        total_price: Number(
-          invoice.order.statement.total_amount
-        ).toLocaleString("en-US", {
+        total_amount: Number(invoice.total_amount).toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }),

@@ -75,6 +75,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
 
   // the products customer chose
   const [products, setProducts] = useState([]);
+  const [initialProducts, setInitialProducts] = useState([]);
 
   const [deliveryInfo, setDeliveryInfo] = useState({
     customer_id: "",
@@ -87,7 +88,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     discount: 0,
     total_tax: 0,
     shipping_fee: 0,
-    warranty_fee: 0,
     total_price: 0,
   });
 
@@ -113,7 +113,9 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
         })
       );
       console.log(prods);
+
       setProducts(prods);
+      setInitialProducts(prods);
       setSelectedOrder(data);
       setSelectedCustomer(data.statement.customer);
       setSelectedEmployee(data.statement.salesrep);
@@ -128,7 +130,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const deliveryMutation = useMutation({
     mutationFn: async (data) => await POST("sales/delivery/", data),
     onSuccess: (data, variables, context) => {
-      setDeliveryID(data.shipping_id);
+      setDeliveryID(data.delivery_note_id);
     },
   });
 
@@ -143,6 +145,11 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
 
     setProducts(
       products.filter(
+        (product) => product.product_id != selectedProduct.product_id
+      )
+    );
+    setInitialProducts(
+      initialProducts.filter(
         (product) => product.product_id != selectedProduct.product_id
       )
     );
@@ -169,39 +176,55 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       return;
     }
     const order_id = selectedOrder ? selectedOrder.order_id : null;
+    let error = false;
     const request = {
       shipping_data: {
         order_id,
         shipping_method: "Standard", // drop down needed
-        tracking_num: generateRandomID("TRK"),
-        estimated_delivery: deliveryDate,
         delivery_status: "Pending",
-        items: products.map((product) => ({
-          product: product.product_id,
-          quantity: parseInt(product.quantity),
-          unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
-          total_price: Number(parseFloat(product.total_price).toFixed(2)),
-          discount: Number(parseFloat(product.discount).toFixed(2)),
-          tax_amount: Number(parseFloat(product.tax).toFixed(2)),
-        })),
+        items: products.map((product, index) => {
+          const quantity =
+            initialProducts.length > 0
+              ? parseInt(initialProducts[index].quantity)
+              : parseInt(product.quantity);
+          const to_deliver = parseInt(product.quantity);
+          if (quantity != to_deliver) {
+            error = true;
+          }
+          return {
+            product: product.product_id,
+            quantity: initialProducts[index].quantity,
+            quantity_to_deliver: parseInt(product.quantity),
+            unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
+            total_price: Number(parseFloat(product.total_price).toFixed(2)),
+            discount: Number(parseFloat(product.discount).toFixed(2)),
+            tax_amount: Number(parseFloat(product.tax).toFixed(2)),
+          };
+        }),
       },
       statement_data: {
         customer: selectedCustomer.customer_id,
         salesrep: selectedEmployee.employee_id,
-        type: "Non-Project-Based", // make a variable
         total_amount: Number(parseFloat(deliveryInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(deliveryInfo.discount).toFixed(2)),
         total_tax: Number(parseFloat(deliveryInfo.total_tax).toFixed(2)),
       },
     };
-    console.log(request);
-    deliveryMutation.mutate(request);
-    // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
-    setSubmitted(true);
-    showAlert({
-      type: "success",
-      title: "Delivery Submitted",
-    });
+    if (error) {
+      showAlert({
+        type: "error",
+        title: `Product quantities must not exceed those specified on the order.`,
+      });
+    } else {
+      console.log(request);
+      deliveryMutation.mutate(request);
+      // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
+      setSubmitted(true);
+      showAlert({
+        type: "success",
+        title: "Delivery Submitted",
+      });
+    }
   };
 
   const transferData = () => {
@@ -224,34 +247,19 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       0
     );
 
-    const shippingFee = products.length * 100;
-    const warrantyFee = products.reduce(
-      (acc, product) =>
-        acc +
-        ((product.markup_price - product.selling_price) *
-          product.quantity *
-          product.warranty_period) /
-          12,
-      0
-    );
     const totalPrice =
       Number(totalBeforeDiscount) -
       Number(totalDiscount) +
       Number(totalTax) +
-      Number(shippingFee) +
-      Number(warrantyFee);
-
-    setDeliveryInfo((prevOrderInfo) => ({
-      ...prevOrderInfo,
-      customer_id: selectedCustomer.customer_id,
-      selected_products: products,
-      total_before_discount: totalBeforeDiscount,
-      total_tax: Number(totalTax),
-      discount: totalDiscount,
-      shipping_fee: shippingFee,
-      warranty_fee: Number(warrantyFee),
-      total_price: Number(totalPrice),
-    }));
+      setDeliveryInfo((prevOrderInfo) => ({
+        ...prevOrderInfo,
+        customer_id: selectedCustomer.customer_id,
+        selected_products: products,
+        total_before_discount: totalBeforeDiscount,
+        total_tax: Number(totalTax),
+        discount: totalDiscount,
+        total_price: Number(totalPrice),
+      }));
   };
 
   // For copy from feature
@@ -345,14 +353,8 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       0
     );
 
-    const shippingFee = products.length * 100;
-    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
     const totalPrice =
-      Number(totalBeforeDiscount) -
-      Number(totalDiscount) +
-      Number(totalTax) +
-      Number(shippingFee) +
-      Number(warrantyFee);
+      Number(totalBeforeDiscount) - Number(totalDiscount) + Number(totalTax);
     const delivery = {
       ...deliveryInfo,
       customer_id: selectedCustomer.customer_id,
@@ -363,8 +365,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       selected_address: selectedCustomer.address_line1,
       total_tax: Number(totalTax),
       discount: Number(totalDiscount),
-      shipping_fee: Number(shippingFee),
-      warranty_fee: Number(warrantyFee),
       total_price: Number(totalPrice),
     };
 
@@ -453,9 +453,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           <div className="h-full flex flex-col gap-3 w-full">
             {/* Buttons Row */}
             <div className="flex gap-2">
-              <Button type="primary" onClick={() => setIsProductListOpen(true)}>
-                Add Item
-              </Button>
               <Button type="outline" onClick={() => handleDelete()}>
                 Delete Item
               </Button>
@@ -506,20 +503,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
                 maximumFractionDigits: 2,
               })}
             />
-            <InfoField
-              label={"Shipping"}
-              value={Number(deliveryInfo.shipping_fee).toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            />
-            <InfoField
-              label={"Warranty"}
-              value={Number(deliveryInfo.warranty_fee).toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            />
+
             <InfoField
               label={"Tax"}
               value={Number(deliveryInfo.total_tax).toLocaleString("en-US", {

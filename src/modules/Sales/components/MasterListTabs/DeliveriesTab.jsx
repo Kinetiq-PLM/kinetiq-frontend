@@ -14,7 +14,7 @@ export default function BlanketAgreementsTab({
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [deliveryList, setDeliveryList] = useState([]);
   const columns = [
-    { key: "shipping_id", label: "Shipping ID" },
+    { key: "delivery_note_id", label: "Delivery ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "order_id", label: "Order ID" },
     { key: "tracking_num", label: "Tracking Number" },
@@ -26,6 +26,7 @@ export default function BlanketAgreementsTab({
     { key: "total_price", label: "Total Price" },
     { key: "shipping_date", label: "Shipping Date" },
     { key: "estimated_delivery", label: "Estimated Delivery" },
+    { key: "created_at", label: "Created At" },
     { key: "document", label: "Document" },
   ];
 
@@ -75,34 +76,28 @@ export default function BlanketAgreementsTab({
   useEffect(() => {
     if (deliveryQuery.status === "success") {
       const data = deliveryQuery.data.map((delivery) => ({
-        shipping_id: delivery.shipping_id,
-        customer_id: delivery.order
-          ? delivery.order.statement.customer.customer_id
-          : delivery.statement.customer.customer_id,
+        delivery_note_id: delivery.delivery_note_id,
+        customer_id: delivery.statement.customer.customer_id,
         order_id: delivery.order ? delivery.order.order_id : null,
         tracking_num: delivery.tracking_num,
         shipping_method: delivery.shipping_method,
-        customer_name: delivery.order
-          ? delivery.order.statement.customer.name
-          : delivery.statement.customer.name,
+        customer_name: delivery.statement.customer.name,
         delivery_status: delivery.delivery_status,
-        address: delivery.order
-          ? `${delivery.order.statement.customer.address_line1} ${delivery.order.statement.customer.address_line2}`
-          : `${delivery.statement.customer.address_line1} ${delivery.statement.customer.address_line2}`,
-        type: delivery.order.statement.type,
-        total_price: Number(
-          delivery.order
-            ? delivery.order.statement.total_amount
-            : delivery.statement.total_amount
-        ).toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
+        address: `${delivery.statement.customer.address_line1} ${delivery.statement.customer.address_line2}`,
+        type: delivery.order.order_type,
+        total_price: Number(delivery.statement.total_amount).toLocaleString(
+          "en-US",
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }
+        ),
         shipping_date: new Date(delivery.shipping_date).toLocaleString(),
         estimated_delivery: new Date(
           delivery.estimated_delivery
         ).toLocaleString(),
-        document: `${BASE_API_URL}sales/delivery/${delivery.shipping_id}/document`,
+        created_at: new Date(delivery.created_at).toLocaleString(),
+        document: `${BASE_API_URL}sales/delivery/${delivery.delivery_note_id}/document`,
       }));
       setDeliveryList(data);
     }

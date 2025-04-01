@@ -21,7 +21,7 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
   const [filteredData, setFilteredData] = useState([]);
 
   const quotationQuery = useQuery({
-    queryKey: ["quotations"],
+    queryKey: ["quotationsLIst"],
     queryFn: async () => await GET("sales/quotation?status=Pending"),
     enabled: isOpen,
   });
@@ -52,14 +52,14 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
-        queryClient.invalidateQueries({ queryKey: ["quotations"] });
+        queryClient.invalidateQueries({ queryKey: ["quotationsList"] });
         onClose();
       }
     };
 
     // Focus the close button when modal opens
     if (isOpen && closeButtonRef.current) {
-      queryClient.invalidateQueries({ queryKey: ["quotations"] });
+      queryClient.invalidateQueries({ queryKey: ["quotationsList"] });
       closeButtonRef.current.focus();
     }
 

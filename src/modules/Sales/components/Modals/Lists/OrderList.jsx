@@ -25,8 +25,8 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
   const closeButtonRef = useRef(null);
 
   const orderQuery = useQuery({
-    queryKey: ["orders"],
-    queryFn: async () => await GET("sales/order?order_status=Pending"),
+    queryKey: ["ordersList"],
+    queryFn: async () => await GET("sales/order?status=Open"),
     enabled: isOpen,
   });
   const columns = [
@@ -51,14 +51,14 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
-        queryClient.invalidateQueries({ queryKey: ["orders"] });
+        queryClient.invalidateQueries({ queryKey: ["ordersList"] });
         onClose();
       }
     };
 
     // Focus the close button when modal opens
     if (isOpen && closeButtonRef.current) {
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["ordersList"] });
       closeButtonRef.current.focus();
     }
 
@@ -82,10 +82,13 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
       const formattedData = data.map((order) => ({
         ...order,
         customer_name: order.statement.customer.name,
-        total_price: Number(order.order_total_amount).toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
+        total_price: Number(order.statement.total_amount).toLocaleString(
+          "en-US",
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }
+        ),
         date_issued: new Date(order.order_date).toLocaleString(),
       }));
       setFilteredData(formattedData);

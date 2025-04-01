@@ -24,7 +24,6 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "address", label: "Address" },
-    { key: "type", label: "Type" },
     { key: "total_price", label: "Total Price" },
     { key: "salesrep", label: "Sales Representative" }, // name of salesrep if available
     { key: "status", label: "Status" },

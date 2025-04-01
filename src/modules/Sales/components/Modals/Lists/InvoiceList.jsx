@@ -21,7 +21,7 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
   // Filtered data is used to filter the data based on the search term
   const [filteredData, setFilteredData] = useState([]);
   const invoiceQuery = useQuery({
-    queryKey: ["invoices"],
+    queryKey: ["invoicesList"],
     queryFn: async () => await GET("sales/invoice"),
     enabled: isOpen,
   });
@@ -52,14 +52,14 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
-        queryClient.invalidateQueries({ queryKey: ["invoices"] });
+        queryClient.invalidateQueries({ queryKey: ["invoicesList"] });
         onClose();
       }
     };
 
     // Focus the close button when modal opens
     if (isOpen && closeButtonRef.current) {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["invoicesList"] });
       closeButtonRef.current.focus();
     }
 

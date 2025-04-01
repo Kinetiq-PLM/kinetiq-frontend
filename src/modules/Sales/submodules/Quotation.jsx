@@ -79,8 +79,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     date_issued: new Date().toISOString().split("T")[0],
     discount: 0,
     total_tax: 0,
-    shipping_fee: 0,
-    warranty_fee: 0,
     total_price: 0,
   });
 
@@ -154,28 +152,15 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
         0
       )
     ).toFixed(2);
+
+    console.log(products);
     const totalDiscount = products.reduce(
       (acc, product) => acc + Number(product.discount),
       0
     );
-    const shippingFee = products.length * 100;
-    // const warrantyFee = products.reduce(
-    //   (acc, product) =>
-    //     acc +
-    //     ((Number(product.selling_price) - Number(product.unit_price)) *
-    //       product.quantity *
-    //       product.warranty_period) /
-    //       12,
-    //   0
-    // );
-    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
 
     const totalPrice =
-      Number(totalBeforeDiscount) -
-      Number(totalDiscount) +
-      Number(totalTax) +
-      Number(shippingFee) +
-      Number(warrantyFee);
+      Number(totalBeforeDiscount) - Number(totalDiscount) + Number(totalTax);
 
     setQuotationInfo({
       ...quotationInfo,
@@ -185,8 +170,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       total_before_discount: Number(totalBeforeDiscount),
       total_tax: Number(totalTax),
       discount: Number(totalDiscount),
-      shipping_fee: shippingFee,
-      warranty_fee: Number(warrantyFee),
       total_price: Number(totalPrice),
     });
   }, [selectedCustomer, products]);
@@ -231,10 +214,9 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           tax_amount: Number(parseFloat(product.tax).toFixed(2)),
         })),
       },
-      quotation_data: {
-        status: "Pending",
-        date_issued: new Date().toISOString(),
-      },
+      // quotation_data: {
+      //   date_issued: new Date().toISOString(),
+      // },
     };
 
     quotationMutation.mutate(request);
@@ -376,20 +358,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
                 maximumFractionDigits: 2,
               })}
             />
-            <InfoField
-              label={"Shipping"}
-              value={Number(quotationInfo.shipping_fee).toLocaleString(
-                "en-US",
-                { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-              )}
-            />
-            <InfoField
-              label={"Warranty"}
-              value={Number(quotationInfo.warranty_fee).toLocaleString(
-                "en-US",
-                { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-              )}
-            />
+
             <InfoField
               label={"Tax"}
               value={Number(quotationInfo.total_tax).toLocaleString("en-US", {

@@ -268,12 +268,6 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
         {/* BODY */}
         <div className="px-6 mt-4">
           <form action="" className="space-y-4 mb-24">
-            <div>
-              <p className="text-sm">Customer ID</p>
-              <div className="mt-2 bg-[#F9FAFA] w-full py-2 px-3 rounded">
-                <p className="text-sm">{customerID}</p>
-              </div>
-            </div>
             <InputField
               label={"Company Name"}
               value={companyName}
@@ -352,7 +346,7 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
             />
           </form>
 
-          <div className="mt-4 flex justify-between">
+          <div className="flex justify-between">
             <div>
               <Button
                 type="primary"

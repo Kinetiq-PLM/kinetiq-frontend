@@ -23,7 +23,7 @@ const DeliveryListModal = ({ isOpen, onClose, setDelivery }) => {
   const closeButtonRef = useRef(null);
 
   const columns = [
-    { key: "shipping_id", label: "Delivery ID" },
+    { key: "delivery_note_id", label: "Delivery ID" },
     { key: "customer_name", label: "Name" }, // Company Name
     { key: "date_shipped", label: "Shipped" },
     { key: "delivered_date", label: "Delivered" },

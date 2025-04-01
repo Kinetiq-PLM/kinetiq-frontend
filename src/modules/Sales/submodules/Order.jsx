@@ -129,8 +129,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     date_issued: new Date().toISOString().split("T")[0],
     discount: 0,
     total_tax: 0,
-    shipping_fee: 0,
-    warranty_fee: 0,
     total_price: 0,
   });
 
@@ -180,9 +178,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       order_data: {
         quotation_id,
         order_date: new Date().toISOString(),
-        order_status: "Pending",
-        order_total_amount: orderInfo.total_price,
-        order_type: "Direct", // temporary value
+        order_type: "Non-Project-Based", // temporary value
         items: products.map((product) => ({
           product: product.product_id,
           quantity: parseInt(product.quantity),
@@ -195,7 +191,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       statement_data: {
         customer: selectedCustomer.customer_id,
         salesrep: selectedEmployee.employee_id,
-        type: "Non-Project-Based", // make a variable
         total_amount: Number(parseFloat(orderInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(orderInfo.discount).toFixed(2)),
         total_tax: Number(parseFloat(orderInfo.total_tax).toFixed(2)),
@@ -292,14 +287,8 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       0
     );
 
-    const shippingFee = products.length * 100;
-    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
     const totalPrice =
-      Number(totalBeforeDiscount) -
-      Number(totalDiscount) +
-      Number(totalTax) +
-      Number(shippingFee) +
-      Number(warrantyFee);
+      Number(totalBeforeDiscount) - Number(totalDiscount) + Number(totalTax);
     const order = {
       ...orderInfo,
       customer_id: selectedCustomer.customer_id,
@@ -310,8 +299,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       selected_address: selectedCustomer.address_line1,
       total_tax: Number(totalTax),
       discount: Number(totalDiscount),
-      shipping_fee: Number(shippingFee),
-      warranty_fee: Number(warrantyFee),
       total_price: Number(totalPrice),
     };
     setOrderInfo(order);
@@ -444,20 +431,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
             <InfoField
               label={"Discount"}
               value={Number(orderInfo.discount).toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            />
-            <InfoField
-              label={"Shipping"}
-              value={Number(orderInfo.shipping_fee).toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            />
-            <InfoField
-              label={"Warranty"}
-              value={Number(orderInfo.warranty_fee).toLocaleString("en-US", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}

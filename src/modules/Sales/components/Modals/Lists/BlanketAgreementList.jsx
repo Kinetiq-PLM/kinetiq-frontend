@@ -26,7 +26,7 @@ const BlanketAgreementListModal = ({
   // Filtered data is used to filter the data based on the search term
   const [filteredData, setFilteredData] = useState([]);
   const agreementQuery = useQuery({
-    queryKey: ["agreements"],
+    queryKey: ["agreementsList"],
     queryFn: async () => await GET("sales/agreement?status=Active"),
     enabled: isOpen,
   });
@@ -57,7 +57,7 @@ const BlanketAgreementListModal = ({
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
-        queryClient.invalidateQueries({ queryKey: ["agreements"] });
+        queryClient.invalidateQueries({ queryKey: ["agreementsList"] });
         onClose();
       }
     };
@@ -65,7 +65,7 @@ const BlanketAgreementListModal = ({
     // Focus the close button when modal opens
     if (isOpen && closeButtonRef.current) {
       closeButtonRef.current.focus();
-      queryClient.invalidateQueries({ queryKey: ["agreements"] });
+      queryClient.invalidateQueries({ queryKey: ["agreementsList"] });
     }
 
     // Prevent scrolling on body when modal is open

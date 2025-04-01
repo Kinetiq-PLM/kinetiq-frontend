@@ -19,7 +19,8 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "address", label: "Address" },
-    { key: "type", label: "Type" },
+    { key: "order_type", label: "Type" },
+    { key: "order_status", label: "Status" },
     { key: "total_price", label: "Total Price" },
     { key: "salesrep", label: "Sales Representative" }, // name of salesrep if available
     { key: "order_date", label: "Date Issued" },
@@ -70,7 +71,8 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
         customer_id: order.statement.customer.customer_id,
         customer_name: order.statement.customer.name,
         address: `${order.statement.customer.address_line1} ${order.statement.customer.address_line2}`,
-        type: order.statement.type,
+        order_type: order.order_type,
+        order_status: order.completion_status,
         salesrep: `${order.statement.salesrep.first_name} ${order.statement.salesrep.last_name}`,
         total_price: Number(order.statement.total_amount).toLocaleString(
           "en-US",
