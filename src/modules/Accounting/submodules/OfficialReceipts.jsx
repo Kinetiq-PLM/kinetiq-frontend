@@ -60,7 +60,6 @@ const OfficialReceipts = () => {
 
         <div className="title-subtitle-container">
           <h1 className="subModule-title">Official Receipts</h1>
-          <h2 className="subModule-subTitle">List of receipts.</h2>
         </div>
 
         <div className="parent-component-container">

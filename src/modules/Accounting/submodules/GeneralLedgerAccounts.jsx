@@ -62,7 +62,6 @@ const GeneralLedgerAccounts = () => {
       <div className="body-content-container">
         <div className="title-subtitle-container">
           <h1 className="subModule-title">General Ledger Accounts</h1>
-          <h2 className="subModule-subTitle">The whole record of accounts.</h2>
         </div>
 
         <div className="parent-component-container">

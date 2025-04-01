@@ -76,6 +76,21 @@ const BodyContent = () => {
             .includes(searching.toLowerCase())
     );
 
+    // Find indices of Debit and Credit columns
+    const debitIndex = columns.indexOf("Debit");
+    const creditIndex = columns.indexOf("Credit");
+
+    // Calculate totals
+    const totalDebit = data.reduce((sum, row) => sum + (parseFloat(row[debitIndex]) || 0), 0);
+    const totalCredit = data.reduce((sum, row) => sum + (parseFloat(row[creditIndex]) || 0), 0);
+
+    // Format numbers with commas
+    const formatNumber = (num) => num.toLocaleString("en-US", { minimumFractionDigits: 2 });
+
+    const formattedTotalDebit = formatNumber(totalDebit);
+    const formattedTotalCredit = formatNumber(totalCredit);
+
+
     return (
         <div className="generalLedger">
             <div className="body-content-container">
@@ -83,7 +98,6 @@ const BodyContent = () => {
 
                 <div className="title-subtitle-container">
                     <h1 className="subModule-title">General Ledger</h1>
-                    <h2 className="subModule-subTitle">The whole record of transactions.</h2>
                 </div>
 
 
@@ -96,6 +110,18 @@ const BodyContent = () => {
                 </div>
 
                 <Table data={filteredData} columns={columns} />
+                <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 
+                 font-light max-sm:text-[10px] max-sm:font-light max-md:text-[10px] max-md:font-light 
+                max-lg:text-[10px] max-lg:font-light max-xl:text-[10px] max-xl:font-light 2xl:text-[10px] 2xl:font-light">
+
+                    <div className="col-span-3"></div> 
+                    <div className="font-bold">Total</div>
+                    <div>{formattedTotalDebit}</div>
+                    <div>{formattedTotalCredit}</div>
+                    
+                </div>
+
+
             </div>
         </div>
     );

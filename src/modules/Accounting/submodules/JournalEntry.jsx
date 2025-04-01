@@ -169,7 +169,6 @@ const JournalEntry = () => {
             <div className="body-content-container">
                 <div className="title-subtitle-container">
                     <h1 className="subModule-title">Journal Entry</h1>
-                    <h2 className="subModule-subTitle">Enter debit and credit details for transactions.</h2>
                 </div>
 
                 <div className="parent-component-container">
@@ -262,8 +261,8 @@ const JournalEntry = () => {
 
                     <div className="totals-row">
                         <div className="column account-column">Totals</div>
-                        <div className="column debit-column">{totalDebit.toFixed(2)}</div>
-                        <div className="column credit-column">{totalCredit.toFixed(2)}</div>
+                        <div className="column debit-column">{totalDebit.toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+                        <div className="column credit-column">{totalCredit.toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
                     </div>
                 </div>
 

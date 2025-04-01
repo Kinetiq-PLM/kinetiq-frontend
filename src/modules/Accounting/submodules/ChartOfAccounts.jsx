@@ -138,7 +138,6 @@ const BodyContent = () => {
 
                 <div className="title-subtitle-container">
                     <h1 className="subModule-title">Chart of Accounts</h1>
-                    <h2 className="subModule-subTitle">A structured list of all accounts used to record financial transactions in the system.</h2>
                 </div>
 
                 <div className="parent-component-container">

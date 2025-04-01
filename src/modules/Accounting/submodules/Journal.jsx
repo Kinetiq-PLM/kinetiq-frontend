@@ -201,7 +201,6 @@ const Journal = () => {
             <div className='body-content-container'>
                 <div className="title-subtitle-container">
                     <h1 className="subModule-title">Journal</h1>
-                    <h2 className="subModule-subTitle">A record that groups transactions under a unique journal ID for accounting purposes.</h2>
                 </div>
 
                 <div className="parent-component-container">

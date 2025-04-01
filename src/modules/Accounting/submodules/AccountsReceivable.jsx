@@ -14,7 +14,6 @@ const AccountsReceivable = () => {
 
         <div className="title-subtitle-container">
           <h1 className="subModule-title">Accounts Receivable</h1>
-          <h2 className="subModule-subTitle">Detailed list of accounts receivable.</h2>
         </div>
 
         <div className="parent-component-container">
