@@ -19,6 +19,8 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
     { key: "customer_name", label: "Customer Name" },
     { key: "invoice_date", label: "Invoice Date" },
     { key: "total_amount", label: "Total Price" },
+    { key: "total_amount_paid", label: "Amount Paid" },
+    { key: "remaining_balance", label: "Remaining Balance" },
     { key: "payment_status", label: "Payment Status" },
     { key: "document", label: "Document" },
   ];
@@ -80,9 +82,21 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }),
-        invoice_status: invoice.invoice_status,
+        total_amount_paid: Number(invoice.total_amount_paid).toLocaleString(
+          "en-US",
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }
+        ),
+        remaining_balance: Number(invoice.remaining_balance).toLocaleString(
+          "en-US",
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }
+        ),
         payment_status: invoice.payment_status,
-        due_date: invoice.due_date,
         document: `${BASE_API_URL}sales/invoice/${invoice.invoice_id}/document`,
       }));
       setInvoiceList(data);

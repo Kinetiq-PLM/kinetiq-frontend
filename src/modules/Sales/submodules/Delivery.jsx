@@ -177,6 +177,8 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     }
     const order_id = selectedOrder ? selectedOrder.order_id : null;
     let error = false;
+    console.log(initialProducts);
+    console.log(products);
     const request = {
       shipping_data: {
         order_id,
@@ -189,12 +191,12 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
               ? parseInt(initialProducts[index].quantity)
               : parseInt(product.quantity);
           const to_deliver = parseInt(product.quantity);
-          if (quantity != to_deliver) {
+          if (to_deliver > quantity) {
             error = true;
           }
           return {
             product: product.product_id,
-            quantity: initialProducts[index].quantity,
+            quantity: parseInt(product.quantity),
             quantity_to_deliver: parseInt(product.quantity),
             unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
             total_price: Number(parseFloat(product.total_price).toFixed(2)),
@@ -216,6 +218,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
         type: "error",
         title: `Product quantities must not exceed those specified on the order.`,
       });
+      console.log(request);
     } else {
       console.log(request);
       deliveryMutation.mutate(request);
@@ -431,7 +434,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           <SalesInfo
             type={"Delivery"}
             customer={selectedCustomer}
-            customerListModal={setIsCustomerListOpen}
+            customerListModal={null}
             setCustomerInfo={setDeliveryInfo}
             operationID={deliveryID}
             setDeliveryDate={setDeliveryDate}

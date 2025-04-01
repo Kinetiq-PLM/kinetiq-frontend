@@ -26,7 +26,8 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
 
   const orderQuery = useQuery({
     queryKey: ["ordersList"],
-    queryFn: async () => await GET("sales/order?status=Open"),
+    queryFn: async () =>
+      await GET(encodeURI("sales/order?status=Open,Partially Delivered")),
     enabled: isOpen,
   });
   const columns = [
