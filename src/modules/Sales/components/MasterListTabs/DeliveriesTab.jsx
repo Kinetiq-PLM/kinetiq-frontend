@@ -26,7 +26,8 @@ export default function BlanketAgreementsTab({
     { key: "total_price", label: "Total Price" },
     { key: "preferred_delivery_date", label: "Preferred Delivery Date" },
     { key: "shipping_date", label: "Shipping Date" },
-    { key: "estimated_delivery", label: "Estimated Delivery" },
+    { key: "estimated_delivery", label: "Estimated Delivery Date" },
+    { key: "actual_delivery_date", label: "Actual Delivery Date" },
     { key: "created_at", label: "Created At" },
     { key: "document", label: "Document" },
   ];
@@ -101,6 +102,9 @@ export default function BlanketAgreementsTab({
           : null,
         estimated_delivery: delivery.estimated_delivery
           ? new Date(delivery.estimated_delivery).toLocaleString()
+          : null,
+        actual_delivery_date: delivery.actual_delivery_date
+          ? new Date(delivery.actual_delivery_date).toLocaleString()
           : null,
         created_at: new Date(delivery.created_at).toLocaleString(),
         document: `${BASE_API_URL}sales/delivery/${delivery.delivery_note_id}/document`,
