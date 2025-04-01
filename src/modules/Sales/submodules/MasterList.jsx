@@ -62,16 +62,6 @@ const BodyContent = ({
         />
       ),
     },
-    {
-      name: "Opportunities",
-      component: (
-        <OpportunitiesTab
-          setActiveModule={setActiveModule}
-          loadSubModule={loadSubModule}
-          setActiveSubModule={setActiveSubModule}
-        />
-      ),
-    },
   ];
   const [activeTab, setActiveTab] = useState(tabs[0].name); // Default to first tab
   return (

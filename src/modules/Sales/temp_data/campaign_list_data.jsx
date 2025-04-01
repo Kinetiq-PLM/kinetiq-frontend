@@ -10,7 +10,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00002",
     campaign_name: "Holiday Promo",
-    type: "Social Media",
+    type: "Referral",
     start_date: "2023-06-15",
     end_date: "2023-12-31",
     status: "Active",
@@ -42,7 +42,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00006",
     campaign_name: "Summer Giveaway",
-    type: "Social Media",
+    type: "Referral",
     start_date: "2024-06-01",
     end_date: "2024-07-01",
     status: "Completed",
@@ -74,7 +74,7 @@ const CAMPAIGN_LIST_DATA = [
   {
     campaign_id: "C-00010",
     campaign_name: "End of Year Clearance",
-    type: "Social Media",
+    type: "Referral",
     start_date: "2024-12-20",
     end_date: "2025-01-10",
     status: "Planned",

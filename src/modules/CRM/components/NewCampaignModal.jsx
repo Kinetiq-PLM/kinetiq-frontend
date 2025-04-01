@@ -179,7 +179,7 @@ const NewCampaignModal = ({ isOpen, onClose }) => {
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            New Campaign
+            Create Campaign
           </h2>
         </div>
 

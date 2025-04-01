@@ -329,14 +329,14 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
               />
             </div>
             <InputField
-              label={"Main Address"}
+              label={"Address 1"}
               value={mainAddress}
               setValue={setMainAddress}
               validation={validateMainAddress}
               isValidationVisible={isValidationVisible}
             />
             <InputField
-              label={"Secondary Address"}
+              label={"Address 2"}
               value={secondaryAddress}
               setValue={setSecondaryAddress}
               validation={validateSecondaryAddress}
