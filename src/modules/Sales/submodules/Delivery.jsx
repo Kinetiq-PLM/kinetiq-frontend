@@ -182,6 +182,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
         order_id,
         shipping_method: "Standard", // drop down needed
         delivery_status: "Pending",
+        preferred_delivery_date: deliveryDate,
         items: products.map((product, index) => {
           const quantity =
             initialProducts.length > 0

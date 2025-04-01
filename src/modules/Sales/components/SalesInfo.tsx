@@ -97,7 +97,7 @@ const DateSelector = ({ label, customer, setDeliveryDate, disabled }) => {
   const handleDateChange = (event) => {
     const selectedDate = event.target.value;
     setDate(selectedDate);
-    setDeliveryDate(defaultDate);
+    setDeliveryDate(selectedDate);
   };
 
   return (
