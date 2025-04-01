@@ -3,10 +3,10 @@ import { useState } from "react";
 
 const InputCustomer = ({ label, value = "", customerListModal }) => {
   return (
-    <div className="flex justify-between mb-2 w-full">
+    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
       <p className="flex-1">{label}</p>
       <div
-        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
+        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded"
         onClick={() => customerListModal(true)}
       >
         <p className="text-sm">{value}</p>
@@ -21,10 +21,10 @@ const InputCustomer = ({ label, value = "", customerListModal }) => {
 };
 const Information = ({ label, value = "" }) => {
   return (
-    <div className="flex justify-between mb-2 w-full">
+    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
       <p className="flex-1">{label}</p>
       <div
-        className={`border border-[#9a9a9a] flex-1 p-1 h-[30px] rounded overflow-x-auto whitespace-nowrap ${
+        className={`border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded overflow-x-auto whitespace-nowrap ${
           value === "" ? "bg-[#f7f7f7]" : ""
         }`}
       >
@@ -55,7 +55,7 @@ const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
   }, [customer]);
 
   return (
-    <div className="flex justify-between mb-2 w-full">
+    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
       <p className="flex-1">{label}</p>
       {customer ? (
         <select
@@ -71,7 +71,7 @@ const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
         </select>
       ) : (
         <div
-          className={`border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-[#f7f7f7]`}
+          className={`border border-[#9a9a9a] flex-1 p-1 min-h-[30px] bg-[#f7f7f7]`}
         ></div>
       )}
     </div>
@@ -101,11 +101,11 @@ const DateSelector = ({ label, customer, setDeliveryDate, disabled }) => {
   };
 
   return (
-    <div className="flex justify-between mb-2 w-full">
+    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
       <p className="flex-1">{label}</p>
       <input
         type="date"
-        className="border border-[#9a9a9a] flex-1 p-1 h-[30px] rounded cursor-pointer disabled:cursor-default disabled:bg-[#f7f7f7]"
+        className="border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded cursor-pointer disabled:cursor-default disabled:bg-[#f7f7f7]"
         onChange={handleDateChange}
         value={date}
         min={defaultDate} // Restrict to at least 3 days from now
