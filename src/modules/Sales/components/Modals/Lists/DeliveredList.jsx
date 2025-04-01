@@ -9,8 +9,16 @@ import DELIVERY_LIST_DATA from "../../../temp_data/deliveries_list_data.jsx";
 import Table from "../../Table";
 import Button from "../../Button";
 
-const DeliveredList = ({ isOpen, onClose, setDelivery, customerID }) => {
+const DeliveredList = ({
+  isOpen,
+  onClose,
+  setDelivery,
+  customerID,
+  setProducts,
+  setEditable,
+}) => {
   // ALL DELIVERED ORDERS TO THE CUSTOMER
+  // console.log("Customer ID:", customerID);
   const { showAlert } = useAlert();
 
   const delivery_list = DELIVERY_LIST_DATA;
@@ -32,6 +40,7 @@ const DeliveredList = ({ isOpen, onClose, setDelivery, customerID }) => {
 
   const handleConfirm = () => {
     if (selectedDelivery) {
+      setProducts(selectedDelivery.selected_products); // Set the selected products to the parent component
       setDelivery(selectedDelivery); // Properly update the array
       onClose();
       showAlert({
@@ -39,6 +48,7 @@ const DeliveredList = ({ isOpen, onClose, setDelivery, customerID }) => {
         title: "Delivery Selected",
       });
       setSelectedDelivery(null);
+      setEditable(true);
     }
   };
 

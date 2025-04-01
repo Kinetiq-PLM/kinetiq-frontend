@@ -8,8 +8,7 @@ import {
 } from "../components/Context/AlertContext.jsx";
 
 import CustomerListModal from "../components/Modals/Lists/CustomerList";
-import ProductListModal from "../components/Modals/Lists/ProductList";
-import OrderListModal from "./../components/Modals/Lists/OrderList";
+import DeliveredProductList from "../components/Modals/Lists/DeliveredProductList.jsx";
 import EmployeeListModal from "../components/Modals/Lists/EmployeeListModal.jsx";
 import DeliveredList from "./../components/Modals/Lists/DeliveredList";
 
@@ -24,16 +23,7 @@ import { GET, POST } from "../api/api.jsx";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import generateRandomID from "../components/GenerateID.jsx";
 
-const Return = ({ loadSubModule, setActiveSubModule }) => {
-  // TODO:
-  // 1. Disable delivery select if no customer selected
-  // 2. Disable submit return request if no customer selected
-  // 3. Disable submit return request if no products selected
-  // 4. Disable submit return request if no employee selected
-  // 5. Disable add and delete item if no delivery selected
-  // 6. Modal for selecting products in the delivery
-  // 7. Limit quantity of products to the quantity in the delivery
-
+const Return = () => {
   const { showAlert } = useAlert();
 
   const [address, setAddress] = useState("");
@@ -49,16 +39,17 @@ const Return = ({ loadSubModule, setActiveSubModule }) => {
   const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
 
   const [isDeliveredListOpen, setIsDeliveredListOpen] = useState(false);
+  const [canEditList, setCanEditList] = useState(false);
 
   // columns for table
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
     { key: "reason", label: "Reason", editable: true },
-    { key: "quantity", label: "Quantity" },
-    { key: "selling_price", label: "Price" },
+    { key: "quantity", label: "Quantity", editable: true },
+    { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
-    { key: "discount", label: "Discount" },
+    { key: "discount", label: "Discount", editable: false },
     { key: "total_price", label: "Total Price", editable: false },
   ];
 
@@ -117,21 +108,29 @@ const Return = ({ loadSubModule, setActiveSubModule }) => {
       });
       return;
     }
+    if (selectedEmployee == "") {
+      showAlert({
+        type: "error",
+        title: "Please select employee.",
+      });
+      return;
+    }
     // INSERT LOGIC HERE FOR RETURN
-    setSubmitted(true);
     showAlert({
       type: "success",
-      title: "Delivery Submitted",
+      title: "Return request submitted.",
     });
   };
 
   // Change customer
   useEffect(() => {
+    setProducts([]);
+    setSelectedProduct(null);
     setDeliveryInfo({
       customer_id: "",
       order_id: "",
-      shipping_id: "",
-      selected_products: products,
+      shipping_id: null,
+      selected_products: [],
       selected_address: "",
       selected_delivery_date: "",
       total_before_discount: 0,
@@ -142,6 +141,7 @@ const Return = ({ loadSubModule, setActiveSubModule }) => {
       warranty_fee: 0,
       total_price: 0,
     });
+    setCanEditList(false);
   }, [selectedCustomer]);
 
   useEffect(() => {
@@ -197,13 +197,6 @@ const Return = ({ loadSubModule, setActiveSubModule }) => {
     });
   }, [address]);
 
-  useEffect(() => {
-    if (deliveryInfo.selected_products.length > 0) {
-      console.log(deliveryInfo.selected_products);
-      setProducts(deliveryInfo.selected_products);
-    }
-  }, [deliveryInfo]);
-
   return (
     <div className="delivery">
       <div className="body-content-container">
@@ -216,12 +209,15 @@ const Return = ({ loadSubModule, setActiveSubModule }) => {
           setCustomer={setSelectedCustomer}
         ></CustomerListModal>
 
-        {/* <ProductListModal
+        <DeliveredProductList
           isOpen={isProductListOpen}
           onClose={() => setIsProductListOpen(false)}
           addProduct={setProducts}
           products={products}
-        ></ProductListModal> */}
+          // Pass customer and order ID to the product list modal and search for delivered products
+          customerID={selectedCustomer.customer_id}
+          orderID={deliveryInfo.order_id}
+        ></DeliveredProductList>
 
         <NewCustomerModal
           isOpen={isNewCustomerModalOpen}
@@ -234,6 +230,8 @@ const Return = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsDeliveredListOpen(false)}
           customerID={selectedCustomer.customer_id}
           setDelivery={setDeliveryInfo}
+          setProducts={setProducts}
+          setEditable={setCanEditList}
         ></DeliveredList>
 
         <EmployeeListModal
@@ -250,8 +248,6 @@ const Return = ({ loadSubModule, setActiveSubModule }) => {
             customerListModal={setIsCustomerListOpen}
             delivery={deliveryInfo}
             deliveredListModal={setIsDeliveredListOpen}
-            setCustomerInfo={setDeliveryInfo}
-            setAddress={setAddress}
           />
         </div>
         {/* TABLE */}
@@ -270,19 +266,27 @@ const Return = ({ loadSubModule, setActiveSubModule }) => {
           <div className="h-full flex flex-col gap-3 w-full">
             {/* Buttons Row */}
             <div className="flex gap-2">
-              <Button type="primary" onClick={() => setIsProductListOpen(true)}>
+              <Button
+                type="primary"
+                disabled={!canEditList}
+                onClick={() => setIsProductListOpen(true)}
+              >
                 Add Item
               </Button>
-              <Button type="outline" onClick={() => handleDelete()}>
+              <Button
+                type="outline"
+                disabled={!canEditList}
+                onClick={() => handleDelete()}
+              >
                 Delete Item
               </Button>
             </div>
 
             {/* Employee ID Input */}
-            <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+            <div className="flex mb-2 w-full mt-4 gap-4 flex-col sm:flex-row">
               <p className="">Employee ID</p>
               <div
-                className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
+                className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded max-w-[300px] sm:max-w-none"
                 onClick={() => setIsEmployeeListOpen(true)}
               >
                 <p className="text-sm">
@@ -298,14 +302,14 @@ const Return = ({ loadSubModule, setActiveSubModule }) => {
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto">
-              <Button type="primary" className="" onClick={handleSubmit}>
-                Submit Return
+              <Button type="primary" onClick={handleSubmit}>
+                Submit Return Request
               </Button>
             </div>
           </div>
 
           <div className="w-full hidden xl:block"></div>
-          <div className="w-full flex flex-col gap-3 mt-4 lg:mt-0">
+          <div className="w-full flex flex-col gap-3 mt-4 lg:mt-0 flex-wrap">
             <InfoField
               label={"Total Before Discount"}
               value={Number(deliveryInfo.total_before_discount).toLocaleString(
@@ -372,13 +376,10 @@ const Return = ({ loadSubModule, setActiveSubModule }) => {
   );
 };
 
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+const BodyContent = () => {
   return (
     <AlertProvider>
-      <Return
-        loadSubModule={loadSubModule}
-        setActiveSubModule={setActiveSubModule}
-      />
+      <Return />
     </AlertProvider>
   );
 };

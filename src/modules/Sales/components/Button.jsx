@@ -30,8 +30,8 @@ const Button = ({
 
   return (
     <button
-      className={`cursor-pointer  ${styling}  ${
-        disabled ? "opacity-50 cursor-not-allowed" : ""
+      className={` ${styling}  ${
+        disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer "
       } ${className}`}
       onClick={disabled ? () => {} : onClick}
       type={submit ? "submit" : "button"}

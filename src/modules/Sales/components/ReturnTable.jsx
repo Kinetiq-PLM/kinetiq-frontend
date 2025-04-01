@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { TAX_RATE } from "../temp_data/sales_data";
+import { useAlert } from "./Context/AlertContext";
 
 const ReturnTable = ({
   columns,
@@ -11,6 +12,8 @@ const ReturnTable = ({
   minWidth = false,
   updateData,
 }) => {
+  const showAlert = useAlert();
+
   const [selectedRow, setSelectedRow] = useState(null);
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState("");
@@ -58,9 +61,10 @@ const ReturnTable = ({
       editingCell.columnKey === "discount" &&
       (newValue < 0 || newValue > newData[rowIndex].total_price)
     ) {
-      alert(
-        "Invalid discount value: Discount cannot be negative or bigger than the total price."
-      );
+      showAlert({
+        type: "error",
+        title: "Invalid discount value",
+      });
       return; // Prevent saving invalid discount values
     }
 
@@ -69,7 +73,10 @@ const ReturnTable = ({
       editingCell.columnKey === "quantity" &&
       (newValue <= 0 || !Number.isInteger(newValue))
     ) {
-      alert("Invalid quantity: Quantity must be a positive whole number.");
+      showAlert({
+        type: "error",
+        title: "Invalid quantity value",
+      });
       return;
     }
     if (
@@ -82,7 +89,10 @@ const ReturnTable = ({
 
     // Validate unit price
     if (editingCell.columnKey === "selling_price" && newValue < 0) {
-      alert("Invalid unit price: Price cannot be negative.");
+      showAlert({
+        type: "error",
+        title: "Price cannot be negative.",
+      });
       return;
     }
 

@@ -268,7 +268,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   }, [copyFromModal]);
 
   useEffect(() => {
-    console.log(copyFromModal);
     if (copyFromModal === "Order" && selectedOrder) {
       setCopyFromModal("");
       setDeliveryInfo((prev) => ({

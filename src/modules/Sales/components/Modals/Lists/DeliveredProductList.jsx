@@ -4,42 +4,78 @@ import { useState, useEffect, useRef } from "react";
 
 import { useAlert } from "../../Context/AlertContext.jsx";
 
-import DELIVERY_LIST_DATA from "../../../temp_data/deliveries_list_data.jsx";
-
 import Table from "../../Table";
+import { PRODUCTS_DATA } from "../../../temp_data/products_data";
 import Button from "../../Button";
+import { useQuery } from "@tanstack/react-query";
+import { GET } from "../../../api/api";
 
-const DeliveredProductList = ({ isOpen, onClose, setDelivery }) => {
+const DeliveredProductList = ({
+  isOpen,
+  onClose,
+  products,
+  addProduct,
+  customerID,
+  orderID,
+}) => {
   const { showAlert } = useAlert();
 
-  const delivery_list = DELIVERY_LIST_DATA;
-
-  const [selectedDelivery, setSelectedDelivery] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(delivery_list);
+  // const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  // const [productList, setProductList] = useState([]); // ORIGINAL
+  const [productList, setProductList] = useState(PRODUCTS_DATA); // TEMP
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  const productsQuery = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => await GET("sales/products"),
+    enabled: isOpen,
+  });
 
   const columns = [
-    { key: "shipping_id", label: "Delivery ID" },
-    { key: "customer_name", label: "Name" }, // Company Name
-    { key: "date_shipped", label: "Shipped" },
-    { key: "delivered_date", label: "Delivered" },
+    { key: "product_id", label: "Product ID" },
+    { key: "product_name", label: "Name" }, // Company Name
+    { key: "stock_level", label: "Stock" }, // Country
   ];
 
   const handleConfirm = () => {
-    if (selectedDelivery) {
-      setDelivery(selectedDelivery); // Properly update the array
+    if (selectedProduct) {
+      selectedProduct.quantity = 1;
+      selectedProduct.tax = 0;
+      selectedProduct.discount = 0;
+      selectedProduct.total_price = selectedProduct.selling_price;
+      addProduct([...products, selectedProduct]); // Properly update the array
       onClose();
       showAlert({
         type: "success",
-        title: "Order Selected",
+        title: "Added product.",
       });
-      setSelectedDelivery(null);
+      setSelectedProduct(null);
     }
   };
+
+  // useEffect(() => {
+  //   if (productsQuery.status === "success") {
+  //     setProductList(productsQuery.data);
+  //     if (!hasLoaded) {
+  //       setFilteredData(productsQuery.data);
+  //       setHasLoaded(true);
+  //     }
+  //   } else if (productsQuery.status === "error") {
+  //     showAlert({
+  //       type: "error",
+  //       title:
+  //         "An error occurred while fetching products: " +
+  //         productsQuery.error?.data,
+  //     });
+  //   }
+  // }, [productsQuery.data]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -67,6 +103,14 @@ const DeliveredProductList = ({ isOpen, onClose, setDelivery }) => {
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    // Exclude products that are already in the selected products list
+    const filtered = productList.filter(
+      (product) => !products.some((p) => p.product_id === product.product_id)
+    );
+    setFilteredData(filtered);
+  }, [products]);
+
   if (!isOpen) return null;
 
   return (
@@ -85,7 +129,7 @@ const DeliveredProductList = ({ isOpen, onClose, setDelivery }) => {
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Orders
+            List Of Items
           </h2>
         </div>
 
@@ -109,8 +153,8 @@ const DeliveredProductList = ({ isOpen, onClose, setDelivery }) => {
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filtered = delivery_list.filter((item) =>
-                  item.customer_name.toLowerCase().includes(searchTerm)
+                const filtered = productList.filter((product) =>
+                  product.product_name.toLowerCase().includes(searchTerm)
                 );
                 setFilteredData(filtered);
               }}
@@ -120,7 +164,7 @@ const DeliveredProductList = ({ isOpen, onClose, setDelivery }) => {
             <Table
               columns={columns}
               data={filteredData}
-              onSelect={setSelectedDelivery}
+              onSelect={setSelectedProduct}
             />
           </div>
           <div className="mt-4 flex justify-between">
@@ -128,9 +172,9 @@ const DeliveredProductList = ({ isOpen, onClose, setDelivery }) => {
               <Button
                 type="primary"
                 onClick={handleConfirm}
-                disabled={!selectedDelivery}
+                disabled={!selectedProduct}
               >
-                Select
+                Add
               </Button>
             </div>
             <div>
