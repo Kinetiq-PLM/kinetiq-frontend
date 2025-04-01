@@ -22,3 +22,19 @@
     min-height: 30rem;
   }
   
+
+  /* White Scrollbar Styling */
+  .stockflow  .scroll-container::-webkit-scrollbar {
+    width: 12px; /* Scrollbar width */
+    background: #e5e7eb;
+  }
+  
+  .stockflow  ::-webkit-scrollbar-thumb {
+    background: rgb(168, 168, 168); /* Scrollbar color */
+    border-radius: 6px; /* Rounded edges */
+  }
+  
+  .stockflow ::-webkit-scrollbar-thumb:hover {
+    background: #c1c3c6; /* Light gray on hover */
+  }
+  

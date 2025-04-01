@@ -69,12 +69,12 @@ const BodyContent = () => {
             <div className="body-content-container">
                 
                 {/* Navigation Tabs */}
-                <nav className="top-0 left-0 flex flex-wrap justify-between space-x-8 w-full p-2">
-                    <div className="invNav flex border-b border-gray-200 space-x-8 md:w-auto mt-3 mb-1">
+                <nav className="top-0 left-0 flex flex-wrap justify-between max-h-[50px] space-x-8 w-full p-2">
+                    <div className="invNav flex border-b border-gray-200 space-x-8 md:w-auto mt-1 mb-1">
                         {Object.keys(stockFlowTableConfigs).map((tab) => (
                             <span
                                 key={tab}
-                                className={`cursor-pointer text:xs md:text-lg font-semibold transition-colors ${
+                                className={`cursor-pointer text:xs md:text-md font-semibold transition-colors ${
                                     activeTab === tab ? "text-cyan-600 border-b-2 border-cyan-600" : "text-gray-500"
                                 }`}
                                 onClick={() => setActiveTab(tab)}
@@ -86,8 +86,8 @@ const BodyContent = () => {
                 </nav>
 
                 {/* Data Table Section */}
-                <section className="w-full h-100 overflow-y-auto rounded-lg grid">
-                    <div className="pcounts-table-container flex-2 border border-gray-300 rounded-lg scroll-container overflow-y-auto m-h-auto p-3">
+                <section className="flex w-full h-100 overflow-y-auto rounded-lg">
+                    <div className="flex-1 border min-h-[400px] border-gray-300 rounded-lg scroll-container overflow-y-auto p-3">
                         {loading ? (
                             <p className="text-center text-gray-600">Loading data...</p>
                         ) : error ? (
@@ -112,7 +112,7 @@ const BodyContent = () => {
                                         activeConfig.Data.map((item, index) => (
                                             <tr key={index} className="border-b border-gray-300">
                                                 {activeConfig.Columns.map((col) => (
-                                                    <td key={col} className="p-2">
+                                                    <td key={col} className="text-sm p-2">
                                                         {item[col.toLowerCase().replace(/\s+/g, "_")]} {/* Convert column names to match API keys */}
                                                     </td>
                                                 ))}
@@ -122,6 +122,34 @@ const BodyContent = () => {
                                 </tbody>
                             </table>
                         )}
+                    </div>
+                    
+                    {/* side section for filters and item details */}
+                    <div className={`flex flex-col justify-between  rounded-lg min-h-full w-[230px] ml-4 p-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
+                        <div className="flex flex-col justify-between space-y-2">
+                            
+                            {/* Warehouse Filyer */}
+                            <select name="" id="" className="border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1">
+                                <option value="" className="text-gray-600">Select Warehouse</option>
+                                {warehouseData.map((warehouse) => (
+                                    <option className="text-gray-600 cursor-pointer" key={warehouse.warehouse_id} value={warehouse.warehouse_id}>
+                                        {warehouse.warehouse_location}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {/* Expiry */}
+                            <select name="" id="" className="border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1">
+                                <option value="">Select Expiry</option>
+                            </select>
+                        </div>
+                        <div>
+                            <h2 className="text-center text-gray-600">ITEM DETAILS</h2>
+                            <div className="h-[290px] border rounded-lg border-gray-300 p-2">
+
+                            </div>  
+                        </div>
+                        
                     </div>
                 </section>
             </div>               
