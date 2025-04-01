@@ -23,7 +23,7 @@ const InputField = ({
       </p>
       <div className="mt-2">
         <input
-          className="bg-[#F9FAFA] w-full py-2 px-3 rounded"
+          className="bg-[#F7F7F7] w-full py-2 px-3 rounded"
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}

@@ -13,13 +13,13 @@ import { GET } from "../../../api/api";
 const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   const { showAlert } = useAlert();
 
-  const products_data = PRODUCTS_DATA;
-
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
+  // const [filteredData, setFilteredData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [productList, setProductList] = useState([]);
+  // const [productList, setProductList] = useState([]); // ORIGINAL
+  const [productList, setProductList] = useState(PRODUCTS_DATA); // TEMP
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -53,22 +53,22 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
     }
   };
 
-  useEffect(() => {
-    if (productsQuery.status === "success") {
-      setProductList(productsQuery.data);
-      if (!hasLoaded) {
-        setFilteredData(productsQuery.data);
-        setHasLoaded(true);
-      }
-    } else if (productsQuery.status === "error") {
-      showAlert({
-        type: "error",
-        title:
-          "An error occurred while fetching products: " +
-          productsQuery.error?.data,
-      });
-    }
-  }, [productsQuery.data]);
+  // useEffect(() => {
+  //   if (productsQuery.status === "success") {
+  //     setProductList(productsQuery.data);
+  //     if (!hasLoaded) {
+  //       setFilteredData(productsQuery.data);
+  //       setHasLoaded(true);
+  //     }
+  //   } else if (productsQuery.status === "error") {
+  //     showAlert({
+  //       type: "error",
+  //       title:
+  //         "An error occurred while fetching products: " +
+  //         productsQuery.error?.data,
+  //     });
+  //   }
+  // }, [productsQuery.data]);
 
   useEffect(() => {
     const handleEscape = (e) => {

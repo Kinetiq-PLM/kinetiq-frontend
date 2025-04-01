@@ -1,88 +1,46 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { useAlert } from "../../Context/AlertContext.jsx";
 
+import DELIVERY_LIST_DATA from "../../../temp_data/deliveries_list_data.jsx";
+
 import Table from "../../Table";
 import Button from "../../Button";
-import { useQuery } from "@tanstack/react-query";
-import { GET } from "../../../api/api";
 
-import { CUSTOMER_DATA } from "../../../temp_data/customer_data.jsx";
-
-const CustomerListModal = ({
-  isOpen,
-  isNewCustomerModalOpen,
-  onClose,
-  setCustomer,
-  newCustomerModal,
-  duplicates = [],
-}) => {
+const DeliveredList = ({ isOpen, onClose, setDelivery, customerID }) => {
+  // ALL DELIVERED ORDERS TO THE CUSTOMER
   const { showAlert } = useAlert();
 
-  // setSelectedCustomer is used to set the selected customer in this component
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const delivery_list = DELIVERY_LIST_DATA;
+
+  const [selectedDelivery, setSelectedDelivery] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  //const [filteredData, setFilteredData] = useState([]); // ORIGINAL
-  const [filteredData, setFilteredData] = useState(CUSTOMER_DATA); // TEMP
-
-  const [customers, setCustomers] = useState([]);
+  const [filteredData, setFilteredData] = useState(delivery_list);
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
-  const customersQuery = useQuery({
-    queryKey: ["customers"],
-    queryFn: async () => await GET("sales/customer?status=Active"),
-    enabled: isOpen || isNewCustomerModalOpen,
-  });
-
   const columns = [
-    { key: "customer_id", label: "Customer ID" },
-    { key: "name", label: "Name" }, // Company Name
-    { key: "country", label: "Country" }, // Country
+    { key: "shipping_id", label: "Delivery ID" },
+    { key: "customer_name", label: "Name" }, // Company Name
+    { key: "date_shipped", label: "Shipped" },
+    { key: "delivered_date", label: "Delivered" },
   ];
 
-  useEffect(() => {
-    // Exclude products that are already in the customer list
-    if (duplicates.length === 0) return;
-
-    setFilteredData(
-      customers.filter(
-        (customer) =>
-          !duplicates.some((c) => c.customer_id === customer.customer_id)
-      )
-    );
-  }, [duplicates]);
-
   const handleConfirm = () => {
-    if (selectedCustomer) {
-      setCustomer(selectedCustomer);
+    if (selectedDelivery) {
+      setDelivery(selectedDelivery); // Properly update the array
       onClose();
       showAlert({
         type: "success",
-        title: "Customer selected.",
+        title: "Delivery Selected",
       });
-      setSelectedCustomer(null);
+      setSelectedDelivery(null);
     }
   };
-
-  // === FETCH ===
-  // useEffect(() => {
-  //   if (customersQuery.status === "success") {
-  //     setFilteredData(customersQuery.data);
-  //     setCustomers(customersQuery.data);
-  //   } else if (customersQuery.status === "error") {
-  //     showAlert({
-  //       type: "error",
-  //       title:
-  //         "An error occurred while fetching the data: " +
-  //         customersQuery.error?.message,
-  //     });
-  //   }
-  // }, [customersQuery.data]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -128,7 +86,7 @@ const CustomerListModal = ({
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Business Partners
+            List Of Deliveries
           </h2>
         </div>
 
@@ -152,10 +110,10 @@ const CustomerListModal = ({
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filteredData = customers.filter((customer) =>
-                  customer.name.toLowerCase().includes(searchTerm)
+                const filtered = delivery_list.filter((item) =>
+                  item.customer_name.toLowerCase().includes(searchTerm)
                 );
-                setFilteredData(filteredData);
+                setFilteredData(filtered);
               }}
             />
           </div>
@@ -163,21 +121,17 @@ const CustomerListModal = ({
             <Table
               columns={columns}
               data={filteredData}
-              onSelect={setSelectedCustomer}
+              onSelect={setSelectedDelivery}
             />
           </div>
           <div className="mt-4 flex justify-between">
             <div>
               <Button
                 type="primary"
-                className={"mr-2"}
                 onClick={handleConfirm}
-                disabled={!selectedCustomer}
+                disabled={!selectedDelivery}
               >
                 Select
-              </Button>
-              <Button type="primary" onClick={() => newCustomerModal(true)}>
-                New
               </Button>
             </div>
             <div>
@@ -192,4 +146,4 @@ const CustomerListModal = ({
   );
 };
 
-export default CustomerListModal;
+export default DeliveredList;
