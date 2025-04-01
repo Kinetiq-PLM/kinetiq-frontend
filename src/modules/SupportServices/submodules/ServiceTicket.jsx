@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react"
 import "../styles/ServiceTicket.css"
 import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
-import SubmitTicketModal from "../components/SubmitTicketModal"
-import QueueTicketModal from "../components/QueueTicketModal"
-import ServTickInputField from "../components/ServTickInputField"
-import ServTickTable from "../components/ServTickTable"
+import SubmitTicketModal from "../components/ServiceTicket/SubmitTicketModal"
+import QueueTicketModal from "../components/ServiceTicket/QueueTicketModal"
+import ServTickInputField from "../components/ServiceTicket/ServTickInputField"
+import ServTickTable from "../components/ServiceTicket/ServTickTable"
 
 const ServiceTicket = () => {
   // State for form fields
