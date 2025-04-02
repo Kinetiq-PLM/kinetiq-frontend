@@ -172,7 +172,7 @@ const JournalEntry = () => {
                 </div>
 
                 <div className="parent-component-container">
-                    <div className="component-container">
+                    <div className="parent-component-container">
                         <div className="flex flex-col w-80">
                             <Forms
                                 type="text"

@@ -118,7 +118,9 @@ const BodyContent = () => {
                 </div>
 
                 <Table data={filteredData} columns={columns} />
-                <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 font-light">
+                <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 
+                 font-light max-sm:text-[10px] max-sm:font-light max-md:text-[10px] max-md:font-light 
+                max-lg:text-[10px] max-lg:font-light max-xl:text-[10px] max-xl:font-light 2xl:text-[10px] 2xl:font-light">
                     <div className="col-span-3"></div>
                     <div className="font-bold">Total</div>
                     <div>{formattedTotalDebit}</div>
@@ -128,7 +130,7 @@ const BodyContent = () => {
 
             
                 <ReportModalInput
-                    isModalOpen={true}
+                    isModalOpen={false}
                     closeModal={closeModal}
                     reportForm={reportForm}
                     handleInputChange={handleInputChange}
