@@ -12,6 +12,7 @@ const OrderedProductList = ({
   onClose,
   products,
   addProduct,
+  setInitialProducts,
   order,
 }) => {
   const { showAlert } = useAlert();
@@ -31,12 +32,13 @@ const OrderedProductList = ({
   const columns = [
     { key: "product_id", label: "Product ID" },
     { key: "product_name", label: "Name" }, // Company Name
-    { key: "stock_level", label: "Stock" }, // Country
+    { key: "quantity", label: "Quantity" }, // Country
   ];
 
   const handleConfirm = () => {
     if (selectedProduct) {
       addProduct([...products, selectedProduct]); // Properly update the array
+      setInitialProducts((prev) => [...prev, selectedProduct]);
       onClose();
       showAlert({
         type: "success",
@@ -138,10 +140,18 @@ const OrderedProductList = ({
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filtered = productList.filter((product) =>
-                  product.product_name.toLowerCase().includes(searchTerm)
-                );
-                setFilteredData(filtered);
+                if (searchTerm.trim().length > 0) {
+                  const filtered = filteredData.filter((product) =>
+                    product.product_name.toLowerCase().includes(searchTerm)
+                  );
+                  setFilteredData(filtered);
+                } else {
+                  const filtered = productList.filter(
+                    (product) =>
+                      !products.some((p) => p.product_id === product.product_id)
+                  );
+                  setFilteredData(filtered);
+                }
               }}
             />
           </div>

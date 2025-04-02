@@ -397,6 +397,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsProductListOpen(false)}
           products={products}
           addProduct={setProducts}
+          setInitialProducts={setInitialProducts}
           order={selectedOrder}
         />
 

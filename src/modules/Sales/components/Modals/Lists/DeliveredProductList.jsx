@@ -15,6 +15,7 @@ const DeliveredProductList = ({
   onClose,
   products,
   addProduct,
+  setInitialProducts,
   delivery,
 }) => {
   const { showAlert } = useAlert();
@@ -34,16 +35,13 @@ const DeliveredProductList = ({
   const columns = [
     { key: "product_id", label: "Product ID" },
     { key: "product_name", label: "Name" }, // Company Name
-    { key: "stock_level", label: "Stock" }, // Country
+    { key: "quantity", label: "Quantity" }, // Country
   ];
 
   const handleConfirm = () => {
     if (selectedProduct) {
-      selectedProduct.quantity = 1;
-      selectedProduct.tax = 0;
-      selectedProduct.discount = 0;
-      selectedProduct.total_price = selectedProduct.selling_price;
       addProduct([...products, selectedProduct]); // Properly update the array
+      setInitialProducts((prev) => [...prev, selectedProduct]);
       onClose();
       showAlert({
         type: "success",
@@ -55,7 +53,7 @@ const DeliveredProductList = ({
 
   useEffect(() => {
     if (delivery.statement) {
-      const products = delivery.statement.items.map((item) => ({
+      const res = delivery.statement.items.map((item) => ({
         product_id: item.product.product_id,
         product_name: item.product.product_name,
         quantity: Number(item.quantity),
@@ -65,26 +63,15 @@ const DeliveredProductList = ({
         total_price: Number(item.total_price),
         reason: "",
       }));
-      setProductList(products);
+      setProductList(res);
     }
   }, [delivery]);
-
-  // useEffect(() => {
-  //   if (productsQuery.status === "success") {
-  //     setProductList(productsQuery.data);
-  //     if (!hasLoaded) {
-  //       setFilteredData(productsQuery.data);
-  //       setHasLoaded(true);
-  //     }
-  //   } else if (productsQuery.status === "error") {
-  //     showAlert({
-  //       type: "error",
-  //       title:
-  //         "An error occurred while fetching products: " +
-  //         productsQuery.error?.data,
-  //     });
-  //   }
-  // }, [productsQuery.data]);
+  useEffect(() => {
+    const filtered = productList.filter(
+      (product) => !products.some((p) => p.product_id === product.product_id)
+    );
+    setFilteredData(filtered);
+  }, [products]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -111,14 +98,6 @@ const DeliveredProductList = ({
       document.body.style.overflow = "";
     };
   }, [isOpen, onClose]);
-
-  useEffect(() => {
-    // Exclude products that are already in the selected products list
-    const filtered = productList.filter(
-      (product) => !products.some((p) => p.product_id === product.product_id)
-    );
-    setFilteredData(filtered);
-  }, [products]);
 
   if (!isOpen) return null;
 
@@ -162,10 +141,18 @@ const DeliveredProductList = ({
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const filtered = productList.filter((product) =>
-                  product.product_name.toLowerCase().includes(searchTerm)
-                );
-                setFilteredData(filtered);
+                if (searchTerm.trim().length > 0) {
+                  const filtered = filteredData.filter((product) =>
+                    product.product_name.toLowerCase().includes(searchTerm)
+                  );
+                  setFilteredData(filtered);
+                } else {
+                  const filtered = productList.filter(
+                    (product) =>
+                      !products.some((p) => p.product_id === product.product_id)
+                  );
+                  setFilteredData(filtered);
+                }
               }}
             />
           </div>

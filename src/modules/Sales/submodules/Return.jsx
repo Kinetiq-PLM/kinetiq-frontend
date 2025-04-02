@@ -258,6 +258,7 @@ const Return = () => {
           onClose={() => setIsProductListOpen(false)}
           addProduct={setProducts}
           products={products}
+          setInitialProducts={setInitialProducts}
           // Pass customer and order ID to the product list modal and search for delivered products
           delivery={deliveryInfo}
         ></DeliveredProductList>
