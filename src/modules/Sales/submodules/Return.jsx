@@ -60,7 +60,20 @@ const Return = () => {
 
   const [returnID, setReturnID] = useState("");
   const returnMutation = useMutation({
-    mutationFn: async (data) => await POST("sales/return", data),
+    mutationFn: async (data) => await POST("sales/returns/", data),
+    onSuccess: (data) => {
+      showAlert({
+        type: "success",
+        title: "Return request submitted.",
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title:
+          "An error occurred while submitting return request: " + error.message,
+      });
+    },
   });
 
   const [deliveryInfo, setDeliveryInfo] = useState({
@@ -129,16 +142,9 @@ const Return = () => {
     // INSERT LOGIC HERE FOR RETURN
     const request = {
       return_data: {
-        delivery_note_id: deliveryInfo.delivery_note_id,
+        delivery_note: deliveryInfo.delivery_note_id,
+        status: "Pending",
         items: products.map((product, index) => {
-          const quantity =
-            initialProducts.length > 0
-              ? parseInt(initialProducts[index].quantity)
-              : parseInt(product.quantity);
-          const to_deliver = parseInt(product.quantity);
-          if (to_deliver > quantity) {
-            error = true;
-          }
           return {
             product: product.product_id,
             quantity: parseInt(product.quantity),
@@ -147,6 +153,8 @@ const Return = () => {
             total_price: Number(parseFloat(product.total_price).toFixed(2)),
             discount: Number(parseFloat(product.discount).toFixed(2)),
             tax_amount: Number(parseFloat(product.tax).toFixed(2)),
+            return_reason: product.reason,
+            return_action: "Return", // make drop down
           };
         }),
       },
@@ -158,10 +166,7 @@ const Return = () => {
         total_tax: Number(parseFloat(deliveryInfo.total_tax).toFixed(2)),
       },
     };
-    showAlert({
-      type: "success",
-      title: "Return request submitted.",
-    });
+    returnMutation.mutate(request);
   };
 
   // Change customer
@@ -384,7 +389,7 @@ const Return = () => {
               })}
             />
             <InfoField
-              label={"Total"}
+              label={"Total Amount to Return"}
               value={Number(deliveryInfo.total_price).toLocaleString("en-US", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
