@@ -1,9 +1,8 @@
 import React from 'react'
-import './Forms.css'
 
 const Search = ({ type, placeholder, value, onChange }) => {
   return (
-    <div className="flex items-center border border-gray-500 rounded-lg px-3 py-2 bg-white shadow-sm focus-within:border-gray-800">
+    <div className="max-sm:py-1 max-sm:px-2 max-sm:w-40 flex items-center border border-gray-500 rounded-lg px-3 py-2 bg-white shadow-sm focus-within:border-gray-800">
       <img 
         src="./accounting/searching-icon.svg" 
         alt="Search" 
@@ -14,7 +13,7 @@ const Search = ({ type, placeholder, value, onChange }) => {
         placeholder={placeholder} 
         value={value} 
         onChange={onChange} 
-        className="ml-2 w-full outline-none bg-transparent text-gray-700"
+        className="max-sm:text-xs ml-2 w-full outline-none bg-transparent text-gray-700"
       />
     </div>
   );
