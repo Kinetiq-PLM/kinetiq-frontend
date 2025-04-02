@@ -587,3 +587,10 @@
 .serv .alert-modal-content p {
   font-size: 15px;
 }
+
+.serv .alert-buttons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}

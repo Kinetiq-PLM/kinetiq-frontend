@@ -12,6 +12,8 @@ import UpdateReportModal from "../components/ServiceReport/UpdateReportModal"
 import SubmitReportModal from "../components/ServiceReport/SubmitReportModal"
 
 import { GET } from "../api/api"
+import { POST } from "../api/api"
+import { PATCH } from "../api/api"
 
 const ServiceReport = () => {
   // State for form fields
@@ -29,6 +31,10 @@ const ServiceReport = () => {
   const [filterBy, setFilterBy] = useState("Filter by")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedTicketStatus, setSelectedTicketStatus] = useState(null);
+  const [selectedTicketId, setSelectedTicketId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showModalSafe, setShowModalSafe] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   // Modal states
   const [showUpdateModal, setShowUpdateModal] = useState(false)
@@ -50,12 +56,11 @@ const ServiceReport = () => {
 
   // table row clicking func
   const handleRowClick = async (report) => {
-    setSelectedReport(report);
     try {
       const data = await GET(`service-reports/${report.report_id}`); 
       console.log("Fetched data:", data);
 
-      setTicketSubject(data.service_ticket?.ticketSubject || "");
+      setTicketSubject(data.service_ticket?.subject || "");
       setDescription(data.description || ""); 
       setRequestType(data.request_type || "");
       setCustomerId(data.service_ticket?.customer?.customer_id || "");
@@ -64,6 +69,8 @@ const ServiceReport = () => {
       setBillingId(data.service_billing?.service_billing_id || "");
 
       setSelectedTicketStatus(data.service_ticket?.status || "");
+      setSelectedTicketId(data.service_ticket?.ticket_id || "");
+      setSelectedReport(data);
 
     } catch (error) {
       console.error("Error fetching report details:", error);
@@ -72,15 +79,6 @@ const ServiceReport = () => {
 
   // Handle update report
   const handleUpdate = () => {
-    setSelectedReport({
-      ticketId: "",
-      requestId: "",
-      requestType: "",
-      renewalId: "",
-      billingId: "",
-      description: "",
-      status: "",
-    })
     setShowUpdateModal(true)
   }
 
@@ -99,20 +97,65 @@ const ServiceReport = () => {
   }
 
   // Handle update from modal
-  const handleUpdateReport = (reportData) => {
-    console.log("Updating report:", reportData)
-    setShowUpdateModal(false)
+  const handleUpdateReport = async (reportData) => {
+    console.log("repdata", reportData)
+    const reportId = reportData.report_id;
+    if (!reportId) {
+      console.error("Error: report_id is undefined");
+      return;
+    }
+    console.log("Updating report:", reportData);
+
+    try {
+      await PATCH(`service-reports/${reportId}/update/`, reportData);
+      setShowUpdateModal(false);
+      fetchReports();
+    } catch (error) {
+        console.error("Error updating service report:", error.message);
+    }
   }
 
   // Handle submit from modal
-  const handleSubmitReport = (reportData) => {
+  const handleSubmitReport = async (reportData) => {
     console.log("Submitting report:", reportData)
-    setShowSubmitModal(false)
+    try {
+      const data = await POST("/create-report/", reportData);
+      console.log("Report created successfully:", data);
+      setShowSubmitModal(false);
+      fetchReports();
+  } catch (error) {
+      console.error("Error submitting report:", error.message);
+  }
+    
   }
 
   // Handle close ticket
   const handleCloseTicket = () => {
-    console.log("Closing ticket")
+    if (selectedTicketStatus === 'Closed') {
+      setShowModalSafe(true);
+    } else {
+      setShowModal(true);
+    }
+    // setShowModalSafe(true);
+  }
+
+  const closeTicket = async () => {
+    if (!selectedTicketId) {
+      console.error("Error: ticket_id is undefined");
+      return;
+    }
+    const ticketData = {
+      ticket_id: selectedTicketId,
+      status: "Closed"
+    }
+    console.log("Updating ticket:", ticketData)
+    try {
+      await PATCH(`update-ticket/${selectedTicketId}/`, ticketData);
+      setShowModal(false);
+      fetchReports();
+    } catch (error) {
+        console.error("Error updating ticket:", error.message);
+    }
   }
 
   // Handle filter change
@@ -299,8 +342,28 @@ const ServiceReport = () => {
         isOpen={showSubmitModal}
         onClose={() => setShowSubmitModal(false)}
         onSubmit={handleSubmitReport}
-        report={selectedReport}
       />
+
+      {showModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>⚠  WARNING</h2>
+            <p>Trying to close the ticket: ' {selectedTicketId} '.</p>
+            <div className="alert-buttons">
+            <button className="cancel-button" onClick={() => setShowModal(false)}>Cancel</button>
+            <button className="alert-okay-button" onClick={() => closeTicket()}>Close Ticket</button>
+            </div> 
+          </div>
+        </div>
+      )}
+      {showModalSafe && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <p>Ticket's status is already closed.</p>
+            <button className="alert-okay-button" onClick={() => setShowModalSafe(false)}>OK</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

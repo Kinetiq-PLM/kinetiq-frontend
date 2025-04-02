@@ -27,7 +27,6 @@ const InputField = ({
             value={ticketSubject}
             readOnly
             onChange={(e) => setTicketSubject(e.target.value)}
-            placeholder="Enter ticket subject"
           />
         </div>
 
@@ -39,7 +38,6 @@ const InputField = ({
             value={requestType}
             readOnly
             onChange={(e) => setRequestType(e.target.value)}
-            placeholder="Enter request type"
           />
         </div>
 
@@ -51,7 +49,6 @@ const InputField = ({
             value={customerId}
             readOnly
             onChange={(e) => setCustomerId(e.target.value)}
-            placeholder="Enter customer ID"
           />
         </div>
 
@@ -63,7 +60,6 @@ const InputField = ({
             value={name}
             readOnly
             onChange={(e) => setName(e.target.value)}
-            placeholder="Enter name"
           />
         </div>
       </div>
@@ -77,7 +73,6 @@ const InputField = ({
               value={description}
               readOnly
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter description"
               rows={6}
               className="description-textarea"
             />
@@ -99,7 +94,6 @@ const InputField = ({
             value={renewalId}
             readOnly
             onChange={(e) => setRenewalId(e.target.value)}
-            placeholder="Enter renewal ID"
           />
         </div>
 
@@ -110,7 +104,6 @@ const InputField = ({
             id="billingId"
             value={billingId}
             onChange={(e) => setBillingId(e.target.value)}
-            placeholder="Enter billing ID"
           />
         </div>
       </div>

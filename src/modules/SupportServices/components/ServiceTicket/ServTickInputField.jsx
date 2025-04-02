@@ -27,7 +27,6 @@ const ServTickInputField = ({
             value={ticketId}
             readOnly 
             onChange={(e) => setTicketId(e.target.value)}
-            placeholder="Enter ticket ID"
           />
         </div>
 
@@ -39,7 +38,6 @@ const ServTickInputField = ({
             value={subject}
             readOnly 
             onChange={(e) => setSubject(e.target.value)}
-            placeholder="Enter ticket subject"
           />
         </div>
 
@@ -50,7 +48,6 @@ const ServTickInputField = ({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             readOnly 
-            placeholder="Enter ticket description"
             style={{ height: "8.5rem" }} /* Align exactly with phone number */
           />
         </div>
@@ -66,7 +63,6 @@ const ServTickInputField = ({
               value={customerId}
               readOnly 
               onChange={(e) => setCustomerId(e.target.value)}
-              placeholder="Enter customer ID"
             />
             {/* <span className="select-arrow">▼</span> */}
           </div>
@@ -80,7 +76,6 @@ const ServTickInputField = ({
             value={name}
             readOnly 
             onChange={(e) => setName(e.target.value)}
-            placeholder="Enter name"
           />
         </div>
 
@@ -92,7 +87,6 @@ const ServTickInputField = ({
             value={email}
             readOnly 
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter email address"
           />
         </div>
 
@@ -104,7 +98,6 @@ const ServTickInputField = ({
             value={phone}
             readOnly 
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="Enter phone number"
           />
         </div>
       </div>
