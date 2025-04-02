@@ -11,7 +11,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
     "Blanket Agreement": "BlanketAgreement",
     "Master List": "MasterList",
     Reporting: "Reporting",
-    Returns: "Returns",
+    Return: "Return",
   };
 
   return (

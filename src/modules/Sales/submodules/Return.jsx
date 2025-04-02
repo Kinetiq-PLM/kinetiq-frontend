@@ -28,6 +28,8 @@ const Return = () => {
 
   const [address, setAddress] = useState("");
 
+  const copyFromOptions = ["Delivery"];
+  const [copyFromModal, setCopyFromModal] = useState("");
   const [selectedProduct, setSelectedProduct] = useState();
   const [selectedCustomer, setSelectedCustomer] = useState("");
 
@@ -55,11 +57,12 @@ const Return = () => {
 
   // the products customer chose
   const [products, setProducts] = useState([]);
+  const [returnID, setReturnID] = useState("");
 
   const [deliveryInfo, setDeliveryInfo] = useState({
     customer_id: "",
     order_id: "",
-    shipping_id: "",
+    delivery_note_id: "",
     selected_products: products,
     selected_address: "",
     selected_delivery_date: "",
@@ -67,8 +70,6 @@ const Return = () => {
     date_issued: new Date().toISOString().split("T")[0],
     discount: 0,
     total_tax: 0,
-    shipping_fee: 0,
-    warranty_fee: 0,
     total_price: 0,
   });
 
@@ -125,11 +126,10 @@ const Return = () => {
   // Change customer
   useEffect(() => {
     setProducts([]);
-    setSelectedProduct(null);
     setDeliveryInfo({
       customer_id: "",
       order_id: "",
-      shipping_id: null,
+      delivery_note_id: null,
       selected_products: [],
       selected_address: "",
       selected_delivery_date: "",
@@ -137,10 +137,9 @@ const Return = () => {
       date_issued: new Date().toISOString().split("T")[0],
       discount: 0,
       total_tax: 0,
-      shipping_fee: 0,
-      warranty_fee: 0,
       total_price: 0,
     });
+    setSelectedProduct(null);
     setCanEditList(false);
   }, [selectedCustomer]);
 
@@ -165,13 +164,8 @@ const Return = () => {
     );
 
     const shippingFee = products.length * 100;
-    const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
     const totalPrice =
-      Number(totalBeforeDiscount) -
-      Number(totalDiscount) +
-      Number(totalTax) +
-      Number(shippingFee) +
-      Number(warrantyFee);
+      Number(totalBeforeDiscount) - Number(totalDiscount) + Number(totalTax);
     const delivery = {
       ...deliveryInfo,
       customer_id: selectedCustomer.customer_id,
@@ -182,8 +176,6 @@ const Return = () => {
       selected_address: selectedCustomer.address_line1,
       total_tax: Number(totalTax),
       discount: Number(totalDiscount),
-      shipping_fee: Number(shippingFee),
-      warranty_fee: Number(warrantyFee),
       total_price: Number(totalPrice),
     };
 
@@ -196,6 +188,16 @@ const Return = () => {
       selected_address: address,
     });
   }, [address]);
+
+  useEffect(() => {
+    if (!copyFromModal) return;
+
+    const modalActions = {
+      Delivery: setIsDeliveredListOpen,
+    };
+
+    modalActions[copyFromModal]?.(true);
+  }, [copyFromModal]);
 
   return (
     <div className="delivery">
@@ -215,8 +217,7 @@ const Return = () => {
           addProduct={setProducts}
           products={products}
           // Pass customer and order ID to the product list modal and search for delivered products
-          customerID={selectedCustomer.customer_id}
-          orderID={deliveryInfo.order_id}
+          delivery={deliveryInfo}
         ></DeliveredProductList>
 
         <NewCustomerModal
@@ -232,6 +233,8 @@ const Return = () => {
           setDelivery={setDeliveryInfo}
           setProducts={setProducts}
           setEditable={setCanEditList}
+          selectedCustomer={selectedCustomer}
+          setSelectedEmployee={setSelectedEmployee}
         ></DeliveredList>
 
         <EmployeeListModal
@@ -248,6 +251,7 @@ const Return = () => {
             customerListModal={setIsCustomerListOpen}
             delivery={deliveryInfo}
             deliveredListModal={setIsDeliveredListOpen}
+            returnID={returnID}
           />
         </div>
         {/* TABLE */}
@@ -328,20 +332,6 @@ const Return = () => {
               })}
             />
             <InfoField
-              label={"Shipping"}
-              value={Number(deliveryInfo.shipping_fee).toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            />
-            <InfoField
-              label={"Warranty"}
-              value={Number(deliveryInfo.warranty_fee).toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            />
-            <InfoField
               label={"Tax"}
               value={Number(deliveryInfo.total_tax).toLocaleString("en-US", {
                 minimumFractionDigits: 2,
@@ -361,6 +351,7 @@ const Return = () => {
                 placeholder="Copy From"
                 options={[]}
                 disabled={true}
+                setOption={setCopyFromModal}
               />
               <SalesDropup
                 label=""

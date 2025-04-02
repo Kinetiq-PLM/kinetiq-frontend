@@ -162,8 +162,12 @@ const SalesInfo = ({
         <DateSelector
           customer={customer}
           setDeliveryDate={setDeliveryDate}
-          label={type === "Quotation" ? "Date Issued" : "Delivery Date"}
-          disabled={type === "Quotation"}
+          label={
+            ["Quotation", "Order"].includes(type)
+              ? "Date Issued"
+              : "Delivery Date"
+          }
+          disabled={["Quotation", "Order"].includes(type)}
         />
         {/* Date Selector*/}
       </div>

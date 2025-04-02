@@ -9,8 +9,6 @@ import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../../api/api";
 
-import { CUSTOMER_DATA } from "../../../temp_data/customer_data.jsx";
-
 const CustomerListModal = ({
   isOpen,
   isNewCustomerModalOpen,
@@ -26,7 +24,7 @@ const CustomerListModal = ({
 
   // Filtered data is used to filter the data based on the search term
   //const [filteredData, setFilteredData] = useState([]); // ORIGINAL
-  const [filteredData, setFilteredData] = useState(CUSTOMER_DATA); // TEMP
+  const [filteredData, setFilteredData] = useState([]); // TEMP
 
   const [customers, setCustomers] = useState([]);
 
@@ -70,19 +68,19 @@ const CustomerListModal = ({
   };
 
   // === FETCH ===
-  // useEffect(() => {
-  //   if (customersQuery.status === "success") {
-  //     setFilteredData(customersQuery.data);
-  //     setCustomers(customersQuery.data);
-  //   } else if (customersQuery.status === "error") {
-  //     showAlert({
-  //       type: "error",
-  //       title:
-  //         "An error occurred while fetching the data: " +
-  //         customersQuery.error?.message,
-  //     });
-  //   }
-  // }, [customersQuery.data]);
+  useEffect(() => {
+    if (customersQuery.status === "success") {
+      setFilteredData(customersQuery.data);
+      setCustomers(customersQuery.data);
+    } else if (customersQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title:
+          "An error occurred while fetching the data: " +
+          customersQuery.error?.message,
+      });
+    }
+  }, [customersQuery.data]);
 
   useEffect(() => {
     const handleEscape = (e) => {

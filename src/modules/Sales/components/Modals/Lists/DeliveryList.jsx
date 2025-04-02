@@ -8,16 +8,21 @@ import DELIVERY_LIST_DATA from "../../../temp_data/deliveries_list_data.jsx";
 
 import Table from "../../Table";
 import Button from "../../Button";
+import { GET } from "../../../api/api.jsx";
+import { useQuery } from "@tanstack/react-query";
 
 const DeliveryListModal = ({ isOpen, onClose, setDelivery }) => {
   const { showAlert } = useAlert();
 
-  const delivery_list = DELIVERY_LIST_DATA;
-
   const [selectedDelivery, setSelectedDelivery] = useState(null);
+  const deliveryQuery = useQuery({
+    queryKey: ["deliveriesList"],
+    queryFn: async () => await GET("sales/delivery?delivery_status=Delivered"),
+  });
 
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(delivery_list);
+  const [delivery_list, set_delivery_list] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);

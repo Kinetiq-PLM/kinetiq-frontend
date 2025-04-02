@@ -8,6 +8,8 @@ import DELIVERY_LIST_DATA from "../../../temp_data/deliveries_list_data.jsx";
 
 import Table from "../../Table";
 import Button from "../../Button";
+import { GET } from "../../../api/api.jsx";
+import { useQuery } from "@tanstack/react-query";
 
 const DeliveredList = ({
   isOpen,
@@ -16,23 +18,32 @@ const DeliveredList = ({
   customerID,
   setProducts,
   setEditable,
+  selectedCustomer,
+  setSelectedEmployee,
 }) => {
   // ALL DELIVERED ORDERS TO THE CUSTOMER
   // console.log("Customer ID:", customerID);
   const { showAlert } = useAlert();
 
-  const delivery_list = DELIVERY_LIST_DATA;
+  const [delivery_list, set_delivery_list] = useState([]);
 
   const [selectedDelivery, setSelectedDelivery] = useState(null);
-
   // Filtered data is used to filter the data based on the search term
-  const [filteredData, setFilteredData] = useState(delivery_list);
+  const [filteredData, setFilteredData] = useState([]);
+  const deliveryQuery = useQuery({
+    queryKey: ["deliveriesList"],
+    queryFn: async () =>
+      await GET(
+        `sales/delivery?delivery_status=Delivered&customer_id=${selectedCustomer.customer_id}`
+      ),
+    enabled: isOpen,
+  });
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
   const columns = [
-    { key: "shipping_id", label: "Delivery ID" },
+    { key: "delivery_note_id", label: "Delivery ID" },
     { key: "customer_name", label: "Name" }, // Company Name
     { key: "date_shipped", label: "Shipped" },
     { key: "delivered_date", label: "Delivered" },
@@ -40,14 +51,25 @@ const DeliveredList = ({
 
   const handleConfirm = () => {
     if (selectedDelivery) {
-      setProducts(selectedDelivery.selected_products); // Set the selected products to the parent component
+      const prods = selectedDelivery.statement.items.map((item) => ({
+        product_id: item.product.product_id,
+        product_name: item.product.product_name,
+        quantity: Number(item.quantity),
+        selling_price: Number(item.unit_price),
+        discount: Number(item.discount),
+        tax: Number(item.tax_amount),
+        total_price: Number(item.total_price),
+        reason: "",
+      }));
       setDelivery(selectedDelivery); // Properly update the array
+      setSelectedEmployee(selectedDelivery.statement.salesrep);
+      setProducts(prods); // Set the selected products to the parent component
       onClose();
       showAlert({
         type: "success",
         title: "Delivery Selected",
       });
-      setSelectedDelivery(null);
+      // setSelectedDelivery(null);
       setEditable(true);
     }
   };
@@ -78,6 +100,28 @@ const DeliveredList = ({
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (deliveryQuery.status === "success") {
+      const data = deliveryQuery.data.map((delivery) => ({
+        ...delivery,
+        delivery_note_id: delivery.delivery_note_id,
+        customer_name: delivery.statement.customer.name,
+        date_shipped: new Date(delivery.shipping_date).toLocaleString(),
+        delivered_date: new Date(
+          delivery.actual_delivery_date
+        ).toLocaleString(),
+      }));
+      set_delivery_list(data);
+      setFilteredData(data);
+    } else if (deliveryQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title:
+          "An error occurred while fetching data: " +
+          deliveryQuery.error.message,
+      });
+    }
+  }, [deliveryQuery.data]);
   if (!isOpen) return null;
 
   return (

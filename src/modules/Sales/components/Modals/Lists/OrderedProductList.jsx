@@ -4,18 +4,15 @@ import { useState, useEffect, useRef } from "react";
 
 import { useAlert } from "../../Context/AlertContext.jsx";
 
-import Table from "../../Table";
-import { PRODUCTS_DATA } from "../../../temp_data/products_data";
-import Button from "../../Button";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { GET } from "../../../api/api";
+import Table from "../../Table.jsx";
+import Button from "../../Button.jsx";
 
-const DeliveredProductList = ({
+const OrderedProductList = ({
   isOpen,
   onClose,
   products,
   addProduct,
-  delivery,
+  order,
 }) => {
   const { showAlert } = useAlert();
 
@@ -39,10 +36,6 @@ const DeliveredProductList = ({
 
   const handleConfirm = () => {
     if (selectedProduct) {
-      selectedProduct.quantity = 1;
-      selectedProduct.tax = 0;
-      selectedProduct.discount = 0;
-      selectedProduct.total_price = selectedProduct.selling_price;
       addProduct([...products, selectedProduct]); // Properly update the array
       onClose();
       showAlert({
@@ -54,8 +47,8 @@ const DeliveredProductList = ({
   };
 
   useEffect(() => {
-    if (delivery.statement) {
-      const products = delivery.statement.items.map((item) => ({
+    if (order) {
+      const products = order.statement.items.map((item) => ({
         product_id: item.product.product_id,
         product_name: item.product.product_name,
         quantity: Number(item.quantity),
@@ -67,24 +60,7 @@ const DeliveredProductList = ({
       }));
       setProductList(products);
     }
-  }, [delivery]);
-
-  // useEffect(() => {
-  //   if (productsQuery.status === "success") {
-  //     setProductList(productsQuery.data);
-  //     if (!hasLoaded) {
-  //       setFilteredData(productsQuery.data);
-  //       setHasLoaded(true);
-  //     }
-  //   } else if (productsQuery.status === "error") {
-  //     showAlert({
-  //       type: "error",
-  //       title:
-  //         "An error occurred while fetching products: " +
-  //         productsQuery.error?.data,
-  //     });
-  //   }
-  // }, [productsQuery.data]);
+  }, [order]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -198,4 +174,4 @@ const DeliveredProductList = ({
   );
 };
 
-export default DeliveredProductList;
+export default OrderedProductList;

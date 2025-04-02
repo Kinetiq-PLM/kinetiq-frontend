@@ -22,6 +22,7 @@ import SalesDropup from "../components/SalesDropup.jsx";
 import { GET, POST } from "../api/api.jsx";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import generateRandomID from "../components/GenerateID.jsx";
+import OrderedProductList from "../components/Modals/Lists/OrderedProductList.jsx";
 
 const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
@@ -53,6 +54,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
+  const [canEditList, setCanEditList] = useState(false);
 
   const [isOrderListOpen, setIsOrderListOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -94,24 +96,19 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const copyFromMutation = useMutation({
     mutationFn: async (data) =>
       await GET(`sales/${data.transferOperation}/${data.transferID}`),
-    onSuccess: async (data, variables, context) => {
-      const prods = await Promise.all(
-        data.statement.items.map(async (item) => {
-          const price = (
-            await GET(`sales/products?admin_product=${item.product.product_id}`)
-          )[0];
-
-          return {
-            product_id: item.product.product_id,
-            product_name: item.product.product_name,
-            quantity: Number(item.quantity),
-            selling_price: Number(price.selling_price),
-            discount: Number(item.discount),
-            tax: Number(item.tax_amount),
-            total_price: Number(item.total_price),
-          };
-        })
-      );
+    onSuccess: (data, variables, context) => {
+      const prods = data.statement.items.map((item) => {
+        console.log(item);
+        return {
+          product_id: item.product.product_id,
+          product_name: item.product.product_name,
+          quantity: Number(item.quantity),
+          selling_price: Number(item.unit_price),
+          discount: Number(item.discount),
+          tax: Number(item.tax_amount),
+          total_price: Number(item.total_price),
+        };
+      });
       console.log(prods);
 
       setProducts(prods);
@@ -252,18 +249,16 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     );
 
     const totalPrice =
-      Number(totalBeforeDiscount) -
-      Number(totalDiscount) +
-      Number(totalTax) +
-      setDeliveryInfo((prevOrderInfo) => ({
-        ...prevOrderInfo,
-        customer_id: selectedCustomer.customer_id,
-        selected_products: products,
-        total_before_discount: totalBeforeDiscount,
-        total_tax: Number(totalTax),
-        discount: totalDiscount,
-        total_price: Number(totalPrice),
-      }));
+      Number(totalBeforeDiscount) - Number(totalDiscount) + Number(totalTax);
+    setDeliveryInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      customer_id: selectedCustomer.customer_id,
+      selected_products: products,
+      total_before_discount: totalBeforeDiscount,
+      total_tax: Number(totalTax),
+      discount: totalDiscount,
+      total_price: Number(totalPrice),
+    }));
   };
 
   // For copy from feature
@@ -305,6 +300,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       setSelectedBlanketAgreement(null);
       // fill out fields HERE
     }
+    setCanEditList(selectedOrder !== null);
   }, [selectedOrder, selectedBlanketAgreement]);
 
   // For copy to feature
@@ -373,6 +369,9 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     };
 
     setDeliveryInfo(delivery);
+    if (!selectedCustomer) {
+      setCanEditList(false);
+    }
   }, [products, selectedCustomer]);
 
   useEffect(() => {
@@ -400,12 +399,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           setSelectedCustomer={setSelectedCustomer}
           setCustomer={setSelectedCustomer}
         ></CustomerListModal>
-        <ProductListModal
-          isOpen={isProductListOpen}
-          onClose={() => setIsProductListOpen(false)}
-          addProduct={setProducts}
-          products={products}
-        ></ProductListModal>
+
         <NewCustomerModal
           isOpen={isNewCustomerModalOpen}
           onClose={() => setIsNewCustomerModalOpen(false)}
@@ -417,6 +411,14 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsOrderListOpen(false)}
           setOrder={setSelectedOrder}
         ></OrderListModal>
+
+        <OrderedProductList
+          isOpen={isProductListOpen}
+          onClose={() => setIsProductListOpen(false)}
+          products={products}
+          addProduct={setProducts}
+          order={selectedOrder}
+        />
 
         <EmployeeListModal
           isOpen={isEmployeeListOpen}
@@ -457,6 +459,13 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           <div className="h-full flex flex-col gap-3 w-full">
             {/* Buttons Row */}
             <div className="flex gap-2">
+              <Button
+                type="primary"
+                disabled={!canEditList}
+                onClick={() => setIsProductListOpen(true)}
+              >
+                Add Item
+              </Button>
               <Button type="outline" onClick={() => handleDelete()}>
                 Delete Item
               </Button>

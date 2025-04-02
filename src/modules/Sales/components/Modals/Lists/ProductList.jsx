@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from "react";
 import { useAlert } from "../../Context/AlertContext.jsx";
 
 import Table from "../../Table";
-import { PRODUCTS_DATA } from "../../../temp_data/products_data";
 import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../../api/api";
@@ -19,7 +18,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   // const [filteredData, setFilteredData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   // const [productList, setProductList] = useState([]); // ORIGINAL
-  const [productList, setProductList] = useState(PRODUCTS_DATA); // TEMP
+  const [productList, setProductList] = useState([]); // TEMP
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -53,22 +52,22 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
     }
   };
 
-  // useEffect(() => {
-  //   if (productsQuery.status === "success") {
-  //     setProductList(productsQuery.data);
-  //     if (!hasLoaded) {
-  //       setFilteredData(productsQuery.data);
-  //       setHasLoaded(true);
-  //     }
-  //   } else if (productsQuery.status === "error") {
-  //     showAlert({
-  //       type: "error",
-  //       title:
-  //         "An error occurred while fetching products: " +
-  //         productsQuery.error?.data,
-  //     });
-  //   }
-  // }, [productsQuery.data]);
+  useEffect(() => {
+    if (productsQuery.status === "success") {
+      setProductList(productsQuery.data);
+      if (!hasLoaded) {
+        setFilteredData(productsQuery.data);
+        setHasLoaded(true);
+      }
+    } else if (productsQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title:
+          "An error occurred while fetching products: " +
+          productsQuery.error?.data,
+      });
+    }
+  }, [productsQuery.data]);
 
   useEffect(() => {
     const handleEscape = (e) => {

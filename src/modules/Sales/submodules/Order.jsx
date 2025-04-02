@@ -68,24 +68,18 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const copyFromMutation = useMutation({
     mutationFn: async (data) =>
       await GET(`sales/${data.transferOperation}/${data.transferID}`),
-    onSuccess: async (data, variables, context) => {
-      const prods = await Promise.all(
-        data.statement.items.map(async (item) => {
-          const price = (
-            await GET(`sales/products?admin_product=${item.product.product_id}`)
-          )[0];
-
-          return {
-            product_id: item.product.product_id,
-            product_name: item.product.product_name,
-            quantity: Number(item.quantity),
-            selling_price: Number(price.selling_price),
-            discount: Number(item.discount),
-            tax: Number(item.tax_amount),
-            total_price: Number(item.total_price),
-          };
-        })
-      );
+    onSuccess: (data, variables, context) => {
+      const prods = data.statement.items.map((item) => {
+        return {
+          product_id: item.product.product_id,
+          product_name: item.product.product_name,
+          quantity: Number(item.quantity),
+          selling_price: Number(item.unit_price),
+          discount: Number(item.discount),
+          tax: Number(item.tax_amount),
+          total_price: Number(item.total_price),
+        };
+      });
       setProducts(prods);
       setSelectedQuotation(data);
       setSelectedCustomer(data.statement.customer);

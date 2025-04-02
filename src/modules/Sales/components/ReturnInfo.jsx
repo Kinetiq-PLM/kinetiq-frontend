@@ -59,6 +59,7 @@ const ReturnInfo = ({
   deliveredListModal,
   customer,
   delivery,
+  returnID,
 }) => {
   return (
     <section className="flex justify-between gap-6 flex-col md:flex-row">
@@ -77,16 +78,26 @@ const ReturnInfo = ({
         {customer.customer_id != undefined ? (
           <InputDelivery
             label={"Delivery ID"}
-            value={delivery.shipping_id}
+            value={delivery.delivery_note_id}
             deliveredListModal={deliveredListModal}
           />
         ) : (
-          <Information label={"Delivery ID"} value={""} />
+          <Information
+            label={"Delivery ID"}
+            value={delivery.delivery_note_id}
+          />
         )}
 
         <Information label={"Date Delivered"} value={delivery.delivered_date} />
-        <Information label={"Address"} value={delivery.delivery_address} />
-        <Information label={"Total"} value={delivery.total_price} />
+        <Information
+          label={"Address"}
+          value={
+            delivery.statement
+              ? `${delivery.statement.customer.address_line1} ${delivery.statement.customer.address_line2}`
+              : ""
+          }
+        />
+        <Information label={"Return ID"} value={returnID} />
       </div>
     </section>
   );
