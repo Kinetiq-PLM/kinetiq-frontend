@@ -203,7 +203,7 @@ const ReturnTable = ({
                   return (
                     <td
                       key={colIndex}
-                      className={`px-4 py-3 text-center ${
+                      className={`px-4 py-3 text-center max-w-[300px] break-words ${
                         column.editable !== false ? "cursor-pointer" : ""
                       }`}
                       onDoubleClick={() =>

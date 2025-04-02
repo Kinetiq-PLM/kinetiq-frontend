@@ -5,59 +5,69 @@ import Heading from "../../Sales/components/Heading";
 import Button from "../../Sales/components/Button";
 import Table from "../../Sales/components/Table";
 import { AlertProvider } from "../../Sales/components/Context/AlertContext";
+import Dropdown from "../../Sales/components/Dropdown";
+
 import OpportunityInfo from "../components/OpportunityInfo";
 import NewCustomerModal from "./../../Sales/components/Modals/NewCustomer";
 import CustomerListModal from "./../../Sales/components/Modals/Lists/CustomerList";
+import OpportunityTab from "./../components/OpportunityTabs/OpportunityTab";
+import MainTab from "../components/OpportunityTabs/MainTab";
 
 const Opportunity = ({ loadSubModule, setActiveSubModule }) => {
-  const [selectedCustomer, setSelectedCustomer] = useState("");
-  const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
-  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
-  const [opportunityInfo, setOpportunityInfo] = useState({
-    // Customer information
-    customer_id: "",
-    quotation_id: "",
-    selected_products: [],
-    selected_address: "",
-    selected_delivery_date: "",
-    total_before_discount: 0,
-    date_issued: new Date().toISOString().split("T")[0],
-    discount: 0,
-    total_tax: 0,
-    shipping_fee: 0,
-    warranty_fee: 0,
-    total_price: 0,
-  });
-  const [address, setAddress] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
+  const [activeTab, setActiveTab] = useState("Opportunity");
+  const tabs = [
+    {
+      name: "Opportunity",
+      component: <OpportunityTab setActiveTab={setActiveTab} />,
+    },
+    {
+      name: "Main Page",
+      component: <MainTab />,
+    },
+  ];
 
   return (
     <div className="opportunity">
       <div className="body-content-container">
-        <CustomerListModal
-          isOpen={isCustomerListOpen}
-          onClose={() => setIsCustomerListOpen(false)}
-          newCustomerModal={setIsNewCustomerModalOpen}
-          setCustomer={setSelectedCustomer}
-        ></CustomerListModal>
-        <NewCustomerModal
-          isOpen={isNewCustomerModalOpen}
-          onClose={() => setIsNewCustomerModalOpen(false)}
-        ></NewCustomerModal>
         <Heading
           Title="Opportunity"
           SubTitle="Tracking and nurturing sales opportunities to drive business success."
         />
-        <main className="mt-4">
-          <OpportunityInfo
-            type={"Quotation"}
-            customer={selectedCustomer}
-            customerListModal={setIsCustomerListOpen}
-            setCustomerInfo={setOpportunityInfo}
-            operationID={opportunityInfo.quotation_id}
-            setDeliveryDate={setDeliveryDate}
-            setAddress={setAddress}
-          />
+        <main className="">
+          {/* Tab Selector */}
+          <div className="mt-4 flex flex-col md:flex-row lg:hidden md:justify-between md:items-center gap-4">
+            <div>
+              <h4 className="font-medium">Select Data:</h4>
+            </div>
+            <div className="flex items-center gap-2">
+              <h4 className="text-lg font-medium text-gray-400">View:</h4>
+              <div className="w-64">
+                <Dropdown
+                  label=""
+                  options={tabs.map((tab) => tab.name)}
+                  onChange={setActiveTab}
+                  value={activeTab}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex mt-4 border-b border-[#E8E8E8] w-fit gap-2">
+            {tabs.map((tab) => (
+              <Button
+                key={tab.name}
+                type={activeTab === tab.name ? "active" : "link"}
+                onClick={() => setActiveTab(tab.name)}
+              >
+                {tab.name}
+              </Button>
+            ))}
+          </div>
+
+          {/* Active Tab Content */}
+          <div className="mt-6">
+            {tabs.find((tab) => tab.name === activeTab)?.component}
+          </div>
         </main>
       </div>
     </div>

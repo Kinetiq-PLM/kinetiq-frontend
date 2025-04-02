@@ -114,52 +114,21 @@ const DateSelector = ({ label, customer, setDeliveryDate }) => {
   );
 };
 
-const OpportunityInfo = ({
-  type,
-  customerListModal,
-  customer,
-  setCustomerInfo,
-  operationID,
-  setAddress,
-  setDeliveryDate,
-}) => {
-  let id = "";
-  if (type === "Quotation") {
-    id = "quotation_id";
-  } else if (type === "Order") {
-    id = "order_id";
-  } else if (type === "Delivery") {
-    id = "Delivery_id";
-  } else if (type === "Invoice") {
-    id = "invoice_id";
-  }
-
+const OpportunityInfo = ({ customerListModal, customer }) => {
   return (
     <section className="flex justify-between gap-6 flex-col md:flex-row">
       <div className="h-full w-full flex flex-col items-center">
         <InputCustomer
-          label={"Business Partner ID"}
+          label={"Customer ID"}
           value={customer.customer_id}
           customerListModal={customerListModal}
         />
         <Information label={"Contact Person"} value={customer.name} />
-        <Information label={"Employee ID"} value={""} />{" "}
-        {/* Employee ID of currently logged in*/}
       </div>
       <div className="w-full hidden xl:block"></div>
       <div className="h-full w-full flex flex-col items-center">
-        <Information label={"Status"} value={customer.status} />
-        <DateSelector
-          customer={customer}
-          setDeliveryDate={setDeliveryDate}
-          label={"Start Date"}
-        />
-        <DateSelector
-          customer={customer}
-          setDeliveryDate={setDeliveryDate}
-          label={"Closing Date"}
-        />
-        {/* Date Selector*/}
+        <Information label={"Number"} value={customer.phone_number} />
+        <Information label={"Email"} value={customer.email_address} />
       </div>
     </section>
   );
