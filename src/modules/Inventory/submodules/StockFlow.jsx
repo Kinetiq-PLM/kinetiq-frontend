@@ -31,7 +31,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchWarehouseData = async () => { 
             try {
-                const response = await fetch("http://localhost:8000/api/warehouse-list/");
+                const response = await fetch("http://localhost:8000/api/warehouse-item-list/");
                 if (!response.ok) throw new Error("Failed to fetch data");
                 const data = await response.json();
                 setWarehouseData(data);
@@ -56,7 +56,7 @@ const BodyContent = () => {
             Data: warehouseMovements
         },
         "Warehouse": {
-            Columns: ["Warehouse_ID", "Warehouse_Location"],
+            Columns: ["Item Name", "Type", "Item Management", "Quantity", "Expiry"],
             Data:  warehouseData
         },
         
