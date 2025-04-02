@@ -19,7 +19,7 @@ import ReturnInfo from "../components/ReturnInfo.jsx";
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
-import { GET, POST } from "../api/api.jsx";
+import { POST } from "../api/api.jsx";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import generateRandomID from "../components/GenerateID.jsx";
 
@@ -28,7 +28,6 @@ const Return = () => {
 
   const [address, setAddress] = useState("");
 
-  const copyFromOptions = ["Delivery"];
   const [copyFromModal, setCopyFromModal] = useState("");
   const [selectedProduct, setSelectedProduct] = useState();
   const [selectedCustomer, setSelectedCustomer] = useState("");
@@ -57,7 +56,12 @@ const Return = () => {
 
   // the products customer chose
   const [products, setProducts] = useState([]);
+  const [initialProducts, setInitialProducts] = useState([]);
+
   const [returnID, setReturnID] = useState("");
+  const returnMutation = useMutation({
+    mutationFn: async (data) => await POST("sales/return", data),
+  });
 
   const [deliveryInfo, setDeliveryInfo] = useState({
     customer_id: "",
@@ -84,6 +88,12 @@ const Return = () => {
 
     setProducts(
       products.filter(
+        (product) => product.product_id != selectedProduct.product_id
+      )
+    );
+
+    setInitialProducts(
+      initialProducts.filter(
         (product) => product.product_id != selectedProduct.product_id
       )
     );
@@ -117,6 +127,37 @@ const Return = () => {
       return;
     }
     // INSERT LOGIC HERE FOR RETURN
+    const request = {
+      return_data: {
+        delivery_note_id: deliveryInfo.delivery_note_id,
+        items: products.map((product, index) => {
+          const quantity =
+            initialProducts.length > 0
+              ? parseInt(initialProducts[index].quantity)
+              : parseInt(product.quantity);
+          const to_deliver = parseInt(product.quantity);
+          if (to_deliver > quantity) {
+            error = true;
+          }
+          return {
+            product: product.product_id,
+            quantity: parseInt(product.quantity),
+            quantity_to_deliver: parseInt(product.quantity),
+            unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
+            total_price: Number(parseFloat(product.total_price).toFixed(2)),
+            discount: Number(parseFloat(product.discount).toFixed(2)),
+            tax_amount: Number(parseFloat(product.tax).toFixed(2)),
+          };
+        }),
+      },
+      statement_data: {
+        customer: selectedCustomer.customer_id,
+        salesrep: selectedEmployee.employee_id,
+        total_amount: Number(parseFloat(deliveryInfo.total_price).toFixed(2)),
+        discount: Number(parseFloat(deliveryInfo.discount).toFixed(2)),
+        total_tax: Number(parseFloat(deliveryInfo.total_tax).toFixed(2)),
+      },
+    };
     showAlert({
       type: "success",
       title: "Return request submitted.",
@@ -129,7 +170,7 @@ const Return = () => {
     setDeliveryInfo({
       customer_id: "",
       order_id: "",
-      delivery_note_id: null,
+      delivery_note_id: "",
       selected_products: [],
       selected_address: "",
       selected_delivery_date: "",
@@ -141,6 +182,7 @@ const Return = () => {
     });
     setSelectedProduct(null);
     setCanEditList(false);
+    setSelectedEmployee(null);
   }, [selectedCustomer]);
 
   useEffect(() => {
@@ -180,7 +222,7 @@ const Return = () => {
     };
 
     setDeliveryInfo(delivery);
-  }, [products, selectedCustomer]);
+  }, [products]);
 
   useEffect(() => {
     setDeliveryInfo({
@@ -232,6 +274,7 @@ const Return = () => {
           customerID={selectedCustomer.customer_id}
           setDelivery={setDeliveryInfo}
           setProducts={setProducts}
+          setInitialProducts={setInitialProducts}
           setEditable={setCanEditList}
           selectedCustomer={selectedCustomer}
           setSelectedEmployee={setSelectedEmployee}
@@ -259,6 +302,7 @@ const Return = () => {
           <ReturnTable
             columns={columns}
             data={products}
+            initialProducts={initialProducts}
             updateData={setProducts}
             onSelect={setSelectedProduct}
             minWidth={true}

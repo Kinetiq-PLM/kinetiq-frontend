@@ -7,6 +7,7 @@ import { useAlert } from "./Context/AlertContext";
 const SalesTable = ({
   columns,
   data,
+  initialProducts,
   onSelect,
   onDataChange,
   minWidth = false,
@@ -83,7 +84,23 @@ const SalesTable = ({
       editingCell.columnKey === "quantity" &&
       newValue > Number(newData[rowIndex].stock_level)
     ) {
-      alert("Invalid quantity: Quantity must not exceed stock level.");
+      showAlert({
+        type: "error",
+        title: "Quantity must not exceed stock level.",
+      });
+      return;
+    }
+
+    if (
+      initialProducts &&
+      editingCell.columnKey === "quantity" &&
+      newValue > Number(initialProducts[rowIndex].quantity)
+    ) {
+      showAlert({
+        type: "error",
+        title:
+          "The product quantity cannot exceed the specified amount in the order.",
+      });
       return;
     }
 

@@ -75,17 +75,14 @@ const ReturnInfo = ({
       </div>
       <div className="w-full hidden xl:block"></div>
       <div className="h-full w-full flex flex-col items-center">
-        {customer.customer_id != undefined ? (
+        {customer ? (
           <InputDelivery
             label={"Delivery ID"}
             value={delivery.delivery_note_id}
             deliveredListModal={deliveredListModal}
           />
         ) : (
-          <Information
-            label={"Delivery ID"}
-            value={delivery.delivery_note_id}
-          />
+          <Information label={"Delivery ID"} value={""} />
         )}
 
         <Information label={"Date Delivered"} value={delivery.delivered_date} />

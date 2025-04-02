@@ -173,9 +173,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       return;
     }
     const order_id = selectedOrder ? selectedOrder.order_id : null;
-    let error = false;
-    console.log(initialProducts);
-    console.log(products);
     const request = {
       shipping_data: {
         order_id,
@@ -183,14 +180,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
         delivery_status: "Pending",
         preferred_delivery_date: deliveryDate,
         items: products.map((product, index) => {
-          const quantity =
-            initialProducts.length > 0
-              ? parseInt(initialProducts[index].quantity)
-              : parseInt(product.quantity);
-          const to_deliver = parseInt(product.quantity);
-          if (to_deliver > quantity) {
-            error = true;
-          }
           return {
             product: product.product_id,
             quantity: parseInt(product.quantity),
@@ -210,22 +199,13 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
         total_tax: Number(parseFloat(deliveryInfo.total_tax).toFixed(2)),
       },
     };
-    if (error) {
-      showAlert({
-        type: "error",
-        title: `Product quantities must not exceed those specified on the order.`,
-      });
-      console.log(request);
-    } else {
-      console.log(request);
-      deliveryMutation.mutate(request);
-      // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
-      setSubmitted(true);
-      showAlert({
-        type: "success",
-        title: "Delivery Submitted",
-      });
-    }
+    deliveryMutation.mutate(request);
+    // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
+    setSubmitted(true);
+    showAlert({
+      type: "success",
+      title: "Delivery Submitted",
+    });
   };
 
   const transferData = () => {
@@ -448,6 +428,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           <SalesTable
             columns={columns}
             data={products}
+            initialProducts={initialProducts}
             updateData={setProducts}
             onSelect={setSelectedProduct}
             minWidth={true}

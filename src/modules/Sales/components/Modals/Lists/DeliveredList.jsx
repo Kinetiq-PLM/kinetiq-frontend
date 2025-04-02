@@ -17,6 +17,7 @@ const DeliveredList = ({
   setDelivery,
   customerID,
   setProducts,
+  setInitialProducts,
   setEditable,
   selectedCustomer,
   setSelectedEmployee,
@@ -64,6 +65,7 @@ const DeliveredList = ({
       setDelivery(selectedDelivery); // Properly update the array
       setSelectedEmployee(selectedDelivery.statement.salesrep);
       setProducts(prods); // Set the selected products to the parent component
+      setInitialProducts(prods); // Set the selected products to the parent component
       onClose();
       showAlert({
         type: "success",
