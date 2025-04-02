@@ -9,23 +9,26 @@ import { useAlert } from "../../../Sales/components/Context/AlertContext.jsx";
 import { GET, PATCH } from "../../../Sales/api/api.jsx";
 
 import OpportunityInfo from "./../OpportunityInfo";
+import NewOpportunityModal from "./../NewOpportunityModal";
 
 export default function MainTab() {
   const { showAlert } = useAlert();
 
   const [canSave, setCanSave] = useState(false); // Save button state
 
-  const [contactList, setContactList] = useState([]); // Customers part of the campaign
+  const [opportunityList, setOpportunityList] = useState([]); // Customers part of the campaign
 
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+  const [isNewOpportunityModalOpen, setIsOpportunityModalOpen] =
+    useState(false);
   const [selectedContact, setSelectedContact] = useState(""); // table data that is selected
   const [selectedCustomer, setSelectedCustomer] = useState(""); // customer selected from modal
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
 
   const columns = [
     { key: "opportunity_id", label: "Opportunity ID" },
-    { key: "customer_id", label: "Description" },
-    { key: "description", label: "Customer ID" },
+    { key: "description", label: "Description" },
+    { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "start_date", label: "Start Date" },
     { key: "end_date", label: "End Date" },
@@ -39,7 +42,8 @@ export default function MainTab() {
 
   useEffect(() => {
     if (selectedCustomer) {
-      setContactList((prevList) => [...prevList, selectedCustomer]);
+      // setOpportunityList([]); // insert opportunity list here
+      setOpportunityList((prevList) => [...prevList, selectedCustomer]);
       setCanSave(true);
     }
   }, [selectedCustomer]);
@@ -53,8 +57,8 @@ export default function MainTab() {
       return;
     }
 
-    setContactList(
-      contactList.filter(
+    setOpportunityList(
+      opportunityList.filter(
         (contact) => contact.customer_id != selectedContact.customer_id
       )
     );
@@ -68,7 +72,7 @@ export default function MainTab() {
   };
 
   const handleSendMessage = () => {
-    if (contactList.length === 0) {
+    if (opportunityList.length === 0) {
       showAlert({
         type: "error",
         title: "Add contact.",
@@ -93,6 +97,11 @@ export default function MainTab() {
           onClose={() => setIsNewCustomerModalOpen(false)}
         ></NewCustomerModal>
 
+        <NewOpportunityModal
+          isOpen={isNewOpportunityModalOpen}
+          onClose={() => setIsOpportunityModalOpen(false)}
+        ></NewOpportunityModal>
+
         <div>
           <OpportunityInfo
             customerListModal={setIsCustomerListOpen}
@@ -102,7 +111,7 @@ export default function MainTab() {
         <div className="border border-[#CBCBCB] w-full min-h-[350px] rounded-md mt-2 table-layout overflow-auto">
           <Table
             onSelect={setSelectedContact}
-            data={contactList}
+            data={opportunityList}
             columns={columns}
           />
         </div>
@@ -113,24 +122,24 @@ export default function MainTab() {
               <div className="flex gap-2 flex-wrap ">
                 <Button
                   type="primary"
-                  onClick={() => setIsCustomerListOpen(true)}
+                  onClick={() => setIsOpportunityModalOpen(true)}
                 >
-                  Add Contact
+                  Create Opportunity
                 </Button>
                 <Button type="outline" onClick={() => handleDelete()}>
                   Remove
                 </Button>
               </div>
-              <div className="flex">
+              <div className="flex gap-2 flex-wrap">
                 <Button type="primary" onClick={handleSendMessage}>
-                  Send Message
+                  Reminders
                 </Button>
               </div>
             </div>
             <div>
               <div className="flex">
                 <Button type="primary" disabled={!canSave}>
-                  Save Campaign
+                  Save Changes
                 </Button>
               </div>
             </div>
