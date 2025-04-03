@@ -50,16 +50,18 @@ const OrderedProductList = ({
 
   useEffect(() => {
     if (order) {
-      const products = order.statement.items.map((item) => ({
-        product_id: item.product.product_id,
-        product_name: item.product.product_name,
-        quantity: Number(item.quantity),
-        selling_price: Number(item.unit_price),
-        discount: Number(item.discount),
-        tax: Number(item.tax_amount),
-        total_price: Number(item.total_price),
-        reason: "",
-      }));
+      const products = order.statement.items
+        .filter((item) => item.quantity - item.quantity_delivered !== 0)
+        .map((item) => ({
+          product_id: item.product.product_id,
+          product_name: item.product.product_name,
+          quantity: Number(item.quantity) - Number(item.quantity_delivered),
+          selling_price: Number(item.unit_price),
+          discount: Number(item.discount),
+          tax: Number(item.tax_amount),
+          total_price: Number(item.total_price),
+        }));
+
       setProductList(products);
     }
   }, [order]);

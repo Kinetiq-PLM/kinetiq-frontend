@@ -138,11 +138,15 @@ const SalesInfo = ({
   return (
     <section className="flex justify-between gap-6 flex-col md:flex-row">
       <div className="h-full w-full flex flex-col items-center">
-        <InputCustomer
-          label={"Customer"}
-          value={customer.customer_id}
-          customerListModal={customerListModal}
-        />
+        {type === "Delivery" ? (
+          <Information label={"Customer ID"} value={customer.customer_id} />
+        ) : (
+          <InputCustomer
+            label={"Customer"}
+            value={customer.customer_id}
+            customerListModal={customerListModal}
+          />
+        )}
         <Information label={"Name"} value={customer.name} />
         <Information label={"Country"} value={customer.country} />
         <Information label={"Number"} value={customer.phone_number} />

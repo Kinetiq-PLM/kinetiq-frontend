@@ -35,7 +35,7 @@ const DeliveredList = ({
     queryKey: ["deliveriesList"],
     queryFn: async () =>
       await GET(
-        `sales/delivery?delivery_status=Delivered&customer_id=${selectedCustomer.customer_id}`
+        `sales/delivery?shipment_status=Delivered&customer_id=${selectedCustomer.customer_id}`
       ),
     enabled: isOpen,
   });

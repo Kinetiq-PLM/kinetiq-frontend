@@ -69,7 +69,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
     { key: "quantity", label: "Quantity" },
-    { key: "selling_price", label: "Price" },
+    { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },
@@ -96,20 +96,18 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const copyFromMutation = useMutation({
     mutationFn: async (data) =>
       await GET(`sales/${data.transferOperation}/${data.transferID}`),
-    onSuccess: (data, variables, context) => {
-      const prods = data.statement.items.map((item) => {
-        console.log(item);
-        return {
+    onSuccess: async (data, variables, context) => {
+      const prods = data.statement.items
+        .filter((item) => item.quantity - item.quantity_delivered !== 0)
+        .map((item) => ({
           product_id: item.product.product_id,
           product_name: item.product.product_name,
-          quantity: Number(item.quantity),
+          quantity: Number(item.quantity) - Number(item.quantity_delivered),
           selling_price: Number(item.unit_price),
           discount: Number(item.discount),
           tax: Number(item.tax_amount),
           total_price: Number(item.total_price),
-        };
-      });
-      console.log(prods);
+        }));
 
       setProducts(prods);
       setInitialProducts(prods);
@@ -177,7 +175,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       shipping_data: {
         order_id,
         shipping_method: "Standard", // drop down needed
-        delivery_status: "Pending",
+        shipment_status: "Pending",
         preferred_delivery_date: deliveryDate,
         items: products.map((product, index) => {
           return {

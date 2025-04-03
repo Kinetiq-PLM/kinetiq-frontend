@@ -17,7 +17,7 @@ const DeliveryListModal = ({ isOpen, onClose, setDelivery }) => {
   const [selectedDelivery, setSelectedDelivery] = useState(null);
   const deliveryQuery = useQuery({
     queryKey: ["deliveriesList"],
-    queryFn: async () => await GET("sales/delivery?delivery_status=Delivered"),
+    queryFn: async () => await GET("sales/delivery?shipment_status=Delivered"),
   });
 
   // Filtered data is used to filter the data based on the search term

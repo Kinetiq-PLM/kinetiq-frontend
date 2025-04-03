@@ -104,7 +104,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
     { key: "quantity", label: "Quantity" },
-    { key: "selling_price", label: "Price" },
+    { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },

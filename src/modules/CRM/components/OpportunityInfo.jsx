@@ -123,7 +123,7 @@ const OpportunityInfo = ({ customerListModal, customer }) => {
           value={customer.customer_id}
           customerListModal={customerListModal}
         />
-        <Information label={"Contact Person"} value={customer.name} />
+        <Information label={"Contact Person"} value={customer.contact_person} />
       </div>
       <div className="w-full hidden xl:block"></div>
       <div className="h-full w-full flex flex-col items-center">
