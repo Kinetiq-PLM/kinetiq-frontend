@@ -37,7 +37,7 @@ const ReportModalInput = ({
 
 
         {/* Modal Header */}
-        <div className="modal-header flex justify-between items-center">
+        <div className="modal-header">
           <h2 className="text-lg font-semibold">Generate Financial Report</h2>
           <img
             className="cursor-pointer hover:scale-110"
@@ -51,7 +51,7 @@ const ReportModalInput = ({
         <div className="modal-body mt-4">
 
 
-          <div className="flex gap-x-10">
+          <div className="flex gap-x-10 max-sm:flex-col max-sm:gap-y-5 max-sm:items-end">
             {/* Start Date Input */}
             <div className="form-group">
               <label>Start Date*</label>
@@ -92,7 +92,7 @@ const ReportModalInput = ({
           />
 
           <label>Select Accounts*</label>
-          <div className="flex gap-10">
+          <div className="flex gap-10 max-sm:flex-col max-sm:gap-3">
             {/* Account Dropdown */}
             <div className="form-group">
               <Dropdown
