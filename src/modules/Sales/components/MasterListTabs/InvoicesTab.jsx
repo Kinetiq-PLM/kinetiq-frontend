@@ -17,6 +17,7 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
     { key: "delivery_note_id", label: "Delivery ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
+    { key: "delivery_status", label: "Delivery Status" },
     { key: "invoice_date", label: "Invoice Date" },
     { key: "total_amount", label: "Total Price" },
     { key: "total_amount_paid", label: "Amount Paid" },
@@ -78,6 +79,7 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
         customer_id: invoice.delivery_note.statement.customer.customer_id,
         customer_name: invoice.delivery_note.statement.customer.name,
         invoice_date: new Date(invoice.invoice_date).toLocaleString(),
+        delivery_status: invoice.delivery_note.shipment_status,
         total_amount: Number(invoice.total_amount).toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,

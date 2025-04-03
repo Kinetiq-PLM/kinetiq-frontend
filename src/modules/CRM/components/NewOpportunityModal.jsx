@@ -268,6 +268,8 @@ const NewOpportunityModal = ({
     setStatus("");
     setLostReason("");
     setGrossProfit("");
+    setEstimatedValue("");
+    setWeightedAmount("");
     setGrossProfitTotal("");
     setInterestLevel("");
     setIsValidationVisible(false);
