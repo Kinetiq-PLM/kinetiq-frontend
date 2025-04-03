@@ -98,22 +98,30 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       await GET(`sales/${data.transferOperation}/${data.transferID}`),
     onSuccess: async (data, variables, context) => {
       const prods = data.statement.items
-        .filter((item) => item.quantity - item.quantity_delivered !== 0)
+        .filter((item) => item.quantity - item.quantity_to_deliver !== 0)
         .map((item) => ({
           product_id: item.product.product_id,
           product_name: item.product.product_name,
-          quantity: Number(item.quantity) - Number(item.quantity_delivered),
+          quantity: Number(item.quantity) - Number(item.quantity_to_deliver),
           selling_price: Number(item.unit_price),
           discount: Number(item.discount),
           tax: Number(item.tax_amount),
           total_price: Number(item.total_price),
         }));
 
-      setProducts(prods);
-      setInitialProducts(prods);
-      setSelectedOrder(data);
-      setSelectedCustomer(data.statement.customer);
-      setSelectedEmployee(data.statement.salesrep);
+      if (prods.length === 0) {
+        showAlert({
+          type: "error",
+          title:
+            "Delivery notes have already been generated for all order items.",
+        });
+      } else {
+        setProducts(prods);
+        setInitialProducts(prods);
+        setSelectedOrder(data);
+        setSelectedCustomer(data.statement.customer);
+        setSelectedEmployee(data.statement.salesrep);
+      }
       localStorage.removeItem("TransferID");
       localStorage.removeItem("TransferOperation");
     },
