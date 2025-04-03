@@ -11,7 +11,6 @@ const BodyContent = () => {
     const [selectedItem, setSelectedItem] = useState(null); // State to manage the selected item/row sa table
     const [selectedWarehouse, setWarehouse] = useState("");
     const [selectedExpiry, setExpiry] = useState("");
-    const [filteredData, setFilteredData] = useState([])
 
     // Fetch data from Warehouse Transfers Django API
     useEffect(() => {
@@ -77,7 +76,7 @@ const BodyContent = () => {
 
 
 
-    // Filter Function for Warehouse Locations & Expiry
+    // Filter Functions for Warehouse Locations & Expiry
     
        // Filter function for expiry dates
        const filterByExpiry = (items, range) => {
@@ -91,17 +90,17 @@ const BodyContent = () => {
             if (isNaN(expiryDate)) return false;
 
             switch (range) {
-                case "Next 30 days":
+                case "Next 30 Days":
                     const in30Days = new Date();
                     in30Days.setDate(now.getDate() + 30);
                     return expiryDate >= now && expiryDate <= in30Days;
                 
-                case "Next 6 months":
+                case "Next 6 Months":
                     const in6Months = new Date();
                     in6Months.setMonth(now.getMonth() + 6);
                     return expiryDate >= now && expiryDate <= in6Months;
                 
-                case "Within this year":
+                case "Within this Year":
                     return expiryDate.getFullYear() === now.getFullYear();
                 
                 case "expired":
@@ -113,28 +112,20 @@ const BodyContent = () => {
         });
     };
 
+
     // Apply filters whenever criteria change
-    // Apply filters whenever criteria change
-    useEffect(() => {
-        if (activeTab !== "Warehouse") return;
+
+    const expiryFilteredData = filterByExpiry(warehouseItemsData, selectedExpiry);
+
+    const filteredData = expiryFilteredData.filter((item) => {
+        const warehouseMatch = selectedWarehouse ? item.warehouse_loc?.toLowerCase() === selectedWarehouse.toLowerCase() : true;
+        return warehouseMatch;
+    });
+
         
-        let result = warehouseItemsData;
-
-        // Apply warehouse filter
-        if (selectedWarehouse) {
-            result = result.filter(item => 
-                item.warehouse_loc && item.warehouse_loc.toLowerCase() === selectedWarehouse.toLowerCase()
-            );
-        }
-
-        // Apply expiry filter
-        if (selectedExpiry) {
-            result = filterByExpiry(result, selectedExpiry);
-        }
-
-        console.log("Filtered Data:", result); // Debugging
-        setFilteredData(result);
-    }, [selectedWarehouse, selectedExpiry, warehouseItemsData, activeTab]);
+    
+    
+    
 
 
     // Table Configurations per Active Tab
@@ -158,7 +149,10 @@ const BodyContent = () => {
         
     };
 
+    
+
     const activeConfig = stockFlowTableConfigs[activeTab];
+
 
     return (
         <div className="stockflow">
