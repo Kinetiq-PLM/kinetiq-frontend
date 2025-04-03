@@ -56,6 +56,15 @@ const CountryData = [
       { cityID: "25", city: "Frankfurt" },
     ],
   },
+  {
+    countryID: "6",
+    country: "Philippines",
+    cities: [
+      { cityID: "26", city: "Manila" },
+      { cityID: "27", city: "Cebu City" },
+      { cityID: "28", city: "Davao City" },
+    ],
+  },
 ];
 
 export { CountryData, CustomerTypes };

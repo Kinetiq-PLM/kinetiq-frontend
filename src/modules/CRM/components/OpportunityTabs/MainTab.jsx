@@ -71,11 +71,6 @@ export default function MainTab() {
   ];
 
   useEffect(() => {
-    if (selectedCustomer) {
-      // setOpportunityList([]); // insert opportunity list here
-      setOpportunityList((prevList) => [...prevList, selectedCustomer]);
-      setCanSave(true);
-    }
     customerOppQuery.refetch();
   }, [selectedCustomer]);
 
@@ -103,7 +98,6 @@ export default function MainTab() {
         interest_level: opp.interest_level,
         reason_lost: opp.reason_lost || "-",
       }));
-      console.log("hereeee");
       console.log(data);
       setOpportunityList(data);
     } else if (customerOppQuery.status === "error") {

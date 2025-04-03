@@ -77,8 +77,6 @@ const Invoice = ({ loadSubModule, setActiveSubModule }) => {
     date_issued: new Date().toISOString().split("T")[0],
     discount: 0,
     total_tax: 0,
-    shipping_fee: 0,
-    warranty_fee: 0,
     total_price: 0,
   });
 
@@ -149,22 +147,8 @@ const Invoice = ({ loadSubModule, setActiveSubModule }) => {
       0
     );
 
-    const shippingFee = products.length * 100;
-    const warrantyFee = products.reduce(
-      (acc, product) =>
-        acc +
-        ((product.markup_price - product.unit_price) *
-          product.quantity *
-          product.warranty_period) /
-          12,
-      0
-    );
     const totalPrice =
-      Number(totalBeforeDiscount) -
-      Number(totalDiscount) +
-      Number(totalTax) +
-      Number(shippingFee) +
-      Number(warrantyFee);
+      Number(totalBeforeDiscount) - Number(totalDiscount) + Number(totalTax);
 
     setOrderInfo((prevOrderInfo) => ({
       ...prevOrderInfo,
@@ -173,8 +157,6 @@ const Invoice = ({ loadSubModule, setActiveSubModule }) => {
       total_before_discount: totalBeforeDiscount,
       total_tax: Number(totalTax),
       discount: totalDiscount,
-      shipping_fee: shippingFee,
-      warranty_fee: Number(warrantyFee),
       total_price: Number(totalPrice),
     }));
   };
@@ -332,14 +314,6 @@ const Invoice = ({ loadSubModule, setActiveSubModule }) => {
             <InfoField
               label={"Discount"}
               value={Number(orderInfo.discount).toFixed(2)}
-            />
-            <InfoField
-              label={"Shipping"}
-              value={Number(orderInfo.shipping_fee).toFixed(2)}
-            />
-            <InfoField
-              label={"Warranty"}
-              value={Number(orderInfo.warranty_fee).toFixed(2)}
             />
             <InfoField
               label={"Tax"}
