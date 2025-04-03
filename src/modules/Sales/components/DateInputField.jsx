@@ -21,7 +21,7 @@ const DateInputField = ({
       </p>
       <div className="mt-2">
         <input
-          className="bg-[#F9FAFA] w-full py-2 px-3 rounded cursor-pointer"
+          className="bg-[#F7F7F7] w-full py-2 px-3 rounded cursor-pointer"
           type="date"
           value={value}
           onChange={(e) => setValue(e.target.value)}

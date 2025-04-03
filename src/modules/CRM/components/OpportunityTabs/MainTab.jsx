@@ -248,9 +248,6 @@ export default function MainTab() {
                   </Button>
                 </div>
               </div>
-              <div className="flex">
-                <Button type="primary">Reminders</Button>
-              </div>
             </div>
           </div>
         </section>

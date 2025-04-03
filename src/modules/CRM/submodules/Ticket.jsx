@@ -162,13 +162,14 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
           <Button
             type="primary"
             onClick={handleSubmit}
+            className={"mt-8"}
             disabled={
               subject && description && selectedEmployee && selectedCustomer
                 ? false
                 : true
             }
           >
-            Submit
+            Submit Ticket
           </Button>
         </main>
       </div>
