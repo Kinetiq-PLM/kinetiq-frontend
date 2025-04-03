@@ -34,6 +34,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
     { key: "product_id", label: "Product ID" },
     { key: "product_name", label: "Name" }, // Company Name
     { key: "stock_level", label: "Stock" }, // Country
+    { key: "demand_level", label: "Demand Level" }, // Country
   ];
 
   const handleConfirm = () => {
