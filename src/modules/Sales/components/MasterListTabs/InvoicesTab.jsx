@@ -30,6 +30,7 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
   const invoiceQuery = useQuery({
     queryKey: ["invoices"],
     queryFn: async () => await GET("sales/invoice"),
+    refetchInterval: 5000,
   });
 
   const dateFilters = [

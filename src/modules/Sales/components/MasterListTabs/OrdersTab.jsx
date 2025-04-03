@@ -4,7 +4,8 @@ import Dropdown from "../Dropdown";
 import Button from "../Button";
 import ORDER_LIST_DATA from "../../temp_data/order_list_data";
 import { useQuery } from "@tanstack/react-query";
-import { GET } from "../../api/api";
+import { BASE_API_URL, GET } from "../../api/api";
+
 export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
@@ -25,6 +26,7 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
     { key: "total_price", label: "Total Price" },
     { key: "salesrep", label: "Sales Representative" }, // name of salesrep if available
     { key: "order_date", label: "Date Issued" },
+    { key: "document", label: "Document" },
   ];
 
   const dateFilters = [
@@ -81,6 +83,7 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),
         order_date: new Date(order.order_date).toLocaleString(),
+        document: `${BASE_API_URL}sales/order/${order.order_id}/document`,
       }));
       setOrderList(data);
     }
