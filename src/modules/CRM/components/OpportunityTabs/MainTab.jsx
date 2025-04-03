@@ -50,7 +50,6 @@ export default function MainTab() {
     if (selectedCustomer) {
       // setOpportunityList([]); // insert opportunity list here
       setOpportunityList((prevList) => [...prevList, selectedCustomer]);
-      setCanSave(true);
     }
   }, [selectedCustomer]);
 
@@ -159,13 +158,10 @@ export default function MainTab() {
                   Delete Opportunity
                 </Button>
               </div>
-              <div className="flex">
-                <Button type="primary">Reminders</Button>
-              </div>
             </div>
             <div>
               <div className="flex">
-                <Button type="primary" disabled={canSave}>
+                <Button type="primary" disabled={!canSave}>
                   Save Changes
                 </Button>
               </div>
