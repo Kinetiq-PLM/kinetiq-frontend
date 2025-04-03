@@ -12,7 +12,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [quotationList, setQuotationList] = useState([]);
-  const [filteredQuotations, setFilteredQuotations] = useState([]);
+  // const [filteredQuotations, setFilteredQuotations] = useState([]);
 
   const quotationQuery = useQuery({
     queryKey: ["quotations"],
@@ -73,29 +73,26 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
     }
   }, [quotationQuery.data]);
 
-  useEffect(() => {
-    const filteredQuotations = quotationList.filter((quotation) => {
-      // Filter by search term
-      if (searchTerm) {
-        const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
-        if (!fieldValue.includes(searchTerm.toLowerCase())) return false;
-      }
+  const filteredQuotations = quotationList.filter((quotation) => {
+    // Filter by search term
+    if (searchTerm) {
+      const fieldValue = quotation[searchBy]?.toString().toLowerCase() || "";
+      if (!fieldValue.includes(searchTerm.toLowerCase())) return false;
+    }
 
-      // Filter by date (assuming date_issued is in YYYY-MM-DD format)
-      if (dateFilter !== "All Time") {
-        const today = new Date();
-        const pastDate = new Date();
-        const days = parseInt(dateFilter.match(/\d+/)[0], 10); // Extract number from filter
-        pastDate.setDate(today.getDate() - days);
+    // Filter by date (assuming date_issued is in YYYY-MM-DD format)
+    if (dateFilter !== "All Time") {
+      const today = new Date();
+      const pastDate = new Date();
+      const days = parseInt(dateFilter.match(/\d+/)[0], 10); // Extract number from filter
+      pastDate.setDate(today.getDate() - days);
 
-        const issuedDate = new Date(quotation.date_issued);
-        if (issuedDate < pastDate) return false;
-      }
+      const issuedDate = new Date(quotation.date_issued);
+      if (issuedDate < pastDate) return false;
+    }
 
-      return true;
-    });
-    setFilteredQuotations(filteredQuotations);
-  }, [quotationList]);
+    return true;
+  });
 
   return (
     <section className="h-full">
