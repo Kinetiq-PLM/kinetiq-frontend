@@ -5,18 +5,24 @@ import Button from "../../../Sales/components/Button";
 import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
 import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
+import { useAlert } from "../../../Sales/components/Context/AlertContext";
 
 export default function OpportunityTab({ setActiveTab }) {
+  const showAlert = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [customers, setCustomers] = useState([]);
+  const opportunityQuery = useQuery({
+    queryKey: ["opportunities"],
+    queryFn: async () => await GET("crm/opportunities"),
+  });
 
   const columns = [
     { key: "opportunity_id", label: "Opportunity ID" },
-    { key: "customer_id", label: "Description" },
-    { key: "description", label: "Customer ID" },
+    { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
+    { key: "description", label: "Description" },
     { key: "start_date", label: "Start Date" },
     { key: "end_date", label: "End Date" },
     { key: "stage", label: "Stage" },
@@ -64,6 +70,42 @@ export default function OpportunityTab({ setActiveTab }) {
     console.log("CLICKED");
   };
 
+  useEffect(() => {
+    if (opportunityQuery.status === "success") {
+      const data = opportunityQuery.data.map((opp) => ({
+        ...opp,
+        opportunity_id: opp.opportunity_id,
+        description: opp.description,
+        customer_id: opp.customer.customer_id,
+        customer_name: opp.customer.name,
+        start_date: new Date(opp.starting_date).toLocaleString(),
+        end_date: new Date(opp.expected_closed_date).toLocaleDateString(),
+        stage: opp.stage,
+        status: opp.status,
+        estimated_value: Number(opp.estimated_value).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        gross_profit_total: Number(opp.gross_profit_total).toLocaleString(
+          "en-US",
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }
+        ),
+        interest_level: opp.interest_level,
+        reason_lost: opp.reason_lost || "-",
+      }));
+      setCustomers(data);
+    } else if (opportunityQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title:
+          "An error occurred while fetching data: " +
+          opportunityQuery.error.message,
+      });
+    }
+  }, [opportunityQuery.data]);
   return (
     <section className="h-full">
       {/* Header Section */}

@@ -11,11 +11,18 @@ import Dropdown from "../../Sales/components/Dropdown.jsx";
 import Dropup from "../../Sales/components/Dropup.jsx";
 import TextField from "./TextField.jsx";
 
-import { POST } from "../../Sales/api/api.jsx";
+import { PATCH } from "../../Sales/api/api.jsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import NumberInputField from "../../Sales/components/NumberInputField.jsx";
 
-const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
+const OpportunityModal = ({
+  isOpen,
+  onClose,
+  setCanSave,
+  selectedCustomer,
+  selectedEmployee,
+  details,
+}) => {
   const { showAlert } = useAlert();
 
   const modalRef = useRef(null);
@@ -25,16 +32,35 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
   const stages = ["Prospecting", "Negotiation", "Closed"];
   const statuses = ["Open", "Won", "Lost"];
   const interestLevels = ["Very High", "High", "Medium", "Low"];
-
+  const queryClient = useQueryClient();
   const [description, setDescription] = useState("");
   const [lostReason, setLostReason] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [stage, setStage] = useState("");
   const [status, setStatus] = useState("");
+  const [estimatedValue, setEstimatedValue] = useState("");
+  const [weightedAmount, setWeightedAmount] = useState("");
   const [grossProfit, setGrossProfit] = useState("");
   const [grossProfitTotal, setGrossProfitTotal] = useState("");
   const [interestLevel, setInterestLevel] = useState("");
+  const opportunityMutation = useMutation({
+    mutationFn: async (data) =>
+      await PATCH(`crm/opportunities/${details.opportunity_id}/`, data),
+    onSuccess: (data) => {
+      queryClient.refetchQueries(["customerOpps"]);
+      showAlert({
+        type: "success",
+        title: "Opportunity updated.",
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title: "An error occurred while updating opportunity: " + error.message,
+      });
+    },
+  });
   // ========== DATA ==========
 
   const [isValidationVisible, setIsValidationVisible] = useState(false);
@@ -46,8 +72,10 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
       validateStartDate,
       validateEndDate,
       validateStatus,
+      validateEstimatedValue,
+      validateWeightedAmount,
       validateGrossProfit,
-      validateGrossProfitTotal,
+      // validateGrossProfitTotal,
       validateLevelOfInterest,
     ];
 
@@ -62,21 +90,38 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
 
     if (errorCount === 0) {
       // Reset form fields
+      const request = {
+        customer: selectedCustomer.customer_id,
+        partner: selectedCustomer.partner.partner_id,
+        salesrep: selectedEmployee.employee_id,
+        starting_date: startDate,
+        expected_closed_date: endDate,
+        estimated_value: Number(estimatedValue.replace(",", "")),
+        weighted_amount: Number(weightedAmount),
+        gross_profit_percentage: Number(grossProfit),
+        gross_profit_total: Number(grossProfitTotal),
+        stage,
+        status,
+        description,
+        interest_level: interestLevel,
+        reason_lost: lostReason,
+      };
+
+      opportunityMutation.mutate(request);
       setDescription("");
       setStartDate("");
       setEndDate("");
       setStage("");
       setStatus("");
+      setEstimatedValue("");
+      setWeightedAmount("");
       setGrossProfit("");
       setGrossProfitTotal("");
       setInterestLevel("");
       setIsValidationVisible(false);
 
-      showAlert({
-        type: "success",
-        title: "Opportunity modified.",
-      });
       setCanSave(true);
+
       onClose();
     } else {
       setIsValidationVisible(true);
@@ -110,6 +155,18 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
     return "";
   };
 
+  const validateEstimatedValue = () => {
+    if (!estimatedValue.trim()) {
+      return "Estimated Value is required.";
+    }
+    return "";
+  };
+  const validateWeightedAmount = () => {
+    if (!weightedAmount.trim()) {
+      return "Weighted Amount is required.";
+    }
+    return "";
+  };
   const validateGrossProfit = () => {
     if (!grossProfit.trim()) {
       return "Gross Profit is required.";
@@ -117,12 +174,12 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
     return "";
   };
 
-  const validateGrossProfitTotal = () => {
-    if (!grossProfitTotal.trim()) {
-      return "Gross Profit Total is required.";
-    }
-    return "";
-  };
+  // const validateGrossProfitTotal = () => {
+  //   if (!grossProfitTotal.trim()) {
+  //     return "Gross Profit Total is required.";
+  //   }
+  //   return "";
+  // };
 
   const validateLevelOfInterest = () => {
     if (!interestLevel.trim()) {
@@ -208,18 +265,39 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    setDescription("");
-    setStartDate("");
-    setEndDate("");
-    setStage("");
-    setStatus("");
-    setLostReason("");
-    setGrossProfit("");
-    setGrossProfitTotal("");
-    setInterestLevel("");
+    if (details) {
+      setDescription(details.description);
+      setStartDate(new Date(details.starting_date).toISOString().split("T")[0]);
+      setEndDate(details.expected_closed_date);
+      setStage(details.stage);
+      setStatus(details.status);
+      setLostReason(details.reason_lost);
+      setGrossProfit(details.gross_profit_percentage.replace(".00", ""));
+      // setGrossProfitTotal(details.gross_profit_total);
+      setEstimatedValue(details.estimated_value);
+      setWeightedAmount(details.weighted_amount);
+      setInterestLevel(details.interest_level);
+    } else {
+      setDescription("");
+      setStartDate("");
+      setEndDate("");
+      setStage("");
+      setEstimatedValue("");
+      setWeightedAmount("");
+      setStatus("");
+      setLostReason("");
+      setGrossProfit("");
+      setGrossProfitTotal("");
+      setInterestLevel("");
+    }
     setIsValidationVisible(false);
   }, [isOpen]);
 
+  useEffect(() => {
+    setGrossProfitTotal(
+      Number(estimatedValue.replace(",", "")) * (Number(grossProfit) / 100)
+    );
+  }, [grossProfit, estimatedValue]);
   if (!isOpen) return null;
 
   return (
@@ -238,7 +316,7 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            Modify Opportunity
+            Update Opportunity
           </h2>
         </div>
 
@@ -256,7 +334,7 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
         <div className="px-6 mt-4">
           <form action="" className="space-y-4 mb-6">
             <InputField
-              label={"Decription"}
+              label={"Description"}
               value={description}
               setValue={setDescription}
               validation={validateDescription}
@@ -309,6 +387,22 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
 
             <div className="flex gap-2">
               <NumberInputField
+                label={"Estimated Value"}
+                value={estimatedValue}
+                setValue={setEstimatedValue}
+                validation={validateEstimatedValue}
+                isValidationVisible={isValidationVisible}
+              />
+              <NumberInputField
+                label={"Weighted Amount"}
+                value={weightedAmount}
+                setValue={setWeightedAmount}
+                validation={validateWeightedAmount}
+                isValidationVisible={isValidationVisible}
+              />
+            </div>
+            <div className="flex gap-2">
+              <NumberInputField
                 label={"Gross Profit %"}
                 value={grossProfit}
                 setValue={setGrossProfit}
@@ -319,9 +413,7 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
               <NumberInputField
                 label={"Gross Profit Total"}
                 value={grossProfitTotal}
-                setValue={setGrossProfitTotal}
-                validation={validateGrossProfitTotal}
-                isValidationVisible={isValidationVisible}
+                disabled={true}
               />
             </div>
             <Dropup
@@ -342,7 +434,7 @@ const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
                 onClick={handleConfirm}
                 submit={true}
               >
-                Create
+                Update
               </Button>
             </div>
             <div>

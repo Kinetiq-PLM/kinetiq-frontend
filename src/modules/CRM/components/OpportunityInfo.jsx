@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-const InputCustomer = ({ label, value = "", customerListModal }) => {
+export const InputCustomer = ({ label, value = "", customerListModal }) => {
   return (
     <div className="flex justify-between mb-2 w-full">
       <p className="flex-1 text-sm">{label}</p>
@@ -114,7 +114,12 @@ const DateSelector = ({ label, customer, setDeliveryDate }) => {
   );
 };
 
-const OpportunityInfo = ({ customerListModal, customer }) => {
+const OpportunityInfo = ({
+  customerListModal,
+  customer,
+  employeeListModal,
+  employee,
+}) => {
   return (
     <section className="flex justify-between gap-6 flex-col md:flex-row">
       <div className="h-full w-full flex flex-col items-center">
@@ -130,6 +135,7 @@ const OpportunityInfo = ({ customerListModal, customer }) => {
         <Information label={"Number"} value={customer.phone_number} />
         <Information label={"Email"} value={customer.email_address} />
       </div>
+      {/* Employee ID Input */}
     </section>
   );
 };

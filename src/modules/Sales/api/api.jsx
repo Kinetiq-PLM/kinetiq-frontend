@@ -23,3 +23,10 @@ export async function PATCH(endpoint, data) {
   });
   return await res.json();
 }
+
+export async function DELETE(endpoint) {
+  const res = await fetch(BASE_API_URL + endpoint, {
+    method: "DELETE",
+  });
+  return res.ok;
+}
