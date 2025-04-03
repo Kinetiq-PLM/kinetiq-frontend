@@ -9,7 +9,7 @@ const Button = ({
   submit = false,
 }) => {
   let styling =
-    "py-1 px-6 font-medium transition-all duration-300 ease-in-out transform";
+    "h-[38px] py-1 px-6 font-medium transition-all duration-300 ease-in-out transform";
 
   if (type === "primary") {
     styling +=

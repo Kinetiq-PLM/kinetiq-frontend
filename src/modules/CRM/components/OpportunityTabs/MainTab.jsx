@@ -10,6 +10,8 @@ import { GET, PATCH } from "../../../Sales/api/api.jsx";
 
 import OpportunityInfo from "./../OpportunityInfo";
 import NewOpportunityModal from "./../NewOpportunityModal";
+import OpportunityModal from "../OpportunityModal.jsx";
+import ConfirmDelete from "./../ConfirmDelete";
 
 export default function MainTab() {
   const { showAlert } = useAlert();
@@ -19,9 +21,13 @@ export default function MainTab() {
   const [opportunityList, setOpportunityList] = useState([]); // Customers part of the campaign
 
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
-  const [isNewOpportunityModalOpen, setIsOpportunityModalOpen] =
+  const [isNewOpportunityModalOpen, setIsNewOpportunityModalOpen] =
     useState(false);
-  const [selectedContact, setSelectedContact] = useState(""); // table data that is selected
+  const [isOpportunityModalOpen, setIsOpportunityModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // Confirm delete modal state
+  const [isConfirmedDelete, setIsConfirmedDelete] = useState(false); // Confirm delete state
+
+  const [selectedOpportunity, setSelectedOpportunity] = useState(""); // table data that is selected
   const [selectedCustomer, setSelectedCustomer] = useState(""); // customer selected from modal
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
 
@@ -49,35 +55,29 @@ export default function MainTab() {
   }, [selectedCustomer]);
 
   const handleDelete = () => {
-    if (selectedContact === "") {
+    if (selectedOpportunity === "") {
       showAlert({
         type: "error",
-        title: "Select a contact to remove.",
+        title: "Select an opportunity to remove.",
       });
       return;
     }
 
     setOpportunityList(
       opportunityList.filter(
-        (contact) => contact.customer_id != selectedContact.customer_id
+        //(opportunity) => opportunity.opportunity_id != selectedOpportunity.opportunity_id
+        (opportunity) =>
+          opportunity.customer_id != selectedOpportunity.customer_id
       )
     );
-    setCanSave(true);
-    setSelectedContact("");
+    setSelectedOpportunity("");
 
     showAlert({
       type: "success",
-      title: "Contact removed.",
+      title: "Opportunity removed.",
     });
-  };
-
-  const handleSendMessage = () => {
-    if (opportunityList.length === 0) {
-      showAlert({
-        type: "error",
-        title: "Add contact.",
-      });
-    }
+    setCanSave(true);
+    setIsConfirmedDelete(false);
   };
 
   return (
@@ -97,10 +97,25 @@ export default function MainTab() {
           onClose={() => setIsNewCustomerModalOpen(false)}
         ></NewCustomerModal>
 
+        {/** Opportunity edit */}
+        <OpportunityModal
+          isOpen={isOpportunityModalOpen}
+          onClose={() => setIsOpportunityModalOpen(false)}
+          opportunityID={selectedOpportunity.opportunity_id}
+          setCanSave={setCanSave}
+        ></OpportunityModal>
+
         <NewOpportunityModal
           isOpen={isNewOpportunityModalOpen}
-          onClose={() => setIsOpportunityModalOpen(false)}
+          onClose={() => setIsNewOpportunityModalOpen(false)}
+          setCanSave={setCanSave}
         ></NewOpportunityModal>
+
+        <ConfirmDelete
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          handleDelete={handleDelete}
+        ></ConfirmDelete>
 
         <div>
           <OpportunityInfo
@@ -110,7 +125,7 @@ export default function MainTab() {
         </div>
         <div className="border border-[#CBCBCB] w-full min-h-[350px] rounded-md mt-2 table-layout overflow-auto">
           <Table
-            onSelect={setSelectedContact}
+            onSelect={setSelectedOpportunity}
             data={opportunityList}
             columns={columns}
           />
@@ -122,23 +137,35 @@ export default function MainTab() {
               <div className="flex gap-2 flex-wrap ">
                 <Button
                   type="primary"
-                  onClick={() => setIsOpportunityModalOpen(true)}
+                  onClick={() => setIsNewOpportunityModalOpen(true)}
+                  disabled={!selectedCustomer}
                 >
-                  Create Opportunity
+                  New Opportunity
                 </Button>
-                <Button type="outline" onClick={() => handleDelete()}>
-                  Remove
+
+                <Button
+                  type="primary"
+                  onClick={() => setIsOpportunityModalOpen(true)}
+                  disabled={!selectedOpportunity}
+                >
+                  Modify Opportunity
+                </Button>
+
+                <Button
+                  type="outline"
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  disabled={!selectedOpportunity}
+                >
+                  Delete Opportunity
                 </Button>
               </div>
-              <div className="flex gap-2 flex-wrap">
-                <Button type="primary" onClick={handleSendMessage}>
-                  Reminders
-                </Button>
+              <div className="flex">
+                <Button type="primary">Reminders</Button>
               </div>
             </div>
             <div>
               <div className="flex">
-                <Button type="primary" disabled={!canSave}>
+                <Button type="primary" disabled={canSave}>
                   Save Changes
                 </Button>
               </div>

@@ -15,7 +15,7 @@ import { POST } from "../../Sales/api/api.jsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import NumberInputField from "../../Sales/components/NumberInputField.jsx";
 
-const NewOpportunityModal = ({ isOpen, onClose, setCanSave }) => {
+const OpportunityModal = ({ isOpen, onClose, setCanSave }) => {
   const { showAlert } = useAlert();
 
   const modalRef = useRef(null);
@@ -74,10 +74,9 @@ const NewOpportunityModal = ({ isOpen, onClose, setCanSave }) => {
 
       showAlert({
         type: "success",
-        title: "Opportunity created.",
+        title: "Opportunity modified.",
       });
       setCanSave(true);
-
       onClose();
     } else {
       setIsValidationVisible(true);
@@ -239,7 +238,7 @@ const NewOpportunityModal = ({ isOpen, onClose, setCanSave }) => {
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            Create Opportunity
+            Modify Opportunity
           </h2>
         </div>
 
@@ -358,4 +357,4 @@ const NewOpportunityModal = ({ isOpen, onClose, setCanSave }) => {
   );
 };
 
-export default NewOpportunityModal;
+export default OpportunityModal;
