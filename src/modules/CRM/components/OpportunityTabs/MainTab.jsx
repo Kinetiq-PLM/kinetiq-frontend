@@ -207,12 +207,12 @@ export default function MainTab() {
             columns={columns}
           />
         </div>
-        <section className="mt-4 flex justify-between flex-col lg:flex-row space-x-4">
-          <div className="h-full flex flex-col gap-3 w-full justify-between">
+        <section className="mt-4 flex justify-end flex-col lg:flex-row space-x-4">
+          <div className="h-full flex flex-col gap-3 w-full">
             {/* Buttons Row 1*/}
             <div className="flex flex-row flex-wrap justify-between mb-20 sm:mb-10 gap-2">
               <div className="flex flex-col">
-                <div className="flex mb-4 w-xs gap-4 items-center">
+                <div className="flex mb-8 w-xs gap-4 items-center">
                   <p className="">Employee ID</p>
                   <div
                     className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
@@ -256,13 +256,6 @@ export default function MainTab() {
               </div>
               <div className="flex">
                 <Button type="primary">Reminders</Button>
-              </div>
-            </div>
-            <div>
-              <div className="flex">
-                <Button type="primary" disabled={canSave}>
-                  Save Changes
-                </Button>
               </div>
             </div>
           </div>
