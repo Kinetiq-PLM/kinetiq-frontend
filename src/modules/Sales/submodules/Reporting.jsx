@@ -58,13 +58,17 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
 
   useEffect(() => {
     if (salesQuery.status === "success") {
-      const data = salesQuery.data.data.map((sale) => ({
-        date: new Date(sale.date),
-        quotations: sale.quotations,
-        orders: sale.orders,
-        invoices: sale.invoices,
-        deliveries: sale.deliveries,
-      }));
+      const data = salesQuery.data.data.map((sale) => {
+        console.log(sale.date, new Date(sale.date));
+        return {
+          date: new Date(sale.date),
+          quotations: sale.quotations,
+          orders: sale.orders,
+          invoices: sale.invoices,
+          deliveries: sale.deliveries,
+        };
+      });
+      console.log(data);
       setSalesReportData(data);
       setTotalOperations(salesQuery.data.total);
     }
@@ -121,7 +125,10 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                 {
                   dataKey: "date",
                   scaleType: "time",
-                  valueFormatter: (value) => value.toLocaleDateString(),
+                  valueFormatter: (value) =>
+                    profitPeriod === "day"
+                      ? value.toLocaleString().split(",")[1]
+                      : value.toLocaleDateString(),
                 },
               ]}
               series={[{ dataKey: "profit" }]}
@@ -199,7 +206,10 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                 {
                   dataKey: "date",
                   scaleType: "time",
-                  valueFormatter: (value) => value.toLocaleDateString(),
+                  valueFormatter: (value) =>
+                    salesPeriod === "day"
+                      ? value.toLocaleString().split(",")[1]
+                      : value.toLocaleDateString(),
                 },
               ]}
               series={[

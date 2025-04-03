@@ -273,7 +273,7 @@ const OpportunityModal = ({
       setStatus(details.status);
       setLostReason(details.reason_lost);
       setGrossProfit(details.gross_profit_percentage.replace(".00", ""));
-      // setGrossProfitTotal(details.gross_profit_total);
+      setGrossProfitTotal(details.gross_profit_total);
       setEstimatedValue(details.estimated_value);
       setWeightedAmount(details.weighted_amount);
       setInterestLevel(details.interest_level);
@@ -294,9 +294,11 @@ const OpportunityModal = ({
   }, [isOpen]);
 
   useEffect(() => {
-    setGrossProfitTotal(
-      Number(estimatedValue.replace(",", "")) * (Number(grossProfit) / 100)
-    );
+    if (isOpen && grossProfit && estimatedValue) {
+      setGrossProfitTotal(
+        Number(estimatedValue.replace(",", "")) * (Number(grossProfit) / 100)
+      );
+    }
   }, [grossProfit, estimatedValue]);
   if (!isOpen) return null;
 
