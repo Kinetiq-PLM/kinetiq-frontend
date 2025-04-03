@@ -9,23 +9,32 @@ import { useAlert } from "../../../Sales/components/Context/AlertContext.jsx";
 import { GET, PATCH } from "../../../Sales/api/api.jsx";
 
 import OpportunityInfo from "./../OpportunityInfo";
+import NewOpportunityModal from "./../NewOpportunityModal";
+import OpportunityModal from "../OpportunityModal.jsx";
+import ConfirmDelete from "./../ConfirmDelete";
 
 export default function MainTab() {
   const { showAlert } = useAlert();
 
   const [canSave, setCanSave] = useState(false); // Save button state
 
-  const [contactList, setContactList] = useState([]); // Customers part of the campaign
+  const [opportunityList, setOpportunityList] = useState([]); // Customers part of the campaign
 
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
-  const [selectedContact, setSelectedContact] = useState(""); // table data that is selected
+  const [isNewOpportunityModalOpen, setIsNewOpportunityModalOpen] =
+    useState(false);
+  const [isOpportunityModalOpen, setIsOpportunityModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // Confirm delete modal state
+  const [isConfirmedDelete, setIsConfirmedDelete] = useState(false); // Confirm delete state
+
+  const [selectedOpportunity, setSelectedOpportunity] = useState(""); // table data that is selected
   const [selectedCustomer, setSelectedCustomer] = useState(""); // customer selected from modal
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
 
   const columns = [
     { key: "opportunity_id", label: "Opportunity ID" },
-    { key: "customer_id", label: "Description" },
-    { key: "description", label: "Customer ID" },
+    { key: "description", label: "Description" },
+    { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "start_date", label: "Start Date" },
     { key: "end_date", label: "End Date" },
@@ -39,41 +48,36 @@ export default function MainTab() {
 
   useEffect(() => {
     if (selectedCustomer) {
-      setContactList((prevList) => [...prevList, selectedCustomer]);
+      // setOpportunityList([]); // insert opportunity list here
+      setOpportunityList((prevList) => [...prevList, selectedCustomer]);
       setCanSave(true);
     }
   }, [selectedCustomer]);
 
   const handleDelete = () => {
-    if (selectedContact === "") {
+    if (selectedOpportunity === "") {
       showAlert({
         type: "error",
-        title: "Select a contact to remove.",
+        title: "Select an opportunity to remove.",
       });
       return;
     }
 
-    setContactList(
-      contactList.filter(
-        (contact) => contact.customer_id != selectedContact.customer_id
+    setOpportunityList(
+      opportunityList.filter(
+        //(opportunity) => opportunity.opportunity_id != selectedOpportunity.opportunity_id
+        (opportunity) =>
+          opportunity.customer_id != selectedOpportunity.customer_id
       )
     );
-    setCanSave(true);
-    setSelectedContact("");
+    setSelectedOpportunity("");
 
     showAlert({
       type: "success",
-      title: "Contact removed.",
+      title: "Opportunity removed.",
     });
-  };
-
-  const handleSendMessage = () => {
-    if (contactList.length === 0) {
-      showAlert({
-        type: "error",
-        title: "Add contact.",
-      });
-    }
+    setCanSave(true);
+    setIsConfirmedDelete(false);
   };
 
   return (
@@ -93,6 +97,26 @@ export default function MainTab() {
           onClose={() => setIsNewCustomerModalOpen(false)}
         ></NewCustomerModal>
 
+        {/** Opportunity edit */}
+        <OpportunityModal
+          isOpen={isOpportunityModalOpen}
+          onClose={() => setIsOpportunityModalOpen(false)}
+          opportunityID={selectedOpportunity.opportunity_id}
+          setCanSave={setCanSave}
+        ></OpportunityModal>
+
+        <NewOpportunityModal
+          isOpen={isNewOpportunityModalOpen}
+          onClose={() => setIsNewOpportunityModalOpen(false)}
+          setCanSave={setCanSave}
+        ></NewOpportunityModal>
+
+        <ConfirmDelete
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          handleDelete={handleDelete}
+        ></ConfirmDelete>
+
         <div>
           <OpportunityInfo
             customerListModal={setIsCustomerListOpen}
@@ -101,8 +125,8 @@ export default function MainTab() {
         </div>
         <div className="border border-[#CBCBCB] w-full min-h-[350px] rounded-md mt-2 table-layout overflow-auto">
           <Table
-            onSelect={setSelectedContact}
-            data={contactList}
+            onSelect={setSelectedOpportunity}
+            data={opportunityList}
             columns={columns}
           />
         </div>
@@ -113,24 +137,36 @@ export default function MainTab() {
               <div className="flex gap-2 flex-wrap ">
                 <Button
                   type="primary"
-                  onClick={() => setIsCustomerListOpen(true)}
+                  onClick={() => setIsNewOpportunityModalOpen(true)}
+                  disabled={!selectedCustomer}
                 >
-                  Add Contact
+                  New Opportunity
                 </Button>
-                <Button type="outline" onClick={() => handleDelete()}>
-                  Remove
+
+                <Button
+                  type="primary"
+                  onClick={() => setIsOpportunityModalOpen(true)}
+                  disabled={!selectedOpportunity}
+                >
+                  Modify Opportunity
+                </Button>
+
+                <Button
+                  type="outline"
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  disabled={!selectedOpportunity}
+                >
+                  Delete Opportunity
                 </Button>
               </div>
               <div className="flex">
-                <Button type="primary" onClick={handleSendMessage}>
-                  Send Message
-                </Button>
+                <Button type="primary">Reminders</Button>
               </div>
             </div>
             <div>
               <div className="flex">
-                <Button type="primary" disabled={!canSave}>
-                  Save Campaign
+                <Button type="primary" disabled={canSave}>
+                  Save Changes
                 </Button>
               </div>
             </div>

@@ -10,6 +10,7 @@ import DateInputField from "../../Sales/components/DateInputField.jsx";
 import Dropdown from "../../Sales/components/Dropdown.jsx";
 import { POST } from "../../Sales/api/api.jsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 const NewCampaignModal = ({ isOpen, onClose }) => {
   const { showAlert } = useAlert();
 
