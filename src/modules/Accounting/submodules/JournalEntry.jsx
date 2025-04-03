@@ -23,14 +23,18 @@ const JournalEntry = () => {
     });
 
     const handleInputChange = (index, field, value) => {
+        // Remove commas from input before storing in state
+        const sanitizedValue = value.replace(/,/g, '');
+
         setJournalForm((prevState) => {
             const updatedTransactions = prevState.transactions.map((entry, i) =>
-                i === index ? { ...entry, [field]: value } : entry
+                i === index ? { ...entry, [field]: sanitizedValue } : entry
             );
             updateTotals(updatedTransactions);
             return { ...prevState, transactions: updatedTransactions };
         });
     };
+
 
     const addEntry = (type) => {
         setJournalForm((prevState) => {
@@ -236,23 +240,25 @@ const JournalEntry = () => {
                             <div className="column debit-column">
                                 {entry.type === 'debit' && (
                                     <Forms
-                                        type="number"
+                                        type="text" // Keep it text to allow formatted display
                                         placeholder="Enter Debit"
-                                        value={entry.amount}
+                                        value={entry.amount ? Number(entry.amount).toLocaleString() : ''}
                                         onChange={(e) => handleInputChange(index, 'amount', e.target.value)}
                                     />
                                 )}
                             </div>
+
                             <div className="column credit-column">
                                 {entry.type === 'credit' && (
                                     <Forms
-                                        type="number"
+                                        type="text" // Keep it text to allow formatted display
                                         placeholder="Enter Credit"
-                                        value={entry.amount}
+                                        value={entry.amount ? Number(entry.amount).toLocaleString() : ''}
                                         onChange={(e) => handleInputChange(index, 'amount', e.target.value)}
                                     />
                                 )}
                             </div>
+
                             <button className="remove-btn" onClick={() => removeEntry(index)}>
                                 Remove
                             </button>
