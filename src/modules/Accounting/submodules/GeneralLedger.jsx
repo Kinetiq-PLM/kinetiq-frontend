@@ -7,7 +7,6 @@ import Search from "../components/Search";
 import ReportModalInput from "../components/ReportModalInput";
 
 const BodyContent = () => {
-
     const columns = ["Entry Line ID", "GL Account ID", "Account name", "Journal ID", "Debit", "Credit", "Description"];
     const [data, setData] = useState([]);
     const [searching, setSearching] = useState("");
@@ -22,27 +21,15 @@ const BodyContent = () => {
         currencyId: ""
     });
 
-    const openModal = () => {
-        console.log("Opening Modal...");
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        console.log("Closing Modal...");
-        setIsModalOpen(false);
-    };
-
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
 
     const handleInputChange = (field, value) => {
-        setReportForm({
-            ...reportForm,
-            [field]: value
-        });
+        setReportForm(prevState => ({ ...prevState, [field]: value }));
     };
 
     const handleSubmit = () => {
         console.log("Form submitted with data: ", reportForm);
-        // handle form submission logic here
         closeModal();
     };
 
@@ -114,7 +101,7 @@ const BodyContent = () => {
                         <Dropdown options={["Ascending", "Descending"]} style="selection" defaultOption="Sort Debit Credit.." onChange={handleSort} />
                         <Search type="text" placeholder="Search Entries.." value={searching} onChange={(e) => setSearching(e.target.value)} />
                     </div>
-                    <div><Button name="Generate report" variant="standard2" onClick={openModal} /></div>
+                    <div><Button name="Generate report" variant="standard2" onclick={openModal} /></div>
                 </div>
 
                 <Table data={filteredData} columns={columns} />
@@ -128,17 +115,13 @@ const BodyContent = () => {
                 </div>
             </div>
 
-            
-                <ReportModalInput
-                    isModalOpen={false}
-                    closeModal={closeModal}
-                    reportForm={reportForm}
-                    handleInputChange={handleInputChange}
-                    handleSubmit={handleSubmit}
-                />
-            
-
-
+            <ReportModalInput
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                reportForm={reportForm}
+                handleInputChange={handleInputChange}
+                handleSubmit={handleSubmit}
+            />
         </div>
     );
 };
