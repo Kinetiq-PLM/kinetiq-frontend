@@ -10,7 +10,6 @@ import {
 import CustomerListModal from "../components/Modals/Lists/CustomerList";
 import ProductListModal from "../components/Modals/Lists/ProductList";
 import OrderListModal from "./../components/Modals/Lists/OrderList";
-import BlanketAgreementListModal from "../components/Modals/Lists/BlanketAgreementList";
 import EmployeeListModal from "../components/Modals/Lists/EmployeeListModal.jsx";
 
 import NewCustomerModal from "../components/Modals/NewCustomer";
@@ -27,7 +26,7 @@ import OrderedProductList from "../components/Modals/Lists/OrderedProductList.js
 const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
 
-  const copyFromOptions = ["Order", "Blanket Agreement"];
+  const copyFromOptions = ["Order"];
   const copyToOptions = ["Return", "Invoice"];
 
   const [copyToModal, setCopyToModal] = useState("");
@@ -58,11 +57,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
 
   const [isOrderListOpen, setIsOrderListOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-
-  const [isBlanketAgreementListOpen, setIsBlanketAgreementListOpen] =
-    useState(false);
-  const [selectedBlanketAgreement, setSelectedBlanketAgreement] =
-    useState(null);
 
   // columns for table
   const columns = [
@@ -253,7 +247,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
 
     const modalActions = {
       Order: setIsOrderListOpen,
-      "Blanket Agreement": setIsBlanketAgreementListOpen,
     };
 
     modalActions[copyFromModal]?.(true);
@@ -273,21 +266,9 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
       });
       setSelectedOrder(null);
       // fill out fields HERE
-    } else if (
-      copyFromModal === "Blanket Agreement" &&
-      selectedBlanketAgreement
-    ) {
-      setDeliveryInfo(selectedBlanketAgreement);
-      copyFromMutation.mutate({
-        transferID: selectedBlanketAgreement.agreement_id,
-        transferOperation: "agreement",
-      });
-      setCopyFromModal("");
-      setSelectedBlanketAgreement(null);
-      // fill out fields HERE
     }
     setCanEditList(selectedOrder !== null);
-  }, [selectedOrder, selectedBlanketAgreement]);
+  }, [selectedOrder]);
 
   // For copy to feature
   useEffect(() => {
@@ -413,11 +394,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
           setEmployee={setSelectedEmployee}
         ></EmployeeListModal>
 
-        <BlanketAgreementListModal
-          isOpen={isBlanketAgreementListOpen}
-          onClose={() => setIsBlanketAgreementListOpen(false)}
-          setBlanketAgreement={setSelectedBlanketAgreement}
-        ></BlanketAgreementListModal>
         {/* DETAILS */}
         <div>
           <SalesInfo
