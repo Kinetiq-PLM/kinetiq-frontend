@@ -1,31 +1,33 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
 
+.service-report  {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
 
 .service-report .body-content-container {
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
-  background-color: white;
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
   min-width: 40rem;
   min-height: 30rem;
-  overflow: hidden;
-  position: relative;
 }
-
 
 /* Content area */
 .service-report .content-scroll-area {
   flex: 1;
   overflow-y: auto;
-  padding-right: 0.5rem;
-  margin-right: -0.5rem;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
-  max-height: calc(100% - 8rem);
+  border-radius: 8px;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
 }
 
 /* Input fields container */
@@ -34,7 +36,7 @@
   border-radius: 0.5rem;
   background-color: #ffffff;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(34, 33, 33, 0.15);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -426,6 +428,7 @@
 
   .service-report .modal-container {
     max-width: 90%;
+    max-height: 70%;
   }
 }
 
@@ -456,10 +459,11 @@
   .service-report .modal-form .form-row {
     flex-direction: column;
     gap: 1.25rem;
+    align-items: stretch;
   }
 
   .service-report .action-buttons {
-    flex-direction: column;
+    justify-content: flex-end;
     gap: 1rem;
   }
 

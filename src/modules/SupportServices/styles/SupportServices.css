@@ -21,6 +21,10 @@
   font-family: "Poppins", sans-serif;
 }
 
+.body-container  {
+  min-height: calc(100vh - 4rem);
+}
+
 .serv .header {
   display: flex;
   align-items: center;

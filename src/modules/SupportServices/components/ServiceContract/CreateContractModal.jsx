@@ -132,7 +132,6 @@ const handleSelectStatus = (status) => {
       renewal_id: formData.add,
       contract_description: formData.contractDescription,
       additional_service_id: formData.additionalServiceId,
-      contract_description: formData.contractDescription,
       product_id: formData.productId,
       contract_status: formData.contractStatus,
       product_quantity: formData.productQuantity,

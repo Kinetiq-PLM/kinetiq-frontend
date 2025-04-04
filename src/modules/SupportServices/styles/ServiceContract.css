@@ -21,7 +21,11 @@
   margin-right: -0.5rem;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
-  max-height: calc(100% - 8rem);
+  border-radius: 8px;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  max-height: calc(100% - 7rem);
 }
 
 .servcont .filter-options {
@@ -333,6 +337,7 @@
   .servcont .form-row {
     flex-direction: column;
     gap: 1.25rem;
+    align-items: stretch;
   }
 }
 

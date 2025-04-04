@@ -17,11 +17,12 @@
 .servtick .content-scroll-area {
   flex: 1;
   overflow-y: auto;
-  padding-right: 0.5rem;
-  margin-right: -0.5rem;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
-  max-height: calc(100% - 8rem);
+  border-radius: 8px;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
 }
 .servtick .input-fields-container {
   width: 100%;
@@ -135,6 +136,7 @@
   border: 1px solid #e0e0e0;
   max-height: 270px;
   overflow-y: auto;
+  overflow-x: auto;
   display: block;
   position: relative;
 }
@@ -343,6 +345,7 @@
 
   .servtick .modal-container {
     max-width: 90%;
+    max-height: 70%;
   }
 
   .servtick .modal-form.two-column {
@@ -354,13 +357,11 @@
 @media (max-width: 768px) {
   .servtick .input-fields-container {
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
   }
 
   .servtick .filter-submit-container {
-    flex-direction: column;
     gap: 1rem;
-    align-items: stretch;
   }
 
   .servtick .filter-dropdown {
@@ -368,28 +369,21 @@
   }
 
   .servtick .submit-button {
-    width: 100%;
+    width: 40%;
   }
 
   .servtick .table-container {
     overflow-x: auto;
   }
 
-  .servtick .tickets-table {
-    min-width: 600px;
-  }
-
   .servtick .form-row {
     flex-direction: column;
     gap: 1.25rem;
+    align-items: stretch;
   }
 }
 
 @media (max-width: 480px) {
-  .servtick .body-content-container {
-    padding: 1rem;
-  }
-
   .servtick .input-fields-container {
     padding: 1rem;
   }
