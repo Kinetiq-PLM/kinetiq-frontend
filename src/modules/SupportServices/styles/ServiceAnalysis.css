@@ -171,18 +171,18 @@
 }
 
 /* Service Order Items styling */
-.service-order-items-section {
+.servanal .service-order-items-section {
   margin-top: 1.5rem;
 }
 
-.service-order-items-section h3 {
+.servanal .service-order-items-section h3 {
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
   color: #00a8a8;
 }
 
-.service-order-table-container {
+.servanal .service-order-table-container {
   width: 100%;
   border-radius: 0.5rem;
   overflow: hidden;
@@ -190,23 +190,23 @@
   margin-bottom: 1rem;
 }
 
-.service-order-table {
+.servanal .service-order-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   font-family: "Inter", sans-serif;
 }
 
-.item-buttons-left {
+.servanal .item-buttons-left {
   display: flex;
   justify-content: flex-start;
   gap: 0.75rem;
   margin-top: 0.75rem;
 }
 
-.delete-item-button,
-.edit-item-button,
-.add-item-button {
+.servanal .delete-item-button,
+.servanal .edit-item-button,
+.servanal .add-item-button {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -219,21 +219,21 @@
   font-weight: 600;
 }
 
-.delete-item-button {
+.servanal .delete-item-button {
   background-color: #ff6b6b;
 }
 
-.delete-item-button:hover {
+.servanal .delete-item-button:hover {
   background-color: #ff5252;
 }
 
-.edit-item-button:hover,
-.add-item-button:hover {
+.servanal .edit-item-button:hover,
+.servanal .add-item-button:hover {
   background-color: #098f8f;
 }
 
 /* Inventory modal styling */
-.inventory-table-container {
+.servanal .inventory-table-container {
   width: 100%;
   border-radius: 0.5rem;
   overflow: hidden;
@@ -241,35 +241,35 @@
   margin-bottom: 1rem;
 }
 
-.inventory-table {
+.servanal .inventory-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   font-family: "Inter", sans-serif;
 }
 
-.inventory-request-section {
+.servanal .inventory-request-section {
   padding: 1rem 1.5rem;
   border-top: 1px solid #e0e0e0;
   margin-top: 0.5rem;
   text-align: left;
 }
 
-.inventory-request-section p {
+.servanal .inventory-request-section p {
   margin-bottom: 0.75rem;
   font-size: 0.875rem;
   color: #666;
 }
 
-.inventory-buttons-left {
+.servanal .inventory-buttons-left {
   display: flex;
   justify-content: flex-start;
   gap: 1rem;
   margin-top: 0.5rem;
 }
 
-.view-inventory-button,
-.purchase-request-button {
+.servanal .view-inventory-button,
+.servanal .purchase-request-button {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -282,21 +282,21 @@
   font-weight: 600;
 }
 
-.view-inventory-button:hover {
+.servanal .view-inventory-button:hover {
   background-color: #098f8f;
 }
 
-.purchase-request-button:hover {
+.servanal .purchase-request-button:hover {
   background-color: #098f8f;
 }
 
 /* Edit Item Modal styling */
-.edit-item-modal {
+.servanal .edit-item-modal {
   max-width: 700px;
 }
 
 /* Buttons container */
-.buttons-container-right {
+.servanal .buttons-container-right {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
@@ -304,7 +304,7 @@
   margin-bottom: 1rem;
 }
 
-.buttons-container-left {
+.servanal .buttons-container-left {
   display: flex;
   justify-content: flex-start;
   gap: 1rem;
@@ -342,24 +342,9 @@
 
 .servanal .table-buttons {
   margin-top: 0.5rem;
-  margin-bottom: 2rem;
 }
 
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-container {
+.servanal .modal-container {
   background-color: white;
   border-radius: 0.5rem;
   width: 100%;
@@ -371,49 +356,7 @@
   overflow: hidden;
 }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  border-bottom: 2px solid #00a8a8;
-  background-color: white;
-}
-
-.modal-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.modal-header-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: #00a8a8;
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #000;
-  font-family: "Inter", sans-serif;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  color: #00a8a8;
-}
-
-.close-button img {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.modal-content {
+.servanal .modal-content {
   padding: 1.5rem;
   flex: 1;
   overflow-y: auto;
@@ -421,155 +364,33 @@
   scrollbar-color: #00a8a8 #f0f0f0;
 }
 
-.modal-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 4px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-  background-color: #00a8a8;
-  border-radius: 4px;
-}
-
-.modal-form {
+.servanal .modal-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
-.form-row {
+.servanal .form-row {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
 }
 
-.form-row .form-group {
+.servanal .form-row .form-group {
   flex: 1;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-  margin-bottom: 0.5rem;
-}
-
-.form-group label {
-  font-size: 0.75rem;
-  color: #00a8a8;
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  padding: 0.625rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
-  height: 2.5rem;
-  box-sizing: border-box;
-  width: 100%;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
+.servanal .form-group input:focus,
+.servanal .form-group textarea:focus,
+.servanal .form-group select:focus {
   outline: none;
   border: 2px solid #00a8a8; /* Thicker border when focused */
 }
 
-.form-group textarea {
-  height: 5.5rem;
+.servanal .form-group textarea {
+  height: 13rem;
   resize: none;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e0e0e0;
-}
-
-.cancel-button {
-  background-color: white;
-  color: #00a8a8;
-  border: 1px solid #00a8a8;
-  border-radius: 0.5rem;
-  padding: 0.625rem 1.75rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
-  height: 2.5rem;
-  min-width: 7rem;
-}
-
-.cancel-button:hover {
-  background-color: #e4fdfb;
-}
-
-.update-modal-button {
-  background-color: #00a8a8;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.625rem 1.75rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
-  height: 2.5rem;
-  min-width: 7rem;
-}
-
-.update-modal-button:hover {
-  background-color: #098f8f;
-}
-
-.date-input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.date-input-wrapper input {
-  padding-right: 2.5rem;
-}
-
-.calendar-icon {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0.85rem;
-  height: 0.85rem;
-  pointer-events: none;
-}
-
-.select-wrapper {
-  position: relative;
-}
-
-.select-arrow {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.625rem;
-  color: #888;
-  pointer-events: none;
-  background: none;
-}
+}   
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
@@ -579,7 +400,7 @@
     padding: 1.25rem;
   }
 
-  .modal-container {
+  .servanal .modal-container {
     max-width: 90%;
   }
 }
@@ -611,7 +432,7 @@
     min-width: 600px;
   }
 
-  .form-row {
+  .servanal .form-row {
     flex-direction: column;
     gap: 1.25rem;
   }
@@ -632,31 +453,25 @@
     width: 100%;
   }
 
-  .modal-header,
-  .modal-content,
-  .modal-footer {
+  .servanal .modal-header,
+  .servanal .modal-content,
+  .servanal .modal-footer {
     padding: 1rem;
   }
 }
 
-.input-fields-container {
+.servanal .input-fields-container {
   display: flex;
   gap: 2rem;
 }
 
-.form-column {
+.servanal .form-column {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   flex: 1;
 }
 
-.update-analysis-modal {
-  max-width: 600px;
+.servanal .update-analysis-modal {
+  max-width: 900px;
 }
-
-.update-analysis-modal .form-group input,
-.update-analysis-modal .form-group textarea {
-  width: 100%;
-}
-

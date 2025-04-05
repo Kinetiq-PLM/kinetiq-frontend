@@ -169,9 +169,20 @@ const ServiceAnalysis = () => {
   }
 
   // Handle update analysis
-  const handleUpdateAnalysis = (analysisData) => {
+  const handleUpdateAnalysis = async (analysisData) => {
+    const analysisId = analysisData.analysis_id;
+    if (!analysisId) {
+      console.error("Error: analysis_id is undefined");
+      return;
+    }
     console.log("Updating analysis:", analysisData)
-    setShowUpdateModal(false)
+    try {
+      await PATCH(`service-analyses/${analysisId}/update/`, analysisData);
+      setShowUpdateModal(false);
+      fetchAnalyses();
+    } catch (error) {
+        console.error("Error updating service analysis:", error.message);
+    }
   }
 
   // Handle create analysis

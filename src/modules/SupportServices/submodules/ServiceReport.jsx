@@ -97,7 +97,6 @@ const ServiceReport = () => {
 
   // Handle update from modal
   const handleUpdateReport = async (reportData) => {
-    console.log("repdata", reportData)
     const reportId = reportData.report_id;
     if (!reportId) {
       console.error("Error: report_id is undefined");

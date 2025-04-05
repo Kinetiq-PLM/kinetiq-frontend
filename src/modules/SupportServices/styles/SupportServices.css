@@ -389,6 +389,7 @@
   font-size: 0.75rem;
   color: #00a8a8;
   font-weight: 500;
+  font-family: "Poppins", sans-serif;
 }
 
 .serv .form-group input,
@@ -403,6 +404,7 @@
   box-sizing: border-box;
   width: 100%;
   color: #333;
+  font-family: "Poppins", sans-serif;
 }
 
 .serv .select-wrapper {
@@ -482,8 +484,8 @@
   right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
 }
 
 .serv .modal-footer {
