@@ -184,7 +184,7 @@
 
 .servanal .service-order-table-container {
   width: 100%;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   border-radius: 0.5rem;
   border: 1px solid #e0e0e0;
   max-height: 270px;
@@ -270,6 +270,21 @@
   background-color: #098f8f;
 }
 
+.servanal .add-item-button:disabled,
+.servanal .edit-item-button:disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
+.servanal .delete-item-button:disabled {
+  background-color: white;
+  color: #ff5252;
+  border: 1px solid #ff5252;
+  cursor: not-allowed;
+}
+
 /* Inventory modal styling */
 .servanal .inventory-table-container {
   width: 100%;
@@ -291,12 +306,19 @@
   border-top: 1px solid #e0e0e0;
   margin-top: 0.5rem;
   text-align: left;
+  display: flex;
+  gap: 1rem;
 }
 
 .servanal .inventory-request-section p {
-  margin-bottom: 0.75rem;
   font-size: 0.875rem;
   color: #666;
+}
+
+.servanal .request-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .servanal .inventory-buttons-left {
@@ -318,6 +340,8 @@
   transition: background-color 0.2s;
   font-family: "Inter", sans-serif;
   font-weight: 600;
+  align-self: flex-start; /* prevent full width stretch */
+  width: auto; 
 }
 
 .servanal .view-inventory-button:hover {
@@ -376,6 +400,13 @@
 .servanal .add-button:active,
 .servanal .schedule-button:active {
   background-color: #087d7d;
+}
+
+.servanal .add-button:disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
 }
 
 .servanal .table-buttons {
@@ -518,4 +549,31 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.servanal .item-buttons-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.servanal .inner-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 0.75rem;
+}
+
+.servanal .no-order-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif;
+  color: #f44336;
+}
+
+.servanal .add-cancel-button {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-left: 124px;
+  margin-top: 1.5rem;
 }

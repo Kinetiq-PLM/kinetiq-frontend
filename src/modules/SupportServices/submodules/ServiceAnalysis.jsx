@@ -176,10 +176,8 @@ const ServiceAnalysis = () => {
 
   // Handle view analysis
   const handleViewAnalysis = (analysis) => {
-    if (activeTab === "General") {
       setSelectedAnalysis(analysis)
       setShowUpdateModal(true)
-    }
   }
 
   // Handle add new analysis
@@ -217,12 +215,57 @@ const ServiceAnalysis = () => {
     }
   }
 
+  const handleAddOrder = async () => {
+    const orderData = {
+      analysis_id: selectedAnalysis.analysis_id,
+      customer_id: customerInfo.customerId,
+    }
+
+    console.log("Creating analysis:", orderData)
+      try {
+        const data = await POST("/service-order/", orderData);
+        console.log("Service order created successfully:", data);
+        fetchOrder(selectedAnalysis.analysis_id);
+    } catch (error) {
+        console.error("Error submitting service order:", error.message);
+    }
+  }
+
   // Handle add item
   const handleAddItem = () => {
     if (activeTab === "Service Order") {
       setShowAddItemModal(true)
     }
   }
+
+  const handleCreateOrderItem = async (orderItemData) => {
+    console.log("Creating order item:", orderItemData)
+    try {
+      const data = await POST("service-order-item/", orderItemData);
+      console.log("Order item created successfully:", data);
+      setShowAddItemModal(false);
+      fetchServiceOrderItems(serviceOrderInfo.serviceOrderId);
+      
+      try {
+        const data = await GET(`orders/${selectedAnalysis.analysis_id}/`);
+    
+        setServiceOrderInfo({
+          ...serviceOrderInfo,
+          orderTotalPrice: data?.order_total_price || "",
+        });
+
+      } catch (error) {
+        console.error("Error fetching order:", error);
+        setServiceOrderInfo({
+          ...serviceOrderInfo,
+          orderTotalPrice: ""
+        });
+      }
+
+  } catch (error) {
+      console.error("Error submitting order item:", error.message);
+  }
+}
 
   // Handle edit item
   const handleEditItem = (item) => {
@@ -508,13 +551,31 @@ const ServiceAnalysis = () => {
                 </div>
                 <div className="item-buttons-container">
                   <div className="item-buttons-left">
-                    <button className="delete-item-button">Delete Item</button>
-                    <button className="edit-item-button" onClick={() => handleEditItem(serviceOrderItems[0])}>
-                      Edit Item
-                    </button>
-                    <button className="add-item-button" onClick={handleAddItem}>
-                      Add Item
-                    </button>
+                    {serviceOrderInfo.serviceOrderId === "" && (
+                      <span className="no-order-label">No service order issued yet</span>
+                    )}
+                    <div className="inner-buttons-container">
+                      <button 
+                        className="delete-item-button"
+                        disabled={serviceOrderInfo.serviceOrderId === ""}
+                      >
+                        Delete Item
+                      </button>
+                      <button 
+                        className="edit-item-button" 
+                        onClick={() => handleEditItem(serviceOrderItems[0])}
+                        disabled={serviceOrderInfo.serviceOrderId === ""}
+                      >
+                        Edit Item
+                      </button>
+                      <button 
+                        className="add-item-button" 
+                        onClick={handleAddItem}
+                        disabled={serviceOrderInfo.serviceOrderId === ""}
+                      >
+                        Add Item
+                      </button>
+                    </div>
                   </div>
                   <div className="items-button-right">
                     <div className="form-group">
@@ -532,7 +593,13 @@ const ServiceAnalysis = () => {
                 </div>
                 
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
-                  <button className="add-button">Add</button>
+                  <button 
+                    className="add-button"
+                    disabled={serviceOrderInfo.serviceOrderId !== "" || !selectedAnalysis }
+                    onClick={handleAddOrder}
+                  >
+                    Add
+                  </button>
                 </div>
               </div>
             </div>
@@ -909,11 +976,9 @@ const ServiceAnalysis = () => {
         <AddItemModal
           isOpen={showAddItemModal}
           onClose={() => setShowAddItemModal(false)}
-          onAdd={(item) => {
-            console.log("Adding item:", item)
-            setShowAddItemModal(false)
-          }}
+          onAdd={handleCreateOrderItem}
           onViewInventory={handleViewInventory}
+          order ={serviceOrderInfo.serviceOrderId}
         />
       )}
 
