@@ -168,7 +168,7 @@ const ServiceTicket = () => {
             phone={phone}
             setPhone={setPhone}
           />
-
+          <div className="section-divider"></div>
           <div className="filter-submit-container">
             <div className="filter-dropdown">
               <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>

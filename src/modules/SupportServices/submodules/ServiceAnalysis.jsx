@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import "../styles/ServiceAnalysis.css"
+import "../styles/SupportServices.css"
 import ServiceAnalysisIcon from "/icons/SupportServices/ServiceAnalysisIcon.png"
 import Table from "../components/ServiceAnalysis/Table"
 import UpdateAnalysisModal from "../components/ServiceAnalysis/UpdateAnalysisModal"
@@ -11,6 +12,10 @@ import EditItemModal from "../components/ServiceAnalysis/EditItemModal"
 import ViewInventoryModal from "../components/ServiceAnalysis/ViewInventoryModal"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
+
+import { GET } from "../api/api"
+import { POST } from "../api/api"
+import { PATCH } from "../api/api"
 
 const ServiceAnalysis = () => {
   // State for analyses
@@ -110,48 +115,43 @@ const ServiceAnalysis = () => {
     orderDate: "",
   })
 
-  // Fetch analyses from API (mock function)
-  useEffect(() => {
-    // Replace with actual API call
-    const fetchAnalyses = async () => {
-      try {
-        // Sample data
-        setAnalyses([
-          {
-            id: "123",
-            requestId: "REQ-001",
-            technicianId: "TECH-001",
-            analysisDate: "dd/mm/yy",
-            status: "Scheduled",
-            description: "Initial assessment of X-ray machine",
-            laborCost: "₱ 5,000",
-          },
-          {
-            id: "1234",
-            requestId: "REQ-002",
-            technicianId: "TECH-002",
-            analysisDate: "dd/mm/yy",
-            status: "In Progress",
-            description: "Troubleshooting power supply issues",
-            laborCost: "₱ 7,500",
-          },
-          {
-            id: "543",
-            requestId: "REQ-003",
-            technicianId: "TECH-003",
-            analysisDate: "dd/mm/yy",
-            status: "Completed",
-            description: "Replacement of faulty components",
-            laborCost: "₱ 12,000",
-          },
-        ])
-      } catch (error) {
-        console.error("Error fetching analyses:", error)
-      }
+  const fetchAnalyses = async () => {
+    try {
+      const data = await GET("service-analyses/");
+      setAnalyses(data);
+    } catch (error) {
+      console.error("Error fetching analyses:", error)
     }
+  }
 
-    fetchAnalyses()
-  }, [])
+  useEffect(() => {
+    fetchAnalyses();
+  }, []);
+
+  const handleRowClick = async (analysis) => {
+    try {
+      const data = await GET(`service-analyses/${analysis.analysis_id}`); 
+      console.log("Fetched data:", data);
+
+      setCustomerInfo({
+        customerId: data.customer?.customer_id || "",
+        name: data.customer?.name || "",
+        address: data.customer ? `${data.customer.address_line1 || ""} ${data.customer.address_line2 || ""}`.trim() : "",
+        phoneNumber: data.customer?.phone_number || "",
+        emailAddress: data.customer?.email_address || "",
+        productId: data.product?.product_id,
+        productName: data.product?.product_name,
+        contractId: data.contract?.contract_id,
+        terminationDate: data.contract?.end_date,
+        requestType: data.service_request?.request_type,
+      })
+
+      setSelectedAnalysis(data);
+
+    } catch (error) {
+      console.error("Error fetching service analysis details:", error);
+    }
+  };
 
   // Handle view analysis
   const handleViewAnalysis = (analysis) => {
@@ -202,6 +202,12 @@ const ServiceAnalysis = () => {
     }
   }
 
+  const filterOptions = [
+    { value: "all", label: "All" },
+    { value: "scheduled", label: "Scheduled" },
+    { value: "done", label: "Done" },
+  ]
+
   // Handle filter selection
   const handleFilterSelect = (option) => {
     setFilterOption(option)
@@ -210,26 +216,24 @@ const ServiceAnalysis = () => {
 
   // Filter analyses based on search query and filter option
   const filteredAnalyses = analyses.filter((analysis) => {
-    // First apply the status filter if it's not "Filter by" or "All"
-    if (filterOption !== "Filter by" && filterOption !== "All") {
-      if (analysis.status !== filterOption) {
-        return false
-      }
+    const matchesSearch =
+    searchQuery === "" ||
+    analysis.analysis_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+    analysis.service_request?.service_request_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (`${analysis.technician?.first_name ?? ""} ${analysis.technician?.last_name ?? ""}`
+    .toLowerCase()
+    .includes(searchQuery.toLowerCase()));
+
+    if (filterOption !== "all") {
+      if (filterOption === "scheduled" && analysis.analysis_status !== "Scheduled") return false;
+      if (filterOption === "done" && analysis.analysis_status !== "Done") return false;
     }
-
-    // Then apply the search query filter
-    if (!searchQuery) return true
-
-    return (
-      analysis.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      analysis.requestId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      analysis.technicianId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      analysis.status.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  })
+  
+    return matchesSearch;
+  });
 
   return (
-    <div className="servanal">
+    <div className="serv servanal">
       <div className="body-content-container">
         <div className="header">
           <div className="icon-container">
@@ -285,6 +289,7 @@ const ServiceAnalysis = () => {
                     type="text"
                     id="customerId"
                     value={customerInfo.customerId}
+                    readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, customerId: e.target.value })}
                     placeholder="Enter customer ID"
                   />
@@ -295,6 +300,7 @@ const ServiceAnalysis = () => {
                     type="text"
                     id="productId"
                     value={customerInfo.productId}
+                    readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, productId: e.target.value })}
                     placeholder="Enter product ID"
                   />
@@ -308,6 +314,7 @@ const ServiceAnalysis = () => {
                     type="text"
                     id="name"
                     value={customerInfo.name}
+                    readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
                     placeholder="Enter name"
                   />
@@ -331,6 +338,7 @@ const ServiceAnalysis = () => {
                     type="text"
                     id="address"
                     value={customerInfo.address}
+                    readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, address: e.target.value })}
                     placeholder="Enter address"
                   />
@@ -341,6 +349,7 @@ const ServiceAnalysis = () => {
                     type="text"
                     id="contractId"
                     value={customerInfo.contractId}
+                    readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, contractId: e.target.value })}
                     placeholder="Enter contract ID"
                   />
@@ -354,6 +363,7 @@ const ServiceAnalysis = () => {
                     type="text"
                     id="phoneNumber"
                     value={customerInfo.phoneNumber}
+                    readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, phoneNumber: e.target.value })}
                     placeholder="Enter phone number"
                   />
@@ -364,6 +374,7 @@ const ServiceAnalysis = () => {
                     type="text"
                     id="terminationDate"
                     value={customerInfo.terminationDate}
+                    readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, terminationDate: e.target.value })}
                     placeholder="dd/mm/yy"
                   />
@@ -377,6 +388,7 @@ const ServiceAnalysis = () => {
                     type="email"
                     id="emailAddress"
                     value={customerInfo.emailAddress}
+                    readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, emailAddress: e.target.value })}
                     placeholder="Enter email address"
                   />
@@ -387,13 +399,12 @@ const ServiceAnalysis = () => {
                     type="text"
                     id="requestType"
                     value={customerInfo.requestType}
+                    readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, requestType: e.target.value })}
                     placeholder="Enter request type"
                   />
                 </div>
               </div>
-
-              <div className="section-divider"></div>
             </div>
           )}
 
@@ -570,15 +581,6 @@ const ServiceAnalysis = () => {
                 <button className="update-button">Update</button>
                 <button className="add-button">Add</button>
               </div>
-
-              <div className="search-container">{/* Search and filter components would go here */}</div>
-
-              <div className="table-container">{/* Table would go here */}</div>
-
-              <div className="buttons-container-right table-buttons">
-                <button className="update-button">Update</button>
-                <button className="add-button">Add</button>
-              </div>
             </div>
           )}
 
@@ -656,15 +658,6 @@ const ServiceAnalysis = () => {
               <div className="buttons-container-right">
                 <button className="update-button">Update</button>
                 <button className="schedule-button">Schedule</button>
-              </div>
-
-              <div className="search-container">{/* Search and filter components would go here */}</div>
-
-              <div className="table-container">{/* Table would go here */}</div>
-
-              <div className="buttons-container-right table-buttons">
-                <button className="update-button">Update</button>
-                <button className="add-button">Add</button>
               </div>
             </div>
           )}
@@ -787,20 +780,11 @@ const ServiceAnalysis = () => {
                 <button className="update-button">Update</button>
                 <button className="add-button">Add</button>
               </div>
-
-              <div className="search-container">{/* Search and filter components would go here */}</div>
-
-              <div className="table-container">{/* Table would go here */}</div>
-
-              <div className="buttons-container-right table-buttons">
-                <button className="update-button">Update</button>
-                <button className="add-button">Add</button>
-              </div>
             </div>
           )}
-
-          <div className="search-container">
-            <div className="search-input-wrapper">
+          <div className="section-divider"></div>
+          <div className="search-filter-container">
+            <div className="search-container">
               <img src={SearchIcon || "/placeholder.svg?height=16&width=16"} alt="Search" className="search-icon" />
               <input
                 type="text"
@@ -812,32 +796,32 @@ const ServiceAnalysis = () => {
             </div>
             <div className="filter-dropdown">
               <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-                {filterOption}
+              {filterOptions.find(opt => opt.value === filterOption)?.label || "Filter by"}
                 <span className="arrow">▼</span>
               </button>
-              <div className={`filter-options ${showFilterOptions ? "show" : ""}`}>
-                <div className="filter-option" onClick={() => handleFilterSelect("Scheduled")}>
-                  Scheduled
+              {showFilterOptions && (
+                <div className="filter-options">
+                  {filterOptions.map((option) => (
+                    <div key={option.value} className="filter-option" onClick={() => handleFilterSelect(option.value)}>
+                      {option.label}
+                    </div>
+                  ))}
                 </div>
-                <div className="filter-option" onClick={() => handleFilterSelect("In Progress")}>
-                  In Progress
-                </div>
-                <div className="filter-option" onClick={() => handleFilterSelect("Completed")}>
-                  Completed
-                </div>
-                <div className="filter-option" onClick={() => handleFilterSelect("All")}>
-                  All
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
           {/* Table Component */}
-          <Table analyses={filteredAnalyses} onViewAnalysis={handleViewAnalysis} />
+          <Table analyses={filteredAnalyses} onRowClick={handleRowClick} onViewAnalysis={handleViewAnalysis} />
 
           {activeTab === "General" && (
             <div className="buttons-container-right table-buttons">
-              <button className="update-button" onClick={() => setShowUpdateModal(true)}>
+              <button 
+                type="button"
+                className={`update-button ${selectedAnalysis ? "clickable" : "disabled"}`} 
+                onClick={() => setShowUpdateModal(true)}
+                disabled={!selectedAnalysis}
+              >
                 Update
               </button>
               <button className="add-button" onClick={() => setShowAddModal(true)}>

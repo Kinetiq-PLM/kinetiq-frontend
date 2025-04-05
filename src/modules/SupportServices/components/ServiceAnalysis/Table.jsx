@@ -1,15 +1,14 @@
 "use client"
 
-const Table = ({ analyses, onViewAnalysis }) => {
+const Table = ({ analyses, onRowClick, onViewAnalysis }) => {
   return (
     <div className="table-container">
-      <div style={{ overflowX: "auto" }}>
         <table className="analyses-table">
           <thead>
             <tr>
               <th>Analysis ID</th>
               <th>Request ID</th>
-              <th>Technician ID</th>
+              <th>Technician Name</th>
               <th>Analysis Date</th>
               <th>Analysis Status</th>
               <th>Analysis Description</th>
@@ -17,39 +16,43 @@ const Table = ({ analyses, onViewAnalysis }) => {
             </tr>
           </thead>
           <tbody>
-            {analyses.map((analysis) => (
-              <tr key={analysis.id}>
-                <td>{analysis.id}</td>
-                <td>{analysis.requestId}</td>
-                <td>{analysis.technicianId}</td>
-                <td>{analysis.analysisDate}</td>
-                <td>{analysis.status}</td>
-                <td>
-                  <button className="view-button" onClick={() => onViewAnalysis(analysis)}>
-                    View
-                  </button>
-                </td>
-                <td>{analysis.laborCost}</td>
+            {analyses.map((analysis, index) => (
+              <tr 
+                key={analysis.analysis_id || `analysis-${index}`}
+                className={index % 2 === 0 ? "" : "alternate-row"}
+                onClick={() => onRowClick(analysis)}
+                style={{ cursor: "pointer" }} 
+              >
+                {!analysis.empty ? (
+                  <>
+                    <td>{analysis.analysis_id}</td>
+                    <td>{analysis.service_request?.service_request_id || "None"}</td>
+                    <td>{analysis.technician ? `${analysis.technician.first_name || ""} ${analysis.technician.last_name || ""}`.trim() : "Unknown"}</td>
+                    <td>{analysis.analysis_date || "Null"}</td>
+                    <td>{analysis.analysis_status}</td>
+                    <td>
+                      <button className="view-button" onClick={() => onViewAnalysis(analysis)}>
+                        View
+                      </button>
+                    </td>
+                    <td>{analysis.labor_cost || "None"}</td>
+                  </>
+                ) : (
+                  <>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </>
+                )}
               </tr>
             ))}
-            {/* Empty rows to match the design */}
-            {Array(5 - analyses.length)
-              .fill()
-              .map((_, index) => (
-                <tr key={`empty-${index}`} className="empty-row">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              ))}
           </tbody>
         </table>
       </div>
-    </div>
   )
 }
 

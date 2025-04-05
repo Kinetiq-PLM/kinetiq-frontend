@@ -22,7 +22,7 @@ const Table = ({ reports, onRowClick }) => {
         <tbody>
           {filledReports.map((report, index) => (
             <tr
-              key={report.reportId || `report-${index}`}
+              key={report.report_id || `report-${index}`}
               className={index % 2 === 0 ? "" : "alternate-row"}
               onClick={() => onRowClick(report)} // makes table row clickable, function update the state fields
               style={{ cursor: "pointer" }} 

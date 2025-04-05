@@ -34,7 +34,6 @@ const ServiceReport = () => {
   const [selectedTicketId, setSelectedTicketId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showModalSafe, setShowModalSafe] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
 
   // Modal states
   const [showUpdateModal, setShowUpdateModal] = useState(false)
@@ -249,7 +248,7 @@ const ServiceReport = () => {
             billingId={billingId}
             setBillingId={setBillingId}
           />
-
+          <div className="section-divider"></div>
           <div className="search-filter-container">
             <div className="search-container">
               <img src={SearchIcon || "/placeholder.svg?height=16&width=16"} alt="Search" className="search-icon" />

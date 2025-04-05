@@ -26,6 +26,7 @@
   padding: 1rem;
   border: 1px solid #e0e0e0;
   max-height: calc(100% - 7rem);
+  margin-top: 2rem;
 }
 
 .servcont .filter-options {
