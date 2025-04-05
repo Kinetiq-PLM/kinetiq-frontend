@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/JournalEntry.css';
 import '../styles/accounting-styling.css';
 import Button from '../components/Button';
 import Forms from '../components/Forms';
 import NotifModal from '../components/modalNotif/NotifModal'; // Import NotifModal
+import Dropdown from '../components/Dropdown';
 
 const JournalEntry = () => {
     const [journalForm, setJournalForm] = useState({
@@ -13,6 +14,7 @@ const JournalEntry = () => {
     });
     const [totalDebit, setTotalDebit] = useState(0);
     const [totalCredit, setTotalCredit] = useState(0);
+    const [journalOptions, setJournalOptions] = useState([]);
 
     // New state for modal notification
     const [validation, setValidation] = useState({
@@ -115,6 +117,7 @@ const JournalEntry = () => {
             return;
         }
 
+        // Numbers comma formatted
         const payload = {
             total_debit: totalDebit.toFixed(2),
             total_credit: totalCredit.toFixed(2),
@@ -129,6 +132,7 @@ const JournalEntry = () => {
         };
         console.log('Submitting payload to PATCH /journal-entries:', payload);
 
+        // Display the Data to the Table
         try {
             const response = await fetch(`http://127.0.0.1:8000/api/journal-entries/${journalForm.journalId}/`, {
                 method: 'PATCH',
@@ -168,6 +172,25 @@ const JournalEntry = () => {
         }
     };
 
+    // Checking if the journal ID is already in use
+    useEffect(() => {
+        const fetchJournalIDs = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/journal-entries/');
+                const result = await response.json();
+                const zeroBalanceJournals = result
+                    .filter(entry => parseFloat(entry.total_debit) === 0 && parseFloat(entry.total_credit) === 0)
+                    .map(entry => entry.journal_id || entry.id);
+                setJournalOptions(zeroBalanceJournals);
+            } catch (error) {
+                console.error('Error fetching journal IDs:', error);
+            }
+        };
+
+        fetchJournalIDs();
+    }, []);
+
+
     return (
         <div className="JournalEntry">
             <div className="body-content-container">
@@ -177,14 +200,21 @@ const JournalEntry = () => {
 
                 <div className="parent-component-container">
                     <div className="parent-component-container">
+
+                        
                         <div className="flex flex-col w-80">
-                            <Forms
-                                type="text"
-                                formName="Journal ID*"
-                                placeholder="Enter Journal ID"
-                                value={journalForm.journalId}
-                                onChange={(e) => setJournalForm({ ...journalForm, journalId: e.target.value })}
-                            />
+                            
+                            <div className="form-group">
+                                <label htmlFor="journalId">Journal ID*</label>
+                                <Dropdown
+                                    options={journalOptions}
+                                    style="selection"
+                                    defaultOption="Select Journal ID"
+                                    value={journalForm.journalId}
+                                    onChange={(value) => setJournalForm({ ...journalForm, journalId: value })}
+                                />
+                            </div>
+
                             <Forms
                                 type="text"
                                 formName="Description*"
