@@ -65,35 +65,7 @@ const ServiceAnalysis = () => {
   })
 
   // Service order items
-  const [serviceOrderItems, setServiceOrderItems] = useState([
-    {
-      id: "123",
-      name: "Battery",
-      unitPrice: "₱ 18,900",
-      markupPrice: "₱ 1,000,000",
-      quantity: "1",
-      totalPrice: "₱ 1,018,900",
-      principalItemId: "12345679",
-    },
-    {
-      id: "1234",
-      name: "Power Supply",
-      unitPrice: "₱ 12,500",
-      markupPrice: "₱ 500,000",
-      quantity: "2",
-      totalPrice: "₱ 525,000",
-      principalItemId: "98765432",
-    },
-    {
-      id: "543",
-      name: "Circuit Board",
-      unitPrice: "₱ 35,000",
-      markupPrice: "₱ 750,000",
-      quantity: "1",
-      totalPrice: "₱ 785,000",
-      principalItemId: "45678912",
-    },
-  ])
+  const [serviceOrderItems, setServiceOrderItems] = useState([])
 
   // Customer information
   const [customerInfo, setCustomerInfo] = useState({
@@ -113,6 +85,7 @@ const ServiceAnalysis = () => {
   const [serviceOrderInfo, setServiceOrderInfo] = useState({
     serviceOrderId: "",
     orderDate: "",
+    orderTotalPrice: "",
   })
 
   const fetchAnalyses = async () => {
@@ -133,6 +106,8 @@ const ServiceAnalysis = () => {
       const data = await GET(`service-analyses/${analysis.analysis_id}`); 
       console.log("Fetched data:", data);
 
+      setSelectedAnalysis(data);
+
       setCustomerInfo({
         customerId: data.customer?.customer_id || "",
         name: data.customer?.name || "",
@@ -146,12 +121,58 @@ const ServiceAnalysis = () => {
         requestType: data.service_request?.request_type,
       })
 
-      setSelectedAnalysis(data);
+      fetchOrder(data.analysis_id);
 
     } catch (error) {
       console.error("Error fetching service analysis details:", error);
     }
   };
+  
+  const fetchOrder = async (analysisId) => {
+    try {
+      const data = await GET(`orders/${analysisId}/`);
+      const rawDate = data?.order_date;
+  
+      let formattedDate = "";
+      if (rawDate) {
+        const date = new Date(rawDate);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        const seconds = String(date.getSeconds()).padStart(2, "0");
+  
+        formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      }
+  
+      setServiceOrderInfo({
+        serviceOrderId: data?.service_order_id || "",
+        orderDate: formattedDate,
+        orderTotalPrice: data?.order_total_price || "",
+      });
+
+      fetchServiceOrderItems(data?.service_order_id);
+
+    } catch (error) {
+      console.error("Error fetching order:", error);
+      setServiceOrderInfo({
+        serviceOrderId: "",
+        orderDate: "",
+        orderTotalPrice: ""
+      });
+    }
+  };
+
+  const fetchServiceOrderItems = async (serviceOrderId) => {
+    try {
+      const data = await GET(`order-items/${serviceOrderId}/`);
+      setServiceOrderItems(data)
+    } catch (error) {
+      console.error("Error fetching order items:", error);
+    }
+  };
+  
 
   // Handle view analysis
   const handleViewAnalysis = (analysis) => {
@@ -432,9 +453,10 @@ const ServiceAnalysis = () => {
                   <input
                     type="text"
                     id="serviceOrderId"
+                    readOnly
                     value={serviceOrderInfo.serviceOrderId}
                     onChange={(e) => setServiceOrderInfo({ ...serviceOrderInfo, serviceOrderId: e.target.value })}
-                    placeholder="Enter service order ID"
+                    placeholder="No service order issued yet..."
                   />
                 </div>
                 <div className="form-group">
@@ -442,14 +464,13 @@ const ServiceAnalysis = () => {
                   <input
                     type="text"
                     id="orderDate"
+                    readOnly
                     value={serviceOrderInfo.orderDate}
                     onChange={(e) => setServiceOrderInfo({ ...serviceOrderInfo, orderDate: e.target.value })}
                     placeholder="dd/mm/yy"
                   />
                 </div>
               </div>
-
-              {/* No button here */}
 
               <div className="service-order-items-section">
                 <h3>Service Order Items</h3>
@@ -460,42 +481,60 @@ const ServiceAnalysis = () => {
                         <th>Item ID</th>
                         <th>Item Name</th>
                         <th>Unit Price</th>
-                        <th>Markup Price</th>
                         <th>Quantity</th>
                         <th>Total Price</th>
                         <th>Principal Item ID</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {serviceOrderItems.map((item) => (
-                        <tr key={item.id}>
-                          <td>{item.id}</td>
-                          <td>{item.name}</td>
-                          <td>{item.unitPrice}</td>
-                          <td>{item.markupPrice}</td>
-                          <td>{item.quantity}</td>
-                          <td>{item.totalPrice}</td>
-                          <td>{item.principalItemId}</td>
+                      {serviceOrderItems.length > 0 ? (
+                        serviceOrderItems.map((item, index) => (
+                          <tr key={index}>
+                            <td>{item.item?.item_id || ""}</td>
+                            <td>{item.item?.item_name || ""}</td>
+                            <td>{item.item_price}</td>
+                            <td>{item.item_quantity}</td>
+                            <td>{item.total_price}</td>
+                            <td>{item.principal_item?.principal_item_id || ""}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="6" style={{ textAlign: "center" }}></td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
-                <div className="item-buttons-left">
-                  <button className="delete-item-button">Delete Item</button>
-                  <button className="edit-item-button" onClick={() => handleEditItem(serviceOrderItems[0])}>
-                    Edit Item
-                  </button>
-                  <button className="add-item-button" onClick={handleAddItem}>
-                    Add Item
-                  </button>
+                <div className="item-buttons-container">
+                  <div className="item-buttons-left">
+                    <button className="delete-item-button">Delete Item</button>
+                    <button className="edit-item-button" onClick={() => handleEditItem(serviceOrderItems[0])}>
+                      Edit Item
+                    </button>
+                    <button className="add-item-button" onClick={handleAddItem}>
+                      Add Item
+                    </button>
+                  </div>
+                  <div className="items-button-right">
+                    <div className="form-group">
+                      <label htmlFor="orderTotalPrice">Service Order Total Price</label>
+                      <input
+                        type="text"
+                        id="orderTotalPrice"
+                        readOnly
+                        value={serviceOrderInfo.orderTotalPrice}
+                        onChange={(e) => setOrderTotalPrice({ ...serviceOrderInfo, orderTotalPrice: e.target.value })}
+                        placeholder="₱ 0.00"
+                      />
+                  </div>
+                  </div>
                 </div>
+                
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
                   <button className="add-button">Add</button>
                 </div>
               </div>
-
-              {/* No divider */}
             </div>
           )}
 
@@ -830,7 +869,7 @@ const ServiceAnalysis = () => {
           {/* Table Component */}
           <Table analyses={filteredAnalyses} onRowClick={handleRowClick} onViewAnalysis={handleViewAnalysis} />
 
-          {activeTab === "General" && (
+          {
             <div className="buttons-container-right table-buttons">
               <button 
                 type="button"
@@ -844,7 +883,7 @@ const ServiceAnalysis = () => {
                 Add
               </button>
             </div>
-          )}
+          }
         </div>
       </div>
 
