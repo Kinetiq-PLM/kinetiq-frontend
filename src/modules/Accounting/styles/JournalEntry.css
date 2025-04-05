@@ -30,7 +30,7 @@
 /* Table Header */
 .JournalEntry .table-header {
   display: grid;
-  grid-template-columns: 1fr 0.5fr 0.5fr 0.2fr;
+  grid-template-columns: .5fr 0.5fr 0.5fr 0.2fr;
   background-color: #5a9ecf;
   color: white;
   font-weight: bold;
@@ -45,7 +45,7 @@
 .totals-row,
 .totals-row2 {
   display: grid;
-  grid-template-columns: 1fr 0.5fr 0.5fr 0.2fr;
+  grid-template-columns: .5fr 0.5fr 0.5fr 0.2fr;
   gap: 10px;
   padding: 1rem;
   border-bottom: 1px solid #ccc;

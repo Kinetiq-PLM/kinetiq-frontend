@@ -204,7 +204,7 @@ const JournalEntry = () => {
                         
                         <div className="flex flex-col w-80">
                             
-                            <div className="form-group">
+                            <div className="flex flex-col mb-4">
                                 <label htmlFor="journalId">Journal ID*</label>
                                 <Dropdown
                                     options={journalOptions}
@@ -245,11 +245,13 @@ const JournalEntry = () => {
                     </div>
                 </div>
 
+
+                {/* Debit and Credit table  */}
                 <div className="journal-table">
                     <div className="table-header">
                         <div className="column account-column">Accounts Affected</div>
-                        <div className="column debit-column">Debit</div>
-                        <div className="column credit-column">Credit</div>
+                        <div className="column debit-column">Debit Input</div>
+                        <div className="column credit-column">Credit Input</div>
                     </div>
 
                     {journalForm.transactions.map((entry, index) => (
@@ -258,19 +260,14 @@ const JournalEntry = () => {
                             className={`table-row ${entry.type === 'credit' ? 'credit-row' : ''}`}
                         >
                             <div
-                                className={`column account-column ${entry.type === 'credit' ? 'indent' : ''}`}
-                            >
-                                <Forms
-                                    type="text"
-                                    placeholder={entry.type === 'credit' ? 'To Account ID' : 'Account ID'}
-                                    value={entry.glAccountId}
-                                    onChange={(e) => handleInputChange(index, 'glAccountId', e.target.value)}
-                                />
+                                className={`column account-column ${entry.type === 'credit' ? 'ml-6' : ''}`}>
+                                <Button name={entry.type === 'credit' ? 'Credit' : 'Debit'} variant="standard2"/>
                             </div>
+                            
                             <div className="column debit-column">
                                 {entry.type === 'debit' && (
                                     <Forms
-                                        type="text" // Keep it text to allow formatted display
+                                        type="number" // Keep it text to allow formatted display
                                         placeholder="Enter Debit"
                                         value={entry.amount ? Number(entry.amount).toLocaleString() : ''}
                                         onChange={(e) => handleInputChange(index, 'amount', e.target.value)}
@@ -281,7 +278,7 @@ const JournalEntry = () => {
                             <div className="column credit-column">
                                 {entry.type === 'credit' && (
                                     <Forms
-                                        type="text" // Keep it text to allow formatted display
+                                        type="number" // Keep it text to allow formatted display
                                         placeholder="Enter Credit"
                                         value={entry.amount ? Number(entry.amount).toLocaleString() : ''}
                                         onChange={(e) => handleInputChange(index, 'amount', e.target.value)}
