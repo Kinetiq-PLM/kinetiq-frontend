@@ -163,9 +163,7 @@ const ServiceAnalysis = () => {
 
   // Handle add new analysis
   const handleAddAnalysis = () => {
-    if (activeTab === "General") {
-      setShowAddModal(true)
-    }
+    setShowAddModal(true)
   }
 
   // Handle update analysis
@@ -186,9 +184,16 @@ const ServiceAnalysis = () => {
   }
 
   // Handle create analysis
-  const handleCreateAnalysis = (analysisData) => {
-    console.log("Creating analysis:", analysisData)
-    setShowAddModal(false)
+  const handleCreateAnalysis = async (analysisData) => {
+      console.log("Creating analysis:", analysisData)
+      try {
+        const data = await POST("/service-analyses/", analysisData);
+        console.log("Analysis created successfully:", data);
+        setShowAddModal(false);
+        fetchAnalyses();
+    } catch (error) {
+        console.error("Error submitting analysis:", error.message);
+    }
   }
 
   // Handle add item
