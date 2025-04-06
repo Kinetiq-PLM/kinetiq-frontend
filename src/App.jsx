@@ -110,11 +110,11 @@ function App() {
       Quotation: "Quotation",
       Order: "Order",
       Delivery: "Delivery",
-      Invoice: "Invoice",
+      // Invoice: "Invoice",
       "Blanket Agreement": "BlanketAgreement",
       "Master List": "MasterList",
       Reporting: "Reporting",
-      Return: "Return",
+      // Return: "Return",
     },
     CRM: {
       Ticket: "Ticket",

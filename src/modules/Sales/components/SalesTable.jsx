@@ -54,10 +54,14 @@ const SalesTable = ({
     if (!editingCell) return;
 
     const newData = [...tableData];
-    const newValue = isNaN(editValue) ? editValue : Number(editValue);
+    const newValue =
+      editingCell.columnKey === "special_requests"
+        ? editValue
+        : isNaN(editValue)
+        ? editValue
+        : Number(editValue);
 
     // Validate discount
-    console.log(newData[rowIndex].total_price);
     if (
       editingCell.columnKey === "discount" &&
       (newValue < 0 || newValue > newData[rowIndex].total_price)
@@ -115,7 +119,12 @@ const SalesTable = ({
 
     newData[rowIndex] = {
       ...newData[rowIndex],
-      [editingCell.columnKey]: isNaN(editValue) ? editValue : Number(editValue),
+      [editingCell.columnKey]:
+        editingCell.columnKey === "special_requests"
+          ? editValue
+          : isNaN(editValue)
+          ? editValue
+          : Number(editValue),
     };
 
     const updatedData = newData.map((item) => {
@@ -247,7 +256,7 @@ const SalesTable = ({
                           })
                         )
                       ) : (
-                        row[column.key] ?? "-"
+                        row[column.key] || "-"
                       )}
                     </td>
                   );

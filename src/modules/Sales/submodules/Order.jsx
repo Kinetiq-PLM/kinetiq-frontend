@@ -50,7 +50,6 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
-
   const [isQuotationListOpen, setIsQuotationListOpen] = useState(false);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState("");
@@ -73,6 +72,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
         return {
           product_id: item.product.product_id,
           product_name: item.product.product_name,
+          special_requests: item.special_requests,
           quantity: Number(item.quantity),
           selling_price: Number(item.unit_price),
           discount: Number(item.discount),
@@ -103,6 +103,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
+    { key: "special_requests", label: "Specification" },
     { key: "quantity", label: "Quantity" },
     { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
@@ -168,19 +169,32 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     const quotation_id = selectedQuotation
       ? selectedQuotation.quotation_id
       : null;
+    const agreement_id = selectedBlanketAgreement
+      ? selectedBlanketAgreement.agreement_id
+      : null;
+    let orderType = "Non-Project-Based";
+    const items = products.map((product) => {
+      if (product.special_requests) {
+        orderType = "Project-Based";
+      }
+      return {
+        product: product.product_id,
+        quantity: parseInt(product.quantity),
+        special_requests: product.special_requests
+          ? product.special_requests
+          : null,
+        unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
+        total_price: Number(parseFloat(product.total_price).toFixed(2)),
+        discount: Number(parseFloat(product.discount).toFixed(2)),
+        tax_amount: Number(parseFloat(product.tax).toFixed(2)),
+      };
+    });
     const request = {
       order_data: {
         quotation_id,
         order_date: new Date().toISOString(),
-        order_type: "Non-Project-Based", // temporary value
-        items: products.map((product) => ({
-          product: product.product_id,
-          quantity: parseInt(product.quantity),
-          unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
-          total_price: Number(parseFloat(product.total_price).toFixed(2)),
-          discount: Number(parseFloat(product.discount).toFixed(2)),
-          tax_amount: Number(parseFloat(product.tax).toFixed(2)),
-        })),
+        order_type: orderType,
+        items,
       },
       statement_data: {
         customer: selectedCustomer.customer_id,

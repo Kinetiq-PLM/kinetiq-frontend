@@ -62,6 +62,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
+    { key: "special_requests", label: "Specification", editable: false },
     { key: "quantity", label: "Quantity" },
     { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
@@ -96,6 +97,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
         .map((item) => ({
           product_id: item.product.product_id,
           product_name: item.product.product_name,
+          special_requests: item.special_requests,
           quantity: Number(item.quantity) - Number(item.quantity_to_deliver),
           selling_price: Number(item.unit_price),
           discount: Number(item.discount),
@@ -182,6 +184,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule }) => {
         items: products.map((product, index) => {
           return {
             product: product.product_id,
+            special_requests: product.special_requests,
             quantity: parseInt(product.quantity),
             quantity_to_deliver: parseInt(product.quantity),
             unit_price: Number(parseFloat(product.selling_price).toFixed(2)),

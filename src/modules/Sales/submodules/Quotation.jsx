@@ -95,6 +95,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
+    { key: "special_requests", label: "Specification" },
     { key: "quantity", label: "Quantity" },
     { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
@@ -208,6 +209,9 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
         items: products.map((product) => ({
           product: product.product_id,
           quantity: parseInt(product.quantity),
+          special_requests: product.special_requests
+            ? product.special_requests
+            : null,
           unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
           total_price: Number(parseFloat(product.total_price).toFixed(2)),
           discount: Number(parseFloat(product.discount).toFixed(2)),
@@ -218,7 +222,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       //   date_issued: new Date().toISOString(),
       // },
     };
-
+    // console.log(request);
     quotationMutation.mutate(request);
   };
 
