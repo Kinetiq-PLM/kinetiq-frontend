@@ -81,7 +81,11 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
         };
       });
       setProducts(prods);
-      setSelectedQuotation(data);
+      if (data.quotation_id) {
+        setSelectedQuotation(data);
+      } else if (data.agreement_id) {
+        setSelectedBlanketAgreement(data);
+      }
       setSelectedCustomer(data.statement.customer);
       setSelectedEmployee(data.statement.salesrep);
       localStorage.removeItem("TransferID");
@@ -192,6 +196,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     const request = {
       order_data: {
         quotation_id,
+        agreement_id,
         order_date: new Date().toISOString(),
         order_type: orderType,
         items,
