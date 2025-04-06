@@ -51,14 +51,14 @@ const CreateReceiptModal = ({ isModalOpen, closeModal, reportForm, handleInputCh
                     <Forms
                         type="number"
                         formName="Amount Paid*"
-                        placeholder="Enter Amount paid*"
+                        placeholder="Enter Amount paid"
                     />
 
-                    <div className="flex flex-col gap-y-1">
-                        <label>Account ID*</label>
-                        <Dropdown options={["ACC-NO1-2025-SAMP1", "ACC-NO2-2025-SAMP2"]} style="selection" defaultOption="Select account ID..." />
-                    </div>
-
+                    <Forms
+                        type="text"
+                        formName="Created By*"
+                        placeholder="Created by..."
+                    />
 
                 </div>
 
