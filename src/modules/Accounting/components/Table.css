@@ -37,7 +37,7 @@ tr:hover {
 }
 
 th {
-  padding: 1rem;
+  padding: .8rem;
   background-color: #5a9ecf;
   color: white;
   font-size: 16px;
@@ -45,7 +45,7 @@ th {
 }
 
 td {
-  padding: .3rem 1rem;
+  padding: .3rem .8rem;
   font-size: 14px;
   font-weight: 300;
   text-wrap: wrap;
