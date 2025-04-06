@@ -94,16 +94,18 @@ const BodyContent = () => {
 
         const sortedData = [...data].sort((a, b) => {
             const debitA = parseFloat(a[4]) || 0;
-            const debitB = parseFloat(b[4]) || 0;
             const creditA = parseFloat(a[5]) || 0;
+            const debitB = parseFloat(b[4]) || 0;
             const creditB = parseFloat(b[5]) || 0;
 
-            const sortByDebit = debitA - debitB;
-            const sortByCredit = creditA - creditB;
+            const totalA = debitA + creditA;
+            const totalB = debitB + creditB;
 
-            return newSortOrder === "asc" ?
-                (sortByDebit !== 0 ? sortByDebit : sortByCredit) :
-                (sortByDebit !== 0 ? -sortByDebit : -sortByCredit);
+            if (newSortOrder === "asc") {
+                return totalA - totalB; // Sort in ascending order based on the combined debit/credit amount
+            } else {
+                return totalB - totalA; // Sort in descending order based on the combined debit/credit amount
+            }
         });
 
         setData(sortedData);
