@@ -5,6 +5,7 @@ import Button from '../components/Button';
 import Forms from '../components/Forms';
 import NotifModal from '../components/modalNotif/NotifModal'; // Import NotifModal
 import Dropdown from '../components/Dropdown';
+import AddAccountModal from '../components/AddAccountModal';
 
 const JournalEntry = () => {
     const [journalForm, setJournalForm] = useState({
@@ -15,6 +16,7 @@ const JournalEntry = () => {
     const [totalDebit, setTotalDebit] = useState(0);
     const [totalCredit, setTotalCredit] = useState(0);
     const [journalOptions, setJournalOptions] = useState([]);
+    const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
 
     // New state for modal notification
     const [validation, setValidation] = useState({
@@ -36,6 +38,8 @@ const JournalEntry = () => {
             return { ...prevState, transactions: updatedTransactions };
         });
     };
+
+
 
 
     const addEntry = (type) => {
@@ -67,6 +71,12 @@ const JournalEntry = () => {
         setTotalDebit(debitSum);
         setTotalCredit(creditSum);
     };
+
+    const handleAddAccount = () => {
+        console.log("handleAddAccount called");
+        setIsAccountModalOpen(false); // closes the modal after submission
+    };
+    
 
     const handleSubmit = async () => {
         if (!journalForm.journalId && !journalForm.description) {
@@ -199,12 +209,13 @@ const JournalEntry = () => {
                 </div>
 
                 <div className="parent-component-container">
-                    <div className="parent-component-container">
+                    <div className="flex justify-between gap-x-5">
 
-                        
-                        <div className="flex flex-col w-80">
-                            
-                            <div className="flex flex-col mb-4">
+
+                        {/* Top Buttons */}
+                        <div className="flex gap-x-5 w-auto">
+
+                            <div className="flex flex-col">
                                 <label htmlFor="journalId">Journal ID*</label>
                                 <Dropdown
                                     options={journalOptions}
@@ -223,6 +234,8 @@ const JournalEntry = () => {
                                 onChange={(e) => setJournalForm({ ...journalForm, description: e.target.value })}
                             />
                         </div>
+
+                        {/* Add Debit and Credit Buttons */}
                         <div className="component-container">
                             <Button name="+ Add debit" variant="standard2" onclick={() => addEntry('debit')} />
                             <Button name="+ Add credit" variant="standard2" onclick={() => addEntry('credit')} />
@@ -255,15 +268,20 @@ const JournalEntry = () => {
                     </div>
 
                     {journalForm.transactions.map((entry, index) => (
-                        <div
-                            key={index}
-                            className={`table-row ${entry.type === 'credit' ? 'credit-row' : ''}`}
-                        >
+                        <div key={index} className={`table-row ${entry.type === 'credit' ? 'credit-row' : ''}`}>
                             <div
                                 className={`column account-column ${entry.type === 'credit' ? 'ml-6' : ''}`}>
-                                <Button name={entry.type === 'credit' ? 'Credit' : 'Debit'} variant="standard2"/>
+                                <Button
+                                    name={entry.type === 'credit' ? 'Select Account' : 'Select Account'}
+                                    variant="standard2"
+                                    onclick={() => {
+                                        console.log('Opening Account Modal');
+                                        setIsAccountModalOpen(true);
+                                    }}
+                                />
+
                             </div>
-                            
+
                             <div className="column debit-column">
                                 {entry.type === 'debit' && (
                                     <Forms
@@ -291,12 +309,12 @@ const JournalEntry = () => {
                             </button>
                         </div>
                     ))}
+                </div>
 
-                    <div className="totals-row">
-                        <div className="column account-column">Totals</div>
-                        <div className="column debit-column">{totalDebit.toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
-                        <div className="column credit-column">{totalCredit.toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
-                    </div>
+                <div className="totals-row">
+                    <div className="column account-column">Totals</div>
+                    <div className="column debit-column">{totalDebit.toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+                    <div className="column credit-column">{totalCredit.toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
                 </div>
 
                 {/* Add NotifModal for feedback */}
@@ -309,6 +327,18 @@ const JournalEntry = () => {
                         message={validation.message}
                     />
                 )}
+
+                {isAccountModalOpen && (
+                    <AddAccountModal
+                        isModalOpen={isAccountModalOpen} // ✅ match the expected prop name
+                        closeModal={() => setIsAccountModalOpen(false)}
+                        reportForm={{}} // dummy placeholder
+                        handleInputChange={() => { }}
+                        handleSubmit={handleAddAccount} // ❌ This function is never defined in your component!
+                    />
+
+                )}
+
             </div>
         </div>
     );
