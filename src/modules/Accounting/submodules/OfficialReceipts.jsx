@@ -2,11 +2,22 @@ import React, { useState, useEffect } from 'react';
 import "../styles/accounting-styling.css";
 import Table from "../components/Table";
 import Search from "../components/Search";
+import Button from "../components/Button";
+import CreateReceiptModal from "../components/CreateReceiptModal";
 
 const OfficialReceipts = () => {
   const columns = ["OR ID", "Invoice ID", "Customer ID", "OR Date", "Settled Amount", "Remaining Amount", "Payment Method", "Reference #", "Created By"];
   const [data, setData] = useState([]);
   const [searching, setSearching] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const openModal = () => {
+    setModalOpen(true);
+  }
+  const closeModal = () => {
+    setModalOpen(false);
+  }
+
 
   const fetchData = () => {
     fetch('http://127.0.0.1:8000/api/official-receipts/')
@@ -64,11 +75,16 @@ const OfficialReceipts = () => {
 
         <div className="parent-component-container">
           <Search type="text" placeholder="Search Record.." value={searching} onChange={(e) => setSearching(e.target.value)} />
+          <div><Button name="Create Receipt" variant="standard2" onclick={openModal} /></div>
         </div>
 
         <Table data={filteredData} columns={columns} enableCheckbox={false} />
 
       </div>
+
+      {modalOpen && (
+        <CreateReceiptModal isModalOpen={modalOpen} closeModal={closeModal} />)}
+
     </div>
   )
 }
