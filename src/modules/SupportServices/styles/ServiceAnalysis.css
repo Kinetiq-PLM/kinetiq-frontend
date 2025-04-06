@@ -50,7 +50,7 @@
 }
 
 .servanal .tab:hover {
-  background-color: #bee2e2;
+  background-color: #d6f5f5;
 }
 
 .servanal .tab.active {
@@ -141,7 +141,11 @@
 }
 
 .servanal .analyses-table tbody tr:hover {
-  background-color: #bee2e2;
+  background-color: #d6f5f5;
+}
+
+.servanal .analyses-table .selected-row {
+  background-color: #d6f5f5;
 }
 
 .servanal .analyses-table tbody tr:last-child td {
@@ -223,8 +227,17 @@
   text-align: center;
 }
 
+.servanal .service-order-table .selected-row {
+  background-color: #d6f5f5;/* light teal */
+}
+
 .servanal .service-order-table tbody tr {
   background-color: #eff8f9;
+  transition: background-color 0.3s ease;
+}
+
+.servanal .service-order-table tbody tr:hover {
+  background-color: #d6f5f5;
 }
 
 .servanal .service-order-table tbody tr:last-child td {
@@ -288,10 +301,13 @@
 /* Inventory modal styling */
 .servanal .inventory-table-container {
   width: 100%;
+  margin-bottom: 0.5rem;
   border-radius: 0.5rem;
-  overflow: hidden;
   border: 1px solid #e0e0e0;
-  margin-bottom: 1rem;
+  max-height: 250px;
+  overflow-y: auto;
+  display: block;
+  position: relative;
 }
 
 .servanal .inventory-table {
@@ -299,6 +315,46 @@
   border-collapse: separate;
   border-spacing: 0;
   font-family: "Inter", sans-serif;
+}
+
+.servanal .inventory-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 3;
+}
+
+.servanal .inventory-table  th {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.servanal .inventory-table  td {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.servanal .inventory-table  tbody tr {
+  background-color: #eff8f9;
+  transition: background-color 0.3s ease;
+}
+
+.servanal .inventory-table tbody tr:hover {
+  background-color: #d6f5f5;
+}
+
+.servanal .inventory-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.servanal .inventory-table .empty-row td {
+  height: 2.5rem;
 }
 
 .servanal .inventory-request-section {
@@ -570,7 +626,8 @@
   color: #f44336;
 }
 
-.servanal .add-cancel-button {
+.servanal .add-cancel-button,
+.servanal .edit-cancel-button {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;

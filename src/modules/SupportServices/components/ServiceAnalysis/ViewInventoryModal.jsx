@@ -1,37 +1,37 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceAnalysisIcon from "/icons/SupportServices/ServiceAnalysisIcon.png"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 
+import { GET } from "../../api/api"
+
 const ViewInventoryModal = ({ isOpen, onClose, onSelectItem }) => {
   const [searchQuery, setSearchQuery] = useState("")
+  const [inventoryItems, setInventoryItems] = useState([])
 
-  // Sample inventory data
-  const inventoryItems = [
-    {
-      mdId: "123",
-      itemId: "999",
-      itemName: "Battery",
-      unitPrice: "₱ 18,900",
-      availableStock: "None",
-    },
-    {
-      mdId: "456",
-      itemId: "888",
-      itemName: "Power Supply",
-      unitPrice: "₱ 12,500",
-      availableStock: "5",
-    },
-    {
-      mdId: "789",
-      itemId: "777",
-      itemName: "Circuit Board",
-      unitPrice: "₱ 35,000",
-      availableStock: "2",
-    },
-  ]
+  const fetchItems = async () => {
+    try {
+      const data = await GET("inventory-items/");
+      setInventoryItems(data);
+    } catch (error) {
+      console.error("Error fetching inventory items:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  const filteredItems = inventoryItems.filter((inventoryItem) => {
+    const matchesSearch =
+    searchQuery === "" ||
+    inventoryItem.item_md_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+    inventoryItem.item?.item_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+    inventoryItem.item?.item_name?.toLowerCase().includes(searchQuery.toLowerCase()) 
+    return matchesSearch;
+  });  
 
   const handleSelectItem = (item) => {
     onSelectItem(item)
@@ -58,7 +58,7 @@ const ViewInventoryModal = ({ isOpen, onClose, onSelectItem }) => {
         </div>
 
         <div className="modal-content">
-          <div className="search-input-wrapper" style={{ marginBottom: "1rem" }}>
+          <div className="search-container" style={{ marginBottom: "1rem" }}>
             <img src={SearchIcon || "/placeholder.svg?height=16&width=16"} alt="Search" className="search-icon" />
             <input
               type="text"
@@ -76,18 +76,16 @@ const ViewInventoryModal = ({ isOpen, onClose, onSelectItem }) => {
                   <th>Item MD ID</th>
                   <th>Item ID</th>
                   <th>Item Name</th>
-                  <th>Unit Price</th>
                   <th>Available Stock</th>
                 </tr>
               </thead>
               <tbody>
-                {inventoryItems.map((item) => (
-                  <tr key={item.mdId} onClick={() => handleSelectItem(item)} style={{ cursor: "pointer" }}>
-                    <td>{item.mdId}</td>
-                    <td>{item.itemId}</td>
-                    <td>{item.itemName}</td>
-                    <td>{item.unitPrice}</td>
-                    <td>{item.availableStock}</td>
+                {filteredItems.map((item) => (
+                  <tr key={item.item_md_id} onClick={() => handleSelectItem(item)} style={{ cursor: "pointer" }}>
+                    <td>{item.item_md_id}</td>
+                    <td>{item.item?.item_id || ""}</td>
+                    <td>{item.item?.item_name}</td>
+                    <td>{item.available_stock}</td>
                   </tr>
                 ))}
               </tbody>

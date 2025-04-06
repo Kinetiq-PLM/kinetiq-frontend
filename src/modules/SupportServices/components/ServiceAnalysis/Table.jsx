@@ -1,6 +1,6 @@
 "use client"
 
-const Table = ({ analyses, onRowClick, onViewAnalysis }) => {
+const Table = ({ analyses, onRowClick, onViewAnalysis, selectedAnalysis }) => {
   return (
     <div className="table-container">
         <table className="analyses-table">
@@ -19,7 +19,9 @@ const Table = ({ analyses, onRowClick, onViewAnalysis }) => {
             {analyses.map((analysis, index) => (
               <tr 
                 key={analysis.analysis_id || `analysis-${index}`}
-                className={index % 2 === 0 ? "" : "alternate-row"}
+                className={`${
+                  selectedAnalysis?.analysis_id === analysis.analysis_id ? "selected-row" : ""
+                } ${index % 2 !== 0 ? "alternate-row" : ""}`}
                 onClick={() => onRowClick(analysis)}
                 style={{ cursor: "pointer" }} 
               >

@@ -267,10 +267,44 @@ const ServiceAnalysis = () => {
   }
 }
 
+  const handleEditOrderItem = async (orderItemData) => {
+    const orderItemId = orderItemData.service_order_item_id;
+    if (!orderItemId) {
+      console.error("Error: service_order_item_id is undefined");
+      return;
+    }
+    console.log("Updating service order item:", orderItemData)
+
+    try {
+      const data = await PATCH (`order-item/${orderItemId}/update/`, orderItemData);
+      console.log("Order item updated successfully:", data);
+      setShowEditItemModal(false);
+      fetchServiceOrderItems(serviceOrderInfo.serviceOrderId);
+      
+      try {
+        const data = await GET(`orders/${selectedAnalysis.analysis_id}/`);
+    
+        setServiceOrderInfo({
+          ...serviceOrderInfo,
+          orderTotalPrice: data?.order_total_price || "",
+        });
+
+      } catch (error) {
+        console.error("Error fetching order:", error);
+        setServiceOrderInfo({
+          ...serviceOrderInfo,
+          orderTotalPrice: ""
+        });
+      }
+
+  } catch (error) {
+      console.error("Error updating order item:", error.message);
+  }
+  }
+
   // Handle edit item
   const handleEditItem = (item) => {
     if (activeTab === "Service Order") {
-      setSelectedItem(item)
       setShowEditItemModal(true)
     }
   }
@@ -532,7 +566,12 @@ const ServiceAnalysis = () => {
                     <tbody>
                       {serviceOrderItems.length > 0 ? (
                         serviceOrderItems.map((item, index) => (
-                          <tr key={index}>
+                          <tr 
+                            key={index}
+                            onClick={() => setSelectedItem(item)}
+                            style={{ cursor: "pointer" }}
+                            className={selectedItem === item ? "selected-row" : ""}
+                          >
                             <td>{item.item?.item_id || ""}</td>
                             <td>{item.item?.item_name || ""}</td>
                             <td>{item.item_price}</td>
@@ -555,16 +594,16 @@ const ServiceAnalysis = () => {
                       <span className="no-order-label">No service order issued yet</span>
                     )}
                     <div className="inner-buttons-container">
-                      <button 
+                      {/* <button 
                         className="delete-item-button"
                         disabled={serviceOrderInfo.serviceOrderId === ""}
                       >
                         Delete Item
-                      </button>
+                      </button> */}
                       <button 
-                        className="edit-item-button" 
-                        onClick={() => handleEditItem(serviceOrderItems[0])}
-                        disabled={serviceOrderInfo.serviceOrderId === ""}
+                        className={`edit-item-button ${selectedItem ? "clickable" : "disabled"}`}
+                        onClick={() => handleEditItem(selectedItem)}
+                        disabled={serviceOrderInfo.serviceOrderId === "" || !selectedItem}
                       >
                         Edit Item
                       </button>
@@ -934,7 +973,12 @@ const ServiceAnalysis = () => {
           </div>
 
           {/* Table Component */}
-          <Table analyses={filteredAnalyses} onRowClick={handleRowClick} onViewAnalysis={handleViewAnalysis} />
+          <Table 
+            analyses={filteredAnalyses} 
+            onRowClick={handleRowClick} 
+            onViewAnalysis={handleViewAnalysis} 
+            selectedAnalysis={selectedAnalysis}
+          />
 
           {
             <div className="buttons-container-right table-buttons">
@@ -977,7 +1021,6 @@ const ServiceAnalysis = () => {
           isOpen={showAddItemModal}
           onClose={() => setShowAddItemModal(false)}
           onAdd={handleCreateOrderItem}
-          onViewInventory={handleViewInventory}
           order ={serviceOrderInfo.serviceOrderId}
         />
       )}
@@ -986,10 +1029,7 @@ const ServiceAnalysis = () => {
         <EditItemModal
           isOpen={showEditItemModal}
           onClose={() => setShowEditItemModal(false)}
-          onEdit={(item) => {
-            console.log("Editing item:", item)
-            setShowEditItemModal(false)
-          }}
+          onEdit={handleEditOrderItem}
           item={selectedItem}
           onViewInventory={handleViewInventory}
         />

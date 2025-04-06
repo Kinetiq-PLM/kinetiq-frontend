@@ -3,10 +3,11 @@
 import { useState } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceAnalysisIcon from "/icons/SupportServices/ServiceAnalysisIcon.png"
+import ViewInventoryModal from "./ViewInventoryModal"
 
 import { GET } from "../../api/api"
 
-const AddItemModal = ({ isOpen, onClose, onAdd, onViewInventory, order }) => {
+const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
   const [itemId, setItemId] = useState("")
   const [principalItemId, setPrincipalItemId] = useState("")
   const [quantity, setQuantity] = useState("")
@@ -15,6 +16,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, onViewInventory, order }) => {
 
   const [items, setItems] = useState([]);
   const [isItemsDropdown, setItemsDropdown] = useState(false)
+  const [showViewInventoryModal, setShowViewInventoryModal] = useState(false)
 
   const fetchItems= async () => {
     try {
@@ -28,6 +30,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, onViewInventory, order }) => {
   const handleToggleItems = () => {
     if (!isItemsDropdown) {
       fetchItems(); 
+      setItemsDropdown(true);
     }
     setItemsDropdown(!isItemsDropdown);
   };
@@ -37,6 +40,11 @@ const AddItemModal = ({ isOpen, onClose, onAdd, onViewInventory, order }) => {
     setItemName(item.item_name || "");
 
     setItemsDropdown(false);
+  };
+
+  const handleSelectItemInventory = (item) => {
+    setItemId(item.item?.item_id);
+    setItemName(item.item?.item_name || "");
   };
 
   const [principals, setPrincipals] = useState([]);
@@ -65,6 +73,10 @@ const AddItemModal = ({ isOpen, onClose, onAdd, onViewInventory, order }) => {
     setPrincipalDropdown(false);
   };
 
+  const handleViewInventory = () => {
+    setShowViewInventoryModal(true)
+  }
+
   const handleAdd = () => {
     onAdd({
       item_id: itemId,
@@ -72,7 +84,8 @@ const AddItemModal = ({ isOpen, onClose, onAdd, onViewInventory, order }) => {
       item_quantity: quantity,
       item_price: markupPrice,
       total_price: "0.00",
-      service_order_id: order
+      service_order_id: order,
+      item_name: itemName,
     })
   }
 
@@ -98,33 +111,42 @@ const AddItemModal = ({ isOpen, onClose, onAdd, onViewInventory, order }) => {
         <div className="modal-content">
           <div className="modal-form">
             <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="itemId">Item ID  <span className="required">*</span></label>
-                <div className="select-wrapper">
-                  <input
-                    type="text"
-                    id="itemId"
-                    value={itemId}
-                    readOnly
-                    onChange={(e) => setItemId(e.target.value)}
-                    placeholder="Enter item ID"
-                  />
-                  <span className="select-arrow" onClick={handleToggleItems}>▼</span>
-                  {isItemsDropdown && (
-                    <ul className="dropdown-list">
-                      {items.length > 0 ? (
-                        items.map((item) => (
-                              <li key={item.item_id} onClick={() => handleSelectItem(item)}>
-                                {item.item_id}
-                              </li>
-                            ))
-                          ) : (
-                            <li>No item ID found</li>
-                          )}
-                        </ul>
-                  )} 
-                </div>
+            <div className="form-group">
+              <label htmlFor="itemId">
+                Item ID <span className="required">*</span>
+              </label>
+              <div className="select-wrapper">
+                <input
+                  type="text"
+                  id="itemId"
+                  value={itemId}
+                  onChange={(e) => {
+                    setItemId(e.target.value);
+                    setItemsDropdown(true); // show dropdown on typing
+                  }}
+                  onClick={handleToggleItems}
+                  placeholder="Enter item ID"
+                />
+                <span className="select-arrow" onClick={handleToggleItems}>▼</span>
+                {isItemsDropdown && (
+                  <ul className="dropdown-list">
+                    {items.length > 0 ? (
+                      items
+                        .filter((item) =>
+                          item.item_id.toLowerCase().includes(itemId.toLowerCase())
+                        )
+                        .map((item) => (
+                          <li key={item.item_id} onClick={() => handleSelectItem(item)}>
+                            {item.item_id}
+                          </li>
+                        ))
+                    ) : (
+                      <li>No item ID found</li>
+                    )}
+                  </ul>
+                )}
               </div>
+            </div>
               <div className="form-group">
                 <label htmlFor="principalItemId">Principal Item ID <span className="required">*</span></label>
                 <div className="select-wrapper">
@@ -170,6 +192,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, onViewInventory, order }) => {
                 <input
                   type="text"
                   id="markupPrice"
+                  readOnly
                   value={markupPrice}
                   onChange={(e) => setMarkupPrice(e.target.value)}
                   placeholder="Enter markup price"
@@ -205,7 +228,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, onViewInventory, order }) => {
         <div className="inventory-request-section">  
           <div className="request-group">
             <p>&nbsp;</p>
-            <button className="view-inventory-button" onClick={onViewInventory}>
+            <button className="view-inventory-button" onClick={handleViewInventory}>
               View Inventory
             </button>
           </div>
@@ -216,9 +239,18 @@ const AddItemModal = ({ isOpen, onClose, onAdd, onViewInventory, order }) => {
             </button>
           </div>
         </div>
-        <div className="modal-footer">
-          
-        </div>
+
+        {showViewInventoryModal && (
+        <ViewInventoryModal
+          isOpen={showViewInventoryModal}
+          onClose={() => setShowViewInventoryModal(false)}
+          onSelectItem={(item) => {
+            console.log("Selected item:", item)
+            handleSelectItemInventory(item)
+            setShowViewInventoryModal(false)
+          }}
+        />
+      )}
       </div>
     </div>
   )
