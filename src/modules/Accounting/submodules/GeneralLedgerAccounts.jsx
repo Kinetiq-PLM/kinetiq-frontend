@@ -3,6 +3,8 @@ import '../styles/accounting-styling.css';
 import Table from '../components/Table';
 import Search from '../components/Search';
 import Dropdown from '../components/Dropdown';
+import Button from '../components/Button';
+import CreateGLAccountModal from '../components/CreateGLAccountModal';
 
 const GeneralLedgerAccounts = () => {
   const columns = ["GL Account ID", "Account name", "Account code", "Account ID", "Status", "Created at.."];
@@ -10,6 +12,10 @@ const GeneralLedgerAccounts = () => {
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   const fetchData = () => {
     fetch('http://127.0.0.1:8000/api/general-ledger-accounts/')
@@ -44,7 +50,7 @@ const GeneralLedgerAccounts = () => {
   const handleStatusFilter = (status) => {
     setStatusFilter(status === "" ? "All" : status);
   };
-  
+
   const filteredData = data.filter(row => {
     const matchesSearch = [row[0], row[1], row[2], row[3], row[4], row[5]]
       .filter(Boolean)
@@ -53,7 +59,7 @@ const GeneralLedgerAccounts = () => {
       .includes(searching.toLowerCase());
 
     const matchesStatus = statusFilter === "All" || statusFilter === "" || row[4].toLowerCase() === statusFilter.toLowerCase();
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -70,10 +76,19 @@ const GeneralLedgerAccounts = () => {
             <Dropdown options={["All", "Active", "Inactive"]} style="selection" defaultOption="Filter by Status.." onChange={handleStatusFilter} />
             <Search type="text" placeholder="Search Entries.." value={searching} onChange={(e) => setSearching(e.target.value)} />
           </div>
+          <div><Button name="Create account" variant="standard2" onclick={openModal} /></div>
         </div>
 
         <Table data={filteredData} columns={columns} enableCheckbox={false} />
       </div>
+
+      {isModalOpen && (
+        <CreateGLAccountModal
+          isModalOpen={isModalOpen}
+          closeModal={() => setIsModalOpen(false)}
+        />
+
+      )}
     </div>
   );
 };
