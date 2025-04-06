@@ -422,6 +422,14 @@
   margin-bottom: 1rem;
 }
 
+.servanal .buttons-container-right-delorder {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  margin-left: 278.5px;
+}
+
 .servanal .buttons-container-left {
   display: flex;
   justify-content: flex-start;

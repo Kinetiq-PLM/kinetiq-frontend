@@ -101,6 +101,24 @@ const ServiceAnalysis = () => {
     fetchAnalyses();
   }, []);
 
+    useEffect(() => {
+      if (activeTab === "Delivery Order") {
+        setDeliveryOrderInfo((prev) => ({
+          ...prev,
+          ...(selectedAnalysis?.analysis_id && {
+            customerId: selectedAnalysis.customer?.customer_id || "",
+            name: selectedAnalysis.customer?.name || "",
+            address: selectedAnalysis.customer
+              ? `${selectedAnalysis.customer.address_line1 || ""} ${selectedAnalysis.customer.address_line2 || ""}`.trim()
+              : "",
+          }),
+          ...(serviceOrderInfo?.serviceOrderId && {
+            serviceOrderId: serviceOrderInfo?.serviceOrderId || "",
+          }),
+        }));
+      }
+    }, [activeTab, selectedAnalysis, serviceOrderInfo]);
+
   const handleRowClick = async (analysis) => {
     try {
       const data = await GET(`service-analyses/${analysis.analysis_id}`); 
@@ -121,13 +139,22 @@ const ServiceAnalysis = () => {
         requestType: data.service_request?.request_type,
       })
 
+      setDeliveryOrderInfo({
+        customerId: data.customer?.customer_id || "",
+        name: data.customer?.name || "",
+        address: data.customer
+          ? `${data.customer.address_line1 || ""} ${data.customer.address_line2 || ""}`.trim()
+          : "",
+        serviceOrderId: serviceOrderInfo?.serviceOrderId || "",
+      });
+
       fetchOrder(data.analysis_id);
 
     } catch (error) {
       console.error("Error fetching service analysis details:", error);
     }
   };
-  
+
   const fetchOrder = async (analysisId) => {
     try {
       const data = await GET(`orders/${analysisId}/`);
@@ -152,7 +179,12 @@ const ServiceAnalysis = () => {
         orderTotalPrice: data?.order_total_price || "",
       });
 
+      setDeliveryOrderInfo({
+        serviceOrderId: data?.service_order_id || "",
+      })
+
       fetchServiceOrderItems(data?.service_order_id);
+      fetchDeliveryOrder(data?.service_order_id);
 
     } catch (error) {
       console.error("Error fetching order:", error);
@@ -172,7 +204,53 @@ const ServiceAnalysis = () => {
       console.error("Error fetching order items:", error);
     }
   };
+
+  const fetchDeliveryOrder = async (serviceOrderId) => {
+    try {
+      const data = await GET(`delivery-orders/${serviceOrderId}/`);
+      setDeliveryOrderInfo((prevState) => ({
+        ...prevState,  
+        deliveryOrderId: data?.delivery_order_id || prevState.deliveryOrderId,
+        deliveryDate: data?.delivery_date || prevState.deliveryDate,
+        deliveryStatus: data?.delivery_status || prevState.deliveryStatus,
+      }));
+    } catch (error) {
+      console.error("Error fetching delivery order:", error);
+      setDeliveryOrderInfo((prevState) => ({
+        ...prevState,  
+        deliveryOrderId: "",
+        deliveryDate: "",
+        deliveryStatus: "",
+      }));
+    }
+  };
   
+  const [isOpenStatusDD, setOpenStatusDD] = useState(false);
+
+  const handleToggleDropdownStatus = () => {
+    setOpenStatusDD(!isOpenStatusDD);
+  };
+  
+  const handleSelectStatus = (status) => {
+    setDeliveryOrderInfo((prevState) => ({
+      ...prevState,  
+      deliveryStatus: status,
+    }));
+    setOpenStatusDD(false); 
+  };
+
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+
+    const toggleDatePicker = () => {
+      const dateInput = document.getElementById("deliveryDate");
+      if (isPickerOpen) {
+        dateInput.blur(); 
+      } else {
+        dateInput.showPicker(); 
+      }
+      
+      setIsPickerOpen(!isPickerOpen); 
+    };
 
   // Handle view analysis
   const handleViewAnalysis = (analysis) => {
@@ -313,6 +391,44 @@ const ServiceAnalysis = () => {
   const handleViewInventory = () => {
     if (activeTab === "Service Order") {
       setShowViewInventoryModal(true)
+    }
+  }
+
+  const createDeliveryOrder  = async () => {
+    if (activeTab === "Delivery Order") {
+      const newDeliveryOrderInfo  = {
+        customer_id: deliveryOrderInfo.customerId || "",
+        customer_address: deliveryOrderInfo.address || "",
+        delivery_status: deliveryOrderInfo.deliveryStatus,
+        delivery_date: deliveryOrderInfo.deliveryDate,
+        service_order_id: deliveryOrderInfo.serviceOrderId,
+      }
+      console.log("Creating delivery order:", newDeliveryOrderInfo )
+      try {
+        const data = await POST("/delivery-order/", newDeliveryOrderInfo );
+        console.log("Delivery order created successfully:", data);
+        fetchDeliveryOrder(serviceOrderInfo.serviceOrderId);
+      } catch (error) {
+          console.error("Error submitting delivery order:", error.message);
+      }
+    }
+  }
+
+  const updateDeliveryOrder  = async () => {
+    if (activeTab === "Delivery Order") {
+      const newDeliveryOrderInfo  = {
+        delivery_status: deliveryOrderInfo.deliveryStatus,
+        delivery_date: deliveryOrderInfo.deliveryDate,
+      }
+      const id = deliveryOrderInfo.deliveryOrderId
+      console.log("Updating delivery order:", id )
+      try {
+        const data = await PATCH(`delivery-order/${id}/update/`, newDeliveryOrderInfo );
+        console.log("Delivery order updated successfully:", data);
+        fetchDeliveryOrder(serviceOrderInfo.serviceOrderId);
+      } catch (error) {
+          console.error("Error updating delivery order:", error.message);
+      }
     }
   }
 
@@ -652,6 +768,7 @@ const ServiceAnalysis = () => {
                   <input
                     type="text"
                     id="deliveryOrderId"
+                    readOnly
                     value={deliveryOrderInfo.deliveryOrderId}
                     onChange={(e) => setDeliveryOrderInfo({ ...deliveryOrderInfo, deliveryOrderId: e.target.value })}
                     placeholder="No delivery order issued yet..."
@@ -694,10 +811,10 @@ const ServiceAnalysis = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="deliveryDate">Delivery Date *</label>
+                  <label htmlFor="deliveryDate">Delivery Date <span className="required">*</span></label>
                   <div className="date-input-wrapper">
                     <input
-                      type="text"
+                      type="date"
                       id="deliveryDate"
                       value={deliveryOrderInfo.deliveryDate}
                       onChange={(e) => setDeliveryOrderInfo({ ...deliveryOrderInfo, deliveryDate: e.target.value })}
@@ -707,6 +824,8 @@ const ServiceAnalysis = () => {
                       src={CalendarInputIcon || "/placeholder.svg?height=16&width=16"}
                       alt="Calendar"
                       className="calendar-icon"
+                      onClick={toggleDatePicker}
+                      style={{ cursor: "pointer" }}
                     />
                   </div>
                 </div>
@@ -724,24 +843,50 @@ const ServiceAnalysis = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="deliveryStatus">Delivery Status *</label>
+                  <label htmlFor="deliveryStatus">Delivery Status <span className="required">*</span></label>
                   <div className="select-wrapper">
                     <input
                       type="text"
                       id="deliveryStatus"
+                      readOnly
                       value={deliveryOrderInfo.deliveryStatus}
                       onChange={(e) => setDeliveryOrderInfo({ ...deliveryOrderInfo, deliveryStatus: e.target.value })}
                       placeholder="Pending"
                     />
-                    <span className="select-arrow">▼</span>
+                    <span className="select-arrow" onClick={handleToggleDropdownStatus}>▼</span>
+                    {isOpenStatusDD && (
+                    <ul className="dropdown-list">
+                      {["Pending", "Shipped", "Delivered"].map((status) => (
+                        <li key={status} onClick={() => handleSelectStatus(status)}>
+                          {status}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   </div>
                 </div>
+
+                <div className="buttons-container-right-delorder">
+                <button 
+                  type="button"
+                  className={`update-button ${deliveryOrderInfo.deliveryOrderId !== "" ? "clickable" : "disabled"}`} 
+                  onClick={() => updateDeliveryOrder()}
+                  disabled={deliveryOrderInfo.deliveryOrderId === ""}
+                >
+                  Update
+                </button>
+                <button 
+                  type="button"
+                  className={`add-button ${deliveryOrderInfo.deliveryOrderId === "" ? "clickable" : "disabled"}`} 
+                  onClick={() => createDeliveryOrder()}
+                  disabled={deliveryOrderInfo.deliveryOrderId !== ""}
+                >
+                  Add
+                </button>
+              </div>
               </div>
 
-              <div className="buttons-container-right">
-                <button className="update-button">Update</button>
-                <button className="add-button">Add</button>
-              </div>
+              
             </div>
           )}
 
