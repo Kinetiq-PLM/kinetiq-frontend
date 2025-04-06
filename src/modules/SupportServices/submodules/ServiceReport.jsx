@@ -300,7 +300,11 @@ const ServiceReport = () => {
           </div>
 
           {/* Table Component */}
-          <Table reports={filteredReports} onRowClick={handleRowClick}  />
+          <Table 
+            reports={filteredReports} 
+            onRowClick={handleRowClick}  
+            selectedReport={selectedReport}
+          />
 
           <div className="action-buttons">
           <button

@@ -1,4 +1,4 @@
-const Table = ({ reports, onRowClick }) => {
+const Table = ({ reports, onRowClick, selectedReport }) => {
   // Ensure we have at least 5 rows for the table
   const filledReports = [...reports]
   while (filledReports.length < 5) {
@@ -23,8 +23,10 @@ const Table = ({ reports, onRowClick }) => {
           {filledReports.map((report, index) => (
             <tr
               key={report.report_id || `report-${index}`}
-              className={index % 2 === 0 ? "" : "alternate-row"}
-              onClick={() => onRowClick(report)} // makes table row clickable, function update the state fields
+              className={`${
+                selectedReport?.report_id === report.report_id ? "selected-row" : ""
+              } ${index % 2 !== 0 ? "alternate-row" : ""}`}
+              onClick={() => onRowClick(report)}
               style={{ cursor: "pointer" }} 
             >
               {!report.empty ? (

@@ -139,7 +139,7 @@ const ServiceRequest = () => {
 
             <div className="filter-dropdown">
               <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-                Filter by
+                {filterOptions.find(opt => opt.value === filterBy)?.label || "Filter by"}
                 <span className="arrow">▼</span>
               </button>
               {showFilterOptions && (
@@ -155,7 +155,12 @@ const ServiceRequest = () => {
           </div>
 
           {/* Table Component */}
-          <Table requests={filteredRequests} onRowClick={handleRowClick}  onViewRequest={handleViewRequest} />
+          <Table 
+            requests={filteredRequests} 
+            onRowClick={handleRowClick}  
+            onViewRequest={handleViewRequest} 
+            selectedRequest={selectedRequest}
+          />
 
           <div className="update-container">
             <button 

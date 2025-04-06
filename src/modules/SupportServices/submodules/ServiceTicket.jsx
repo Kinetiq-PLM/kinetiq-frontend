@@ -191,7 +191,11 @@ const ServiceTicket = () => {
           </div>
           
           {/*Table Component */}
-          <ServTickTable filteredTickets={filteredTickets} onRowClick={handleRowClick} />
+          <ServTickTable 
+            filteredTickets={filteredTickets} 
+            onRowClick={handleRowClick} 
+            selectedTicket={selectedTicket}
+          />
 
           <div className="queue-container">
             <button

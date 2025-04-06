@@ -259,24 +259,31 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                       type="text"
                       id="ticketId"
                       value={formData.ticketId}
-                      readOnly
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChange(e); 
+                        setOpenTixDD(true);
+                      }}
+                      onClick={handleToggleTickets}
                       placeholder="Enter ticket ID"
                     />
                     <span className="select-arrow"  onClick={handleToggleTickets}>▼</span>
                     {isTixDropdown && (
-                    <ul className="dropdown-list">
-                      {tickets.length > 0 ? (
-                        tickets.map((ticket) => (
+                      <ul className="dropdown-list">
+                        {tickets.length > 0 ? (
+                          tickets
+                            .filter((ticket) =>
+                              ticket.ticket_id.toLowerCase().includes(formData.ticketId.toLowerCase())
+                            )
+                            .map((ticket) => (
                               <li key={ticket.ticket_id} onClick={() => handleSelectTix(ticket)}>
                                 {ticket.ticket_id}
                               </li>
                             ))
-                          ) : (
-                            <li>No ticket ID found</li>
-                          )}
-                        </ul>
-                  )}
+                        ) : (
+                          <li>No ticket ID found</li>
+                        )}
+                      </ul>
+                    )}
                   </div>
                 </div>
 
@@ -355,24 +362,31 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                       type="text"
                       id="renewalId"
                       value={formData.renewalId}
-                      readOnly
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChange(e); 
+                        setOpenRenewalDD(true);
+                      }}
+                      onClick={handleToggleRenewals}
                       placeholder="Enter renewal ID"
                     />
                     <span className="select-arrow"  onClick={handleToggleRenewals}>▼</span>
                     {isRenewalDropdown && (
-                    <ul className="renewal-dropdown-list dropdown-list">
-                      {renewals.length > 0 ? (
-                        renewals.map((renewal) => (
+                      <ul className="renewal-dropdown-list dropdown-list">
+                        {renewals.length > 0 ? (
+                          renewals
+                            .filter((renewal) =>
+                            renewal.renewal_id.toLowerCase().includes(formData.renewalId.toLowerCase())
+                            )
+                            .map((renewal) => (
                               <li key={renewal.renewal_id} onClick={() => handleSelectRenewal(renewal)}>
                                 {renewal.renewal_id}
                               </li>
                             ))
-                          ) : (
-                            <li>No renewal ID found</li>
-                          )}
-                        </ul>
-                  )}
+                        ) : (
+                          <li>No renewal ID found</li>
+                        )}
+                      </ul>
+                    )}
                   </div>
                 </div>
 
@@ -383,24 +397,31 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                     type="text"
                     id="billingId"
                     value={formData.billingId}
-                    readOnly
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e); 
+                      setOpenBillingDD(true);
+                    }}
+                    onClick={handleToggleBillings}
                     placeholder="Enter billing ID"
                   />
                   <span className="select-arrow" onClick={handleToggleBillings}>▼</span>
-                    {isBillingDropdown && (
-                    <ul className="billing-dropdown-list dropdown-list">
-                      {billings.length > 0 ? (
-                        billings.map((billing) => (
+                  {isBillingDropdown && (
+                      <ul className="billing-dropdown-list dropdown-list">
+                        {billings.length > 0 ? (
+                          billings
+                            .filter((billing) =>
+                            billing.service_billing_id.toLowerCase().includes(formData.billingId.toLowerCase())
+                            )
+                            .map((billing) => (
                               <li key={billing.service_billing_id} onClick={() => handleSelectBilling(billing)}>
                                 {billing.service_billing_id}
                               </li>
                             ))
-                          ) : (
-                            <li>No billing ID found</li>
-                          )}
-                        </ul>
-                  )}
+                        ) : (
+                          <li>No billing ID found</li>
+                        )}
+                      </ul>
+                    )}
                   </div>
                   
                 </div>
@@ -459,19 +480,26 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                     type="text"
                     id="technicianId"
                     value={formData.technicianId}
-                    readOnly
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e); 
+                      setOpenTechDD(true);
+                    }}
+                    onClick={handleToggleDropdownTech}
                     placeholder="Select technician ID"
                   />
                   <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
-                    {isTechDropdown && (
+                  {isTechDropdown && (
                       <ul className="technician-dropdown-list dropdown-list">
                         {technicians.length > 0 ? (
-                          technicians.map((technician) => (
-                            <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
-                              {technician.employee_id}
-                            </li>
-                          ))
+                          technicians
+                            .filter((technician) =>
+                            technician.employee_id.toLowerCase().includes(formData.technicianId.toLowerCase())
+                            )
+                            .map((technician) => (
+                              <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
+                                {technician.employee_id}
+                              </li>
+                            ))
                         ) : (
                           <li>No technicians found</li>
                         )}

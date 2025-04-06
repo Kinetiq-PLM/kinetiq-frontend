@@ -288,7 +288,11 @@
 }
 
 .service-report tbody tr:hover {
-  background-color: #bee2e2;
+  background-color: #d6f5f5;
+}
+
+.service-report .reports-table .selected-row {
+  background-color: #d6f5f5;
 }
 
 .service-report tbody tr:last-child td {

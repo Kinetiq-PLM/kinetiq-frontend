@@ -68,7 +68,7 @@
   position: absolute;
   top: 100%;
   left: 0;
-  width: 100%;
+  width: 130px;
   background-color: white;
   border: 1px solid #e8e8e8;
   border-radius: 8px;
@@ -180,7 +180,11 @@
 }
 
 .servtick tbody tr:hover {
-  background-color: #bee2e2;
+  background-color: #d6f5f5;
+}
+
+.servtick .tickets-table .selected-row {
+  background-color: #d6f5f5;
 }
 
 .servtick tbody tr:last-child td {

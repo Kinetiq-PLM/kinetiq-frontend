@@ -30,8 +30,8 @@
 .servcall .filter-options {
   position: absolute;
   top: 100%;
-  left: 0;
-  width: 100%;
+  right: 0;
+  width: 130px;
   background-color: white;
   border: 1px solid #e8e8e8;
   border-radius: 0.25rem;
@@ -81,7 +81,11 @@
 }
 
 .servcall tbody tr:hover {
-  background-color: #bee2e2;
+  background-color: #d6f5f5;
+}
+
+.servcall .service-calls-table .selected-row {
+  background-color: #d6f5f5;
 }
 
 .servcall tbody tr:last-child td {

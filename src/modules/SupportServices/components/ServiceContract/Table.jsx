@@ -1,6 +1,6 @@
 "use client"
 
-const Table = ({ contracts, onRowClick, onViewContract }) => {
+const Table = ({ contracts, onRowClick, onViewContract, selectedContract }) => {
   return (
     <div className="table-container">
         <table className="contracts-table">
@@ -18,8 +18,10 @@ const Table = ({ contracts, onRowClick, onViewContract }) => {
           <tbody>
             {contracts.map((contract, index) => (
               <tr 
-                key={contract.id || `contract-${index}`} 
-                className={index % 2 === 0 ? "" : "alternate-row"} 
+                key={contract.contract_id || `contract-${index}`} 
+                className={`${
+                  selectedContract?.contract_id === contract.contract_id ? "selected-row" : ""
+                } ${index % 2 !== 0 ? "alternate-row" : ""}`}
                 onClick={() => onRowClick(contract)} 
                 style={{ cursor: "pointer" }} 
               >

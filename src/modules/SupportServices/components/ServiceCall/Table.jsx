@@ -1,6 +1,6 @@
 "use client"
 
-const Table = ({ serviceCalls, onRowClick, onViewDetails }) => {
+const Table = ({ serviceCalls, onRowClick, onViewDetails, selectedCall }) => {
   return (
     <div className="table-container">
       <table className="service-calls-table">
@@ -17,8 +17,10 @@ const Table = ({ serviceCalls, onRowClick, onViewDetails }) => {
         <tbody>
           {serviceCalls.map((call, index) => (
             <tr 
-              key={call.id || `ticket-${index}`} 
-              className={index % 2 === 0 ? "" : "alternate-row"}
+              key={call.service_call_id || `ticket-${index}`} 
+              className={`${
+                selectedCall?.service_call_id === call.service_call_id ? "selected-row" : ""
+              } ${index % 2 !== 0 ? "alternate-row" : ""}`}
               onClick={() => onRowClick(call)} // makes table row clickable, function update the state fields
               style={{ cursor: "pointer" }} 
             >

@@ -36,6 +36,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
     const handleToggleRequests = () => {
       if (!isReqDropdown) {
         fetchRequests(); 
+        setOpenReqDD(true);
       }
       setOpenReqDD(!isReqDropdown);
     };
@@ -67,6 +68,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
     const handleToggleDropdownTech = () => {
       if (!isTechDropdown) {
         fetchTechnicians(); 
+        setOpenTechDD(true);
       }
       setOpenTechDD(!isTechDropdown);
     };
@@ -167,24 +169,31 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
                     type="text"
                     id="requestId"
                     value={requestId}
-                    readOnly
-                    onChange={(e) => setRequestId(e.target.value)}
+                    onChange={(e) => {
+                      setRequestId(e.target.value);
+                      setOpenReqDD(true)
+                    }}
+                    onClick={handleToggleRequests}
                     placeholder="Enter request ID"
                   />
                   <span className="select-arrow" onClick={handleToggleRequests} >▼</span>
                   {isReqDropdown && (
-                    <ul className="dropdown-list">
-                      {requests.length > 0 ? (
-                        requests.map((request) => (
-                              <li key={request.service_request_id} onClick={() => handleSelectReq(request)}>
-                                {request.service_request_id}
-                              </li>
-                            ))
-                          ) : (
-                            <li>No request ID found</li>
-                          )}
-                        </ul>
-                  )} 
+                  <ul className="dropdown-list">
+                    {requests.length > 0 ? (
+                      requests
+                        .filter((request) =>
+                        request.service_request_id.toLowerCase().includes(requestId.toLowerCase())
+                        )
+                        .map((request) => (
+                          <li key={request.service_request_id} onClick={() => handleSelectReq(request)}>
+                            {request.service_request_id}
+                          </li>
+                        ))
+                    ) : (
+                      <li>No request ID found</li>
+                    )}
+                  </ul>
+                )}
                 </div>
               </div>
               <div className="form-group">
@@ -193,22 +202,29 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
                   <input
                     type="text"
                     id="technicianId"
-                    readOnly
                     value={technicianId}
-                    onChange={(e) => setTechnicianId(e.target.value)}
+                    onChange={(e) => {
+                      setTechnicianId(e.target.value);
+                      setOpenTechDD(true);
+                    }}
+                    onClick = {handleToggleDropdownTech}
                     placeholder="Enter technician ID"
                   />
                   <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
                       {isTechDropdown && (
-                        <ul className="technician-dropdown-list dropdown-list">
+                        <ul className="dropdown-list">
                           {technicians.length > 0 ? (
-                            technicians.map((technician) => (
-                              <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
-                                {technician.employee_id}
-                              </li>
-                            ))
+                            technicians
+                              .filter((technician) =>
+                                technician.employee_id.toLowerCase().includes(technicianId.toLowerCase())
+                              )
+                              .map((technician) => (
+                                <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
+                                  {technician.employee_id}
+                                </li>
+                              ))
                           ) : (
-                            <li>No technicians found</li>
+                            <li>No technicians ID found</li>
                           )}
                         </ul>
                       )}

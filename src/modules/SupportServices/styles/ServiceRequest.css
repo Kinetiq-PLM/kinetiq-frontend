@@ -82,9 +82,12 @@
 }
 
 .servrequ tbody tr:hover {
-  background-color: #bee2e2;
+  background-color: #d6f5f5;
 }
 
+.servrequ .requests-table .selected-row {
+  background-color: #d6f5f5;
+}
 .servrequ tbody tr:last-child td {
   border-bottom: none;
 }

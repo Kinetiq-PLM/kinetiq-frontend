@@ -66,6 +66,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   const handleToggleDropdownTech = () => {
     if (!isTechDropdown) {
       fetchTechnicians(); 
+      setOpenTechDD(true);
     }
     setOpenTechDD(!isTechDropdown);
   };
@@ -102,6 +103,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   const handleToggleDropdownProd = () => {
     if (!isProdDropdown) {
       fetchProducts(); 
+      setOpenProdDD(true);
     }
     setOpenProdDD(!isProdDropdown);
   };
@@ -197,25 +199,31 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
                     type="text"
                     id="productId"
                     value={productId}
-                    //readOnly
-                    onChange={(e) => setProductId(e.target.value)}
+                    onChange={(e) => {
+                      setProductId(e.target.value);
+                      setOpenProdDD(true);
+                    }}
+                    onClick = {handleToggleDropdownProd}
                     placeholder="Select product ID"
                   />
                   <span className="select-arrow"  onClick={handleToggleDropdownProd}>▼</span>
-                  { /* Dropdown List */}
                     {isProdDropdown && (
-                      <ul className="dropdown-list prod-dropdown-list">
-                        {products.length > 0 ? (
-                          products.map((product) => (
-                            <li key={product.product_id} onClick={() => handleSelectProduct(product)}>
-                              {product.product_id}
-                            </li>
-                          ))
-                        ) : (
-                          <li>No products found</li>
-                        )}
-                      </ul>
-                    )}
+                        <ul className="dropdown-list prod-dropdown-list">
+                          {products.length > 0 ? (
+                            products
+                              .filter((product) =>
+                              product.product_id.toLowerCase().includes(productId.toLowerCase())
+                              )
+                              .map((product) => (
+                                <li key={product.product_id} onClick={() => handleSelectProduct(product)}>
+                                  {product.product_id}
+                                </li>
+                              ))
+                          ) : (
+                            <li>No products found</li>
+                          )}
+                        </ul>
+                      )}
                 </div>
               </div>
             </div>
@@ -232,25 +240,31 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
                     type="text"
                     id="assignTechnicianId"
                     value={technicianId}
-                    //readOnly
-                    onChange={(e) => handletechnicianInput(e.target.value)}
+                    onChange={(e) => {
+                      setTechnicianId(e.target.value);
+                      setOpenTechDD(true);
+                    }}
+                    onClick = {handleToggleDropdownTech}
                     placeholder="Select technician ID"
                   />
                   <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
-                  { /* Dropdown List */}
-                    {isTechDropdown && (
-                      <ul className="dropdown-list">
-                        {technicians.length > 0 ? (
-                          technicians.map((technician) => (
-                            <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
-                              {technician.employee_id}
-                            </li>
-                          ))
-                        ) : (
-                          <li>No technicians found</li>
-                        )}
-                      </ul>
-                    )}
+                  {isTechDropdown && (
+                        <ul className="dropdown-list">
+                          {technicians.length > 0 ? (
+                            technicians
+                              .filter((technician) =>
+                                technician.employee_id.toLowerCase().includes(technicianId.toLowerCase())
+                              )
+                              .map((technician) => (
+                                <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
+                                  {technician.employee_id}
+                                </li>
+                              ))
+                          ) : (
+                            <li>No technicians ID found</li>
+                          )}
+                        </ul>
+                      )}
                 </div>
               </div>
 
