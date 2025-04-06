@@ -1,130 +1,123 @@
 import React, { useState, useEffect } from "react";
 import "../styles/InvPcountForm.css";
 
-const InvPcountForm = ({ onClose, selectedItem, activeTab }) => {
+const InvPcountForm = ({ onClose, selectedItem }) => {
+  const [inventoryItemId, setInventoryItemId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [employeeId, setEmployeeId] = useState("");
-  const [purchaseDescription, setPurchaseDescription] = useState("");
-  const [purchaseItem, setPurchaseItem] = useState("");
+  const [status, setStatus] = useState("");
+  const [timePeriod, setTimePeriod] = useState("");
+  const [warehouse, setWarehouse] = useState("");
+  const [remarks, setRemarks] = useState("");
+
+  // Success/error messages
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Generate a request ID with prefix
-  const generateRequestId = () => {
-    const prefix = activeTab === "Assets" ? "ASST-" : "MAT-";
-    return `${prefix}${Date.now()}`;
-  };
-
+  // Prefill fields from selectedItem if available
   useEffect(() => {
     if (selectedItem) {
-      setPurchaseItem(selectedItem.product_data || "");  
+      setInventoryItemId(selectedItem.inventory_item_id || "");
       setQuantity(selectedItem.item_actually_counted || "");
-      setEmployeeId(selectedItem.employee || "");
+      setEmployeeId(selectedItem.employee_id || "");
+      setStatus(selectedItem.status || "");
+      setTimePeriod(selectedItem.time_period || "");
+      setWarehouse(selectedItem.warehouse || "");
+      setRemarks(selectedItem.remarks || "");
     } else {
-      setPurchaseItem("");
-      setQuantity("");
-      setEmployeeId("");
-      setPurchaseDescription("");
+      handleClear();
     }
-  }, [selectedItem, activeTab]);
-  
+  }, [selectedItem]);
+
+  // Clear all form fields
   const handleClear = () => {
+    setInventoryItemId("");
     setQuantity("");
     setEmployeeId("");
-    setPurchaseDescription("");
-    if (selectedItem) {
-      if (activeTab === "Assets") {
-        setPurchaseItem(selectedItem.asset_id || selectedItem.Name || "");
-      } else if (activeTab === "Raw Materials") {
-        setPurchaseItem(selectedItem.material_id || selectedItem.Name || "");
-      } else {
-        setPurchaseItem(selectedItem.product_name || selectedItem.item_id || "");
-      }
-    } else {
-      setPurchaseItem("");
-    }
-    setErrorMessage("");
+    setStatus("");
+    setTimePeriod("");
+    setWarehouse("");
+    setRemarks("");
     setSuccessMessage("");
+    setErrorMessage("");
   };
 
+  // Submit form to create a new row in inventory_cyclic_counts
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
-  
-    if (!selectedItem) {
-      setErrorMessage("No item selected. Please select an item first.");
-      return;
-    }
-  
-    if (!quantity || !employeeId) {
+
+    // Basic validation
+    if (
+      !inventoryItemId ||
+      !quantity ||
+      !employeeId ||
+      !status ||
+      !timePeriod ||
+      !warehouse
+    ) {
       setErrorMessage("Please fill in all required fields.");
       return;
     }
-  
-    const requestData = {
-      request_id: "REQ-" + Date.now(), 
+
+    // Define item_onhand (defaulting to 0 if not provided) and compute difference_in_qty
+    const itemOnHand = 0; // Default value; update if available from selectedItem
+    const actualCounted = Number(quantity);
+    const diffQty = itemOnHand - actualCounted;
+
+    // Build request payload
+    const newRecord = {
+      inventory_item_id: inventoryItemId,
+      item_onhand: itemOnHand,
+      item_actually_counted: actualCounted,
+      difference_in_qty: diffQty,
       employee_id: employeeId,
-      item_id: purchaseItem,
-      purchase_quantity: quantity,
-      purchase_description: purchaseDescription
+      status: status,
+      time_period: timePeriod,
+      remarks: remarks,
+      warehouse: warehouse,
     };
-  
-    if (activeTab === "Assets") {
-      requestData.asset_id = selectedItem.asset_id;
-    } else if (activeTab === "Raw Materials") {
-      requestData.material_id = selectedItem.material_id;
-    }
-  
+
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/purchase-requests/", {
+      const response = await fetch("http://127.0.0.1:8000/api/cyclic_counts/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
+        body: JSON.stringify(newRecord),
       });
-  
+
       if (!response.ok) {
-        const clonedResponse = response.clone();
-        let errorDetails = "";
-  
-        try {
-          const errorData = await response.json();
-          errorDetails = errorData.detail || JSON.stringify(errorData);
-        } catch {
-          const textData = await clonedResponse.text();
-          if (textData.includes("<!DOCTYPE") || textData.includes("<html")) {
-            errorDetails = "Server error occurred";
-          } else {
-            errorDetails = textData.slice(0, 200) + "...";
-          }
-        }
-        throw new Error(`Submission failed: ${errorDetails || "Unexpected error."}`);
+        const errorText = await response.text();
+        throw new Error(`Failed to insert record: ${errorText}`);
       }
-  
+
       const data = await response.json();
-      console.log("Successfully submitted purchase request:", data);
-      setSuccessMessage("Purchase request submitted successfully!");
-      
-      // Optionally reset the form fields after successful submission
-      setQuantity("");
-      setEmployeeId("");
-      setPurchaseDescription("");
-      
-      setTimeout(() => onClose(), 2000);
-    } catch (error) {
-      console.error("Error submitting purchase request:", error);
-      setErrorMessage(error.message || "An unexpected error occurred.");
+      console.log("Successfully inserted new record:", data);
+      setSuccessMessage("Successfully inserted new record!");
+
+      // Optionally clear the form or close the modal after success
+      setTimeout(() => {
+        handleClear();
+        onClose();
+      }, 1500);
+    } catch (err) {
+      console.error("Error inserting record:", err);
+      setErrorMessage(err.message || "An unexpected error occurred.");
     }
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Add P-counts Form</h2>
-          <button onClick={onClose} className="close-btn">✕</button>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-semibold">Add P-count</h2>
+          <button onClick={onClose} className="close-btn">
+            ✕
+          </button>
         </div>
 
+        {/* Success / Error messages */}
         {successMessage && (
           <p style={{ color: "green", marginBottom: "1rem" }}>
             {successMessage}
@@ -136,17 +129,22 @@ const InvPcountForm = ({ onClose, selectedItem, activeTab }) => {
           </p>
         )}
 
+        {/* Form Fields */}
         <form onSubmit={handleSubmit}>
-          <label>Inventory Item ID</label>
+          <label>
+            Inventory Item ID <span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
-            value={purchaseItem}
-            onChange={(e) => setPurchaseItem(e.target.value)}
-            readOnly={!!selectedItem}
-            className={selectedItem ? "bg-gray-100" : ""}
+            placeholder="Enter Inventory Item ID"
+            value={inventoryItemId}
+            onChange={(e) => setInventoryItemId(e.target.value)}
+            required
           />
 
-          <label>Physical Count <span className="text-red-500">*</span></label>
+          <label>
+            Physical Count <span className="text-red-500">*</span>
+          </label>
           <input
             type="number"
             placeholder="Enter Quantity"
@@ -155,7 +153,9 @@ const InvPcountForm = ({ onClose, selectedItem, activeTab }) => {
             required
           />
 
-          <label>Employee ID <span className="text-red-500">*</span></label>
+          <label>
+            Employee ID <span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
             placeholder="Enter Employee ID"
@@ -164,24 +164,57 @@ const InvPcountForm = ({ onClose, selectedItem, activeTab }) => {
             required
           />
 
+          <label>
+            Status <span className="text-red-500">*</span>
+          </label>
+          <select value={status} onChange={(e) => setStatus(e.target.value)} required>
+            <option value="">Select Status</option>
+            <option value="Completed">Completed</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Open">Open</option>
+            <option value="Closed">Closed</option>
+          </select>
+
+          <label>
+            Time Period <span className="text-red-500">*</span>
+          </label>
+          <select
+            value={timePeriod}
+            onChange={(e) => setTimePeriod(e.target.value)}
+            required
+          >
+            <option value="">Select Time Period</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+          </select>
+
+          <label>
+            Warehouse <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter Warehouse"
+            value={warehouse}
+            onChange={(e) => setWarehouse(e.target.value)}
+            required
+          />
+
           <label>Remarks</label>
           <textarea
             placeholder="Enter Remarks"
-            value={purchaseDescription} 
-            onChange={(e) => setPurchaseDescription(e.target.value)}
-            rows="4"
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            rows="3"
           />
 
+          {/* Buttons */}
           <div className="form-actions">
-            <button
-              type="button"
-              onClick={handleClear}
-              className="clear-btn"
-            >
-              Clear Forms
+            <button type="button" onClick={handleClear} className="clear-btn">
+              Clear
             </button>
             <button type="submit" className="submit-btn">
-              Submit Request
+              Submit
             </button>
           </div>
         </form>
