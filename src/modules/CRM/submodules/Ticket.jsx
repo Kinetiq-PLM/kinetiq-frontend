@@ -1,9 +1,8 @@
-import React from "react";
+import React, { act } from "react";
 import { useState, useEffect } from "react";
 import "../styles/Index.css";
-import Heading from "../../Sales/components/Heading";
+import Dropdown from "../../Sales/components/Dropdown";
 import Button from "../../Sales/components/Button";
-import Table from "../../Sales/components/Table";
 import {
   AlertProvider,
   useAlert,
@@ -16,6 +15,10 @@ import CustomerListModal from "./../../Sales/components/Modals/Lists/CustomerLis
 import NewCustomerModal from "./../../Sales/components/Modals/NewCustomer";
 import { POST } from "../../Sales/api/api";
 import { useMutation } from "@tanstack/react-query";
+
+import SalesTicketTab from "../components/TicketTabs/SalesTicketTab";
+import ServiceTicketTab from "../components/TicketTabs/ServiceTicketTab";
+
 const Ticket = ({ loadSubModule, setActiveSubModule }) => {
   const { showAlert } = useAlert();
 
@@ -33,27 +36,11 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
     customer: "",
     subject: subject,
     description: description,
+    type: "",
     status: "",
     priority: "",
     salesrep: "",
     created_at: new Date().toISOString().split("T")[0],
-  });
-
-  const ticketMutation = useMutation({
-    mutationFn: async (data) => await POST("crm/ticket/", data),
-    onSuccess: (data) => {
-      setTicketID(data.ticket_id);
-      showAlert({
-        type: "success",
-        message: "Ticket created successfully.",
-      });
-    },
-    onError: (error) => {
-      showAlert({
-        type: "error",
-        message: "An error occurred while creating a ticket: " + error.message,
-      });
-    },
   });
 
   useEffect(() => {
@@ -63,39 +50,51 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
     }));
   }, [selectedCustomer]);
 
-  const handleSubmit = () => {
-    if (ticketInfo.priority === "") {
-      showAlert({
-        type: "error",
-        message: "Please select a priority.",
-      });
-      return;
-    } else if (ticketInfo.status === "") {
-      showAlert({
-        type: "error",
-        message: "Please select a status.",
-      });
-      return;
-    } else {
-      const request = { ...ticketInfo, created_at: new Date().toISOString() };
-      ticketMutation.mutate(request);
-    }
-  };
-
-  useEffect(() => {
-    setTicketInfo((prev) => ({ ...prev, subject: subject }));
-  }, [subject]);
-
-  useEffect(() => {
-    setTicketInfo((prev) => ({ ...prev, description: description }));
-  }, [description]);
-
   useEffect(() => {
     setTicketInfo((prev) => ({
       ...prev,
       salesrep: selectedEmployee.employee_id,
     }));
   }, [selectedEmployee]);
+
+  const tabs = [
+    {
+      name: "Sales Ticket",
+      component: (
+        <SalesTicketTab
+          setIsEmployeeListOpen={setIsEmployeeListOpen}
+          selectedEmployee={selectedEmployee}
+          selectedCustomer={selectedCustomer}
+          ticketInfo={ticketInfo}
+          setTicketInfo={setTicketInfo}
+          setTicketID={setTicketID}
+        />
+      ),
+    },
+    {
+      name: "Service Ticket",
+      component: (
+        <ServiceTicketTab
+          setIsEmployeeListOpen={setIsEmployeeListOpen}
+          selectedEmployee={selectedEmployee}
+          selectedCustomer={selectedCustomer}
+          ticketInfo={ticketInfo}
+          setTicketInfo={setTicketInfo}
+          setTicketID={setTicketID}
+        />
+      ),
+    },
+  ];
+
+  const [activeTab, setActiveTab] = useState(tabs[0].name);
+
+  useEffect(() => {
+    setTicketInfo((prev) => ({
+      ...prev,
+      type: activeTab === "Sales Ticket" ? "sales" : "service",
+    }));
+  }, [activeTab]);
+
   return (
     <div className="ticket">
       <div className="body-content-container">
@@ -108,6 +107,44 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
           date={ticketInfo.created_at}
           ticket={ticketInfo}
         />
+
+        <main className="">
+          {/* Tab Selector */}
+          <div className="mt-4 flex flex-col md:flex-row lg:hidden md:justify-between md:items-center gap-4">
+            <div>
+              <h4 className="font-medium">Action:</h4>
+            </div>
+            <div className="flex items-center gap-2">
+              <h4 className="text-base font-medium text-gray-400">View:</h4>
+              <div className="w-64">
+                <Dropdown
+                  label=""
+                  options={tabs.map((tab) => tab.name)}
+                  onChange={setActiveTab}
+                  value={activeTab}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex mt-4 border-b border-[#E8E8E8] w-fit gap-2">
+            {tabs.map((tab) => (
+              <Button
+                key={tab.name}
+                type={activeTab === tab.name ? "active" : "link"}
+                onClick={() => setActiveTab(tab.name)}
+              >
+                {tab.name}
+              </Button>
+            ))}
+          </div>
+
+          {/* Active Tab Content */}
+          <div className="mt-6">
+            {tabs.find((tab) => tab.name === activeTab)?.component}
+          </div>
+        </main>
+
         <CustomerListModal
           isOpen={isCustomerListOpen}
           onClose={() => setIsCustomerListOpen(false)}
@@ -123,55 +160,6 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsEmployeeListOpen(false)}
           setEmployee={setSelectedEmployee}
         ></EmployeeListModal>
-        <main className="mt-4">
-          <div className="text-sm flex gap-10 flex-wrap">
-            <h3 className="font-bold">Create Ticket Issue</h3>
-            <h3 className="opacity-50">Create Ticket Product Renewal</h3>
-          </div>
-          <div className="flex flex-col flex-wrap my-4">
-            <InputField
-              label={"Ticket Subject"}
-              value={subject}
-              setValue={setSubject}
-            />
-
-            <TextField
-              label={"Description"}
-              value={description}
-              setValue={setDescription}
-            />
-          </div>
-
-          <div className="flex mb-2 w-[25%] mt-4 gap-4 items-center">
-            <p className="">Employee ID</p>
-            <div
-              className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
-              onClick={() => setIsEmployeeListOpen(true)}
-            >
-              <p className="text-sm">
-                {selectedEmployee ? selectedEmployee.employee_id : ""}
-              </p>
-              <img
-                src="/icons/information-icon.svg"
-                className="h-[15px]"
-                alt="info icon"
-              />
-            </div>
-          </div>
-
-          <Button
-            type="primary"
-            onClick={handleSubmit}
-            className={"mt-8"}
-            disabled={
-              subject && description && selectedEmployee && selectedCustomer
-                ? false
-                : true
-            }
-          >
-            Submit Ticket
-          </Button>
-        </main>
       </div>
     </div>
   );
