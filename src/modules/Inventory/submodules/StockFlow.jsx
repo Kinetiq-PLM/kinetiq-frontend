@@ -53,7 +53,7 @@ const BodyContent = () => {
     }, []); 
 
 
-    // Fetch data from Warehouse Transfers Django API
+    // Fetch data from Warehouse List Django API
     useEffect(() => {
         const fetchWarehouseListData = async () => {
             try {
@@ -139,10 +139,10 @@ const BodyContent = () => {
             Data:  filteredData.map((item) => {
                 return {
                     "Item Name": item.item_name || "Unknown",
-                    "Type": item.type || "Unspecified",
+                    "Type": item.item_type || "Unspecified",
                     "Item Management": item.item_management || "-",
-                    "Quantity": item.quantity || "-",
-                    "Expiry": item.expiry_date || "-" 
+                    "Quantity": item.current_quantity || "-",
+                    "Expiry": item.expiry || "-" 
                 }
             })
         },
@@ -249,11 +249,11 @@ const BodyContent = () => {
                                     <>
                                         {[
                                             {label: "Selected Item", value: warehouseItemsData[selectedItem]?.item_name || "Unknown"},
-                                            {label: "Item Type", value: warehouseItemsData[selectedItem]?.type},
-                                            {label: "Item Management", value: warehouseItemsData[selectedItem]?.item_management + ": " + warehouseItemsData[selectedItem]?.identifier},
-                                            {label: "Quantity", value: warehouseItemsData[selectedItem]?.quantity},
-                                            {label: "Expiry", value: warehouseItemsData[selectedItem]?.expiry_date},
-                                            {label: "Warehouse Location", value: warehouseItemsData[selectedItem]?.warehouse_loc}
+                                            {label: "Item Type", value: warehouseItemsData[selectedItem]?.item_type},
+                                            {label: "Item Management", value: warehouseItemsData[selectedItem]?.item_management + ": " + warehouseItemsData[selectedItem]?.item_management_id},
+                                            {label: "Quantity", value: warehouseItemsData[selectedItem]?.current_quantity},
+                                            {label: "Expiry", value: warehouseItemsData[selectedItem]?.expiry},
+                                            {label: "Warehouse Location", value: warehouseItemsData[selectedItem]?.warehouse_location}
                                         ].map(({label, value}) => (
                                             <div key={label} className="mb-1">
                                                 <h5 className="text-gray-700 text-[15px] font-semibold">{label}</h5>
