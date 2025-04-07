@@ -51,7 +51,11 @@ const SalesTicketTab = ({
       });
       return;
     } else {
-      const request = { ...ticketInfo, created_at: new Date().toISOString() };
+      const request = {
+        ...ticketInfo,
+        type: "Sales",
+        created_at: new Date().toISOString(),
+      };
       ticketMutation.mutate(request);
     }
   };

@@ -31,9 +31,7 @@ const NewCampaignModal = ({ isOpen, onClose }) => {
   const campaignMutation = useMutation({
     mutationFn: async (data) => await POST("crm/campaigns/", data),
     onSuccess: (data) => {
-      queryClient.setQueryData(["campaigns"], (old) => {
-        return [...old, data];
-      });
+      queryClient.refetchQueries(["campaigns"]);
     },
   });
 

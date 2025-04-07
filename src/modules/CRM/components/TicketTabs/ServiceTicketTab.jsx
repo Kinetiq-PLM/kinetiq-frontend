@@ -51,7 +51,11 @@ const ServiceTicketTab = ({
       });
       return;
     } else {
-      const request = { ...ticketInfo, created_at: new Date().toISOString() };
+      const request = {
+        ...ticketInfo,
+        type: "Service",
+        created_at: new Date().toISOString(),
+      };
       ticketMutation.mutate(request);
     }
   };
