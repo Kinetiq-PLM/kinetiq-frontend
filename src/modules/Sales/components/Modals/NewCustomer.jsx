@@ -40,9 +40,7 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
   const customerMutation = useMutation({
     mutationFn: async (data) => await POST("sales/customer/", data),
     onSuccess: (data, variables, context) => {
-      queryClient.setQueryData(["customers"], (oldCustomers) => {
-        return [...oldCustomers, data];
-      });
+      queryClient.refetchQueries(["customers", "customerPartners"]);
     },
     onError: (error) => {
       alert(error.message);

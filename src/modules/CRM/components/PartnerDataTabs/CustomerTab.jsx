@@ -5,6 +5,7 @@ import Button from "../../../Sales/components/Button";
 import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
 import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
+import NewCustomerModal from "../../../Sales/components/Modals/NewCustomer";
 
 export default function CustomerTab() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,7 +13,7 @@ export default function CustomerTab() {
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [customers, setCustomers] = useState([]);
   const customersQuery = useQuery({
-    queryKey: ["customers"],
+    queryKey: ["customerPartners"],
     queryFn: async () => await GET("misc/business-partners?category=Customer"),
   });
   const columns = [
@@ -33,6 +34,7 @@ export default function CustomerTab() {
     label: col.label,
   }));
 
+  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
   // Filter quotations based on search and date
   const filteredQuotations = customers.filter((quotation) => {
     // Filter by search term
@@ -55,10 +57,6 @@ export default function CustomerTab() {
     return true;
   });
 
-  const handleClick = () => {
-    console.log("CLICKED");
-  };
-
   useEffect(() => {
     if (customersQuery.status === "success") {
       const data = customersQuery.data.map((customer) => ({
@@ -73,6 +71,10 @@ export default function CustomerTab() {
 
   return (
     <section className="h-full">
+      <NewCustomerModal
+        isOpen={isNewCustomerModalOpen}
+        onClose={() => setIsNewCustomerModalOpen(false)}
+      ></NewCustomerModal>
       {/* Header Section */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
         {/* Filters */}
@@ -110,7 +112,7 @@ export default function CustomerTab() {
 
         {/* New Quotation Button (No onClick) */}
         <Button
-          onClick={handleClick}
+          onClick={() => setIsNewCustomerModalOpen(true)}
           type="primary"
           className={"w-[200px] py-2"}
         >
