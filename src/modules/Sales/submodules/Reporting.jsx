@@ -11,6 +11,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   const [salesReportData, setSalesReportData] = useState([]);
   const [customerReportData, setCustomerReportData] = useState([]);
   const [productReportData, setProductReportData] = useState([]);
+  const [employeeReportData, setEmployeeReportData] = useState([]);
   const [profitPeriod, setProfitPeriod] = useState("day"); // day, month, year, all
   const [salesPeriod, setSalesPeriod] = useState("day"); // day, month, year, all
   const [totalProfit, setTotalProfit] = useState(0);
@@ -35,6 +36,10 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   const productQuery = useQuery({
     queryKey: ["productReport"],
     queryFn: async () => await GET(`sales/reporting/top-products`),
+  });
+  const employeeQuery = useQuery({
+    queryKey: ["employeeReport"],
+    queryFn: async () => await GET(`sales/reporting/top-employees`),
   });
   const colors = ["#c084fc", "#2563eb", "#fb923c", "#22c55e"];
   const options = ["day", "month", "year", "all"];
@@ -86,6 +91,13 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
       setTotalSold(productQuery.data.total_sold);
     }
   }, [productQuery.data]);
+
+  useEffect(() => {
+    if (employeeQuery.status === "success") {
+      const data = employeeQuery.data.top_employees;
+      setEmployeeReportData(data);
+    }
+  }, [employeeQuery.data]);
 
   useEffect(() => {
     profitQuery.refetch();
@@ -247,11 +259,19 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
 
       {/* SECOND ROW */}
       <div className="flex gap-4">
-        <div className="bg-white rounded-lg p-6 flex-2/5 shadow flex flex-col gap-4">
+        <div className="bg-white rounded-lg p-6 flex-2/5 shadow flex flex-col gap-2">
           <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
             Customer Report
           </h1>
           <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
+            <div className="flex flex-col gap-2 font-medium mx-6 mt-5">
+              <span>Top Customer</span>
+              <span className="text-3xl">
+                {customerReportData.length > 0
+                  ? customerReportData[0].customer
+                  : ""}
+              </span>
+            </div>
             <BarChart
               height={475}
               dataset={customerReportData}
@@ -317,15 +337,58 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               </span>
             </div>
             <div className="bg-white rounded-lg p-4 flex flex-col">
-              <span>Top Customers</span>
+              <span>Top Customer</span>
               <span className="text-xl">
                 {customerReportData.length > 0
                   ? customerReportData[0].customer
                   : ""}
               </span>
             </div>
+            <div className="bg-white rounded-lg p-4 flex flex-col">
+              <span>Top Employee</span>
+              <span className="text-xl">
+                {employeeReportData.length > 0
+                  ? employeeReportData[0].employee
+                  : ""}
+              </span>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* THIRD ROW */}
+      <div className="flex">
+        <div className="bg-white rounded-lg p-6 flex-2/5 shadow flex flex-col gap-2">
+          <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
+            Sales Employee Report
+          </h1>
+          <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
+            <div className="flex flex-col gap-2 font-medium mx-6 mt-5">
+              <span>Top Employee</span>
+              <span className="text-3xl">
+                {employeeReportData.length > 0
+                  ? employeeReportData[0].employee
+                  : ""}
+              </span>
+            </div>
+            <BarChart
+              height={475}
+              dataset={employeeReportData}
+              xAxis={[
+                {
+                  dataKey: "employee",
+                  scaleType: "band",
+                },
+              ]}
+              series={[
+                {
+                  dataKey: "percentage",
+                },
+              ]}
+            />
+          </div>
+        </div>
+        <div className="flex-3/5"></div>
       </div>
     </div>
   );
