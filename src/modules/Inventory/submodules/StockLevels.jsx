@@ -77,33 +77,33 @@ const BodyContent = () => {
     // Filtered Tab Config
     const tableConfig = {
         Products: {
-            columns: ["Product Name", "Content ID", "Expiry Date", "Quantity", "Status"],
+            columns: ["Product Name", "Inventory Item ID", "Expiry Date", "Quantity", "Status"],
             data: productsData.map((item) => ({
                 "Product Name": item?.product_name || "---",
-                "Content ID": item?.content_id || "---",
-                "Expiry Date": item?.expiry_date,
+                "Inventory Item ID": item?.inventory_item_id || "---",
+                "Expiry Date": item?.expiry,
                 "Quantity": item?.quantity,
                 "Status": item?.status,
             })),
         },
 
         Assets: {
-            columns: ["Asset Name", "Content ID", "Expiry Date", "Quantity", "Status"],
+            columns: ["Asset Name", "Inventory Item ID", "Expiry Date", "Quantity", "Status"],
             data: assetsData.map((item) => ({
                 "Asset Name": item?.asset_name || "---",
-                "Content ID": item?.content_id || "---",
-                "Expiry Date": item?.expiry_date,
+                "Content ID": item?.inventory_item_id || "---",
+                "Expiry Date": item?.expiry,
                 "Quantity": item?.quantity,
                 "Status": item?.status,
             })),
         },
         
         "Raw Materials": {
-            columns: ["Material Name", "Content ID", "Expiry Date", "Quantity", "Status"],
+            columns: ["Material Name", "Inventory Item ID", "Expiry Date", "Quantity", "Status"],
             data: rawMaterialsData.map((item) => ({
                 "Material Name": item?.material_name || "---",
-                "Content ID": item?.content_id || "---",
-                "Expiry Date": item?.expiry_date,
+                "Content ID": item?.inventory_item_id || "---",
+                "Expiry Date": item?.expiry,
                 "Quantity": item?.quantity,
                 "Status": item?.status,
             })),
