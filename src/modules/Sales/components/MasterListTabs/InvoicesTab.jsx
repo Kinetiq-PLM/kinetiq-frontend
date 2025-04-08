@@ -7,10 +7,7 @@ import { GET } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_API_URL } from "../../api/api";
 
-export default function BlanketAgreementsTab({
-  loadSubModule,
-  setActiveSubModule,
-}) {
+export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -124,7 +121,7 @@ export default function BlanketAgreementsTab({
           <input
             type="text"
             placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm"
+            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

@@ -6,11 +6,15 @@ import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
 import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 
+import NewCustomerModal from "../../../Sales/components/Modals/NewCustomer";
+
 export default function CustomerTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [customers, setCustomers] = useState([]);
+  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+
   const customersQuery = useQuery({
     queryKey: ["customers"],
     queryFn: async () => await GET("misc/business-partners?category=Customer"),
@@ -55,10 +59,6 @@ export default function CustomerTab() {
     return true;
   });
 
-  const handleClick = () => {
-    console.log("CLICKED");
-  };
-
   useEffect(() => {
     if (customersQuery.status === "success") {
       const data = customersQuery.data.map((customer) => ({
@@ -73,6 +73,10 @@ export default function CustomerTab() {
 
   return (
     <section className="h-full">
+      <NewCustomerModal
+        isOpen={isNewCustomerModalOpen}
+        onClose={() => setIsNewCustomerModalOpen(false)}
+      ></NewCustomerModal>
       {/* Header Section */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
         {/* Filters */}
@@ -102,15 +106,14 @@ export default function CustomerTab() {
           <input
             type="text"
             placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm"
+            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        {/* New Quotation Button (No onClick) */}
         <Button
-          onClick={handleClick}
+          onClick={() => setIsNewCustomerModalOpen(true)}
           type="primary"
           className={"w-[200px] py-2"}
         >
