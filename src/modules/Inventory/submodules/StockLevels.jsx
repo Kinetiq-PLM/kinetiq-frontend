@@ -91,7 +91,7 @@ const BodyContent = () => {
             columns: ["Asset Name", "Inventory Item ID", "Expiry Date", "Quantity", "Status"],
             data: assetsData.map((item) => ({
                 "Asset Name": item?.asset_name || "---",
-                "Content ID": item?.inventory_item_id || "---",
+                "Inventory Item ID": item?.inventory_item_id || "---",
                 "Expiry Date": item?.expiry,
                 "Quantity": item?.quantity,
                 "Status": item?.status,
@@ -102,7 +102,7 @@ const BodyContent = () => {
             columns: ["Material Name", "Inventory Item ID", "Expiry Date", "Quantity", "Status"],
             data: rawMaterialsData.map((item) => ({
                 "Material Name": item?.material_name || "---",
-                "Content ID": item?.inventory_item_id || "---",
+                "Inventory Item ID": item?.inventory_item_id || "---",
                 "Expiry Date": item?.expiry,
                 "Quantity": item?.quantity,
                 "Status": item?.status,
