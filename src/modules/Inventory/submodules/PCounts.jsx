@@ -3,6 +3,7 @@ import "../styles/PCounts.css";
 import InvPcountForm from "../components/InvPcountForm";
 
 const BodyContent = () => {
+
   const [pcounts, setPcounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -93,6 +94,8 @@ const BodyContent = () => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Physical Counts</h2>
               {/* Debug toggle can be added here if needed */}
+
+  
             </div>
 
             {error && (
@@ -113,7 +116,7 @@ const BodyContent = () => {
                 <table className="w-full table-layout:fixed text-center cursor-pointer">
                   <thead>
                     <tr className="border-b border-gray-300">
-                      {['Product Name', 'Item Onhand', 'Item Counted', ,'Difference', 'Date Checked', 'Employee', 'Status'].map((header) => (
+                      {['Product Name', 'Item Onhand', 'Item Counted' ,'Difference', 'Date Checked', 'Employee', 'Status'].map((header) => (
                         <th key={header} className="p-2 text-gray-600">{header}</th>
                       ))}
                     </tr>
