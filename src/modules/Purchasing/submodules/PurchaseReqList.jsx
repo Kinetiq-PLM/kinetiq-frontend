@@ -1,130 +1,180 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "../styles/PurchaseReqList.css";
 import PurchaseReqForm from "./PurchaseReqForm";
+import PurchForQuotForm from "./PurchForQuotForm";
 
 const PurchaseReqListBody = () => {
-    // State for search input
-    const [searchTerm, setSearchTerm] = useState("");
-    const [showNewForm, setShowNewForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showNewForm, setShowNewForm] = useState(false);
+  const [showPurchQuot, setShowPurchQuot] = useState(false);
+  const [purchaseRequests, setPurchaseRequests] = useState([]);
+  const [employeeMap, setEmployeeMap] = useState({}); // Map of employee_id to employee_name
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showAll, setShowAll] = useState(false); // Toggle for Load More
+  const [selectedRequest, setSelectedRequest] = useState(null); // Store selected request
 
-    // Sample purchase request data
-    const purchaseRequests = [
-        { id: "PR001", name: "Son Goku", department: "Operations", documentDate: "01/31/2025", validDate: "03/02/2025" },
-        { id: "PR002", name: "Monkey D. Luffy", department: "Project Management", documentDate: "01/31/2025", validDate: "03/02/2025" },
-        { id: "PR003", name: "Tanjiro Kamado", department: "Sales", documentDate: "01/31/2025", validDate: "03/02/2025" },
-        { id: "PR004", name: "Toni Fowler", department: "Ah Daddy!", documentDate: "01/31/2025", validDate: "03/02/2025" },
-        { id: "PR005", name: "Anya Forger", department: "Admin", documentDate: "01/31/2025", validDate: "03/02/2025" },
-        { id: "PR006", name: "Gojo Satoru", department: "Finance", documentDate: "01/31/2025", validDate: "03/02/2025" },
-        { id: "PR007", name: "Itadori Yuji", department: "Finance Buddy", documentDate: "01/31/2025", validDate: "03/02/2025" }
-    ];
-
-    const handleBack = () => {
-        // Add navigation logic here
-        console.log("Back button clicked");
+  // Fetch purchase requests and employee data from the API
+  useEffect(() => {
+    const fetchPurchaseRequests = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/api/prf/list/");
+        // Sort the purchase requests by request_id in descending order
+        const sortedRequests = response.data.sort((a, b) => {
+          const idA = parseInt(a.request_id, 10);
+          const idB = parseInt(b.request_id, 10);
+          return idB - idA; // Descending order
+        });
+        setPurchaseRequests(sortedRequests);
+      } catch (error) {
+        console.error("Error fetching purchase requests:", error);
+        setError("Failed to load purchase requests");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
-        console.log("Searching for:", e.target.value);
-    };
+    const fetchEmployees = async () => {
+        try {
+          const response = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+          // Create a map of employee_id to full name (first_name + last_name)
+          const employeeData = response.data.reduce((map, employee) => {
+            const fullName = `${employee.first_name} ${employee.last_name}`.trim(); // Combine first_name and last_name
+            map[employee.employee_id] = fullName;
+            return map;
+          }, {});
+          setEmployeeMap(employeeData);
+        } catch (error) {
+          console.error("Error fetching employees:", error);
+          setError("Failed to load employee data");
+        }
+      };
 
-    const handleNewRequest = () => {
-        setShowNewForm(true);
-    };
+    fetchPurchaseRequests();
+    fetchEmployees();
+  }, []);
 
-    const handleRequestClick = (request) => {
-        // Add request click logic here
-        console.log("Request clicked:", request);
-    };
+  const handleBack = () => {
+    console.log("Back button clicked");
+    setSelectedRequest(null);
+    setShowPurchQuot(false);
+  };
 
-    const handleCheckboxClick = () => {
-        // Add checkbox click logic here
-        console.log("Checkbox clicked");
-    };
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
 
-    const handleLoadMore = () => {
-        // Add load more logic here
-        console.log("Load more button clicked");
-    };
+  const handleNewRequest = () => {
+    setShowNewForm(true); // Show the new form
+    setSelectedRequest(null); // Reset selectedRequest
+  };
 
-    // Filter requests based on search term
-    const filteredRequests = purchaseRequests.filter(request => {
-        const searchLower = searchTerm.toLowerCase();
-        return (
-            request.id.toLowerCase().includes(searchLower) ||
-            request.name.toLowerCase().includes(searchLower) ||
-            request.department.toLowerCase().includes(searchLower) ||
-            request.documentDate.toLowerCase().includes(searchLower) ||
-            request.validDate.toLowerCase().includes(searchLower)
-        );
-    });
+  const handleRequestClick = (request) => {
+    console.log("Selected Request (PurchaseReqList):", request); // Debugging
+    const employeeName = employeeMap[request.employee_id] || "Unknown"; // Get employee_name from the map
+    setSelectedRequest({...request, employee_name: employeeName}); // Set the clicked request
+    setShowPurchQuot(true); // Show the quotation form
+  };
 
+  const handleCheckboxClick = (event) => {
+    event.stopPropagation();
+  };
+
+  const handleLoadMore = () => {
+    setShowAll(!showAll);
+  };
+
+  // Filter and limit requests
+  const filteredRequests = purchaseRequests.filter((request) => {
+    const searchLower = searchTerm.toLowerCase();
+    const employeeName = employeeMap[request.employee_id] || ""; // Get employee_name from the map
     return (
-        <div className="purchreq">
-            {showNewForm ? (
-                <PurchaseReqForm onClose={() => setShowNewForm(false)} />
-            ) : (
-                <div className="purchreq-body-content-container">
-                    
-                    {/* Header section */}
-                    <div className="purchreq-header">
-                        <button className="purchreq-back-btn" onClick={handleBack}>← Back</button>
-                        <input
-                            type="text"
-                            className="purchreq-search"
-                            placeholder="Search by PR No., Name, Department, or Date..."
-                            value={searchTerm}
-                            onChange={handleSearch}
-                        />
-                    </div>
-
-                    {/* Table container */}
-                    <div className="purchreq-table-container">
-                        <table className="purchreq-table">
-                            <thead>
-                                <tr>
-                                    <th><input type="checkbox" onClick={handleCheckboxClick} /></th>
-                                    <th>PR No.</th>
-                                    <th>Name</th>
-                                    <th>Department</th>
-                                    <th>Document Date</th>
-                                    <th>Valid Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredRequests.length > 0 ? (
-                                    filteredRequests.map((request, index) => (
-                                        <tr key={index} onClick={() => handleRequestClick(request)}>
-                                            <td><input type="checkbox" onClick={handleCheckboxClick} /></td>
-                                            <td>{request.id}</td>
-                                            <td>{request.name}</td>
-                                            <td>{request.department}</td>
-                                            <td>{request.documentDate}</td>
-                                            <td>{request.validDate}</td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    /* Display message when no results found */
-                                    <tr>
-                                        <td colSpan="6" className="purchreq-no-results">
-                                            No results found
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Button Container */}
-                    <div className="purchreq-button-container">
-                        <button className="purchreq-new-form" onClick={handleNewRequest}>New Form</button>
-                        <button className="purchreq-load-more" onClick={handleLoadMore}>Load more</button>
-                        <button className="purchreq-send-to">Send to</button>
-                    </div>
-                </div>
-            )}
-        </div>
+      (request.request_id || "").toLowerCase().includes(searchLower) ||
+      employeeName.toLowerCase().includes(searchLower) || // Search by employee_name
+      (request.department || "").toLowerCase().includes(searchLower) ||
+      (request.document_date || "").toLowerCase().includes(searchLower) ||
+      (request.valid_date || "").toLowerCase().includes(searchLower)
     );
+  });
+
+  const displayedRequests = showAll ? filteredRequests : filteredRequests.slice(0, 11);
+
+  return (
+    <div className="purchreq">
+      {showNewForm ? (
+        <PurchaseReqForm onClose={() => setShowNewForm(false)} />
+      ) : showPurchQuot && selectedRequest ? (
+        <PurchForQuotForm
+          request={selectedRequest} // Pass the selected request object
+          onClose={handleBack} // Pass the handleBack function to reset
+        />
+      ) : (
+        <div className="purchreq-body-content-container">
+          <div className="purchreq-header">
+            <button className="purchreq-back-btn" onClick={handleBack}>← Back</button>
+            <input
+              type="text"
+              className="purchreq-search"
+              placeholder="Search by PR No., Employee Name, Department, or Date..."
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+          </div>
+
+          {loading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p className="error">{error}</p>
+          ) : (
+            <div className="purchreq-table-container">
+              <table className="purchreq-table">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" onClick={handleCheckboxClick} /></th>
+                    <th>PR No.</th>
+                    <th>Employee Name</th>
+                    <th>Department</th>
+                    <th>Document Date</th>
+                    <th>Valid Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayedRequests.length > 0 ? (
+                    displayedRequests.map((request, index) => (
+                      <tr key={index} onClick={() => handleRequestClick(request)}>
+                        <td><input type="checkbox" onClick={handleCheckboxClick} /></td>
+                        <td>{request.request_id}</td>
+                        <td>{employeeMap[request.employee_id] || " "}</td> {/* Display employee_name */}
+                        <td>{request.department}</td>
+                        <td>{request.document_date}</td>
+                        <td>{request.valid_date}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" className="purchreq-no-results">No results found</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Buttons */}
+          <div className="purchreq-button-container">
+            <button className="purchreq-new-form" onClick={handleNewRequest}>New Form</button>
+            {filteredRequests.length > 10 && (
+              <button className="purchreq-load-more" onClick={handleLoadMore}>
+                {showAll ? "Show Less" : "Load More"}
+              </button>
+            )}
+            <button className="purchreq-send-to">Send to</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default PurchaseReqListBody;

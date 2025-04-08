@@ -22,15 +22,15 @@
 
 /* Back Button */
 .purchord-back-button {
-  position: absolute;
+  position: relative;
   top: 1rem;
-  left: 1rem;
-  background: none;
-  border: none;
+  right: 32rem;
   font-size: 1rem;
   cursor: pointer;
   color: #666666;
   transition: color 0.2s ease;
+  visibility: visible; /* Ensure the button is visible */
+    
 }
 
 .purchord-back-button:hover {

@@ -1,6 +1,8 @@
 import React from "react";
 import "./styles/Purchasing.css";
 
+
+
 const BodyContent = () => {
     return (
         <div className="purch">

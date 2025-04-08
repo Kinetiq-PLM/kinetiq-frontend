@@ -1,3 +1,45 @@
+.org-type-dropdown {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+}
+
+.org-type-toggle {
+    width: 100%;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-arrow {
+    float: right;
+}
+
+.org-type-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.org-type-option {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.org-type-option:hover,
+.org-type-option.selected {
+    background-color: #f0f0f0;
+}
+
 .vendorappform {
     display: flex;
     width: 100%;

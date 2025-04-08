@@ -25,7 +25,7 @@ function App() {
       iconsRef.current.scrollTop = descsRef.current.scrollTop;
     }
   };
-
+  
   // load jsx files for main modules
   const loadMainModule = (moduleId) => {
     if (
@@ -100,7 +100,6 @@ function App() {
     Purchasing: {
       "Purchase Request List": "PurchaseReqList",
       "Puchase Quotation List": "PurchaseQuot",
-      "Purchase Orders": "PurchaseOrders",
       "Purchase Order Status": "PurchaseOrdStat",
       "A/P Invoice": "PurchaseAPInvoice",
       "Credit Memo": "PurchaseCredMemo",

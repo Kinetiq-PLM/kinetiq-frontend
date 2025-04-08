@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/PurchaseAPInvoice.css";
 import PurchaseAPInvoiceForm from "./PurchaseAPInvoiceForm";
 
 const PurchaseAPInvoiceBody = () => {
+    const [invoices, setInvoices] = useState([]);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showDateDropdown, setShowDateDropdown] = useState(false);
     const [selectedDate, setSelectedDate] = useState("Last 30 days");
@@ -15,6 +16,19 @@ const PurchaseAPInvoiceBody = () => {
         "Last 3 days",
         "Last 1 day"
     ];
+
+    useEffect(() => {
+        // Fetch invoices from the API
+        fetch("http://127.0.0.1:8000/api/invoices/list/")
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Fetched data:", data); // Log to check API response structure
+                setInvoices(data);
+            })
+            .catch((error) => {
+                console.error("Error fetching invoices:", error);
+            });
+    }, []);
 
     const handleBack = () => {
         // Add navigation logic here
@@ -99,57 +113,32 @@ const PurchaseAPInvoiceBody = () => {
                         <div className="apinvoice-table">
                             <div className="apinvoice-table-header">
                                 <div className="apinvoice-checkbox"><input type="checkbox" /></div>
-                                <div>A/P Invoice</div>
-                                <div>Ref: Purchase Order</div>
+                                <div>Invoice ID</div>
+                                <div>Purchase Order</div>
                                 <div>Status</div>
-                                <div>Invoice Date</div>
-                                <div>Due Date</div>
+                                <div>Due Date</div> {/* Updated header */}
+                                <div>Document Date</div>
                             </div>
 
                             <div className="apinvoice-table-rows">
-                                <div className="apinvoice-row">
-                                    <div className="apinvoice-checkbox">
-                                        <input type="checkbox" />
+                                {invoices.length > 0 ? invoices.map((invoice) => (
+                                    <div key={invoice.id} className="apinvoice-row">
+                                        <div className="apinvoice-checkbox">
+                                            <input type="checkbox" />
+                                        </div>
+                                        <div>{invoice.invoice_id}</div> {/* Display invoice_id */}
+                                        <div>{invoice.purchase_order}</div>
+                                        <div>
+                                            <span className={`status-${invoice.status.toLowerCase()}`}>
+                                                {invoice.status}
+                                            </span>
+                                        </div>
+                                        <div>{invoice.due_date}</div> {/* Updated to display due_date */}
+                                        <div>{invoice.document_date}</div> {/* Display document_date */}
                                     </div>
-                                    <div>INV001</div>
-                                    <div>PO001</div>
-                                    <div><span className="status-closed">Closed</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
-
-                                <div className="apinvoice-row">
-                                    <div className="apinvoice-checkbox">
-                                        <input type="checkbox" />
-                                    </div>
-                                    <div>INV002</div>
-                                    <div>PO002</div>
-                                    <div><span className="status-open">Open</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
-
-                                <div className="apinvoice-row">
-                                    <div className="apinvoice-checkbox">
-                                        <input type="checkbox" />
-                                    </div>
-                                    <div>INV003</div>
-                                    <div>PO003</div>
-                                    <div><span className="status-cancelled">Cancelled</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
-
-                                <div className="apinvoice-row">
-                                    <div className="apinvoice-checkbox">
-                                        <input type="checkbox" />
-                                    </div>
-                                    <div>INV004</div>
-                                    <div>PO004</div>
-                                    <div><span className="status-draft">Draft</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
+                                )) : (
+                                    <div>No invoices found</div>
+                                )}
                             </div>
                         </div>
                     </div>

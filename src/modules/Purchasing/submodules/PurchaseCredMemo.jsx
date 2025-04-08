@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/PurchaseCredMemo.css";
 import PurchaseCredMemoForm from "./PurchaseCredMemoForm";
 
 const PurchaseCredMemoBody = () => {
+    const [creditMemos, setCreditMemos] = useState([]);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showDateDropdown, setShowDateDropdown] = useState(false);
     const [selectedDate, setSelectedDate] = useState("Last 30 days");
@@ -16,6 +17,19 @@ const PurchaseCredMemoBody = () => {
         "Last 3 days",
         "Last 1 day"
     ];
+
+    useEffect(() => {
+        // Fetch credit memos from the API
+        fetch("http://127.0.0.1:8000/api/credit-memo/list/")
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Fetched credit memos:", data); // Log the API response structure
+                setCreditMemos(data);
+            })
+            .catch((error) => {
+                console.error("Error fetching credit memos:", error);
+            });
+    }, []);
 
     const handleBack = () => {
         // Add navigation logic here
@@ -104,54 +118,29 @@ const PurchaseCredMemoBody = () => {
                                 <div>Credit Memo</div>
                                 <div>Ref: Purchase Order</div>
                                 <div>Status</div>
-                                <div>Credit Memo Date</div>
+                                <div>Document Date</div> {/* Updated field name */}
                                 <div>Due Date</div>
                             </div>
 
                             <div className="credmemo-table-rows">
-                                <div className="credmemo-row">
-                                    <div className="credmemo-checkbox">
-                                        <input type="checkbox" />
+                                {creditMemos.length > 0 ? creditMemos.map((memo) => (
+                                    <div key={memo.id} className="credmemo-row">
+                                        <div className="credmemo-checkbox">
+                                            <input type="checkbox" />
+                                        </div>
+                                        <div>{memo.credit_memo_id}</div> {/* Display Credit Memo ID */}
+                                        <div>{memo.purchase_order}</div>
+                                        <div>
+                                            <span className={`status-${memo.status.toLowerCase()}`}>
+                                                {memo.status}
+                                            </span>
+                                        </div>
+                                        <div>{memo.document_date}</div> {/* Updated to display Document Date */}
+                                        <div>{memo.due_date}</div> {/* Display Due Date */}
                                     </div>
-                                    <div>CM0001</div>
-                                    <div>RFQ000001</div>
-                                    <div><span className="status-closed">Closed</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
-
-                                <div className="credmemo-row">
-                                    <div className="credmemo-checkbox">
-                                        <input type="checkbox" />
-                                    </div>
-                                    <div>CM0001</div>
-                                    <div>RFQ000002</div>
-                                    <div><span className="status-open">Open</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
-
-                                <div className="credmemo-row">
-                                    <div className="credmemo-checkbox">
-                                        <input type="checkbox" />
-                                    </div>
-                                    <div>CM0002</div>
-                                    <div>RFQ000003</div>
-                                    <div><span className="status-cancelled">Cancelled</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
-
-                                <div className="credmemo-row">
-                                    <div className="credmemo-checkbox">
-                                        <input type="checkbox" />
-                                    </div>
-                                    <div>CM0003</div>
-                                    <div>RFQ000003</div>
-                                    <div><span className="status-draft">Draft</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
+                                )) : (
+                                    <div>No credit memos found</div>
+                                )}
                             </div>
                         </div>
                     </div>

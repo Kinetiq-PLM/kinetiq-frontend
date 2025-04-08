@@ -1,39 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/PurchaseQuot.css";
 import PurchForQuotForm from "./PurchForQuotForm";
+import PurchaseOrdStat from "./PurchaseOrdStat"; // Import the PurchaseOrdStat component
 
 const PurchaseQuotBody = () => {
-    const [showDatePicker, setShowDatePicker] = useState(false);
     const [showDateDropdown, setShowDateDropdown] = useState(false);
     const [selectedDate, setSelectedDate] = useState("Last 30 days");
     const [searchTerm, setSearchTerm] = useState("");
     const [showNewForm, setShowNewForm] = useState(false);
+    const [quotations, setQuotations] = useState([]);
+    const [selectedQuotation, setSelectedQuotation] = useState(null); // Store the selected quotation
+    const [view, setView] = useState("list"); // Manage the current view (list, form, or order status)
 
     const timeOptions = [
         "Last 30 days",
         "Last 20 days",
         "Last 10 days",
         "Last 3 days",
-        "Last 1 day"
+        "Last 1 day",
     ];
 
-    const handleBack = () => {
-        // Add navigation logic here
-        console.log("Back button clicked");
-    };
+    useEffect(() => {
+        fetch("http://127.0.0.1:8000/api/purchase_quotation/list/")
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch quotations");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log("Fetched Quotations:", data);
+                setQuotations(data.results || data);
+            })
+            .catch((error) => console.error("Error fetching data:", error));
+    }, []);
 
-    const handleFilter = () => {
-        // Add filter logic here
-        console.log("Filter clicked");
-    };
+    const filterByDate = (dateRange) => {
+        const days = parseInt(dateRange.match(/\d+/)[0], 10);
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days);
 
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
-    };
-
-    const handleCompare = () => {
-        // Add compare logic here
-        console.log("Compare button clicked");
+        return quotations.filter((q) => new Date(q.document_date) >= cutoffDate);
     };
 
     const handleDateOptionSelect = (option) => {
@@ -41,26 +48,25 @@ const PurchaseQuotBody = () => {
         setShowDateDropdown(false);
     };
 
-    const handleNewForm = () => {
-        setShowNewForm(true);
+    const handleRowClick = (quotation) => {
+        setSelectedQuotation(quotation); // Store the selected quotation
+        setView("form"); // Switch to the PurchForQuotForm view
     };
 
-    const handleSendTo = () => {
-        // Add send to logic here
-        console.log("Send to clicked");
-    };
+    const filteredQuotations = filterByDate(selectedDate).filter((q) =>
+        q.document_no.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (q.status && q.status.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
 
     return (
         <div className="purchquote">
-            {showNewForm ? (
-                <PurchForQuotForm onClose={() => setShowNewForm(false)} />
-            ) : (
+            {view === "list" ? (
                 <div className="body-content-container">
                     <div className="purchquote-header">
-                        <button className="purchquote-back" onClick={handleBack}>← Back</button>
+                        <button className="purchquote-back">← Back</button>
                         <div className="purchquote-filters">
                             <div className="purchquote-date-filter">
-                                <div 
+                                <div
                                     className="date-display"
                                     onClick={() => setShowDateDropdown(!showDateDropdown)}
                                 >
@@ -81,16 +87,12 @@ const PurchaseQuotBody = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="purchquote-filter-btn" onClick={handleFilter}>
-                                <span>Filter by</span>
-                                <span>▼</span>
-                            </div>
                             <div className="purchquote-search">
-                                <input 
-                                    type="text" 
-                                    placeholder="Search for RQF number, supplier, date"
+                                <input
+                                    type="text"
+                                    placeholder="Search for Document No, Status"
                                     value={searchTerm}
-                                    onChange={handleSearch}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
                         </div>
@@ -99,70 +101,50 @@ const PurchaseQuotBody = () => {
                     <div className="purchquote-content">
                         <div className="purchquote-table">
                             <div className="purchquote-table-header">
-                                <div className="purchquote-checkbox"><input type="checkbox" /></div>
-                                <div>Purchase Quotation</div>
-                                <div>Ref: Purchase Request</div>
-                                <div>Status</div>
-                                <div>Shipped Date</div>
-                                <div>RFQ Deadline</div>
+                                <div className="purchquote-column">Document No</div>
+                                <div className="purchquote-column">Quotation ID</div>
+                                <div className="purchquote-column">Status</div>
+                                <div className="purchquote-column">Document Date</div>
                             </div>
 
                             <div className="purchquote-table-rows">
-                                <div className="purchquote-row">
-                                    <div className="purchquote-checkbox">
-                                        <input type="checkbox" />
-                                    </div>
-                                    <div>PR0001</div>
-                                    <div>RFQ000001</div>
-                                    <div><span className="status-closed">Closed</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
-
-                                <div className="purchquote-row">
-                                    <div className="purchquote-checkbox">
-                                        <input type="checkbox" />
-                                    </div>
-                                    <div>PR0001</div>
-                                    <div>RFQ000002</div>
-                                    <div><span className="status-open">Open</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
-
-                                <div className="purchquote-row">
-                                    <div className="purchquote-checkbox">
-                                        <input type="checkbox" />
-                                    </div>
-                                    <div>PR0002</div>
-                                    <div>RFQ000003</div>
-                                    <div><span className="status-cancelled">Cancelled</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
-
-                                <div className="purchquote-row">
-                                    <div className="purchquote-checkbox">
-                                        <input type="checkbox" />
-                                    </div>
-                                    <div>PR0002</div>
-                                    <div>RFQ000003</div>
-                                    <div><span className="status-draft">Draft</span></div>
-                                    <div>01/01/2025</div>
-                                    <div>01/01/2025</div>
-                                </div>
+                                {filteredQuotations.length > 0 ? (
+                                    filteredQuotations.map((q) => (
+                                        <div
+                                            className="purchquote-row"
+                                            key={q.quotation_id}
+                                            onClick={() => handleRowClick(q)} // Handle row click
+                                        >
+                                            <div className="purchquote-column">{q.document_no}</div>
+                                            <div className="purchquote-column">{q.quotation_id}</div>
+                                            <div className="purchquote-column">
+                                                <span className={`status-${q.status.toLowerCase()}`}>
+                                                    {q.status}
+                                                </span>
+                                            </div>
+                                            <div className="purchquote-column">
+                                                {new Date(q.document_date).toLocaleDateString()}
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="purchquote-no-data">No quotations found</div>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    <div className="purchquote-footer">
-                        <button className="purchquote-new-form" onClick={handleNewForm}>New Form</button>
-                        <div className="purchquote-footer-right">
-                            <button className="purchquote-compare" onClick={handleCompare}>Compare</button>
-                            <button className="purchquote-send-to" onClick={handleSendTo}>Send to</button>
-                        </div>
-                    </div>
                 </div>
+            ) : view === "form" ? (
+                <PurchForQuotForm
+                    onClose={() => setView("list")} // Go back to the list view
+                    request={selectedQuotation} // Pass the selected quotation
+                />
+            ) : (
+                <PurchaseOrdStat
+                    onClose={() => setView("list")} // Go back to the list view
+                    request={selectedQuotation} // Pass the selected quotation
+                />
             )}
         </div>
     );
