@@ -9,12 +9,6 @@ const InvRestockForm = ({ onClose, selectedItem, activeTab }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Generate a request ID with prefix
-  const generateRequestId = () => {
-    const prefix = activeTab === "Assets" ? "ASST-" : "MAT-";
-    return `${prefix}${Date.now()}`;
-  };
-
   useEffect(() => {
     if (selectedItem) {
       if (activeTab === "Assets") {
@@ -54,50 +48,51 @@ const InvRestockForm = ({ onClose, selectedItem, activeTab }) => {
       setErrorMessage("Please fill in all required fields.");
       return;
     }
-  
-    const requestData = {
-      request_id: "REQ-" + Date.now(), 
-      employee_id: employeeId,
-      item_id: purchaseItem,
-      purchase_quantity: quantity,
-      purchase_description: purchaseDescription
-    };
-  
-    if (activeTab === "Assets") {
-      requestData.asset_id = selectedItem.asset_id;
-    } else if (activeTab === "Raw Materials") {
-      requestData.material_id = selectedItem.material_id;
-    }
-  
+    
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/purchase-requests/", {
+      const purchaseRequestData = {
+        employee_id: employeeId
+      };
+  
+      const requestResponse = await fetch("http://127.0.0.1:8000/api/purchase-requests/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
+        body: JSON.stringify(purchaseRequestData),
       });
   
-      if (!response.ok) {
-        const clonedResponse = response.clone();
-        let errorDetails = "";
-  
-        try {
-          const errorData = await response.json();
-          errorDetails =
-            errorData.detail ||
-            JSON.stringify(errorData);
-        } catch {
-          const textData = await clonedResponse.text();
-          if (textData.includes("<!DOCTYPE") || textData.includes("<html")) {
-            errorDetails = "Server error occurred";
-          } else {
-            errorDetails = textData.slice(0, 200) + "...";
-          }
-        }
-        throw new Error(`Submission failed: ${errorDetails || "Unexpected error."}`);
+      if (!requestResponse.ok) {
+        throw new Error(`Failed to create purchase request: ${await requestResponse.text()}`);
       }
   
-      const data = await response.json();
-      console.log("Successfully submitted purchase request:", data);
+      const requestData = await requestResponse.json();
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const quotationContentData = {
+        request: requestData.request_id,
+        purchase_quantity: quantity,
+        unit_price: 0,
+        discount: 0,
+        total: 0
+      };
+  
+      if (activeTab === "Assets") {
+        quotationContentData.asset = selectedItem.asset_id;
+      } else if (activeTab === "Raw Materials") {
+        quotationContentData.material = selectedItem.material_id;
+      }
+  
+      const quotationContentResponse = await fetch("http://127.0.0.1:8000/api/quotation-contents/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(quotationContentData),
+      });
+  
+      if (!quotationContentResponse.ok) {
+        throw new Error(`Failed to create quotation content: ${await quotationContentResponse.text()}`);
+      }
+      
+      console.log("Successfully submitted purchase request and quotation content");
       setSuccessMessage("Purchase request submitted successfully!");
       
       setQuantity("");
