@@ -1,0 +1,665 @@
+/* REMINDER! All of your elements must use your unique namespace '.packing' at the start to avoid leaking */
+
+.packing {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.packing .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+  overflow: auto;
+}
+
+/* Page title styling */
+.packing .page-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+/* Filters section */
+.packing .filters-row {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.packing .search-container {
+  position: relative;
+  width: 300px;
+}
+
+.packing .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 14px;
+}
+
+.packing .search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.packing .search-input:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.packing .filter-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.packing .filter-label {
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.packing .status-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.packing .status-button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.packing .status-button:hover {
+  background-color: #f8f9fa;
+  border-color: #c8cfd6;
+}
+
+.packing .status-button.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+.packing .status-button.pending.active {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.packing .status-button.packed.active {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.packing .status-button.shipped.active {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.packing .type-filter {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.packing .type-filter:focus {
+  outline: none;
+  border-color: #00a8a8;
+}
+
+/* Stats Row */
+.packing .stats-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.packing .stat-box {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+}
+
+.packing .stat-label {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 0.25rem;
+}
+
+.packing .stat-value {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Packing Content (Table and Actions) */
+.packing .packing-content {
+  display: flex;
+  gap: 1.5rem;
+  height: 100%;
+  flex: 1;
+}
+
+/* Table styling */
+.packing .packing-table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+  min-width: 0; /* Ensure table can shrink if needed */
+}
+
+.packing .table-metadata {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.packing .table-wrapper {
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  flex: 1;
+}
+
+.packing .packing-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: center;
+}
+
+.packing .packing-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 500;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  color: #495057;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.packing .packing-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.packing .packing-table th.sortable:hover {
+  background-color: #e9ecef;
+}
+
+.packing .sort-icon {
+  margin-left: 0.25rem;
+  color: #00a8a8;
+}
+
+.packing .packing-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.875rem;
+}
+
+.packing .packing-table tr:last-child td {
+  border-bottom: none;
+}
+
+.packing .centered-cell {
+  text-align: center;
+}
+
+.packing .even-row {
+  background-color: #fff;
+}
+
+.packing .odd-row {
+  background-color: #f8f9fa;
+}
+
+.packing .selected-row {
+  background-color: rgba(0, 168, 168, 0.1) !important;
+}
+
+.packing .packing-table tbody tr:hover {
+  background-color: rgba(0, 168, 168, 0.05);
+  cursor: pointer;
+}
+
+/* Status cell styling */
+.packing .status-cell {
+  position: relative;
+  padding-left: 1.75rem;
+}
+
+.packing .status-cell::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.packing .status-pending::before {
+  background-color: #6c757d;
+}
+
+.packing .status-packed::before {
+  background-color: #007bff;
+}
+
+.packing .status-shipped::before {
+  background-color: #28a745;
+}
+
+.packing .no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Modal styles */
+.packing .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.packing .edit-packing-modal {
+  background-color: white;
+  border-radius: 6px;
+  width: 600px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.packing .completion-modal {
+  background-color: white;
+  border-radius: 6px;
+  width: 480px;
+  max-width: 90%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.packing .modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.packing .modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.packing .close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #666;
+}
+
+.packing .close-button:hover {
+  color: #333;
+}
+
+.packing .modal-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.packing .modal-body p {
+  margin: 0 0 0.5rem;
+}
+
+.packing .modal-body ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.packing .modal-body li {
+  margin-bottom: 0.25rem;
+}
+
+.packing .modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Information sections */
+.packing .info-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.packing .info-section h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.packing .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.packing .info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.packing .info-label {
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.packing .info-value {
+  font-size: 0.875rem;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Status colors in info sections */
+.packing .info-value.status-pending {
+  color: #6c757d;
+}
+
+.packing .info-value.status-packed {
+  color: #007bff;
+}
+
+.packing .info-value.status-shipped {
+  color: #28a745;
+}
+
+.packing .info-value.status-completed {
+  color: #28a745;
+}
+
+.packing .info-value.status-in-progress {
+  color: #007bff;
+}
+
+.packing .info-value.status-not-started {
+  color: #6c757d;
+}
+
+/* Edit sections */
+.packing .edit-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.packing .edit-section h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.packing .employee-selection,
+.packing .packing-type-selection {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.packing .employee-dropdown,
+.packing .packing-type-dropdown {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+}
+
+/* Cost editing section */
+.packing .cost-editing {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.packing .cost-input-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.packing .cost-label {
+  font-size: 0.875rem;
+  color: #333;
+}
+
+.packing .cost-input {
+  width: 150px;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  text-align: right;
+}
+
+.packing .cost-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.packing .cost-total-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.packing .cost-total-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Status section */
+.packing .status-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.packing .status-update-button {
+  width: 100%;
+  padding: 0.75rem;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.packing .status-update-button.status-packed {
+  background-color: #007bff;
+}
+
+.packing .status-update-button.status-packed:hover {
+  background-color: #0069d9;
+}
+
+.packing .status-update-button.status-shipped {
+  background-color: #28a745;
+}
+
+.packing .status-update-button.status-shipped:hover {
+  background-color: #218838;
+}
+
+/* Action buttons */
+.packing .cancel-button {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.packing .cancel-button:hover {
+  background-color: #f8f9fa;
+}
+
+.packing .save-button {
+  padding: 0.5rem 1rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.packing .save-button:hover:not(:disabled) {
+  background-color: #009191;
+}
+
+.packing .save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.packing .confirm-button {
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.packing .confirm-button:hover {
+  background-color: #218838;
+}
+
+/* Shipped message */
+.packing .shipped-message {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Loading and error states */
+.packing .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #666;
+}
+
+.packing .spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #00a8a8;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.packing .error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+}
+
+.packing .error-message {
+  color: #dc3545;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: #f8d7da;
+}
