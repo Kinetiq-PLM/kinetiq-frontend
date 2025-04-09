@@ -79,6 +79,15 @@ function App() {
 
   const moduleSubmoduleFileNames = {
     Management: {
+      "Dashboard": "ManagementDashboard",
+      "Policy Compliance Oversight": "ManagementPolicyComplianceOversight",
+      "Salary Release Approval": "ManagementSalaryReleaseApproval",
+      "Budget Review Approval": "ManagementBudgetReviewApproval",
+      "Purchasing Approval": "ManagementPurchasingApproval",
+      "Project Approval": "ManagementProjectApproval",
+      "Project Monitoring": "ManagementProjectMonitoring",
+      "RecruitmentCandidates": "ManagementRecruitmentCandidates",
+      "AssetRemoval": "ManagementAssetRemoval",
       "User Roles": "UserRoles",
       "Access Control": "AccessControl",
       Settings: "Settings",
