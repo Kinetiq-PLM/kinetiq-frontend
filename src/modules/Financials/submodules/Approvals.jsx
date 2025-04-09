@@ -1,480 +1,968 @@
-import React, { useState, useEffect } from "react";
-import "../styles/Approvals.css";
-
-const tabs = ["All Approvals", "Approved Requests", "Pending Requests"];
-
-const InfoCard = ({ title, value, color, children, className }) => (
-    <div className={`info-card ${className}`}>
-        {title && <h2 className="info-title">{title}</h2>}
-        {value && <p className={`info-value ${color}`}>{value}</p>}
-        {children}
-    </div>
-);
-
-const BodyContent = () => {
-    const [activeTab, setActiveTab] = useState(tabs[0]);
-    const [isCompact, setIsCompact] = useState(window.innerWidth < 768);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [dateRange, setDateRange] = useState("Last 30 days");
-    const [dateRangeApproved, setDateRangeApproved] = useState("Last 30 days");
-    const [dateRangePending, setDateRangePending] = useState("Last 30 days");
-    const [filterBy, setFilterBy] = useState("All");
-    const [originalData, setOriginalData] = useState([
-        { requestId: "BUD2025-001", approvalId: "APP2025-001", amount: "500,000", approvalDate: "2025-02-17", approvedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "500,000", approvalStatus: "Approved" },
-        { requestId: "BUD2025-002", approvalId: "APP2025-002",amount: "1,000,000", approvalDate: "2024-12-15", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-        { requestId: "BUD2025-003", approvalId: "APP2025-003",amount: "1,300,000", approvalDate: "2024-12-25", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-        { requestId: "BUD2025-004", approvalId: "APP2025-004",amount: "1,200,000", approvalDate: "2025-01-30", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-        { requestId: "BUD2025-005", approvalId: "APP2025-005",amount: "1,900,000", approvalDate: "2025-02-28", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-        { requestId: "BUD2025-006", approvalId: "APP2025-006",amount: "1,100,000", approvalDate: "2025-02-26", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-        { requestId: "BUD2025-007", approvalId: "APP2025-007",amount: "3,200,000", approvalDate: "2025-02-14", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-        { requestId: "BUD2025-008", approvalId: "APP2025-008",amount: "2,300,000", approvalDate: "2025-01-19", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-        { requestId: "BUD2025-009", approvalId: "APP2025-009",amount: "1,200,000", approvalDate: "2025-01-29", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-        { requestId: "BUD2025-010", approvalId: "APP2025-010",amount: "2,500,000", approvalDate: "2025-03-14", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-        { requestId: "BUD2025-011", approvalId: "APP2025-011",amount: "3,700,000", approvalDate: "2025-03-02", approvedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "3,500,000", approvalStatus: "Approved" },
-        { requestId: "BUD2025-012", approvalId: "APP2025-012",amount: "5,100,000", approvalDate: "2025-03-16", approvedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "5,000,000", approvalStatus: "Approved" },
-        { requestId: "BUD2025-013", approvalId: "APP2025-013",amount: "6,200,000", approvalDate: "2025-03-12", approvedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "6,000,000", approvalStatus: "Approved" },
-        { requestId: "BUD2025-014", approvalId: "APP2025-014",amount: "2,400,000", approvalDate: "2025-03-15", approvedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "2,400,000", approvalStatus: "Approved" },
-        { requestId: "BUD2025-015", approvalId: "APP2025-015",amount: "1,500,000", approvalDate: "2025-03-13", approvedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "1,500,000", approvalStatus: "Approved" },
-        { requestId: "BUD2025-016", approvalId: "APP2025-016",amount: "2,200,000", approvalDate: "2025-02-02", approvedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "2,000,000", approvalStatus: "Approved" },
-        { requestId: "BUD2025-017", approvalId: "APP2025-017",amount: "3,000,000", approvalDate: "2025-01-02", approvedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "3,000,000", approvalStatus: "Approved" },
-        { requestId: "BUD2025-018", approvalId: "APP2025-018",amount: "4,900,000", approvalDate: "2025-02-25", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-        { requestId: "BUD2025-019", approvalId: "APP2025-019",amount: "5,500,000", approvalDate: "2025-01-01", approvedBy: "Sexbomb Aiah", remarks: "Awaiting Approval", approvedAmount: "Awaiting Approval", approvalStatus: "Pending" },
-    ].map(item => ({
-        ...item,
-        approvalDate: new Date(item.approvalDate)
-    })));
-
-    const [filteredData, setFilteredData] = useState(originalData);
-    const [approvedData, setApprovedData] = useState([]); 
-    const [pendingData, setPendingData] = useState([]);
-    const [filterByApproved, setFilterByApproved] = useState("All");
-    const [filterByPending, setFilterByPending] = useState("All");
-    const [approvedSearchTerm, setApprovedSearchTerm] = useState("");
-    const [pendingSearchTerm, setPendingSearchTerm] = useState("");
-   
-    useEffect(() => {
-        const sortedApprovedData = sortData(approvedData, filterByApproved);
-        setApprovedData(sortedApprovedData);
-    }, [filterByApproved, approvedData]);
-
-    useEffect(() => {
-        const filteredApprovedData = filterDataByDate(originalData.filter(item => item.approvalStatus === "Approved"), dateRangeApproved);
-        setApprovedData(filteredApprovedData);
-    }, [dateRangeApproved, originalData]);
-
-    useEffect(() => {
-        const sortedPendingData = sortData(pendingData, filterByPending);
-        setPendingData(sortedPendingData);
-    }, [filterByPending, pendingData]);
-
-    useEffect(() => {
-        const filteredPendingData = filterDataByDate(originalData.filter(item => item.approvalStatus === "Pending"), dateRangePending);
-        setPendingData(filteredPendingData);
-    }, [dateRangePending, originalData]);
-
-    useEffect(() => {
-        let filteredApprovedData = filterDataByDate(originalData.filter(item => item.approvalStatus === "Approved"), dateRangeApproved);
-        filteredApprovedData = filterDataBySearch(filteredApprovedData, approvedSearchTerm);
-        setApprovedData(filteredApprovedData);
-    }, [dateRangeApproved, approvedSearchTerm, originalData]);
-
-    useEffect(() => {
-        let filteredPendingData = filterDataByDate(originalData.filter(item => item.approvalStatus === "Pending"), dateRangePending);
-        filteredPendingData = filterDataBySearch(filteredPendingData, pendingSearchTerm);
-        setPendingData(filteredPendingData);
-    }, [dateRangePending, pendingSearchTerm, originalData]);
-
-    useEffect(() => {
-        let tempData = filterDataByDate(originalData, dateRange);
-        tempData = filterDataBySearch(tempData, searchTerm);
-        tempData = sortData(tempData, filterBy); 
-        setFilteredData(tempData);
-    }, [dateRange, searchTerm, filterBy, originalData]);
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsCompact(window.innerWidth < 768);
-        };
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
-
-    useEffect(() => {
+import React, { useState, useEffect, useMemo } from "react";
+    import "../styles/Approvals.css";
+    
+    const tabs = ["Budget Allocation Plan", "Budget Submission List", "Budget Request List"];
+    const departmentIds = {
+      "MAR016": "Marketing",
+      "OPER015": "Operations",
+      "IT014": "IT",
+      "ACC013": "Accounting",
+      "PUR012": "Purchasing",
+      "SUP011": "Support and Services",
+      "MAN010": "Management",
+      "MRP009": "MRP",
+      "INV008": "Inventory",
+      "PM007": "Project Management",
+      "HR006": "Human Resources",
+      "SAL001": "Sales",
+      "ADM002": "Administration",
+      "FIN003": "Financials",
+      "PRO004": "Production",
+      "DIS005": "Distribution",
+    };
+    const initialDepartmentBudgets = {
+      "Marketing": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Operations": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "IT": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Accounting": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Purchasing": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Support and Services": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Management": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "MRP": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Inventory": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Project Management": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Human Resources": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Sales": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Administration": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Financials": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Production": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+      "Distribution": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
+    };
+    const InfoCard = ({ title, value, color, children, className }) => (
+      <div className={`info-card ${className}`}>{children}</div>
+    );
+    
+    const ApprovalContent = () => {
+      const [activeTab, setActiveTab] = useState(tabs[0]);
+      const [isCompact, setIsCompact] = useState(window.innerWidth < 768);
+      const [searchTerm, setSearchTerm] = useState("");
+      const [dateRange, setDateRange] = useState("Last 30 days");
+      const [filterBy, setFilterBy] = useState("All");
+      const [originalData, setOriginalData] = useState([
+        { requestId: "BUD2025-01", departmentId: "MAR016", amount: "500,000", approvedAmount: "300,000", submissionDate: "2025-02-17", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-17"), approvedBy: "Sexbomb Aiah", approvalDate: new Date("2025-02-20"), remarks: "Approved", validationStatus: "Approved" },
+        { requestId: "BUD2025-02", departmentId: "OPER015", amount: "1,000,000", approvedAmount: "1000000", submissionDate: "2024-12-15", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-01-10"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-03", departmentId: "IT014", amount: "1,300,000", approvedAmount: "1300000", submissionDate: "2024-12-25", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-05"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-04", departmentId: "ACC013", amount: "1,200,000", approvedAmount: "1200000", submissionDate: "2025-01-30", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-01"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-05", departmentId: "PUR012", amount: "1,900,000", approvedAmount: "1900000", submissionDate: "2025-02-28", validatedBy: "Sexbomb Aiah", validationDate: new Date("2024-12-20"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-06", departmentId: "SUP011", amount: "1,100,000", approvedAmount: "1100000", submissionDate: "2025-02-26", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-01-25"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-07", departmentId: "MAN010", amount: "3,200,000", approvedAmount: "3200000", submissionDate: "2025-02-14", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-28"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-08", departmentId: "MRP009", amount: "2,300,000", approvedAmount: "2300000", submissionDate: "2025-01-19", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-10"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-09", departmentId: "INV008", amount: "1,200,000", approvedAmount: "1200000", submissionDate: "2025-01-29", validatedBy: "Sexbomb Aiah", validationDate: new Date("2024-12-30"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-010", departmentId: "PM007", amount: "2,500,000", approvedAmount: "2500000", submissionDate: "2025-03-14", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-01-15"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-011", departmentId: "HR006", amount: "3,700,000", approvedAmount: "3700000", submissionDate: "2025-03-02", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-20"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-012", departmentId: "SAL001", amount: "5,100,000", approvedAmount: "5100000", submissionDate: "2025-03-16", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-05"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-013", departmentId: "ADM002", amount: "6,200,000", approvedAmount: "6,000,000", submissionDate: "2025-03-12", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-12"), approvedBy: "Sexbomb Aiah", approvalDate: new Date("2025-03-15"), remarks: "Approved", validationStatus: "Approved" },
+        { requestId: "BUD2025-014", departmentId: "FIN003", amount: "2,400,000", approvedAmount: "2,000,000", submissionDate: "2025-03-15", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-15"), approvedBy: "Sexbomb Aiah", approvalDate: new Date("2025-03-18"), remarks: "Approved", validationStatus: "Approved" },
+        { requestId: "BUD2025-015", departmentId: "PRO004", amount: "1,500,000", approvedAmount: "1,500,000", submissionDate: "2025-03-13", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-13"), approvedBy: "Sexbomb Aiah", approvalDate: new Date("2025-03-16"), remarks: "Approved", validationStatus: "Approved" },
+        { requestId: "BUD2025-016", departmentId: "DIS005", amount: "2,200,000", approvedAmount: "2200000", submissionDate: "2025-02-02", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-02"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
+        { requestId: "BUD2025-017", departmentId: "DIS005", amount: "300000", approvedAmount: null, submissionDate: "2025-02-02", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-02"), approvedBy: "Sexbomb Aiah", approvalDate: new Date("2025-02-05"), remarks: "Rejected", validationStatus: "Rejected" },
+      ].map(item => ({ ...item, submissionDate: new Date(item.submissionDate) })));
+    
+      const [originalRequestData, setOriginalRequestData] = useState([
+        { requestId: "REQ-MAR-2025", departmentId: "MAR016", amount: "200000", requestDate: new Date("2025-08-01"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-09"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-OPER-2025", departmentId: "OPER015", amount: "200000", requestDate: new Date("2025-08-02"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-10"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-IT-2025", departmentId: "IT014", amount: "200000", requestDate: new Date("2025-08-03"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-11"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-ACC-2025", departmentId: "ACC013", amount: "200000", requestDate: new Date("2025-08-04"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-12"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-PUR-2025", departmentId: "PUR012", amount: "200000", requestDate: new Date("2025-08-05"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-13"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-SUP-2025", departmentId: "SUP011", amount: "200000", requestDate: new Date("2025-08-06"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-14"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-MAN-2025", departmentId: "MAN010", amount: "200000", requestDate: new Date("2025-08-07"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-15"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-MRP-2025", departmentId: "MRP009", amount: "200000", requestDate: new Date("2025-08-08"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-16"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-INV-2025", departmentId: "INV008", amount: "200000", requestDate: new Date("2025-08-09"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-17"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-PM-2025", departmentId: "PM007", amount: "200000", requestDate: new Date("2025-08-10"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-18"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-HR-2025", departmentId: "HR006", amount: "200000", requestDate: new Date("2025-08-11"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-19"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-SAL-2025", departmentId: "SAL001", amount: "200000", requestDate: new Date("2025-08-12"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-20"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-ADM-2025", departmentId: "ADM002", amount: "200000", requestDate: new Date("2025-08-13"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-21"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-FIN-2025", departmentId: "FIN003", amount: "200000", requestDate: new Date("2025-08-14"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-22"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-PRO-2025", departmentId: "PRO004", amount: "200000", requestDate: new Date("2025-08-15"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-23"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+        { requestId: "REQ-DIS-2025", departmentId: "DIS005", amount: "200000", requestDate: new Date("2025-08-16"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-24"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
+      ].map(item => ({ ...item, requestDate: new Date(item.requestDate) })));
+    
+      const [filteredData, setFilteredData] = useState(originalData);
+      const [filteredRequestData, setFilteredRequestData] = useState(originalRequestData);
+      const [selectedRows, setSelectedRows] = useState([]);
+      const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
+      const [confirmationMessage, setConfirmationMessage] = useState("");
+      const [validationTableData, setValidationTableData] = useState([]);
+      const [totalBudget, setTotalBudget] = useState(0);
+      const [isWarningPopupVisible, setIsWarningPopupVisible] = useState(false);
+      const [departmentBudgets, setDepartmentBudgets] = useState(initialDepartmentBudgets);
+      const [rejectedData, setRejectedData] = useState([]);
+      const [budgetPlanStatus, setBudgetPlanStatus] = useState('Tentative');
+      const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+      const [editedApprovedBy, setEditedApprovedBy] = useState("");
+      const [editingRows, setEditingRows] = useState([]);
+      const [approvalStatus, setApprovalStatus] = useState(null);
+      const [isApprovedByWarningVisible, setIsApprovedByWarningVisible] = useState(false);
+      const [isAllocatedBudgetUpdated, setIsAllocatedBudgetUpdated] = useState(false);
+      const [initialBudgets, setInitialBudgets] = useState(initialDepartmentBudgets);
+      const [isRequestWarningVisible, setIsRequestWarningVisible] = useState(false);
+    
+      const closeWarningPopup = () => { setIsWarningPopupVisible(false); };
+      const closeApprovedByWarning = () => { setIsApprovedByWarningVisible(false); };
+    
+      useEffect(() => {
         let tempData = filterDataByDate(originalData, dateRange);
         tempData = filterDataBySearch(tempData, searchTerm);
         tempData = sortData(tempData, filterBy);
         setFilteredData(tempData);
-    }, [dateRange, searchTerm, filterBy, originalData]);
-
-
-    useEffect(() => {
-        const approved = originalData.filter(item => item.approvalStatus === "Approved");
-        setApprovedData(approved);
-    }, [originalData]);
-
-    useEffect(() => {
-        const pending = originalData.filter(item => item.approvalStatus === "Pending");
-        setPendingData(pending);
-    }, [originalData]);
-
-    const handlePageChange = (direction) => {
+    
+        let tempRequestData = filterDataByDate(originalRequestData, dateRange, 'requestDate');
+        tempRequestData = filterDataBySearch(tempRequestData, searchTerm, 'requestId');
+        tempRequestData = sortData(tempRequestData, filterBy, 'requestId', 'requestDate');
+        setFilteredRequestData(tempRequestData);
+      }, [dateRange, searchTerm, filterBy, originalData, originalRequestData]);
+    
+      useEffect(() => {
+        const handleResize = () => {
+          setIsCompact(window.innerWidth < 768);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+      }, []);
+    
+      const handlePageChange = (direction) => {
         const currentIndex = tabs.indexOf(activeTab);
-            if (direction === "next" && currentIndex < tabs.length - 1) {
-                setActiveTab(tabs[currentIndex + 1]);
-            } else if (direction === "prev" && currentIndex > 0) {
-                setActiveTab(tabs[currentIndex - 1]);
-            }
-    };
-
-    const filterDataByDate = (data, range) => {
-        try {
-            const today = new Date();
-            let startDate;
-    
-                if (range === "Last 7 days") {
-                    startDate = new Date(today);
-                    startDate.setDate(today.getDate() - 7);
-                } else if (range === "Last 30 days") {
-                    startDate = new Date(today);
-                    startDate.setDate(today.getDate() - 30);
-                } else {
-                    return data;
-                }
-        
-                return data.filter(item => {
-                    const approvalDate = new Date(item.approvalDate);
-                    return !isNaN(approvalDate) && approvalDate >= startDate && approvalDate <= today;
-                });
-            } catch (error) {
-                console.error("Error in filterDataByDate:", error);
-                return [];
-            }
-    };
-
-    const filterDataBySearch = (data, term) => {
-        try {
-            if (!term) return data;
-            const lowerTerm = term.toLowerCase();
-                return data.filter(item => {
-                    return (
-                        item.requestId.toLowerCase().includes(lowerTerm) ||
-                        item.approvalId.toLowerCase().includes(lowerTerm) ||
-                        item.amount.toLowerCase().includes(lowerTerm) ||
-                        item.approvalDate.toISOString().toLowerCase().includes(lowerTerm) ||
-                        item.approvedBy.toLowerCase().includes(lowerTerm) ||
-                        item.remarks.toLowerCase().includes(lowerTerm) ||
-                        item.approvedAmount.toLowerCase().includes(lowerTerm) ||
-                        item.approvalStatus.toLowerCase().includes(lowerTerm)
-                    );
-                });
-            } catch (error) {
-                console.error("Error in filterDataBySearch:", error);
-                return [];
+        if (direction === "next" && currentIndex < tabs.length - 1) {
+          setActiveTab(tabs[currentIndex + 1]);
+        } else if (direction === "prev" && currentIndex > 0) {
+          setActiveTab(tabs[currentIndex - 1]);
         }
-    };
-
-    const sortData = (data, sortBy) => {
-        try {
-            if (sortBy === "All") return data;
-            const sortedData = [...data];
-                sortedData.sort((a, b) => {
-                    let comparison = 0;
-                    if (sortBy === "lowest amount") {
-                        const amountA = parseFloat(a.amount.replace(/,/g, ''));
-                        const amountB = parseFloat(b.amount.replace(/,/g, ''));
-                        if (isNaN(amountA)) return 1;
-                        if (isNaN(amountB)) return -1;
-                        comparison = amountA - amountB;
-                    } else if (sortBy === "highest amount") {
-                        const amountA = parseFloat(a.amount.replace(/,/g, ''));
-                        const amountB = parseFloat(b.amount.replace(/,/g, ''));
-                        if (isNaN(amountA)) return 1;
-                        if (isNaN(amountB)) return -1;
-                        comparison = amountB - amountA;
-                    } else if (sortBy === "oldest requests") {
-                        comparison = new Date(a.approvalDate) - new Date(b.approvalDate);
-                    } else if (sortBy === "latest requests") {
-                        comparison = new Date(b.approvalDate) - new Date(a.approvalDate);
-                    }
-                    return comparison;
-                });
-                return sortedData;
-            } catch (error) {
-                console.error("Error in sortData:", error);
-                return [];
-            }
-    };
-
+      };
     
- return (
+      const filterDataByDate = (data, range, dateField = 'submissionDate') => {
+        try {
+          const today = new Date();
+          let startDate;
+          if (range === "Last 7 days") {
+            startDate = new Date(today);
+            startDate.setDate(today.getDate() - 7);
+          } else if (range === "Last 30 days") {
+            startDate = new Date(today);
+            startDate.setDate(today.getDate() - 30);
+          } else {
+            return data;
+          }
+          return data.filter(item => {
+            const itemDate = new Date(item[dateField]);
+            return !isNaN(itemDate) && itemDate >= startDate && itemDate <= today;
+          });
+        } catch (error) {
+          console.error("Error in filterDataByDate:", error);
+          return [];
+        }
+      };
+    
+      const filterDataBySearch = (data, term, requestIdField = 'requestId') => {
+        try {
+          if (!term) return data;
+          const lowerTerm = term.toLowerCase();
+          return data.filter(item => {
+            return (item[requestIdField].toLowerCase().includes(lowerTerm) ||
+              item.departmentId.toLowerCase().includes(lowerTerm) ||
+              item.amount.toLowerCase().includes(lowerTerm) ||
+              (item.submissionDate ? item.submissionDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
+              (item.validationDate ? item.validationDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
+              (item.approvalDate ? item.approvalDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
+              item.validatedBy.toLowerCase().includes(lowerTerm) ||
+              item.remarks.toLowerCase().includes(lowerTerm) ||
+              item.approvedAmount.toLowerCase().includes(lowerTerm) ||
+              item.validationStatus.toLowerCase().includes(lowerTerm) ||
+              item.approvedBy.toLowerCase().includes(lowerTerm));
+          });
+        } catch (error) {
+          console.error("Error in filterDataBySearch:", error);
+          return [];
+        }
+      };
+    
+      const sortData = (data, sortBy, requestIdField = 'requestId', dateField = 'submissionDate') => {
+        try {
+          if (sortBy === "All") return data;
+          const sortedData = [...data];
+          sortedData.sort((a, b) => {
+            let comparison = 0;
+            if (sortBy === "lowest amount") {
+              const amountA = parseFloat(a.amount.replace(/,/g, ''));
+              const amountB = parseFloat(b.amount.replace(/,/g, ''));
+              if (isNaN(amountA)) return 1;
+              if (isNaN(amountB)) return -1;
+              comparison = amountA - amountB;
+            } else if (sortBy === "highest amount") {
+              const amountA = parseFloat(a.amount.replace(/,/g, ''));
+              const amountB = parseFloat(b.amount.replace(/,/g, ''));
+              if (isNaN(amountA)) return 1;
+              if (isNaN(amountB)) return -1;
+              comparison = amountB - amountA;
+            } else if (sortBy === "oldest requests") {
+              comparison = new Date(a[dateField]) - new Date(b[dateField]);
+            } else if (sortBy === "latest requests") {
+              comparison = new Date(b[dateField]) - new Date(a[dateField]);
+            }
+            return comparison;
+          });
+          return sortedData;
+        } catch (error) {
+          console.error("Error in sortData:", error);
+          return [];
+        }
+      };
+    
+      const updateApprovalTable = (totalBudget) => {
+        const tableData = Object.keys(departmentBudgets).map(dept => ({
+          department: dept,
+          allocatedBudget: departmentBudgets[dept].allocatedBudget.toLocaleString(undefined, { minimumFractionDigits: 2 }),
+          totalSpent: departmentBudgets[dept].totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 }),
+          remainingBudget: departmentBudgets[dept].remainingBudget.toLocaleString(undefined, { minimumFractionDigits: 2 })
+        }));
+    
+        setValidationTableData(tableData);
+        setTotalBudget(totalBudget);
+      };
+    
+      const updateSubmissionTable = (data) => {
+        const approved = data.filter(item => item.validationStatus === "Approved").length;
+        const pending = data.filter(item => item.validationStatus === "Pending").length;
+        const rejected = data.filter(item => item.validationStatus === "Rejected").length;
+    
+        const totalApprovedAmount = data.reduce((acc, item) => {
+          if (item.validationStatus === "Approved") {
+            return acc + (parseFloat(item.approvedAmount?.replace(/,/g, '')) || 0);
+          }
+          return acc;
+        }, 0);
+    
+        setTotalBudget({
+          approvedAmount: totalApprovedAmount
+        });
+    
+        const rejectedItems = data.filter(item => item.validationStatus === "Rejected");
+        setRejectedData(rejectedItems);
+      };
+    
+      useEffect(() => {
+        if (activeTab === "Budget Allocation Plan") {
+          updateAllocatedBudgetAndTotalSpent();
+        } else if (activeTab === "Budget Submission List") {
+          updateSubmissionTable(originalData);
+          updateBudgetPlanStatus(originalData);
+        } else if (activeTab === "Budget Request List") {
+          if (budgetPlanStatus !== 'Final') {
+            setIsRequestWarningVisible(true);
+          } else {
+            setIsRequestWarningVisible(false);
+            updateSubmissionTable(originalRequestData);
+            updateAllocatedBudgetAndTotalSpent();
+          }
+        }
+      }, [originalData, originalRequestData, activeTab, budgetPlanStatus]);
+    
+      const handleRowSelect = (rowId) => {
+        if (selectedRows.includes(rowId)) {
+          setSelectedRows(selectedRows.filter(id => id !== rowId));
+        } else {
+          setSelectedRows([...selectedRows, rowId]);
+        }
+      };
+    
+      const handleProcessClick = () => {
+        if (selectedRows.length === 0) {
+          setIsWarningPopupVisible(true);
+          return;
+        }
+        const selectedRowsData = selectedRows.map(rowId => {
+          return activeTab === "Budget Submission List" ? originalData.find(row => row.requestId === rowId) : originalRequestData.find(row => row.requestId === rowId);
+        });
+        setEditingRows(selectedRowsData);
+        setIsEditModalVisible(true);
+      };
+    
+      const handleRejectClick = () => {
+        setApprovalStatus("Rejected");
+        setIsConfirmationVisible(true);
+        setConfirmationMessage(`Are you sure you want to approve the selected data?\n` +
+          `Submission ID(s): ${editingRows.map(row => row.requestId).join(', ')}\n` +
+          `Requested Amount(s): ${editingRows.map(row => row.amount).join(', ')}\n` +
+          `Approved Amount(s): ${editingRows.map(row => row.approvedAmount || row.amount).join(', ')}`
+        );
+    };
+    
+      const handleApproveClick = () => {
+        setApprovalStatus("Approved");
+        setIsConfirmationVisible(true);
+        setConfirmationMessage(
+          `Are you sure you want to approve the selected data?\n` +
+          `Submission ID(s): ${editingRows.map(row => row.requestId).join(', ')}\n` +
+          `Requested Amount(s): ${editingRows.map(row => row.amount).join(', ')}\n` +
+          `Approved Amount(s): ${editingRows.map(row => row.approvedAmount || row.amount).join(', ')}`
+        );
+      };
+    
+      const handleProceedApproval = (status) => {
+        if (status === "Approved" && !editedApprovedBy.trim()) {
+          setIsApprovedByWarningVisible(true);
+          return;
+        }
+    
+        const currentDate = new Date();
+        let updatedData;
+        let dataToUpdate = activeTab === "Budget Submission List" ? originalData : originalRequestData;
+    
+        updatedData = dataToUpdate.map(row => {
+          const editingRow = editingRows.find(editRow => editRow.requestId === row.requestId);
+          if (editingRow) {
+            if (status === "Approved") {
+              const approvedAmount = parseFloat((row.approvedAmount || row.amount).replace(/,/g, ''));
+              const departmentName = departmentIds[row.departmentId];
+    
+              if (departmentName) {
+                setDepartmentBudgets(prevBudgets => {
+                  const updatedBudgets = {
+                    ...prevBudgets,
+                    [departmentName]: {
+                      ...prevBudgets[departmentName],
+                      allocatedBudget: prevBudgets[departmentName].allocatedBudget,
+                      remainingBudget: prevBudgets[departmentName].remainingBudget - approvedAmount,
+                      totalSpent: prevBudgets[departmentName].totalSpent + approvedAmount,
+                    }
+                  };
+                  return updatedBudgets;
+                });
+              }
+    
+              return {
+                ...row,
+                validationStatus: "Approved",
+                approvedBy: editedApprovedBy,
+                approvalDate: currentDate,
+                remarks: "Approved",
+                validationDate: currentDate,
+                validatedBy: "Sexbomb Aiah",
+                approvedAmount: row.approvedAmount
+              };
+            } else if (status === "Rejected") {
+              return {
+                ...row,
+                validationStatus: "Rejected",
+                approvedBy: editedApprovedBy,
+                approvalDate: currentDate,
+                remarks: "For Resubmission"
+              };
+            }
+          }
+          return row;
+        });
+    
+        if (activeTab === "Budget Submission List") {
+          setOriginalData(updatedData);
+          updateSubmissionTable(updatedData);
+        } else if (activeTab === "Budget Request List") {
+          setOriginalRequestData(updatedData);
+          updateSubmissionTable(updatedData);
+        }
+        setIsConfirmationVisible(false);
+        setSelectedRows([]);
+        setIsEditModalVisible(false);
+        setEditingRows([]);
+        setEditedApprovedBy("");
+        setApprovalStatus(null);
+      };
+    
+      const getSortedFilteredData = () => {
+        const dataToFilter = activeTab === "Budget Submission List" ? filteredData : filteredRequestData;
+        const approved = dataToFilter.filter(item => item.validationStatus === "Approved");
+        const pending = dataToFilter.filter(item => item.validationStatus === "Pending");
+        const rejected = dataToFilter.filter(item => item.validationStatus === "Rejected");
+        return [...approved, ...pending, ...rejected];
+      };
+    
+      const handleCancelConfirmation = () => {
+        setIsConfirmationVisible(false);
+      };
+    
+      const updateBudgetPlanStatus = (data) => {
+        const allApproved = data.every(item => item.validationStatus === "Approved");
+        setBudgetPlanStatus(allApproved ? 'Final' : 'Tentative');
+      };
+    
+      useEffect(() => {
+        if(activeTab === "Budget Allocation Plan" || activeTab === "Budget Request List") {
+          updateAllocatedBudgetAndTotalSpent();
+        }
+      }, [originalData, originalRequestData, activeTab]);
+    
+        const updateAllocatedBudgetAndTotalSpent = () => {
+        if (activeTab === "Budget Allocation Plan" || activeTab === "Budget Request List") {
+          const updatedDepartmentBudgets = { ...initialDepartmentBudgets };
+          let totalAllocated = 0;
+          let totalSpent = 0;
+    
+          originalData.forEach(item => {
+            if (item.validationStatus === "Approved") {
+              const departmentName = departmentIds[item.departmentId];
+              if (departmentName) {
+                const approvedAmount = parseFloat((item.approvedAmount || item.amount).replace(/,/g, ''));
+                updatedDepartmentBudgets[departmentName] = {
+                  ...updatedDepartmentBudgets[departmentName],
+                  allocatedBudget: updatedDepartmentBudgets[departmentName].allocatedBudget + approvedAmount,
+                  remainingBudget: updatedDepartmentBudgets[departmentName].remainingBudget + approvedAmount,
+                  totalSpent: updatedDepartmentBudgets[departmentName].totalSpent,
+                };
+                totalAllocated += approvedAmount;
+              }
+            }
+          });
+    
+          originalRequestData.forEach(item => {
+            if (item.validationStatus === "Approved") {
+              const departmentName = departmentIds[item.departmentId];
+              if (departmentName) {
+                const approvedAmount = parseFloat((item.approvedAmount || item.amount).replace(/,/g, ''));
+                updatedDepartmentBudgets[departmentName] = {
+                  ...updatedDepartmentBudgets[departmentName],
+                  totalSpent: updatedDepartmentBudgets[departmentName].totalSpent + approvedAmount,
+                };
+                totalSpent += approvedAmount;
+              }
+            }
+          });
+    
+          Object.keys(updatedDepartmentBudgets).forEach(dept => {
+            updatedDepartmentBudgets[dept].remainingBudget = updatedDepartmentBudgets[dept].allocatedBudget - updatedDepartmentBudgets[dept].totalSpent;
+          });
+    
+          setDepartmentBudgets(updatedDepartmentBudgets);
+          updateApprovalTable({ allocated: totalAllocated, spent: totalSpent, remaining: totalAllocated - totalSpent });
+        }
+      };
+    
+      useEffect(() => {
+        setIsAllocatedBudgetUpdated(false)
+      },[activeTab])
+      return (
         <div className="approvals">
-            <div className="body-content-container">
-                <div className="tabs">
-                    {isCompact ? (
-                        <div className="compact-tabs">
-                            <button className="tab-button active">{activeTab}</button>
-                            <button onClick={() => handlePageChange("prev")} className="nav-button" disabled={activeTab === tabs[0]}>&#60;</button>
-                            <button onClick={() => handlePageChange("next")} className="nav-button" disabled={activeTab === tabs[tabs.length - 1]}>&#62;</button>
-                        </div>
-                    ) : (
-                        <div className="full-tabs">
-                            {tabs.map(tab => (
-                                <button key={tab} className={`tab-button ${activeTab === tab ? "active" : ""}`} onClick={() => setActiveTab(tab)}>
-                                    {tab}
-                                </button>
-                            ))}
-                            <button className="nav-button" onClick={() => handlePageChange("prev")}>&#60;</button>
-                            {[1, 2, 3].map((num, index) => (
-                                <button key={num} className={`page-button ${activeTab === tabs[index] ? "active" : ""}`} onClick={() => setActiveTab(tabs[index])}>
-                                    {num}
-                                </button>
-                            ))}
+          <div className="body-content-container">
+            <div className="tabs">{isCompact ? (
+                <div className="compact-tabs">
+                    <button className="tab-button active">{activeTab}</button>
+                    <button onClick={() => handlePageChange("prev")} className="nav-button" disabled={activeTab ===tabs[0]}>&#60;</button>
+                    <button onClick={() => handlePageChange("next")} className="nav-button"disabled={activeTab === tabs[tabs.length - 1]}>&#62;</button></div>) : (
+                        <div className="full-tabs">{tabs.map(tab => (<button key={tab} className={`tab-button ${activeTab === tab ? "active" : ""}`} onClick={() => setActiveTab(tab)}>{tab}</button>))}
+                            <button className="nav-button" onClick={() => handlePageChange("prev")}>&#60;</button>{[1, 2, 3].map((num, index) => (<button key={num} className={`page-button ${activeTab === tabs[index] ? "active" : ""}`} onClick={() => setActiveTab(tabs[index])}>{num}</button>))}
                             <button className="nav-button" onClick={() => handlePageChange("next")}>&#62;</button>
                         </div>
                     )}
                 </div>
-
-                {activeTab === "All Approvals" && (
-                    <div className="content-container">
-                        <InfoCard className="filter-infocard">
-                            <div className="filter-controls">
-                                <input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                                    <div class="filter-group">
-                                        <select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
-                                            <option value="Last 30 days">Last 30 days</option>
-                                            <option value="Last 7 days">Last 7 days</option>
-                                            <option value="All Time">All Time</option>
-                                        </select>
-                                        <select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
-                                            <option value="All">Filter By</option>
-                                            <option value="lowest amount">Lowest Amount</option>
-                                            <option value="highest amount">Highest Amount</option>
-                                            <option value="oldest requests">Oldest Requests</option>
-                                            <option value="latest requests">Latest Requests</option>
-                                        </select>
-                                    </div>
-                            </div>
-                                        <InfoCard className="table-infocard">
-                                            <table className="approval-table-2">
-                                                <thead>
-                                                    <tr>
-                                                        <th></th>
-                                                        <th>Request ID</th>
-                                                        <th>Approval ID</th>
-                                                        <th>Amount Requested</th>
-                                                        <th>Approval Date</th>
-                                                        <th>Approved By</th>
-                                                        <th>Remarks</th>
-                                                        <th>Approved Amount</th>
-                                                        <th>Approval Status</th>
-                                                    </tr>
-                                                </thead>
-                                                    <tbody>
-                                                        {filteredData.map((row, index) => (
-                                                            <tr key={index}>
-                                                                <td>
-                                                                    <div className="row-wrapper">
-                                                                        <input type="checkbox" />
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <div className="row-wrapper">{row.requestId}</div>
-                                                                </td>
-                                                                <td>
-                                                                    <div className="row-wrapper">{row.approvalId}</div>
-                                                                </td>
-                                                                <td>
-                                                                    <div className="row-wrapper">{row.amount}</div>
-                                                                </td>
-                                                                <td>
-                                                                    <div className="row-wrapper">{row.approvalDate.toLocaleDateString()}</div>
-                                                                </td>
-                                                                <td>
-                                                                    <div className="row-wrapper">{row.approvedBy}</div>
-                                                                </td>
-                                                                <td>
-                                                                    <div className="row-wrapper">{row.remarks}</div>
-                                                                </td>
-                                                                <td>
-                                                                    <div className="row-wrapper">{row.approvedAmount}</div>
-                                                                </td>
-                                                                <td>
-                                                                    <div className="row-wrapper">
-                                                                        <span className={`status-label ${row.approvalStatus.toLowerCase()}`}>
-                                                                            {row.approvalStatus}
-                                                                        </span>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                            </table>
-                                        </InfoCard>
-                        </InfoCard>
+            {activeTab === "Budget Allocation Plan" && (
+              <div className="content-container">
+                <InfoCard className="summary-infocard">
+                  <div className="summary-container">
+                  <div className="date-status-container">
+        <div className="summary-date-range">August 2025 - August 2026</div>
+        <div className="summary-status">
+        <span className="status-prefix">Status:</span>
+        <span className={`summary-status-label ${budgetPlanStatus.toLowerCase()}`}>
+            {budgetPlanStatus}
+        </span>
+        </div>
+      </div>
+      <div className="date-range-border"></div>
+                    <div className="summary-details">
+                      <div className="summary-total-budget">
+                        Total Budget
+                        <p>₱{totalBudget.allocated?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      </div>
+                      <div className="summary-total-spent">
+                        Total Spent
+                        <p>₱{totalBudget.spent?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      </div>
+                      <div className="summary-total-remaining">
+                        Total Remaining
+                        <p>₱{totalBudget.remaining?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      </div>
                     </div>
-                )}
-                {activeTab === "Approved Requests" && (
-                    <div className="content-container">
-                        <InfoCard className="filter-infocard">
-                            <div className="filter-controls">
-                                <input className="search" type="text" placeholder="Search..." value={approvedSearchTerm} onChange={(e) => setApprovedSearchTerm(e.target.value)} />
-                                    <div className="filter-group">
-                                        <select className="select-day" value={dateRangeApproved} onChange={(e) => setDateRangeApproved(e.target.value)}>
-                                            <option value="Last 30 days">Last 30 days</option>
-                                            <option value="Last 7 days">Last 7 days</option>
-                                            <option value="All Time">All Time</option>
-                                        </select>
-                                        <select className="select-type" value={filterByApproved} onChange={(e) => setFilterByApproved(e.target.value)}>
-                                            <option value="All">Filter By</option>
-                                            <option value="lowest amount">Lowest Amount</option>
-                                            <option value="highest amount">Highest Amount</option>
-                                            <option value="oldest requests">Oldest Requests</option>
-                                            <option value="latest requests">Latest Requests</option>
-                                        </select>
-                                    </div>
-                            </div>
-                            <InfoCard className="table-infocard">
-                                <table className="approval-table-2"> 
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Request ID</th>
-                                            <th>Approval ID</th>
-                                            <th>Amount Requested</th>
-                                            <th>Approval Date</th>
-                                            <th>Approved By</th>
-                                            <th>Remarks</th>
-                                            <th>Approved Amount</th>
-                                            <th>Approval Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {approvedData.map((row, index) => (
-                                            <tr key={index}>
-                                                <td>
-                                                    <div className="row-wrapper"> 
-                                                        <input type="checkbox" /> 
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.requestId}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.approvalId}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.amount}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.approvalDate.toLocaleDateString()}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.approvedBy}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.remarks}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.approvedAmount}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">
-                                                        <span className={`status-label ${row.approvalStatus.toLowerCase()}`}> 
-                                                            {row.approvalStatus}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </InfoCard>
-                        </InfoCard>
+                  </div>
+                </InfoCard>
+                <InfoCard className="infocard-validation-table">
+                  <table className="validation-table">
+                    <thead>
+                      <tr>
+                        <th>Department</th>
+                        <th>Allocated Budget</th>
+                        <th>Total Spent</th>
+                        <th>Remaining Budget</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {validationTableData.map(row => (
+                        <tr key={row.department}>
+                          <td>{row.department}</td>
+                          <td>{row.allocatedBudget}</td>
+                          <td>{row.totalSpent}</td>
+                          <td>{row.remainingBudget}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </InfoCard>
+              </div>
+            )}
+            {activeTab === "Budget Submission List" && (
+              <div className="content-container">
+                {/* Budget Submission List content */}
+                <InfoCard className="summary-infocard">
+                  <div className="summary-container">
+                    <div className="summary-date-range">August 2025 - August 2026</div>
+                    <div className="date-range-border"></div>
+                    <div className="summary-details">
+                      <div className="summary-total-budget">
+                        Total Approved Amount
+                        <p>₱{totalBudget.approvedAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      </div>
+                      
+                      <div className="summary-status">
+                        <div className="summary-approved">
+                          Approved <span className="status-circle approved"></span>
+                          <p>{originalData.filter(item => item.validationStatus === "Approved").length}</p>
+                        </div>
+                        <div className="summary-pending">
+                          Pending <span className="status-circle pending"></span>
+                          <p>{originalData.filter(item => item.validationStatus === "Pending").length}</p>
+                        </div>
+                        <div className="summary-rejected">
+                          Rejected <span className="status-circle rejected"></span>
+                          <p>{originalData.filter(item => item.validationStatus === "Rejected").length}</p>
+                        </div>
+                      </div>
                     </div>
-                )}
-                {activeTab === "Pending Requests" && (
-                    <div className="content-container">
-                        <InfoCard className="filter-infocard">
-                            <div className="filter-controls">
-                                <input className="search" type="text" placeholder="Search..." value={pendingSearchTerm} onChange={(e) => setPendingSearchTerm(e.target.value)} />
-                                    <div className="filter-group">  
-                                        <select className="select-day" value={dateRangePending} onChange={(e) => setDateRangePending(e.target.value)}>
-                                            <option value="Last 30 days">Last 30 days</option>
-                                            <option value="Last 7 days">Last 7 days</option>
-                                            <option value="All Time">All Time</option>
-                                        </select>
-
-                                        <select className="select-type" value={filterByPending} onChange={(e) => setFilterByPending(e.target.value)}>
-                                            <option value="All">Filter By</option>
-                                            <option value="lowest amount">Lowest Amount</option>
-                                            <option value="highest amount">Highest Amount</option>
-                                            <option value="oldest requests">Oldest Requests</option>
-                                            <option value="latest requests">Latest Requests</option>
-                                        </select>
-                                    </div> 
-                            </div>
-                            <InfoCard className="table-infocard">
-                                <table className="approval-table-2">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Request ID</th>
-                                            <th>Approval ID</th>
-                                            <th>Amount Requested</th>
-                                            <th>Approval Date</th>
-                                            <th>Approved By</th>
-                                            <th>Remarks</th>
-                                            <th>Approved Amount</th>
-                                            <th>Approval Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {pendingData.map((row, index) => (
-                                            <tr key={index}>
-                                                <td>
-                                                    <div className="row-wrapper">
-                                                        <input type="checkbox" />
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.requestId}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.approvalId}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.amount}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.approvalDate.toLocaleDateString()}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.approvedBy}</div>
-                                                </td>
-                                                <td>
-                                                    <div classNameclassName="row-wrapper">{row.remarks}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">{row.approvedAmount}</div>
-                                                </td>
-                                                <td>
-                                                    <div className="row-wrapper">
-                                                        <span className={`status-label ${row.approvalStatus.toLowerCase()}`}>
-                                                            {row.approvalStatus}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </InfoCard>
-                        </InfoCard>
+                  </div>
+                </InfoCard>
+                <InfoCard className="filter-infocard">
+                  <div className="filter-controls">
+                    <input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                    <div className="filter-group">
+                      <select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+                        <option value="Last 30 days">Last 30 days</option>
+                        <option value="Last 7 days">Last 7 days</option>
+                        <option value="All Time">All Time</option>
+                      </select>
+                      <select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
+                        <option value="All">Filter By</option>
+                        <option value="lowest amount">Lowest Amount</option>
+                        <option value="highest amount">Highest Amount</option>
+                        <option value="oldest requests">Oldest Requests</option>
+                        <option value="latest requests">Latest Requests</option>
+                      </select>
                     </div>
-                )}
-</div>
-</div>
- );
-};
+                  </div>
+                  <InfoCard className="table-infocard">
+                    <table className="validation-table-2">
+                      <thead>
+                        <tr>
+                          <th>Select</th>
+                          <th>Submission ID</th>
+                          <th>Department ID</th>
+                          <th>Amount Requested</th>
+                          <th>Approved Amount</th>
+                          <th>Submission Date</th>
+                          <th>Validation Date</th>
+                          <th>Validated By</th>
+                          <th>Approval Date</th>
+                          <th>Approved By</th>
+                          <th>Remarks</th>
+                          <th>Validation Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {getSortedFilteredData().map((row, index) => (
+                          <tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Approved" ? "#f0f0f0" : "white" }}>
+                            <td><div className="row-wrapper"><input type="checkbox" checked={selectedRows.includes(row.requestId)} readOnly /></div></td>
+                            <td><div className="row-wrapper">{row.requestId}</div></td>
+                            <td><div className="row-wrapper">{row.departmentId}</div></td>
+                            <td><div className="row-wrapper">{row.amount}</div></td>
+                            <td><div className="row-wrapper">{row.approvedAmount}</div></td>
+                            <td><div className="row-wrapper">{row.submissionDate.toLocaleDateString()}</div></td>
+                            <td><div className="row-wrapper">{row.validationDate ? row.validationDate.toLocaleDateString() : "N/A"}</div></td>
+                            <td><div className="row-wrapper">{row.validatedBy}</div></td>
+                            <td><div className="row-wrapper">{row.approvalDate ? row.approvalDate.toLocaleDateString() : "N/A"}</div></td>
+                            <td><div className="row-wrapper">{row.approvedBy}</div></td>
+                            <td><div className="row-wrapper">{row.remarks}</div></td>
+                            <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <div className="button-container">
+                      <button className="process-button" onClick={handleProcessClick}>Process</button>
+                    </div>
+                  </InfoCard>
+                  {isEditModalVisible && (
+  <InfoCard className="edit-modal">
+    <div className="edit-modal-content">
+      <div className="edit-modal-header">
+        <h3>Approval Process</h3>
+      </div>
+      {editingRows.map((row) => (
+        <div key={row.requestId} className="edit-modal-item">
+          <div className="edit-modal-left">
+            <div className="edit-modal-select-icon">
+              <input
+                type="checkbox"
+                style={{ transform: "scale(1.5)" }}
+                checked={selectedRows.includes(row.requestId)}
+                readOnly
+              />
+            </div>
+            <div className="edit-modal-details">
+              <p>
+                <strong>Submission ID:</strong> {row.requestId}
+              </p>
+              <p>
+                <strong>Department ID:</strong> {row.departmentId}
+              </p>
+              <p>
+                <strong>Amount Requested:</strong> {row.amount}
+              </p>
+              <p>
+                <strong>Approved Amount:</strong> {row.approvedAmount || row.amount}
+              </p>
+              <p>
+                <strong>Validated By:</strong> {row.validatedBy}
+              </p>
+              <p>
+                <strong>Validation Date:</strong>{" "}
+                {row.validationDate ? row.validationDate.toLocaleDateString() : "N/A"}
+              </p>
+              <div className="edit-modal-input-group approved-by-group">
+                <div className="edit-modal-label-input">
+                  <label>
+                    <strong>Approved By:</strong>
+                  </label>
+                  <input
+                    type="text"
+                    value={editedApprovedBy}
+                    onChange={(e) => setEditedApprovedBy(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="popup-buttons">
+        <button className="cancel-button" onClick={() => setIsEditModalVisible(false)}>
+          Cancel
+        </button>
+        <button className="reject-button" onClick={handleRejectClick}>
+          Reject
+        </button>
+        <button className="approve-button" onClick={handleApproveClick}>
+          Approve
+        </button>
+      </div>
+    </div>
+  </InfoCard>
+)}
+                  {isConfirmationVisible && (
+                    <InfoCard className="popup-overlay">
+                      <div className="popup-content">
+                      <div className="popup-title">
+                            <h3>Confirmation</h3>
+                        </div>
+                        <p>{confirmationMessage}</p>
+                        <div className="popup-buttons">
+                          <button className="cancel-button" onClick={handleCancelConfirmation}>Cancel</button>
+                          <button className="proceed-button" onClick={() => handleProceedApproval(approvalStatus)}>Confirm</button>
+                        </div>
+                      </div>
+                    </InfoCard>
+                  )}
+                    <InfoCard className="reject-table">
+                        <div className="reject-title">
+                            <h3> Rejected Submissions</h3>
+                            </div>
+                    <table className="validation-table-2-reject">
+                      <thead>
+                        <tr>
+                          <th>Submission ID</th>
+                          <th>Amount Requested</th>
+                          <th>Date</th>
+                          <th>Rejected By</th>
+                          <th>Remarks</th>
+                          <th>Approval Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rejectedData.map((row, index) => (
+                          <tr key={index}>
+                            <td><div className="row-wrapper">{row.requestId}</div></td>
+                            <td><div className="row-wrapper">{row.amount}</div></td>
+                            <td><div className="row-wrapper">{row.submissionDate.toLocaleDateString()}</div></td>
+                            <td><div className="row-wrapper">{row.approvedBy}</div></td>
+                            <td><div className="row-wrapper">{row.remarks === "Rejected" ? "For Resubmission" : row.remarks}</div></td>
+                            <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
 
-export default BodyContent;
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </InfoCard>
+                  </InfoCard>
+                
+              </div>
+            )}
+            {activeTab === "Budget Request List" && (
+              <div className="content-container">
+                {isRequestWarningVisible ? (
+                  <div className="warning-popup">
+                    <div className="warning-popup-content">
+                      <h3>Oops...</h3>
+                      <p>Sorry, we're not yet accepting any budget request at the moment.</p>
+                      <p>No records to show yet.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <InfoCard className="summary-infocard">
+                  <div className="summary-container">
+                    <div className="summary-date-range">August 2025 - August 2026</div>
+                    <div className="date-range-border"></div>
+                    <div className="summary-details">
+                      <div className="summary-total-budget">
+                            Total Approved Amount
+                            <p>{totalBudget.approvedAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '₱0.00'}</p>
+                          </div>
+                          <div className="summary-status">
+                            <div className="summary-approved">
+                              Approved <span className="status-circle approved"></span>
+                              <p>{originalRequestData.filter(item => item.validationStatus === "Approved").length}</p>
+                            </div>
+                            <div className="summary-pending">
+                              Pending <span className="status-circle pending"></span>
+                              <p>{originalRequestData.filter(item => item.validationStatus === "Pending").length}</p>
+                            </div>
+                            <div className="summary-rejected">
+                              Rejected <span className="status-circle rejected"></span>
+                              <p>{originalRequestData.filter(item => item.validationStatus === "Rejected").length}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </InfoCard>
+                    <InfoCard className="infocard-validation-table">
+                      <table className="validation-table">
+                        <thead>
+                          <tr>
+                            <th>Department</th>
+                            <th>Allocated Budget</th>
+                            <th>Total Spent</th>
+                            <th>Remaining Budget</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {validationTableData.map(row => (
+                            <tr key={row.department}>
+                              <td>{row.department}</td>
+                              <td>{row.allocatedBudget}</td>
+                              <td>{row.totalSpent}</td>
+                              <td>{row.remainingBudget}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </InfoCard>
+                    <InfoCard className="filter-infocard">
+                      <div className="filter-controls">
+                        <input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                        <div className="filter-group">
+                          <select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+                            <option value="Last 30 days">Last 30 days</option>
+                            <option value="Last 7 days">Last 7 days</option>
+                            <option value="All Time">All Time</option>
+                          </select>
+                          <select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
+                            <option value="All">Filter By</option>
+                            <option value="lowest amount">Lowest Amount</option>
+                            <option value="highest amount">Highest Amount</option>
+                            <option value="oldest requests">Oldest Requests</option>
+                            <option value="latest requests">Latest Requests</option>
+                          </select>
+                        </div>
+                      </div>
+                      <InfoCard className="table-infocard">
+                        <table className="validation-table-2">
+                          <thead>
+                            <tr>
+                              <th>Select</th>
+                              <th>Request ID</th>
+                              <th>Department ID</th>
+                              <th>Amount Requested</th>
+                              <th>Approved Amount</th>
+                              <th>Request Date</th>
+                              <th>Validation Date</th>
+                              <th>Validated By</th>
+                              <th>Approval Date</th>
+                              <th>Approved By</th>
+                              <th>Remarks</th>
+                              <th>Approval Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {getSortedFilteredData().map((row, index) => (
+                              <tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Approved" ? "#f0f0f0" : "white" }}>
+                                <td><div className="row-wrapper"><input type="checkbox" checked={selectedRows.includes(row.requestId)} readOnly /></div></td>
+                                <td><div className="row-wrapper">{row.requestId}</div></td>
+                                <td><div className="row-wrapper">{row.departmentId}</div></td>
+                                <td><div className="row-wrapper">{row.amount}</div></td>
+                                <td><div className="row-wrapper">{row.approvedAmount}</div></td>
+                                <td><div className="row-wrapper">{row.requestDate.toLocaleDateString()}</div></td>
+                                <td><div className="row-wrapper">{row.validationDate ? row.validationDate.toLocaleDateString() : "N/A"}</div></td>
+                                <td><div className="row-wrapper">{row.validatedBy}</div></td>
+                                <td><div className="row-wrapper">{row.approvalDate ? row.approvalDate.toLocaleDateString() : "N/A"}</div></td>
+                                <td><div className="row-wrapper">{row.approvedBy}</div></td>
+                                <td><div className="row-wrapper">{row.remarks}</div></td>
+                                <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <div className="button-container">
+                          <button className="process-button" onClick={handleProcessClick}>Process</button>
+                        </div>
+                      </InfoCard>
+                      {isEditModalVisible && (
+  <InfoCard className="edit-modal">
+    <div className="edit-modal-content">
+      <div className="edit-modal-header">
+        <h3>Approval Process</h3>
+      </div>
+      {editingRows.map((row) => (
+        <div key={row.requestId} className="edit-modal-item">
+          <div className="edit-modal-left">
+            <div className="edit-modal-select-icon">
+              <input
+                type="checkbox"
+                style={{ transform: "scale(1.5)" }}
+                checked={selectedRows.includes(row.requestId)}
+                readOnly
+              />
+            </div>
+            <div className="edit-modal-details">
+                                <p><strong>Request ID:</strong> {row.requestId}</p>
+                                <p><strong>Department ID:</strong> {row.departmentId}</p>
+                                <p><strong>Amount Requested:</strong> {row.amount}</p>
+                                <p><strong>Approved Amount:</strong> {row.approvedAmount || row.amount}</p>
+                                <p><strong>Validated By:</strong> {row.validatedBy}</p>
+                                <p><strong>Validation Date:</strong> {row.validationDate ? row.validationDate.toLocaleDateString() : 'N/A'}</p>
+                                <div className="edit-modal-input-group approved-by-group">
+                <div className="edit-modal-label-input">
+                  <label>
+                    <strong>Approved By:</strong>
+                  </label>
+                  <input
+                    type="text"
+                    value={editedApprovedBy}
+                    onChange={(e) => setEditedApprovedBy(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="popup-buttons">
+        <button className="cancel-button" onClick={() => setIsEditModalVisible(false)}>
+          Cancel
+        </button>
+        <button className="reject-button" onClick={handleRejectClick}>
+          Reject
+        </button>
+        <button className="approve-button" onClick={handleApproveClick}>
+          Approve
+        </button>
+      </div>
+    </div>
+  </InfoCard>
+)}
+                      {isConfirmationVisible && (
+                    <InfoCard className="popup-overlay">
+                      <div className="popup-content">
+                      <div className="popup-title">
+                            <h3>Confirmation</h3>
+                        </div>
+                        <p>{confirmationMessage}</p>
+                        <div className="popup-buttons">
+                          <button className="cancel-button" onClick={handleCancelConfirmation}>Cancel</button>
+                          <button className="proceed-button" onClick={() => handleProceedApproval(approvalStatus)}>Confirm</button>
+                        </div>
+                      </div>
+                    </InfoCard>
+                  )}
+                      <InfoCard className="reject-table">
+                        <div className="reject-title">
+                            <h3> Rejected Submissions</h3>
+                            </div>
+                        <table className="validation-table-2-reject">
+                          <thead>
+                            <tr>
+                              <th>Request ID</th>
+                              <th>Amount Requested</th>
+                              <th>Date</th>
+                              <th>Rejected By</th>
+                              <th>Remarks</th>
+                              <th>Approval Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rejectedData.map((row, index) => (
+                              <tr key={index}>
+                                <td><div className="row-wrapper">{row.requestId}</div></td>
+                                <td><div className="row-wrapper">{row.amount}</div></td>
+                                <td><div className="row-wrapper">{row.requestDate.toLocaleDateString()}</div></td>
+                                <td><div className="row-wrapper">{row.approvedBy}</div></td>
+                                <td><div className="row-wrapper">{row.remarks}</div></td>
+                                <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </InfoCard>
+                    </InfoCard>
+                    
+                  </>
+                )}
+              </div>
+            )}
+            {isWarningPopupVisible && (
+              <div className="warning-popup">
+                <div className="warning-popup-content">
+                  <h3>Warning</h3>
+                  <p>Please select at least one row to approve or reject.</p>
+                  <button className="close-popup-button" onClick={closeWarningPopup}>OK</button>
+                </div>
+              </div>
+            )}
+            {isApprovedByWarningVisible && (
+              <div className="warning-popup">
+                <div className="warning-popup-content">
+                  <h3>Warning</h3>
+                  <p>Please fill out this field.</p>
+                  <button className="close-popup-button" onClick={closeApprovedByWarning}>OK</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+    
+    export default ApprovalContent;

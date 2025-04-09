@@ -34,7 +34,7 @@
 
 .approvals .tabs button {
   padding: 8px 16px;
-  font-size: 14px;
+  font-size: 13px;
   font-family: "Inter", sans-serif;
   font-weight: 500;
   transition: all 0.2s ease-in-out;
@@ -89,24 +89,544 @@
   padding: 20px;
   box-sizing: border-box;
 }
+.approvals .summary-infocard {
+  margin-bottom: 20px;
+  border-radius: 20px;
+  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.approvals .summary-container {
+  padding: 20px;
+}
+
+.date-status-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.approvals .summary-date-range {
+  font-size: clamp(13px, 2vw, 15px);
+  font-weight: 600;
+  color: #687C7B;
+  padding: 9px 0px;
+  margin-bottom: 0; /* Remove bottom margin from date range */
+}
+
+.date-range-border {
+  border-bottom: 1.5px solid lightgrey;
+  width: 100%;
+  margin-bottom: 10px;
+  min-height: 2px; 
+}
+
+.approvals .summary-status{
+  font-size: 12px;
+  margin-right: 20px;
+}
+
+.approvals .status-prefix{
+  font-weight: 600;
+  color: rgb(85, 85, 85);
+
+}
+.summary-status-label.tentative {
+  color: orange; 
+  font-weight: bold; 
+}
+
+.summary-status-label.final {
+  color: green; 
+  font-weight: bold;
+}
+.approvals .summary-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 10px;
+}
+
+.approvals .summary-total-spent,
+.approvals .summary-total-budget,
+.approvals .summary-total-remaining {
+  flex: 1;
+  margin-top: 20px;
+  color: #787878;
+  font-size: clamp(12px, 2vw, 14px);
+
+}
+
+.approvals .summary-total-spent,
+.approvals .summary-total-remaining{
+  border-left:  1.5px solid lightgray;
+  padding: 1px 70px;
+}
+
+.approvals .summary-total-budget{
+  margin-right: 70px;
+}
+
+
+
+.approvals .summary-total-spent p,
+.approvals .summary-total-budget p,
+.approvals .summary-total-remaining p {
+  font-size: clamp(15px, 2vw, 30px);
+  font-weight: bold;
+  margin-top: -1px;
+
+}
+
+
+.approvals .summary-status {
+  display: flex;
+  gap: 20px;
+}
+
+.approvals .summary-approved,
+.approvals .summary-pending,
+.approvals .summary-rejected {
+  text-align: center;
+  padding: 1px 30px;
+  color: #787878;
+  border-left: 1.5px solid lightgray ;
+  font-size: clamp(12px, 2vw, 14px);
+  margin-top: 20px;
+}
+
+.approvals .summary-approved p,
+.approvals .summary-pending p,
+.approvals .summary-rejected p {
+  font-size: clamp(20px, 2vw, 50px);
+  font-weight: 600;
+  margin-top: 5px;
+  color: #a5a3a3;
+}
+
+.approvals .status-circle {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: 5px;
+}
+
+.approvals .status-circle.approved {
+  background-color: #a5d8ef; /* Light blue */
+}
+
+.approvals .status-circle.pending {
+  background-color: #ffe082; /* Light yellow */
+}
+
+.approvals .status-circle.rejected {
+  background-color: #812020; /* Light yellow */
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .approvals .summary-details {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+  }
+}
+
+.approvals .infocard-validation-table {
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 85vw;
+  margin: 20px auto 40px auto;
+}
+
+.approvals .validation-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 100%;
+  border-radius: 20px;
+  font-size: clamp(12px, 2vw, 13px);
+}
+
+.approvals .validation-table th,
+.approvals .validation-table td {
+  padding: 15px;
+  text-align: center;
+  border: none; /* Remove borders from validation-table */
+}
+
+.approvals .validation-table th {
+  background-color: #9ab2b1;
+  padding: 17px;
+  color: white;
+}
+
+.approvals .validation-table tbody tr:nth-child(even) {
+  background-color: #fbfcfc;
+}
+
+.approvals .validation-table tbody tr:nth-child(odd) {
+  background-color: #d7e0e0;
+}
+
+
+.approvals .validation-table tbody tr:nth-child(odd) {
+  background-color: #d7e0e0;
+}
+
+.approvals .validation-table th:nth-child(1),
+.approvals .validation-table td:nth-child(1),
+.approvals .validation-table th:nth-child(2),
+.approvals .validation-table td:nth-child(2),
+.approvals .validation-table th:nth-child(3),
+.approvals .validation-table td:nth-child(3),
+.approvals .validation-table th:nth-child(4),
+.approvals .validation-table td:nth-child(4) {
+  min-width: 80px;
+  width: auto;
+}
 
 .approvals .filter-infocard {
   display: flex;
   flex-direction: column;
   background-color: white;
   border-radius: 13px;
-  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
   margin: 20px auto;
-  padding: 20px;
   width: 100%;
   max-width: 85vw;
+  position: relative;
+}
+
+.approvals .process-button {
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  padding: 6px 25px;
+  background-color: #00A8A8;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  position: absolute;
+  font-size: 12px;
+}
+
+.approvals .edit-modal{
+  margin-top: 20px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+.approvals .edit-modal-buttons{
+  display: flex;
+    justify-content: flex-end;
+    margin-top: auto;
+}
+
+
+.approvals table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.approvals th,
+.approvals td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.approvals th {
+  background-color: #f2f2f2;
+}
+
+.approvals tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.approvals .edit-modal h3 {
+  margin-bottom: 15px;
+  font-size: clamp(12px, 2vw, 18px);
+  font-weight: 600;
+}
+
+.approvals .edit-modal label{
+  display: block;
+  margin-top: 10px;
+}
+
+.approvals .edit-modal input{
+  width: calc(100% - 22px);
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.approvals .edit-modal button{
+  padding: 6px 17px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  left: 90px;
+}
+
+.approvals .edit-modal button:first-child{
+  background-color: #e6e6e6;
+  color: rgb(90, 88, 88);
+  margin-right: 10px;
+  
+}
+
+.approvals .edit-modal button:last-child {
+  background-color: #00A8A8;
+  color: white;
+
+}
+
+
+.approvals .edit-modal-left {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.approvals .edit-modal-select-icon {
+  width: 30px; /* Adjust as needed */
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 20px;
+  margin-top: 100px;
+  margin-right: 10px; /* Space between icon and details */
+}
+
+.approvals .edit-modal-header{
+  flex: 1;
+}
+.approvals .edit-modal-details {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    margin-bottom: 20px;
+    border: 1.5px solid;
+    border-color: rgb(202, 199, 197);
+    padding: 20px 20px;
+    border-radius: 20px;
+    font-size: clamp(12px, 2vw, 14px);
+    margin-left: 50px;
+    margin-top: 20px;
+}
+
+.approvals .edit-modal-details p,
+.approvals .edit-modal-details label {
+    flex: 1 1 50%;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+.approvals .edit-modal-details label {
+    display: block;
+    margin-top: 10px;
+}
+
+.approvals .edit-modal-input-group {
+    display: flex;
+    flex-direction: column; /* Stack input and error vertically */
+    flex: 1 1 50%;
+    padding: 5px;
+    box-sizing: border-box;
+    margin-bottom: 15px; /* Add margin between input groups */
+}
+
+.approvals .edit-modal-details input {
+    width: calc(100% - 22px); /* Input takes full width */
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+.approvals .validated-by-group input,
+.approvals .approved-amount-group input {
+    width: 250px; /* Or your desired width */
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+.approvals .error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px; /* Space between input and error */
+}
+.approvals .warning-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  border-radius: 20px;
+}
+
+.approvals .warning-popup-content {
+  text-align: center;
+  font-size: 14px;
+}
+.approvals .warning-popup-content h3{
+  color: #812020;
+  font-weight: 600;
+  font-size: larger;
+  font-style: italic;
+}
+
+.approvals .warning-popup-content button {
+  margin-top: 10px;
+  padding: 7px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  background-color: #00A8A8;
+  border-radius: 6px;
+}
+
+.approvals .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.approvals .popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 600px;
+    font-family: sans-serif;
+}
+
+.approvals .popup-title {
+    margin-top: 0;
+    color: #333;
+    font-size: 25px;
+    font-style: italic;
+    margin-bottom: 10px;
+    border-bottom: 1.5px solid;
+    border-color: #dcd9d9;
+}
+
+.approvals .popup-message {
+    color: #555;
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+.approvals .popup-message strong{
+  color: #048080;
+}
+.approvals .popup-data, .popup-edited {
+    margin-left: 35px;
+}
+
+.approvals .popup-edited{
+  margin-bottom: 20px;
+}
+.approvals .popup-data input{
+  margin-right: 20px;
+  width: 10px;
+  margin-top: 10px;
+}
+.approvals .popup-data span{
+font-size: 12.5px;
+}
+
+.approvals .popup-edited h1 {
+    display: block;
+    font-weight: 600;
+  margin-left: 33px;
+    font-size: 12.5px;
+    color: #048080;
+}
+
+.approvals .popup-edited p{
+  font-size: 12.5px;
+  margin-left: 33px;
+  
+}
+
+.approvals .popup-edited span {
+  color: #048080;
+}
+.approvals .popup-buttons {
+    text-align: right;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+.approvals .cancel-button {
+    background-color: #fdfdfd;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 20px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.approvals .proceed-button {
+    background-color: #00A8A8;
+    color: white;
+    border: none;
+    padding: 7px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.approvals .reject-button {
+  background-color: #e66565;
+  color: white;
+  border: none;
+  padding: 7px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.approvals .selected {
+  background-color: #e0f7fa !important;
+}
+
+.approvals .row-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
 .approvals .filter-controls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  font-size: clamp(11px, 2vw, 14px);
+  font-size: clamp(11px, 2vw, 12px);
   justify-content: space-between;
 }
 
@@ -119,7 +639,6 @@
 .approvals .search {
   width: 100%;
   max-width: 300px;
-  margin-left: 20px;
   margin-right: 25px;
 }
 
@@ -142,37 +661,96 @@
 
 .approvals .table-infocard {
   background-color: white;
-  border-radius: 13px;
+  border-radius: 20px;
+  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
   margin: 20px auto;
   width: 100%;
-  padding: 6px;
-  font-size: clamp(12px, 2vw, 14px);
+  padding: 0px 20px;
+  padding-bottom: 50px;
+  position: relative;
+  font-size: clamp(11px, 2vw, 12.5px);
+}
+.approvals .validation-table-2-reject th {
+  background-color: transparent;
 }
 
-.approvals .approval-table-2 {
+.approvals .reject-table {
+  background-color: #cf7676;
+  border-radius: 20px;
+  margin: 20px auto;
+  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  font-size: clamp(11px, 2vw, 12.5px);
+  border: none; /* Remove table border */
+}
+
+.approvals .validation-table-2-reject {
   width: 100%;
   border-collapse: collapse;
+  border-radius: 20px;
+  background-color: white;
+  border: none; /* Remove table border */
 }
 
-.approvals .approval-table-2 th,
-.approvals .approval-table-2 td {
-  padding: 12px;
-  text-align: left;
+.approvals .validation-table-2-reject th,
+.approvals .validation-table-2-reject td {
+  border: none; /* Remove cell borders */
+  text-align: center;
+  padding: 20px;
+  border-bottom: 1px solid #c8cdcc; /* Added border bottom to cells */
 }
 
-.approvals .approval-table-2 thead th {
+.approvals .reject-title {
+  padding: 15px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.status-label {
+  padding: 4px 8px; /* Adjust padding as needed */
+  border-radius: 4px; /* Optional: Add rounded corners */
+  color: rgb(0, 0, 0); /* Set default text color to white */
+  font-size: 12px; /* Adjust font size as needed */
+}
+
+.status-label.pending {
+  background-color: #ffe082; /* Orange for pending */
+}
+
+.status-label.approved {
+  background-color: #a5d8ef; /* Green for approved */
+}
+
+.status-label.rejected {
+  background-color: #d18e8a; /* Red for rejected */
+}
+
+.status-label.to-review {
+  background-color: #2196f3; /* Blue for to-review */
+}
+
+
+.approvals .validation-table-2 thead th {
   color: black;
+  background-color: white;
 }
 
-.approvals .approval-table-2 tbody tr {
-  border-bottom: 1px solid #ddd;
+.approvals .validation-table-2 tbody tr {
+  border-bottom: 1px solid #ddd; /* Only bottom border */
 }
 
-.approvals .approval-table-2 tbody tr:last-child {
-  border-bottom: none;
+/* Remove unnecessary border rules */
+.approvals .validation-table-2 th,
+.approvals .validation-table-2 td {
+  border: none; /* Remove all other borders */
+  padding: 10px;
+  text-align: center;
 }
 
-.approvals .approval-table-2 .row-wrapper {
+.approvals .validation-table-2 .row-wrapper 
+.approvals .validation-table-2-reject .row-wrapper{
   margin-bottom: 10px;
   display: flex;
   align-items: center;
@@ -180,30 +758,29 @@
   box-sizing: border-box;
 }
 
-.approvals .approval-table-2 .row-wrapper:last-child {
+.approvals .validation-table-2 .row-wrapper:last-child {
   margin-bottom: 0;
 }
-
-.approvals .approval-table-2 td:nth-child(1) {
+.approvals .validation-table-2 td:nth-child(1) {
   width: 5%;
   text-align: center;
 }
 
-.approvals .approval-table-2 td input[type="checkbox"] {
+.approvals .validation-table-2 td input[type="checkbox"] {
   vertical-align: middle;
 }
 
-.approvals .approval-table-2 td:nth-child(2),
-.approvals .approval-table-2 td:nth-child(3),
-.approvals .approval-table-2 td:nth-child(4),
-.approvals .approval-table-2 td:nth-child(5),
-.approvals .approval-table-2 td:nth-child(6),
-.approvals .approval-table-2 td:nth-child(7) {
+.approvals .validation-table-2 td:nth-child(2),
+.approvals .validation-table-2 td:nth-child(3),
+.approvals .validation-table-2 td:nth-child(4),
+.approvals .validation-table-2 td:nth-child(5),
+.approvals .validation-table-2 td:nth-child(6),
+.approvals .validation-table-2 td:nth-child(8) {
   width: 16%;
   min-width: 80px;
 }
 
-.approvals .approval-table-2 td:nth-child(8) {
+.approvals .validation-table-2 td:nth-child(9) {
   width: 15%;
   text-align: center;
 }
@@ -211,17 +788,18 @@
 .approvals .status-label {
   padding: 5px 10px;
   border-radius: 8px;
-  font-size: clamp(12px, 2vw, 14px);
+  font-size: clamp(11px, 2vw, 12.5px);
   font-weight: 500;
   display: inline-block;
 }
 
-.approvals .status-label.approved {
-  background-color: #C9E7E5;
+.approvals .status-label.validated {
+  background-color: #c9e7e5;
+  color: grey;
 }
 
 .approvals .status-label.pending {
-  background-color: #F5E1AC;
+  background-color: #f5e1ac;
   padding: 5px 15px;
 }
 
@@ -229,156 +807,188 @@
   .approvals .search,
   .approvals .filter-controls select,
   .approvals .filter-controls input {
-      max-width: 150px;
+    max-width: 150px;
   }
 }
 
 @media (max-width: 768px) {
-  .approvals .table-infocard {
-      overflow-x: auto;
+  .approvals .table-infocard,
+  .approvals .reject-table {
+    overflow-x: auto;
   }
 }
 
-@media (max-width: 480px) { 
+.approvals .infocard-validation-table {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .approvals .infocard-validation-table,
   .approvals .filter-infocard {
-      max-width: 95%; 
-      margin: 10px auto 20px auto;
-      padding: 10px; 
+    max-width: 95%;
+    margin: 10px auto 20px auto;
+    padding: 10px;
   }
 
-  .approvals .approval-table-2 th,
-  .approvals .approval-table-2 td {
-      padding: 8px; 
+  .approvals .validation-table-2-reject th, 
+  .approvals .validation-table-2-reject td,
+  .approvals .validation-table th,
+  .approvals .validation-table td,
+  .approvals .validation-table-2 th,
+  .approvals .validation-table-2 td {
+    padding: 8px;
   }
 
   .approvals .filter-controls {
-      flex-direction: column; 
-      align-items: stretch; 
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .approvals .search,
   .approvals .filter-controls select,
   .approvals .filter-controls input {
-      max-width: 100%; 
-      margin: 5px 0; 
+    max-width: 100%;
+    margin: 5px 0;
   }
 
   .approvals .filter-group {
-      flex-direction: column; 
-      margin-left: 0; 
+    flex-direction: column;
+    margin-left: 0;
   }
 
-  .approvals .approval-table-2 td:nth-child(2),
-  .approvals .approval-table-2 td:nth-child(3),
-  .approvals .approval-table-2 td:nth-child(4),
-  .approvals .approval-table-2 td:nth-child(5),
-  .approvals .approval-table-2 td:nth-child(6),
-  .approvals .approval-table-2 td:nth-child(7) {
-      min-width: 50px; 
+  
+
+  .approvals .validation-table-2-reject td:nth-child(2),
+  .approvals .validation-table-2-reject td:nth-child(3),
+  .approvals .validation-table-2-reject td:nth-child(4),
+  .approvals .validation-table-2-reject td:nth-child(5),
+  .approvals .validation-table-2-reject td:nth-child(6) {
+    min-width: 50px;
+  }
+
+  .approvals .validation-table-2 td:nth-child(2),
+  .approvals .validation-table-2 td:nth-child(3),
+  .approvals .validation-table-2 td:nth-child(4),
+  .approvals .validation-table-2 td:nth-child(5),
+  .approvals .validation-table-2 td:nth-child(6),
+  .approvals .validation-table-2 td:nth-child(7),
+  .approvals .validation-table-2 td:nth-child(8) {
+    min-width: 50px;
+  }
+
+  .approvals .validation-table-reject th:nth-child(1),
+  .approvals .validation-table-reject td:nth-child(1),
+  .approvals .validation-table-reject th:nth-child(2),
+  .approvals .validation-table-reject td:nth-child(2),
+  .approvals .validation-table-reject th:nth-child(3),
+  .approvals .validation-table-reject td:nth-child(3),
+  .approvals .validation-table-reject th:nth-child(4),
+  .approvals .validation-table-reject td:nth-child(4) {
+    min-width: 50px;
+  }
+
+  .approvals .validation-table th:nth-child(1),
+  .approvals .validation-table td:nth-child(1),
+  .approvals .validation-table th:nth-child(2),
+  .approvals .validation-table td:nth-child(2),
+  .approvals .validation-table th:nth-child(3),
+  .approvals .validation-table td:nth-child(3),
+  .approvals .validation-table th:nth-child(4),
+  .approvals .validation-table td:nth-child(4) {
+    min-width: 50px;
   }
 }
 
-.approvals .down-table-infocard {
-  background-color: #9AB2B1;
-  display: flex;
-  flex-direction: column;
-  border-radius: 13px;
-  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
-  margin: 20px auto;
-  width: 100%; 
-  max-width: 85vw;
-  padding: 6px;
-  font-size: clamp(12px, 2vw, 14px);
+.approvals .validation-table-2 td:nth-child(1) {
+  width: 3%;
 }
 
-.approvals .down-title th {
-  padding: 15px 15px;
-  text-align: left;
-  text-indent: 20px;
+.approvals .validation-table-2 td:nth-child(2),
+.approvals .validation-table-2 td:nth-child(3),
+.approvals .validation-table-2 td:nth-child(4),
+.approvals .validation-table-2 td:nth-child(5),
+.approvals .validation-table-2 td:nth-child(6),
+.approvals .validation-table-2 td:nth-child(7),
+.approvals .validation-table-2 td:nth-child(8),
+.approvals .validation-table-2 td:nth-child(9) {
+  width: 11%;
+  min-width: 70px;
 }
 
-.approvals .down-title thead th {
-  color: rgb(255, 255, 255);
-  font-size: 22px;
-}
-
-.approvals .down-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.approvals .down-table th,
-.approvals .down-table td {
-  padding: 12px;
-  text-align: left;
-}
-
-.approvals .down-table thead th {
-  color: black;
-}
-
-.approvals .down-table tbody tr {
-  border-bottom: 1px solid #ddd;
-}
-
-.approvals .down-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.approvals .down-table .row-wrapper {
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.approvals .down-table .row-wrapper:last-child {
-  margin-bottom: 0;
-}
-
-.approvals .down-table td:nth-child(1) {
-  width: 5%;
+.approvals .validation-table-2 td:nth-child(9) {
   text-align: center;
 }
 
-.approvals .down-table td input[type="checkbox"] {
-  vertical-align: middle;
-}
 
-.approvals .down-table td:nth-child(2),
-.approvals .down-table td:nth-child(3),
-.approvals .down-table td:nth-child(4),
-.approvals .down-table td:nth-child(5),
-.approvals .down-table td:nth-child(6),
-.approvals .down-table td:nth-child(7) {
-  width: 16%;
-  min-width: 80px;
-}
 
-.approvals .down-table td:nth-child(8) {
-  width: 15%;
-  text-align: center;
+@media (max-width: 768px) {
+  .approvals .validation-table-2-reject td:nth-child(2),
+  .approvals .validation-table-2-reject td:nth-child(3),
+  .approvals .validation-table-2-reject td:nth-child(4),
+  .approvals .validation-table-2-reject td:nth-child(5),
+  .approvals .validation-table-2-reject td:nth-child(6),
+  .approvals .validation-table-2-reject td:nth-child(7),
+  .approvals .validation-table-2-reject td:nth-child(8),
+  .approvals .validation-table-2-reject td:nth-child(9) {
+    width: auto;
+    min-width: 50px;
+    padding: 8px;
+    font-size: 12px;
+  }
 }
 
 @media (max-width: 480px) {
-  .approvals .down-table th,
-  .approvals .down-table td {
-      padding: 8px;
+  .approvals .validation-table-2-reject td:nth-child(2),
+  .approvals .validation-table-2-reject td:nth-child(3),
+  .approvals .validation-table-2-reject td:nth-child(4),
+  .approvals .validation-table-2-reject td:nth-child(5),
+  .approvals .validation-table-2-reject td:nth-child(6),
+  .approvals .validation-table-2-reject td:nth-child(7),
+  .approvals .validation-table-2-reject td:nth-child(8),
+  .approvals .validation-table-2-reject td:nth-child(9) {
+    min-width: 40px;
+    padding: 6px;
+    font-size: 10px;
   }
-
-  .approvals .down-table td:nth-child(2),
-  .approvals .down-table td:nth-child(3),
-  .approvals .down-table td:nth-child(4),
-  .approvals .down-table td:nth-child(5),
-  .approvals .down-table td:nth-child(6),
-  .approvals .down-table td:nth-child(7) {
-      min-width: 50px;
+}
+@media (max-width: 768px) {
+  .approvals .validation-table-2 td:nth-child(2),
+  .approvals .validation-table-2 td:nth-child(3),
+  .approvals .validation-table-2 td:nth-child(4),
+  .approvals .validation-table-2 td:nth-child(5),
+  .approvals .validation-table-2 td:nth-child(6),
+  .approvals .validation-table-2 td:nth-child(7),
+  .approvals .validation-table-2 td:nth-child(8),
+  .approvals .validation-table-2 td:nth-child(9) {
+    width: auto;
+    min-width: 50px;
+    padding: 8px;
+    font-size: 12px;
   }
 }
 
-@media (max-width: 768px){
-  .approvals .down-table-infocard {
-      overflow-x: auto;
+@media (max-width: 480px) {
+  .approvals .validation-table-2 td:nth-child(2),
+  .approvals .validation-table-2 td:nth-child(3),
+  .approvals .validation-table-2 td:nth-child(4),
+  .approvals .validation-table-2 td:nth-child(5),
+  .approvals .validation-table-2 td:nth-child(6),
+  .approvals .validation-table-2 td:nth-child(7),
+  .approvals .validation-table-2 td:nth-child(8),
+  .approvals .validation-table-2 td:nth-child(9) {
+    min-width: 40px;
+    padding: 6px;
+    font-size: 10px;
   }
 }
+
+.approvals .validation-table-2.no-grid {
+  border-collapse: collapse;
+}
+
+.approvals .validation-table-2.no-grid th,
+.approvals .validation-table-2.no-grid td {
+  border: none !important;
+}
+

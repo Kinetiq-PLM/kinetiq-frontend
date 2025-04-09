@@ -83,6 +83,7 @@ function App() {
       "Reports": "Reports",
       "Validations": "Validations",
       "Approvals": "Approvals",
+      "Forms": "Forms",
     },
     "Purchasing": {
       "Supplier Management": "SupplierManagement",
