@@ -10,6 +10,7 @@ import ShipmentModal from "../components/shipment/ShipmentModal";
 import ConfirmShipModal from "../components/shipment/ConfirmShipModal";
 import DeliveryReceiptModal from "../components/shipment/DeliveryReceiptModal";
 import FailureReportModal from "../components/shipment/FailureReportModal";
+import CarrierManagementModal from "../components/shipment/CarrierManagementModal";
 
 const Shipment = () => {
   // New tab state
@@ -34,6 +35,7 @@ const Shipment = () => {
   const [showConfirmShipModal, setShowConfirmShipModal] = useState(false);
   const [showDeliveryReceiptModal, setShowDeliveryReceiptModal] = useState(false);
   const [showFailureReportModal, setShowFailureReportModal] = useState(false);
+  const [showCarrierManagementModal, setShowCarrierManagementModal] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Fetch data on component mount and when refreshTrigger changes
@@ -308,6 +310,11 @@ const Shipment = () => {
     }
   };
   
+  // Refresh carriers
+  const refreshCarriers = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+  
   // Calculate stats for the shipments tab
   const shipmentStats = {
     total: shipments.length,
@@ -381,6 +388,15 @@ const Shipment = () => {
                 selectedType={deliveryTypeFilter}
                 onTypeChange={handleDeliveryTypeFilterChange}
               />
+              
+              <button 
+                type="button" 
+                className="save-button"
+                onClick={() => setShowCarrierManagementModal(true)}
+                style={{ marginLeft: 'auto' }}
+              >
+                Manage Carriers
+              </button>
             </>
           )}
         </div>
@@ -492,6 +508,14 @@ const Shipment = () => {
             shipment={selectedShipment}
             onSubmit={handleSubmitFailureReport}
             onCancel={() => setShowFailureReportModal(false)}
+          />
+        )}
+        
+        {showCarrierManagementModal && (
+          <CarrierManagementModal 
+            carriers={carriers}
+            refreshCarriers={refreshCarriers}
+            onClose={() => setShowCarrierManagementModal(false)}
           />
         )}
       </div>

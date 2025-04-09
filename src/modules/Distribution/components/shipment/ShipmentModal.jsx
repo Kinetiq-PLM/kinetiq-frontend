@@ -172,6 +172,31 @@ const ShipmentModal = ({
               </div>
             </div>
             
+            {/* Carrier Selection Section */}
+            <div className="edit-section">
+              <h4>Carrier Information</h4>
+              <div className="carrier-selection">
+                <select
+                  className="carrier-dropdown"
+                  name="carrier_id"
+                  value={formData.carrier_id}
+                  onChange={handleInputChange}
+                >
+                  <option value="">-- Select Carrier --</option>
+                  {carriers.map(carrier => (
+                    <option key={carrier.carrier_id} value={carrier.carrier_id}>
+                      {carrier.carrier_name} - {carrier.service_type || 'Standard'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {!formData.carrier_id && (
+                <p className="info-value" style={{ color: '#dc3545', marginTop: '0.5rem', fontSize: '0.875rem' }}>
+                  Warning: No carrier assigned. It's recommended to assign a carrier before shipping.
+                </p>
+              )}
+            </div>
+            
             {/* Shipping Cost Section */}
             <div className="edit-section">
               <h4>Shipping Details & Cost</h4>
