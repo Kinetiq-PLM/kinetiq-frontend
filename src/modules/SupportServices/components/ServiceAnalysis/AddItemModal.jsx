@@ -82,7 +82,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
       item_id: itemId,
       principal_item_id: principalItemId,
       item_quantity: quantity,
-      item_price: markupPrice,
+      item_price: "0.00",
       total_price: "0.00",
       service_order_id: order,
       item_name: itemName,
@@ -148,7 +148,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
               </div>
             </div>
               <div className="form-group">
-                <label htmlFor="principalItemId">Principal Item ID <span className="required">*</span></label>
+                <label htmlFor="principalItemId">Principal Item ID</label>
                 <div className="select-wrapper">
                   <input
                     type="text"
