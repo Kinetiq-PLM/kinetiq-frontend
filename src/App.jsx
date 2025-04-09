@@ -121,6 +121,7 @@ function App() {
       Campaign: "Campaign",
       "Partner Master Data": "PartnerMasterData",
       Opportunity: "Opportunity",
+      Support: "Support",
     },
     "Support & Services": {
       "Ticketing System": "TicketingSystem",

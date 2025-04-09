@@ -80,7 +80,6 @@ export default function CampaignListTab() {
 
   return (
     <section className="h-full">
-      {/* Header Section */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
         <NewCampaignModal
           isOpen={isNewCampaignOpen}
@@ -114,7 +113,7 @@ export default function CampaignListTab() {
           <input
             type="text"
             placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm"
+            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

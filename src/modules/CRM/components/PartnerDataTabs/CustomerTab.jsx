@@ -7,11 +7,15 @@ import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 import NewCustomerModal from "../../../Sales/components/Modals/NewCustomer";
 
+import NewCustomerModal from "../../../Sales/components/Modals/NewCustomer";
+
 export default function CustomerTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [customers, setCustomers] = useState([]);
+  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+
   const customersQuery = useQuery({
     queryKey: ["customerPartners"],
     queryFn: async () => await GET("misc/business-partners?category=Customer"),
@@ -104,13 +108,12 @@ export default function CustomerTab() {
           <input
             type="text"
             placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm"
+            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        {/* New Quotation Button (No onClick) */}
         <Button
           onClick={() => setIsNewCustomerModalOpen(true)}
           type="primary"

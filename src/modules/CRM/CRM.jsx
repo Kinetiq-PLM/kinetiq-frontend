@@ -8,6 +8,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
     Campaign: "Campaign",
     "Partner Master Data": "PartnerMasterData",
     Opportunity: "Opportunity",
+    Support: "Support",
   };
 
   return (

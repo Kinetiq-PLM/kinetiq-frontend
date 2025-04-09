@@ -125,7 +125,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
           <input
             type="text"
             placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm"
+            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
