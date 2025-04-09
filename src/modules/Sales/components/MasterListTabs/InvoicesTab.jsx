@@ -30,7 +30,6 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
   const invoiceQuery = useQuery({
     queryKey: ["invoices"],
     queryFn: async () => await GET("sales/invoice"),
-    refetchInterval: 5000,
   });
 
   const dateFilters = [
@@ -73,7 +72,6 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
 
   useEffect(() => {
     if (invoiceQuery.status === "success") {
-      console.log(invoiceQuery.data);
       const data = invoiceQuery.data.map((invoice) => ({
         invoice_id: invoice.invoice_id,
         delivery_note_id: invoice.delivery_note.delivery_note_id,
