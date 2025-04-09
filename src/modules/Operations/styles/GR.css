@@ -1,12 +1,13 @@
 /* REMINDER! All of your elements must use your unique namespace '.workauto' at the start to avoid leaking */
+/* .workauto changed to .gr to reflect submodule modification */
 
-.workauto {
+.gr {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
-.workauto .body-content-container {
+.gr .body-content-container {
     width: 100%;
     height: 100%;
     border-radius: 0.5rem;
