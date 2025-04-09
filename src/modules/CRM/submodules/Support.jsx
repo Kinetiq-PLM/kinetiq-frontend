@@ -10,17 +10,23 @@ import { AlertProvider } from "../../Sales/components/Context/AlertContext";
 import TicketDetail from "../components/TicketDetail";
 import TicketResolve from "../components/TicketResolve";
 import TICKET_LIST_DATA from "../../Sales/temp_data/ticket_list";
-
+import { GET } from "../../Sales/api/api";
+import { useQuery } from "@tanstack/react-query";
+import { useAlert } from "../../Sales/components/Context/AlertContext";
 const Support = () => {
+  const showAlert = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("All Time"); // Default date filter
-  const [ticketList, setTicketList] = useState(TICKET_LIST_DATA);
+  const [ticketList, setTicketList] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
 
   const [isTicketDetailOpen, setIsTicketDetailOpen] = useState(false);
   const [isTicketResolveOpen, setIsTicketResolveOpen] = useState(false);
-
+  const ticketQuery = useQuery({
+    queryKey: ["tickets"],
+    queryFn: async () => await GET("crm/ticket"),
+  });
   const columns = [
     { key: "ticket_id", label: "Ticket ID" },
     { key: "customer_id", label: "Customer ID" },
@@ -63,6 +69,31 @@ const Support = () => {
 
     return true;
   });
+
+  useEffect(() => {
+    if (ticketQuery.status === "success") {
+      const data = ticketQuery.data.map((ticket) => ({
+        ticket_id: ticket.ticket_id,
+        customer_id: ticket.customer.customer_id,
+        customer_name: ticket.customer.name,
+        subject: ticket.subject,
+        description: ticket.description,
+        created_at: new Date(ticket.created_at).toLocaleString(),
+        priority: ticket.priority,
+        status: ticket.status,
+        employee_id: ticket.salesrep.employee_id,
+        employee_name: `${ticket.salesrep.first_name} ${ticket.salesrep.last_name}`,
+      }));
+      setTicketList(data);
+    } else if (ticketQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title:
+          "An error occurred while fetching tickets: " +
+          ticketQuery.error.message,
+      });
+    }
+  }, [ticketQuery.data]);
 
   return (
     <div className="partner-master-data">

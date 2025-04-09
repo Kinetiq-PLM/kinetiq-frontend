@@ -9,7 +9,6 @@ import OrdersTab from "./../components/MasterListTabs/OrdersTab";
 import DeliveriesTab from "./../components/MasterListTabs/DeliveriesTab";
 import InvoicesTab from "./../components/MasterListTabs/InvoicesTab";
 import BlanketAgreementsTab from "./../components/MasterListTabs/BlanketAgreementsTab";
-import OpportunitiesTab from "./../components/MasterListTabs/OpportunitiesTab";
 
 const BodyContent = ({
   setActiveModule,

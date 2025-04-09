@@ -7,8 +7,6 @@ import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 import NewCustomerModal from "../../../Sales/components/Modals/NewCustomer";
 
-import NewCustomerModal from "../../../Sales/components/Modals/NewCustomer";
-
 export default function CustomerTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
@@ -38,7 +36,6 @@ export default function CustomerTab() {
     label: col.label,
   }));
 
-  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
   // Filter quotations based on search and date
   const filteredQuotations = customers.filter((quotation) => {
     // Filter by search term

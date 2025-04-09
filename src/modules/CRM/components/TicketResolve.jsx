@@ -7,7 +7,8 @@ import { useAlert } from "../../Sales/components/Context/AlertContext.jsx";
 import Button from "../../Sales/components/Button.jsx";
 import InputField from "../../Sales/components/InputField.jsx";
 import TextField from "./TextField.jsx";
-
+import { PATCH, POST } from "../../Sales/api/api.jsx";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 const TicketResolve = ({ isOpen, onClose, ticket, setIsTicketDetailOpen }) => {
   const { showAlert } = useAlert();
 
@@ -17,7 +18,26 @@ const TicketResolve = ({ isOpen, onClose, ticket, setIsTicketDetailOpen }) => {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isValidationVisible, setIsValidationVisible] = useState(false);
-
+  const queryClient = useQueryClient();
+  const ticketMutation = useMutation({
+    mutationFn: async (data) => await POST("crm/ticket-convo/", data),
+    onSuccess: async (data) => {
+      await PATCH(`crm/ticket/${ticket.ticket_id}/`, {
+        status: "Closed",
+      });
+      queryClient.refetchQueries(["tickets"]);
+      showAlert({
+        type: "success",
+        title: "Ticket resolved.",
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title: "An error occurred while resolving ticket: " + error.message,
+      });
+    },
+  });
   const handleConfirm = () => {
     const validators = [validateMessage, validateSubject];
 
@@ -28,16 +48,17 @@ const TicketResolve = ({ isOpen, onClose, ticket, setIsTicketDetailOpen }) => {
     setIsValidationVisible(true);
     if (errorCount === 0) {
       // Resolve ticket here
-
+      const request = {
+        ticket: ticket.ticket_id,
+        subject,
+        content: message,
+      };
+      ticketMutation.mutate(request);
       // Reset form fields
       setSubject("");
       setMessage("");
       setIsValidationVisible(false);
 
-      showAlert({
-        type: "success",
-        title: "Ticket resolved.",
-      });
       onClose();
       setIsTicketDetailOpen(false);
     } else {

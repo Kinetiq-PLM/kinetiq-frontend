@@ -88,7 +88,7 @@ const TicketDetail = ({ isOpen, onClose, ticket, setIsTicketResolveOpen }) => {
             </div>
             <DateInputField
               label={"Date Issued"}
-              value={ticket.created_at}
+              value={new Date(ticket.created_at).toISOString().split("T")[0]}
               isDisabled={true}
             />
             <InputField
