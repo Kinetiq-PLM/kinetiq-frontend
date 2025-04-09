@@ -183,7 +183,7 @@ const ServiceCall = () => {
             </div>
             <div className="filter-dropdown">
               <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-                Filter by
+                {filterOptions.find(opt => opt.value === filterBy)?.label || "Filter by"}
                 <span className="arrow">▼</span>
               </button>
               {showFilterOptions && (
@@ -199,7 +199,12 @@ const ServiceCall = () => {
           </div>
 
           {/* Table Component */}
-          <Table serviceCalls={filteredCalls} onRowClick={handleRowClick} onViewDetails={handleViewDetails} />
+          <Table 
+            serviceCalls={filteredCalls} 
+            onRowClick={handleRowClick} 
+            onViewDetails={handleViewDetails} 
+            selectedCall={selectedCall}
+          />
 
           <div className="update-container">
             <button 

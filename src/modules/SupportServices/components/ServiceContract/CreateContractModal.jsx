@@ -71,7 +71,7 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
   }
 };
 
-const handleToggleDDRenewals = () => {
+const handleToggleDDStatements = () => {
   if (!isSTMDropdown) {
     fetchStatementItems(); 
   }
@@ -132,7 +132,6 @@ const handleSelectStatus = (status) => {
       renewal_id: formData.add,
       contract_description: formData.contractDescription,
       additional_service_id: formData.additionalServiceId,
-      contract_description: formData.contractDescription,
       product_id: formData.productId,
       contract_status: formData.contractStatus,
       product_quantity: formData.productQuantity,
@@ -178,23 +177,31 @@ const handleSelectStatus = (status) => {
                   type="text"
                   id="statementId"
                   value={formData.statementId}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e); 
+                    setOpenSTMDD(true);
+                  }}
+                  onClick={handleToggleDDStatements}
                   placeholder="Enter sales statement ID"
                 />
-                <span className="select-arrow" onClick={handleToggleDDRenewals}>▼</span>
+                <span className="select-arrow" onClick={handleToggleDDStatements}>▼</span>
                   {isSTMDropdown && (
-                    <ul className="dropdown-list">
-                      {statementItems.length > 0 ? (
-                        statementItems.map((statementItem) => (
+                      <ul className="dropdown-list">
+                        {statementItems.length > 0 ? (
+                          statementItems
+                            .filter((statementItem) =>
+                            statementItem.statement_item_id.toLowerCase().includes(formData.statementId.toLowerCase())
+                            )
+                            .map((statementItem) => (
                               <li key={statementItem.statement_item_id} onClick={() => handleSelectSTM(statementItem)}>
                                 {statementItem.statement_item_id}
                               </li>
                             ))
-                          ) : (
-                            <li>No statement item ID found</li>
-                          )}
-                        </ul>
-                  )}
+                        ) : (
+                          <li>No statement item ID  found</li>
+                        )}
+                      </ul>
+                    )}
                 </div>
               </div>
               <div className="form-group">
@@ -353,7 +360,7 @@ const handleSelectStatus = (status) => {
                   />
                   <span className="select-arrow" onClick={handleToggleDropdownStatus}>▼</span>
                   {isOpenStatusDD && (
-                    <ul className="dropdown-list">
+                    <ul className="status-dropdown-list dropdown-list">
                       {["Pending", "Active", "Expired", "Terminated"].map((status) => (
                         <li key={status} onClick={() => handleSelectStatus(status)}>
                           {status}

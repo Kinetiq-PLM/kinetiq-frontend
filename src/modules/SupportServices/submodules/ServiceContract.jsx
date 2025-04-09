@@ -149,7 +149,7 @@ const ServiceContract = () => {
             </div>
             <div className="filter-dropdown">
               <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-                Filter by
+                {filterOptions.find(opt => opt.value === filterBy)?.label || "Filter by"}
                 <span className="arrow">▼</span>
               </button>
               {showFilterOptions && (
@@ -165,7 +165,12 @@ const ServiceContract = () => {
           </div>
 
           {/* Table Component */}
-          <Table contracts={filteredContracts} onRowClick={handleRowClick} onViewContract={handleViewContract} />
+          <Table 
+            contracts={filteredContracts} 
+            onRowClick={handleRowClick} 
+            onViewContract={handleViewContract} 
+            selectedContract={selectedContract}
+          />
 
           <div className="buttons-container">
             <button 

@@ -17,18 +17,21 @@
 .servcall .content-scroll-area {
   flex: 1;
   overflow-y: auto;
-  padding-right: 0.5rem;
-  margin-right: -0.5rem;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
-  max-height: calc(100% - 8rem);
+  border-radius: 8px;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  max-height: calc(100% - 7rem);
+  margin-top: 2rem;
 }
 
 .servcall .filter-options {
   position: absolute;
   top: 100%;
-  left: 0;
-  width: 100%;
+  right: 0;
+  width: 130px;
   background-color: white;
   border: 1px solid #e8e8e8;
   border-radius: 0.25rem;
@@ -78,7 +81,11 @@
 }
 
 .servcall tbody tr:hover {
-  background-color: #bee2e2;
+  background-color: #d6f5f5;
+}
+
+.servcall .service-calls-table .selected-row {
+  background-color: #d6f5f5;
 }
 
 .servcall tbody tr:last-child td {
@@ -355,9 +362,7 @@
 
 @media (max-width: 768px) {
   .servcall .search-filter-container {
-    flex-direction: column;
     gap: 1rem;
-    align-items: stretch;
   }
 
   .servcall .search-container {
@@ -384,7 +389,19 @@
   .servcall .form-row {
     flex-direction: column;
     gap: 1.25rem;
+    align-items: stretch;
   }
+  .servcall .aligned-row .form-group:first-child,
+  .servcall .aligned-row .form-group:last-child {
+    width: 100%; /* Fixed width for the left column */
+    flex: 0 0 48%;
+  }
+
+  .servcall .resolution-footer .form-group {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+}
 }
 
 @media (max-width: 480px) {

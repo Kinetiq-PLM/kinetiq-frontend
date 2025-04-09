@@ -108,6 +108,8 @@ function App() {
       "Service Call": "ServiceCall",
       "Service Request": "ServiceRequest",
       "Service Contract": "ServiceContract",
+      "Service Report": "ServiceReport",
+      "Service Analysis": "ServiceAnalysis",
     },
     "Inventory": {
       "Stock Levels": "StockLevels",

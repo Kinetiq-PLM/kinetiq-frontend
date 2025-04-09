@@ -407,24 +407,32 @@ const handleRenewalCheckbox = () => {
                       type="text"
                       id="renewalId"
                       value={formData.renewalId}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChange(e); 
+                        setOpenRenewalDD(true);
+                      }}
+                      onClick={handleToggleDDRenewals}
                       placeholder="Select renewal ID"
                       disabled={!isRenewalChecked}
                     />
                     <span className="select-arrow" onClick={handleToggleDDRenewals}>▼</span>
                     {isRenewalDropdown && (
-                        <ul className="dropdown-list">
-                          {renewals.length > 0 ? (
-                            renewals.map((renewal) => (
+                      <ul className="dropdown-list">
+                        {renewals.length > 0 ? (
+                          renewals
+                            .filter((renewal) =>
+                            renewal.renewal_id.toLowerCase().includes(formData.renewalId.toLowerCase())
+                            )
+                            .map((renewal) => (
                               <li key={renewal.renewal_id} onClick={() => handleSelectRenewal(renewal)}>
                                 {renewal.renewal_id}
                               </li>
                             ))
-                          ) : (
-                            <li>No renewal ID found</li>
-                          )}
-                        </ul>
-                      )}
+                        ) : (
+                          <li>No renewal ID found</li>
+                        )}
+                      </ul>
+                    )}
                   </div>    
                 </div>
 

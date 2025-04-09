@@ -1,38 +1,46 @@
-const BASE_API_URL = "http://localhost:8000/";
+const API_BASE_URL = "http://localhost:8000/";
 
-export async function GET(endpoint) {
-  const res = await fetch(BASE_API_URL + endpoint, {
-    method: "GET",
-  });
-
-  if (!res.ok) throw new Error(`GET request failed: ${res.status}`); // catch errors
-
-  return await res.json();
-}
-
-export async function POST(endpoint, data) {
-  const res = await fetch(BASE_API_URL + endpoint, {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" },
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text(); // catch errors
-    throw new Error(`POST request failed: ${res.status} - ${errorText}`);
+export const GET = async (endpoint) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`);
+    if (!response.ok) throw new Error("Failed to fetch");
+    return await response.json();
+  } catch (error) {
+    console.error("GET error:", error);
+    throw error;
   }
+};
 
-  return res.json(); 
-}
+export const POST = async (endpoint, data) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Failed to post");
+    return await response.json();
+  } catch (error) {
+    console.error("POST error:", error);
+    throw error;
+  }
+};
 
-export async function PATCH(endpoint, data) {
-  const res = await fetch(BASE_API_URL + endpoint, {
-    method: "PATCH",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" },
-  });
-
-  if (!res.ok) throw new Error(`PATCH request failed: ${res.status}`); // catch errors
-
-  return await res.json();
-}
+export const PATCH = async (endpoint, data) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Failed to patch");
+    return await response.json();
+  } catch (error) {
+    console.error("PATCH error:", error);
+    throw error;
+  }
+};

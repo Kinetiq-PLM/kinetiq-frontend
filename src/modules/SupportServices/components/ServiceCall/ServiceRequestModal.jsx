@@ -77,7 +77,8 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
   
   const handleToggleDropdownTech = () => {
     if (!isTechDropdown) {
-      fetchTechnicians(); 
+      fetchTechnicians();
+      setOpenTechDD(true); 
     }
     setOpenTechDD(!isTechDropdown);
   };
@@ -86,18 +87,6 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
     setTechnicianId(technician.employee_id); 
     setTechnicianName(technician.first_name + " " + technician.last_name);
     setOpenTechDD(false); 
-  };
-
-  const handletechnicianInput = (input) => {
-    setTechnicianId(input); 
-  
-    const matchedTechnician = technicians.find(technician => technician.employee_id === input);
-  
-    if (matchedTechnician) {
-      handleSelectTechnician(matchedTechnician); 
-    } else {
-      setTechnicianName(""); 
-    }
   };
 
   // handle type
@@ -165,25 +154,31 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
                   type="text"
                   id="technicianId"
                   value={technicianId}
-                  //readOnly
-                  onChange={(e) => handletechnicianInput(e.target.value)}
+                  onChange={(e) => {
+                    setTechnicianId(e.target.value);
+                    setOpenTechDD(true);
+                  }}
+                  onClick = {handleToggleDropdownTech}
                   placeholder="Select technician ID"
                 />
                 <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
-                { /* Dropdown List */}
-                    {isTechDropdown && (
-                      <ul className="dropdown-list">
-                        {technicians.length > 0 ? (
-                          technicians.map((technician) => (
-                            <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
-                              {technician.employee_id}
-                            </li>
-                          ))
-                        ) : (
-                          <li>No technicians found</li>
-                        )}
-                      </ul>
-                    )}
+                {isTechDropdown && (
+                        <ul className="dropdown-list">
+                          {technicians.length > 0 ? (
+                            technicians
+                              .filter((technician) =>
+                                technician.employee_id.toLowerCase().includes(technicianId.toLowerCase())
+                              )
+                              .map((technician) => (
+                                <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
+                                  {technician.employee_id}
+                                </li>
+                              ))
+                          ) : (
+                            <li>No technicians ID found</li>
+                          )}
+                        </ul>
+                      )}
                 </div>
                 
               </div>

@@ -80,6 +80,7 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
   const handleToggleDropdownProd = () => {
     if (!isProdDropdown) {
       fetchProducts(); 
+      setOpenProdDD(true)
     }
     setOpenProdDD(!isProdDropdown);
   };
@@ -88,18 +89,6 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
     setProductId(product.product_id); 
     setProductName(product.product_name)
     setOpenProdDD(false); 
-  };
-
-  const handleproductInput = (input) => {
-    setProductId(input); 
-  
-    const matchedProduct = products.find(product => product.product_id === input);
-  
-    if (matchedProduct) {
-      handleSelectProduct(matchedProduct); 
-    } else {
-      setTechnicianName(""); 
-    }
   };
 
   // fetches a list of contracts
@@ -116,6 +105,7 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
   const handleToggleDropdownContract = () => {
     if (!isContractDropdown) {
       fetchContracts(); 
+      setOpenContractDD(true)
     }
     setOpenContractDD(!isContractDropdown);
   };
@@ -285,25 +275,31 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
                     type="text"
                     id="productId"
                     value={productId}
-                    //readOnly
-                    onChange={(e) => handleproductInput(e.target.value)}
+                    onChange={(e) => {
+                      setProductId(e.target.value);
+                      setOpenProdDD(true); // show dropdown on typing
+                    }}
+                    onClick={handleToggleDropdownProd}
                     placeholder="Select product ID"
                   />
                   <span className="select-arrow" onClick={handleToggleDropdownProd}>▼</span>
-                  { /* Dropdown List */}
-                    {isProdDropdown && (
-                      <ul className="dropdown-list prod-dropdown-list">
-                        {products.length > 0 ? (
-                          products.map((product) => (
+                  {isProdDropdown && (
+                    <ul className="dropdown-list prod-dropdown-list">
+                      {products.length > 0 ? (
+                        products
+                          .filter((product) =>
+                          product.product_id.toLowerCase().includes(productId.toLowerCase())
+                          )
+                          .map((product) => (
                             <li key={product.product_id} onClick={() => handleSelectProduct(product)}>
                               {product.product_id}
                             </li>
                           ))
-                        ) : (
-                          <li>No products found</li>
-                        )}
-                      </ul>
-                    )}
+                      ) : (
+                        <li>No products found</li>
+                      )}
+                    </ul>
+                  )}
                 </div>
               </div>
               <div className="form-group">{/* Empty div to maintain alignment */}</div>
@@ -332,20 +328,26 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
                     type="text"
                     id="contractNo"
                     value={contractNo}
-                    //readOnly
-                    onChange={(e) => handlecontractInput(e.target.value)}
+                    onChange={(e) => {
+                      setContractNo(e.target.value);
+                      setOpenContractDD(true); // show dropdown on typing
+                    }}
+                    onClick={handleToggleDropdownContract}
                     placeholder="Select contract number"
                   />
                   <span className="select-arrow" onClick={handleToggleDropdownContract}>▼</span>
-                  { /* Dropdown List */}
                     {isContractDropdown && (
                       <ul className="dropdown-list">
                         {contracts.length > 0 ? (
-                          contracts.map((contract) => (
-                            <li key={contract.contract_id} onClick={() => handleSelectContract(contract)}>
-                              {contract.contract_id}
-                            </li>
-                          ))
+                          contracts
+                            .filter((contract) =>
+                              contract.contract_id.toLowerCase().includes(contractNo.toLowerCase())
+                            )
+                            .map((contract) => (
+                              <li key={contract.contract_id} onClick={() => handleSelectContract(contract)}>
+                                {contract.contract_id}
+                              </li>
+                            ))
                         ) : (
                           <li>No contracts found</li>
                         )}

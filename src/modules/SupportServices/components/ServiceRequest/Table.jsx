@@ -1,6 +1,6 @@
 "use client"
 
-const Table = ({ requests, onRowClick, onViewRequest }) => {
+const Table = ({ requests, onRowClick, onViewRequest, selectedRequest }) => {
   return (
     <div className="table-container">
       <table className="requests-table">
@@ -18,8 +18,10 @@ const Table = ({ requests, onRowClick, onViewRequest }) => {
         <tbody>
           {requests.map((request, index) => (
             <tr 
-              key={request.id || `request-${index}`} 
-              className={index % 2 === 0 ? "" : "alternate-row"} 
+              key={request.service_request_id || `request-${index}`} 
+              className={`${
+                selectedRequest?.service_request_id === request.service_request_id ? "selected-row" : ""
+              } ${index % 2 !== 0 ? "alternate-row" : ""}`}
               onClick={() => onRowClick(request)} // makes table row clickable, function update the state fields
               style={{ cursor: "pointer" }} 
             >

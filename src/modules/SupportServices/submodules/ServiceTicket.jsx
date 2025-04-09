@@ -168,11 +168,11 @@ const ServiceTicket = () => {
             phone={phone}
             setPhone={setPhone}
           />
-
+          <div className="section-divider"></div>
           <div className="filter-submit-container">
             <div className="filter-dropdown">
               <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-                Filter by
+              {filterOptions.find(opt => opt.value === filterBy)?.label || "Filter by"}
                 <span className="arrow">▼</span>
               </button>
               {showFilterOptions && (
@@ -191,7 +191,11 @@ const ServiceTicket = () => {
           </div>
           
           {/*Table Component */}
-          <ServTickTable filteredTickets={filteredTickets} onRowClick={handleRowClick} />
+          <ServTickTable 
+            filteredTickets={filteredTickets} 
+            onRowClick={handleRowClick} 
+            selectedTicket={selectedTicket}
+          />
 
           <div className="queue-container">
             <button

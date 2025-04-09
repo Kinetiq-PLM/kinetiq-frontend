@@ -1,4 +1,4 @@
-const ServTickTable = ({ filteredTickets, onRowClick }) => {
+const ServTickTable = ({ filteredTickets, onRowClick, selectedTicket }) => {
   return (
     <div className="table-container">
       <table className="tickets-table">
@@ -14,8 +14,10 @@ const ServTickTable = ({ filteredTickets, onRowClick }) => {
         <tbody>
           {filteredTickets.map((ticket, index) => (
             <tr 
-              key={ticket.id || `ticket-${index}`} 
-              className={index % 2 === 0 ? "" : "alternate-row"} 
+              key={ticket.ticket_id || `ticket-${index}`} 
+              className={`${
+                selectedTicket?.ticket_id === ticket.ticket_id ? "selected-row" : ""
+              } ${index % 2 !== 0 ? "alternate-row" : ""}`}
               onClick={() => onRowClick(ticket)} // makes table row clickable, function update the state fields
               style={{ cursor: "pointer" }} 
             >

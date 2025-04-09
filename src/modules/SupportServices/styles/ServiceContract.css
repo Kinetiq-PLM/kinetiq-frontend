@@ -10,9 +10,7 @@
   display: flex;
   flex-direction: column;
   min-width: 40rem;
-  max-height: 39rem;
-  overflow: hidden;
-  position: relative;
+  min-height: 30rem;
 }
 
 /* Hide scrollbar arrows unless hovered */
@@ -23,6 +21,12 @@
   margin-right: -0.5rem;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
+  border-radius: 8px;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  max-height: calc(100% - 7rem);
+  margin-top: 2rem;
 }
 
 .servcont .filter-options {
@@ -78,7 +82,11 @@
 }
 
 .servcont tbody tr:hover {
-  background-color: #bee2e2;
+  background-color: #d6f5f5;
+}
+
+.servcont .contracts-table .selected-row {
+  background-color: #d6f5f5;
 }
 
 .servcont tbody tr:last-child td {
@@ -167,7 +175,7 @@
 }
 
 .servcont .form-group textarea {
-  height: 5.5rem;
+  height: 10rem;
   resize: none;
 }
 
@@ -291,6 +299,11 @@
   opacity: 0.6;
 }
 
+.servcont .status-dropdown-list {
+  top: auto !important;
+  bottom: 100% !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 992px) {
   .servcont .body-content-container {
@@ -334,6 +347,7 @@
   .servcont .form-row {
     flex-direction: column;
     gap: 1.25rem;
+    align-items: stretch;
   }
 }
 
