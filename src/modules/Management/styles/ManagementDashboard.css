@@ -1,0 +1,127 @@
+.dashboard-container {
+    font-family: sans-serif;
+    background-color: white; /* White background */
+    padding: 20px;
+    min-height: 100vh;
+  }
+ 
+  .dashboard-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+ 
+  .dashboard-widgets {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+ 
+  .dashboard-widget {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 30%; /* Adjust width as needed */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+ 
+  .dashboard-widget h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+ 
+  .dashboard-widget .value {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+ 
+  .dashboard-widget .details {
+    display: flex;
+    justify-content: space-around;
+  }
+ 
+  .dashboard-widget .details div {
+    text-align: center;
+  }
+ 
+  .dashboard-calendar {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 30%; /* Adjust width as needed */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+ 
+  .dashboard-calendar h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+ 
+  .dashboard-calendar .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+ 
+  .dashboard-calendar .calendar-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+ 
+  .dashboard-calendar table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+ 
+  .dashboard-calendar th,
+  .dashboard-calendar td {
+    padding: 8px;
+    text-align: center;
+  }
+ 
+  .dashboard-calendar th {
+    font-weight: bold;
+  }
+ 
+  .dashboard-requests {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+ 
+  .dashboard-requests h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+ 
+  .dashboard-requests table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+ 
+  .dashboard-requests th,
+  .dashboard-requests td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+ 
+  .dashboard-requests th {
+    background-color: #e0f2fe; /* Light header background */
+    font-weight: bold;
+  }
+ 
+  .dashboard-requests tr:last-child td {
+    border-bottom: none;
+  }
+ 
+  .dashboard-requests tr:hover {
+    background-color: #f9f9f9;
+  }
