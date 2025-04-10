@@ -107,9 +107,11 @@ function App() {
       "Service Ticket": "ServiceTicket",
       "Service Call": "ServiceCall",
       "Service Request": "ServiceRequest",
-      "Service Contract": "ServiceContract",
-      "Service Report": "ServiceReport",
+      "Warranty Renewal": "WarrantyRenewal",
       "Service Analysis": "ServiceAnalysis",
+      "Service Billing": "ServiceBilling",
+      "Service Report": "ServiceReport",
+      "Service Contract": "ServiceContract",
     },
     "Inventory": {
       "Stock Levels": "StockLevels",

@@ -7,6 +7,7 @@ import SubmitTicketModal from "../components/ServiceTicket/SubmitTicketModal"
 import QueueTicketModal from "../components/ServiceTicket/QueueTicketModal"
 import ServTickInputField from "../components/ServiceTicket/ServTickInputField"
 import ServTickTable from "../components/ServiceTicket/ServTickTable"
+import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 
 import { GET } from "../api/api"
 import { POST } from "../api/api"
@@ -23,6 +24,7 @@ const ServiceTicket = () => {
   const [tickets, setTickets] = useState([])
   const [filterBy, setFilterBy] = useState("")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
   const [selectedTicketStatus, setSelectedTicketStatus] = useState(null);
   const [selectedTicket, setSelectedTicket] = useState(null);
@@ -124,15 +126,23 @@ const ServiceTicket = () => {
 
   // Filter tickets based on selected filter
   const filteredTickets = tickets.filter((ticket) => {
-    if (!filterBy || filterBy === "all") return true
-    if (filterBy === "open" && ticket.status === "Open") return true
-    if (filterBy === "closed" && ticket.status === "Closed") return true
-    if (filterBy === "pending" && ticket.status === "Pending") return true
-    if (filterBy === "low" && ticket.priority === "Low") return true
-    if (filterBy === "medium" && ticket.priority === "Medium") return true
-    if (filterBy === "high" && ticket.priority === "High") return true
-    if (filterBy === "urgent" && ticket.priority === "Urgent") return true
-    return false
+    let matchesFilter = true
+    if (filterBy === "open" && ticket.status === "Open") matchesFilter = false
+    if (filterBy === "closed" && ticket.status === "Closed") matchesFilter = false
+    if (filterBy === "pending" && ticket.status === "Pending") matchesFilter = false
+    if (filterBy === "low" && ticket.priority === "Low") matchesFilter = false
+    if (filterBy === "medium" && ticket.priority === "Medium") matchesFilter = false
+    if (filterBy === "high" && ticket.priority === "High") matchesFilter = false
+    if (filterBy === "urgent" && ticket.priority === "Urgent") matchesFilter = false
+    
+    let matchesSearch = true
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      matchesSearch =
+        (ticket.ticket_id?.toString().toLowerCase().includes(query) ?? false) ||  
+        (ticket.customer?.name?.toLowerCase().includes(query) ?? false);
+      }
+    return matchesFilter && matchesSearch
   })
 
   return (
@@ -170,20 +180,32 @@ const ServiceTicket = () => {
           />
           <div className="section-divider"></div>
           <div className="filter-submit-container">
-            <div className="filter-dropdown">
-              <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
-              {filterOptions.find(opt => opt.value === filterBy)?.label || "Filter by"}
-                <span className="arrow">▼</span>
-              </button>
-              {showFilterOptions && (
-                <div className="filter-options">
-                  {filterOptions.map((option) => (
-                    <div key={option.value} className="filter-option" onClick={() => handleFilterChange(option.value)}>
-                      {option.label}
-                    </div>
-                  ))}
+            <div className="search-filter-container">
+              <div className="search-container">
+                  <img src={SearchIcon || "/placeholder.svg?height=16&width=16"} alt="Search" className="search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Search or type a command (Ctrl + G)"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input"
+                  />
                 </div>
-              )}
+                <div className="filter-dropdown">
+                  <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
+                  {filterOptions.find(opt => opt.value === filterBy)?.label || "Filter by"}
+                    <span className="arrow">▼</span>
+                  </button>
+                  {showFilterOptions && (
+                    <div className="filter-options">
+                      {filterOptions.map((option) => (
+                        <div key={option.value} className="filter-option" onClick={() => handleFilterChange(option.value)}>
+                          {option.label}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
             </div>
             <button className="submit-button" onClick={handleSubmit}>
               Submit a Ticket

@@ -333,6 +333,14 @@
 .servtick .modal-form textarea {
   height: 5.5rem;
 }
+.servtick .form-row .form-group.desc textarea {
+  height: 8.5rem;
+}
+
+.servtick .search-filter-container {
+  gap: 1rem;
+  margin-bottom: 0rem;
+}
 
 /* Responsive adjustments */
 @media (max-width: 992px) {

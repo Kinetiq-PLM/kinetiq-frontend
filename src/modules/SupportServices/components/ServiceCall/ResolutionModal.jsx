@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 
-const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, onShowRequest, callData }) => {
+const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, onShowRequest, onShowRenewal, callData }) => {
   const [resolutionDetails, setResolutionDetails] = useState("")
   const [wasResolved, setWasResolved] = useState("No")
   const [activeTab, setActiveTab] = useState("resolution")
@@ -38,7 +38,7 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, onShowReque
 
   return (
     <div className="modal-overlay">
-      <div className="modal-container service-call-modal">
+      <div className="modal-container service-resolution-modal">
         <div className="modal-header">
           <div className="modal-header-left">
             <img
@@ -106,6 +106,13 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, onShowReque
                   disabled={wasResolved === "Yes"}
                 >
                 Service Request
+              </button>
+              <button 
+                  className={`service-renewal-button ${wasResolved === "Yes" ? "disabled" : ""}`} 
+                  onClick={onShowRenewal}
+                  disabled={wasResolved === "Yes"}
+                >
+                Renewal
               </button>
               </div>
               <div className="resolution-footer-right">

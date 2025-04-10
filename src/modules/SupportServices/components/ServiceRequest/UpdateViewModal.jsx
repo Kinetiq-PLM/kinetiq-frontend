@@ -292,7 +292,7 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
                   value={formData.requestDate}
                   readOnly
                   onChange={handleChange}
-                  placeholder="dd/mm/y"
+                  placeholder="dd/mm/yy"
                 />
                 {/* <img
                   src={CalendarInputIcon || "/placeholder.svg?height=16&width=16"}
@@ -352,7 +352,7 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
                 <span className="select-arrow" onClick={handleTypeDropdown}>▼</span>
                     {isOpenTypeDD && (
                         <ul className="dropdown-list type-dropdown-list">
-                        {["Repair", "Installation", "Maintenance", "Renewal", "Other"].map((type) => (
+                        {["Repair", "Installation", "Maintenance", "Other"].map((type) => (
                             <li key={type} onClick={() => handleSelectType(type)}>
                             {type}
                             </li>

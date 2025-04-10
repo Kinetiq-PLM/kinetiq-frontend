@@ -119,6 +119,15 @@ const ServiceAnalysis = () => {
       }
     }, [activeTab, selectedAnalysis, serviceOrderInfo]);
 
+    useEffect(() => {
+      if (activeTab === "After Analysis" && selectedAnalysis) {
+        setAfterAnalysisInfo((prev) => ({
+          ...prev,
+          analysisId: selectedAnalysis.analysis_id,
+        }));
+      }
+    }, [activeTab, selectedAnalysis]);
+
   const handleRowClick = async (analysis) => {
     try {
       const data = await GET(`service-analyses/${analysis.analysis_id}`); 
@@ -148,7 +157,12 @@ const ServiceAnalysis = () => {
         serviceOrderId: serviceOrderInfo?.serviceOrderId || "",
       });
 
+      setAfterAnalysisInfo({
+        analysisId: data.analysis_id
+      });
+
       fetchOrder(data.analysis_id);
+      fetchAfterAnalysis(data.analysis_id);
 
     } catch (error) {
       console.error("Error fetching service analysis details:", error);
@@ -224,6 +238,28 @@ const ServiceAnalysis = () => {
       }));
     }
   };
+
+  const fetchAfterAnalysis = async (analysisId) => {
+    try {
+      const data = await GET(`analysis-sched/${analysisId}/`);
+
+      setAfterAnalysisInfo({
+        afterAnalysisId: data?.analysis_sched_id || "",
+        serviceStatus: data?.service_status || "",
+        serviceDate: data.service_date || "",
+        description: data.description || "",
+      });
+
+    } catch (error) {
+      console.error("Error fetching after analysis:", error);
+      setAfterAnalysisInfo({
+        afterAnalysisId: "",
+        serviceStatus: "",
+        serviceDate: "",
+        description: "",
+      });
+    }
+  };
   
   const [isOpenStatusDD, setOpenStatusDD] = useState(false);
 
@@ -239,6 +275,20 @@ const ServiceAnalysis = () => {
     setOpenStatusDD(false); 
   };
 
+  const [isOpenAfterStatusDD, setOpenAfterStatusDD] = useState(false);
+
+  const handleToggleDropdownAfterStatus = () => {
+    setOpenAfterStatusDD(!isOpenAfterStatusDD);
+  };
+
+  const handleSelectAfterStatus = (status) => {
+    setAfterAnalysisInfo((prevState) => ({
+      ...prevState,  
+      serviceStatus: status,
+    }));
+    setOpenAfterStatusDD(false); 
+  };
+
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
     const toggleDatePicker = () => {
@@ -252,15 +302,21 @@ const ServiceAnalysis = () => {
       setIsPickerOpen(!isPickerOpen); 
     };
 
+    const toggleDateAfterPicker = () => {
+      const dateInput = document.getElementById("serviceDate");
+      if (isPickerOpen) {
+        dateInput.blur(); 
+      } else {
+        dateInput.showPicker(); 
+      }
+      
+      setIsPickerOpen(!isPickerOpen); 
+    };
+
   // Handle view analysis
   const handleViewAnalysis = (analysis) => {
       setSelectedAnalysis(analysis)
       setShowUpdateModal(true)
-  }
-
-  // Handle add new analysis
-  const handleAddAnalysis = () => {
-    setShowAddModal(true)
   }
 
   // Handle update analysis
@@ -429,6 +485,48 @@ const ServiceAnalysis = () => {
       } catch (error) {
           console.error("Error updating delivery order:", error.message);
       }
+    }
+  }
+
+  const updateAfterAnalysis  = async () => {
+    const afterAnalysisId = afterAnalysisInfo.afterAnalysisId
+    if (!afterAnalysisId) {
+      console.error("Error: afterAnalysisId is undefined");
+      return;
+    }
+
+    const afterAnalysisData = {
+      service_status: afterAnalysisInfo.serviceStatus,
+      service_date: afterAnalysisInfo.serviceDate,
+      description: afterAnalysisInfo.description
+    }
+
+    console.log("Updating after analysis sched:", afterAnalysisData)
+    try {
+        const data = await PATCH (`analysis-sched/${afterAnalysisId}/update/`, afterAnalysisData);
+        console.log("After analysis sched update successfully:", data);
+        fetchAfterAnalysis(selectedAnalysis.analysis_id);
+    } catch (error) {
+        console.error("Error updating after analysis sched:", error.message);
+    }
+  }
+
+  const createAfterAnalysis  = async () => {
+    const afterAnalysisData = {
+      analysis_id: selectedAnalysis.analysis_id,
+      service_status: afterAnalysisInfo.serviceStatus,
+      service_date: afterAnalysisInfo.serviceDate,
+      description: afterAnalysisInfo.description,
+      technician_id: selectedAnalysis?.technician?.employee_id
+    }
+
+    console.log("Creating after analysis sched:", afterAnalysisData)
+      try {
+        const data = await POST("/after-analysis/", afterAnalysisData);
+        console.log("After analysis sched created successfully:", data);
+        fetchAfterAnalysis(selectedAnalysis.analysis_id);
+    } catch (error) {
+        console.error("Error submitting after analysis sched:", error.message);
     }
   }
 
@@ -865,25 +963,27 @@ const ServiceAnalysis = () => {
                   )}
                   </div>
                 </div>
-
-                <div className="buttons-container-right-delorder">
-                <button 
-                  type="button"
-                  className={`update-button ${deliveryOrderInfo.deliveryOrderId !== "" ? "clickable" : "disabled"}`} 
-                  onClick={() => updateDeliveryOrder()}
-                  disabled={deliveryOrderInfo.deliveryOrderId === ""}
-                >
-                  Update
-                </button>
-                <button 
-                  type="button"
-                  className={`add-button ${deliveryOrderInfo.deliveryOrderId === "" ? "clickable" : "disabled"}`} 
-                  onClick={() => createDeliveryOrder()}
-                  disabled={deliveryOrderInfo.deliveryOrderId !== ""}
-                >
-                  Add
-                </button>
-              </div>
+                <div className="form-group">
+                  <div className="buttons-container-right-delorder">
+                    <button 
+                      type="button"
+                      className={`update-button ${deliveryOrderInfo.deliveryOrderId !== "" ? "clickable" : "disabled"}`} 
+                      onClick={() => updateDeliveryOrder()}
+                      disabled={deliveryOrderInfo.deliveryOrderId === ""}
+                    >
+                      Update
+                    </button>
+                    <button 
+                      type="button"
+                      className={`add-button ${deliveryOrderInfo.deliveryOrderId === "" ? "clickable" : "disabled"}`} 
+                      onClick={() => createDeliveryOrder()}
+                      disabled={deliveryOrderInfo.deliveryOrderId !== ""}
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+                
               </div>
 
               
@@ -898,6 +998,7 @@ const ServiceAnalysis = () => {
                   <input
                     type="text"
                     id="afterAnalysisId"
+                    readOnly
                     value={afterAnalysisInfo.afterAnalysisId}
                     onChange={(e) => setAfterAnalysisInfo({ ...afterAnalysisInfo, afterAnalysisId: e.target.value })}
                     placeholder="No after analysis scheduled yet..."
@@ -908,6 +1009,7 @@ const ServiceAnalysis = () => {
                   <input
                     type="text"
                     id="analysisId"
+                    readOnly
                     value={afterAnalysisInfo.analysisId}
                     onChange={(e) => setAfterAnalysisInfo({ ...afterAnalysisInfo, analysisId: e.target.value })}
                     placeholder="Enter analysis ID"
@@ -917,23 +1019,33 @@ const ServiceAnalysis = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="serviceStatus">Service Status *</label>
+                  <label htmlFor="serviceStatus">Service Status <span className="required">*</span></label>
                   <div className="select-wrapper">
                     <input
                       type="text"
                       id="serviceStatus"
+                      readOnly
                       value={afterAnalysisInfo.serviceStatus}
                       onChange={(e) => setAfterAnalysisInfo({ ...afterAnalysisInfo, serviceStatus: e.target.value })}
-                      placeholder="Pending"
+                      placeholder="Scheduled"
                     />
-                    <span className="select-arrow">▼</span>
+                    <span className="select-arrow" onClick={handleToggleDropdownAfterStatus}>▼</span>
+                    {isOpenAfterStatusDD && (
+                    <ul className="dropdown-list">
+                      {["Scheduled", "Completed", "Cancelled", "In Progress"].map((status) => (
+                        <li key={status} onClick={() => handleSelectAfterStatus(status)}>
+                          {status}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   </div>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="serviceDate">Service Date *</label>
+                  <label htmlFor="serviceDate">Service Date <span className="required">*</span></label>
                   <div className="date-input-wrapper">
                     <input
-                      type="text"
+                      type="date"
                       id="serviceDate"
                       value={afterAnalysisInfo.serviceDate}
                       onChange={(e) => setAfterAnalysisInfo({ ...afterAnalysisInfo, serviceDate: e.target.value })}
@@ -943,6 +1055,8 @@ const ServiceAnalysis = () => {
                       src={CalendarInputIcon || "/placeholder.svg?height=16&width=16"}
                       alt="Calendar"
                       className="calendar-icon"
+                      onClick={toggleDateAfterPicker}
+                      style={{ cursor: "pointer" }}
                     />
                   </div>
                 </div>
@@ -962,8 +1076,22 @@ const ServiceAnalysis = () => {
               </div>
 
               <div className="buttons-container-right">
-                <button className="update-button">Update</button>
-                <button className="schedule-button">Schedule</button>
+                <button 
+                  type="button"
+                  className={`update-button ${afterAnalysisInfo.afterAnalysisId !== "" ? "clickable" : "disabled"}`} 
+                  onClick={() => updateAfterAnalysis()}
+                  disabled={afterAnalysisInfo.afterAnalysisId === ""}
+                >
+                  Update
+                </button>
+                <button 
+                  type="button"
+                  className={`add-button ${afterAnalysisInfo.afterAnalysisId === "" ? "clickable" : "disabled"}`} 
+                  onClick={() => createAfterAnalysis()}
+                  disabled={afterAnalysisInfo.afterAnalysisId !== ""}
+                >
+                  Schedule
+                </button>
               </div>
             </div>
           )}

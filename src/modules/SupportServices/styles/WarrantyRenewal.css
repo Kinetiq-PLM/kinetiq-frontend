@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
 
-.servcall .body-content-container {
+.renew .body-content-container {
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
@@ -14,7 +14,7 @@
 }
 
 /* Hide scrollbar arrows unless hovered */
-.servcall .content-scroll-area {
+.renew .content-scroll-area {
   flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -27,7 +27,7 @@
   margin-top: 2rem;
 }
 
-.servcall .filter-options {
+.renew .filter-options {
   position: absolute;
   top: 100%;
   right: 0;
@@ -41,13 +41,13 @@
 }
 
 /* Table with Inter font */
-.servcall .service-calls-table {
+.renew .renewals-table {
   width: 100%;
   border-collapse: collapse;
   font-family: "Inter", sans-serif;
 }
 
-.servcall .service-calls-table thead {
+.renew .renewals-table thead {
   position: sticky;
   top: 0;
   background-color: #00a8a8; 
@@ -55,19 +55,19 @@
   z-index: 3;
 }
 
-.servcall thead {
+.renew thead {
   background-color: #00a8a8;
   color: white;
 }
 
-.servcall th {
+.renew th {
   padding: 0.75rem 1.5rem;
   text-align: center;
   font-weight: 500;
   font-size: 0.875rem;
 }
 
-.servcall td {
+.renew td {
   padding: 0.75rem 1.5rem;
   border-bottom: 1px solid #e0e0e0;
   font-size: 0.875rem;
@@ -75,41 +75,41 @@
   text-align: center;
 }
 
-.servcall tbody tr {
+.renew tbody tr {
   background-color: #eff8f9;
   transition: background-color 0.3s ease;
 }
 
-.servcall tbody tr:hover {
+.renew tbody tr:hover {
   background-color: #d6f5f5;
 }
 
-.servcall .service-calls-table .selected-row {
+.renew .renewals-table .selected-row {
   background-color: #d6f5f5;
 }
 
-.servcall tbody tr:last-child td {
+.renew tbody tr:last-child td {
   border-bottom: none;
 }
 
-.servcall .empty-row td {
+.renew .empty-row td {
   height: 2.5rem;
 }
 
-.servcall .priority-medium {
+.renew .priority-medium {
   color: #ffb341;
 }
 
-.servcall .priority-high {
+.renew .priority-high {
   color: #ff7300;
 }
 
-.servcall .priority-urgent {
+.renew .priority-urgent {
   color: #f44336;
 }
 
 /* Increase modal size */
-.servcall .modal-container {
+.renew .modal-container {
   background-color: white;
   border-radius: 0.5rem;
   width: 100%;
@@ -119,17 +119,17 @@
   flex-direction: column;
 }
 
-.servcall .service-call-modal {
+.renew .service-call-modal {
   max-width: 750px; /* Increased from 650px */
 }
 
-.servcall .service-resolution-modal {
+.renew .service-resolution-modal {
   max-width: 900px; /* Increased from 650px */
 }
 
 
 /* Tabs styling */
-.servcall .modal-tabs {
+.renew .modal-tabs {
   display: flex;
   border-bottom: 1px solid #e0e0e0;
   margin-top: 0.5rem;
@@ -138,7 +138,7 @@
   gap: 45px;
 }
 
-.servcall .modal-tab {
+.renew .modal-tab {
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
   font-weight: 500;
@@ -151,23 +151,23 @@
   font-family: "Inter", sans-serif;
 }
 
-.servcall .modal-tab:hover {
+.renew .modal-tab:hover {
   background-color: #00a8a8;
   color: #fff1f1;
 }
 
-.servcall .modal-tab.active {
+.renew .modal-tab.active {
   color: #00a8a8;
   transition: background-color 0.3s ease, color 0.3s ease;
   border-bottom: 2px solid #00a8a8;
 }
 
-.servcall .modal-tab.active:hover {
+.renew .modal-tab.active:hover {
   background-color: #00a8a8;
   color: #fff1f1;
 }
 
-.servcall .modal-content {
+.renew .modal-content {
   padding: 1.5rem;
   flex: 1;
   overflow-y: auto;
@@ -176,80 +176,80 @@
   scrollbar-color: transparent transparent;
 }
 
-.servcall .modal-form {
+.renew .modal-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
-.servcall .form-row {
+.renew .form-row {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
 }
 
 /* Special row for aligned fields */
-.servcall .aligned-row {
+.renew .aligned-row {
   align-items: stretch;
   display: flex;
   width: 100%;
 }
 
-.servcall .aligned-row .form-group:first-child {
+.renew .aligned-row .form-group:first-child {
   width: 48%; /* Fixed width for the left column */
   flex: 0 0 48%;
 }
 
-.servcall .aligned-row .form-group:last-child {
+.renew .aligned-row .form-group:last-child {
   width: 48%; /* Fixed width for the right column */
   flex: 0 0 48%;
   margin-left: auto;
 }
 
-.servcall .aligned-row-desc {
+.renew .aligned-row-desc {
   align-items: stretch;
   display: flex;
   width: 100%;
 }
 
-.servcall .aligned-column {
+.renew .aligned-column {
   align-items: stretch;
   display: flex;
   flex-direction: column;
   width: 48%;
 }
-.servcall .form-row .form-group {
+.renew .form-row .form-group {
   flex: 1;
 }
 
-.servcall .form-group input::placeholder,
-.servcall .form-group textarea::placeholder {
+.renew .form-group input::placeholder,
+.renew .form-group textarea::placeholder {
   color: #999;
   opacity: 1;
 }
 
-.servcall .form-group textarea {
+.renew .form-group textarea {
   height: 5.5rem;
   resize: none;
 }
 
-.servcall .form-group.req-desc textarea {
+.renew .form-group.req-desc textarea {
   height: 10rem !important;
 }
 
-.servcall .form-group.contract-desc textarea {
+.renew .form-group.contract-desc textarea {
   height: 14.5rem !important;
 }
 
 
-.servcall .prio-dropdown-list,
-.servcall .type-dropdown-list{
+.renew .prio-dropdown-list,
+.renew .type-dropdown-list{
   top: auto !important;
   bottom: 100% !important;
 }
 
 /* Fix service request button to ensure text is visible */
-.servcall .service-request-button {
+.renew .service-request-button {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -264,7 +264,7 @@
   width: 9.5rem;
 }
 
-.servcall .service-renewal-button {
+.renew .service-renewal-button {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -279,8 +279,8 @@
   width: 7rem;
 }
 
-.servcall .service-request-button.clickable,
-.servcall .service-renewal-button.clickable {
+.renew .service-request-button.clickable,
+.renew .service-renewal-button.clickable {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -288,36 +288,36 @@
   transition: background-color 0.2s;
 }
 
-.servcall .service-request-button.disabled,
-.servcall .service-renewal-button.disabled {
+.renew .service-request-button.disabled,
+.renew .service-renewal-button.disabled {
   background-color: white;
   color: #00a8a8;
   border: 1px solid #00a8a8;
   cursor: not-allowed;
 }
 
-.servcall .service-request-button.clickable:hover,
-.servcall .service-renewal-button.clickable:hover {
+.renew .service-request-button.clickable:hover,
+.renew .service-renewal-button.clickable:hover {
   background-color: #098f8f;
 }
 
-.servcall .service-request-button.clickable:active,
-.servcall .service-renewal-button.clickable:active {
+.renew .service-request-button.clickable:active,
+.renew .service-renewal-button.clickable:active {
   background-color: #087d7d;
 }
 
-.servcall .service-request-button:hover,
-.servcall .service-renewal-button:hover {
+.renew .service-request-button:hover,
+.renew .service-renewal-button:hover {
   background-color: #098f8f;
 }
 
-.servcall .service-request-button:active,
-.servcall .service-renewal-button:hover {
+.renew .service-request-button:active,
+.renew .service-renewal-button:hover {
   background-color: #087d7d;
 }
 
 /* Resolution textarea */
-.servcall .resolution-textarea {
+.renew .resolution-textarea {
   width: 100%;
   height: 300px;
   padding: 0.75rem;
@@ -328,13 +328,13 @@
   resize: none;
 }
 
-.servcall .resolution-textarea::placeholder {
+.renew .resolution-textarea::placeholder {
   color: #999;
   opacity: 1;
 }
 
 /* Divider in general modals */
-.servcall .form-divider {
+.renew .form-divider {
   height: 1px;
   background-color: #00a8a8;
   width: 100%;
@@ -342,7 +342,7 @@
 }
 
 /* Ensure resolution footer stays within container with more spacing */
-.servcall .resolution-footer {
+.renew .resolution-footer {
   display: flex;
   flex-direction: column;
   padding: 24px;
@@ -350,24 +350,24 @@
   gap: 5px
 }
 
-.servcall .resolution-footer-left {
+.renew .resolution-footer-left {
   display: flex;
   gap: 5px
 }
 
-.servcall .resolution-footer label{
+.renew .resolution-footer label{
   color:#00a8a8;
   font-size: 0.875rem;
   font-weight: bold;
   font-family: "Inter", sans-serif;
 }
 
-.servcall .resolution-footer-right {
+.renew .resolution-footer-right {
   display: flex;
   gap: 12px; /* Increased gap between buttons */
 }
 
-.servcall .resolution-footer .form-group {
+.renew .resolution-footer .form-group {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -378,13 +378,13 @@
 }
 
 /* Input focus color */
-.servcall input:focus,
-.servcall textarea:focus,
-.servcall select:focus,
-.servcall .modal-form input:focus,
-.servcall .modal-form textarea:focus,
-.servcall .modal-form select:focus,
-.servcall .resolution-textarea:focus {
+.renew input:focus,
+.renew textarea:focus,
+.renew select:focus,
+.renew .modal-form input:focus,
+.renew .modal-form textarea:focus,
+.renew .modal-form select:focus,
+.renew .resolution-textarea:focus {
   outline: none;
   border-color: #00a8a8;
   box-shadow: 0 0 0 1px #00a8a8;
@@ -392,55 +392,55 @@
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
-  .servcall .body-content-container {
+  .renew .body-content-container {
     min-width: auto;
     max-height: none;
     padding: 1.25rem;
   }
 
-  .servcall .modal-container {
+  .renew .modal-container {
     max-width: 90%;
   }
 }
 
 @media (max-width: 768px) {
-  .servcall .search-filter-container {
+  .renew .search-filter-container {
     gap: 1rem;
   }
 
-  .servcall .search-container {
+  .renew .search-container {
     margin-right: 0;
     width: 100%;
   }
 
-  .servcall .search-input {
+  .renew .search-input {
     width: 100%;
   }
 
-  .servcall .filter-dropdown {
+  .renew .filter-dropdown {
     width: 100%;
   }
 
-  .servcall .table-container {
+  .renew .table-container {
     overflow-x: auto;
   }
 
-  .servcall .service-calls-table {
+  .renew .renewals-table {
     min-width: 600px;
   }
 
-  .servcall .form-row {
+  .renew .form-row {
     flex-direction: column;
     gap: 1.25rem;
     align-items: stretch;
   }
-  .servcall .aligned-row .form-group:first-child,
-  .servcall .aligned-row .form-group:last-child {
+  .renew .aligned-row .form-group:first-child,
+  .renew .aligned-row .form-group:last-child {
     width: 100%; /* Fixed width for the left column */
     flex: 0 0 48%;
   }
 
-  .servcall .resolution-footer .form-group {
+  .renew .resolution-footer .form-group {
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
@@ -448,23 +448,23 @@
 }
 
 @media (max-width: 480px) {
-  .servcall .body-content-container {
+  .renew .body-content-container {
     padding: 1rem;
   }
 
-  .servcall .header {
+  .renew .header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
 
-  .servcall .title-container {
+  .renew .title-container {
     width: 100%;
   }
 
-  .servcall .modal-header,
-  .servcall .modal-content,
-  .servcall .modal-footer {
+  .renew .modal-header,
+  .renew .modal-content,
+  .renew .modal-footer {
     padding: 1rem;
   }
 }

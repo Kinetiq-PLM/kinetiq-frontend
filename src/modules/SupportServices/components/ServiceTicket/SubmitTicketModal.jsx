@@ -13,6 +13,7 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
   const [technicians, setTechnicians] = useState([]);
   const [isDropdownOpenT, setDropdownOpenT] = useState(false);
   const [isDropdownOpenP, setDropdownOpenP] = useState(false);
+  const [isDropdownOpenType, setDropdownOpenType] = useState(false);
   
   const [customerId, setCustomerId] = useState("")
   const [name, setName] = useState("")
@@ -23,6 +24,7 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
   const [createdAt, setCreatedAt] = useState(() => {
     return new Date().toISOString().split("T")[0]; // yyyy/mm/dd
   });
+  const [ticketType, setTicketType] = useState("")
 
   // fetches a list of customers
   const fetchCustomers = async () => {
@@ -83,12 +85,23 @@ const handleSelectPriority = (selectedPrio) => {
   setDropdownOpenP(false); 
 };
 
+// handle type 
+const handleTypeDropdown = () => {
+  setDropdownOpenType((prev) => !prev); 
+};
+
+const handleSelectType = (selectedType) => {
+  setTicketType(selectedType); 
+  setDropdownOpenType(false); 
+};
+
   const handleSubmit = async () => {
     onSubmit({
       customer_id: customerId,  
       priority: priority,
       subject: subject,
-      description: description
+      description: description,
+      type: ticketType
     })
     setCustomerId("");
     setName("");
@@ -154,19 +167,31 @@ const handleSelectPriority = (selectedPrio) => {
                       )}
                 </div>
               </div>
-
               <div className="form-group">
-                <label htmlFor="ticketSubject">
-                  Ticket Subject <span className="required">*</span>
+                <label htmlFor="ticketType">
+                  Ticket Type <span className="required">*</span>
                 </label>
-                <input
-                  type="text"
-                  id="ticketSubject"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  placeholder="Enter ticket subject"
-                />
-              </div>
+                <div className="select-wrapper">
+                  <input
+                    type="text"
+                    id="ticketType"
+                    value={ticketType}
+                    onChange={(e) => setTicketType(e.target.value)}
+                    placeholder="Select ticket type"
+                  />
+                  <span className="select-arrow" onClick={handleTypeDropdown}>▼</span>
+                  {isDropdownOpenType && (
+                    <ul className="dropdown-list">
+                      {["Service", "Sales"].map((type) => (
+                        <li key={type} onClick={() => handleSelectType(type)}>
+                          {type}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>   
+              </div>         
+              
             </div>
 
             <div className="form-row">
@@ -266,7 +291,21 @@ const handleSelectPriority = (selectedPrio) => {
             </div>
 
             <div className="form-row">
-              <div className="form-group" style={{ flex: "1 1 100%" }}>
+              <div className="form-group" >
+                  <label htmlFor="ticketSubject">
+                    Ticket Subject <span className="required">*</span>
+                  </label>
+                  <textarea
+                    type="text"
+                    id="ticketSubject"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="Enter ticket subject"
+                  />
+                </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group desc" style={{ flex: "1 1 100%" }}>
                 <label htmlFor="ticketDescription">
                   Ticket Description <span className="required">*</span>
                 </label>
