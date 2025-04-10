@@ -5,15 +5,18 @@ import { BarChart, LineChart, PieChart } from "@mui/x-charts";
 import { GET } from "../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-
+import Dropdown from "../components/Dropdown";
 const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   const [profitReportData, setProfitReportData] = useState([]);
   const [salesReportData, setSalesReportData] = useState([]);
   const [customerReportData, setCustomerReportData] = useState([]);
   const [productReportData, setProductReportData] = useState([]);
   const [employeeReportData, setEmployeeReportData] = useState([]);
+  const [employeeDealsData, setEmployeeDealsData] = useState([]);
   const [profitPeriod, setProfitPeriod] = useState("day"); // day, month, year, all
   const [salesPeriod, setSalesPeriod] = useState("day"); // day, month, year, all
+  const [salesReportPeriod, setSalesReportPeriod] = useState("Day"); // day, month, year, all
+  const [dealsPeriod, setDealsPeriod] = useState("Day"); // day, month, year, all
   const [totalProfit, setTotalProfit] = useState(0);
   const [totalSold, setTotalSold] = useState(0);
   const [totalOperations, setTotalOperations] = useState(0);
@@ -39,7 +42,15 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   });
   const employeeQuery = useQuery({
     queryKey: ["employeeReport"],
-    queryFn: async () => await GET(`sales/reporting/top-employees`),
+    queryFn: async () =>
+      await GET(`sales/reporting/top-employees?period=${salesReportPeriod}`),
+  });
+  const employeeDealsQuery = useQuery({
+    queryKey: ["employeeDealsReport"],
+    queryFn: async () =>
+      await GET(
+        `sales/reporting/top-employee-conversions?period=${dealsPeriod}`
+      ),
   });
   const colors = ["#c084fc", "#2563eb", "#fb923c", "#22c55e"];
   const options = ["day", "month", "year", "all"];
@@ -100,12 +111,25 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   }, [employeeQuery.data]);
 
   useEffect(() => {
+    if (employeeDealsQuery.status === "success") {
+      const data = employeeDealsQuery.data.top_employees;
+      setEmployeeDealsData(data);
+    }
+  }, [employeeDealsQuery.data]);
+
+  useEffect(() => {
     profitQuery.refetch();
   }, [profitPeriod]);
 
   useEffect(() => {
     salesQuery.refetch();
   }, [salesPeriod]);
+  useEffect(() => {
+    employeeQuery.refetch();
+  }, [salesReportPeriod]);
+  useEffect(() => {
+    employeeDealsQuery.refetch();
+  }, [dealsPeriod]);
 
   return (
     <div className="reporting flex flex-col gap-4 overflow-y-auto w-full">
@@ -345,10 +369,18 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               </span>
             </div>
             <div className="bg-white rounded-lg p-4 flex flex-col">
-              <span>Top Employee</span>
+              <span>Top Sales Employee - Sales Revenue</span>
               <span className="text-xl">
                 {employeeReportData.length > 0
                   ? employeeReportData[0].employee
+                  : ""}
+              </span>
+            </div>
+            <div className="bg-white rounded-lg p-4 flex flex-col">
+              <span>Top Sales Employee - Closed Deals</span>
+              <span className="text-xl">
+                {employeeDealsData.length > 0
+                  ? employeeDealsData[0].employee
                   : ""}
               </span>
             </div>
@@ -357,38 +389,107 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
       </div>
 
       {/* THIRD ROW */}
-      <div className="flex">
-        <div className="bg-white rounded-lg p-6 flex-2/5 shadow flex flex-col gap-2">
-          <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
-            Sales Employee Report
-          </h1>
-          <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
-            <div className="flex flex-col gap-2 font-medium mx-6 mt-5">
-              <span>Top Employee</span>
-              <span className="text-3xl">
-                {employeeReportData.length > 0
-                  ? employeeReportData[0].employee
-                  : ""}
-              </span>
+      <div className="bg-white rounded-lg p-6 w-full shadow flex flex-col gap-6">
+        <h1 className="font-bold text-2xl text-[#1c1c1c] mt-2 mb-1 text-center">
+          Top Sales Employee Report
+        </h1>
+        <div className="flex gap-8">
+          <div className="flex flex-col gap-2 flex-1/2">
+            <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
+              <div className="flex justify-between mx-6 mt-5">
+                <div className="flex flex-col gap-2 font-medium">
+                  <span>Sales Revenue</span>
+                  <span className="text-3xl">
+                    {employeeReportData.length > 0
+                      ? employeeReportData[0].employee
+                      : ""}
+                  </span>
+                </div>
+                <div>
+                  <Dropdown
+                    options={options.map(
+                      (p) => p.charAt(0).toUpperCase() + p.slice(1)
+                    )}
+                    onChange={setSalesReportPeriod}
+                    value={
+                      salesReportPeriod.charAt(0).toUpperCase() +
+                      salesReportPeriod.slice(1)
+                    }
+                  />
+                </div>
+              </div>
+              <PieChart
+                colors={colors}
+                height={475}
+                series={[
+                  {
+                    data: employeeReportData.map((data, index) => ({
+                      value: data.percentage,
+                      label: data.employee,
+                      color: colors[index],
+                    })),
+                    innerRadius: 100,
+                    outerRadius: 165,
+                  },
+                ]}
+                slotProps={{
+                  legend: {
+                    direction: "row", // Align items in a row
+                    position: { vertical: "bottom", horizontal: "middle" }, // Move to the bottom center
+                  },
+                }}
+                margin={{ top: 20, bottom: 70, left: 50, right: 50 }}
+              />
             </div>
-            <BarChart
-              height={475}
-              dataset={employeeReportData}
-              xAxis={[
-                {
-                  dataKey: "employee",
-                  scaleType: "band",
-                },
-              ]}
-              series={[
-                {
-                  dataKey: "percentage",
-                },
-              ]}
-            />
+          </div>
+          <div className="flex flex-col gap-2 flex-1/2">
+            <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
+              <div className="flex justify-between mx-6 mt-5">
+                <div className="flex flex-col gap-2 font-medium">
+                  <span>Closed Deals</span>
+                  <span className="text-3xl">
+                    {employeeDealsData.length > 0
+                      ? employeeDealsData[0].employee
+                      : ""}
+                  </span>
+                </div>
+                <div>
+                  <Dropdown
+                    options={options.map(
+                      (p) => p.charAt(0).toUpperCase() + p.slice(1)
+                    )}
+                    onChange={setDealsPeriod}
+                    value={
+                      dealsPeriod.charAt(0).toUpperCase() + dealsPeriod.slice(1)
+                    }
+                  />
+                </div>
+              </div>
+              <PieChart
+                colors={colors}
+                height={475}
+                series={[
+                  {
+                    data: employeeDealsData.map((data, index) => ({
+                      value: data.percentage,
+                      label: data.employee,
+                      color: colors[index],
+                    })),
+                    innerRadius: 100,
+                    outerRadius: 165,
+                  },
+                ]}
+                slotProps={{
+                  legend: {
+                    direction: "row", // Align items in a row
+                    position: { vertical: "bottom", horizontal: "middle" }, // Move to the bottom center
+                  },
+                }}
+                margin={{ top: 20, bottom: 70, left: 50, right: 50 }}
+              />
+            </div>
           </div>
         </div>
-        <div className="flex-3/5"></div>
       </div>
     </div>
   );
