@@ -293,7 +293,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               <span className="text-3xl">
                 {customerReportData.length > 0
                   ? customerReportData[0].customer
-                  : ""}
+                  : "-"}
               </span>
             </div>
             <BarChart
@@ -314,14 +314,12 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           </div>
         </div>
         {/*  PRODUCT REPORT */}
-        <div className="bg-white rounded-lg p-6 flex-2/5 shadow flex flex-col gap-4">
-          <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
-            Product Report
-          </h1>
+        <div className="bg-white rounded-lg p-6 flex-2/5 shadow flex flex-col gap-3">
+          <h1 className="font-bold text-2xl text-[#1c1c1c]">Product Report</h1>
           <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
             <PieChart
               colors={colors}
-              height={475}
+              height={560}
               series={[
                 {
                   data: productReportData.map((data, index) => ({
@@ -365,7 +363,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               <span className="text-xl">
                 {customerReportData.length > 0
                   ? customerReportData[0].customer
-                  : ""}
+                  : "-"}
               </span>
             </div>
             <div className="bg-white rounded-lg p-4 flex flex-col">
@@ -373,7 +371,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               <span className="text-xl">
                 {employeeReportData.length > 0
                   ? employeeReportData[0].employee
-                  : ""}
+                  : "-"}
               </span>
             </div>
             <div className="bg-white rounded-lg p-4 flex flex-col">
@@ -381,7 +379,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
               <span className="text-xl">
                 {employeeDealsData.length > 0
                   ? employeeDealsData[0].employee
-                  : ""}
+                  : "-"}
               </span>
             </div>
           </div>
@@ -402,7 +400,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                   <span className="text-3xl">
                     {employeeReportData.length > 0
                       ? employeeReportData[0].employee
-                      : ""}
+                      : "-"}
                   </span>
                 </div>
                 <div>
@@ -450,7 +448,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
                   <span className="text-3xl">
                     {employeeDealsData.length > 0
                       ? employeeDealsData[0].employee
-                      : ""}
+                      : "-"}
                   </span>
                 </div>
                 <div>
