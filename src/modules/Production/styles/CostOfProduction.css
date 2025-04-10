@@ -1,0 +1,14 @@
+/* REMINDER! All of your elements must use your unique namespace '.prodqa' at the start to avoid leaking */
+
+
+.prodCPheader{
+    font-family: Inter;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+  }
+
+ 
