@@ -109,7 +109,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
   const fetchRenewals = async () => {
     try {
-      const data = await GET("renewals/");
+      const data = await GET(`renewals/${formData.callId}`);
       setRenewals(data);
     } catch (error) {
       console.error("Error fetching renewals:", error)

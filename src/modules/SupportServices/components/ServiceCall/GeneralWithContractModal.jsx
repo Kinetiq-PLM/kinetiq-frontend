@@ -244,80 +244,75 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
               </div>
             </div>
 
-            <div className="form-row aligned-row">
-              <div className="form-group">
-                <label htmlFor="phoneNumber">Phone Number</label>
-                <input
-                  type="text"
-                  id="phoneNumber"
-                  value={phoneNumber}
-                  readOnly
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="Enter phone number"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="ticketDescription">Ticket Description</label>
-                <textarea
-                  id="ticketDescription"
-                  value={ticketDescription}
-                  onChange={(e) => setTicketDescription(e.target.value)}
-                  placeholder="Enter ticket description"
-                />
-              </div>
-            </div>
-
-            <div className="form-row aligned-row">
-              <div className="form-group">
-                <label htmlFor="productId">Product ID</label>
-                <div className="select-wrapper">
+            <div className="form-row aligned-row-desc">
+            <div className="form-row aligned-column">
+                <div className="form-group">
+                  <label htmlFor="phoneNumber">Phone Number</label>
                   <input
                     type="text"
-                    id="productId"
-                    value={productId}
-                    onChange={(e) => {
-                      setProductId(e.target.value);
-                      setOpenProdDD(true); // show dropdown on typing
-                    }}
-                    onClick={handleToggleDropdownProd}
-                    placeholder="Select product ID"
+                    id="phoneNumber"
+                    value={phoneNumber}
+                    readOnly
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="Enter phone number"
                   />
-                  <span className="select-arrow" onClick={handleToggleDropdownProd}>▼</span>
-                  {isProdDropdown && (
-                    <ul className="dropdown-list prod-dropdown-list">
-                      {products.length > 0 ? (
-                        products
-                          .filter((product) =>
-                          product.product_id.toLowerCase().includes(productId.toLowerCase())
-                          )
-                          .map((product) => (
-                            <li key={product.product_id} onClick={() => handleSelectProduct(product)}>
-                              {product.product_id}
-                            </li>
-                          ))
-                      ) : (
-                        <li>No products found</li>
-                      )}
-                    </ul>
-                  )}
+                </div>
+                <div className="form-group">
+                  <label htmlFor="productId">Product ID</label>
+                  <div className="select-wrapper">
+                    <input
+                      type="text"
+                      id="productId"
+                      value={productId}
+                      onChange={(e) => {
+                        setProductId(e.target.value);
+                        setOpenProdDD(true); // show dropdown on typing
+                      }}
+                      onClick={handleToggleDropdownProd}
+                      placeholder="Select product ID"
+                    />
+                    <span className="select-arrow" onClick={handleToggleDropdownProd}>▼</span>
+                    {isProdDropdown && (
+                      <ul className="dropdown-list prod-dropdown-list">
+                        {products.length > 0 ? (
+                          products
+                            .filter((product) =>
+                            product.product_id.toLowerCase().includes(productId.toLowerCase())
+                            )
+                            .map((product) => (
+                              <li key={product.product_id} onClick={() => handleSelectProduct(product)}>
+                                {product.product_id}
+                              </li>
+                            ))
+                        ) : (
+                          <li>No products found</li>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="productName">Product Name</label>
+                  <input
+                    type="text"
+                    id="productName"
+                    value={productName}
+                    readOnly
+                    onChange={(e) => setProductName(e.target.value)}
+                    placeholder="Enter product name"
+                  />
                 </div>
               </div>
-              <div className="form-group">{/* Empty div to maintain alignment */}</div>
-            </div>
 
-            <div className="form-row aligned-row">
-              <div className="form-group">
-                <label htmlFor="productName">Product Name</label>
-                <input
-                  type="text"
-                  id="productName"
-                  value={productName}
-                  readOnly
-                  onChange={(e) => setProductName(e.target.value)}
-                  placeholder="Enter product name"
-                />
+              <div className="form-group contract-desc">
+                  <label htmlFor="ticketDescription">Ticket Description</label>
+                  <textarea
+                    id="ticketDescription"
+                    value={ticketDescription}
+                    onChange={(e) => setTicketDescription(e.target.value)}
+                    placeholder="Enter ticket description"
+                  />
               </div>
-              <div className="form-group">{/* Empty div to maintain alignment */}</div>
             </div>
 
             <div className="form-row aligned-row">

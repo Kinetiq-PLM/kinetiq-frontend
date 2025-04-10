@@ -116,7 +116,7 @@ const handleSelectStatus = (status) => {
 // fetches a list of renewals
 const fetchRenewals = async () => {
   try {
-    const response = await GET(`/renewals/${productId.value}/${customerId.value}/`); 
+    const response = await GET(`/renewals/${formData.contractId}/`); 
     console.log("renewals", response)
     setRenewals(response);
   } catch (error) {

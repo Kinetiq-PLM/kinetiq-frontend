@@ -6,6 +6,7 @@ import "../styles/SupportServices.css"
 import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 import Table from "../components/ServiceCall/Table"
 import ServiceRequestModal from "../components/ServiceCall/ServiceRequestModal"
+import RenewalModal from "../components/ServiceCall/RenewalModal"
 import GeneralWithContractModal from "../components/ServiceCall/GeneralWithContractModal"
 import ResolutionModal from "../components/ServiceCall/ResolutionModal"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
@@ -25,6 +26,7 @@ const ServiceCall = () => {
   const [showWithContractModal, setShowWithContractModal] = useState(false)
   const [showResolutionModal, setShowResolutionModal] = useState(false)
   const [showRequestModal, setShowRequestModal] = useState(false)
+  const [showRenewalModal, setShowRenewalModal] = useState(false)
   const [selectedCall, setSelectedCall] = useState(null)
 
   // Fetch service calls from API (mock function)
@@ -103,6 +105,17 @@ const ServiceCall = () => {
     setShowResolutionModal(true);
   }
 
+  const handleOpenRen = () => {
+    setShowResolutionModal(false)
+    setShowWithContractModal(false);
+    setShowRenewalModal(true);
+  }
+  
+  const closeRenModal = () => {
+    setShowRenewalModal(false);
+    setShowResolutionModal(true);
+  }
+
   const handleSubmitReq = async (reqData) => {
     // submit req
     console.log("Queueing ticket:", reqData)
@@ -115,6 +128,21 @@ const ServiceCall = () => {
       fetchServiceCalls();
     } catch (error) {
       console.error("Error creating service request:", error.message);
+    }
+  }
+
+  const handleSubmitRen = async (renData) => {
+    // submit ren
+    console.log("Submitting warranty renewal:", renData)
+
+    try {
+      const data = await POST("create-renewal/", renData);
+      console.log("Warranty renewal created successfully:", data);
+      setShowRenewalModal(false);
+      setShowResolutionModal(true);
+      fetchServiceCalls();
+    } catch (error) {
+      console.error("Error creating waranty renewal:", error.message);
     }
   }
 
@@ -233,6 +261,7 @@ const ServiceCall = () => {
         onUpdate={handleUpdate}
         onShowGeneral={handleReturnToGeneral}
         onShowRequest={handleOpenReq}
+        onShowRenewal={handleOpenRen}
         callData={selectedCall}
       />
 
@@ -240,6 +269,13 @@ const ServiceCall = () => {
         isOpen={showRequestModal}
         onClose={closeReqModal}
         onSubmit={handleSubmitReq}
+        callData={selectedCall}
+      />
+
+      <RenewalModal
+        isOpen={showRenewalModal}
+        onClose={closeRenModal}
+        onSubmit={handleSubmitRen}
         callData={selectedCall}
       />
     </div>

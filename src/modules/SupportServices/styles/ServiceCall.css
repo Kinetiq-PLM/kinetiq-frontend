@@ -123,6 +123,11 @@
   max-width: 750px; /* Increased from 650px */
 }
 
+.servcall .service-resolution-modal {
+  max-width: 900px; /* Increased from 650px */
+}
+
+
 /* Tabs styling */
 .servcall .modal-tabs {
   display: flex;
@@ -201,12 +206,20 @@
   margin-left: auto;
 }
 
-.servcall .form-row .form-group {
-  flex: 1;
+.servcall .aligned-row-desc {
+  align-items: stretch;
+  display: flex;
+  width: 100%;
 }
 
-.servcall .form-group.req-desc textarea {
-  height: 10rem !important;
+.servcall .aligned-column {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  width: 48%;
+}
+.servcall .form-row .form-group {
+  flex: 1;
 }
 
 .servcall .form-group input::placeholder,
@@ -220,6 +233,15 @@
   resize: none;
 }
 
+.servcall .form-group.req-desc textarea {
+  height: 10rem !important;
+}
+
+.servcall .form-group.contract-desc textarea {
+  height: 14.5rem !important;
+}
+
+
 .servcall .prio-dropdown-list,
 .servcall .type-dropdown-list{
   top: auto !important;
@@ -232,17 +254,33 @@
   color: white;
   border: none;
   border-radius: 0.5rem;
-  padding: 0.625rem 1.75rem;
+  padding: 0.625rem;
   font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.2s;
   font-family: "Inter", sans-serif;
   font-weight: 600;
   height: 2.5rem;
-  min-width: 7rem;
+  width: 9.5rem;
 }
 
-.servcall .service-request-button.clickable {
+.servcall .service-renewal-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  width: 7rem;
+}
+
+.servcall .service-request-button.clickable,
+.servcall .service-renewal-button.clickable {
   background-color: #00a8a8;
   color: white;
   border: none;
@@ -250,26 +288,31 @@
   transition: background-color 0.2s;
 }
 
-.servcall .service-request-button.disabled {
+.servcall .service-request-button.disabled,
+.servcall .service-renewal-button.disabled {
   background-color: white;
   color: #00a8a8;
   border: 1px solid #00a8a8;
   cursor: not-allowed;
 }
 
-.servcall .service-request-button.clickable:hover{
+.servcall .service-request-button.clickable:hover,
+.servcall .service-renewal-button.clickable:hover {
   background-color: #098f8f;
 }
 
-.servcall .service-request-button.clickable:active {
+.servcall .service-request-button.clickable:active,
+.servcall .service-renewal-button.clickable:active {
   background-color: #087d7d;
 }
 
-.servcall .service-request-button:hover {
+.servcall .service-request-button:hover,
+.servcall .service-renewal-button:hover {
   background-color: #098f8f;
 }
 
-.servcall .service-request-button:active {
+.servcall .service-request-button:active,
+.servcall .service-renewal-button:hover {
   background-color: #087d7d;
 }
 

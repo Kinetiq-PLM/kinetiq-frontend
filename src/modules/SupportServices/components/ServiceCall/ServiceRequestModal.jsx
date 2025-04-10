@@ -235,7 +235,7 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
                     <span className="select-arrow" onClick={handleTypeDropdown}>▼</span>
                     {isOpenTypeDD && (
                         <ul className="dropdown-list type-dropdown-list">
-                        {["Repair", "Installation", "Maintenance", "Renewal", "Other"].map((type) => (
+                        {["Repair", "Installation", "Maintenance", "Other"].map((type) => (
                             <li key={type} onClick={() => handleSelectType(type)}>
                             {type}
                             </li>
