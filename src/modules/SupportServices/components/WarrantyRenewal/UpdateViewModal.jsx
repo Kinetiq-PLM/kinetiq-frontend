@@ -7,9 +7,11 @@ import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 
 import { GET } from "../../api/api"
 
-const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
+const UpdateViewModal = ({ isOpen, onClose, onUpdate, renewalData }) => {
+  const [renewalId, setRenewalId] = useState("")
   const [callId, setCallId] = useState("")
   const [productId, setProductId] = useState("")
+  const [productName, setProductName] = useState("")
   const [contractId, setContractId] = useState("")
   const [customerId, setCustomerId] = useState("")
   const [name, setName] = useState("")
@@ -25,18 +27,23 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
 
   // Update form when callData changes
   useEffect(() => {
-    if (callData) {
-      console.log("asdasd", callData)
+    if (renewalData) {
+      console.log("asdasd", renewalData)
       // Reset all fields to empty to show placeholders
-      setCallId(callData.service_call_id || "")
-      setCustomerId(callData.customer?.customer_id || "")
-      setName(callData.customer?.name || "");
-      setProductId(callData.product?.product_id || "");
-      setSellingPrice(callData.product?.selling_price || "");
-      setContractId(callData.contract?.contract_id)
-      setContractStatus(callData.contract?.contract_status)
+      setRenewalId(renewalData.renewal_id || "")
+      setCallId(renewalData.service_call?.service_call_id || "")
+      setCustomerId(renewalData.service_call?.customer?.customer_id || "")
+      setName(renewalData.service_call?.customer?.name || "")
+      setProductName(renewalData.service_call?.product?.product_name || "")
+      setProductId(renewalData.service_call?.product?.product_id || "")
+      setSellingPrice(renewalData.service_call?.product?.selling_price || "")
+      setContractId(renewalData.contract?.contract_id || "")
+      setContractStatus(renewalData.contract?.contract_status || "")
+      setDuration(renewalData.duration)
+      setRenewalContractStart(renewalData.renewal_warranty_start)
+      setRenewalFee(renewalData.renewal_fee)
     }
-  }, [callData])
+  }, [renewalData])
 
   useEffect(() => {
     if (duration && sellingPrice) {
@@ -48,20 +55,7 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
     }
   }, [duration, sellingPrice]);
 
-  const handleSubmitReq = () => {
-    if (contractStatus === "Active") {
-        setShowModal(true);
-        return; // Stop execution
-    }
-
-    onSubmit({
-      service_call_id: callId,
-      contract_id: contractId,
-      duration: duration,
-      renewal_warranty_start: renewalContractStart,
-      renewal_fee: renewalFee
-    })
-  }
+  
 
   // fetches a list of techs
   const fetchContracts = async () => {
@@ -101,6 +95,16 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
     setIsPickerOpen(!isPickerOpen); 
   };
 
+  const handleUpdate = () => {
+    onUpdate({
+      renewal_id: renewalId,
+      contract_id: contractId,
+      duration: duration,
+      renewal_warranty_start: renewalContractStart,
+      renewal_fee: renewalFee
+    })
+  }
+
   if (!isOpen) return null
 
   return (
@@ -113,7 +117,7 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
               alt="Service Call"
               className="modal-header-icon"
             />
-            <h2>Create a Warranty Renewal Request</h2>
+            <h2>Update Warranty Renewal</h2>
           </div>
           <button className="close-button" onClick={onClose}>
             <img src={ExitIcon || "/placeholder.svg?height=24&width=24"} alt="Close" />
@@ -125,6 +129,17 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
           <div className="modal-form">
             <div className="form-row">
               <div className="form-group">
+                <label htmlFor="callId">Renewal ID</label>
+                <input
+                  type="text"
+                  id="renewalId"
+                  value={renewalId}
+                  readOnly
+                  onChange={(e) => setRenewalId(e.target.value)}
+                  placeholder="Renewal ID"
+                />
+              </div>
+              <div className="form-group">
                 <label htmlFor="callId">Service Call ID</label>
                 <input
                   type="text"
@@ -135,6 +150,9 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
                   placeholder="Service call ID"
                 />
               </div>
+            </div>
+
+            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="customerId">Customer ID</label>
                 <input
@@ -145,23 +163,6 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
                   onChange={(e) => setCustomerId(e.target.value)}
                   placeholder="Customer ID"
                 />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="productId">Product ID </label>
-                <div className="select-wrapper">
-                <input
-                  type="text"
-                  id="productId"
-                  value={productId}
-                  readOnly
-                  onChange={(e) => setProductId(e.target.value)}
-                  placeholder="Enter product ID"
-                />
-                </div>
-                
               </div>
               <div className="form-group">
                 <label htmlFor="name">Name</label>
@@ -177,41 +178,39 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
             </div>
 
             <div className="form-row aligned-row">
-              <div className="form-group">
-                <label htmlFor="productName">Product Price</label>
+            <div className="form-group">
+                <label htmlFor="productId">Product ID </label>
+                <div className="select-wrapper">
                 <input
                   type="text"
-                  id="sellingPrice"
-                  value={sellingPrice}
+                  id="productId"
+                  value={productId}
                   readOnly
-                  onChange={(e) => setSellingPrice(e.target.value)}
-                  placeholder="Product price"
+                  onChange={(e) => setProductId(e.target.value)}
+                  placeholder="Enter product ID"
                 />
+                </div>
+                
               </div>
               <div className="form-group">
-                <label htmlFor="renewalContractStart">Renewal Contract Start <span className="required">*</span></label>
-                <div className="date-input-wrapper">
+                <label htmlFor="productName">Product Name </label>
+                <div className="select-wrapper">
                 <input
-                  type="date"
-                  id="renewalContractStart"
-                  value={renewalContractStart}
-                  onChange={(e) => setRenewalContractStart(e.target.value)}
-                  placeholder="Enter renewal contract start"
+                  type="text"
+                  id="productName"
+                  value={productName}
+                  readOnly
+                  onChange={(e) => setProductName(e.target.value)}
+                  placeholder="Product name"
                 />
-                <img
-                    src={CalendarInputIcon || "/placeholder.svg?height=16&width=16"}
-                    alt="Calendar"
-                    className="calendar-icon"
-                    onClick={toggleDatePicker}
-                    style={{ cursor: "pointer" }}
-                  />
                 </div>
+                
               </div>
             </div>
 
             <div className="form-row aligned-row">
               <div className="form-group">
-                  <label htmlFor="contractId">Contract ID <span className="required">*</span></label>
+                  <label htmlFor="contractId">Contract ID</label>
                     <div className="select-wrapper">
                     <input
                       type="text"
@@ -246,19 +245,7 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
                     </div>
                   </div>
                 
-                <div className="form-group">
-                <label htmlFor="duration">Duration <span className="required">*</span> </label>
-                <input
-                  type="text"
-                  id="duration"
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  placeholder="Contract duration"
-                />
-              </div>
-            </div>
-            <div className="form-row aligned-row">
-            <div className="form-group">
+                  <div className="form-group">
                     <label htmlFor="contractStatus">Contract Status</label>
                     <div className="select-wrapper">
                     <input
@@ -271,7 +258,52 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
                     />
                     </div>
                 </div>
+            </div>
+            <div className="form-row aligned-row">
             <div className="form-group">
+                <label htmlFor="renewalContractStart">Renewal Contract Start</label>
+                <div className="date-input-wrapper">
+                <input
+                  type="date"
+                  id="renewalContractStart"
+                  value={renewalContractStart}
+                  onChange={(e) => setRenewalContractStart(e.target.value)}
+                  placeholder="Enter renewal contract start"
+                />
+                <img
+                    src={CalendarInputIcon || "/placeholder.svg?height=16&width=16"}
+                    alt="Calendar"
+                    className="calendar-icon"
+                    onClick={toggleDatePicker}
+                    style={{ cursor: "pointer" }}
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label htmlFor="duration">Duration</label>
+                <input
+                  type="text"
+                  id="duration"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  placeholder="Contract duration"
+                />
+              </div>
+            </div>
+
+            <div className="form-row aligned-row">
+            <div className="form-group">
+                <label htmlFor="productName">Product Price</label>
+                <input
+                  type="text"
+                  id="sellingPrice"
+                  value={sellingPrice}
+                  readOnly
+                  onChange={(e) => setSellingPrice(e.target.value)}
+                  placeholder="Product price"
+                />
+              </div>
+              <div className="form-group">
                     <label htmlFor="renewalFee">Renewal Fee</label>
                     <div className="select-wrapper">
                     <input
@@ -284,7 +316,8 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
                     />
                     </div>
                 </div>
-            </div>
+            </div>                    
+
           </div>
         </div>
 
@@ -293,13 +326,10 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
             Cancel
           </button>
           <button 
-            className={`update-button ${
-              duration && renewalContractStart && contractId ? "clickable" : "disabled"
-            }`}
-            onClick={handleSubmitReq}
-            disabled={!(duration && renewalContractStart && contractId)}
+            className="update-modal-button"
+            onClick={handleUpdate}
           >
-            Submit for Approval
+            Update
           </button>
         </div>
       </div>
@@ -317,5 +347,5 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
   )
 }
 
-export default RenewalModal
+export default UpdateViewModal
 

@@ -1,0 +1,471 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.renew .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+/* Hide scrollbar arrows unless hovered */
+.renew .content-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  border-radius: 8px;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  max-height: calc(100% - 7rem);
+  margin-top: 2rem;
+}
+
+.renew .filter-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 130px;
+  background-color: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 0.25rem;
+}
+
+/* Table with Inter font */
+.renew .renewals-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inter", sans-serif;
+}
+
+.renew .renewals-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 3;
+}
+
+.renew thead {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.renew th {
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.renew td {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+}
+
+.renew tbody tr {
+  background-color: #eff8f9;
+  transition: background-color 0.3s ease;
+}
+
+.renew tbody tr:hover {
+  background-color: #d6f5f5;
+}
+
+.renew .renewals-table .selected-row {
+  background-color: #d6f5f5;
+}
+
+.renew tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.renew .empty-row td {
+  height: 2.5rem;
+}
+
+.renew .priority-medium {
+  color: #ffb341;
+}
+
+.renew .priority-high {
+  color: #ff7300;
+}
+
+.renew .priority-urgent {
+  color: #f44336;
+}
+
+/* Increase modal size */
+.renew .modal-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 800px; /* Increased from 700px */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.renew .service-call-modal {
+  max-width: 750px; /* Increased from 650px */
+}
+
+.renew .service-resolution-modal {
+  max-width: 900px; /* Increased from 650px */
+}
+
+
+/* Tabs styling */
+.renew .modal-tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-top: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 45px;
+}
+
+.renew .modal-tab {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #666;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  font-family: "Inter", sans-serif;
+}
+
+.renew .modal-tab:hover {
+  background-color: #00a8a8;
+  color: #fff1f1;
+}
+
+.renew .modal-tab.active {
+  color: #00a8a8;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-bottom: 2px solid #00a8a8;
+}
+
+.renew .modal-tab.active:hover {
+  background-color: #00a8a8;
+  color: #fff1f1;
+}
+
+.renew .modal-content {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 60vh; /* Limit height to prevent overflow */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.renew .modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.renew .form-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+/* Special row for aligned fields */
+.renew .aligned-row {
+  align-items: stretch;
+  display: flex;
+  width: 100%;
+}
+
+.renew .aligned-row .form-group:first-child {
+  width: 48%; /* Fixed width for the left column */
+  flex: 0 0 48%;
+}
+
+.renew .aligned-row .form-group:last-child {
+  width: 48%; /* Fixed width for the right column */
+  flex: 0 0 48%;
+  margin-left: auto;
+}
+
+.renew .aligned-row-desc {
+  align-items: stretch;
+  display: flex;
+  width: 100%;
+}
+
+.renew .aligned-column {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  width: 48%;
+}
+.renew .form-row .form-group {
+  flex: 1;
+}
+
+.renew .form-group input::placeholder,
+.renew .form-group textarea::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+.renew .form-group textarea {
+  height: 5.5rem;
+  resize: none;
+}
+
+.renew .form-group.req-desc textarea {
+  height: 10rem !important;
+}
+
+.renew .form-group.contract-desc textarea {
+  height: 14.5rem !important;
+}
+
+
+.renew .prio-dropdown-list,
+.renew .type-dropdown-list{
+  top: auto !important;
+  bottom: 100% !important;
+}
+
+/* Fix service request button to ensure text is visible */
+.renew .service-request-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  width: 9.5rem;
+}
+
+.renew .service-renewal-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  width: 7rem;
+}
+
+.renew .service-request-button.clickable,
+.renew .service-renewal-button.clickable {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.renew .service-request-button.disabled,
+.renew .service-renewal-button.disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
+.renew .service-request-button.clickable:hover,
+.renew .service-renewal-button.clickable:hover {
+  background-color: #098f8f;
+}
+
+.renew .service-request-button.clickable:active,
+.renew .service-renewal-button.clickable:active {
+  background-color: #087d7d;
+}
+
+.renew .service-request-button:hover,
+.renew .service-renewal-button:hover {
+  background-color: #098f8f;
+}
+
+.renew .service-request-button:active,
+.renew .service-renewal-button:hover {
+  background-color: #087d7d;
+}
+
+/* Resolution textarea */
+.renew .resolution-textarea {
+  width: 100%;
+  height: 300px;
+  padding: 0.75rem;
+  border: 1px solid #00a8a8;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: "Poppins", sans-serif;
+  resize: none;
+}
+
+.renew .resolution-textarea::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+/* Divider in general modals */
+.renew .form-divider {
+  height: 1px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+/* Ensure resolution footer stays within container with more spacing */
+.renew .resolution-footer {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border-top: 1px solid #e0e0e0;
+  gap: 5px
+}
+
+.renew .resolution-footer-left {
+  display: flex;
+  gap: 5px
+}
+
+.renew .resolution-footer label{
+  color:#00a8a8;
+  font-size: 0.875rem;
+  font-weight: bold;
+  font-family: "Inter", sans-serif;
+}
+
+.renew .resolution-footer-right {
+  display: flex;
+  gap: 12px; /* Increased gap between buttons */
+}
+
+.renew .resolution-footer .form-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  margin: 0;
+  min-width: 180px; /* Increased width */
+  gap: 10px;
+}
+
+/* Input focus color */
+.renew input:focus,
+.renew textarea:focus,
+.renew select:focus,
+.renew .modal-form input:focus,
+.renew .modal-form textarea:focus,
+.renew .modal-form select:focus,
+.renew .resolution-textarea:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 1px #00a8a8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .renew .body-content-container {
+    min-width: auto;
+    max-height: none;
+    padding: 1.25rem;
+  }
+
+  .renew .modal-container {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .renew .search-filter-container {
+    gap: 1rem;
+  }
+
+  .renew .search-container {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .renew .search-input {
+    width: 100%;
+  }
+
+  .renew .filter-dropdown {
+    width: 100%;
+  }
+
+  .renew .table-container {
+    overflow-x: auto;
+  }
+
+  .renew .renewals-table {
+    min-width: 600px;
+  }
+
+  .renew .form-row {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: stretch;
+  }
+  .renew .aligned-row .form-group:first-child,
+  .renew .aligned-row .form-group:last-child {
+    width: 100%; /* Fixed width for the left column */
+    flex: 0 0 48%;
+  }
+
+  .renew .resolution-footer .form-group {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+}
+}
+
+@media (max-width: 480px) {
+  .renew .body-content-container {
+    padding: 1rem;
+  }
+
+  .renew .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .renew .title-container {
+    width: 100%;
+  }
+
+  .renew .modal-header,
+  .renew .modal-content,
+  .renew .modal-footer {
+    padding: 1rem;
+  }
+}
+
