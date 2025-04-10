@@ -55,8 +55,6 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, renewalData }) => {
     }
   }, [duration, sellingPrice]);
 
-  
-
   // fetches a list of techs
   const fetchContracts = async () => {
       try {

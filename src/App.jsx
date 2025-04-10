@@ -109,6 +109,7 @@ function App() {
       "Service Request": "ServiceRequest",
       "Warranty Renewal": "WarrantyRenewal",
       "Service Analysis": "ServiceAnalysis",
+      "Service Billing": "ServiceBilling",
       "Service Report": "ServiceReport",
       "Service Contract": "ServiceContract",
     },

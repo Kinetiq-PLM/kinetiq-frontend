@@ -292,7 +292,7 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
                   value={formData.requestDate}
                   readOnly
                   onChange={handleChange}
-                  placeholder="dd/mm/y"
+                  placeholder="dd/mm/yy"
                 />
                 {/* <img
                   src={CalendarInputIcon || "/placeholder.svg?height=16&width=16"}
