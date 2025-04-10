@@ -1,13 +1,13 @@
 import React from "react";
-import "../styles/UserAccounts.css";
+import "../styles/AuditLogs.css";
 
 const BodyContent = () => {
     return (
-        <div className="useraccs">
+        <div className="audit">
             <div className="body-content-container">
-                <p>Hello User Accounts SubModule!</p>
+                <p>Hello Audit Logs SubModule!</p>
                 <p>Fill this container with your elements, change the display if need be.</p>
-                <p>If you're going to style with css, use your unique namespace '.useraccs' at the start.</p>
+                <p>If you're going to style with css, use your unique namespace '.compol' at the start.</p>
             </div>
         </div>
 
