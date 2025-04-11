@@ -106,7 +106,7 @@ function App() {
       "Internal Transfer": "InternalTransfer",
       "Delivery Approval": "DeliveryApproval",
       "Delivery Receipt": "DeliveryReceipt",
-      "Asset Removal": "AssetRemoval",
+      "Item Removal": "ItemRemoval",
     },
     Sales: {
       Quotation: "Quotation",
