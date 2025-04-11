@@ -186,91 +186,6 @@
   margin: 1.5rem 0;
 }
 
-.billing .additional-services-table-container {
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid #e0e0e0;
-  border-radius: 0.25rem;
-  margin: 0.5rem 0 1rem 0; /* Adjusted spacing */
-}
-
-.billing .additional-services-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: "Poppins", sans-serif;
-}
-
-.billing .additional-services-table thead {
-  background-color: #00a8a8;
-  color: white;
-}
-
-.billing .additional-services-table th {
-  padding: 0.5rem 1rem;
-  text-align: center;
-  font-weight: 500;
-  font-size: 0.75rem;
-}
-
-.billing .additional-services-table td {
-  padding: 0.5rem 1rem;
-  font-size: 0.75rem;
-  color: #333;
-  text-align: center;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.billing .additional-services-table tbody tr:nth-child(odd) {
-  background-color: #ffffff;
-}
-
-.billing .additional-services-table tbody tr:nth-child(even) {
-  background-color: #eff8f9;
-}
-
-.billing .renewal-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.billing .renewal-container input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  margin-right: 0.5rem;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: #eff8f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 3px;
-  cursor: pointer;
-  position: relative;
-}
-
-.billing .renewal-container input[type="checkbox"]:checked {
-  background-color: #00a8a8;
-  border-color: #00a8a8;
-}
-
-.billing .renewal-container input[type="checkbox"]:checked::after {
-  content: "✓";
-  color: white;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 12px;
-}
-
-.billing .renewal-container label {
-  font-size: 0.75rem;
-  color: #00a8a8;
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-}
-
 /* not renewal styling */
 .billing  input:disabled {
   background-color: #f0f0f0; 
@@ -384,27 +299,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-}
-
-/* Adjust the additional services table column widths */
-.billing .additional-services-table th:nth-child(1) {
-  width: 18%;
-}
-
-.billing .additional-services-table th:nth-child(2) {
-  width: 22%;
-}
-
-.billing .additional-services-table th:nth-child(3) {
-  width: 20%;
-}
-
-.billing .additional-services-table th:nth-child(4) {
-  width: 20%;
-}
-
-.billing .additional-services-table th:nth-child(5) {
-  width: 20%;
 }
 
 .billing .add-cancel-button,

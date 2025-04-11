@@ -40,19 +40,7 @@ const ServiceAnalysis = () => {
     serviceDate: "",
     description: "",
   })
-
-  // Service Billing state
-  const [serviceBillingInfo, setServiceBillingInfo] = useState({
-    billingId: "",
-    orderId: "",
-    initialBillingAmount: "",
-    totalOrderPrice: "",
-    outsourceFee: "",
-    totalPayable: "",
-    billingStatus: "",
-    datePaid: "",
-  })
-
+  
   // Delivery Order state
   const [deliveryOrderInfo, setDeliveryOrderInfo] = useState({
     deliveryOrderId: "",
@@ -598,12 +586,6 @@ const ServiceAnalysis = () => {
             >
               After Analysis
             </div>
-            <div
-              className={`tab ${activeTab === "Service Billing" ? "active" : ""}`}
-              onClick={() => setActiveTab("Service Billing")}
-            >
-              Service Billing
-            </div>
           </div>
         </div>
 
@@ -1095,127 +1077,7 @@ const ServiceAnalysis = () => {
               </div>
             </div>
           )}
-
-          {activeTab === "Service Billing" && (
-            <div className="tab-content">
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="billingId">Billing ID</label>
-                  <input
-                    type="text"
-                    id="billingId"
-                    value={serviceBillingInfo.billingId}
-                    onChange={(e) => setServiceBillingInfo({ ...serviceBillingInfo, billingId: e.target.value })}
-                    placeholder="No billing done yet..."
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="orderId">Order ID</label>
-                  <input
-                    type="text"
-                    id="orderId"
-                    value={serviceBillingInfo.orderId}
-                    onChange={(e) => setServiceBillingInfo({ ...serviceBillingInfo, orderId: e.target.value })}
-                    placeholder="Enter order ID"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="initialBillingAmount">Initial Billing Amount</label>
-                  <input
-                    type="text"
-                    id="initialBillingAmount"
-                    value={serviceBillingInfo.initialBillingAmount}
-                    onChange={(e) =>
-                      setServiceBillingInfo({
-                        ...serviceBillingInfo,
-                        initialBillingAmount: e.target.value,
-                      })
-                    }
-                    placeholder="₱ 9999"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="totalOrderPrice">Total Order Price</label>
-                  <input
-                    type="text"
-                    id="totalOrderPrice"
-                    value={serviceBillingInfo.totalOrderPrice}
-                    onChange={(e) =>
-                      setServiceBillingInfo({
-                        ...serviceBillingInfo,
-                        totalOrderPrice: e.target.value,
-                      })
-                    }
-                    placeholder="₱ 9999"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="outsourceFee">Outsource Fee</label>
-                  <input
-                    type="text"
-                    id="outsourceFee"
-                    value={serviceBillingInfo.outsourceFee}
-                    onChange={(e) => setServiceBillingInfo({ ...serviceBillingInfo, outsourceFee: e.target.value })}
-                    placeholder="₱ 9999"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="totalPayable">Total Payable</label>
-                  <input
-                    type="text"
-                    id="totalPayable"
-                    value={serviceBillingInfo.totalPayable}
-                    onChange={(e) => setServiceBillingInfo({ ...serviceBillingInfo, totalPayable: e.target.value })}
-                    placeholder="₱ 9999"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="billingStatus">Billing Status</label>
-                  <div className="select-wrapper">
-                    <input
-                      type="text"
-                      id="billingStatus"
-                      value={serviceBillingInfo.billingStatus}
-                      onChange={(e) => setServiceBillingInfo({ ...serviceBillingInfo, billingStatus: e.target.value })}
-                      placeholder="Unpaid"
-                    />
-                    <span className="select-arrow">▼</span>
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="datePaid">Date Paid</label>
-                  <div className="date-input-wrapper">
-                    <input
-                      type="text"
-                      id="datePaid"
-                      value={serviceBillingInfo.datePaid}
-                      onChange={(e) => setServiceBillingInfo({ ...serviceBillingInfo, datePaid: e.target.value })}
-                      placeholder="dd/mm/yy"
-                    />
-                    <img
-                      src={CalendarInputIcon || "/placeholder.svg?height=16&width=16"}
-                      alt="Calendar"
-                      className="calendar-icon"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="buttons-container-right">
-                <button className="update-button">Update</button>
-                <button className="add-button">Add</button>
-              </div>
-            </div>
-          )}
+          
           <div className="section-divider"></div>
           <div className="search-filter-container">
             <div className="search-container">
