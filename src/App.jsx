@@ -97,14 +97,9 @@ function App() {
       "User Accounts": "UserAccounts",
     },
     Accounting: {
-      "Chart of Accounts": "ChartOfAccounts",
-      "Journal": "Journal",
-      "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
-      "General Ledger Accounts": "GeneralLedgerAccounts",
-      "Accounts Receivable": "AccountsReceivable",
       "Accounts Payable": "AccountsPayable",
-      "Official Receipts": "OfficialReceipts",
+      "Accounts Receivable": "AccountsReceivable",
     },
     Financials: {
       Budgeting: "Budgeting",
