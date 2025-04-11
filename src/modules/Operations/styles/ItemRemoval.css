@@ -1,4 +1,4 @@
-.AssetRemoval {
+.ItemRemoval {
     display: flex;
     width: 100%;
     height: 100%;
@@ -6,7 +6,8 @@
     overflow: hidden;
 }
 
-.AssetRemoval .body-content-container {
+
+.ItemRemoval .body-content-container {
     width: 100%;
     height: 100%;
     border-radius: 0.5rem;
@@ -23,6 +24,7 @@
     position: relative;
 }
 
+
 /* Tabs styling */
 .tabs {
     display: flex;
@@ -30,6 +32,7 @@
     margin-bottom: 1.5rem;
     align-self: flex-start;
 }
+
 
 .tab {
     padding: 0.5rem 1rem;
@@ -41,10 +44,12 @@
     font-size: 0.875rem;
 }
 
+
 .tab.active {
     color: #008080;
     font-weight: 500;
 }
+
 
 .tab.active::after {
     content: '';
@@ -56,12 +61,14 @@
     background-color: #008080;
 }
 
+
 /* Table styling */
 .table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
 }
+
 
 .table th,
 .table td {
@@ -70,14 +77,17 @@
     border-bottom: 1px solid #eee;
 }
 
+
 .table th {
     font-weight: 500;
     color: #333;
 }
 
+
 .table th:first-child {
     width: 40px;
 }
+
 
 /* Checkbox styling */
 .checkbox-wrapper {
@@ -85,6 +95,7 @@
     align-items: center;
     justify-content: center;
 }
+
 
 .checkbox {
     appearance: none;
@@ -100,9 +111,11 @@
     background-color: white;
 }
 
+
 .checkbox:checked {
     background-color: #00A8A8;
 }
+
 
 .checkbox:checked::after {
     content: '';
@@ -116,6 +129,7 @@
     transform: rotate(45deg);
 }
 
+
 .status {
     padding: 0.25rem 0.75rem;
     border-radius: 1rem;
@@ -123,21 +137,25 @@
     display: inline-block;
 }
 
+
 .status.approved {
     background-color: #E8F5E9;
     color: #008024;
 }
+
 
 .status.pending {
     background-color: #FFF3E0;
     color: #EF6C00;
 }
 
+
 .send-to {
     margin-top: auto;
     padding-top: 1rem;
     align-self: flex-end;
 }
+
 
 .send-to button {
     padding: 0.5rem 1rem;
@@ -149,6 +167,9 @@
     cursor: pointer;
 }
 
+
 .send-to button:hover {
     background-color: #0f766e;
 }
+
+
