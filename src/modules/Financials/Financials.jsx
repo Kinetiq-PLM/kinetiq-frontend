@@ -44,7 +44,7 @@ const CashFlowCard = ({ data }) => {
     );
   };
  
-  const [chartHeight, setChartHeight] = useState(500);
+  const [chartHeight, setChartHeight] = useState(400);
   const [chartMargin, setChartMargin] = useState({ top: 10, right: 50, left: 50, bottom: 60 });
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const CashFlowCard = ({ data }) => {
         setChartHeight(500);
         setChartMargin({ top: 10, right: 20, left: 20, bottom: 30 }); 
       } else {
-        setChartHeight(500);
+        setChartHeight(400);
         setChartMargin({ top: 10, right: 50, left: 50, bottom: 45 }); 
       }
     };
