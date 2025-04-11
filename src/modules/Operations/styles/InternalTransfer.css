@@ -1,80 +1,98 @@
 .InternalTransfer {
     display: flex;
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 140px); /* Increased height by reducing subtraction */
     flex-direction: column;
+    overflow: hidden; /* Prevent outer scrolling */
 }
+
+
+
+
+
+
 
 
 .InternalTransfer .body-content-container {
     width: 100%;
-    height: calc(100vh - 160px);
+    height: 100%;
     border-radius: 0.5rem;
     background-color: white;
-    padding: 1.5rem;
+    padding: 0%;
     box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 400px;
+    min-height: unset; /* Remove min-height */
+    overflow: hidden; /* Prevent container scroll */
 }
 
 
-/* Table container with fixed header and scrollable body with teal scrollbar */
-.table-container {
+
+
+
+
+
+
+/* Common table container styles for both Delivery Request and Rework Order */
+.InternalTransfer .table-container,
+.InternalTransfer.rework .table-container {
     width: 100%;
-    height: 450px;
+    height: 492px;
+    position: relative;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 1rem;
-    position: relative;
+    padding: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    max-width: 100%;
+    overflow: hidden; /* Changed from auto to hidden */
 }
+
+
 
 
 .table-container table {
     width: 100%;
+    height: 100%;
     border-collapse: collapse;
 }
+
+
 
 
 .table-container thead {
     position: sticky;
     top: 0;
-    background: white;
-    z-index: 1;
+    background: #f8f9fa;
+    z-index: 2;
 }
+
+
 
 
 .table-container tbody {
     display: block;
     overflow-y: auto;
-    height: calc(100% - 48px); /* Adjust based on your header height */
+    height: calc(100% - 40px); /* Changed to use percentage */
+    width: 100%;
 }
 
 
-.table-container tbody::-webkit-scrollbar {
-    width: 8px;
+
+
+.table-container thead tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }
 
 
-.table-container tbody::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
 
 
-.table-container tbody::-webkit-scrollbar-thumb {
-    background: #008080;
-    border-radius: 4px;
-}
-
-
-.table-container tbody::-webkit-scrollbar-thumb:hover {
-    background: #006666;
-}
-
-
-.table-container thead tr,
 .table-container tbody tr {
     display: table;
     width: 100%;
@@ -82,31 +100,351 @@
 }
 
 
-.table-container th,
-.table-container td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+
+
+.InternalTransfer table th {
+    background: #f8f9fa;
+    padding: 0.75rem;
     font-size: 0.875rem;
+    color: #495057;
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
 }
 
 
-.table-container th {
-    background: white;
-    font-weight: 500;
-    color: #333;
+
+
+.InternalTransfer table td {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    color: #212529;
+    border-bottom: 1px solid #f1f1f1;
 }
 
 
-/* Input container at the bottom */
+
+
+
+
+
+
 .input-container {
     width: 100%;
-    padding: 1.5rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    margin-top: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+
+
+
+
+
+
+
+input[type="checkbox"] {
+    appearance: none; /* Tinatanggal ang default checkbox style */
+    width: 16px;
+    height: 16px;
+    border: 2px solid #008080; /* Teal Border */
+    background-color: white; /* White Background */
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+  }
+ 
+  input[type="checkbox"]:checked {
+    background-color: #008080; /* Kapag naka-check, magiging teal */
+    border-color: #006666;
+    position: relative;
+  }
+ 
+  input[type="checkbox"]:checked::after {
+    content: "✔";
+    font-size: 12px;
+    color: white;
+    font-weight: bold;
+    position: absolute;
+    left: 3px;
+    top: 0px;
+  }
+
+
+
+
+
+
+
+
+/* Input Group */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    width: 30%; /* Mas maliit */
+}
+
+
+
+
+
+
+
+
+/* Labels */
+.input-group label {
+    font-size: 0.875rem; /* Mas maliit na font */
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+
+
+
+
+
+
+
+/* Row Layout */
+.input-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    align-items: center;
+    gap: 3.9rem; /* Space between inputs */
+}
+
+
+
+
+
+
+
+
+.input-container-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+}
+
+
+
+
+
+
+
+
+/* Para sa mobile */
+@media only screen and (max-width: 600px) {
+    .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .send-to-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+
+
+
+
+
+
+
+/* Para sa tablet */
+@media only screen and (min-width: 600px) {
+    .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+
+
+
+
+
+
+
+/* Para sa desktop */
+@media only screen and (min-width: 768px) {
+    .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+
+
+
+
+
+
+
+.first-row {
+    justify-content: flex-start; /* Align items to the left */
+}
+
+
+
+
+
+
+
+
+.short-input {
+    width: 14rem !important; /* Palitan ang value kung gusto mong mas maikli o mahaba */
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+/* Text Box Fields */
+.input-group input {
+    padding: 0.2rem 0.5rem;
+    border: 0.0625rem solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    width: 100%;
+}
+
+
+
+
+
+
+
+
+/* Date Picker Input */
+.input-group input[type="date"] {
+    position: relative;
+    background: white url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABeoAAADyCAYAAAAyRvX6AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjw') no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 16px;
+    cursor: pointer;
+    padding-right: 1.875rem;
+}
+
+
+
+
+
+
+
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+
+
+
+
+
+
+
+/* Button Container - Align to Right */
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* Para sa gilid (kanan) */
+    margin-top: 1rem;
+    width: 100%;
+   
+}
+
+
+
+
+.send-to-button {
+    padding: 0.5rem 1rem;
+    background: #0d9488;
+    border: none;
+    border-radius: 0.375rem;
+    color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+ 
+  .send-to-button:hover {
+    background: #0f766e;
+  }
+ 
+
+
+
+
+ /* Style for Module Dropdown */
+ .module-dropdown {
+    width: 250px;
+    height: 30px; /* Adjust height */
+    padding: 5px;
+
+
+
+
+
+
+
+
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    appearance: auto; /* Siguraduhing may default dropdown arrow */
+    font-size: 14px;
+  }
+ 
+
+
+
+
+
+
+
+
+/* Dropdown Arrow */
+.module-dropdown::after {  
+    content: "▼";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: down;
+}
+
+
+
+
+
+
+
+
+/* Hover Effect */
+.module-dropdown:hover {
+    border-color: #000000;
+}
+
+
+
+
+
+
 
 
 .tabs {
@@ -115,14 +453,21 @@
     align-items: center;
     border-bottom: 2px solid #ddd;
     width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem; /* Reduced margin */
 }
 
 
+
+
+
+
+
+
+/* MAS MALAKI ANG DELIVERY REQUEST & REWORK ORDER */
 .tab {
-    font-size: 1.3rem; /* Pinalaki */
+    font-size: 1rem; /* Smaller font size */
     font-weight: bold;
-    padding: 0.7rem 1.5rem; /* Mas malaki */
+    padding: 0.5rem 1rem; /* Reduced padding */
     cursor: pointer;
     color: #A0A0A0;
     position: relative;
@@ -130,9 +475,21 @@
 }
 
 
+
+
+
+
+
+
 .tab.active {
     color: #00A8A8;
 }
+
+
+
+
+
+
 
 
 .tab.active::after {
@@ -146,152 +503,60 @@
 }
 
 
-.input-group {
-    display: flex;
-    flex-direction: column;
-    width: 30%; /* Mas maliit */
+
+
+
+
+
+
+/* Scrollbar styling for both views */
+.InternalTransfer .table-container tbody::-webkit-scrollbar {
+    width: 6px;
 }
 
 
-.input-group label {
-    font-size: 0.875rem; /* Mas maliit na font */
-    font-weight: bold;
-    margin-bottom: 0.2rem;
+
+
+.InternalTransfer .table-container tbody::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }
 
 
-.input-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    align-items: center;
-    gap: 3.9rem; /* Space between inputs */
+
+
+.InternalTransfer .table-container tbody::-webkit-scrollbar-thumb {
+    background: #00A8A8;
+    border-radius: 3px;
 }
 
 
-.input-container-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    width: 100%;
+
+
+.InternalTransfer .table-container tbody::-webkit-scrollbar-thumb:hover {
+    background: #008080;
 }
 
 
-.first-row {
-    justify-content: flex-start; /* Align items to the left */
+
+
+/* Add specific styling for checkbox column */
+.InternalTransfer table td:first-child,
+.InternalTransfer table th:first-child {
+    width: 50px;
+    padding: 0.5rem;
+    text-align: center;
 }
 
 
-.short-input {
-    width: 14rem !important; /* Palitan ang value kung gusto mong mas maikli o mahaba */
-}
 
 
-.input-group input {
-    padding: 0.2rem 0.5rem;
-    border: 0.0625rem solid #ccc;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-    width: 100%;
-}
 
 
-.input-group input[type="date"] {
-    position: relative;
-    background: white url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABeoAAADyCAYAAAAyRvX6AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjw') no-repeat;
-    background-position: right 0.5rem center;
-    background-size: 16px;
-    cursor: pointer;
-    padding-right: 1.875rem;
-}
 
 
-.button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 1rem;
-}
 
 
-.button-container {
-    display: flex;
-    justify-content: flex-end; /* Para sa gilid (kanan) */
-    margin-top: 1rem;
-    width: 100%;
-}
 
-
-.send-to-button {
-    background-color: #00A8A8;
-    color: white;
-    border: none;
-    padding: 0.4rem 1rem; /* Mas maliit na padding */
-    font-size: 0.875rem; /* Mas maliit na font */
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    bottom: 40px;
-    right: 5x;
-    width: auto;
-}
-
-
-.send-to-button:hover {
-    background-color: #008080;
-}
-
-
-.module-dropdown {
-    width: 250px;
-    height: 30px; /* Adjust height */
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: white;
-    appearance: auto; /* Siguraduhing may default dropdown arrow */
-    font-size: 14px;
-}
-
-
-.module-dropdown::after {
-    content: "▼";
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: down;
-}
-
-
-.module-dropdown:hover {
-    border-color: #000000;
-}
-
-
-@media only screen and (max-width: 600px) {
-    .input-container {
-        grid-template-columns: repeat(6, 1fr);
-    }
-    .send-to-button {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-
-@media only screen and (min-width: 600px) {
-    .input-container {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
-
-
-@media only screen and (min-width: 768px) {
-    .input-container {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
 
 
 
