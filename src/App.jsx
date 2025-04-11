@@ -102,9 +102,11 @@ function App() {
       "Purchase Orders": "PurchaseOrders",
     },
     Operations: {
-      "Goods Receipt PO": "GRPO",
-      "Goods Receipt": "GR",
-      "Removal Request": "RemovalReq",
+      "Goods Tracking": "GoodsTracking",
+      "Internal Transfer": "InternalTransfer",
+      "Delivery Approval": "DeliveryApproval",
+      "Delivery Receipt": "DeliveryReceipt",
+      "Asset Removal": "AssetRemoval",
     },
     Sales: {
       Quotation: "Quotation",
