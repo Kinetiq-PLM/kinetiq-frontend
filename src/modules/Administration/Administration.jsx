@@ -1,5 +1,4 @@
 import React from "react";
-import "./styles/Administration.css";
 
 const Administration = ({ setActiveSubModule, loadSubModule }) => {
     return (
@@ -7,7 +6,7 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
             <div className="p-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Admin</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* User Table with dummy data */}
+                    {/* User Table */}
                     <Card title="User" clickable={true}>
                         <div
                             onClick={() => {
@@ -35,9 +34,13 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
                             }}
                             className="cursor-pointer"
                         >
-                            <p className="text-gray-600">View and manage the master record list.</p>
+                            <Table
+                                headers={["Username", "Email", "Date", "Category"]}
+                                data={Array(4).fill(["User_02", "User02@Gmail.Com", "2024-12-16", "Employee Benefits"])}
+                            />
                         </div>
-                    </Card>
+                    </Card>                                
+
 
                     {/* Audit Logs Card */}
                     <Card title="Audit Logs" clickable={true}>
@@ -48,9 +51,15 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
                             }}
                             className="cursor-pointer"
                         >
-                            <p className="text-gray-600">Track and monitor system activities.</p>
+                            <Table
+                                headers={[" ", "Username", "Email", "Date"]}
+                                data={Array(4).fill(["User_02", "User02@Gmail.Com", "2024-12-16"])}
+                                withCheckbox={true}
+                                badge={true}
+                            />
                         </div>
                     </Card>
+
 
                     {/* Policy Card */}
                     <Card title="Policy" clickable={true}>
@@ -61,7 +70,10 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
                             }}
                             className="cursor-pointer"
                         >
-                            <p className="text-gray-600">Manage company policies and regulations.</p>
+                            <Table
+                                headers={["Policy Id", "Policy Name", "Description"]}
+                                data={Array(3).fill(["Mari123", "Employee Conduct Policy", "Masikip"])}
+                            />
                         </div>
                     </Card>
                 </div>
