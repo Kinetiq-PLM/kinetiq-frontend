@@ -107,7 +107,7 @@
   border-radius: 20px;
   grid-column: 1 / 3;
   grid-row: 1 / 3;
-  width: 190%;
+  width: 100%;
 }
 
 .reports .cash-flow-container {
@@ -131,7 +131,7 @@
 }
 
 .reports .summary-value {
-  font-size: 1.7em;
+  font-size: 1em;
   font-weight: bold;
   margin-bottom: 30px;
 }
@@ -148,7 +148,7 @@
 }
 
 .reports .invoice-collections-title {
-  font-size: 1.5em;
+  font-size: 1em;
   margin-bottom: 20px;
   font-weight: 600;
 }
@@ -186,6 +186,13 @@
   width: 33.33%;
 }
 
+.reports .overdue {
+  background-color: #E96062;
+  color: white;
+  border-radius:  0 10px 10px 0 ;
+  width: 33.33%;
+}
+
 .reports .label-group {
   display: flex;
   justify-content: space-between;
@@ -205,9 +212,9 @@
   grid-column: 3 / 4;
   grid-row: 1 / 2;
   width: 100%;
-  height: 450px;
+  height: 350px;
   padding: 0; 
-  margin: 0; 
+  margin-right: 20px; 
   box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 20px;
   display: flex;
@@ -226,6 +233,7 @@
   width: 500px;
 }
 
+
 .reports .title-container {
   width: 100%;
   padding: 20px;
@@ -234,9 +242,9 @@
 
 .reports .receivable-aging-title,
 .reports .payable-aging-title {
-  font-size: 1.5em;
+  font-size: 1.2em;
   margin-bottom: 0px;
-  margin-top: 20px;
+  margin-top: 30px;
   text-align: left;
   font-weight: 600;
 }
@@ -265,7 +273,7 @@
   grid-column: 3 / 4; 
   grid-row: 2 / 3; 
   width: 100%; 
-  height: 450px;
+  height: 350px;
   padding: 20px;
   box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 20px;
@@ -274,7 +282,6 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-top: 20px; 
 }
 
 .reports .expense-overview-card {
@@ -285,12 +292,12 @@
   padding: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 95%;
-  margin-top: 20px; 
+  margin-top: 0px; 
   margin-bottom: 30px;
 }
 
 .reports .expense-overview-title {
-  font-size: 1.5em;
+  font-size: 1.2em;
   margin-bottom: 20px;
   font-weight: 600;
   margin-left: 20px;
@@ -322,7 +329,7 @@
 }
 
 .reports .categories-title {
-  font-size: 1.2em;
+  font-size: 1em;
   font-weight: 600;
   margin-bottom: 10px;
   margin-top: -50px;
@@ -365,7 +372,7 @@
 }
 
 .reports .category-name {
-  font-size: 1.1em;
+  font-size: 1em;
   color: #080808;
   white-space: nowrap;
   font-weight: bold;
@@ -380,7 +387,7 @@
 
 .reports .categories-vertical-line {
   position: absolute;
-  margin-left: -100px;
+  margin-left: -80px;
   margin-top: 20px;
   left: 0;
   top: 0;
@@ -406,7 +413,6 @@
 .reports .info-card-2 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 20px;
-  margin-bottom: 50px;
 }
 
 .reports .pie-chart-container {
@@ -414,7 +420,7 @@
   flex-direction: column;
   align-items: center;
   margin: 0;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 .reports .pie-chart-labels {
@@ -423,6 +429,8 @@
   justify-content: space-around;
   align-items: center;
   flex: 1;
+  font-size: 13px;
+  padding: 20px 5px;
   min-width: 12;
   gap: 50px;
 }
@@ -456,6 +464,7 @@
   box-shadow: 1px 4px 8px rgba(0, 0, 0, 0);
   margin-top: -90px;
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .reports .period-container {
@@ -473,14 +482,14 @@
 
 .reports .period-covered {
   background-color: #6cb3d0;
-  padding: 21px 30px;
+  padding: 18px 30px;
   width: 200px;
   border-top-left-radius: 20px;
 }
 
 .reports .february-2023 {
   background-color: #dec47d;
-  padding: 21px 70px;
+  padding: 18px 70px;
   text-align: center;
   left: -15px;
   width: 300px;
@@ -514,6 +523,7 @@
   box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
   margin-top: 20px;
   margin-right: 20px;
+  width: 100%;
 }
 
 .reports .infocard-4-header-row {
@@ -522,7 +532,7 @@
   color: rgb(255, 255, 255);
   
   border-radius: 20px;
-  padding: 10px 50px;
+  padding: 10px 10px;
   text-align: right;
   font-size: 25px;
   font-style: italic;
@@ -538,10 +548,26 @@
   padding: 10px;
   text-align: left;
   align-content: center;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 400;
   font-style: italic;
   justify-content: space-between;
+}
+
+.reports .infocard-4-header-label,
+.reports .infocard-4-header-cell1,
+.reports .infocard-4-header-cell2{
+  font-size: .70em;
+}
+
+.reports .infocard-4-header-label{
+  margin-right: 19px;
+  margin-left: 5px;
+}
+
+.reports .infocard-4-header-cell1{
+  text-align: right;
+  margin-right: 10px;
 }
 
 .reports .infocard-4-header-cell {
@@ -559,7 +585,7 @@
   justify-content: space-between;
   align-items: center;
   color: #333;
-  font-size: 1em;
+  font-size: .8em;
 }
 
 .reports .infocard-4-row:nth-child(odd) {
@@ -586,20 +612,21 @@
 /* Group 3: Income Statement */
 .reports .info-card-income-statement {
   display: flex;
-  grid-column: 2/2;
+  grid-column: 1/4;
   background-color: #f1f7f7;
   border-radius: 20px;
   box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
-  width: 1400px;
+  width: 100%;
   justify-content: center;
   align-items: center;
   margin: 0 auto;
   margin-top: 20px;
+  margin-right: 50px;
   overflow-x: auto;
 }
 
 .reports .income-statement-table {
-  width: 1400px;
+  width: 100px;
 }
 
 .reports .income-statement-table tbody th {
@@ -628,6 +655,7 @@
 .reports .income-statement-table td {
   padding: 12px 15px;
   text-align: left;
+  font-size: 14px;
 }
 
 .reports .financial-table thead tr:first-of-type + tr th,
@@ -676,7 +704,7 @@
 
 @media (min-width: 768px) {
   .reports .payable-aging-card {
-    margin-top: -480px;
+    margin-top: -385px;
   }
 }
 
@@ -687,11 +715,10 @@
     margin: 20px auto;
   }
 }
-
 @media (min-width: 768px) {
   .reports .content-grid {
     display: grid;
-    grid-template-columns: 3fr 3fr 3fr;
+    grid-template-columns: 4fr 3fr 2fr; /* Adjusted column widths */
     grid-template-rows: auto auto;
     gap: 30px;
     margin-left: 40px;
@@ -699,17 +726,17 @@
   }
 
   .reports .chart-container {
-    grid-column: 1 / 3;
+    grid-column: 1 / 3; /* Adjusted column span */
     grid-row: 1 / 3;
     height: 600px;
   }
 
   .reports .info-card-2,
   .reports .info-card-4 {
-    grid-column: 3 / 4;
+    grid-column: 3 / 4; /* Adjusted column placement */
     grid-row: auto;
     height: 100%;
-    width: 700px;
+    width: 400px; /* Reduced width */
     margin-right: 40px;
   }
 
@@ -720,11 +747,13 @@
   .reports .info-card-4 {
     grid-row: 2 / 2;
   }
+
   .reports .info-card-3-base {
     grid-column: 1 / 4;
     grid-row: 4 / 4;
     margin-right: 40px;
   }
+
   .reports .info-card-3 {
     grid-column: 1 / 4;
     grid-row: 4 / 4;
@@ -838,7 +867,6 @@
   .reports .financial-table td,
   .reports .income-statement-table th,
   .reports .income-statement-table td,
-  .reports .infocard-4-header-row,
   .reports .infocard-4-header-row-bottom,
   .reports .infocard-4-row,
   .reports .infocard-4-row-label,
@@ -851,9 +879,12 @@
   .reports .summary-item,
   .reports .summary-label,
   .reports .summary-value {
-    font-size: 12px;
+    font-size: 13px;
   }
 
+  .reports .financial-table th{
+    text-align: left;
+  }
   .reports .budget-balance-select {
     padding: 5px 15px;
     border-radius: 5px;
@@ -890,7 +921,6 @@
     }
 
     .reports .chart-container,
-    .reports .info-card-2,
     .reports .info-card-3,
     .reports .info-card-3-base,
     .reports .info-card-4,
@@ -901,6 +931,16 @@
       grid-column: 1;
       grid-row: auto;
       height: auto;
+    }
+
+    
+    .reports .info-card-2{
+      max-height: 200px;
+      margin-bottom: 50px;
+    }
+
+    .reports .pie-chart-container{
+      margin-top: -30px;
     }
 
     .reports .info-card-3-base {
@@ -935,6 +975,8 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
+    top: -200px;
+    padding: 5px 20px;
   }
 
   .reports .pie-chart-label {

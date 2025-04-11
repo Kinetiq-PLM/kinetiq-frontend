@@ -7,10 +7,10 @@
 
 .finance .body-content-container {
   width: 100%;
-  border-radius: 0.5rem;
+  border-radius: 0.375rem; 
   background-color: white;
-  padding: 1rem;
-  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 0.75rem; 
+  box-shadow: 0rem 0.15rem 0.075rem rgba(162, 162, 162, 0.1); /* Slightly reduced box-shadow */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,69 +21,66 @@
 .finance .cash-flow-card,
 .finance .chart-container,
 .finance .info-card-income-statement {
-  margin: 20px auto;
-  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 20px;
+  margin: 15px auto; 
+  box-shadow: 0.75px 3px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 15px; 
   width: 100%;
   box-sizing: border-box;
 }
 
-
 .finance .budget-balance-card {
-  height: 500px;
-  max-width: 850px;
+  height: 375px; 
+  max-width: 637.5px; 
 }
 
 .finance .cash-flow-card {
-  height: 100%;
-  max-width: 850px;
+  height: 375px;
+  max-width: 637.5px; 
 }
 
-.finance .chart-container{
-  
+.finance .chart-container {
   overflow-x: scroll;
 }
 
 .finance .chart-container,
 .finance .info-card-income-statement {
-  height: 600px;
-  max-width: 850px;
+  height: 450px;
+  max-width: 637.5px; 
   overflow-x: auto;
-
 }
 
 .finance .all-reports-4 {
-  max-width: 1100px;
+  max-width: 825px; 
   overflow-x: auto;
 }
 
 .finance .budget-balance-select {
-  padding: 5px 15px;
-  border-radius: 5px;
-  border: 0.5px solid #ccc;
+  padding: 3.75px 11.25px; 
+  border-radius: 3.75px; 
+  border: 0.375px solid #ccc; 
   margin-right: 0px;
-  margin-top: 20px;
+  margin-top: 15px; 
 }
 
 .finance .budget-balance-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 7.5px; 
 }
 
 .finance .budget-balance-title {
-  font-size: 2.2em;
-  text-indent: 50px;
-  margin-top: 50px;
+  font-size: 1.4em; 
+  text-indent: 37.5px; 
+  margin-top: 37.5px; 
 }
 
 .finance .budget-balance-select {
-  padding: 7px 30px;
-  border-radius: 5px;
-  border: 0.5px solid #ccc;
-  margin-right: 50px;
-  margin-top: 50px;
+  padding: 5.25px 22.5px; 
+  border-radius: 3.75px; 
+  border: 0.375px solid #ccc;
+  margin-right: 37.5px; 
+  margin-top: 37.5px; 
 }
 
 .finance .budget-balance-select:hover {
@@ -91,45 +88,45 @@
 }
 
 .finance .budget-balance-content {
-  padding: 20px;
+  padding: 15px; 
 }
 
 .finance .total-balance {
   margin-bottom: 0px;
-  margin-top: 40px;
-  text-indent: 50px;
+  margin-top: 50px; 
+  text-indent: 37.5px; 
 }
 
 .finance .earned-last-month,
 .finance .total-bonus {
-  margin-bottom: 10px;
-  margin-top: 15px;
-  text-indent: 50px;
+  margin-bottom: 7.5px; 
+  margin-top: 11.25px; 
+  text-indent: 37.5px;
 }
 
 .finance .total-balance-label,
 .finance .earned-last-month-label,
 .finance .total-bonus-label {
-  margin-right: 5px;
-  font-size: 1.5em;
+  margin-right: 3.75px; 
+  font-size: 1.125em; 
 }
 
 .finance .total-balance-amount {
-  font-size: 3.5em;
+  font-size: 2em; 
   font-weight: 500;
-  top: -40px;
-  text-indent: 50px;
+  top: -30px; 
+  text-indent: 37.5px; 
 }
 
 .finance .cents {
-  font-size: 0.6em;
+  font-size: 0.45em; 
   color: #6b7280;
 }
 
 .finance .earned-last-month-amount,
 .finance .total-bonus-amount {
-  font-size: 2.1em;
-  margin-left: 20px;
+  font-size: 1.2em; 
+  margin-left: 15px; 
   color: #008080;
 }
 
@@ -138,7 +135,7 @@
 }
 
 .finance .cash-flow-container {
-  margin-bottom: 20px;
+  margin-bottom: 15px; 
 }
 
 .finance .summary-numbers {
@@ -150,24 +147,24 @@
 
 .finance .chart-title,
 .finance .all-reports-chart-title {
-  font-size: 18px;
+  font-size: 15.5px;
   font-weight: bold;
-  margin-top: 20px;
+  margin-top: 15px; 
   text-align: center;
-  margin-top: 50px;
+  margin-top: 37.5px; 
 }
 
 .finance .income-statement-table {
   width: 100%;
   border-collapse: collapse;
-  border-radius: 10px;
+  border-radius: 7.5px;
   table-layout: fixed;
   overflow: hidden;
 }
 
 .finance .income-statement-table th,
 .finance .income-statement-table td {
-  padding: 12px 15px;
+  padding: 9px 11.25px; 
   text-align: left;
 }
 
@@ -195,12 +192,12 @@
   background-color: #d2ebeb;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 576px) { 
   .finance .content-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
-    gap: 15px;
+    gap: 11.25px; 
   }
 
   .finance .budget-balance-card {
@@ -224,11 +221,9 @@
   }
 }
 
-
-
-@media (max-width: 767px) {
+@media (max-width: 575px) { 
   .finance .body-content-container {
-    padding: 10px;
+    padding: 7.5px; 
     overflow-x: hidden;
   }
 
@@ -239,29 +234,28 @@
 
   .finance .budget-balance-card {
     grid-row: 1/2;
-    height: auto; 
+    height: auto;
   }
 
   .finance .cash-flow-card {
     grid-row: 2/3;
-    height: 500px; 
+    height: 375px; 
   }
 
   .finance .chart-container {
     grid-row: 3/4;
-    height: 500px; 
-    overflow-x: scroll; 
+    height: 375px; 
+    overflow-x: scroll;
   }
-
 
   .finance .info-card-income-statement {
     grid-row: 4/5;
-    height: auto; 
+    height: auto;
   }
 
   .finance .all-reports-4 {
     grid-row: 5/6;
-    height: auto; 
+    height: auto;
   }
 
   .finance .budget-balance-card,
@@ -269,49 +263,49 @@
   .finance .chart-container,
   .finance .info-card-income-statement,
   .finance .all-reports-4 {
-    width: 350px;
-    max-width: 500px;
-    margin: 20px auto;
+    width: 262.5px;
+    max-width: 375px; 
+    margin: 15px auto;
   }
 
   .finance .budget-balance-title {
-    font-size: 1.1em;
-    padding: 10px 10px;
-    margin-left: 20px;
-    text-indent: -20px  
+    font-size: 0.600em; 
+    padding: 7.5px 7.5px; 
+    margin-left: 15px;
+    text-indent: -15px; 
   }
 
   .finance .budget-balance-select {
-    font-size: 1em; 
-    padding: 5px 5px;
-    margin-right: 10px;
+    font-size: 0.75em; 
+    padding: 3.75px 3.75px;
+    margin-right: 7.5px; 
   }
-  
-  .finance .total-balance{
-    margin-top: -10px;
+
+  .finance .total-balance {
+    margin-top: -7.5px; 
   }
 
   .finance .total-balance-label,
   .finance .earned-last-month-label,
   .finance .total-bonus-label {
-    font-size: 1em; 
-    text-indent: -50px;
-    margin-left: -50px;
-    margin-right: -10px; 
+    font-size: 0.30em; 
+    text-indent: -37.5px;
+    margin-left: -37.5px;
+    margin-right: -7.5px; 
   }
 
   .finance .total-balance-amount {
-    font-size: 2em;
-    margin-left: -30px; 
+    font-size: 1.2em; 
+    margin-left: -22.5px; 
   }
 
   .finance .earned-last-month-amount,
   .finance .total-bonus-amount {
-    font-size: 1em;
-    text-indent: 20px;
+    font-size: 0.75em; 
+    text-indent: 15px; 
   }
-  
-.finance .income-statement-table tbody{
-  font-size: 13px;
-}
+
+  .finance .income-statement-table tbody {
+    font-size: 9.75px; 
+  }
 }

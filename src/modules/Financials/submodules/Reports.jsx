@@ -45,7 +45,7 @@ const CashFlowCard = ({ data }) => {
     );
   };
 
-  const [chartHeight, setChartHeight] = useState(550);
+  const [chartHeight, setChartHeight] = useState(400);
   const [chartMargin, setChartMargin] = useState({ top: 50, right: 50, left: 50, bottom: 45 });
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const CashFlowCard = ({ data }) => {
         setChartHeight(300);
         setChartMargin({ top: 30, right: 20, left: 20, bottom: 10}); 
       } else {
-        setChartHeight(550);
+        setChartHeight(400);
         setChartMargin({ top: 50, right: 50, left: 50, bottom: 45 }); 
       }
     };
@@ -91,7 +91,7 @@ const CashFlowCard = ({ data }) => {
                 padding: '5px', 
               }}
               contentStyle={{
-                fontSize: '14px',
+                fontSize: '13px',
                 color: '#6C7676',
             }}
             />
@@ -392,7 +392,7 @@ const BodyContent = () => {
                                     <div className="title-container"> 
                                         <h2 className="receivable-aging-title">Receivable Aging</h2>
                                     </div>
-                                    <ResponsiveContainer width="100%" height={300}>
+                                    <ResponsiveContainer width="100%" height={200}>
                                         <BarChart data={receivableAgingData} layout="vertical" margin={{ top: 15, right: 30, left: 50, bottom: 5 }}>
                                             <XAxis type="number" tick={false} axisLine={false} />
                                             <YAxis
@@ -445,7 +445,7 @@ const BodyContent = () => {
                                     <div className="title-container"> 
                                         <h2 className="payable-aging-title">Payable Aging</h2>
                                     </div>
-                                    <ResponsiveContainer width="100%" height={300}>
+                                    <ResponsiveContainer width="100%" height={200}>
                                         <BarChart data={payableAgingData} layout="vertical" margin={{ top: 15, right: 30, left: 50, bottom: 5 }}>
                                             <XAxis type="number" tick={false} axisLine={false} />
                                             <YAxis
@@ -543,7 +543,7 @@ const BodyContent = () => {
                     <div className="content-grid">
                         <div className="chart-container">
                             <h2 className="chart-title">Current Period Balance And Previous Period Balance</h2>
-                            <ResponsiveContainer width="95%" height="75%">
+                            <ResponsiveContainer width="100%" height="75%">
                                 <BarChart data={data} margin={{ top: 10, right: 20, left: 15, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="currentBarGradient" x1="0" y1="0" x2="0" y2="1">
@@ -586,7 +586,7 @@ const BodyContent = () => {
                         </div>
                         <InfoCard className="info-card-2">
   <div className="pie-chart-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-    <ResponsiveContainer className="pie" width="100%" height={200}>
+    <ResponsiveContainer className="pie" width="100%" height={150}>
       <PieChart>
         <Pie
           data={[
@@ -597,7 +597,7 @@ const BodyContent = () => {
           nameKey="name"
           cx="50%"
           cy="60%"
-          outerRadius={80}
+          outerRadius={55}
           innerRadius={0}
           startAngle={90}
           endAngle={-270}
@@ -610,13 +610,13 @@ const BodyContent = () => {
     </ResponsiveContainer>
     <div className="pie-chart-labels" style={{ fontWeight: 'bold', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', marginTop: '-100px' }}>
       <div style={{ textAlign: 'left', paddingLeft: '20px', position: 'relative' }}>
-        <div style={{ fontWeight: 'bold', position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '-61px', width: '250px', height: '1px', backgroundColor: 'black' }}></div>
+        <div style={{ fontWeight: 'bold', position: 'absolute', top: '60%', transform: 'translateY(-60%)', right: '45px', width: '110px', height: '1px', backgroundColor: 'black' }}></div>
         Previous Period Balance
         <div style={{ color:'#C5C8C8', textAlign: 'left', marginTop: '10px' }}>50.5%</div>
       </div>
       <div style={{  textAlign: 'right', paddingRight: '20px', position: 'relative' }}>
         Current Period Balance
-        <div style={{ fontWeight: 'bold', position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: '-69px', width: '250px', height: '1px', backgroundColor: 'black' }}></div>
+        <div style={{ fontWeight: 'bold', position: 'absolute', top: '60%', transform: 'translateY(-50%)', left: '45px', width: '110px', height: '1px', backgroundColor: 'black' }}></div>
         <div  style={{ color:'#C5C8C8', textAlign: 'right', marginTop: '10px' }}>49.5%</div>
       </div>
     </div>
@@ -668,10 +668,10 @@ const BodyContent = () => {
                                         <div className="infocard-4-header-row">
                                             <div className="infocard-4-header-label"></div>
                                             <div className="infocard-4-header-label">Total</div>
-                                            <div className="infocard-4-header-label"></div>
+                                            <div className="infocard-4-header-label1"></div>
                                             <div className="infocard-4-header-label"></div>
                                             <div className="infocard-4-header-cell1">₱ 515,500.00</div>
-                                            <div className="infocard-4-header-cell1">₱ 515,500.00</div>
+                                            <div className="infocard-4-header-cell2">₱ 515,500.00</div>
                                         </div>
                                         <div className="infocard-4-header-row-bottom">
                                             <div className="infocard-4-header-cell"></div>
