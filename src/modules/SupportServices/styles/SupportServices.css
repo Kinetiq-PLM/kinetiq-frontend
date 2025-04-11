@@ -1,18 +1,271 @@
-/* REMINDER! All of your elements must use your unique namespace '.serv' at the start to avoid leaking */
-.serv-main .body-content-container {
-    width: 100%;
-    height: 100%;
-    border-radius: 0.5rem;
-    background-color: white;
-    padding: 1rem;
-    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 40rem;
-    min-height: 30rem;
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.servdash {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  font-family: "Poppins", sans-serif;
+}
+
+.servdash .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.servdash .body-content-container.fixed {
+  min-width: 40rem;
+  max-height: 39rem;
+}
+
+/* Header styling */
+.servdash .header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.servdash .icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.servdash .header-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #00a8a8;
+  margin-top: 0.125rem;
+}
+
+.servdash .title-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; /* Added space between title and subtitle */
+}
+
+.servdash .title-container h2 {
+  margin: 0;
+  color: #000000;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  line-height: 1.2;
+}
+
+.servdash .title-container .subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+  font-style: italic;
+  font-family: "Inter", sans-serif;
+}
+
+.servdash .divider {
+  height: 2px; /* Confirmed 2px height */
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 0.5rem 0 1.5rem 0;
+}
+
+/* Dashboard grid layout */
+.servdash .dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem; /* Slightly reduced from 1.5rem */
+  overflow: visible; /* Changed from auto to visible to prevent scrolling */
+}
+
+/* Dashboard card styling */
+.servdash .dashboard-card {
+  border-radius: 0.5rem;
+  padding: 1.125rem 1.25rem; /* Slightly increased vertical padding */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+  height: 100%;
+  min-height: 8.25rem; /* Increased from 7.5rem to 8.25rem */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.servdash .dashboard-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.servdash .dashboard-card.primary {
+  background-color: #00a8a8; /* Teal color from the image */
+  color: white;
+}
+
+.servdash .dashboard-card.secondary {
+  background-color: #e8f7f7; /* Light teal color from the image */
+  color: #333;
+}
+
+.servdash .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem; /* Reduced from 1rem */
+}
+
+.servdash .card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+}
+
+.servdash .card-icon {
+  width: 1.25rem; /* Standardized size */
+  height: 1.25rem; /* Standardized size */
+  object-fit: contain; /* Ensures consistent display */
+}
+
+.servdash .card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.servdash .metric-value {
+  font-size: 2.25rem; /* Slightly reduced */
+  font-weight: 700;
+  margin-bottom: 0.25rem; /* Reduced from 0.5rem */
+  font-family: "Inter", sans-serif;
+  line-height: 1;
+}
+
+.servdash .metric-details {
+  font-size: 0.85rem; /* Increased from 0.75rem */
+  opacity: 0.9;
+  font-family: "Inter", sans-serif;
+  line-height: 1.2;
+}
+
+.servdash .view-all-button {
+  margin-top: 0.75rem; /* Reduced from 1rem */
+  padding: 0.4rem; /* Reduced from 0.5rem */
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Added shadow to buttons */
+}
+
+.servdash .dashboard-card.primary .view-all-button {
+  background-color: #e4f1f2;
+  color: #00a8a8;
+  border: none;
+}
+
+.servdash .dashboard-card.primary .view-all-button:hover {
+  background-color: #d5e8e9;
+}
+
+.servdash .dashboard-card.secondary .view-all-button {
+  background-color: #e4f1f2;
+  color: #00a8a8;
+  border: 2px solid #00a8a8; /* Increased from 1px to 2px */
+}
+
+.servdash .dashboard-card.secondary .view-all-button:hover {
+  background-color: #d5e8e9;
+}
+
+/* Enhanced responsive design for all screen sizes */
+@media (min-width: 1441px) {
+  .servdash .body-content-container.fixed {
+    max-width: 1400px;
+    margin: 0 auto;
   }
+
+  .servdash .metric-value {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 1440px) {
+  .servdash .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .servdash .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .servdash .body-content-container.fixed {
+    min-width: auto;
+    max-height: none;
+  }
+
+  .servdash .metric-value {
+    font-size: 2.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .servdash .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .servdash .body-content-container {
+    padding: 1.25rem;
+  }
+
+  .servdash .dashboard-card {
+    padding: 0.875rem 1rem;
+  }
+
+  .servdash .metric-value {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .servdash .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .servdash .body-content-container {
+    padding: 1rem;
+  }
+
+  .servdash .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .servdash .title-container {
+    width: 100%;
+  }
+
+  .servdash .dashboard-card {
+    padding: 0.75rem;
+    min-height: 7rem;
+  }
+
 
 .serv  {
   display: flex;
@@ -609,4 +862,47 @@
   gap: 20px;
   align-items: center;
   justify-content: center;
+}
+=======
+  .servdash .metric-value {
+    font-size: 1.75rem;
+  }
+
+  .servdash .metric-details {
+    font-size: 0.8rem;
+  }
+
+  .servdash .view-all-button {
+    padding: 0.375rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 360px) {
+  .servdash .body-content-container {
+    padding: 0.75rem;
+  }
+
+  .servdash .dashboard-grid {
+    gap: 0.75rem;
+  }
+
+  .servdash .dashboard-card {
+    padding: 0.75rem;
+    min-height: 6.5rem;
+  }
+
+  .servdash .card-header h3 {
+    font-size: 0.875rem;
+  }
+
+  .servdash .metric-value {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .servdash .metric-details {
+    font-size: 0.75rem;
+  }
 }
