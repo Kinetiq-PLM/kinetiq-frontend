@@ -1,0 +1,120 @@
+/* Modal Overlay (For Restock Form) */
+.inv .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent backdrop */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Modal Content (Restock Form) */
+.inv .modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 380px;
+  /* Removed fixed height so the form can grow if needed */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+@media screen and (min-width: 768px) {
+  .inv .modal-content {
+    width: 500px;
+  }
+}
+
+/* Form Elements */
+.inv .modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Labels for Input Fields */
+.inv .modal-content label {
+  display: block;
+  margin: 10px 0 5px;
+  font-weight: 500;
+}
+
+/* Inputs, Textareas, and Select */
+.inv .modal-content input,
+.inv .modal-content textarea,
+.inv .modal-content select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.inv .modal-content textarea {
+  resize: vertical;
+  min-height: 4rem; /* Adjust as needed */
+}
+
+/* Form Section (Checkbox Groups) */
+.inv .modal-content .form-section {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Form Actions (Buttons) */
+.inv .modal-content .form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+/* Close Button (X) */
+.inv .modal-content .close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Clear and Submit Buttons */
+.inv .modal-content .clear-btn,
+.inv .modal-content .submit-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Clear Button */
+.inv .modal-content .clear-btn {
+  border: 1px solid teal;
+  color: teal;
+  background: none;
+}
+
+/* Submit Button */
+.inv .modal-content .submit-btn {
+  background: teal;
+  color: white;
+  border: none;
+}
+
+.inv .blurred {
+  filter: blur(5px);
+}
+
+.inv .modal-content .form-section label {
+  display: flex;
+  align-items: center;
+  gap: 8px; 
+  margin-bottom: 8px;
+}
+
+.inv .modal-content .form-section input[type="checkbox"] {
+  margin: 0;
+  flex-shrink: 0; 
+}

@@ -138,7 +138,8 @@ function App() {
     },
     Inventory: {
       "Stock Levels": "StockLevels",
-      "Product Catalog": "ProductCatalog",
+      "P-Counts": "PCounts",
+      "Stock Flow": "StockFlow",
     },
     Distribution: {
       Shipping: "Shipping",
