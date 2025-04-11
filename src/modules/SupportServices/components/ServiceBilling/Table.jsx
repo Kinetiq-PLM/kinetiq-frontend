@@ -38,7 +38,7 @@ const Table = ({ billings, onRowClick, onViewBilling, selectedBilling }) => {
                 <td>{billing.service_billing_amount}</td>
                 <td>{billing.total_payable}</td>
                 <td>{billing.billing_status}</td>
-                <td>{billing.date_paid}</td>
+                <td>{billing?.date_paid || "Unpaid"}</td>
                 <td>
                   <button className="view-button" onClick={() => onViewBilling(billing)}>
                     View

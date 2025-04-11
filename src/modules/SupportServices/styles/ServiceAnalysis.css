@@ -525,6 +525,10 @@
   resize: none;
 }   
 
+.servanal .item-list {
+  max-height: 100px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 992px) {
   .servanal .body-content-container {

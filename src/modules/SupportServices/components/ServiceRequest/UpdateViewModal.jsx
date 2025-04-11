@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceRequestIcon from "/icons/SupportServices/ServiceRequestIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
@@ -131,7 +131,7 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
 
   const handleSubmit = () => {
     onUpdate({
-      ...request,
+      technician_id: formData.technicianId,
       service_request_id: formData.id,
       service_call_id: formData.callId,
       request_type: formData.requestType,
@@ -139,24 +139,30 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
       request_description: formData.requestDescription,
       request_remarks: formData.requestRemarks,
     })
-
-    // reset form
-    setFormData({
-      id: "",
-      callId: "",
-      customerId: "",
-      name: "",
-      technicianId: "",
-      technicianName: "",
-      requestDate: "",
-      phoneNumber: "",
-      emailAddress: "",
-      requestType: "",
-      requestStatus: "",
-      requestDescription: "",
-      requestRemarks: "",
-  });
   }
+
+  const techRef = useRef(null);
+  const statusRef = useRef(null);
+  const typeRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (techRef.current && !techRef.current.contains(event.target)) {
+        setOpenTechDD(false); // Close the dropdown
+      }
+      if (statusRef.current && !statusRef.current.contains(event.target)) {
+        setOpenStatusDD(false); // Close the dropdown
+      }
+      if (typeRef.current && !typeRef.current.contains(event.target)) {
+        setOpenTypeDD(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   if (!isOpen || !request) return null
 
@@ -214,7 +220,7 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
 
             <div className="form-group">
               <label htmlFor="technicianId">Technician ID</label>
-              <div className="select-wrapper">
+              <div className="select-wrapper" ref={techRef}>
                 <input
                   type="text"
                   id="technicianId"
@@ -305,7 +311,7 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
             {/* Request Status */}
             <div className="form-group status-group">
               <label htmlFor="requestStatus">Request Status</label>
-              <div className="select-wrapper">
+              <div className="select-wrapper"ref={statusRef}>
                 <input
                   type="text"
                   id="requestStatus"
@@ -340,7 +346,7 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
 
             <div className="form-group type-group">
               <label htmlFor="requestType">Request Type</label>
-              <div className="select-wrapper">
+              <div className="select-wrapper" ref={typeRef}>
                 <input
                   type="text"
                   id="requestType"

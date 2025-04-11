@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useEffect, useState } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 import ServiceAnalysisIcon from "/icons/SupportServices/ServiceAnalysisIcon.png"
@@ -20,6 +20,10 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
   const [productId, setProductId] = useState("")
   const [contractId, setContractId] = useState("")
   const [terminationDate, setTerminationDate] = useState("")
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorModalMessage, setErrorModalMessage] = useState("")
+
+  const [requestStatus, setRequestStatus] = useState("")
 
   const [requests, setRequests] = useState([]);
   const [isReqDropdown, setOpenReqDD] = useState(false);
@@ -50,6 +54,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
       setPhoneNumber(request.customer?.phone_number || "");
       setProductId(request.service_call?.product?.product_id || "");
 
+      setRequestStatus(request?.request_status || "")
       setOpenReqDD(false);
     };
 
@@ -129,6 +134,11 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
     };
 
   const handleAdd = () => {
+    if (requestStatus !== "Approved") {
+      setErrorModalMessage("Cannot schedule a service analysis for a request that is not approved yet!"); 
+      setShowErrorModal(true);  
+    }
+
     onAdd({
       service_request_id: requestId,
       analysis_date: analysisDate,
@@ -139,6 +149,33 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
       contract_id: contractId,
     })
   }
+
+  const requestRef = useRef(null);
+  const statusRef = useRef(null);
+  const techRef = useRef(null);
+  const contractRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (requestRef.current && !requestRef.current.contains(event.target)) {
+        setOpenReqDD(false); // Close the dropdown
+      }
+      if (techRef.current && !techRef.current.contains(event.target)) {
+        setOpenTechDD(false); // Close the dropdown
+      }
+      if (statusRef.current && !statusRef.current.contains(event.target)) {
+        setOpenStatusDD(false); // Close the dropdown
+      }
+      if (contractRef.current && !contractRef.current.contains(event.target)) {
+        setOpenContractDD(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   if (!isOpen) return null
 
@@ -164,7 +201,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="requestId">Request ID <span className="required">*</span></label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={requestRef}>
                   <input
                     type="text"
                     id="requestId"
@@ -197,8 +234,8 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
                 </div>
               </div>
               <div className="form-group">
-                <label htmlFor="technicianId">Technician ID</label>
-                <div className="select-wrapper">
+                <label htmlFor="technicianId">Technician ID <span className="required">*</span></label>
+                <div className="select-wrapper" ref={techRef}>
                   <input
                     type="text"
                     id="technicianId"
@@ -254,7 +291,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="analysisStatus">Analysis Status <span className="required">*</span></label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={statusRef}>
                   <input
                     type="text"
                     id="analysisStatus"
@@ -341,7 +378,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="contractId">Contract ID</label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={contractRef}>
                   <input
                     type="text"
                     id="contractId"
@@ -406,11 +443,26 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
           <button className="cancel-button" onClick={onClose}>
             Cancel
           </button>
-          <button className="update-modal-button" onClick={handleAdd}>
+          <button 
+            className={`update-button ${
+              requestId && analysisDate && technicianId && analysisStatus ? "clickable" : "disabled"
+            }`}
+            onClick={handleAdd}
+            disabled={!(requestId && analysisDate && technicianId && analysisStatus)}
+          >
             Add
           </button>
         </div>
       </div>
+      {showErrorModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>ERROR</h2>
+            <p>{errorModalMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowErrorModal(false)}>OK</button>
+          </div>
+        </div>
+      )} 
     </div>
   )
 }

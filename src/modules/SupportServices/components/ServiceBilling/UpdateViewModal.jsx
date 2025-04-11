@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
-import ServiceContractIcon from "/icons/SupportServices/ServiceContractIcon.png"
+import ServiceBillingIcon from "/icons/SupportServices/ServiceBillingIcon.svg"
 
 import { GET } from "../../api/api"
 
@@ -344,7 +344,7 @@ const handleSelectOpCost = (operationalCost) => {
       <div className="modal-container">
         <div className="modal-header" style={{ borderBottom: "2px solid #00a8a8" }}>
           <div className="modal-header-left">
-            <img src={ServiceContractIcon || "/placeholder.svg"} alt="Service Contract" className="modal-header-icon" />
+            <img src={ServiceBillingIcon || "/placeholder.svg"} alt="Service Billing" className="modal-header-icon" />
             <h2>Service Billing</h2>
           </div>
           <button className="close-button" onClick={onClose}>

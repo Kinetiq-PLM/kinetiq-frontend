@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import "../styles/ServiceBilling.css"
-import ServiceContractIcon from "/icons/SupportServices/ServiceContractIcon.png"
+import ServiceBillingIcon from "/icons/SupportServices/ServiceBillingIcon.svg"
 import Table from "../components/ServiceBilling/Table"
 import UpdateViewModal from "../components/ServiceBilling/UpdateViewModal"
 import CreateBillingModal from "../components/ServiceBilling/CreateBillingModal"
@@ -21,6 +21,8 @@ const ServiceBilling = () => {
   const [filterBy, setFilterBy] = useState("")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorModalMessage, setErrorModalMessage] = useState("")
 
   const fetchBillings = async () => {
     try {
@@ -101,7 +103,22 @@ const ServiceBilling = () => {
       setShowUpdateModal(false);
       fetchBillings();
     } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
         console.error("Error updating billing:", error.message);
+        setErrorModalMessage(firstError); 
+        setShowErrorModal(true);  
     }
   }
 
@@ -114,7 +131,22 @@ const ServiceBilling = () => {
       setShowCreateModal(false);
       fetchBillings();
     } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
         console.error("Error submitting service billing:", error.message);
+        setErrorModalMessage(firstError); 
+        setShowErrorModal(true);  
     }
   }
 
@@ -123,7 +155,7 @@ const ServiceBilling = () => {
       <div className="body-content-container">
         <div className="header">
           <div className="icon-container">
-            <img src={ServiceContractIcon || "/placeholder.svg?height=24&width=24"} alt="Service Contract" />
+            <img src={ServiceBillingIcon || "/placeholder.svg?height=24&width=24"} alt="Service Billing" />
           </div>
           <div className="title-container">
             <h2>Service Billing</h2>
@@ -203,6 +235,16 @@ const ServiceBilling = () => {
           onCreate={handleCreateBilling}
         />
       )}
+
+{showErrorModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>ERROR</h2>
+            <p>{errorModalMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowErrorModal(false)}>OK</button>
+          </div>
+        </div>
+      )}  
     </div>
   )
 }

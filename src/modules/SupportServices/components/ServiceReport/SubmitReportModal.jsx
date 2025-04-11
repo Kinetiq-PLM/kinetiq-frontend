@@ -1,6 +1,6 @@
 "use client"
 
-import { useState} from "react"
+import { useRef, useEffect, useState} from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceReportIcon from "/icons/SupportServices/ServiceReportIcon.png"
 
@@ -26,7 +26,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
     ticketId: "",
     callId: "",
     requestId: "",
-    requestType: "",
+    requestType: "Other",
     renewalId: "",
     billingId: "",
     description: "",
@@ -109,7 +109,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
   const fetchRenewals = async () => {
     try {
-      const data = await GET(`renewals/${formData.callId}`);
+      const data = await GET(`renewals-calls/${formData.callId}`);
       setRenewals(data);
     } catch (error) {
       console.error("Error fetching renewals:", error)
@@ -133,7 +133,12 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
   const fetchBillings = async () => {
     try {
-      const data = await GET("service-billings/");
+      let data = await GET("service-billings/");
+      if (formData.renewalId !== "") {
+        data = await GET(`renewals-billings/${formData.renewalId}`);
+      }  else if (formData.requestId !== "") {
+        data = await GET(`requests-billings/${formData.requestId}`);
+      }
       setBillings(data);
     } catch (error) {
       console.error("Error fetching service billings:", error)
@@ -205,7 +210,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
       service_ticket_id: formData.ticketId,
       service_call_id: formData.callId,
       service_request_id: formData.requestId,
-      request_type: formData.requestType,
+      request_type: formData?.requestType || "Other",
       renewal_id: formData.renewalId,
       service_billing_id: formData.billingId,
       description: formData.description,
@@ -213,21 +218,48 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
       technician_id: formData.technicianId,
       submission_date: today
     })
-    setFormData({
-      ticketId: "",
-      callId: "",
-      requestId: "",
-      requestType: "",
-      renewalId: "",
-      billingId: "",
-      technicianName: "",
-      description: "",
-      reportStatus: "",
-      technicianId: ""
-    });
-  
   }
 
+  const tixRef = useRef(null);
+  const callRef = useRef(null);
+  const reqRef = useRef(null);
+  const renewalRef = useRef(null);
+  const billingRef = useRef(null);
+  const statusRef = useRef(null);
+  const techRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tixRef.current && !tixRef.current.contains(event.target)) {
+        setOpenTixDD(false);
+      }
+      if (callRef.current && !callRef.current.contains(event.target)) {
+        setOpenCallDD(false); // Close the dropdown
+      }
+      if (reqRef.current && !reqRef.current.contains(event.target)) {
+        setOpenReqDD(false); // Close the dropdown
+      }
+      if (renewalRef.current && !renewalRef.current.contains(event.target)) {
+        setOpenRenewalDD(false); // Close the dropdown
+      }
+      if (billingRef.current && !billingRef.current.contains(event.target)) {
+        setOpenBillingDD(false); // Close the dropdown
+      }
+      if (statusRef.current && !statusRef.current.contains(event.target)) {
+        setOpenStatusDD(false); // Close the dropdown
+      }
+      if (techRef.current && !techRef.current.contains(event.target)) {
+        setOpenTechDD(false); // Close the dropdown
+      }
+
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  
   if (!isOpen) return null
 
   return (
@@ -254,7 +286,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
               <div className="form-column">
                 <div className="form-group">
                   <label htmlFor="ticketId">Ticket ID <span className="required">*</span></label>
-                  <div className="select-wrapper">
+                  <div className="select-wrapper" ref={tixRef}>
                     <input
                       type="text"
                       id="ticketId"
@@ -289,7 +321,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
                 <div className="form-group">
                   <label htmlFor="callId">Call ID <span className="required">*</span></label>
-                  <div className="select-wrapper">
+                  <div className="select-wrapper" ref={callRef}>
                     <input
                       type="text"
                       id="callId"
@@ -317,7 +349,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
                 <div className="form-group">
                   <label htmlFor="requestId">Request ID</label>
-                  <div className="select-wrapper">
+                  <div className="select-wrapper" ref={reqRef}>
                   <input
                     type="text"
                     id="requestId"
@@ -325,6 +357,8 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                     value={formData.requestId}
                     onChange={handleChange}
                     placeholder="Enter request ID"
+                    disabled={formData.renewalId !== ""}
+                    className={formData.renewalId !== "" ? "disabled-input" : ""}
                   />
                   <span className="select-arrow"  onClick={handleToggleRequests}>▼</span>
                     {isReqDropdown && (
@@ -352,12 +386,14 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                     value={formData.requestType}
                     onChange={handleChange}
                     placeholder="Enter request type"
+                    disabled={formData.renewalId !== ""}
+                    className={formData.renewalId !== "" ? "disabled-input" : ""}
                   />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="renewalId">Renewal ID</label>
-                  <div className="select-wrapper">
+                  <div className="select-wrapper" ref={renewalRef}>
                     <input
                       type="text"
                       id="renewalId"
@@ -368,6 +404,8 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                       }}
                       onClick={handleToggleRenewals}
                       placeholder="Enter renewal ID"
+                      disabled={formData.requestId !== ""}
+                      className={formData.requestId !== "" ? "disabled-input" : ""}
                     />
                     <span className="select-arrow"  onClick={handleToggleRenewals}>▼</span>
                     {isRenewalDropdown && (
@@ -392,7 +430,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
                 <div className="form-group">
                   <label htmlFor="billingId">Billing ID</label>
-                  <div className="select-wrapper">
+                  <div className="select-wrapper" ref={billingRef}>
                   <input
                     type="text"
                     id="billingId"
@@ -449,8 +487,8 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="reportStatus">Report Status</label>
-                  <div className="select-wrapper">
+                  <label htmlFor="reportStatus">Report Status <span className="required">*</span></label>
+                  <div className="select-wrapper" ref={statusRef}>
                     <input
                       type="text"
                       id="reportStatus"
@@ -475,7 +513,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                 <label htmlFor="technicianId">
                   Technician ID <span className="required">*</span>
                 </label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={techRef}>
                   <input
                     type="text"
                     id="technicianId"
@@ -516,7 +554,16 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
           <button className="cancel-button" onClick={onClose}>
             Cancel
           </button>
-          <button className="update-modal-button" onClick={handleSubmit}>
+          <button 
+            className={`update-button ${
+              formData.ticketId && formData.callId && formData.reportStatus 
+              && formData.technicianId && 
+              (formData.renewalId || formData.requestId) ? "clickable" : "disabled"
+              }`}
+              onClick={handleSubmit}
+              disabled={!(formData.ticketId && formData.callId && formData.reportStatus 
+              && formData.technicianId && (formData.renewalId || formData.requestId))}
+            >
             Submit
           </button>
         </div>

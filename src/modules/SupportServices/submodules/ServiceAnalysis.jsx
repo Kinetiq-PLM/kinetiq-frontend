@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import "../styles/ServiceAnalysis.css"
 import "../styles/SupportServices.css"
 import ServiceAnalysisIcon from "/icons/SupportServices/ServiceAnalysisIcon.png"
@@ -31,6 +31,10 @@ const ServiceAnalysis = () => {
   const [filterOption, setFilterOption] = useState("Filter by")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
   const [activeTab, setActiveTab] = useState("General")
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorModalMessage, setErrorModalMessage] = useState("")
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successModalMessage, setSuccessModalMessage] = useState("")
 
   // After Analysis state
   const [afterAnalysisInfo, setAfterAnalysisInfo] = useState({
@@ -277,6 +281,25 @@ const ServiceAnalysis = () => {
     setOpenAfterStatusDD(false); 
   };
 
+  const statusRef = useRef(null);
+  const afterStatusRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (statusRef.current && !statusRef.current.contains(event.target)) {
+        setOpenStatusDD(false); // Close the dropdown
+      }
+      if (afterStatusRef.current && !afterStatusRef.current.contains(event.target)) {
+        setOpenAfterStatusDD(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
     const toggleDatePicker = () => {
@@ -320,7 +343,22 @@ const ServiceAnalysis = () => {
       setShowUpdateModal(false);
       fetchAnalyses();
     } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
         console.error("Error updating service analysis:", error.message);
+        setErrorModalMessage(firstError); 
+        setShowErrorModal(true);  
     }
   }
 
@@ -333,7 +371,22 @@ const ServiceAnalysis = () => {
         setShowAddModal(false);
         fetchAnalyses();
     } catch (error) {
-        console.error("Error submitting analysis:", error.message);
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+      console.error("Error submitting analysis:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
     }
   }
 
@@ -343,13 +396,30 @@ const ServiceAnalysis = () => {
       customer_id: customerInfo.customerId,
     }
 
-    console.log("Creating analysis:", orderData)
+    console.log("Creating service order:", orderData)
       try {
         const data = await POST("/service-order/", orderData);
         console.log("Service order created successfully:", data);
         fetchOrder(selectedAnalysis.analysis_id);
+        setSuccessModalMessage("Service order created successfully!"); 
+        setShowSuccessModal(true);  
     } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
         console.error("Error submitting service order:", error.message);
+        setErrorModalMessage(firstError); 
+        setShowErrorModal(true);  
     }
   }
 
@@ -385,7 +455,22 @@ const ServiceAnalysis = () => {
       }
 
   } catch (error) {
+    let firstError = "An unknown error occurred.";
+    if (error && typeof error === "object") {
+      const keys = Object.keys(error);
+      if (keys.length > 0) {
+        const firstKey = keys[0];
+        const firstValue = error[firstKey];
+        if (Array.isArray(firstValue)) {
+          firstError = `${firstKey}: ${firstValue[0]}`;
+        }
+      } else if (typeof error.detail === "string") {
+        firstError = error.detail;
+      }
+    }
       console.error("Error submitting order item:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
   }
 }
 
@@ -420,7 +505,22 @@ const ServiceAnalysis = () => {
       }
 
   } catch (error) {
+    let firstError = "An unknown error occurred.";
+    if (error && typeof error === "object") {
+      const keys = Object.keys(error);
+      if (keys.length > 0) {
+        const firstKey = keys[0];
+        const firstValue = error[firstKey];
+        if (Array.isArray(firstValue)) {
+          firstError = `${firstKey}: ${firstValue[0]}`;
+        }
+      } else if (typeof error.detail === "string") {
+        firstError = error.detail;
+      }
+    }
       console.error("Error updating order item:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
   }
   }
 
@@ -452,8 +552,25 @@ const ServiceAnalysis = () => {
         const data = await POST("/delivery-order/", newDeliveryOrderInfo );
         console.log("Delivery order created successfully:", data);
         fetchDeliveryOrder(serviceOrderInfo.serviceOrderId);
+        setSuccessModalMessage("Service delivery order created successfully!"); 
+        setShowSuccessModal(true);  
       } catch (error) {
+        let firstError = "An unknown error occurred.";
+        if (error && typeof error === "object") {
+          const keys = Object.keys(error);
+          if (keys.length > 0) {
+            const firstKey = keys[0];
+            const firstValue = error[firstKey];
+            if (Array.isArray(firstValue)) {
+              firstError = `${firstKey}: ${firstValue[0]}`;
+            }
+          } else if (typeof error.detail === "string") {
+            firstError = error.detail;
+          }
+        }
           console.error("Error submitting delivery order:", error.message);
+          setErrorModalMessage(firstError); 
+          setShowErrorModal(true);  
       }
     }
   }
@@ -470,8 +587,25 @@ const ServiceAnalysis = () => {
         const data = await PATCH(`delivery-order/${id}/update/`, newDeliveryOrderInfo );
         console.log("Delivery order updated successfully:", data);
         fetchDeliveryOrder(serviceOrderInfo.serviceOrderId);
+        setSuccessModalMessage("Delivery order updated successfully!"); 
+        setShowSuccessModal(true);  
       } catch (error) {
+        let firstError = "An unknown error occurred.";
+        if (error && typeof error === "object") {
+          const keys = Object.keys(error);
+          if (keys.length > 0) {
+            const firstKey = keys[0];
+            const firstValue = error[firstKey];
+            if (Array.isArray(firstValue)) {
+              firstError = `${firstKey}: ${firstValue[0]}`;
+            }
+          } else if (typeof error.detail === "string") {
+            firstError = error.detail;
+          }
+        }
           console.error("Error updating delivery order:", error.message);
+          setErrorModalMessage(firstError); 
+          setShowErrorModal(true);  
       }
     }
   }
@@ -494,8 +628,21 @@ const ServiceAnalysis = () => {
         const data = await PATCH (`analysis-sched/${afterAnalysisId}/update/`, afterAnalysisData);
         console.log("After analysis sched update successfully:", data);
         fetchAfterAnalysis(selectedAnalysis.analysis_id);
+        setSuccessModalMessage("After analysis schedule updated successfully!"); 
+        setShowSuccessModal(true);  
     } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const firstKey = Object.keys(error)[0];
+        if (firstKey && Array.isArray(error[firstKey])) {
+          firstError = error[firstKey][0];
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
         console.error("Error updating after analysis sched:", error.message);
+        setErrorModalMessage(firstError); 
+        setShowErrorModal(true);  
     }
   }
 
@@ -513,8 +660,25 @@ const ServiceAnalysis = () => {
         const data = await POST("/after-analysis/", afterAnalysisData);
         console.log("After analysis sched created successfully:", data);
         fetchAfterAnalysis(selectedAnalysis.analysis_id);
+        setSuccessModalMessage("After analysis scheduled successfully!"); 
+        setShowSuccessModal(true);  
     } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
         console.error("Error submitting after analysis sched:", error.message);
+        setErrorModalMessage(firstError); 
+        setShowErrorModal(true);  
     }
   }
 
@@ -753,8 +917,8 @@ const ServiceAnalysis = () => {
                       <tr>
                         <th>Item ID</th>
                         <th>Item Name</th>
-                        <th>Unit Price</th>
                         <th>Quantity</th>
+                        <th>Unit Price</th>
                         <th>Total Price</th>
                         <th>Principal Item ID</th>
                       </tr>
@@ -770,8 +934,8 @@ const ServiceAnalysis = () => {
                           >
                             <td>{item.item?.item_id || ""}</td>
                             <td>{item.item?.item_name || ""}</td>
-                            <td>{item.item_price}</td>
                             <td>{item.item_quantity}</td>
+                            <td>{item.item_price}</td>
                             <td>{item.total_price}</td>
                             <td>{item.principal_item?.principal_item_id || ""}</td>
                           </tr>
@@ -924,7 +1088,7 @@ const ServiceAnalysis = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="deliveryStatus">Delivery Status <span className="required">*</span></label>
-                  <div className="select-wrapper">
+                  <div className="select-wrapper" ref={statusRef}>
                     <input
                       type="text"
                       id="deliveryStatus"
@@ -1002,7 +1166,7 @@ const ServiceAnalysis = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="serviceStatus">Service Status <span className="required">*</span></label>
-                  <div className="select-wrapper">
+                  <div className="select-wrapper" ref={afterStatusRef}>
                     <input
                       type="text"
                       id="serviceStatus"
@@ -1180,6 +1344,25 @@ const ServiceAnalysis = () => {
           }}
         />
       )}
+
+{showErrorModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>ERROR</h2>
+            <p>{errorModalMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowErrorModal(false)}>OK</button>
+          </div>
+        </div>
+      )} 
+
+      {showSuccessModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <p>{successModalMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowSuccessModal(false)}>OK</button>
+          </div>
+        </div>
+      )}   
     </div>
   )
 }

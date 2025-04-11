@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 import ServiceContractIcon from "/icons/SupportServices/ServiceContractIcon.png"
@@ -152,6 +152,25 @@ const handleSelectStatus = (status) => {
     });
   }
 
+  const statementItemRef = useRef(null);
+  const statusRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (statementItemRef.current && !statementItemRef.current.contains(event.target)) {
+        setOpenSTMDD(false); // Close the dropdown
+      }
+      if (statusRef.current && !statusRef.current.contains(event.target)) {
+        setOpenStatusDD(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   if (!isOpen) return null
 
   return (
@@ -171,8 +190,8 @@ const handleSelectStatus = (status) => {
           <div className="modal-form">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="statementId">Sales Statement ID</label>
-                <div className="select-wrapper">
+                <label htmlFor="statementId">Sales Statement ID  <span className="required">*</span></label>
+                <div className="select-wrapper" ref={statementItemRef}>
                 <input
                   type="text"
                   id="statementId"
@@ -348,8 +367,8 @@ const handleSelectStatus = (status) => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="contractStatus">Contract Status</label>
-                <div className="select-wrapper">
+                <label htmlFor="contractStatus">Contract Status  <span className="required">*</span></label>
+                <div className="select-wrapper" ref={statusRef}>
                   <input
                     type="text"
                     id="contractStatus"
@@ -378,7 +397,13 @@ const handleSelectStatus = (status) => {
           <button className="cancel-button" onClick={onClose}>
             Cancel
           </button>
-          <button className="update-modal-button" onClick={handleCreate}>
+          <button 
+            className={`update-button ${
+              formData.statementId && formData.contractStatus  ? "clickable" : "disabled"
+              }`}
+              onClick={handleCreate}
+              disabled={!(formData.statementId && formData.contractStatus)}
+            >
             Create
           </button>
         </div>

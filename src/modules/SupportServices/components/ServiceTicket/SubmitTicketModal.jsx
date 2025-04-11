@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useEffect, useState } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
@@ -95,6 +95,33 @@ const handleSelectType = (selectedType) => {
   setDropdownOpenType(false); 
 };
 
+  const customerRef = useRef(null);
+  const typeRef = useRef(null);
+  const techRef = useRef(null);
+  const prioRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (customerRef.current && !customerRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+      if (typeRef.current && !typeRef.current.contains(event.target)) {
+        setDropdownOpenType(false); // Close the dropdown
+      }
+      if (techRef.current && !techRef.current.contains(event.target)) {
+        setDropdownOpenT(false); // Close the dropdown
+      }
+      if (prioRef.current && !prioRef.current.contains(event.target)) {
+        setDropdownOpenP(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleSubmit = async () => {
     onSubmit({
       customer_id: customerId,  
@@ -135,7 +162,7 @@ const handleSelectType = (selectedType) => {
                 <label htmlFor="customerId">
                   Customer ID <span className="required">*</span>
                 </label>
-                <div className="select-wrapper">
+                <div className="select-wrapper"  ref={customerRef}>
                   <input
                     type="text"
                     id="customerId"
@@ -171,11 +198,12 @@ const handleSelectType = (selectedType) => {
                 <label htmlFor="ticketType">
                   Ticket Type <span className="required">*</span>
                 </label>
-                <div className="select-wrapper">
+                <div className="select-wrapper"  ref={typeRef}>
                   <input
                     type="text"
                     id="ticketType"
                     value={ticketType}
+                    readOnly
                     onChange={(e) => setTicketType(e.target.value)}
                     placeholder="Select ticket type"
                   />
@@ -212,7 +240,7 @@ const handleSelectType = (selectedType) => {
                 <label htmlFor="technicianId">
                   Technician ID <span className="required">*</span>
                 </label>
-                <div className="select-wrapper">
+                <div className="select-wrapper"  ref={techRef}>
                   <input
                     type="text"
                     id="technicianId"
@@ -266,7 +294,7 @@ const handleSelectType = (selectedType) => {
                 <label htmlFor="priority">
                   Priority <span className="required">*</span>
                 </label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={prioRef}>
                   <input
                     type="text"
                     id="priority"
@@ -307,7 +335,7 @@ const handleSelectType = (selectedType) => {
             <div className="form-row">
               <div className="form-group desc" style={{ flex: "1 1 100%" }}>
                 <label htmlFor="ticketDescription">
-                  Ticket Description <span className="required">*</span>
+                  Ticket Description
                 </label>
                 <textarea
                   id="ticketDescription"
@@ -324,7 +352,13 @@ const handleSelectType = (selectedType) => {
           <button className="cancel-button" onClick={onClose}>
             Cancel
           </button>
-          <button className="submit-button" onClick={handleSubmit}>
+          <button 
+            className={`update-button ${
+              customerId && ticketType && technicianId && priority && subject ? "clickable" : "disabled"
+            }`}
+            onClick={handleSubmit}
+            disabled={!(customerId && ticketType && technicianId && priority && subject)}
+          >
             Submit Ticket
           </button>
         </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 
@@ -116,18 +116,6 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
     setOpenContractDD(false); 
   };
 
-  const handlecontractInput = (input) => {
-    setContractNo(input); 
-  
-    const matchedContract = contracts.find(contract => contract.contract_id === input);
-  
-    if (matchedContract) {
-      handleSelectContract(matchedContract); 
-    } else {
-      setTerminationDate(""); 
-    }
-  };
-
   // handle type
   const handleTypeDropdown = () => {
     setOpenTypeDD((prev) => !prev); 
@@ -157,6 +145,37 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
     setPriority(selectedPrio); 
     setDropdownOpenP(false); 
   };
+
+  const prodRef = useRef(null);
+  const typeRef = useRef(null);
+  const contractRef = useRef(null);
+  const statusRef = useRef(null);
+  const prioRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (prodRef.current && !prodRef.current.contains(event.target)) {
+        setOpenProdDD(false);
+      }
+      if (typeRef.current && !typeRef.current.contains(event.target)) {
+        setOpenTypeDD(false); // Close the dropdown
+      }
+      if (contractRef.current && !contractRef.current.contains(event.target)) {
+        setOpenContractDD(false); // Close the dropdown
+      }
+      if (statusRef.current && !statusRef.current.contains(event.target)) {
+        setOpenStatusDD(false); // Close the dropdown
+      }
+      if (prioRef.current && !prioRef.current.contains(event.target)) {
+        setDropdownOpenP(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
 
   if (!isOpen) return null
@@ -259,7 +278,7 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
                 </div>
                 <div className="form-group">
                   <label htmlFor="productId">Product ID</label>
-                  <div className="select-wrapper">
+                  <div className="select-wrapper" ref={prodRef}>
                     <input
                       type="text"
                       id="productId"
@@ -318,7 +337,7 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
             <div className="form-row aligned-row">
               <div className="form-group">
                 <label htmlFor="contractNo">Contract No.</label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={contractRef}>
                   <input
                     type="text"
                     id="contractNo"
@@ -386,7 +405,7 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
               </div>
               <div className="form-group">
                 <label htmlFor="status">Status</label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={statusRef}>
                   <input
                     type="text"
                     id="status"
@@ -412,7 +431,7 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="callType">Call Type</label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={typeRef}>
                   <input
                     type="text"
                     id="callType"
@@ -435,7 +454,7 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
               </div>
               <div className="form-group">
                 <label htmlFor="priority">Priority</label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={prioRef}>
                   <input
                     type="text"
                     id="priority"

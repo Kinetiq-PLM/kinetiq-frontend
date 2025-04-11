@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceAnalysisIcon from "/icons/SupportServices/ServiceAnalysisIcon.png"
 import ViewInventoryModal from "./ViewInventoryModal"
@@ -19,6 +19,8 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
   const [items, setItems] = useState([]);
   const [isItemsDropdown, setItemsDropdown] = useState(false)
   const [showViewInventoryModal, setShowViewInventoryModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     if (item) {
@@ -65,9 +67,10 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
   const [principals, setPrincipals] = useState([]);
   const [isPrincipalDropdown, setPrincipalDropdown] = useState(false)
 
-  const fetchPrincipals = async (itemId) => {
+  const fetchPrincipals = async (orderId) => {
+    console.log(orderId)
     try {
-      const data = await GET(`principal-items/${itemId}/`);
+      const data = await GET(`principal-items/${orderId}/`);
       setPrincipals(data);
     } catch (error) {
       console.error("Error fetching principal items:", error);
@@ -76,14 +79,14 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
 
   const handleTogglePrincipals = () => {
     if (!isPrincipalDropdown) {
-      fetchPrincipals(itemId); 
+      fetchPrincipals(orderId); 
     }
     setPrincipalDropdown(!isPrincipalDropdown);
   };
 
   const handleSelectPrincipal = (principal) => {
     setPrincipalItemId(principal.principal_item_id);
-    setMarkupPrice(principal.unit_price || "");
+    setMarkupPrice(principal.mark_up_price || "");
 
     setPrincipalDropdown(false);
   };
@@ -93,6 +96,12 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
   }
 
   const handleEdit = () => {
+    if (!/^\d+$/.test(quantity)) {
+      setErrorMessage("Invalid quantity, please enter a valid number.");
+      setShowModal(true);
+      return;
+    }
+
     onEdit({
       item_id: itemId,
       principal_item_id: principalItemId,
@@ -103,6 +112,25 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
       item_name: itemName,
     })
   }
+
+  const itemRef = useRef(null);
+  const principalRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (itemRef.current && !itemRef.current.contains(event.target)) {
+        setItemsDropdown(false); // Close the dropdown
+      }
+      if (principalRef.current && !principalRef.current.contains(event.target)) {
+        setPrincipalDropdown(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   if (!isOpen) return null
 
@@ -130,7 +158,7 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
                 <label htmlFor="itemId">
                   Item ID 
                 </label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={itemRef}>
                   <input
                     type="text"
                     id="itemId"
@@ -164,7 +192,7 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="principalItemId">Principal Item ID</label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={principalRef}>
                   <input
                     type="text"
                     id="principalItemId"
@@ -288,6 +316,16 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
             setShowViewInventoryModal(false)
           }}
         />
+      )}
+
+      {showModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>⚠  WARNING</h2>
+            <p>{errorMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowModal(false)}>OK</button>
+          </div>
+        </div>
       )}
       </div>
     </div>

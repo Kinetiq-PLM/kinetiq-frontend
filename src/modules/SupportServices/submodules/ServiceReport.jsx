@@ -39,6 +39,8 @@ const ServiceReport = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [showSubmitModal, setShowSubmitModal] = useState(false)
   const [selectedReport, setSelectedReport] = useState(null)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorModalMessage, setErrorModalMessage] = useState("")
 
   const fetchReports = async () => {
     try {
@@ -109,7 +111,22 @@ const ServiceReport = () => {
       setShowUpdateModal(false);
       fetchReports();
     } catch (error) {
-        console.error("Error updating service report:", error.message);
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+      console.error("Error updating service report:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
     }
   }
 
@@ -122,7 +139,23 @@ const ServiceReport = () => {
       setShowSubmitModal(false);
       fetchReports();
   } catch (error) {
-      console.error("Error submitting report:", error.message);
+    let firstError = "An unknown error occurred.";
+    if (error && typeof error === "object") {
+      const keys = Object.keys(error);
+      if (keys.length > 0) {
+        const firstKey = keys[0];
+        const firstValue = error[firstKey];
+        if (Array.isArray(firstValue)) {
+          firstError = `${firstKey}: ${firstValue[0]}`;
+        }
+      } else if (typeof error.detail === "string") {
+        firstError = error.detail;
+      }
+    }
+    
+    console.error("Error submitting report:", error.message);
+    setErrorModalMessage(firstError); 
+    setShowErrorModal(true);  
   }
     
   }
@@ -152,7 +185,22 @@ const ServiceReport = () => {
       setShowModal(false);
       fetchReports();
     } catch (error) {
-        console.error("Error updating ticket:", error.message);
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+      console.error("Error updating ticket:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
     }
   }
 
@@ -366,6 +414,16 @@ const ServiceReport = () => {
           </div>
         </div>
       )}
+
+      {showErrorModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>ERROR</h2>
+            <p>{errorModalMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowErrorModal(false)}>OK</button>
+          </div>
+        </div>
+      )} 
     </div>
   )
 }

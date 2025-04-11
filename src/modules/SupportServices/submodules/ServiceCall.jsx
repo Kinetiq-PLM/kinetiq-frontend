@@ -28,6 +28,8 @@ const ServiceCall = () => {
   const [showRequestModal, setShowRequestModal] = useState(false)
   const [showRenewalModal, setShowRenewalModal] = useState(false)
   const [selectedCall, setSelectedCall] = useState(null)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorModalMessage, setErrorModalMessage] = useState("")
 
   // Fetch service calls from API (mock function)
   const fetchServiceCalls = async () => {
@@ -78,7 +80,23 @@ const ServiceCall = () => {
       setShowResolutionModal(false);
       fetchServiceCalls();
   } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
       console.error("Error updating service call:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
   }
   }
 
@@ -127,7 +145,23 @@ const ServiceCall = () => {
       setShowResolutionModal(true);
       fetchServiceCalls();
     } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
       console.error("Error creating service request:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
     }
   }
 
@@ -142,7 +176,23 @@ const ServiceCall = () => {
       setShowResolutionModal(true);
       fetchServiceCalls();
     } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
       console.error("Error creating waranty renewal:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
     }
   }
 
@@ -278,6 +328,16 @@ const ServiceCall = () => {
         onSubmit={handleSubmitRen}
         callData={selectedCall}
       />
+
+      {showErrorModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>ERROR</h2>
+            <p>{errorModalMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowErrorModal(false)}>OK</button>
+          </div>
+        </div>
+      )}  
     </div>
   )
 }

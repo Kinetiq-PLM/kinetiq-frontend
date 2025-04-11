@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 
@@ -123,6 +123,30 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
     setOpenTypeDD(false); 
   };
 
+  const prodRef = useRef(null);
+  const typeRef = useRef(null);
+  const techRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (prodRef.current && !prodRef.current.contains(event.target)) {
+        setOpenProdDD(false);
+      }
+      if (typeRef.current && !typeRef.current.contains(event.target)) {
+        setOpenTypeDD(false); // Close the dropdown
+      }
+      if (techRef.current && !techRef.current.contains(event.target)) {
+        setOpenTechDD(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
   if (!isOpen) return null
 
   return (
@@ -194,7 +218,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
                 <label htmlFor="productId">
                   Product ID <span className="required">*</span>
                 </label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={prodRef}>
                   <input
                     type="text"
                     id="productId"
@@ -235,7 +259,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
                 <label htmlFor="assignTechnicianId">
                   Technician ID <span className="required">*</span>
                 </label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={techRef}>
                   <input
                     type="text"
                     id="assignTechnicianId"
@@ -284,7 +308,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
                 <label htmlFor="callType">
                   Call Type <span className="required">*</span>
                 </label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={typeRef}>
                   <input
                     type="text"
                     id="callType"
@@ -320,7 +344,13 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
           <button className="cancel-button" onClick={onClose}>
             Cancel
           </button>
-          <button className="queue-button" onClick={handleQueue}>
+          <button 
+            className={`update-button ${
+              productId && technicianId && callType ? "clickable" : "disabled"
+            }`}
+            onClick={handleQueue}
+            disabled={!(productId && technicianId && callType)}
+          >
             Queue Call
           </button>
         </div>

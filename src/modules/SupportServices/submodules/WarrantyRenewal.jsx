@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react"
 import "../styles/WarrantyRenewal.css"
 import "../styles/SupportServices.css"
-import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 import Table from "../components/WarrantyRenewal/Table"
 import UpdateViewModal from "../components/WarrantyRenewal/UpdateViewModal"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
+import WarrantyRenewalIcon from "/icons/SupportServices/WarrantyRenewalIcon.svg"
 
 import { GET } from "../api/api"
 import { PATCH } from "../api/api"
@@ -19,6 +19,8 @@ const WarrantyRenewal = () => {
   // Modal states
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [selectedRenewal, setSelectedRenewal] = useState(null)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorModalMessage, setErrorModalMessage] = useState("")
 
   // Fetch service calls from API (mock function)
   const fetchServiceRenewals = async () => {
@@ -58,7 +60,23 @@ const WarrantyRenewal = () => {
       setShowUpdateModal(false);
       fetchServiceRenewals();
   } catch (error) {
+    let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
       console.error("Error updating renewal:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
   }
   }
 
@@ -82,7 +100,7 @@ const WarrantyRenewal = () => {
       <div className="body-content-container">
         <div className="header">
           <div className="icon-container">
-            <img src={ServiceCallIcon || "/placeholder.svg?height=24&width=24"} alt="Service Call" /> 
+            <img src={WarrantyRenewalIcon || "/placeholder.svg?height=24&width=24"} alt="Warranty Renewal" /> 
           </div>
           <div className="title-container">
             <h2>Warranty Renewal</h2>
@@ -132,6 +150,16 @@ const WarrantyRenewal = () => {
         onUpdate={handleUpdate}
         renewalData={selectedRenewal}
       />
+
+{showErrorModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>ERROR</h2>
+            <p>{errorModalMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowErrorModal(false)}>OK</button>
+          </div>
+        </div>
+      )}  
     </div>
   )
 }

@@ -32,6 +32,8 @@ const ServiceTicket = () => {
   // Modal states
   const [showSubmitModal, setShowSubmitModal] = useState(false)
   const [showQueueModal, setShowQueueModal] = useState(false)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorModalMessage, setErrorModalMessage] = useState("")
 
   const fetchTickets = async () => {
     try {
@@ -87,7 +89,23 @@ const ServiceTicket = () => {
         setShowSubmitModal(false);
         fetchTickets();
     } catch (error) {
-        console.error("Error submitting ticket:", error.message);
+        let firstError = "An unknown error occurred.";
+        if (error && typeof error === "object") {
+          const keys = Object.keys(error);
+          if (keys.length > 0) {
+            const firstKey = keys[0];
+            const firstValue = error[firstKey];
+            if (Array.isArray(firstValue)) {
+              firstError = `${firstKey}: ${firstValue[0]}`;
+            }
+          } else if (typeof error.detail === "string") {
+            firstError = error.detail;
+          }
+        }
+    
+        console.error("Error submitting ticket:", firstError);
+        setErrorModalMessage(firstError); 
+        setShowErrorModal(true);          
     }
   }
 
@@ -104,7 +122,23 @@ const ServiceTicket = () => {
       console.log("Service call created successfully:", data);
       setShowQueueModal(false);
     } catch (error) {
-      console.error("Error creating service call:", error.message);
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+    
+        console.error("Error creating service call:", error.message);
+        setErrorModalMessage(firstError); 
+        setShowErrorModal(true);          
     }
   }
 
@@ -240,6 +274,16 @@ const ServiceTicket = () => {
       />
 
       <QueueTicketModal isOpen={showQueueModal} onClose={() => setShowQueueModal(false)} onQueue={handleQueueCall} ticket={selectedTicket} />
+    
+      {showErrorModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>ERROR</h2>
+            <p>{errorModalMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowErrorModal(false)}>OK</button>
+          </div>
+        </div>
+      )}                  
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
-import ServiceContractIcon from "/icons/SupportServices/ServiceContractIcon.png"
+import ServiceBillingIcon from "/icons/SupportServices/ServiceBillingIcon.svg"
 
 import { GET } from "../../api/api"
 
@@ -120,19 +120,6 @@ const CreateBillingModal = ({ isOpen, onClose, onCreate }) => {
     }));
   };
 
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-
-  const toggleDatePicker = () => {
-    const dateInput = document.getElementById("datePaid");
-    if (isPickerOpen) { 
-      dateInput.blur(); 
-    } else {
-      dateInput.showPicker(); 
-    }
-    
-    setIsPickerOpen(!isPickerOpen); 
-  };
-
 const handleToggleDropdownStatus = () => {
   setOpenStatusDD(!isOpenStatusDD);
 };
@@ -178,6 +165,7 @@ const handleSelectRenewal = (renewal) => {
     orderTotalPrice: "",
     operationalCostId: "",
     totalOperationalCost: "",
+    totalPayable: renewal.renewal_fee,
   }));
   setOpenRenewal(false);
 };
@@ -318,7 +306,7 @@ const handleSelectOpCost = (operationalCost) => {
       <div className="modal-container">
         <div className="modal-header" style={{ borderBottom: "2px solid #00a8a8" }}>
           <div className="modal-header-left">
-            <img src={ServiceContractIcon || "/placeholder.svg"} alt="Service Contract" className="modal-header-icon" />
+            <img src={ServiceBillingIcon || "/placeholder.svg"} alt="Service Billing" className="modal-header-icon" />
             <h2>Create Service Billing</h2>
           </div>
           <button className="close-button" onClick={onClose}>
@@ -627,6 +615,8 @@ const handleSelectOpCost = (operationalCost) => {
                     value={formData.outsourceFee}
                     onChange={handleChange} 
                     placeholder="Outsource fee"
+                    disabled={formData.renewalId !== ""}
+                    className={formData.renewalId !== "" ? "disabled-input" : ""}
                   />
               </div>
             </div>

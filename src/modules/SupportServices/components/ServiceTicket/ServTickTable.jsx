@@ -23,7 +23,7 @@ const ServTickTable = ({ filteredTickets, onRowClick, selectedTicket }) => {
             >
               <td>{ticket.ticket_id}</td>
               <td>{ticket.customer ? ticket.customer.name : "Unknown"}</td>
-              <td>{ticket.created_at}</td>
+              <td>{new Date(ticket.created_at).toISOString().split("T")[0]}</td>
               <td className={`priority-${ticket.priority.toLowerCase()}`}>{ticket.priority}</td>
               <td>{ticket.status}</td>
             </tr>

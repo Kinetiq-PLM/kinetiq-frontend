@@ -1,8 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
-import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 import ServiceContractIcon from "/icons/SupportServices/ServiceContractIcon.png"
 
 import { GET } from "../../api/api"
@@ -153,27 +152,26 @@ const handleRenewalCheckbox = () => {
       renewal_id: formData.renewalId,
       contract_description: formData.contractDescription
     })
-
-    // reset form
-  setFormData({
-    contractId: "",
-    productId: "",
-    productName: "",
-    productQuantity: "",
-    customerId: "",
-    phoneNumber: "",
-    name: "",
-    emailAddress: "",
-    dateIssued: "",
-    terminationDate: "",
-    contractStatus: "",
-    contractDescription: "",
-    renewalId: "",
-    renewalDate: "",
-    renewalEndDate: "",
-  });
-  setIsRenewalChecked(false);
   }
+
+  const renewalRef = useRef(null);
+  const statusRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (renewalRef.current && !renewalRef.current.contains(event.target)) {
+        setOpenRenewalDD(false); // Close the dropdown
+      }
+      if (statusRef.current && !statusRef.current.contains(event.target)) {
+        setOpenStatusDD(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   if (!isOpen) return null
 
@@ -368,7 +366,7 @@ const handleRenewalCheckbox = () => {
               <div className="form-column" style={{ flex: 1 }}>
                 <div className="form-group">
                   <label htmlFor="contractStatus">Contract Status</label>
-                  <div className="select-wrapper">
+                  <div className="select-wrapper" ref={statusRef}>
                     <input
                       type="text"
                       id="contractStatus"
@@ -402,7 +400,7 @@ const handleRenewalCheckbox = () => {
 
                 <div className="form-group">
                   <label htmlFor="renewalId">Renewal ID</label>
-                  <div className="select-wrapper">
+                  <div className="select-wrapper" ref={renewalRef}>
                     <input
                       type="text"
                       id="renewalId"

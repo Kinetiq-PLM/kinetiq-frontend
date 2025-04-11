@@ -422,6 +422,31 @@
   bottom: 100% !important;
 }
 
+.service-report  input:disabled {
+  background-color: #f0f0f0; 
+  cursor: not-allowed; 
+  opacity: 0.6; 
+}
+
+.service-report  .select-wrapper input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.service-report .select-arrow input:disabled  {
+  color: #ccc; 
+  cursor: not-allowed;
+}
+
+.service-report .select-wrapper input:disabled + .select-arrow {
+  pointer-events: none;
+}
+.service-report .disabled-input {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
 
 /* Responsive adjustments */
 @media (max-width: 992px) {

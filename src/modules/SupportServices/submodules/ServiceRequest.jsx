@@ -18,6 +18,8 @@ const ServiceRequest = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState(null)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorModalMessage, setErrorModalMessage] = useState("")
 
   const fetchRequests = async () => {
     try {
@@ -66,7 +68,23 @@ const ServiceRequest = () => {
       setShowUpdateModal(false);
       fetchRequests();
     } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
         console.error("Error updating service request:", error.message);
+        setErrorModalMessage(firstError); 
+        setShowErrorModal(true);  
     }
   }
 
@@ -182,6 +200,16 @@ const ServiceRequest = () => {
         request={selectedRequest}
         onUpdate={handleUpdateRequest}
       />
+
+{showErrorModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>ERROR</h2>
+            <p>{errorModalMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowErrorModal(false)}>OK</button>
+          </div>
+        </div>
+      )}  
     </div>
   )
 }

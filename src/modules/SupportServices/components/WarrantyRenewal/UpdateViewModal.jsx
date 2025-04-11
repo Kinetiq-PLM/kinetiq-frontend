@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
-import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
+import WarrantyRenewalIcon from "/icons/SupportServices/WarrantyRenewalIcon.svg"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 
 import { GET } from "../../api/api"
@@ -24,6 +24,7 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, renewalData }) => {
   const [contracts, setContracts] = useState([]);
   const [isContractDropdown, setOpenContractDD] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Update form when callData changes
   useEffect(() => {
@@ -93,7 +94,28 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, renewalData }) => {
     setIsPickerOpen(!isPickerOpen); 
   };
 
+  const contractRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (contractRef.current && !contractRef.current.contains(event.target)) {
+        setOpenContractDD(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleUpdate = () => {
+    if (!/^\d+$/.test(duration)) {
+      setErrorMessage("Invalid duration, please enter a valid number.");
+      setShowModal(true);
+      return;
+    }
+
     onUpdate({
       renewal_id: renewalId,
       contract_id: contractId,
@@ -111,8 +133,8 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, renewalData }) => {
         <div className="modal-header">
           <div className="modal-header-left">
             <img
-              src={ServiceCallIcon || "/placeholder.svg?height=24&width=24"}
-              alt="Service Call"
+              src={WarrantyRenewalIcon || "/placeholder.svg?height=24&width=24"}
+              alt="Warranty Renewal"
               className="modal-header-icon"
             />
             <h2>Update Warranty Renewal</h2>
@@ -209,7 +231,7 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, renewalData }) => {
             <div className="form-row aligned-row">
               <div className="form-group">
                   <label htmlFor="contractId">Contract ID</label>
-                    <div className="select-wrapper">
+                    <div className="select-wrapper" ref={contractRef}>
                     <input
                       type="text"
                       id="contractId"
@@ -336,7 +358,7 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, renewalData }) => {
         <div className="alert-modal-overlay">
           <div className="alert-modal-content">
             <h2>⚠  WARNING</h2>
-            <p>Service contract still currently active, cannot issue a contract renewal.</p>
+            <p>{errorMessage}</p>
             <button className="alert-okay-button" onClick={() => setShowModal(false)}>OK</button>
           </div>
         </div>

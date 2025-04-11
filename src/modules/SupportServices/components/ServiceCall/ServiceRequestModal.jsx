@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceCallIcon from "/icons/SupportServices/ServiceCallIcon.png"
 
@@ -52,16 +52,6 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
       request_date: today,
       request_description: requestDescription,
     })
-    // reset form
-    setCallId("")
-    setTechnicianId("")
-    setTechnicianName("")
-    setRequestType("")
-    setCustomerId("")
-    setName("")
-    setPhoneNumber("")
-    setEmailAddress("")
-    setRequestDescription("")
   }
 
   // fetches a list of techs
@@ -98,6 +88,25 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
     setRequestType(selectedType); 
     setOpenTypeDD(false); 
   };
+
+  const techRef = useRef(null);
+  const typeRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (typeRef.current && !typeRef.current.contains(event.target)) {
+        setOpenTypeDD(false); // Close the dropdown
+      }
+      if (techRef.current && !techRef.current.contains(event.target)) {
+        setOpenTechDD(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   if (!isOpen) return null
 
@@ -149,7 +158,7 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="technicianId">Technician ID <span className="required">*</span></label>
-                <div className="select-wrapper">
+                <div className="select-wrapper" ref={techRef}>
                 <input
                   type="text"
                   id="technicianId"
@@ -222,8 +231,8 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
 
             <div className="form-row aligned-row">
                 <div className="form-group">
-                    <label htmlFor="requestType">Request Type</label>
-                    <div className="select-wrapper">
+                    <label htmlFor="requestType">Request Type <span className="required">*</span></label>
+                    <div className="select-wrapper" ref={typeRef}>
                     <input
                         type="text"
                         id="requestType"
@@ -257,7 +266,7 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
               </div>
             </div>
             <div className="form-group req-desc">
-                <label htmlFor="requestDescription">Request Description</label>
+                <label htmlFor="requestDescription">Request Description <span className="required">*</span></label>
                 <textarea
                   type="text"
                   id="requestDescription"
@@ -273,7 +282,13 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
           <button className="cancel-button" onClick={onClose}>
             Cancel
           </button>
-          <button className="update-modal-button" onClick={handleSubmitReq}>
+          <button 
+            className={`update-button ${
+              technicianId && requestType ? "clickable" : "disabled"
+            }`}
+            onClick={handleSubmitReq}
+            disabled={!(technicianId && requestType )}
+          >
             Submit for Approval
           </button>
         </div>

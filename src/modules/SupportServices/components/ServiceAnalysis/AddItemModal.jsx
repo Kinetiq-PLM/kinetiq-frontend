@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useEffect, useState } from "react"
 import ExitIcon from "/icons/SupportServices/ExitIcon.png"
 import ServiceAnalysisIcon from "/icons/SupportServices/ServiceAnalysisIcon.png"
 import ViewInventoryModal from "./ViewInventoryModal"
@@ -9,14 +9,14 @@ import { GET } from "../../api/api"
 
 const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
   const [itemId, setItemId] = useState("")
-  const [principalItemId, setPrincipalItemId] = useState("")
   const [quantity, setQuantity] = useState("")
-  const [markupPrice, setMarkupPrice] = useState("")
   const [itemName, setItemName] = useState("")
 
   const [items, setItems] = useState([]);
   const [isItemsDropdown, setItemsDropdown] = useState(false)
   const [showViewInventoryModal, setShowViewInventoryModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchItems= async () => {
     try {
@@ -47,37 +47,17 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
     setItemName(item.item?.item_name || "");
   };
 
-  const [principals, setPrincipals] = useState([]);
-  const [isPrincipalDropdown, setPrincipalDropdown] = useState(false)
-
-  const fetchPrincipals = async (itemId) => {
-    try {
-      const data = await GET(`principal-items/${itemId}/`);
-      setPrincipals(data);
-    } catch (error) {
-      console.error("Error fetching principal items:", error);
-    }
-  };
-
-  const handleTogglePrincipals = () => {
-    if (!isPrincipalDropdown) {
-      fetchPrincipals(itemId); 
-    }
-    setPrincipalDropdown(!isPrincipalDropdown);
-  };
-
-  const handleSelectPrincipal = (principal) => {
-    setPrincipalItemId(principal.principal_item_id);
-    setMarkupPrice(principal.unit_price || "");
-
-    setPrincipalDropdown(false);
-  };
-
   const handleViewInventory = () => {
     setShowViewInventoryModal(true)
   }
 
   const handleAdd = () => {
+    if (!/^\d+$/.test(quantity)) {
+      setErrorMessage("Invalid quantity, please enter a valid number.");
+      setShowModal(true);
+      return;
+    }
+
     onAdd({
       item_id: itemId,
       principal_item_id: principalItemId,
@@ -88,6 +68,21 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
       item_name: itemName,
     })
   }
+
+  const itemRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (itemRef.current && !itemRef.current.contains(event.target)) {
+        setItemsDropdown(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   if (!isOpen) return null
 
@@ -115,7 +110,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
               <label htmlFor="itemId">
                 Item ID <span className="required">*</span>
               </label>
-              <div className="select-wrapper">
+              <div className="select-wrapper" ref={itemRef}>
                 <input
                   type="text"
                   id="itemId"
@@ -129,7 +124,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
                 />
                 <span className="select-arrow" onClick={handleToggleItems}>▼</span>
                 {isItemsDropdown && (
-                  <ul className="dropdown-list">
+                  <ul className="dropdown-list item-list">
                     {items.length > 0 ? (
                       items
                         .filter((item) =>
@@ -147,37 +142,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
                 )}
               </div>
             </div>
-              <div className="form-group">
-                <label htmlFor="principalItemId">Principal Item ID</label>
-                <div className="select-wrapper">
-                  <input
-                    type="text"
-                    id="principalItemId"
-                    readOnly
-                    value={principalItemId}
-                    onChange={(e) => setPrincipalItemId(e.target.value)}
-                    placeholder="Enter principal item ID"
-                  />
-                  <span className="select-arrow" onClick={handleTogglePrincipals} >▼</span>
-                  {isPrincipalDropdown && (
-                    <ul className="dropdown-list">
-                      {principals.length > 0 ? (
-                        principals.map((principal) => (
-                              <li key={principal.principal_item_id} onClick={() => handleSelectPrincipal(principal)}>
-                                {principal.principal_item_id}
-                              </li>
-                            ))
-                          ) : (
-                            <li>No principal ID found</li>
-                          )}
-                        </ul>
-                  )} 
-                </div>
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
+            <div className="form-group">
                 <label htmlFor="quantity">Quantity <span className="required">*</span></label>
                 <input
                   type="text"
@@ -185,17 +150,6 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                   placeholder="Enter quantity"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="markupPrice">Markup Price</label>
-                <input
-                  type="text"
-                  id="markupPrice"
-                  readOnly
-                  value={markupPrice}
-                  onChange={(e) => setMarkupPrice(e.target.value)}
-                  placeholder="Enter markup price"
                 />
               </div>
             </div>
@@ -216,7 +170,13 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
               <button className="cancel-button" onClick={onClose}>
                 Cancel
               </button>
-              <button className="update-modal-button" onClick={handleAdd}>
+              <button 
+                className={`update-button ${
+                  itemId && quantity  ? "clickable" : "disabled"
+                }`}
+                onClick={handleAdd}
+                disabled={!(itemId && quantity)}
+              >
                 Add
               </button>
               </div>
@@ -250,6 +210,16 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
             setShowViewInventoryModal(false)
           }}
         />
+      )}
+
+      {showModal && (
+        <div className="alert-modal-overlay">
+          <div className="alert-modal-content">
+            <h2>⚠  WARNING</h2>
+            <p>{errorMessage}</p>
+            <button className="alert-okay-button" onClick={() => setShowModal(false)}>OK</button>
+          </div>
+        </div>
       )}
       </div>
     </div>
