@@ -105,7 +105,12 @@ const FormSubmit = ({ activeTab, departments, onFormSubmit, onClearForm, formSub
                     {errors.totalBudget && <p className="error">{errors.totalBudget}</p>}
                   </div>
                   <div className="form-group">
-                    <label>Budget Usage Period: <span className="required">*</span></label>
+                    <label>Usage Period (start date): <span className="required">*</span></label>
+                    <input type="text" name="usagePeriod" value={formData.usagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("usagePeriod")} />
+                    {errors.usagePeriod && <p className="error">{errors.usagePeriod}</p>}
+                  </div>
+                  <div className="form-group">
+                    <label>Usage Period (end date): <span className="required">*</span></label>
                     <input type="text" name="usagePeriod" value={formData.usagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("usagePeriod")} />
                     {errors.usagePeriod && <p className="error">{errors.usagePeriod}</p>}
                   </div>
@@ -153,7 +158,12 @@ const FormSubmit = ({ activeTab, departments, onFormSubmit, onClearForm, formSub
                 </div>
                 <div className="form-column">
                   <div className="form-group">
-                    <label>Budget Usage Period: <span className="required">*</span></label>
+                    <label>Usage Period (start date): <span className="required">*</span></label>
+                    <input type="text" name="usagePeriod" value={formData.usagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("usagePeriod")} />
+                    {errors.usagePeriod && <p className="error">{errors.usagePeriod}</p>}
+                  </div>
+                  <div className="form-group">
+                    <label>Usage Period (end date): <span className="required">*</span></label>
                     <input type="text" name="usagePeriod" value={formData.usagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("usagePeriod")} />
                     {errors.usagePeriod && <p className="error">{errors.usagePeriod}</p>}
                   </div>
