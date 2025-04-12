@@ -3,7 +3,7 @@ import "../styles/MaterialRequirementsPlanning.css";
 import { useState } from "react";
 
 
-const BodyContent = () => {
+const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [filter, setFilter] = useState(false);
     const [rawmaterial, setRawMaterial] = useState(false);
     const [additionalcost, setAdditionalCost] = useState(false);
@@ -712,7 +712,7 @@ const BodyContent = () => {
                                 </div>
                             </div>
                         </div></button>
-                        <button><div style={{width: 156, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 12, paddingRight: 15, left: 327, top: 414, position: 'absolute', background: '#00A8A8', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                        <button onClick={() => {setActiveSubModule("Bills Of Material");loadSubModule("Bills Of Material");}}><div style={{width: 156, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 12, paddingRight: 15, left: 327, top: 414, position: 'absolute', background: '#00A8A8', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                             <div style={{justifyContent: 'center', alignItems: 'center', gap: 3, display: 'inline-flex'}}>
                                 <div style={{width: 116, paddingTop: 2, paddingLeft: 0, paddingRight: 10, justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
                                     <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: 'white', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Go to BOM</div>
