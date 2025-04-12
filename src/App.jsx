@@ -59,112 +59,18 @@ function App() {
   };
 
   const moduleFileNames = {
-    Management: "Management",
-    Administration: "Administration",
-    Accounting: "Accounting",
-    Financials: "Financials",
-    Purchasing: "Purchasing",
-    Operations: "Operations",
-    Sales: "Sales",
-    CRM: "CRM",
-    "Support & Services": "SupportServices",
-    Inventory: "Inventory",
     Distribution: "Distribution",
-    Production: "Production",
-    MRP: "MRP",
-    "Project Management": "ProjectManagement",
-    "Human Resources": "HumanResources",
-    "Report Generator": "ReportGenerator",
   };
 
   const moduleSubmoduleFileNames = {
-    Management: {
-      "Dashboard": "ManagementDashboard",
-      "Policy Compliance Oversight": "ManagementPolicyComplianceOversight",
-      "Salary Release Approval": "ManagementSalaryReleaseApproval",
-      "Budget Review Approval": "ManagementBudgetReviewApproval",
-      "Purchasing Approval": "ManagementPurchasingApproval",
-      "Project Approval": "ManagementProjectApproval",
-      "Project Monitoring": "ManagementProjectMonitoring",
-      "RecruitmentCandidates": "ManagementRecruitmentCandidates",
-      "AssetRemoval": "ManagementAssetRemoval",
-      "User Roles": "UserRoles",
-      "Access Control": "AccessControl",
-      Settings: "Settings",
-    },
-    Administration: {
-      "Company Policies": "CompanyPolicies",
-      "User Accounts": "UserAccounts",
-    },
-    Accounting: {
-      "General Ledger": "GeneralLedger",
-      "Accounts Payable": "AccountsPayable",
-      "Accounts Receivable": "AccountsReceivable",
-    },
-    Financials: {
-      Budgeting: "Budgeting",
-      "Cash Flow": "CashFlow",
-      "Financial Reports": "FinancialReports",
-    },
-    Purchasing: {
-      "Supplier Management": "SupplierManagement",
-      "Purchase Orders": "PurchaseOrders",
-    },
-    Operations: {
-      "Workflow Automation": "WorkflowAutomation",
-      "Operational Analytics": "OperationalAnalytics",
-    },
-    Sales: {
-      Quotation: "Quotation",
-      Order: "Order",
-      Delivery: "Delivery",
-      Invoice: "Invoice",
-      "Master List": "MasterList",
-      Dunning: "Dunning",
-      Reporting: "Reporting",
-      Returns: "Returns",
-      "Contact Management": "ContactManagement",
-      Marketing: "Marketing",
-      "Customer Support": "CustomerSupport",
-    },
-    CRM: {
-      "Contact Management": "ContactManagement",
-      Marketing: "Marketing",
-      "Customer Support": "CustomerSupport",
-    },
-    "Support & Services": {
-      "Ticketing System": "TicketingSystem",
-      "Customer Support": "CustomerSupport",
-    },
-    Inventory: {
-      "Stock Levels": "StockLevels",
-      "Product Catalog": "ProductCatalog",
-    },
     Distribution: {
-      Shipping: "Shipping",
-      "Order Fulfillment": "OrderFulfillment",
-    },
-    Production: {
-      "Manufacturing Process": "ManufacturingProcess",
-      "Quality Control": "QualityControl",
-    },
-    MRP: {
-      "Material Requirements Planning": "MaterialRequirementsPlanning",
-      "Production Scheduling": "ProductionScheduling",
-    },
-    "Project Management": {
-      "Task Assignments": "TaskAssignments",
-      "Gantt Charts": "GanttCharts",
-    },
-    "Human Resources": {
-      "Employee Records": "EmployeeRecords",
-      Payroll: "Payroll",
-      Recruitment: "Recruitment",
-    },
-    "Report Generator": {
-      "Custom Reports": "CustomReports",
-      "Data Visualization": "DataVisualization",
-    },
+      "External Delivery": "ExternalDelivery",
+      "Internal Delivery": "InternalDelivery",
+      "Picking" : "Picking",
+      "Packing": "Packing",
+      Shipment: "Shipment",
+      "Rework": "Rework",
+    }
   };
 
   const modulesIcons = Object.keys(moduleFileNames).map((module) => ({
