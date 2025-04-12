@@ -96,9 +96,12 @@ function App() {
       "Supplier Management": "SupplierManagement",
       "Purchase Orders": "PurchaseOrders",
     },
-    "Operations": {
-      "Workflow Automation": "WorkflowAutomation",
-      "Operational Analytics": "OperationalAnalytics",
+    Operations: {
+      "Goods Tracking": "GoodsTracking",
+      "Internal Transfer": "InternalTransfer",
+      "Delivery Approval": "DeliveryApproval",
+      "Delivery Receipt": "DeliveryReceipt",
+      "Item Removal": "ItemRemoval",
     },
     "Sales": {
       "Lead Management": "LeadManagement",
