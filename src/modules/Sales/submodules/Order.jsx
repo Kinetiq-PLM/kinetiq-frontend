@@ -13,6 +13,8 @@ import ProductListModal from "../components/Modals/Lists/ProductList";
 import QuotationListModal from "../components/Modals/Lists/QuotationList";
 import BlanketAgreementListModal from "../components/Modals/Lists/BlanketAgreementList";
 import EmployeeListModal from "../components/Modals/Lists/EmployeeListModal.jsx";
+import ConfirmClear from "./../components/ConfirmClear";
+
 import NewCustomerModal from "../components/Modals/NewCustomer";
 import SalesTable from "../components/SalesTable";
 import SalesInfo from "../components/SalesInfo";
@@ -35,6 +37,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   // remove local storage after use
 
   const [submitted, setSubmitted] = useState(false);
+  const [canClear, setCanClear] = useState(false);
 
   const [copyFromModal, setCopyFromModal] = useState(""); // variable to set what list will be shown
   // show list modal
@@ -47,6 +50,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [orderID, setOrderID] = useState("");
   // Modals
+  const [isConfirmClearOpen, setIsConfirmClearOpen] = useState(false);
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
@@ -331,10 +335,43 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     });
   }, [deliveryDate]);
 
+  const handleClear = () => {
+    setProducts([]);
+    setSelectedCustomer("");
+    setSelectedProduct("");
+    setSelectedEmployee("");
+    setAddress("");
+    setDeliveryDate("");
+    setOrderInfo({
+      customer_id: "",
+      quotation_id: "",
+      selected_products: products,
+      selected_address: "",
+      selected_delivery_date: "",
+      total_before_discount: 0,
+      date_issued: new Date().toISOString().split("T")[0],
+      discount: 0,
+      total_tax: 0,
+      shipping_fee: 0,
+      warranty_fee: 0,
+      total_price: 0,
+    });
+    setCanClear(false);
+  };
+
+  useEffect(() => {
+    if (selectedCustomer != "") setCanClear(true);
+  }, [selectedCustomer]);
+
   return (
     <div className="quotation">
       <div className="body-content-container">
-        {/* Displays a table and can confirm what was selected */}
+        <ConfirmClear
+          isOpen={isConfirmClearOpen}
+          onClose={() => setIsConfirmClearOpen(false)}
+          handleClear={handleClear}
+        ></ConfirmClear>
+
         <CustomerListModal
           isOpen={isCustomerListOpen}
           onClose={() => setIsCustomerListOpen(false)}
@@ -398,7 +435,13 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
           <div className="h-full flex flex-col gap-3 w-full">
             {/* Buttons Row */}
             <div className="flex gap-2">
-              <Button type="primary" onClick={() => setIsProductListOpen(true)}>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setCanClear(true);
+                  setIsProductListOpen(true);
+                }}
+              >
                 Add Item
               </Button>
               <Button type="outline" onClick={() => handleDelete()}>
@@ -425,9 +468,17 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
             </div>
 
             {/* Submit Button Aligned Right */}
-            <div className="mt-auto">
+            <div className="mt-auto gap-2 flex">
               <Button type="primary" className="" onClick={handleSubmit}>
                 Submit Order
+              </Button>
+              <Button
+                type="outline"
+                className=""
+                onClick={() => setIsConfirmClearOpen(true)}
+                disabled={!canClear}
+              >
+                Clear
               </Button>
             </div>
           </div>
