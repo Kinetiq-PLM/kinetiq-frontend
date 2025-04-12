@@ -138,8 +138,9 @@ function App() {
       "Order Fulfillment": "OrderFulfillment",
     },
     Production: {
-      "Manufacturing Process": "ManufacturingProcess",
+      "Equipment and Labor": "Equipment&Labor",
       "Quality Control": "QualityControl",
+      "Cost of Production" : "CostOfProduction"
     },
     MRP: {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
