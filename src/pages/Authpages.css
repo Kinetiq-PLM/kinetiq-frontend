@@ -1,20 +1,25 @@
 /* Auth Container */
 .login-container {
     height: 100vh;
-    width: 100%;
+    width: 100vw;
     background: #d6f1f0;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
   }
   
   .login-wrapper {
     display: flex;
     background: #d6f1f0;
     border-radius: 12px;
-    max-width: 800px;
     width: 100%;
+    max-width: 1200px;
+    height: 90vh;
     overflow: hidden;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   }
   
   .login-left,
@@ -125,20 +130,25 @@
 /* Signup-specific styles */
 .signup-container {
     height: 100vh;
-    width: 100%;
+    width: 100vw;
     background: #d6f1f0;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
   }
   
   .signup-wrapper {
     display: flex;
     background: #d6f1f0;
     border-radius: 12px;
-    max-width: 800px;
     width: 100%;
+    max-width: 1200px;
+    height: 90vh;
     overflow: hidden;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   }
   
   .signup-left,
@@ -236,4 +246,22 @@
     cursor: pointer;
     font-weight: bold;
     margin-top: 1rem;
+  }
+
+    .auth-switch {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem; 
+    color: #666; 
+  }
+  
+  .auth-switch a {
+    color: #00a7a7; 
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 0.3rem;
+  }
+  
+  .auth-switch a:hover {
+    text-decoration: underline;
   }
