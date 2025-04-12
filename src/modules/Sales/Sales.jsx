@@ -1,18 +1,4 @@
 import React from "react";
-<<<<<<< HEAD
-import "./styles/Sales.css";
-
-const BodyContent = () => {
-    return (
-        <div className="sales">
-            <div className="body-content-container">
-                <p>Hello Sales Module!</p>
-                <p>Fill this container with your elements, change the display if need be.</p>
-                <p>If you're going to style with css, use your unique namespace '.sales' at the start.</p>
-            </div>
-        </div>
-    );
-=======
 import "./styles/Index.css";
 import Heading from "./components/Heading";
 
@@ -53,7 +39,6 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
       </div>
     </div>
   );
->>>>>>> 0ea579597449a2ca3b3eba2bd8b608765dcc3044
 };
 
 export default BodyContent;
