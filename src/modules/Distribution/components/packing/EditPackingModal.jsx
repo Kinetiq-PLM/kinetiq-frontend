@@ -10,8 +10,10 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     total_packing_cost: 0
   });
   
-  // Check if packing list is shipped (final state)
+  // Check if packing list is already packed or shipped (both are final states for this module)
+  const isPacked = packingList?.packing_status === 'Packed';
   const isShipped = packingList?.packing_status === 'Shipped';
+  const isNotEditable = isPacked || isShipped;
   
   // Load packing cost data from packingList when modal opens
   useEffect(() => {
@@ -26,8 +28,8 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
   
   // Handle input changes
   const handleInputChange = (field, value) => {
-    // Don't update if shipped
-    if (isShipped) return;
+    // Don't update if packed or shipped
+    if (isNotEditable) return;
     
     setEditedValues(prev => ({
       ...prev,
@@ -37,8 +39,8 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
   
   // Handle cost input changes
   const handleCostChange = (field, value) => {
-    // Don't update if shipped
-    if (isShipped) return;
+    // Don't update if packed or shipped
+    if (isNotEditable) return;
     
     const numericValue = parseFloat(value);
     
@@ -64,7 +66,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
   
   // Handle save button click
   const handleSave = () => {
-    if (isShipped) return;
+    if (isNotEditable) return;
     onSave(packingList, editedValues);
   };
   
@@ -86,8 +88,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     switch (packingList.packing_status) {
       case 'Pending':
         return 'Mark as Packed';
-      case 'Packed':
-        return 'Mark as Shipped';
       default:
         return '';
     }
@@ -98,21 +98,19 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     switch (packingList.packing_status) {
       case 'Pending':
         return 'Packed';
-      case 'Packed':
-        return 'Shipped';
       default:
         return null;
     }
   };
   
-  // Check if status can be updated
+  // Check if status can be updated - only pending can be updated to packed
   const canUpdateStatus = () => {
-    return packingList.packing_status !== 'Shipped' && Boolean(getNextStatus());
+    return packingList.packing_status === 'Pending';
   };
   
   // Handle status update button click
   const handleStatusUpdate = () => {
-    if (isShipped) return;
+    if (isNotEditable) return;
     
     const nextStatus = getNextStatus();
     if (nextStatus) {
@@ -136,16 +134,9 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     <div className="modal-overlay">
       <div className="edit-packing-modal">
         <div className="modal-header">
-          <h3>{isShipped ? 'View Packing List' : 'Edit Packing List'}</h3>
+          <h3>{isNotEditable ? 'View Packing List' : 'Edit Packing List'}</h3>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        
-        {isShipped && (
-          <div className="completed-notification">
-            <span className="info-icon">ℹ</span>
-            This packing list has been shipped and cannot be modified.
-          </div>
-        )}
         
         <div className="modal-body">
           {/* Basic Information */}
@@ -211,7 +202,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           {/* Packing Assignment Section */}
           <div className="edit-section">
             <h4>Assign Packer</h4>
-            {isShipped ? (
+            {isNotEditable ? (
               <div className="employee-display">
                 <span className="employee-value">
                   {getEmployeeName(packingList.packed_by)}
@@ -223,7 +214,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                   className="employee-dropdown"
                   value={editedValues.packed_by || packingList.packed_by || ''}
                   onChange={(e) => handleInputChange('packed_by', e.target.value)}
-                  disabled={isShipped}
+                  disabled={isNotEditable}
                 >
                   <option value="">-- Select Employee --</option>
                   {employees.map((employee) => (
@@ -239,7 +230,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           {/* Packing Type Section */}
           <div className="edit-section">
             <h4>Packing Type</h4>
-            {isShipped ? (
+            {isNotEditable ? (
               <div className="packing-type-display">
                 <span className="packing-type-value">
                   {getPackingTypeName(packingList.packing_type)}
@@ -251,7 +242,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                   className="packing-type-dropdown"
                   value={editedValues.packing_type || packingList.packing_type || ''}
                   onChange={(e) => handleInputChange('packing_type', e.target.value)}
-                  disabled={isShipped}
+                  disabled={isNotEditable}
                 >
                   <option value="">-- Select Packing Type --</option>
                   {packingTypes.map((type) => (
@@ -267,7 +258,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           {/* Packing Cost Section */}
           <div className="edit-section">
             <h4>Packing Costs</h4>
-            {isShipped ? (
+            {isNotEditable ? (
               <div className="cost-display">
                 <div className="cost-info-row">
                   <span className="cost-label">Material Cost:</span>
@@ -295,7 +286,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                     onChange={(e) => handleCostChange('material_cost', e.target.value)}
                     step="0.01"
                     min="0"
-                    disabled={isShipped}
+                    disabled={isNotEditable}
                   />
                 </div>
                 <div className="cost-input-row">
@@ -307,7 +298,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                     onChange={(e) => handleCostChange('labor_cost', e.target.value)}
                     step="0.01"
                     min="0"
-                    disabled={isShipped}
+                    disabled={isNotEditable}
                   />
                 </div>
                 <div className="cost-total-row">
@@ -333,23 +324,30 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
             </div>
           )}
           
-          {/* Already shipped indicator */}
+          {/* Status message for packed items */}
+          {isPacked && (
+            <div className="shipped-message">
+              <span className="info-text">This packing list has been completed. Shipment processing will occur in the Shipment module.</span>
+            </div>
+          )}
+          
+          {/* Status message for shipped items */}
           {isShipped && (
             <div className="shipped-message">
-              <span className="info-text">This packing list was shipped on {new Date(packingList.shipping_date || packingList.updated_at).toLocaleDateString()}.</span>
+              <span className="info-text">This packing list has been shipped and cannot be modified.</span>
             </div>
           )}
         </div>
         
         <div className="modal-footer">
           <button className="cancel-button" onClick={onClose}>
-            {isShipped ? 'Close' : 'Cancel'}
+            {isNotEditable ? 'Close' : 'Cancel'}
           </button>
-          {!isShipped && (
+          {!isNotEditable && (
             <button
               className="save-button"
               onClick={handleSave}
-              disabled={!hasChanges() || isShipped}
+              disabled={!hasChanges() || isNotEditable}
             >
               Save Changes
             </button>

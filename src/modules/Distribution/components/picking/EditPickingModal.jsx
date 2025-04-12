@@ -103,13 +103,6 @@ const EditPickingModal = ({
           <button className="close-button" onClick={onClose}>×</button>
         </div>
         
-        {isCompleted && (
-          <div className="completed-notification">
-            <span className="info-icon">ℹ</span>
-            This picking list is completed and cannot be modified.
-          </div>
-        )}
-        
         <div className="modal-body">
           <div className="picking-details">
             <div className="detail-item">
@@ -216,7 +209,7 @@ const EditPickingModal = ({
                 </button>
               ) : (
                 <div className="completed-message">
-                  This picking list was completed on {formatDate(pickingList.picked_date)}.
+                  This picking list is completed and cannot be modified.
                 </div>
               )}
             </div>

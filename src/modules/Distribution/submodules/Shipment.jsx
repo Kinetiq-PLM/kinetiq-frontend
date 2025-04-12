@@ -58,20 +58,36 @@ const Shipment = () => {
         
         const data = await response.json();
         
-        // Separate regular shipments and failed shipments
-        const failed = data.filter(s => s.shipment_status === 'Failed');
+        // Only get regular shipments 
         const regular = data.filter(s => s.shipment_status !== 'Failed');
-        
         setShipments(regular);
-        setFailedShipments(failed);
-        setLoading(false);
       } catch (err) {
         setError(err.message);
         setLoading(false);
         console.error('Error fetching shipments:', err);
       }
     };
-
+  
+    const fetchFailedShipments = async () => {
+      try {
+        // Use the dedicated endpoint for failed shipments
+        const response = await fetch('http://127.0.0.1:8000/api/failed-shipments/');
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || 'Failed to fetch failed shipments');
+        }
+        
+        const data = await response.json();
+        setFailedShipments(data);
+      } catch (err) {
+        console.error('Error fetching failed shipments:', err);
+        // Don't set error state as the main shipments might have loaded successfully
+      } finally {
+        setLoading(false);
+      }
+    };
+  
     const fetchCarriers = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/carriers/');
@@ -104,10 +120,11 @@ const Shipment = () => {
         console.error('Error fetching employees:', err);
       }
     };
-
+  
     fetchShipments();
+    fetchFailedShipments(); // Add this new fetch call
     fetchCarriers();
-    fetchEmployees(); // Fetch employees data
+    fetchEmployees();
   }, [refreshTrigger]);
   
   // Get employee full name by employee id
@@ -171,16 +188,20 @@ const Shipment = () => {
   });
   
   // Apply only search filter to failed shipments
-  const filteredFailedShipments = failedShipments.filter(shipment => {
-    // Apply search filter (search by shipment_id, tracking_number, or delivery_id)
-    if (searchTerm && 
-        !shipment.shipment_id.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !shipment.tracking_number.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !String(shipment.delivery_id || '').toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
-    }
+  // Apply only search filter to failed shipments
+  const filteredFailedShipments = failedShipments.filter(failedShipment => {
+    if (!searchTerm) return true;
     
-    return true;
+    // Get shipment details if available
+    const shipmentDetails = failedShipment.shipment_details || {};
+  
+    // Search in both failed shipment and shipment details
+    return (
+      failedShipment.failed_shipment_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      shipmentDetails.tracking_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(shipmentDetails.delivery_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      failedShipment.failure_reason?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   });
   
   // Handle shipment selection

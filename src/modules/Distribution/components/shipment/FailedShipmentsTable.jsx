@@ -46,55 +46,23 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
     });
   };
   
-  // Get failure info
-  const getFailureInfo = (shipment) => {
-    if (!shipment.failed_shipment_info) {
-      return {
-        failure_date: null,
-        failure_reason: 'Not available',
-        resolution_status: 'Unknown'
-      };
-    }
-    return {
-      failure_date: shipment.failed_shipment_info.failure_date,
-      failure_reason: shipment.failed_shipment_info.failure_reason || 'Not specified',
-      resolution_status: shipment.failed_shipment_info.resolution_status || 'Pending'
-    };
-  };
-  
   // Sort failed shipments
   const sortedShipments = [...failedShipments].sort((a, b) => {
-    // Special handling for fields in the failed_shipment_info object
-    if (sortField === 'failure_date' || sortField === 'failure_reason' || sortField === 'resolution_status') {
-      const infoA = getFailureInfo(a);
-      const infoB = getFailureInfo(b);
-      
-      if (sortField === 'failure_date') {
-        const dateA = infoA.failure_date ? new Date(infoA.failure_date) : new Date(0);
-        const dateB = infoB.failure_date ? new Date(infoB.failure_date) : new Date(0);
-        
-        return sortDirection === 'asc' 
-          ? dateA - dateB 
-          : dateB - dateA;
+    // Get values based on sort field, handling the new structure
+    const getValueByField = (item, field) => {
+      if (field === 'tracking_number' || field === 'delivery_type') {
+        return item.shipment_details?.[field] || '';
       }
-      
-      const valueA = infoA[sortField].toLowerCase();
-      const valueB = infoB[sortField].toLowerCase();
-      
-      return sortDirection === 'asc'
-        ? valueA.localeCompare(valueB)
-        : valueB.localeCompare(valueA);
-    }
+      return item[field] || '';
+    };
     
-    // For other fields, use standard comparison
-    // Handle null/undefined values
-    if (a[sortField] === null || a[sortField] === undefined) return 1;
-    if (b[sortField] === null || b[sortField] === undefined) return -1;
+    const valueA = getValueByField(a, sortField);
+    const valueB = getValueByField(b, sortField);
     
     // For dates
-    if (sortField.includes('date')) {
-      const dateA = a[sortField] ? new Date(a[sortField]) : new Date(0);
-      const dateB = b[sortField] ? new Date(b[sortField]) : new Date(0);
+    if (sortField === 'failure_date') {
+      const dateA = valueA ? new Date(valueA) : new Date(0);
+      const dateB = valueB ? new Date(valueB) : new Date(0);
       
       return sortDirection === 'asc' 
         ? dateA - dateB 
@@ -102,19 +70,16 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
     }
     
     // For strings
-    if (typeof a[sortField] === 'string') {
-      const valueA = a[sortField].toLowerCase();
-      const valueB = b[sortField].toLowerCase();
-      
+    if (typeof valueA === 'string') {
       return sortDirection === 'asc'
-        ? valueA.localeCompare(valueB)
-        : valueB.localeCompare(valueA);
+        ? valueA.toLowerCase().localeCompare(valueB.toLowerCase())
+        : valueB.toLowerCase().localeCompare(valueA.toLowerCase());
     }
     
     // For numbers and other types
     return sortDirection === 'asc'
-      ? a[sortField] - b[sortField]
-      : b[sortField] - a[sortField];
+      ? valueA - valueB
+      : valueB - valueA;
   });
   
   // Calculate pagination
@@ -124,14 +89,14 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
   const totalPages = Math.ceil(sortedShipments.length / itemsPerPage);
   
   // Get row class
-  const getRowClass = (shipment, index) => {
+  const getRowClass = (failedShipment, index) => {
     let classes = [];
     
     // Add even/odd class
     classes.push(index % 2 === 0 ? 'even-row' : 'odd-row');
     
     // Add selected class if this shipment is selected
-    if (selectedShipment && selectedShipment.shipment_id === shipment.shipment_id) {
+    if (selectedShipment && selectedShipment.shipment_id === failedShipment.shipment_id) {
       classes.push('selected-row');
     }
     
@@ -159,6 +124,27 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
     }
   };
 
+  // Handle the click to show shipment details - adapt to the new structure
+  const handleRowClick = (failedShipment) => {
+    // If there's shipment_details in the failed shipment, pass those to the parent
+    if (failedShipment.shipment_details) {
+      // Merge important failed shipment details into the shipment object
+      const shipmentWithFailureDetails = {
+        ...failedShipment.shipment_details,
+        failed_shipment_info: {
+          failed_shipment_id: failedShipment.failed_shipment_id,
+          failure_date: failedShipment.failure_date,
+          failure_reason: failedShipment.failure_reason,
+          resolution_status: failedShipment.resolution_status
+        }
+      };
+      onShipmentSelect(shipmentWithFailureDetails);
+    } else {
+      // Fallback if structure is unexpected
+      onShipmentSelect(failedShipment);
+    }
+  };
+
   return (
     <div className="shipment-table-container">
       <div className="table-metadata">
@@ -174,9 +160,9 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
             <tr>
               <th 
                 className="sortable"
-                onClick={() => handleSort('shipment_id')}
+                onClick={() => handleSort('failed_shipment_id')}
               >
-                Shipment ID {getSortIcon('shipment_id')}
+                Failed Shipment ID {getSortIcon('failed_shipment_id')}
               </th>
               <th 
                 className="sortable"
@@ -212,29 +198,26 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
           </thead>
           <tbody>
             {currentItems.length > 0 ? (
-              currentItems.map((shipment, index) => {
-                const failureInfo = getFailureInfo(shipment);
-                return (
-                  <tr 
-                    key={shipment.shipment_id} 
-                    className={getRowClass(shipment, index)}
-                    onClick={() => onShipmentSelect(shipment)}
-                  >
-                    <td>{shipment.shipment_id}</td>
-                    <td>{shipment.tracking_number}</td>
-                    <td>{formatDate(failureInfo.failure_date)}</td>
-                    <td className="failure-reason-cell">
-                      {failureInfo.failure_reason.length > 50 
-                        ? `${failureInfo.failure_reason.substring(0, 50)}...` 
-                        : failureInfo.failure_reason}
-                    </td>
-                    <td className="centered-cell">{shipment.delivery_type || 'Unknown'}</td>
-                    <td className={`status-cell ${getResolutionStatusClass(failureInfo.resolution_status)}`}>
-                      {failureInfo.resolution_status}
-                    </td>
-                  </tr>
-                );
-              })
+              currentItems.map((failedShipment, index) => (
+                <tr 
+                  key={failedShipment.failed_shipment_id} 
+                  className={getRowClass(failedShipment, index)}
+                  onClick={() => handleRowClick(failedShipment)}
+                >
+                  <td>{failedShipment.failed_shipment_id}</td>
+                  <td>{failedShipment.shipment_details?.tracking_number || 'N/A'}</td>
+                  <td>{formatDate(failedShipment.failure_date)}</td>
+                  <td className="failure-reason-cell">
+                    {failedShipment.failure_reason.length > 50 
+                      ? `${failedShipment.failure_reason.substring(0, 50)}...` 
+                      : failedShipment.failure_reason}
+                  </td>
+                  <td className="centered-cell">{failedShipment.shipment_details?.delivery_type || 'Unknown'}</td>
+                  <td className={`status-cell ${getResolutionStatusClass(failedShipment.resolution_status)}`}>
+                    {failedShipment.resolution_status}
+                  </td>
+                </tr>
+              ))
             ) : (
               <tr>
                 <td colSpan="6" className="no-data">
