@@ -151,9 +151,15 @@ function App() {
       "Gantt Charts": "GanttCharts",
     },
     "Human Resources": {
-      "Employee Records": "EmployeeRecords",
-      Payroll: "Payroll",
+      Employees: "Employees",
       Recruitment: "Recruitment",
+      "Attendance Tracking": "AttendanceTracking",
+      Payroll: "Payroll",
+      Departments: "Departments",
+      "Workforce Allocation": "WorkforceAllocation",
+      "Leave Requests": "LeaveRequests",
+      "Employee Performance": "EmployeePerformance",
+      "Employee Salary": "EmployeeSalary"
     },
     "Report Generator": {
       "Custom Reports": "CustomReports",
