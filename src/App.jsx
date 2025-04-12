@@ -19,67 +19,67 @@ function App() {
   //dummy notifs
   const notifs = [
     {
-      time:"8:00 PM",
-      msg:"Ur phone ringing!!!",
-      orig_module:"Administration",
+      time: "8:00 PM",
+      msg: "Ur phone ringing!!!",
+      orig_module: "Administration",
       orig_submodule: null,
       read: false
     },
     {
-      time:"9:00 PM",
-      msg:"keep urself safe!!!",
-      orig_module:"Sales",
+      time: "9:00 PM",
+      msg: "keep urself safe!!!",
+      orig_module: "Sales",
       orig_submodule: null,
       read: false
     },
     {
-      time:"8:00 PM",
-      msg:"bibidi bobidi boo wah",
+      time: "8:00 PM",
+      msg: "bibidi bobidi boo wah",
       orig_module: "Management",
-      orig_submodule:"Access Control",
+      orig_submodule: "Access Control",
       read: false
 
     },
     {
-      time:"8:00 PM",
-      msg:"Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
+      time: "8:00 PM",
+      msg: "Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
       orig_module: "Accounting",
-      orig_submodule:"Manufacturing Process",
+      orig_submodule: "Manufacturing Process",
       read: false
     },
     {
-      time:"8:00 PM",
-      msg:"wowee!",
+      time: "8:00 PM",
+      msg: "wowee!",
       orig_module: "Accounting",
-      orig_submodule:"Accounts Receivable",
+      orig_submodule: "Accounts Receivable",
       read: false
     },
     {
-      time:"8:00 PM",
-      msg:"Non incididunt commodo consequat occaecat proident consequat non.",
+      time: "8:00 PM",
+      msg: "Non incididunt commodo consequat occaecat proident consequat non.",
       orig_module: "Accounting",
-      orig_submodule:"Accounts Receivable",
+      orig_submodule: "Accounts Receivable",
       read: true
     },
     {
-      time:"8:00 PM",
-      msg:"Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
+      time: "8:00 PM",
+      msg: "Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
       orig_module: "Accounting",
-      orig_submodule:"Manufacturing Process",
+      orig_submodule: "Manufacturing Process",
       read: true
     },
     {
-      time:"8:00 PM",
-      msg:"yippee!",
+      time: "8:00 PM",
+      msg: "yippee!",
       orig_module: "Accounting",
-      orig_submodule:"Accounts Receivable",
+      orig_submodule: "Accounts Receivable",
       read: true
     },
     {
-      time:"8:00 PM",
-      msg:"Minim amet et non irure quis ea Lorem et dolor et tempor excepteur est.",
+      time: "8:00 PM",
+      msg: "Minim amet et non irure quis ea Lorem et dolor et tempor excepteur est.",
       orig_module: "Accounting",
-      orig_submodule:"Accounts Receivable",
+      orig_submodule: "Accounts Receivable",
       read: true
     }
   ];
@@ -135,7 +135,7 @@ function App() {
   // load jsx files for submodules
   const loadSubModule = (submoduleId) => {
     if (
-      moduleSubmoduleFileNames[activeModule][submoduleId] 
+      moduleSubmoduleFileNames[activeModule][submoduleId]
       // && !(activeSubModule == submoduleId)
     ) {
       const LazyComponent = lazy(() =>
@@ -302,9 +302,8 @@ function App() {
                 </div>
 
                 <div
-                  className={`sidebar-submodule-empty-container ${
-                    isSidebarOpen && activeModule === module.id ? "opened" : ""
-                  }`}
+                  className={`sidebar-submodule-empty-container ${isSidebarOpen && activeModule === module.id ? "opened" : ""
+                    }`}
                 >
                   {/* Submodules - Only show if this module is active */}
                   {moduleSubmoduleFileNames[module.id] &&
@@ -359,9 +358,8 @@ function App() {
                 </div>
 
                 <div
-                  className={`sidebar-submodule-empty-container ${
-                    isSidebarOpen && activeModule === module.id ? "opened" : ""
-                  }`}
+                  className={`sidebar-submodule-empty-container ${isSidebarOpen && activeModule === module.id ? "opened" : ""
+                    }`}
                 >
                   {/* Submodules - only show if the main module is active */}
                   {moduleSubmoduleFileNames[module.id] &&
@@ -397,18 +395,16 @@ function App() {
         <div className="header-body-container">
           <div className="header-navi">
             <div
-              className={`header-tabs-container ${
-                activeModule ? "visible" : "hidden"
-              }`}
+              className={`header-tabs-container ${activeModule ? "visible" : "hidden"
+                }`}
             >
               <img
                 src={`/icons/header-module-icons/${moduleFileNames[activeModule]}.png`}
                 alt={activeModule}
               />
               <p
-                className={`header-module-name ${
-                  !activeSubModule ? "active" : ""
-                }`}
+                className={`header-module-name ${!activeSubModule ? "active" : ""
+                  }`}
                 onClick={() => {
                   setActiveModule(activeModule);
                   // loadMainModule(activeModule);
@@ -428,26 +424,26 @@ function App() {
             <div className="header-right-container">
               <SearchBar />
               <img
-                src={`/icons/Notification-${
-                  hasNotification ? "active-" : ""
-                }logo.png`}
+                src={`/icons/Notification-${hasNotification ? "active-" : ""
+                  }logo.png`}
                 alt="Notificaton-Logo"
                 // onClick={() => setHasNotification(!hasNotification)}
                 onClick={() => {
                   setNotifOpen(!notifOpen)
-                  setHasNotification(false)} //to be replaecd by func for setting notifs as read
+                  setHasNotification(false)
+                } //to be replaecd by func for setting notifs as read
                 }
               ></img>
-              { notifOpen && <div className="notif-menu">
+              {notifOpen && <div className="notif-menu">
                 <div className="notif-title"><p>Notifications</p></div>
-                {notifs.map((notif, i) => 
-                  <div className={ notif.read ? "notif-item" : "notif-item-unread" }
-                    onClick = {
+                {notifs.map((notif, i) =>
+                  <div className={notif.read ? "notif-item" : "notif-item-unread"}
+                    onClick={
                       notif.orig_submodule ? () => {
-                          setActiveModule(notif.orig_module)
-                          setActiveSubModule(notif.orig_submodule)
-                        }
-                      : () => {
+                        setActiveModule(notif.orig_module)
+                        setActiveSubModule(notif.orig_submodule)
+                      }
+                        : () => {
                           setActiveModule(notif.orig_module)
                           setActiveSubModule(null)
                         }
@@ -457,20 +453,20 @@ function App() {
                     <div className="notif-toprow">
                       <div className="notif-origin"><p>{notif.orig_submodule ? notif.orig_submodule : notif.orig_module}</p></div>
                       <div className="notif-time-and-icon">
-                      <div className="notif-time"><p>{notif.time}</p></div>
-                        {!notif.read && <p className="unread-notif-icon"><img src="/icons/unread-notif-icon.png"/></p>/* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */} 
-                        </div>
+                        <div className="notif-time"><p>{notif.time}</p></div>
+                        {!notif.read && <p className="unread-notif-icon"><img src="/icons/unread-notif-icon.png" /></p>/* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */}
+                      </div>
                     </div>
                     <div className="notif-msg"><p>{notif.msg}</p></div>
                   </div>
                 )}
-              </div> }
+              </div>}
               <div className="header-profile-container">
                 <div className="header-profile-icon">
                   {" "}
                   <p>C</p>
                 </div>
-                <p className="header-profile-name">Crusch K.</p>
+                <p className="header-profile-name">John K.</p>
               </div>
             </div>
           </div>
