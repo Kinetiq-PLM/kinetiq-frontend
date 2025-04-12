@@ -151,7 +151,7 @@ const ServiceTicket = () => {
     { value: "all", label: "All" },
     { value: "open", label: "Open" },
     { value: "closed", label: "Closed" },
-    { value: "pending", label: "Pending" },
+    { value: "in progress", label: "In Progress" },
     { value: "low", label: "Low" },
     { value: "medium", label: "Medium" },
     { value: "high", label: "High" },
@@ -161,13 +161,13 @@ const ServiceTicket = () => {
   // Filter tickets based on selected filter
   const filteredTickets = tickets.filter((ticket) => {
     let matchesFilter = true
-    if (filterBy === "open" && ticket.status === "Open") matchesFilter = false
-    if (filterBy === "closed" && ticket.status === "Closed") matchesFilter = false
-    if (filterBy === "pending" && ticket.status === "Pending") matchesFilter = false
-    if (filterBy === "low" && ticket.priority === "Low") matchesFilter = false
-    if (filterBy === "medium" && ticket.priority === "Medium") matchesFilter = false
-    if (filterBy === "high" && ticket.priority === "High") matchesFilter = false
-    if (filterBy === "urgent" && ticket.priority === "Urgent") matchesFilter = false
+    if (filterBy === "open" && ticket.status !== "Open") matchesFilter = false
+    if (filterBy === "closed" && ticket.status !== "Closed") matchesFilter = false
+    if (filterBy === "in progress" && ticket.status !== "In Progress") matchesFilter = false
+    if (filterBy === "low" && ticket.priority !== "Low") matchesFilter = false
+    if (filterBy === "medium" && ticket.priority !== "Medium") matchesFilter = false
+    if (filterBy === "high" && ticket.priority !== "High") matchesFilter = false
+    if (filterBy === "urgent" && ticket.priority !== "Urgent") matchesFilter = false
     
     let matchesSearch = true
     if (searchQuery) {
