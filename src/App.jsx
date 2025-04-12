@@ -99,6 +99,7 @@ function App() {
       "Audit Logs": "AuditLogs",
       "Policy":"Policy",
       "Currency": "Currency",
+      "Notification": "Notification",
       
     },
     Accounting: {
@@ -357,6 +358,32 @@ function App() {
                 alt="Notificaton-Logo"
                 onClick={() => setHasNotification(!hasNotification)}
               ></img>
+              {hasNotification && (
+                <div className="notification-dropdown">
+                  <h3 className="notification-title">
+                    Notifications <span className="notification-count">1</span>
+                  </h3>
+                  <div className="notification-list">
+                    <div
+                      className="notification-item"
+                      onClick={() => {
+                        setActiveModule("Administration");
+                        setActiveSubModule("Notification");
+                        loadMainModule("Administration");
+                        loadSubModule("Notification");
+                        setHasNotification(false);
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <div className="notification-dot" />
+                      <strong>Notification 1</strong>
+                      <p>Lorem ipsum dolor sit amet</p>
+                      <span className="notification-date">02/12/2022</span>
+                      <a href="#" onClick={(e) => e.preventDefault()}>Lorem ipsum</a>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="header-profile-container">
                 <div className="header-profile-icon">
                   {" "}
