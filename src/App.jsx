@@ -76,10 +76,15 @@ function App() {
       "Company Policies": "CompanyPolicies",
       "User Accounts": "UserAccounts",
     },
-    "Accounting": {
+    Accounting: {
+      "Chart of Accounts": "ChartOfAccounts",
+      "Journal": "Journal",
+      "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
-      "Accounts Payable": "AccountsPayable",
+      "General Ledger Accounts": "GeneralLedgerAccounts",
       "Accounts Receivable": "AccountsReceivable",
+      "Accounts Payable": "AccountsPayable",
+      "Official Receipts": "OfficialReceipts",
     },
     "Financials": {
       "Reports": "Reports",
