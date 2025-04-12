@@ -1,11 +1,12 @@
-/* REMINDER! All of your elements must use your unique namespace '.mrp' at the start to avoid leaking */
-.mrp {
+/* REMINDER! All of your elements must use your unique namespace '.prodsched' at the start to avoid leaking */
+
+.prodsched {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
-.mrp .body-content-container {
+.prodsched .body-content-container {
     width: 100%;
     height: 100%;
     border-radius: 0.5rem;
