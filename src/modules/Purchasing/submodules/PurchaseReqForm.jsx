@@ -243,7 +243,12 @@ const PurchaseReqForm = ({ onClose }) => {
 
                         <div className="form-group">
                             <label>Email Address</label>
-                            <input type="email" name="email" value={formData.email} readOnly />
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange} // Allow user input
+                            />
                         </div>
 
                         <div className="form-group">
@@ -278,15 +283,15 @@ const PurchaseReqForm = ({ onClose }) => {
                             <input type="date" name="dateRequested" value={formData.dateRequested} onChange={handleInputChange} />
                         </div>
                         <div className="form-group">
-                            <label>Date Valid</label>
-                            <input type="date" name="dateValid" value={formData.dateValid} onChange={handleInputChange} />
-                        </div>
-                        <div className="form-group">
-                            <label>Document Date</label>
                             <input type="date" name="documentDate" value={formData.documentDate} onChange={handleInputChange} />
                         </div>
-                        
+                        <div className="form-group">
+                            <input type="date" name="dateValid" value={formData.dateValid} onChange={handleInputChange} />
+                        </div>
                     </div>
+                </div>
+
+                <div className="form-group">
                     <button className="save-item" onClick={handleSave}>Next</button>
                 </div>
 
