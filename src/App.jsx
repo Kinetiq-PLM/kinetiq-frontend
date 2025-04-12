@@ -111,7 +111,7 @@ function App() {
       Order: "Order",
       Delivery: "Delivery",
       // Invoice: "Invoice",
-      "Blanket Agreement": "BlanketAgreement",
+      // "Blanket Agreement": "BlanketAgreement",
       "Master List": "MasterList",
       Reporting: "Reporting",
       // Return: "Return",

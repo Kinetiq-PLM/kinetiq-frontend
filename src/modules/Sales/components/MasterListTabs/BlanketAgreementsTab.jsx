@@ -23,7 +23,6 @@ export default function BlanketAgreementsTab({
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "address", label: "Address" },
-    { key: "type", label: "Type" },
     { key: "total_price", label: "Total Price" },
     { key: "salesrep", label: "Sales Rep" }, // name of salesrep if available
     { key: "agreement_method", label: "Agreement Method" }, // signed date

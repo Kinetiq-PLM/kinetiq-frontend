@@ -91,6 +91,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const [isBlanketAgreementDetailsOpen, setIsBlanketAgreementDetailsOpen] =
     useState(false);
 
+  const [payload, setPayload] = useState({});
   // columns for table
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
@@ -201,7 +202,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       statement_data: {
         customer: selectedCustomer.customer_id,
         salesrep: selectedEmployee.employee_id,
-        type: "Non-Project-Based", // make a variable
         total_amount: Number(parseFloat(quotationInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(quotationInfo.discount).toFixed(2)),
         total_tax: Number(quotationInfo.total_tax.toFixed(2)),
@@ -221,6 +221,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       //   date_issued: new Date().toISOString(),
       // },
     };
+    setPayload({ ...request, name: selectedCustomer.name });
     // console.log(request);
     quotationMutation.mutate(request);
   };
@@ -263,7 +264,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
         <BlanketAgreementDetailsModal
           isOpen={isBlanketAgreementDetailsOpen}
           onClose={() => setIsBlanketAgreementDetailsOpen(false)}
-          quotationInfo={quotationInfo}
+          quotationInfo={payload}
         ></BlanketAgreementDetailsModal>
         <EmployeeListModal
           isOpen={isEmployeeListOpen}

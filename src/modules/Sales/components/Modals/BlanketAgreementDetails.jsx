@@ -9,6 +9,8 @@ import DateInputField from "../DateInputField.jsx";
 import Dropdown from "../Dropdown.jsx";
 import InputField from "../InputField.jsx";
 import TextField from "../../../CRM/components/TextField.jsx";
+import { POST } from "../../api/api.jsx";
+import { useMutation } from "@tanstack/react-query";
 
 const BlanketAgreementDetailsModal = ({ isOpen, onClose, quotationInfo }) => {
   const { showAlert } = useAlert();
@@ -27,6 +29,23 @@ const BlanketAgreementDetailsModal = ({ isOpen, onClose, quotationInfo }) => {
   const [description, setDescription] = useState("");
 
   const [isValidationVisible, setIsValidationVisible] = useState(false);
+
+  const agreementMutation = useMutation({
+    mutationFn: async (data) => await POST(`sales/agreement/`, data),
+    onSuccess: (data) => {
+      showAlert({
+        type: "success",
+        title: "New Agreement Created",
+      });
+      onClose();
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title: "An error occurred while creating agreement: " + error.message,
+      });
+    },
+  });
   // ========== DATA ==========
 
   const handleConfirm = () => {
@@ -48,15 +67,23 @@ const BlanketAgreementDetailsModal = ({ isOpen, onClose, quotationInfo }) => {
       // Add new blanket agreement HERE to database
       // w agreementID and quotationInfo
 
+      const request = {
+        statement_data: quotationInfo.statement_data,
+        agreement_data: {
+          start_date: startDate,
+          end_date: endDate,
+          description,
+          signed_date: signedDate,
+          agreement_method: agreementType,
+        },
+      };
+      console.log(request);
+      agreementMutation.mutate(request);
+
       // Reset Fields
       setStartDate("");
       setEndDate("");
       setIsValidationVisible(false);
-      showAlert({
-        type: "success",
-        title: "New Agreement Created",
-      });
-      onClose();
     }
   };
 
@@ -215,11 +242,6 @@ const BlanketAgreementDetailsModal = ({ isOpen, onClose, quotationInfo }) => {
               isDisabled={true}
             />
             <div className="flex gap-2">
-              <InputField
-                label={"Ticket ID"}
-                value={agreementID}
-                isDisabled={true}
-              />
               <Dropdown
                 label="Campaign Type"
                 options={agreementTypes}
