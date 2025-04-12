@@ -79,6 +79,8 @@ function App() {
 
   const moduleSubmoduleFileNames = {
     Management: {
+      "Dashboard": "ManagementDashboard",
+      "Project Approval": "ManagementApprovals",
       "User Roles": "UserRoles",
       "Access Control": "AccessControl",
       Settings: "Settings",
@@ -136,8 +138,9 @@ function App() {
       "Order Fulfillment": "OrderFulfillment",
     },
     Production: {
-      "Manufacturing Process": "ManufacturingProcess",
+      "Equipment and Labor": "Equipment&Labor",
       "Quality Control": "QualityControl",
+      "Cost of Production" : "CostOfProduction"
     },
     MRP: {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
