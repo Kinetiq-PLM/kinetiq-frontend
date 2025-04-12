@@ -55,8 +55,8 @@ const ServiceContract = () => {
 
   const filterOptions = [
     { value: "all", label: "All" },
-    { value: "pending", label: "Pending" },
     { value: "active", label: "Active" },
+    { value: "expired", label: "Expired" },
     { value: "terminated", label: "Terminated" }
   ]
 
@@ -71,7 +71,6 @@ const ServiceContract = () => {
     if (!filterBy || filterBy === "all") return matchesSearch;
   
     const matchesStatus = 
-      (filterBy === "pending" && contract.contract_status === "Pending") ||
       (filterBy === "active" && contract.contract_status === "Active") ||
       (filterBy === "expired" && contract.contract_status === "Expired") ||
       (filterBy === "terminated" && contract.contract_status === "Terminated");
