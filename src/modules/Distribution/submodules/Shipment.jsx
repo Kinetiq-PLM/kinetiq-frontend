@@ -11,6 +11,8 @@ import ConfirmShipModal from "../components/shipment/ConfirmShipModal";
 import DeliveryReceiptModal from "../components/shipment/DeliveryReceiptModal";
 import FailureReportModal from "../components/shipment/FailureReportModal";
 import CarrierManagementModal from "../components/shipment/CarrierManagementModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Shipment = () => {
   // New tab state
@@ -239,9 +241,10 @@ const Shipment = () => {
       // Refresh the list after successful update
       setRefreshTrigger(prev => prev + 1);
       setShowShipmentModal(false);
+      toast.success("Shipment updated successfully!");
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -277,10 +280,12 @@ const Shipment = () => {
       setRefreshTrigger(prev => prev + 1);
       
       // Show success notification
-      alert('Shipment marked as Shipped successfully! A delivery receipt has been created.');
+      toast.success('Shipment marked as Shipped successfully! A delivery receipt has been created.', {
+        autoClose: 5000 // Keep this message visible a bit longer
+      });
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -312,9 +317,10 @@ const Shipment = () => {
       // Close modal and refresh the list
       setShowDeliveryReceiptModal(false);
       setRefreshTrigger(prev => prev + 1);
+      toast.success("Delivery receipt updated successfully!");
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -349,9 +355,10 @@ const Shipment = () => {
       // Close modal and refresh the list
       setShowFailureReportModal(false);
       setRefreshTrigger(prev => prev + 1);
+      toast.warning(`Shipment marked as failed: ${failureDetails.failure_reason}`);
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -383,7 +390,11 @@ const Shipment = () => {
     <div className="shipment">
       <div className="body-content-container">
         <h2 className="page-title">Shipment Management</h2>
-        
+
+        {/* Add ToastContainer component */}
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} 
+          newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+
         {/* Tab Navigation */}
         <div className="tab-navigation">
           <div 

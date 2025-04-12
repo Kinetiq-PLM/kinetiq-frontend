@@ -6,6 +6,8 @@ import StatusFilter from "../components/packing/StatusFilter";
 import TypeFilter from "../components/packing/TypeFilter";
 import CompletionModal from "../components/packing/CompletionModal";
 import EditPackingModal from "../components/packing/EditPackingModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Packing = () => {
   // State for data management
@@ -161,9 +163,10 @@ const Packing = () => {
       // Refresh the list after successful update
       setRefreshTrigger(prev => prev + 1);
       setShowEditModal(false);
+      toast.success("Packing list updated successfully!");
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -195,9 +198,10 @@ const Packing = () => {
       // Refresh the list after successful update
       setRefreshTrigger(prev => prev + 1);
       setShowEditModal(false);
+      toast.info(`Status updated to ${newStatus}`);
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -226,10 +230,12 @@ const Packing = () => {
       setRefreshTrigger(prev => prev + 1);
       
       // Show success notification
-      alert('Packing list marked as Packed successfully! A new Shipment has been created.');
+      toast.success('Packing list marked as Packed successfully! A new Shipment has been created.', {
+        autoClose: 5000 // Keep this message visible a bit longer
+      });
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -238,6 +244,10 @@ const Packing = () => {
       <div className="body-content-container">
         <h2 className="page-title">Packing Lists</h2>
         
+        {/* Add ToastContainer component */}
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} 
+          newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+
         {/* Filters Row */}
         <div className="filters-row">
           <div className="search-container">

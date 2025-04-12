@@ -43,7 +43,7 @@ const ReworkTable = ({
               <th>Assigned To</th>
               <th>Rework Date</th>
               <th>Expected Completion</th>
-              <th>Original Order</th>
+              {/* <th>Original Order</th> */}
               <th>Actions</th>
             </tr>
           </thead>
@@ -80,7 +80,7 @@ const ReworkTable = ({
                   <td>{getEmployeeName(rework.assigned_to)}</td>
                   <td>{formatDate(rework.rework_date)}</td>
                   <td>{formatDate(rework.expected_completion)}</td>
-                  <td>
+                  {/* <td>
                     {rework.original_order_info ? (
                       <span className="order-link" title={`Customer: ${rework.original_order_info.customer_name || 'N/A'}`}>
                         {rework.original_order_info.order_id}
@@ -88,7 +88,7 @@ const ReworkTable = ({
                     ) : (
                       <span className="no-order">No Order</span>
                     )}
-                  </td>
+                  </td> */}
                   <td className="actions-cell">
                     {!showCompleted && (
                       <>

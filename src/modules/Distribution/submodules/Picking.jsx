@@ -6,6 +6,8 @@ import StatusFilter from "../components/picking/StatusFilter";
 import WarehouseFilter from "../components/picking/WarehouseFilter";
 import CompletionModal from "../components/picking/CompletionModal";
 import EditPickingModal from "../components/picking/EditPickingModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Picking = () => {
   // State for data management
@@ -165,9 +167,10 @@ const Picking = () => {
       // Refresh the list after successful update
       setRefreshTrigger(prev => prev + 1);
       setShowEditModal(false);
+      toast.success("Picking list updated successfully!");
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -199,9 +202,10 @@ const Picking = () => {
       // Refresh the list after successful update
       setRefreshTrigger(prev => prev + 1);
       setShowEditModal(false);
+      toast.info(`Status updated to ${newStatus}`);
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -230,10 +234,12 @@ const Picking = () => {
       setRefreshTrigger(prev => prev + 1);
       
       // Show success notification
-      alert('Picking list completed successfully! A new Packing List has been created.');
+      toast.success('Picking list completed successfully! A new Packing List has been created.', {
+        autoClose: 5000 // Keep this message visible a bit longer
+      });
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -241,7 +247,11 @@ const Picking = () => {
     <div className="picking">
       <div className="body-content-container">
         <h2 className="page-title">Picking Lists</h2>
-        
+
+        {/* Add ToastContainer component */}
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} 
+          newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+
         {/* Filters Row */}
         <div className="filters-row">
           <div className="search-container">

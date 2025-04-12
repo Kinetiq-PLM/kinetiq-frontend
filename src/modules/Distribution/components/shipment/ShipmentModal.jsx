@@ -168,7 +168,7 @@ const ShipmentModal = ({
                   <span className="info-value">{shipment.source_location || 'Unknown'}</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">To</span>
+                  <span className="info-label">Destination</span>
                   <span className="info-value">{shipment.destination_location || 'Unknown'}</span>
                 </div>
               </div>

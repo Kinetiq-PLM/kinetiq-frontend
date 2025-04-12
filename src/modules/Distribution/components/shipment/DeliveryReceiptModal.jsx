@@ -150,7 +150,7 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
                   {deliveryReceipt.total_amount && (
                     <div className="info-item">
                       <span className="info-label">Total Amount</span>
-                      <span className="info-value">₱ {deliveryReceipt.total_amountb}</span>
+                      <span className="info-value">₱ {deliveryReceipt.total_amount}</span>
                     </div>
                   )}
                 </div>

@@ -181,7 +181,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                 </div>
                 <div className="info-item">
                   <span className="info-label">Picked By:</span>
-                  <span className="info-value">{packingList.picking_list_info.picked_by || '-'}</span>
+                  <span className="info-value">{getEmployeeName(packingList.packed_by) || '-'}</span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Status:</span>
