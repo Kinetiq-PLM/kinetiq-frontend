@@ -2,6 +2,7 @@ import { useState, useRef, Suspense, lazy, act } from 'react'
 import './App.css'
 import './MediaQueries.css'
 import SearchBar from "./shared/components/SearchBar";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -15,6 +16,7 @@ function App() {
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
 
+  const queryClient = new QueryClient();
   // Sync Scroll
   const handleScroll = (source) => {
     if (!iconsRef.current || !descsRef.current) return;
@@ -28,23 +30,42 @@ function App() {
 
   // load jsx files for main modules
   const loadMainModule = (moduleId) => {
-    if (moduleFileNames[moduleId] && !(activeModule == moduleId && !activeSubModule)) {
+    // if (moduleFileNames[moduleId] && !(activeModule == moduleId && !activeSubModule)) {
+    //   const LazyComponent = lazy(() => import(/* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`));
 
-      const LazyComponent = lazy(() => import(/* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`));
-
+    if (
+      moduleFileNames[moduleId] &&
+      !(activeModule == moduleId && !activeSubModule)
+    ) {
+      const LazyComponent = lazy(() =>
+        import(
+          /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
+        )
+      );
       setModuleComponent(() => LazyComponent);
     }
-  };
+  }};
 
   // load jsx files for submodules
   const loadSubModule = (submoduleId) => {
-    if (moduleSubmoduleFileNames[activeModule][submoduleId] && !(activeSubModule == submoduleId)) {
+    // if (moduleSubmoduleFileNames[activeModule][submoduleId] && !(activeSubModule == submoduleId)) {
 
-      const LazyComponent = lazy(() => import(/* @vite-ignore */ `./modules/${moduleFileNames[activeModule]}/submodules/${moduleSubmoduleFileNames[activeModule][submoduleId]}.jsx`));
+    //   const LazyComponent = lazy(() => import(/* @vite-ignore */ `./modules/${moduleFileNames[activeModule]}/submodules/${moduleSubmoduleFileNames[activeModule][submoduleId]}.jsx`));
+  
+      const loadSubModule = (submoduleId, mainModule = activeModule) => {
+    if (
+      moduleSubmoduleFileNames[mainModule][submoduleId] &&
+      !(activeSubModule == submoduleId)
+    ) {
+      const LazyComponent = lazy(() =>
+        import(
+          /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
+        )
+      );
 
       setModuleComponent(() => LazyComponent);
     }
-  };
+  }};
 
   const moduleFileNames = {
     "Management": "Management",
@@ -103,10 +124,22 @@ function App() {
       "Delivery Receipt": "DeliveryReceipt",
       "Item Removal": "ItemRemoval",
     },
-    "Sales": {
-      "Lead Management": "LeadManagement",
-      "Invoices": "Invoices",
-      "Quotations": "Quotations",
+    Sales: {
+      Quotation: "Quotation",
+      Order: "Order",
+      Delivery: "Delivery",
+      // Invoice: "Invoice",
+      // "Blanket Agreement": "BlanketAgreement",
+      "Master List": "MasterList",
+      Reporting: "Reporting",
+      // Return: "Return",
+    },
+    CRM: {
+      Ticket: "Ticket",
+      Campaign: "Campaign",
+      "Partner Master Data": "PartnerMasterData",
+      Opportunity: "Opportunity",
+      Support: "Support",
     },
     "Support & Services": {
       "Ticketing System": "TicketingSystem",
@@ -321,19 +354,24 @@ function App() {
 
 
           </div>
-          <div className='body-container'>
-            {ModuleComponent && (
-              <Suspense>
-                <ModuleComponent />
-              </Suspense>
-            )}
-
-          </div>
+          <QueryClientProvider client={queryClient}>
+            <div className="body-container">
+              {ModuleComponent && (
+                <Suspense>
+                  <ModuleComponent
+                    setActiveModule={setActiveModule}
+                    loadSubModule={loadSubModule}
+                    setActiveSubModule={setActiveSubModule}
+                  />
+                </Suspense>
+              )}
+            </div>
+          </QueryClientProvider>
         </div>
 
       </div>
     </div>
   )
-}
+
 
 export default App;
