@@ -31,7 +31,7 @@ img {
 .shell-container {
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  height: auto;
   width: 100vw;
   background-color: var(--light-teal-background);
   overflow: auto;
