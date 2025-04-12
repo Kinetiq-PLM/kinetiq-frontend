@@ -80,3 +80,43 @@
   height: 26;
   background-repeat: no-repeat;
 }
+
+.bom-print-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.3); /* translucent dark gray */
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* keep scrollable from top */
+  padding: 2rem;
+}
+
+.bom-print-modal2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0); /* translucent dark gray */
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* keep scrollable from top */
+  padding: 2rem;
+}
+
+
+.bom-print-content {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
+  max-width: 1128px;
+  width: 100%;
+}
