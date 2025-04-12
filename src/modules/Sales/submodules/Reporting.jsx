@@ -5,7 +5,7 @@ import { BarChart, LineChart, PieChart } from "@mui/x-charts";
 import { GET } from "../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-
+  
 const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   const [profitReportData, setProfitReportData] = useState([]);
   const [salesReportData, setSalesReportData] = useState([]);

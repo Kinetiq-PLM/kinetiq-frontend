@@ -13,7 +13,7 @@ import SalesInfo from "../components/SalesInfo";
 import CustomerListModal from "../components/Modals/Lists/CustomerList";
 import ProductListModal from "../components/Modals/Lists/ProductList";
 import NewCustomerModal from "../components/Modals/NewCustomer";
-import BlanketAgreementDateModal from "../components/Modals/BlanketAgreementDates.jsx";
+import BlanketAgreementDetailsModal from "../components/Modals/BlanketAgreementDetails.jsx";
 import EmployeeListModal from "../components/Modals/Lists/EmployeeListModal.jsx";
 
 import Button from "../components/Button";
@@ -90,7 +90,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [isBlanketAgreementDateOpen, setIsBlanketAgreementDateOpen] =
+  const [isBlanketAgreementDetailsOpen, setIsBlanketAgreementDetailsOpen] =
     useState(false);
 
   // columns for table
@@ -136,8 +136,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       loadSubModule("Order");
       setActiveSubModule("Order");
     } else if (copyToModal === "Blanket Agreement") {
-      setIsBlanketAgreementDateOpen(true);
-      // Creates blanket agreement at BlanketAgreementDateModal
+      setIsBlanketAgreementDetailsOpen(true);
     }
   }, [copyToModal]);
 
@@ -275,11 +274,11 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           isOpen={isNewCustomerModalOpen}
           onClose={() => setIsNewCustomerModalOpen(false)}
         ></NewCustomerModal>
-        <BlanketAgreementDateModal
-          isOpen={isBlanketAgreementDateOpen}
-          onClose={() => setIsBlanketAgreementDateOpen(false)}
+        <BlanketAgreementDetailsModal
+          isOpen={isBlanketAgreementDetailsOpen}
+          onClose={() => setIsBlanketAgreementDetailsOpen(false)}
           quotationInfo={quotationInfo}
-        ></BlanketAgreementDateModal>
+        ></BlanketAgreementDetailsModal>
         <EmployeeListModal
           isOpen={isEmployeeListOpen}
           onClose={() => setIsEmployeeListOpen(false)}
