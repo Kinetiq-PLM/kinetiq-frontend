@@ -9,10 +9,35 @@ const BodyContent = () => {
   const [error, setError] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+  const [selectedWarehouse, setSelectedWarehouse] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
   const [debugMode, setDebugMode] = useState(false);
   const [showInvPcountForm, setShowInvPcountForm] = useState(false);
+  const [warehouses, setWarehouses] = useState([]);
 
+  // Fetch warehouses list from API
+  useEffect(() => {
+    // Fetch warehouses first
+    fetch("http://127.0.0.1:8000/api/warehouses/")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error fetching warehouses! Status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Warehouse data:", data);
+        if (data && data.length > 0) {
+          setWarehouses(data);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching warehouses:", err);
+        // Don't set error state here, as we'll continue with cyclic counts
+      });
+  }, []);
+
+  // Fetch cyclic counts
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/cyclic_counts/")
       .then((res) => {
@@ -23,12 +48,18 @@ const BodyContent = () => {
       })
       .then((data) => {
         console.log("API Response Data:", data);
-        data.forEach((item, index) => {
-          console.log(
-            `Item ${index} - Product Name: ${item.product_name}, Debug Info:`,
-            item.debug_info
-          );
-        });
+        
+        // If warehouses weren't fetched separately, extract them from counts
+        if (warehouses.length === 0) {
+          const uniqueWarehouses = [...new Set(data
+            .filter(item => item.warehouse_id)
+            .map(item => item.warehouse_id))];
+          
+          if (uniqueWarehouses.length > 0) {
+            setWarehouses(uniqueWarehouses);
+          }
+        }
+        
         setPcounts(data);
         setLoading(false);
       })
@@ -37,7 +68,7 @@ const BodyContent = () => {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
+  }, [warehouses.length]);
 
   const filterByDateRange = (data, range) => {
     return data.filter((item) => {
@@ -63,7 +94,10 @@ const BodyContent = () => {
       ? item.status?.toLowerCase() === selectedStatus.toLowerCase()
       : true;
     const dateMatch = selectedDate ? filterByDateRange([item], selectedDate).length > 0 : true;
-    return statusMatch && dateMatch;
+    const warehouseMatch = selectedWarehouse
+      ? item.warehouse_id === selectedWarehouse
+      : true;
+    return statusMatch && dateMatch && warehouseMatch;
   });
 
   const getStatusDisplayValue = (backendStatus) => {
@@ -116,7 +150,7 @@ const BodyContent = () => {
                 <table className="w-full table-layout:fixed text-center cursor-pointer">
                   <thead>
                     <tr className="border-b border-gray-300">
-                      {['Product Name', 'Item Onhand', 'Item Counted' ,'Difference', 'Date Checked', 'Employee', 'Status'].map((header) => (
+                      {['Product Name', 'Item Onhand', 'Item Counted' ,'Difference', 'Date Checked', 'Employee', 'Warehouse', 'Status'].map((header) => (
                         <th key={header} className="p-2 text-gray-600">{header}</th>
                       ))}
                     </tr>
@@ -124,13 +158,13 @@ const BodyContent = () => {
                   <tbody>
                     {loading ? (
                       <tr>
-                        <td colSpan="5" className="p-2 text-gray-400">
+                        <td colSpan="8" className="p-2 text-gray-400">
                           Loading...
                         </td>
                       </tr>
                     ) : filteredData.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="p-2 text-gray-400">
+                        <td colSpan="8" className="p-2 text-gray-400">
                           No data available
                         </td>
                       </tr>
@@ -141,12 +175,13 @@ const BodyContent = () => {
                           className="border-b border-gray-300 hover:bg-gray-100"
                           onClick={() => setSelectedRow(item)}
                         >
-                          <td className="p-2">{item.product_name || "N/A"}</td>
+                          <td className="p-2">{item.product_name || "No Inventory Item"}</td>
                           <td className="p-2">{item.item_onhand ?? "-"}</td>
                           <td className="p-2">{item.item_actually_counted ?? "-"}</td>
                           <td className="p-2">{item.difference_in_qty ?? "-"}</td>
                           <td className="p-2">{item.time_period || "-"}</td>
                           <td className="p-2">{item.employee || "Unassigned"}</td>
+                          <td className="p-2">{item.warehouse_id || "-"}</td>
                           <td className={`p-2 ${getStatusColorClass(item.status)}`}>
                             {getStatusDisplayValue(item.status)}
                           </td>
@@ -160,11 +195,15 @@ const BodyContent = () => {
               <div className="grid grid-rows-4 gap-3 justify-between h-full">
                 <div className="self-center text-sm text-gray-500">00 - 00 - 0000 / 00:00 UTC</div>
 
-                {/* Placeholder for Warehouse */}
-                <select className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer">
-                  <option>Select Warehouse</option>
-                  {["Warehouse 1", "Warehouse 2", "Warehouse 3"].map((w) => (
-                    <option key={w}>{w}</option>
+                {/* Warehouse filter dropdown */}
+                <select 
+                  className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
+                  value={selectedWarehouse}
+                  onChange={(e) => setSelectedWarehouse(e.target.value)}
+                >
+                  <option value="">Select Warehouse</option>
+                  {warehouses.map((w) => (
+                    <option key={w} value={w}>{w}</option>
                   ))}
                 </select>
 
@@ -202,6 +241,7 @@ const BodyContent = () => {
                         { label: "Selected Product", value: selectedRow?.product_name || "N/A" },
                         { label: "Total Quantity Checked", value: selectedRow?.item_actually_counted ?? "-" },
                         { label: "Employee", value: selectedRow?.employee || "Unassigned" },
+                        { label: "Warehouse", value: selectedRow?.warehouse_id || "-" },
                         { label: "Date Checked", value: selectedRow?.time_period || "-" }
                       ].map(({ label, value }) => (
                         <div key={label} className="mb-2">
@@ -238,6 +278,7 @@ const BodyContent = () => {
               onClose={() => setShowInvPcountForm(false)}
               selectedItem={selectedRow}
               activeTab="Raw Materials"
+              warehouses={warehouses}
             />
           </div>
         </div>

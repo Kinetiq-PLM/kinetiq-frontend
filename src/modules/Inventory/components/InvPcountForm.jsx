@@ -1,18 +1,45 @@
 import React, { useState, useEffect } from "react";
 import "../styles/InvPcountForm.css";
 
-const InvPcountForm = ({ onClose, selectedItem }) => {
+const InvPcountForm = ({ onClose, selectedItem, warehouses = [] }) => {
   const [inventoryItemId, setInventoryItemId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [employeeId, setEmployeeId] = useState("");
   const [status, setStatus] = useState("");
   const [timePeriod, setTimePeriod] = useState("");
-  const [warehouse, setWarehouse] = useState("");
+  const [warehouseId, setWarehouseId] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [localWarehouses, setLocalWarehouses] = useState([]);
 
   // Success/error messages
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Use warehouses passed from parent, or fetch them if not provided
+  useEffect(() => {
+    if (warehouses && warehouses.length > 0) {
+      setLocalWarehouses(warehouses);
+    } else {
+      // Fetch warehouses if not provided
+      fetch("http://127.0.0.1:8000/api/warehouses/")
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`Error fetching warehouses: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          if (data && data.length > 0) {
+            setLocalWarehouses(data);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to fetch warehouses:", err);
+          // If fetch fails, use a fallback
+          setLocalWarehouses(["Warehouse 1", "Warehouse 2", "Warehouse 3"]);
+        });
+    }
+  }, [warehouses]);
 
   // Prefill fields from selectedItem if available
   useEffect(() => {
@@ -22,7 +49,7 @@ const InvPcountForm = ({ onClose, selectedItem }) => {
       setEmployeeId(selectedItem.employee_id || "");
       setStatus(selectedItem.status || "");
       setTimePeriod(selectedItem.time_period || "");
-      setWarehouse(selectedItem.warehouse || "");
+      setWarehouseId(selectedItem.warehouse_id || "");
       setRemarks(selectedItem.remarks || "");
     } else {
       handleClear();
@@ -36,7 +63,7 @@ const InvPcountForm = ({ onClose, selectedItem }) => {
     setEmployeeId("");
     setStatus("");
     setTimePeriod("");
-    setWarehouse("");
+    setWarehouseId("");
     setRemarks("");
     setSuccessMessage("");
     setErrorMessage("");
@@ -55,7 +82,7 @@ const InvPcountForm = ({ onClose, selectedItem }) => {
       !employeeId ||
       !status ||
       !timePeriod ||
-      !warehouse
+      !warehouseId
     ) {
       setErrorMessage("Please fill in all required fields.");
       return;
@@ -76,7 +103,7 @@ const InvPcountForm = ({ onClose, selectedItem }) => {
       status: status,
       time_period: timePeriod,
       remarks: remarks,
-      warehouse: warehouse,
+      warehouse_id_input: warehouseId, // Use warehouse_id_input to match backend serializer
     };
 
     try {
@@ -190,15 +217,20 @@ const InvPcountForm = ({ onClose, selectedItem }) => {
           </select>
 
           <label>
-            Warehouse <span className="text-red-500">*</span>
+            Warehouse ID <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            placeholder="Enter Warehouse"
-            value={warehouse}
-            onChange={(e) => setWarehouse(e.target.value)}
+          <select
+            value={warehouseId}
+            onChange={(e) => setWarehouseId(e.target.value)}
             required
-          />
+          >
+            <option value="">Select Warehouse</option>
+            {localWarehouses.map((warehouse) => (
+              <option key={warehouse} value={warehouse}>
+                {warehouse}
+              </option>
+            ))}
+          </select>
 
           <label>Remarks</label>
           <textarea
