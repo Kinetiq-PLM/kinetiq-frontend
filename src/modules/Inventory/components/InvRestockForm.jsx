@@ -26,12 +26,25 @@ const InvRestockForm = ({ onClose, selectedItem, activeTab }) => {
     setEmployeeId("");
     setPurchaseDescription("");
     if (selectedItem) {
-      setPurchaseItem(selectedItem.Name);
+      if (activeTab === "Assets") {
+        setPurchaseItem(selectedItem.asset_id || "");
+      } else if (activeTab === "Raw Materials") {
+        setPurchaseItem(selectedItem.material_id || "");
+      }
     } else {
       setPurchaseItem("");
     }
     setErrorMessage("");
     setSuccessMessage("");
+  };
+
+  const getItemLabel = () => {
+    if (activeTab === "Assets") {
+      return "Asset ID";
+    } else if (activeTab === "Raw Materials") {
+      return "Material ID";
+    }
+    return "Item ID";
   };
 
   const handleSubmit = async (e) => {
@@ -126,7 +139,7 @@ const InvRestockForm = ({ onClose, selectedItem, activeTab }) => {
         )}
 
         <form onSubmit={handleSubmit}>
-          <label>Item Name</label>
+          <label>{getItemLabel()}</label>
           <input
             type="text"
             value={purchaseItem}
