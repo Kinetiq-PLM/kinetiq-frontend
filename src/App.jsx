@@ -93,8 +93,13 @@ function App() {
       Settings: "Settings",
     },
     Administration: {
-      "Company Policies": "CompanyPolicies",
-      "User Accounts": "UserAccounts",
+      "User": "User",
+      "Item Masterlist": "ItemMasterlist",
+      "Business Partner Masterlist": "BusinessPartnerMasterlist",
+      "Audit Logs": "AuditLogs",
+      "Policy":"Policy",
+      "Currency": "Currency",
+      
     },
     Accounting: {
       "General Ledger": "GeneralLedger",
