@@ -1,11 +1,11 @@
 import React from "react";
-import "../styles/HumanResources.css";
+import "../styles/EmployeeRecords.css";
 
 const BodyContent = () => {
     return (
-        <div className="payroll">
+        <div className="emprec">
             <div className="body-content-container">
-                <p>Hello Payroll SubModule!</p>
+                <p>Hello Employee Records SubModule!</p>
                 <p>Fill this container with your elements, change the display if need be.</p>
                 <p>If you're going to style with css, use your unique namespace '.emprec' at the start.</p>
             </div>
