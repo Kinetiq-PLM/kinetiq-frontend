@@ -336,31 +336,46 @@ const ItemMasterList = () => {
                                 </tr>
                             ))}
 
-                            {/* Products and Raw Materials stay unchanged... */}
+                            {/* Product Table */}
+                            {activeTab === "Product" &&
+                                productRows.map((row, idx) => (
+                                    <tr key={idx} className="odd:bg-gray-50 hover:bg-gray-100">
+                                        <td className="px-4 py-3 border border-gray-200"><input type="checkbox" className="mr-2" />{row.productId}</td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.productName}</td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.description}</td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.price}</td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.stockLevel}</td>
+                                        <td className="px-4 py-3 border border-gray-200 relative">
+                                            <button onClick={() => toggleMenu(idx)} className="text-xl hover:bg-gray-200 px-2 rounded">⋮</button>
+                                            {openMenuIndex === idx && renderDropdown("Product")}
+                                        </td>
+                                    </tr>
+                                ))}
+
+                            {/* Raw Materials Table */}
+                            {activeTab === "Raw Materials" &&
+                                rawMaterialRows.map((row, idx) => (
+                                    <tr key={idx} className="odd:bg-gray-50 hover:bg-gray-100">
+                                        <td className="px-4 py-3 border border-gray-200"><input type="checkbox" className="mr-2" />{row.materialId}</td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.materialName}</td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.description}</td>
+                                        <td className="px-4 py-3 border border-gray-200">
+                                            <select className="w-full border px-2 py-1 rounded-md" defaultValue={row.unit}>
+                                                {units.map((u) => <option key={u}>{u}</option>)}
+                                            </select>
+                                        </td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.cost}</td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.vendorCode}</td>
+                                        <td className="px-4 py-3 border border-gray-200 relative">
+                                            <button onClick={() => toggleMenu(idx)} className="text-xl hover:bg-gray-200 px-2 rounded">⋮</button>
+                                            {openMenuIndex === idx && renderDropdown("Raw Materials")}
+                                        </td>
+                                    </tr>
+                                ))}
                         </tbody>
                     </table>
                 </div>
             </div>
-
-            {/* Modal */}
-            {modalVisible && (
-                <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-lg w-[600px] h-[400px] relative p-8">
-                        <button onClick={closeModal} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl">
-                            &times;
-                        </button>
-                        <button
-                            onClick={handleDownload}
-                            className="absolute top-3 right-14 bg-white border px-3 py-1 rounded-md text-sm shadow hover:bg-gray-50"
-                        >
-                            Download <span className="ml-1">&#8681;</span>
-                        </button>
-                        <div className="h-full flex items-center justify-center text-lg text-gray-700">
-                            {modalContent}
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
