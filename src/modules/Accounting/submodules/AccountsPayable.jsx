@@ -1,29 +1,19 @@
-import React from 'react'
-import '../styles/accounting-styling.css'
-import Table from '../components/Table'
-import Search from '../components/Search'
+import React from "react";
+import "../styles/AccountsPayable.css";
 
-const AccountsPayable = () => {
-    const columns = ["JERICHO Lagay ka columns here."]
-
-    const data = ["JERICHO Lagay ka data here."]
+const BodyContent = () => {
     return (
-        <div className="accountsPayable">
+        <div className="acctpay">
             <div className="body-content-container">
-
-                <div className="title-subtitle-container">
-                    <h1 className="subModule-title">Accounts Payable</h1>
-                </div>
-
-                <div className="parent-component-container">
-                    <Search type="text" placeholder="Search Record.." />
-                </div>
-
-                {/* <Table data={data} columns={columns} enableCheckbox={false} /> */}
-
+                <p>Hello Accounts Payable SubModule!</p>
+                <p>Fill this container with your elements, change the display if need be.</p>
+                <p>If you're going to style with css, use your unique namespace '.acctpay' at the start.</p>
             </div>
-        </div>
-    )
-}
 
-export default AccountsPayable
+        </div>
+
+
+    );
+};
+
+export default BodyContent;
