@@ -3,6 +3,7 @@ import "./App.css";
 import "./MediaQueries.css";
 import SearchBar from "./shared/components/SearchBar";
 
+
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
@@ -11,6 +12,7 @@ function App() {
   const [hoveredModule, setHoveredModule] = useState(null);
   const [hoveredSubModule, setHoveredSubModule] = useState(null);
   const [ModuleComponent, setModuleComponent] = useState(null);
+  
 
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
@@ -59,6 +61,8 @@ function App() {
   };
 
   const moduleFileNames = {
+    Login: "Login",
+    Signup: "Signup",
     Management: "Management",
     Administration: "Administration",
     Accounting: "Accounting",
@@ -191,6 +195,8 @@ function App() {
               </div>
             </div>
           </div>
+          
+      
 
           <div className="sidebar-main-menu-container"></div>
 
@@ -362,14 +368,13 @@ function App() {
             </div>
           </div>
           <div className="body-container">
-            {ModuleComponent && (
-              <Suspense>
-                <ModuleComponent
-                  loadSubModule={loadSubModule}
-                  setActiveSubModule={setActiveSubModule}
-                />
-              </Suspense>
-            )}
+                {ModuleComponent && (
+                  <Suspense>
+                    <ModuleComponent 
+                      loadSubModule={loadSubModule}
+                      setActiveSubModule={setActiveSubModule} />
+                  </Suspense>
+                )}
           </div>
         </div>
       </div>
