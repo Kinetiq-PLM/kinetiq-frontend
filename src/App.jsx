@@ -85,8 +85,12 @@ function App() {
     },
     Administration: {
       "User": "User",
-      "Masterlist": "Masterlist",
+      "Item Masterlist": "ItemMasterlist",
+      "Business Partner Masterlist": "BusinessPartnerMasterlist",
       "Audit Logs": "AuditLogs",
+      "Policy":"Policy",
+      "Currency": "Currency",
+      
     },
     Accounting: {
       "General Ledger": "GeneralLedger",
