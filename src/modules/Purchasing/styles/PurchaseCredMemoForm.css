@@ -1,0 +1,260 @@
+.purchase-cred-memo-form {
+    display: flex;
+    width: 100%;
+    height: auto;
+}
+  
+.purchase-cred-memo-form .purchase-cred-memo-form-body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+}
+
+/* Header Styles */
+.purchase-cred-memo-form .header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.purchase-cred-memo-form .back-btn {
+    position: absolute;
+    left: 0;
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.purchase-cred-memo-form .header h1 {
+    width: 100%;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+    color: #333;
+}
+
+/* Content Styles */
+.purchase-cred-memo-form .content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    flex: 1;
+}
+
+/* Info Section */
+.purchase-cred-memo-form .info-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.purchase-cred-memo-form .company-info {
+    flex: 1;
+}
+
+.purchase-cred-memo-form .company-info h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.purchase-cred-memo-form .company-info p {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0.25rem;
+}
+
+.purchase-cred-memo-form .customer-info {
+    flex: 2;
+    display: flex;
+    justify-content: space-between;
+}
+
+.purchase-cred-memo-form .info-block {
+    margin-right: 2rem;
+}
+
+.purchase-cred-memo-form .info-block h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.purchase-cred-memo-form .info-block p {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    color: #555;
+}
+
+/* Memo Details */
+.purchase-cred-memo-form .memo-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.purchase-cred-memo-form .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.purchase-cred-memo-form .detail-row span:first-child {
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: #333;
+    min-width: 120px;
+}
+
+.purchase-cred-memo-form .detail-row span:last-child {
+    font-size: 0.8rem;
+    color: #555;
+    text-align: right;
+}
+
+/* Total Section */
+.purchase-cred-memo-form .total-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.5rem 0;
+}
+
+.purchase-cred-memo-form .total-section h2 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Table Styles */
+.purchase-cred-memo-form .table-container {
+    width: 100%;
+    margin: 1rem auto;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e6e6e6;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.items-table th, 
+.items-table td {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    border: 1px solid #e6e6e6;
+    color: #666;
+    font-size: 0.875rem;
+}
+
+.items-table th {
+    background-color: #fff;
+    font-weight: 500;
+    color: #666;
+    border-top: none;
+}
+
+.items-table th:first-child {
+    border-left: none;
+}
+
+.items-table th:last-child {
+    border-right: none;
+}
+
+.items-table td {
+    border-left: none;
+    border-right: none;
+}
+
+.items-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Footer Section */
+.purchase-cred-memo-form .footer-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 4rem;
+}
+
+.purchase-cred-memo-form .terms-section {
+    flex: 1;
+}
+
+.purchase-cred-memo-form .terms-section h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #333;
+}
+
+.purchase-cred-memo-form .terms-section p {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.purchase-cred-memo-form .bank-info {
+    margin-top: 1rem;
+}
+
+.purchase-cred-memo-form .totals-section {
+    flex: 1;
+    max-width: 300px;
+}
+
+.purchase-cred-memo-form .total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.25rem 0;
+    font-size: 0.85rem;
+}
+
+.purchase-cred-memo-form .total-row span:first-child {
+    color: #555;
+}
+
+.purchase-cred-memo-form .total-row span:last-child {
+    font-weight: 500;
+    color: #333;
+}
+
+.purchase-cred-memo-form .balance-due {
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #ddd;
+    font-weight: 600;
+}
+
+.purchase-cred-memo-form .balance-due span {
+    font-weight: 600;
+    color: #333;
+}

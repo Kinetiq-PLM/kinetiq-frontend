@@ -1,0 +1,302 @@
+.purchquote {
+    display: flex;
+    width: 100%;
+    height: auto;
+}
+
+.purchquote .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    min-width: 40rem;
+    min-height: 30rem;
+}
+
+.purchquote .purchquote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    width: 100%;
+}
+
+.purchquote .purchquote-header-left {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.purchquote .purchquote-back {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease;
+}
+
+.purchquote .purchquote-back:hover {
+    color: #00A8A8;
+}
+
+.purchquote .purchquote-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.purchquote .purchquote-date-filter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.purchquote .date-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.purchquote .date-options-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.purchquote .date-option {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.purchquote .date-option:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    color: #00A8A8;
+}
+
+.purchquote .date-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.purchquote .purchquote-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #00bcd4;
+    border-radius: 0.25rem;
+    color: #00bcd4;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.purchquote .purchquote-filter-btn:hover {
+    border-color: #00A8A8;
+    color: #00A8A8;
+    background-color: rgba(0, 168, 168, 0.05);
+}
+
+.purchquote .purchquote-search input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    width: 300px;
+}
+
+.purchquote .purchquote-content {
+    flex: 1;
+    background: white;
+    border: 1px solid #D2D2D2;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: auto;
+    max-height: calc(100vh - 20rem);
+}
+
+.purchquote .purchquote-table {
+    width: 100%;
+    min-width: 800px;
+}
+
+.purchquote .purchquote-table-header {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 17rem 6fr 4fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
+}
+
+.purchquote .purchquote-table-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.purchquote .purchquote-row {
+    display: grid;
+    grid-template-columns: 8rem 6fr 6fr 2fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.purchquote .purchquote-row > div {
+    text-align: center;
+}
+
+.purchquote .purchquote-row:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    cursor: pointer;
+}
+
+.purchquote .status-closed,
+.purchquote .status-open,
+.purchquote .status-cancelled,
+.purchquote .status-draft {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.purchquote .status-closed {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.purchquote .status-open {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.purchquote .status-cancelled {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.purchquote .status-draft {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.purchquote .purchquote-new-form,
+.purchquote .purchquote-compare,
+.purchquote .purchquote-send-to {
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.purchquote .purchquote-new-form {
+    background-color: #00A8A8;
+    color: white;
+}
+
+.purchquote .purchquote-new-form:hover {
+    background-color: #008080;
+}
+
+.purchquote .purchquote-compare {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.purchquote .purchquote-compare:hover {
+    background-color: #d0d0d0;
+}
+
+.purchquote .purchquote-send-to {
+    background-color: #00A8A8;
+    color: white;
+}
+
+.purchquote .purchquote-send-to:hover {
+    background-color: #008080;
+}
+
+.purchquote .purchquote-footer {
+    position: relative;
+    width: 100%;
+    height: 3.5rem;
+    margin-top: 1rem;
+    padding: 0 1rem;
+}
+
+.purchquote .purchquote-new-form {
+    position: absolute;
+    left: 1rem;
+    bottom: 0;
+}
+
+.purchquote .purchquote-compare {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+}
+
+.purchquote .purchquote-send-to {
+    position: absolute;
+    right: 1rem;
+    bottom: 0;
+}
+
+.purchquote .purchquote-footer-right {
+    display: flex;
+    gap: 1rem;
+    justify-self: end;
+}
+
+.status-pending {
+    color: #f57c00;
+    background-color: rgba(245, 124, 0, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.status-approved {
+    color: #4caf50;
+    background-color: rgba(76, 175, 80, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.status-rejected {
+    color: #f44336;
+    background-color: rgba(244, 67, 54, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}

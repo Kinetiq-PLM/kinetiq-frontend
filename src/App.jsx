@@ -25,7 +25,7 @@ function App() {
       iconsRef.current.scrollTop = descsRef.current.scrollTop;
     }
   };
-
+  
   // load jsx files for main modules
   const loadMainModule = (moduleId) => {
     if (moduleFileNames[moduleId] && !(activeModule == moduleId && !activeSubModule)) {
@@ -92,13 +92,19 @@ function App() {
       "Approvals": "Approvals",
       "Forms": "Forms",
     },
-    "Purchasing": {
-      "Supplier Management": "SupplierManagement",
-      "Purchase Orders": "PurchaseOrders",
+    Purchasing: {
+      "Purchase Request List": "PurchaseReqList",
+      "Puchase Quotation List": "PurchaseQuot",
+      "Purchase Order Status": "PurchaseOrdStat",
+      "A/P Invoice": "PurchaseAPInvoice",
+      "Credit Memo": "PurchaseCredMemo",
+      "Vendor Application Form": "VendorAppForm",
     },
     "Operations": {
       "Workflow Automation": "WorkflowAutomation",
       "Operational Analytics": "OperationalAnalytics",
+      "Goods Tracking": "GoodsTracking",
+      "Goods Receipt PO": "GoodsReceiptPO",
     },
     "Sales": {
       "Lead Management": "LeadManagement",
