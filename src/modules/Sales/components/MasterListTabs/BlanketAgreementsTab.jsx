@@ -78,12 +78,15 @@ export default function BlanketAgreementsTab({
         customer_name: agreement.statement.customer.name,
         address: `${agreement.statement.customer.address_line1} ${agreement.statement.customer.address_line2}`,
         type: agreement.statement.type,
-        total_price: agreement.statement.total_amount,
+        total_price: Number(agreement.statement.total_amount).toLocaleString(
+          "en-US",
+          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        ),
         salesrep: `${agreement.statement.salesrep.first_name} ${agreement.statement.salesrep.last_name}`,
         agreement_method: agreement.agreement_method,
-        date_issued: new Date(agreement.signed_date).toLocaleString(),
-        start_date: new Date(agreement.start_date).toLocaleString(),
-        end_date: new Date(agreement.end_date).toLocaleString(),
+        date_issued: new Date(agreement.signed_date).toLocaleDateString(),
+        start_date: new Date(agreement.start_date).toLocaleDateString(),
+        end_date: new Date(agreement.end_date).toLocaleDateString(),
         status: agreement.status,
         document: `${BASE_API_URL}sales/agreement/${agreement.agreement_id}/document`,
       }));
