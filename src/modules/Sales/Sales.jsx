@@ -8,7 +8,6 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
     Order: "Order",
     Delivery: "Delivery",
     Invoice: "Invoice",
-    "Blanket Agreement": "BlanketAgreement",
     "Master List": "MasterList",
     Reporting: "Reporting",
     Returns: "Returns",

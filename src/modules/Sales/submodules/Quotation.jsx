@@ -15,6 +15,7 @@ import ProductListModal from "../components/Modals/Lists/ProductList";
 import NewCustomerModal from "../components/Modals/NewCustomer";
 import BlanketAgreementDetailsModal from "../components/Modals/BlanketAgreementDetails.jsx";
 import EmployeeListModal from "../components/Modals/Lists/EmployeeListModal.jsx";
+import ConfirmClear from "./../components/ConfirmClear";
 
 import Button from "../components/Button";
 import InfoField from "../components/InfoField";
@@ -56,6 +57,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   // remove local storage after use
 
   const [submitted, setSubmitted] = useState(false);
+  const [canClear, setCanClear] = useState(false);
 
   const [copyFromModal, setCopyFromModal] = useState(""); // variable to set what list will be shown
   // show list modal
@@ -85,6 +87,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
   });
 
   // Modals
+  const [isConfirmClearOpen, setIsConfirmClearOpen] = useState(false);
   const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
   const [isProductListOpen, setIsProductListOpen] = useState(false);
   const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
@@ -158,15 +161,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       0
     );
     const shippingFee = products.length * 100;
-    // const warrantyFee = products.reduce(
-    //   (acc, product) =>
-    //     acc +
-    //     ((Number(product.selling_price) - Number(product.unit_price)) *
-    //       product.quantity *
-    //       product.warranty_period) /
-    //       12,
-    //   0
-    // );
     const warrantyFee = (totalBeforeDiscount * 0.1).toFixed(2);
 
     const totalPrice =
@@ -253,10 +247,43 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
     });
   }, [deliveryDate]);
 
+  const handleClear = () => {
+    setProducts([]);
+    setSelectedCustomer("");
+    setSelectedProduct("");
+    setSelectedEmployee("");
+    setAddress("");
+    setDeliveryDate("");
+    setQuotationInfo({
+      customer_id: "",
+      quotation_id: "",
+      selected_products: [],
+      selected_address: "",
+      selected_delivery_date: "",
+      total_before_discount: 0,
+      date_issued: "",
+      discount: 0,
+      total_tax: 0,
+      shipping_fee: 0,
+      warranty_fee: 0,
+      total_price: 0,
+    });
+    setCanClear(false);
+  };
+
+  useEffect(() => {
+    if (selectedCustomer != "") setCanClear(true);
+  }, [selectedCustomer]);
+
   return (
     <div className="quotation">
       <div className="body-content-container">
-        {/* Displays a table and can confirm what was selected */}
+        <ConfirmClear
+          isOpen={isConfirmClearOpen}
+          onClose={() => setIsConfirmClearOpen(false)}
+          handleClear={handleClear}
+        ></ConfirmClear>
+
         <CustomerListModal
           isOpen={isCustomerListOpen}
           isNewCustomerModalOpen={isNewCustomerModalOpen}
@@ -312,7 +339,13 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
           <div className="h-full flex flex-col gap-3 w-full">
             {/* Buttons Row */}
             <div className="flex gap-2">
-              <Button type="primary" onClick={() => setIsProductListOpen(true)}>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setCanClear(true);
+                  setIsProductListOpen(true);
+                }}
+              >
                 Add Item
               </Button>
               <Button type="outline" onClick={() => handleDelete()}>
@@ -348,9 +381,17 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
             </div> */}
 
             {/* Submit Button Aligned Right */}
-            <div className="mt-auto">
+            <div className="mt-auto gap-2 flex">
               <Button type="primary" className="" onClick={handleSubmit}>
                 Submit Quotation
+              </Button>
+              <Button
+                type="outline"
+                className=""
+                onClick={() => setIsConfirmClearOpen(true)}
+                disabled={!canClear}
+              >
+                Clear
               </Button>
             </div>
           </div>
