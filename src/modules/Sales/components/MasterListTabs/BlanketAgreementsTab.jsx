@@ -3,7 +3,7 @@ import Table from "../Table";
 import Dropdown from "../Dropdown";
 import Button from "../Button";
 import BLANKET_AGREEMENT_LIST_DATA from "../../temp_data/ba_list_data";
-import { GET } from "../../api/api";
+import { GET, BASE_API_URL } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
 export default function BlanketAgreementsTab({
   loadSubModule,
@@ -23,7 +23,6 @@ export default function BlanketAgreementsTab({
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "address", label: "Address" },
-    { key: "type", label: "Type" },
     { key: "total_price", label: "Total Price" },
     { key: "salesrep", label: "Sales Rep" }, // name of salesrep if available
     { key: "agreement_method", label: "Agreement Method" }, // signed date
@@ -31,6 +30,7 @@ export default function BlanketAgreementsTab({
     { key: "start_date", label: "Start Date" },
     { key: "end_date", label: "End Date" },
     { key: "status", label: "Status" },
+    { key: "document", label: "Document" },
   ];
 
   const dateFilters = [
@@ -85,6 +85,7 @@ export default function BlanketAgreementsTab({
         start_date: new Date(agreement.start_date).toLocaleString(),
         end_date: new Date(agreement.end_date).toLocaleString(),
         status: agreement.status,
+        document: `${BASE_API_URL}sales/agreement/${agreement.agreement_id}/document`,
       }));
       setAgreementList(data);
     }

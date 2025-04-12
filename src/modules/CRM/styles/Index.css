@@ -69,3 +69,50 @@
     max-width: 400px;
   }
 }
+
+.ticket
+.campaign
+.opportunity
+.partner-master-data
+.crm 
+
+/* Minimalist custom scrollbar for body-content-container */
+.ticket .body-content-container::-webkit-scrollbar,
+.campaign .body-content-container::-webkit-scrollbar,
+.opportunity .body-content-container::-webkit-scrollbar,
+.partner-master-data .body-content-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.ticket .body-content-container::-webkit-scrollbar-track,
+.campaign .body-content-container::-webkit-scrollbar-track,
+.opportunity .body-content-container::-webkit-scrollbar-track,
+.partner-master-data .body-content-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ticket .body-content-container::-webkit-scrollbar-thumb,
+.campaign .body-content-container::-webkit-scrollbar-thumb,
+.opportunity .body-content-container::-webkit-scrollbar-thumb,
+.partner-master-data .body-content-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.ticket .body-content-container:hover::-webkit-scrollbar-thumb,
+.campaign .body-content-container:hover::-webkit-scrollbar-thumb,
+.opportunity .body-content-container:hover::-webkit-scrollbar-thumb,
+.partner-master-data .body-content-container:hover::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+}
+
+/* Firefox scrollbar support */
+.ticket .body-content-container,
+.campaign .body-content-container,
+.opportunity .body-content-container,
+.partner-master-data .body-content-container {
+  scrollbar-width: thin;
+  scrollbar-color: #00a8a8 transparent;
+}

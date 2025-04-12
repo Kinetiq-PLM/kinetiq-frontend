@@ -3,25 +3,61 @@
 import { useState, useEffect, useRef } from "react";
 import { useAlert } from "../Context/AlertContext.jsx";
 
-import Button from "../Button";
+import Button from "../Button.jsx";
 import generateRandomID from "../GenerateID.jsx";
 import DateInputField from "../DateInputField.jsx";
+import Dropdown from "../Dropdown.jsx";
+import InputField from "../InputField.jsx";
+import TextField from "../../../CRM/components/TextField.jsx";
+import { POST } from "../../api/api.jsx";
+import { useMutation } from "@tanstack/react-query";
 
-const BlanketAgreementDateModal = ({ isOpen, onClose, quotationInfo }) => {
+const BlanketAgreementDetailsModal = ({ isOpen, onClose, quotationInfo }) => {
   const { showAlert } = useAlert();
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
+  // ========== DATA ==========
+  const agreementTypes = ["Written", "Oral", "Electronic"];
+
   const [agreementID, setAgreementID] = useState(generateRandomID("B"));
+  const [agreementType, setAgreementType] = useState("");
+  const [signedDate, setSignedDate] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [description, setDescription] = useState("");
+
   const [isValidationVisible, setIsValidationVisible] = useState(false);
+
+  const agreementMutation = useMutation({
+    mutationFn: async (data) => await POST(`sales/agreement/`, data),
+    onSuccess: (data) => {
+      showAlert({
+        type: "success",
+        title: "New Agreement Created",
+      });
+      onClose();
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title: "An error occurred while creating agreement: " + error.message,
+      });
+    },
+  });
+  // ========== DATA ==========
 
   const handleConfirm = () => {
     setIsValidationVisible(true);
 
-    const validators = [validateStartDate, validateEndDate];
+    const validators = [
+      validateStartDate,
+      validateEndDate,
+      validateSignedDate,
+      validateAgreementType,
+      validateDescription,
+    ];
     const errorCount = validators.reduce(
       (count, validate) => count + (validate() ? 1 : 0),
       0
@@ -31,16 +67,52 @@ const BlanketAgreementDateModal = ({ isOpen, onClose, quotationInfo }) => {
       // Add new blanket agreement HERE to database
       // w agreementID and quotationInfo
 
+      const request = {
+        statement_data: quotationInfo.statement_data,
+        agreement_data: {
+          start_date: startDate,
+          end_date: endDate,
+          description,
+          signed_date: signedDate,
+          agreement_method: agreementType,
+        },
+      };
+      console.log(request);
+      agreementMutation.mutate(request);
+
       // Reset Fields
       setStartDate("");
       setEndDate("");
       setIsValidationVisible(false);
-      showAlert({
-        type: "success",
-        title: "New Agreement Created",
-      });
-      onClose();
     }
+  };
+
+  const validateSignedDate = () => {
+    if (!signedDate.trim()) {
+      return "Signed date is required.";
+    }
+
+    const signed = new Date(signedDate);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Ensure all dates are valid
+    if (isNaN(signed.getTime())) {
+      return "Invalid signed date format.";
+    }
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return "Invalid start or end date format.";
+    }
+
+    if (signed < start) {
+      return "Signed date cannot be before the start date.";
+    }
+
+    if (signed > end) {
+      return "Signed date cannot be after the end date.";
+    }
+
+    return "";
   };
 
   const validateStartDate = () => {
@@ -85,11 +157,24 @@ const BlanketAgreementDateModal = ({ isOpen, onClose, quotationInfo }) => {
     return "";
   };
 
+  const validateAgreementType = () => {
+    if (!agreementType.trim()) {
+      return "Agreement Type is required.";
+    }
+    return "";
+  };
+
+  const validateDescription = () => {
+    if (!description.trim()) {
+      return "Description is required.";
+    }
+    return "";
+  };
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
         onClose();
-        setCustomerID("");
       }
     };
 
@@ -151,18 +236,49 @@ const BlanketAgreementDateModal = ({ isOpen, onClose, quotationInfo }) => {
         {/* BODY */}
         <div className="px-6 mt-4">
           <form action="" className="space-y-4">
+            <InputField
+              label={"Company Name"}
+              value={quotationInfo?.name || "INSERT COMPANY NAME"}
+              isDisabled={true}
+            />
+            <div className="flex gap-2">
+              <Dropdown
+                label="Campaign Type"
+                options={agreementTypes}
+                onChange={setAgreementType}
+                value={agreementType}
+                validation={validateAgreementType}
+                isValidationVisible={isValidationVisible}
+              />
+            </div>
             <DateInputField
-              label={"Start Date"}
-              value={startDate}
-              setValue={setStartDate}
-              validation={validateStartDate}
+              label={"Signed Date"}
+              value={signedDate}
+              setValue={setSignedDate}
+              validation={validateSignedDate}
               isValidationVisible={isValidationVisible}
             />
-            <DateInputField
-              label={"End Date"}
-              value={endDate}
-              setValue={setEndDate}
-              validation={validateEndDate}
+            <div className="flex gap-2">
+              <DateInputField
+                label={"Start Date"}
+                value={startDate}
+                setValue={setStartDate}
+                validation={validateStartDate}
+                isValidationVisible={isValidationVisible}
+              />
+              <DateInputField
+                label={"End Date"}
+                value={endDate}
+                setValue={setEndDate}
+                validation={validateEndDate}
+                isValidationVisible={isValidationVisible}
+              />
+            </div>
+            <TextField
+              label={"Description"}
+              value={description}
+              setValue={setDescription}
+              validation={validateDescription}
               isValidationVisible={isValidationVisible}
             />
           </form>
@@ -174,7 +290,7 @@ const BlanketAgreementDateModal = ({ isOpen, onClose, quotationInfo }) => {
                 onClick={handleConfirm}
                 submit={true}
               >
-                Continue
+                Create
               </Button>
             </div>
             <div>
@@ -189,4 +305,4 @@ const BlanketAgreementDateModal = ({ isOpen, onClose, quotationInfo }) => {
   );
 };
 
-export default BlanketAgreementDateModal;
+export default BlanketAgreementDetailsModal;

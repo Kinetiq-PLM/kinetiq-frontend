@@ -12,6 +12,7 @@ import QuotationListModal from "../components/Modals/Lists/QuotationList.jsx";
 import BlanketAgreementListModal from "./../components/Modals/Lists/BlanketAgreementList";
 import OrderListModal from "../components/Modals/Lists/OrderList.jsx";
 import InvoiceListModal from "../components/Modals/Lists/InvoiceList.jsx";
+import BlanketAgreementDetailsModal from "../components/Modals/BlanketAgreementDetails.jsx";
 import DeliveryListModal from "../components/Modals/Lists/DeliveryList.jsx";
 
 import Button from "../components/Button";
@@ -37,9 +38,17 @@ const BlanketAgreement = ({ loadSubModule, setActiveSubModule }) => {
   const [isDeliveryListOpen, setIsDeliveryListOpen] = useState(false);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
 
+  const [isBlanketAgreementDetailsOpen, setIsBlanketAgreementDetailsOpen] =
+    useState(false);
+
   return (
     <div className="blanket-agreement">
       <div className="body-content-container">
+        <BlanketAgreementDetailsModal
+          isOpen={isBlanketAgreementDetailsOpen}
+          onClose={() => setIsBlanketAgreementDetailsOpen(false)}
+        ></BlanketAgreementDetailsModal>
+
         <ProductListModal
           isOpen={isProductListOpen}
           onClose={() => setIsProductListOpen(false)}
@@ -78,6 +87,12 @@ const BlanketAgreement = ({ loadSubModule, setActiveSubModule }) => {
         ></DeliveryListModal>
 
         <div className="space-y-2 space-x-2">
+          <Button
+            type="primary"
+            onClick={() => setIsBlanketAgreementDetailsOpen(true)}
+          >
+            Ba deets
+          </Button>
           <Button type="primary" onClick={() => setIsProductListOpen(true)}>
             Product List
           </Button>
