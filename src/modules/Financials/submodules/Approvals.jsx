@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
     import "../styles/Approvals.css";
+import { GET } from "../api/api";
+
     
     const tabs = ["Budget Allocation Plan", "Budget Submission List", "Budget Request List"];
     const departmentIds = {
@@ -48,44 +50,9 @@ import React, { useState, useEffect, useMemo } from "react";
       const [searchTerm, setSearchTerm] = useState("");
       const [dateRange, setDateRange] = useState("Last 30 days");
       const [filterBy, setFilterBy] = useState("All");
-      const [originalData, setOriginalData] = useState([
-        { requestId: "BUD2025-01", departmentId: "MAR016", amount: "500,000", approvedAmount: "300,000", submissionDate: "2025-02-17", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-17"), approvedBy: "Sexbomb Aiah", approvalDate: new Date("2025-02-20"), remarks: "Approved", validationStatus: "Approved" },
-        { requestId: "BUD2025-02", departmentId: "OPER015", amount: "1,000,000", approvedAmount: "1000000", submissionDate: "2024-12-15", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-01-10"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-03", departmentId: "IT014", amount: "1,300,000", approvedAmount: "1300000", submissionDate: "2024-12-25", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-05"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-04", departmentId: "ACC013", amount: "1,200,000", approvedAmount: "1200000", submissionDate: "2025-01-30", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-01"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-05", departmentId: "PUR012", amount: "1,900,000", approvedAmount: "1900000", submissionDate: "2025-02-28", validatedBy: "Sexbomb Aiah", validationDate: new Date("2024-12-20"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-06", departmentId: "SUP011", amount: "1,100,000", approvedAmount: "1100000", submissionDate: "2025-02-26", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-01-25"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-07", departmentId: "MAN010", amount: "3,200,000", approvedAmount: "3200000", submissionDate: "2025-02-14", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-28"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-08", departmentId: "MRP009", amount: "2,300,000", approvedAmount: "2300000", submissionDate: "2025-01-19", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-10"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-09", departmentId: "INV008", amount: "1,200,000", approvedAmount: "1200000", submissionDate: "2025-01-29", validatedBy: "Sexbomb Aiah", validationDate: new Date("2024-12-30"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-010", departmentId: "PM007", amount: "2,500,000", approvedAmount: "2500000", submissionDate: "2025-03-14", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-01-15"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-011", departmentId: "HR006", amount: "3,700,000", approvedAmount: "3700000", submissionDate: "2025-03-02", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-20"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-012", departmentId: "SAL001", amount: "5,100,000", approvedAmount: "5100000", submissionDate: "2025-03-16", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-05"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-013", departmentId: "ADM002", amount: "6,200,000", approvedAmount: "6,000,000", submissionDate: "2025-03-12", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-12"), approvedBy: "Sexbomb Aiah", approvalDate: new Date("2025-03-15"), remarks: "Approved", validationStatus: "Approved" },
-        { requestId: "BUD2025-014", departmentId: "FIN003", amount: "2,400,000", approvedAmount: "2,000,000", submissionDate: "2025-03-15", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-15"), approvedBy: "Sexbomb Aiah", approvalDate: new Date("2025-03-18"), remarks: "Approved", validationStatus: "Approved" },
-        { requestId: "BUD2025-015", departmentId: "PRO004", amount: "1,500,000", approvedAmount: "1,500,000", submissionDate: "2025-03-13", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-03-13"), approvedBy: "Sexbomb Aiah", approvalDate: new Date("2025-03-16"), remarks: "Approved", validationStatus: "Approved" },
-        { requestId: "BUD2025-016", departmentId: "DIS005", amount: "2,200,000", approvedAmount: "2200000", submissionDate: "2025-02-02", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-02"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending" },
-        { requestId: "BUD2025-017", departmentId: "DIS005", amount: "300000", approvedAmount: null, submissionDate: "2025-02-02", validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-02-02"), approvedBy: "Sexbomb Aiah", approvalDate: new Date("2025-02-05"), remarks: "Rejected", validationStatus: "Rejected" },
-      ].map(item => ({ ...item, submissionDate: new Date(item.submissionDate) })));
-    
-      const [originalRequestData, setOriginalRequestData] = useState([
-        { requestId: "REQ-MAR-2025", departmentId: "MAR016", amount: "200000", requestDate: new Date("2025-08-01"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-09"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-OPER-2025", departmentId: "OPER015", amount: "200000", requestDate: new Date("2025-08-02"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-10"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-IT-2025", departmentId: "IT014", amount: "200000", requestDate: new Date("2025-08-03"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-11"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-ACC-2025", departmentId: "ACC013", amount: "200000", requestDate: new Date("2025-08-04"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-12"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-PUR-2025", departmentId: "PUR012", amount: "200000", requestDate: new Date("2025-08-05"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-13"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-SUP-2025", departmentId: "SUP011", amount: "200000", requestDate: new Date("2025-08-06"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-14"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-MAN-2025", departmentId: "MAN010", amount: "200000", requestDate: new Date("2025-08-07"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-15"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-MRP-2025", departmentId: "MRP009", amount: "200000", requestDate: new Date("2025-08-08"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-16"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-INV-2025", departmentId: "INV008", amount: "200000", requestDate: new Date("2025-08-09"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-17"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-PM-2025", departmentId: "PM007", amount: "200000", requestDate: new Date("2025-08-10"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-18"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-HR-2025", departmentId: "HR006", amount: "200000", requestDate: new Date("2025-08-11"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-19"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-SAL-2025", departmentId: "SAL001", amount: "200000", requestDate: new Date("2025-08-12"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-20"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-ADM-2025", departmentId: "ADM002", amount: "200000", requestDate: new Date("2025-08-13"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-21"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-FIN-2025", departmentId: "FIN003", amount: "200000", requestDate: new Date("2025-08-14"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-22"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-PRO-2025", departmentId: "PRO004", amount: "200000", requestDate: new Date("2025-08-15"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-23"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-        { requestId: "REQ-DIS-2025", departmentId: "DIS005", amount: "200000", requestDate: new Date("2025-08-16"), validatedBy: "Sexbomb Aiah", validationDate: new Date("2025-08-24"), approvedBy: "N/A", approvalDate: null, remarks: "Awaiting Approval", validationStatus: "Pending", approvedAmount: "150000" },
-      ].map(item => ({ ...item, requestDate: new Date(item.requestDate) })));
+
+      const [originalData, setOriginalData] = useState([]);
+      const [originalRequestData, setOriginalRequestData] = useState([]);
     
       const [filteredData, setFilteredData] = useState(originalData);
       const [filteredRequestData, setFilteredRequestData] = useState(originalRequestData);
@@ -448,6 +415,35 @@ import React, { useState, useEffect, useMemo } from "react";
       useEffect(() => {
         setIsAllocatedBudgetUpdated(false)
       },[activeTab])
+
+      const fetchApprovals = async () => {
+      try {
+        const data = await GET("/approvals/budget-approvals/");
+        setOriginalData(data.map(sub => ({
+          requestId: sub.validation?.budget_submission?.budget_submission_id || "",
+          departmentId: sub.validation?.budget_submission?.dept_id || "",
+          amount: sub.validation?.amount_requested || "",
+          approvedAmount: sub.validation?.final_approved_amount || "",
+          submissionDate: sub.validation?.budget_submission?.validation_date || "",
+          validatedBy: sub.validation?.validated_by || "",
+          validationDate: sub.validation?.validation_date || "",
+          approvedBy: sub.approved_by || "",
+          approvalDate: sub.approval_date || "",
+          remarks: sub.remarks || "",
+          validationStatus: sub.validation?.validation_status || ""
+        })));
+      } catch (error) {
+        console.error("Error fetching returns:", error);
+      }
+    };
+
+        useEffect(() => {
+          fetchApprovals();
+          //fetchBudgetApprovals();
+          //fetchReturns();
+        }, []);
+
+
       return (
         <div className="approvals">
           <div className="body-content-container">
@@ -583,17 +579,17 @@ import React, { useState, useEffect, useMemo } from "react";
                         </tr>
                       </thead>
                       <tbody>
-                        {getSortedFilteredData().map((row, index) => (
+                        {originalData.map((row, index) => (
                           <tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Approved" ? "#f0f0f0" : "white" }}>
                             <td><div className="row-wrapper"><input type="checkbox" checked={selectedRows.includes(row.requestId)} readOnly /></div></td>
                             <td><div className="row-wrapper">{row.requestId}</div></td>
                             <td><div className="row-wrapper">{row.departmentId}</div></td>
                             <td><div className="row-wrapper">{row.amount}</div></td>
                             <td><div className="row-wrapper">{row.approvedAmount}</div></td>
-                            <td><div className="row-wrapper">{row.submissionDate.toLocaleDateString()}</div></td>
-                            <td><div className="row-wrapper">{row.validationDate ? row.validationDate.toLocaleDateString() : "N/A"}</div></td>
+                            <td><div className="row-wrapper">{row.submissionDate}</div></td>
+                            <td><div className="row-wrapper">{row.validationDate ? row.validationDate: "N/A"}</div></td>
                             <td><div className="row-wrapper">{row.validatedBy}</div></td>
-                            <td><div className="row-wrapper">{row.approvalDate ? row.approvalDate.toLocaleDateString() : "N/A"}</div></td>
+                            <td><div className="row-wrapper">{row.approvalDate ? row.approvalDate : "N/A"}</div></td>
                             <td><div className="row-wrapper">{row.approvedBy}</div></td>
                             <td><div className="row-wrapper">{row.remarks}</div></td>
                             <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
@@ -706,7 +702,7 @@ import React, { useState, useEffect, useMemo } from "react";
                           <tr key={index}>
                             <td><div className="row-wrapper">{row.requestId}</div></td>
                             <td><div className="row-wrapper">{row.amount}</div></td>
-                            <td><div className="row-wrapper">{row.submissionDate.toLocaleDateString()}</div></td>
+                            <td><div className="row-wrapper">{row.submissionDate}</div></td>
                             <td><div className="row-wrapper">{row.approvedBy}</div></td>
                             <td><div className="row-wrapper">{row.remarks === "Rejected" ? "For Resubmission" : row.remarks}</div></td>
                             <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
@@ -817,17 +813,17 @@ import React, { useState, useEffect, useMemo } from "react";
                             </tr>
                           </thead>
                           <tbody>
-                            {getSortedFilteredData().map((row, index) => (
+                            {originalData.map((row, index) => (
                               <tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Approved" ? "#f0f0f0" : "white" }}>
                                 <td><div className="row-wrapper"><input type="checkbox" checked={selectedRows.includes(row.requestId)} readOnly /></div></td>
                                 <td><div className="row-wrapper">{row.requestId}</div></td>
                                 <td><div className="row-wrapper">{row.departmentId}</div></td>
                                 <td><div className="row-wrapper">{row.amount}</div></td>
                                 <td><div className="row-wrapper">{row.approvedAmount}</div></td>
-                                <td><div className="row-wrapper">{row.requestDate.toLocaleDateString()}</div></td>
-                                <td><div className="row-wrapper">{row.validationDate ? row.validationDate.toLocaleDateString() : "N/A"}</div></td>
+                                <td><div className="row-wrapper">{row.requestDate}</div></td>
+                                <td><div className="row-wrapper">{row.validationDate ? row.validationDate: "N/A"}</div></td>
                                 <td><div className="row-wrapper">{row.validatedBy}</div></td>
-                                <td><div className="row-wrapper">{row.approvalDate ? row.approvalDate.toLocaleDateString() : "N/A"}</div></td>
+                                <td><div className="row-wrapper">{row.approvalDate ? row.approvalDate: "N/A"}</div></td>
                                 <td><div className="row-wrapper">{row.approvedBy}</div></td>
                                 <td><div className="row-wrapper">{row.remarks}</div></td>
                                 <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>

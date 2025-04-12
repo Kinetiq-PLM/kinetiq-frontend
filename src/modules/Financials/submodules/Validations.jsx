@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Validations.css";
+import { GET } from "../api/api";
 
 const tabs = ["Budget Submission List", "Budget Request List", "Returns List"];
 const departmentIds = {
@@ -41,55 +42,18 @@ const initialDepartmentBudgets = {
 const InfoCard = ({ title, value, color, children, className }) => (
   <div className={`info-card ${className}`}>{children}</div>
 );
+
+
 const BodyContent = () => {
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [isCompact, setIsCompact] = useState(window.innerWidth < 768);
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState("Last 30 days");
   const [filterBy, setFilterBy] = useState("All");
-  const [originalData, setOriginalData] = useState([
-    { requestId: "BUD2025-01", departmentId: "MAR016", amount: "500,000", submissionDate: "2025-02-17", validatedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "300,000", validationStatus: "Validated", validationDate: new Date("2025-02-17") },
-    { requestId: "BUD2025-02", departmentId: "OPER015", amount: "1,000,000", submissionDate: "2024-12-15", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-03", departmentId: "IT014", amount: "1,300,000", submissionDate: "2024-12-25", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-04", departmentId: "ACC013", amount: "1,200,000", submissionDate: "2025-01-30", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-05", departmentId: "PUR012", amount: "1,900,000", submissionDate: "2025-02-28", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-06", departmentId: "SUP011", amount: "1,100,000", submissionDate: "2025-02-26", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-07", departmentId: "MAN010", amount: "3,200,000", submissionDate: "2025-02-14", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-08", departmentId: "MRP009", amount: "2,300,000", submissionDate: "2025-01-19", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-09", departmentId: "INV008", amount: "1,200,000", submissionDate: "2025-01-29", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-010", departmentId: "PM007", amount: "2,500,000", submissionDate: "2025-03-14", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-011", departmentId: "HR006", amount: "3,700,000", submissionDate: "2025-03-02", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-012", departmentId: "SAL001", amount: "5,100,000", submissionDate: "2025-03-16", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-    { requestId: "BUD2025-013", departmentId: "ADM002", amount: "6,200,000", submissionDate: "2025-03-12", validatedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "6,000,000", validationStatus: "Validated", validationDate: new Date("2025-03-12") },
-    { requestId: "BUD2025-014", departmentId: "FIN003", amount: "2,400,000", submissionDate: "2025-03-15", validatedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "2,000,000", validationStatus: "Validated", validationDate: new Date("2025-03-15") },
-    { requestId: "BUD2025-015", departmentId: "PRO004", amount: "1,500,000", submissionDate: "2025-03-13", validatedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "1,500,000", validationStatus: "Validated", validationDate: new Date("2025-03-13") },
-    { requestId: "BUD2025-016", departmentId: "DIS005", amount: "2,200,000", submissionDate: "2025-02-02", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  ].map(item => ({ ...item, submissionDate: new Date(item.submissionDate) })));
-  const [originalRequestData, setOriginalRequestData] = useState([{ reqID: "REQ2025-01", departmentId: "MAR016", amount: "200,000", requestDate: "2025-02-20", validatedBy: "Sexbomb Aiah", remarks: "Approved", approvedAmount: "150,000", validationStatus: "Validated", validationDate: new Date("2025-02-20") },
-  { reqID: "REQ2025-02", departmentId: "OPER015", amount: "300,000", requestDate: "2024-12-18", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-03", departmentId: "IT014", amount: "400,000", requestDate: "2024-12-28", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-04", departmentId: "ACC013", amount: "500,000", requestDate: "2025-01-05", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-05", departmentId: "PUR012", amount: "600,000", requestDate: "2025-01-10", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-06", departmentId: "SUP011", amount: "700,000", requestDate: "2025-01-15", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-07", departmentId: "MAN010", amount: "800,000", requestDate: "2025-01-20", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-08", departmentId: "MRP009", amount: "900,000", requestDate: "2025-01-25", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-09", departmentId: "INV008", amount: "1000000", requestDate: "2025-01-30", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-10", departmentId: "PM007", amount: "1100000", requestDate: "2025-02-05", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-11", departmentId: "HR006", amount: "1200000", requestDate: "2025-02-10", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-12", departmentId: "SAL001", amount: "1300000", requestDate: "2025-02-15", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-13", departmentId: "ADM002", amount: "1400000", requestDate: "2025-02-20", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-14", departmentId: "FIN003", amount: "1500000", requestDate: "2025-02-25", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-15", departmentId: "PRO004", amount: "1600000", requestDate: "2025-03-01", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },
-  { reqID: "REQ2025-16", departmentId: "DIS005", amount: "1700000", requestDate: "2025-03-06", validatedBy: "null", remarks: "Awaiting Validation", approvedAmount: "null", validationStatus: "Pending", validationDate: null },].map(item => ({ ...item, requestDate: new Date(item.requestDate) })));
-  const [originalReturnsData, setOriginalReturnsData] = useState([
-    { returnsId: "RET2025-01", departmentId: "MAR016", returnDate: "2025-03-01", originTotalBudget: "500,000", returnedAmount: "100,000", attachedFile: "file1.pdf", validatedBy: "Sexbomb Aiah", remarks: "Approved", comments: "Exact Returned Amount", validationStatus: "Validated", validationDate: new Date("2025-03-01") },
-    { returnsId: "RET2025-02", departmentId: "OPER015", returnDate: "2025-03-05", originTotalBudget: "200,000", returnedAmount: "20,000", attachedFile: "file2.pdf", validatedBy: null, remarks: "Awaiting Validation", comments: "N/A", validationStatus: "Pending", validationDate: null },
-    { returnsId: "RET2025-03", departmentId: "IT014", returnDate: "2025-03-10", originTotalBudget: "300,000", returnedAmount: "10,000", attachedFile: "file3.pdf", validatedBy: null, remarks: "Awaiting Validation", comments: "N/A", validationStatus: "Pending", validationDate: null },
-    { returnsId: "RET2025-04", departmentId: "PUR012", returnDate: "2025-03-14", originTotalBudget: "400,000", returnedAmount: "5,000", attachedFile: "file4.pdf", validatedBy: null, remarks: "Awaiting Validation", comments: "N/A", validationStatus: "Pending", validationDate: null },
-    { returnsId: "RET2025-05", departmentId: "SUP011", returnDate: "2025-03-18", originTotalBudget: "200,000", returnedAmount: "12,000", attachedFile: "file5.pdf", validatedBy: null, remarks: "Awaiting Validation", comments: "N/A", validationStatus: "Pending", validationDate: null },
-    { returnsId: "RET2025-06", departmentId: "MAN010", returnDate: "2025-03-24", originTotalBudget: "600,000", returnedAmount: "60,000", attachedFile: "file6.pdf", validatedBy: null, remarks: "Awaiting Validation", comments: "N/A", validationStatus: "Pending", validationDate: null },
-    { returnsId: "RET2025-07", departmentId: "MRP009", returnDate: "2025-03-29", originTotalBudget: "100,000", returnedAmount: "10,000", attachedFile: "file7.pdf", validatedBy: null, remarks: "Awaiting Validation", comments: "N/A", validationStatus: "Pending", validationDate: null },
-  ].map(item => ({ ...item, returnDate: new Date(item.returnDate) })));
+  const [originalData, setOriginalData] = useState([]); 
+  const [originalRequestData, setOriginalRequestData] = useState([]);
+  const [originalReturnsData, setOriginalReturnsData] = useState([]);
+
   const [filteredData, setFilteredData] = useState(originalData);
   const [filteredRequestData, setFilteredRequestData] = useState(originalRequestData);
   const [filteredReturnsData, setFilteredReturnsData] = useState(originalReturnsData);
@@ -103,7 +67,7 @@ const BodyContent = () => {
   const [isWarningPopupVisible, setIsWarningPopupVisible] = useState(false);
   const [validatedByError, setValidatedByError] = useState({});
   const [approvedAmountError, setApprovedAmountError] = useState({});
-  const [departmentBudgets, setDepartmentBudgets] = useState(initialDepartmentBudgets);
+  const [departmentBudgets, setDepartmentBudgets] = useState({});
   const [isReviewConfirmationVisible, setIsReviewConfirmationVisible] = useState(false);
   const [returnRemarks, setReturnRemarks] = useState({});
   const [returnComments, setReturnComments] = useState({});
@@ -453,6 +417,71 @@ const BodyContent = () => {
   const handleCancelReviewConfirmation = () => {
     setIsReviewConfirmationVisible(false);
   }
+
+
+  const fetchReturns = async () => {
+    try {
+      const data = await GET("/validation/budget-validations/");
+      setOriginalReturnsData(data.map(sub=> ({
+        returnsId: sub.budget_return?.budget_return_id,
+        departmentId: sub.budget_return?.dept_id || "",
+        returnDate: sub.budget_return?.return_date || "",
+        originTotalBudget: sub.final_approved_amount || "",
+        returnedAmount: sub.budget_return?.returned_amount || "",
+        attachedFile: sub.budget_return?.expense_history_breakdown || "",
+        remarks: sub.remarks || "",
+        comments: sub.comments || "",
+        validationStatus: sub.validation_status || "",
+        validationDate: sub.validation_date || "",
+      })));
+    } catch (error) {
+      console.error("Error fetching returns:", error)
+    }
+  }
+
+  const fetchRequests = async () => {
+    try {
+      const data = await GET("/validation/budget-validations/");
+      setOriginalRequestData(data.map(sub=> ({
+        reqID: sub.budget_request?.budget_request_id,
+        departmentId: sub.budget_request?.dept_id || "",
+        amount: sub.budget_request?.amount_requested || "",
+        requestDate: sub.budget_request?.requested_date || "",
+        validatedBy: sub.validated_by || "",
+        remarks: sub.remarks || "",
+        approvedAmount: sub.final_approved_amount || "",
+        validationStatus: sub.validation_status || "",
+        validationDate: sub.validation_date || "",
+      })));
+    } catch (error) {
+      console.error("Error fetching requests:", error)
+    }
+  }
+
+const fetch = async () => {
+  try {
+    const data = await GET("/validation/budget-validations/");
+    setOriginalData(data.map(sub=> ({
+      requestId: sub.budget_submission?.budget_submission_id,
+      departmentId: sub.budget_submission?.dept_id || "",
+      amount: sub.budget_submission?.proposed_total_budget || "",
+      submissionDate: sub.budget_submission?.date_submitted || "",
+      validatedBy: sub.validated_by || "",
+      remarks: sub.remarks || "",
+      approvedAmount: sub.final_approved_amount || "",
+      validationStatus: sub.validation_status || "",
+      validationDate: sub.validation_date || "",
+    })));
+  } catch (error) {
+    console.error("Error fetching budget validations:", error)
+  }
+}
+useEffect(() => {
+  fetch();
+  fetchRequests();
+  fetchReturns();
+}, []);
+
   return (
     <div className="valid">
         <div className="body-content-container">
@@ -547,14 +576,14 @@ const BodyContent = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {getSortedFilteredData().map((row, index) => (
+                    {originalData.map((row, index) => (
                       <tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Validated" ? "#f0f0f0" : "white" }}>
                         <td><div className="row-wrapper"><input type="checkbox" checked={selectedRows.includes(row.requestId)} readOnly /></div></td>
                         <td><div className="row-wrapper">{row.requestId}</div></td>
                         <td><div className="row-wrapper">{row.departmentId}</div></td>
                         <td><div className="row-wrapper">{row.amount}</div></td>
-                        <td><div className="row-wrapper">{row.submissionDate.toLocaleDateString()}</div></td>
-                        <td><div className="row-wrapper">{row.validationDate ? row.validationDate.toLocaleDateString() : "N/A"}</div></td>
+                        <td><div className="row-wrapper">{row.submissionDate}</div></td>
+                        <td><div className="row-wrapper">{row.validationDate ? row.validationDate : "N/A"}</div></td>
                         <td><div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.validatedBy}</div></td>
                         <td><div className="row-wrapper">{row.remarks}</div></td>
                         <td><div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.approvedAmount}</div></td>
@@ -648,14 +677,14 @@ const BodyContent = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {getSortedFilteredRequestData().map((row, index) => (
+                    {originalRequestData.map((row, index) => (
                       <tr key={index} onClick={() => handleRowSelect(row.reqID)} className={selectedRows.includes(row.reqID) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Validated" ? "#f0f0f0" : "white" }}>
                         <td><div className="row-wrapper"><input type="checkbox" checked={selectedRows.includes(row.reqID)} readOnly /></div></td>
                         <td><div className="row-wrapper">{row.reqID}</div></td>
                         <td><div className="row-wrapper">{row.departmentId}</div></td>
                         <td><div className="row-wrapper">{row.amount}</div></td>
-                        <td><div className="row-wrapper">{row.requestDate.toLocaleDateString()}</div></td>
-                        <td><div className="row-wrapper">{row.validationDate ? row.validationDate.toLocaleDateString() : "N/A"}</div></td>
+                        <td><div className="row-wrapper">{row.requestDate}</div></td>
+                        <td><div className="row-wrapper">{row.validationDate ? row.validationDate: "N/A"}</div></td>
                         <td><div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.validatedBy}</div></td>
                         <td><div className="row-wrapper">{row.remarks}</div></td>
                         <td><div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.approvedAmount}</div></td>
@@ -733,16 +762,16 @@ const BodyContent = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {getSortedFilteredReturnsData().map((row, index) => (
+                    {originalReturnsData.map((row, index) => (
                       <tr key={index} onClick={() => handleRowSelect(row.returnsId)} className={selectedRows.includes(row.returnsId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Validated" ? "#f0f0f0" : "white" }}>
                         <td><div className="row-wrapper"><input type="checkbox" checked={selectedRows.includes(row.returnsId)} readOnly /></div></td>
                         <td><div className="row-wrapper">{row.returnsId}</div></td>
                         <td><div className="row-wrapper">{row.departmentId}</div></td>
-                        <td><div className="row-wrapper">{row.returnDate.toLocaleDateString()}</div></td>
+                        <td><div className="row-wrapper">{row.returnDate}</div></td>
                         <td><div className="row-wrapper">{row.originTotalBudget}</div></td>
                         <td><div className="row-wrapper">{row.returnedAmount}</div></td>
-                        <td><div className="row-wrapper">PDF</div></td>
-                        <td><div className="row-wrapper">{row.validationDate ? row.validationDate.toLocaleDateString() : "N/A"}</div></td>
+                        <td><div className="row-wrapper">PDF</div></td> 
+                        <td><div className="row-wrapper">{row.validationDate ? row.validationDate: "N/A"}</div></td>
                         <td><div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.validatedBy}</div></td>
                         <td>
                           <div className="row-wrapper">

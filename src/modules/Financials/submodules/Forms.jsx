@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Forms.css"; // Assuming you have a Forms.css file
+import { POST } from "../api/api"; 
 
 const tabs = ["Budget Submission Form", "Budget Request Form", "Budget Return Form"];
 
@@ -24,8 +25,8 @@ const FormSubmit = ({ activeTab, departments, onFormSubmit, onClearForm, formSub
     let newErrors = {};
     let isValid = true;
     const requiredFields = {
-      "Budget Submission Form": ["submitterName", "employeeId", "departmentName", "departmentId", "totalBudget", "usagePeriod"],
-      "Budget Request Form": ["requestorName", "employeeId", "departmentName", "departmentId", "totalAmountNeeded", "usagePeriod", "requestReason", "urgencyLevel"],
+      "Budget Submission Form": ["submitterName", "employeeId", "departmentName", "departmentId", "totalBudget", "usagePeriod", "endUsagePeriod"],
+      "Budget Request Form": ["requestorName", "employeeId", "departmentName", "departmentId", "totalAmountNeeded", "usagePeriod", "endUsagePeriod", "requestReason", "urgencyLevel"],
       "Budget Return Form": ["requestorName", "employeeId", "departmentName", "departmentId", "requestId", "totalRequestAmount", "returnedAmount", "returnReason"],
     };
 
@@ -111,8 +112,8 @@ const FormSubmit = ({ activeTab, departments, onFormSubmit, onClearForm, formSub
                   </div>
                   <div className="form-group">
                     <label>Usage Period (end date): <span className="required">*</span></label>
-                    <input type="text" name="usagePeriod" value={formData.usagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("usagePeriod")} />
-                    {errors.usagePeriod && <p className="error">{errors.usagePeriod}</p>}
+                    <input type="text" name="endUsagePeriod" value={formData.endUsagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("usagePeriod")} />
+                    {errors.endUsagePeriod && <p className="error">{errors.endUsagePeriod}</p>}
                   </div>
                   <div className="form-group">
                     <label>Expense Breakdown for the Year: <span className="required">*</span></label>
@@ -164,8 +165,8 @@ const FormSubmit = ({ activeTab, departments, onFormSubmit, onClearForm, formSub
                   </div>
                   <div className="form-group">
                     <label>Usage Period (end date): <span className="required">*</span></label>
-                    <input type="text" name="usagePeriod" value={formData.usagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("usagePeriod")} />
-                    {errors.usagePeriod && <p className="error">{errors.usagePeriod}</p>}
+                    <input type="text" name="endUsagePeriod" value={formData.endUsagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("endUsagePeriod")} />
+                    {errors.endUsagePeriod && <p className="error">{errors.endUsagePeriod}</p>}
                   </div>
                   <div className="form-group">
                     <label>Reason for Request: <span className="required">*</span></label>
@@ -296,9 +297,50 @@ const BodyContent = () => {
     }
   };
 
+  const handleSubmitSubmmision= async (subData) => {
+    console.log("Submitting submission:", subData)
+    try {
+        const data = await POST("/form/budget-submission/", subData);
+        console.log("Submission created successfully:", data);
+    } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
+        console.error("Error creating service call:", error.message);
+console.error(firstError);
+
+        console.error("Error submitting submission: ", error);
+    }
+  }
+
+  //handle form budget submission
   const handleFormSubmit = (formData, tabName) => {
     setFormSubmitted({ ...formSubmitted, [tabName]: true });
     console.log(`Form data for ${tabName}:`, formData);
+    let subData = {};
+    if (tabName === "Budget Submission Form") {
+      subData = {
+        submitter_name: formData.submitterName,
+        dept_id: formData.departmentId,
+        date_submitted: new Date().toISOString().split('T')[0],
+        proposed_total_budget: formData.totalBudget,
+        start_usage_period: formData.usagePeriod,
+        end_usage_period: formData.endUsagePeriod,
+        //expense_breakdown: formData.expenseBreakdown
+      }
+      handleSubmitSubmmision(subData);
+    }
   };
 
   const handleClearForm = (tabName) => {
