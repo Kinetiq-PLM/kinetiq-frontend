@@ -1,15 +1,16 @@
 import React from "react";
-import "./styles/CRM.css";
+import "../styles/Marketing.css";
 
 const BodyContent = () => {
     return (
-        <div className="crm">
+        <div className="marketing">
             <div className="body-content-container">
-                <p>Hello CRM Module!</p>
+                <p>Hello Marketing SubModule!</p>
                 <p>Fill this container with your elements, change the display if need be.</p>
-                <p>If you're going to style with css, use your unique namespace '.crm' at the start.</p>
+                <p>If you're going to style with css, use your unique namespace '.marketing' at the start.</p>
             </div>
         </div>
+
     );
 };
 

@@ -341,9 +341,6 @@ img {
   align-items: center;
   justify-content: flex-start;
   flex: 1; 
-  height: 100%;
-  max-height: 100vh;
-  overflow: hidden;
 }
 
 /* header navigation -- fixed height */
@@ -455,7 +452,7 @@ img {
 .body-container {
   flex: 1;
   width: 100%;
-  height: calc(100% - var(--header-navi-height));
+  height: 100%;
   padding: 1.75rem;
   flex-direction: column;
   display: flex;

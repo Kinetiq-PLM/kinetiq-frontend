@@ -3,15 +3,15 @@ import "../styles/Index.css";
 
 const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
   return (
-    <div className="order">
+    <div className="dunning">
       <div className="body-content-container">
-        <p>Hello Order SubModule!</p>
+        <p>Hello Dunning SubModule!</p>
         <p>
           Fill this container with your elements, change the display if need be.
         </p>
         <p>
-          If you're going to style with css, use your unique namespace '.order'
-          at the start.
+          If you're going to style with css, use your unique namespace
+          '.dunning' at the start.
         </p>
       </div>
     </div>
