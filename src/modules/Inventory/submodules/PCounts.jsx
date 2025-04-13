@@ -51,21 +51,21 @@ const BodyContent = () => {
     setError(null);
 
     fetch("http://127.0.0.1:8000/api/warehouses/")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error fetching warehouses! Status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Warehouse data:", data);
-        if (data && data.length > 0) {
-          setWarehouses(data);
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching warehouses:", err);
-      });
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`HTTP error fetching warehouses! Status: ${res.status}`);
+      }
+      return res.json();
+    })
+    .then((data) => {
+      console.log("Warehouse data:", data);
+      if (data && data.length > 0) {
+        setWarehouses(data);
+      }
+    })
+    .catch((err) => {
+      console.error("Error fetching warehouses:", err);
+    });
 
     fetch("http://127.0.0.1:8000/api/inventory-items/")
       .then((res) => {
@@ -103,7 +103,7 @@ const BodyContent = () => {
       .then((data) => {
         console.log("Cyclic Counts API Response:", data);
 
-        // If warehouses weren't fetched separately, extract them from counts
+    
         if (warehouses.length === 0) {
           const uniqueWarehouses = [...new Set(data
             .filter(item => item.warehouse_id)
@@ -267,9 +267,9 @@ const BodyContent = () => {
                 <table className="w-full table-layout:fixed text-center cursor-pointer">
                   <thead>
                     <tr className="border-b border-gray-300">
-                      {['Item Type', 'Item ID', 'Item Onhand', 'Item Counted', 'Difference', 'Date Checked', 'Employee', 'Warehouse', 'Status'].map((header) => (
-                        <th key={header} className="p-2 text-gray-600">{header}</th>
-                      ))}
+                    {['Item Type', 'Item ID', 'Item Onhand', 'Item Counted', 'Difference', 'Date Checked', 'Employee', 'Warehouse', 'Status'].map((header) => (
+  <td key={header} className="p-2">{header}</td>
+))}
                     </tr>
                   </thead>
                   <tbody>
@@ -323,15 +323,17 @@ const BodyContent = () => {
 
                 {/* Warehouse filter dropdown */}
                 <select
-                  className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
-                  value={selectedWarehouse}
-                  onChange={(e) => setSelectedWarehouse(e.target.value)}
-                >
-                  <option value="">Select Warehouse</option>
-                  {warehouses.map((w) => (
-                    <option key={w} value={w}>{w}</option>
-                  ))}
-                </select>
+  className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
+  value={selectedWarehouse}
+  onChange={(e) => setSelectedWarehouse(e.target.value)}
+>
+  <option value="">Select Warehouse</option>
+  {warehouses.map((w) => (
+    <option key={w} value={w}>
+      {w}
+    </option>
+  ))}
+</select>
 
                 <select
                   className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
