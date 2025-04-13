@@ -70,23 +70,11 @@ function App() {
     Management: "Management",
     Administration: "Administration",
     Accounting: "Accounting",
-    Financials: "Financials",
-    Purchasing: "Purchasing",
-    Operations: "Operations",
-    Sales: "Sales",
-    CRM: "CRM",
-    "Support & Services": "SupportServices",
-    Inventory: "Inventory",
-    Distribution: "Distribution",
-    Production: "Production",
-    MRP: "MRP",
-    "Project Management": "ProjectManagement",
-    "Human Resources": "HumanResources",
-    "Report Generator": "ReportGenerator",
+
   };
 
   const moduleSubmoduleFileNames = {
-    Management: {
+    "Management": {
       "Dashboard": "ManagementDashboard",
       "Policy Compliance Oversight": "ManagementPolicyComplianceOversight",
       "Salary Release Approval": "ManagementSalaryReleaseApproval",
@@ -98,66 +86,66 @@ function App() {
       "AssetRemoval": "ManagementAssetRemoval",
       "User Roles": "UserRoles",
       "Access Control": "AccessControl",
-      Settings: "Settings",
+      "Settings": "Settings",
     },
-    Administration: {
+    "Administration": {
       "Company Policies": "CompanyPolicies",
       "User Accounts": "UserAccounts",
     },
-    Accounting: {
+    "Accounting": {
       "General Ledger": "GeneralLedger",
       "Accounts Payable": "AccountsPayable",
       "Accounts Receivable": "AccountsReceivable",
     },
-    Financials: {
-      Budgeting: "Budgeting",
+    "Financials": {
+      "Budgeting": "Budgeting",
       "Cash Flow": "CashFlow",
       "Financial Reports": "FinancialReports",
     },
-    Purchasing: {
+    "Purchasing": {
       "Supplier Management": "SupplierManagement",
       "Purchase Orders": "PurchaseOrders",
     },
-    Operations: {
+    "Operations": {
       "Workflow Automation": "WorkflowAutomation",
       "Operational Analytics": "OperationalAnalytics",
     },
-    Sales: {
-      Quotation: "Quotation",
-      Order: "Order",
-      Delivery: "Delivery",
-      Invoice: "Invoice",
+    "Sales": {
+      "Quotation": "Quotation",
+      "Order": "Order",
+      "Delivery": "Delivery",
+      "Invoice": "Invoice",
       "Master List": "MasterList",
-      Dunning: "Dunning",
-      Reporting: "Reporting",
-      Returns: "Returns",
+      "Dunning": "Dunning",
+      "Reporting": "Reporting",
+      "Returns": "Returns",
       "Contact Management": "ContactManagement",
-      Marketing: "Marketing",
+      "Marketing": "Marketing",
       "Customer Support": "CustomerSupport",
     },
-    CRM: {
+    "CRM": {
       "Contact Management": "ContactManagement",
-      Marketing: "Marketing",
+      "Marketing": "Marketing",
       "Customer Support": "CustomerSupport",
     },
     "Support & Services": {
       "Ticketing System": "TicketingSystem",
       "Customer Support": "CustomerSupport",
     },
-    Inventory: {
+    "Inventory": {
       "Stock Levels": "StockLevels",
       "Product Catalog": "ProductCatalog",
     },
-    Distribution: {
-      Shipping: "Shipping",
+    "Distribution": {
+      "Shipping": "Shipping",
       "Order Fulfillment": "OrderFulfillment",
     },
-    Production: {
+    "Production": {
       "Equipment and Labor": "Equipment&Labor",
       "Quality Control": "QualityControl",
       "Cost of Production": "CostOfProduction"
     },
-    MRP: {
+    "MRP": {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
       "Bills Of Material": "BillsOfMaterial",
     },
@@ -166,11 +154,11 @@ function App() {
       "Gantt Charts": "GanttCharts",
     },
     "Human Resources": {
-      Employees: "Employees",
-      Recruitment: "Recruitment",
+      "Employees": "Employees",
+      "Recruitment": "Recruitment",
       "Attendance Tracking": "AttendanceTracking",
-      Payroll: "Payroll",
-      Departments: "Departments",
+      "Payroll": "Payroll",
+      "Departments": "Departments",
       "Workforce Allocation": "WorkforceAllocation",
       "Leave Requests": "LeaveRequests",
       "Employee Performance": "EmployeePerformance",
@@ -223,10 +211,16 @@ function App() {
                       ${activeModule === module.id ? "active" : ""} 
                       ${hoveredModule === module.id ? "hovered" : ""}`}
                   onClick={() => {
-                    setActiveModule(module.id);
-                    setActiveSubModule(null); // reset submodule when a main module is clicked
-                    setIsSidebarOpen(true);
-                    loadMainModule(module.id); // load active module
+                    if (activeModule === module.id) {
+                      // if it's already active, toggle off
+                      setActiveModule(null);
+                      setActiveSubModule(null);
+                    } else {
+                      // otherwise, activate it
+                      setActiveModule(module.id);
+                      setActiveSubModule(null);
+                      loadMainModule(module.id);
+                    }
                   }}
                   onMouseEnter={() => setHoveredModule(module.id)}
                   onMouseLeave={() => setHoveredModule(null)}
@@ -280,10 +274,18 @@ function App() {
                             ${activeModule === module.id ? "active" : ""} 
                             ${hoveredModule === module.id ? "hovered" : ""}`}
                   onClick={() => {
-                    setActiveModule(module.id);
-                    setActiveSubModule(null);
-                    loadMainModule(module.id);
+                    if (activeModule === module.id) {
+                      // if it's already active, toggle off
+                      setActiveModule(null);
+                      setActiveSubModule(null);
+                    } else {
+                      // otherwise, activate it
+                      setActiveModule(module.id);
+                      setActiveSubModule(null);
+                      loadMainModule(module.id);
+                    }
                   }}
+
                   onMouseEnter={() => setHoveredModule(module.id)}
                   onMouseLeave={() => setHoveredModule(null)}
                 >
