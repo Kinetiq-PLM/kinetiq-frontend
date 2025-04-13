@@ -297,11 +297,19 @@ const BodyContent = () => {
     }
   };
 
-  const handleSubmitSubmmision= async (subData) => {
-    console.log("Submitting submission:", subData)
+  const handleClearForm = (tabName) => {
+    setFormSubmitted({ ...formSubmitted, [tabName]: false });
+  };
+
+  const handleBackToForm = (tabName) => {
+    setFormSubmitted({ ...formSubmitted, [tabName]: false });
+  };
+
+  const handleSubmitSubmmision = async (subData) => {
+    console.log("Submitting submission:", subData);
     try {
-        const data = await POST("/form/budget-submission/", subData);
-        console.log("Submission created successfully:", data);
+      const data = await POST("/form/budget-submission/", subData);
+      console.log("Submission created successfully:", data);
     } catch (error) {
       let firstError = "An unknown error occurred.";
       if (error && typeof error === "object") {
@@ -317,14 +325,41 @@ const BodyContent = () => {
         }
       }
 
-        console.error("Error creating service call:", error.message);
-console.error(firstError);
+      console.error("Error creating service call:", error.message);
+      console.error(firstError);
 
-        console.error("Error submitting submission: ", error);
+      console.error("Error submitting submission: ", error);
     }
-  }
+  };
 
-  //handle form budget submission
+  const handleSubmitRequest = async (requestData) => {
+    console.log("Submitting Budget Request:", requestData);
+    try {
+      const data = await POST("/form/budget-request-form/", requestData);
+      console.log("Budget request created successfully:", data);
+    } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
+      console.error("Error creating budget request:", error.message);
+      console.error(firstError);
+      console.error("Error submitting budget request:", error);
+    }
+  };
+
+  //for Budget Return Form
+
   const handleFormSubmit = (formData, tabName) => {
     setFormSubmitted({ ...formSubmitted, [tabName]: true });
     console.log(`Form data for ${tabName}:`, formData);
@@ -337,19 +372,29 @@ console.error(firstError);
         proposed_total_budget: formData.totalBudget,
         start_usage_period: formData.usagePeriod,
         end_usage_period: formData.endUsagePeriod,
-        //expense_breakdown: formData.expenseBreakdown
-      }
+        // expense_breakdown: formData.expenseBreakdown
+      };
       handleSubmitSubmmision(subData);
-    }
+
+    } else if (tabName === "Budget Request Form") {
+      subData = {
+        dept_id: formData.departmentId,
+        amount_requested: formData.totalAmountNeeded,
+        requestor_name: formData.requestorName,
+        requested_date: new Date().toISOString().split('T')[0],
+        expected_start_usage_period: formData.usagePeriod,
+        expected_end_usage_period: formData.endUsagePeriod,
+        reason_for_request: formData.requestReason,
+        urgency_level_request: formData.urgencyLevel,
+        // expense_breakdown_period: formData.expenseBreakdown
+      };
+      handleSubmitRequest(subData);
+    } else if (tabName === "Budget Return Form") {
+
   };
 
-  const handleClearForm = (tabName) => {
-    setFormSubmitted({ ...formSubmitted, [tabName]: false });
-  };
 
-  const handleBackToForm = (tabName) => {
-    setFormSubmitted({ ...formSubmitted, [tabName]: false });
-  };
+  //for Budget Return Form
 
   return (
     <div className="forms">
@@ -395,4 +440,5 @@ console.error(firstError);
   );
 };
 
+}
 export default BodyContent;
