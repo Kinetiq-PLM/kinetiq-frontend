@@ -2,101 +2,110 @@ import React, { useState, useEffect } from "react";
 import "./ModalInput.css";
 import Button from "./Button";
 import Dropdown from "./Dropdown";
-import { accounts, subAccounts } from "../submodules/ListOfAccounts";
 
-const AddAccountModal = ({ isModalOpen, closeModal, reportForm, handleInputChange, handleSubmit, }) => {
-  const [selectedAccount, setSelectedAccount] = useState("");
-  const [selectedSubAccount, setSelectedSubAccount] = useState([]);
-  const [availableSubAccounts, setAvailableSubAccounts] = useState([]);
-  if (!isModalOpen) return null;
+const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
+  const [allAccounts, setAllAccounts] = useState([]);
+  const [mainAccounts, setMainAccounts] = useState([]);
+  const [subAccounts, setSubAccounts] = useState([]);
+  const [selectedMainAccount, setSelectedMainAccount] = useState("");
+  const [selectedSubAccount, setSelectedSubAccount] = useState("");
 
-
-
-  // Function for Selecting Accounts and Sub-Accounts
   useEffect(() => {
-    if (!selectedAccount) {
-      setAvailableSubAccounts([]);
+    const fetchAccounts = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/general-ledger-accounts/");
+        const result = await response.json();
+        setAllAccounts(result);
+
+        // Extract unique GL account IDs for main accounts
+        const mains = [...new Set(result.map(a => a.account_code))];
+        setMainAccounts(mains);
+      } catch (error) {
+        console.error("Error fetching accounts:", error);
+      }
+    };
+    if (isModalOpen) fetchAccounts();
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    if (!selectedMainAccount) {
+      setSubAccounts([]);
+      setSelectedSubAccount("");
       return;
     }
 
-    const key = toCamelCaseKey(selectedAccount);
-    const subAccountsList = subAccounts[key] || [];
+    // Filter sub-accounts based on selected GL account ID
+    const filteredSubAccounts = allAccounts
+      .filter(a => a.account_code === selectedMainAccount)
+      .map(a => ({
+        account_code: a.account_code,
+        name: a.account_name
+      }));
+    setSubAccounts(filteredSubAccounts);
+    setSelectedSubAccount("");
+  }, [selectedMainAccount, allAccounts]);
 
-    setAvailableSubAccounts(subAccountsList);
-    setSelectedSubAccount(""); // or [] based on how you store value
-  }, [selectedAccount]);
+  const onAddAccount = () => {
+    if (!selectedMainAccount || !selectedSubAccount) {
+      alert("Please select both an account and a sub-account.");
+      return;
+    }
 
+    const selectedAccount = subAccounts.find(a => a.account_code === selectedSubAccount);
+    const accountData = {
+      glAccountId: selectedAccount.account_code, // Use the actual account_code
+      accountName: selectedAccount.name // Display purposes
+    };
 
+    handleSubmit(accountData);
+    closeModal();
+  };
 
-  // Adapt the spacing and cases in the array for accounts and subAccounts
-  const toCamelCaseKey = (str) =>
-    str
-      .replace(/[^a-zA-Z0-9 ]/g, "") // Remove symbols
-      .replace(/\s(.)/g, (match, group1) => group1.toUpperCase()) // Capitalize after spaces
-      .replace(/^(.)/, (match, group1) => group1.toLowerCase()); // Lowercase first
+  if (!isModalOpen) return null;
 
-
-
-  // Modal UI
   return (
     <div className="modal-overlay">
-
-
       <div className="modal-container">
-
-
-        {/* Modal Header */}
         <div className="modal-header">
-
-
           <h2 className="text-lg font-semibold">Select Account</h2>
-
           <img
             className="cursor-pointer hover:scale-110"
             src="/accounting/Close.svg"
             alt="Close"
-            onClick={closeModal} />
-
-
+            onClick={closeModal}
+          />
         </div>
 
-
-
-        {/* Modal Body */}
         <div className="modal-body mt-4">
-
           <div className="flex gap-x-5 max-sm:flex-col max-sm:gap-3">
-            {/* Account Dropdown */}
             <div className="-mt-2">
               <Dropdown
-                options={accounts}
+                options={mainAccounts}
                 style="selection"
-                defaultOption="Select account..."
-                value={selectedAccount}
-                onChange={(value) => setSelectedAccount(value)}
+                defaultOption="Select account code..."
+                value={selectedMainAccount}
+                onChange={(value) => setSelectedMainAccount(value)}
               />
             </div>
 
-            {/* Sub-Account Dropdown */}
             <div className="-mt-2">
               <Dropdown
-                options={availableSubAccounts}
+                options={subAccounts.map(a => a.name)}
                 style="selection"
-                defaultOption="Select sub-account..."
-                value={selectedSubAccount}
-                onChange={(value) => setSelectedSubAccount(value)}
+                defaultOption="Select Account Name..."
+                value={subAccounts.find(a => a.account_code === selectedSubAccount)?.name || ""}
+                onChange={(value) => {
+                  const sub = subAccounts.find(a => a.name === value);
+                  setSelectedSubAccount(sub?.account_code || "");
+                }}
               />
             </div>
           </div>
-
-
-
         </div>
 
-        {/* Modal Footer */}
         <div className="modal-footer mt-5 flex justify-end space-x-3">
           <Button name="Cancel" variant="standard1" onclick={closeModal} />
-          <Button name="Add" variant="standard2" onclick={handleSubmit} />
+          <Button name="Add" variant="standard2" onclick={onAddAccount} />
         </div>
       </div>
     </div>

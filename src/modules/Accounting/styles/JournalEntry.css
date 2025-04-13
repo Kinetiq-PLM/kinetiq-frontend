@@ -31,7 +31,7 @@
 .JournalEntry .table-header {
   display: grid;
   grid-template-columns: .5fr 0.5fr 0.5fr 0.2fr;
-  background-color: #5a9ecf;
+  background-color: #00a8a8; 
   color: white;
   font-weight: bold;
   padding: 1rem;
@@ -46,7 +46,7 @@
 .totals-row2 {
   display: grid;
   grid-template-columns: .5fr 0.5fr 0.5fr 0.2fr;
-  gap: 10px;
+  gap: 8px;
   padding: 1rem;
   border-bottom: 1px solid #ccc;
   align-items: center;

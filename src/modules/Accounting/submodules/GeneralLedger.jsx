@@ -7,6 +7,7 @@ import Search from "../components/Search";
 import ReportModalInput from "../components/ReportModalInput";
 
 const BodyContent = () => {
+    // Use state
     const columns = ["Entry Line ID", "GL Account ID", "Account name", "Journal ID", "Debit", "Credit", "Description"];
     const [data, setData] = useState([]);
     const [searching, setSearching] = useState("");
@@ -21,73 +22,61 @@ const BodyContent = () => {
         currencyId: ""
     });
 
+    
+    // Open modal function
     const openModal = () => setIsModalOpen(true);
+
+
+    // Close modal function
     const closeModal = () => setIsModalOpen(false);
 
-    const handleInputChange = (field, value) => {
-        setReportForm(prevState => ({ ...prevState, [field]: value }));
-    };
 
-    const handleSubmit = () => {
-        console.log("Form submitted with data: ", reportForm);
-        closeModal();
-    };
-
+    // Fetch data
     const fetchData = () => {
-        fetch('http://127.0.0.1:8000/api/journal-entry-lines/')
-            .then(response => response.json())
-            .then(result => {
-                console.log('API Response:', result); // Log the API response for debugging
-
-                // Extract the highest numeric part of entry_line_id
-                let maxEntryLineId = 0;
-
-                result.forEach(entry => {
-                    const match = (entry.entry_line_id || "").match(/(\d+)$/); // Extract numeric part
-                    if (match) {
-                        const numericPart = parseInt(match[1], 10);
-                        if (numericPart > maxEntryLineId) {
-                            maxEntryLineId = numericPart;
-                        }
-                    }
-                });
-
-                const transformedData = result.flatMap(entry => {
-                    // Ensure GL Account ID is the same as Account Name if missing or invalid
-                    const glAccountId = entry.gl_account_id || entry.account_name || '-';
-                    const accountName = entry.account_name || '-';
-
-                    const baseRow = [
-                        glAccountId, // GL Account ID
-                        accountName, // Account Name
-                        entry.journal_id || entry.journal_entry || '-', // Journal ID
-                    ];
-
-                    const description = entry.description || '-'; // Description
-
-                    // Increment the entry_line_id for each new row
-                    const nextDebitEntryLineId = `ACC-JEL-2025-YZ${String(++maxEntryLineId).padStart(4, '0')}`;
-                    const nextCreditEntryLineId = `ACC-JEL-2025-YZ${String(++maxEntryLineId).padStart(4, '0')}`;
-
-                    const debitRow = [nextDebitEntryLineId, ...baseRow, parseFloat(entry.debit_amount || '0.00').toFixed(2), '0.00', description];
-                    const creditRow = [nextCreditEntryLineId, ...baseRow, '0.00', parseFloat(entry.credit_amount || '0.00').toFixed(2), description];
-
-                    return [
-                        ...(parseFloat(entry.debit_amount || '0.00') > 0 ? [debitRow] : []),
-                        ...(parseFloat(entry.credit_amount || '0.00') > 0 ? [creditRow] : [])
-                    ];
-                });
-
-                console.log('Transformed Data:', transformedData); // Log the transformed data for debugging
-                setData(transformedData);
-            })
-            .catch(error => console.error('Error fetching data:', error));
-    };
+        fetch('http://127.0.0.1:8000/api/general-ledger-jel-view/')
+          .then(response => response.json())
+          .then(result => {
+            console.log('API Response:', result); 
+      
+            const transformedData = result.map(entry => [
+              entry.entry_line_id,          
+              entry.gl_account_id || 'N/A', 
+              entry.account_name || 'No Account', 
+              entry.journal_id || '-',      
+              parseFloat(entry.debit_amount || '0.00').toFixed(2), 
+              parseFloat(entry.credit_amount || '0.00').toFixed(2), 
+              entry.description || '-'      
+            ]);
+      
+            console.log('Transformed Data:', transformedData); 
+            setData(transformedData);
+          })
+          .catch(error => console.error('Error fetching data:', error));
+      };
 
     useEffect(() => {
         fetchData();
     }, []);
 
+
+    // Update the report form state when an input field changes
+    const handleInputChange = (field, value) => {
+        setReportForm(prevState => ({ ...prevState, [field]: value }));
+    };
+
+    // Handle the submission of the report form and close the modal
+    const handleSubmit = () => {
+        console.log("Form submitted with data: ", reportForm);
+        closeModal();
+    };
+
+
+    // Compute the total debit and credit
+    const totalDebit = data.reduce((sum, row) => sum + (parseFloat(row[4]) || 0), 0);
+    const totalCredit = data.reduce((sum, row) => sum + (parseFloat(row[5]) || 0), 0);
+
+    
+    //Ascending and Descending sorting
     const handleSort = () => {
         const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
         setSortOrder(newSortOrder);
@@ -111,6 +100,8 @@ const BodyContent = () => {
         setData(sortedData);
     };
 
+
+    // Search Filter
     const filteredData = data.filter(row =>
         [row[0], row[1], row[2], row[3], row[6]]
             .filter(Boolean)
@@ -119,9 +110,8 @@ const BodyContent = () => {
             .includes(searching.toLowerCase())
     );
 
-    const totalDebit = data.reduce((sum, row) => sum + (parseFloat(row[4]) || 0), 0);
-    const totalCredit = data.reduce((sum, row) => sum + (parseFloat(row[5]) || 0), 0);
 
+    // Format the numbers with comma
     const formatNumber = (num) => num.toLocaleString("en-US", { minimumFractionDigits: 2 });
     const formattedTotalDebit = formatNumber(totalDebit);
     const formattedTotalCredit = formatNumber(totalCredit);

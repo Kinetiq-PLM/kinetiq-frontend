@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-// import axios from "axios";
 import "../styles/accounting-styling.css";
+import React, { useState, useEffect } from "react";
 import { accounts } from "./ListOfAccounts";
-import SearchBar from "../../../shared/components/SearchBar";
+import axios from "axios";
+import Search from "../components/Search";
 import Button from "../components/Button";
 import Dropdown from "../components/Dropdown";
 import Table from "../components/Table";
@@ -10,12 +10,12 @@ import CoaModalInput from "../components/CoaModalInput";
 import NotifModal from "../components/modalNotif/NotifModal";
 
 const BodyContent = () => {
+    // Use states
     const columns = ["Account code", "Account name", "Account type"];
-
-    // State for account data and form handling
+    const [selectedAccountType, setSelectedAccountType] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    const [accountTypes, setAccountTypes] = useState([]);
+    const [searching, setSearching] = useState("");
     const [data, setData] = useState([]);
     const [newAccount, setNewAccount] = useState({
         account_code: "",
@@ -23,20 +23,39 @@ const BodyContent = () => {
         account_type: ""
     });
 
-    // // Fetch data from API when the component mounts
-    // useEffect(() => {
-    //     axios.get("http://127.0.0.1:8000/api/chart-of-accounts/")
-    //         .then(response => {
-    //             setData(response.data.map(acc => [acc.account_code, acc.account_name, acc.account_type]));
-    //         })
-    //         .catch(error => console.error("Error fetching data:", error));
-    // }, []);
+
+    // Open modal function
+    const openModal = () => setIsModalOpen(true);
+
+
+    // Close modal function
+    const closeModal = () => setIsModalOpen(false);
+
+
+    // Fetch data
+    useEffect(() => {
+        axios.get("http://127.0.0.1:8000/api/chart-of-accounts/")
+            .then(response => {
+                const rawData = response.data.map(acc => [
+                    acc.account_code,
+                    acc.account_name,
+                    acc.account_type
+                ]);
+                setData(rawData);
+
+                // Extract unique account types from fetched data
+                const uniqueTypes = [...new Set(response.data.map(acc => acc.account_type))];
+                setAccountTypes(uniqueTypes);
+            })
+            .catch(error => console.error("Error fetching data:", error));
+    }, []);
+
+
 
     // Handle Input Change
     const handleInputChange = (field, value) => {
         setNewAccount(prev => ({ ...prev, [field]: value }));
     };
-
     const [validation, setValidation] = useState({
         isOpen: false,
         type: "warning",
@@ -44,6 +63,8 @@ const BodyContent = () => {
         message: "",
     });
 
+
+    // Submit input w/ user validations
     const handleSubmit = async () => {
         if (!newAccount.account_code && !newAccount.account_name && !newAccount.account_type) {
             setValidation({
@@ -85,7 +106,8 @@ const BodyContent = () => {
             return;
         }
 
-        // Check if the account_code already exists
+
+        // Checks if the account_code already exists
         const accountCodeExists = data.some(row => row[0] === newAccount.account_code);
         if (accountCodeExists) {
             setValidation({
@@ -97,6 +119,8 @@ const BodyContent = () => {
             return;
         }
 
+
+        // Checks if data is successfully submitted
         try {
             console.log("Submitting data:", newAccount);
 
@@ -132,6 +156,24 @@ const BodyContent = () => {
         }
     };
 
+
+    // Filter data based on search and selected account type
+    const filteredData = data.filter(([code, name, type]) => {
+        const matchesSearch =
+            [code, name, type]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase()
+                .includes(searching.toLowerCase());
+
+        const matchesType = selectedAccountType
+            ? type === selectedAccountType
+            : true;
+
+        return matchesSearch && matchesType;
+    });
+
+
     return (
         <div className="chartAccounts">
             <div className="body-content-container">
@@ -142,8 +184,15 @@ const BodyContent = () => {
 
                 <div className="parent-component-container">
                     <div className="component-container">
-                        <Dropdown options={accounts} style="selection" defaultOption="Sort account.." />
-                        <SearchBar />
+                        <Dropdown
+                            options={accountTypes}
+                            style="selection"
+                            defaultOption="Sort accounts..."
+                            value={selectedAccountType}
+                            onChange={(value) => setSelectedAccountType(value)}
+                        />
+
+                        <Search type="text" placeholder="Search account.." onChange={(e) => setSearching(e.target.value)} />
                     </div>
 
                     <div className="component-container">
@@ -152,7 +201,7 @@ const BodyContent = () => {
                 </div>
 
                 {/* Table Display */}
-                <Table data={data} columns={columns} enableCheckbox={false} />
+                <Table data={filteredData} columns={columns} enableCheckbox={false} />
             </div>
 
             <CoaModalInput

@@ -8,7 +8,12 @@ import NotifModal from '../components/modalNotif/NotifModal';
 import Search from '../components/Search';
 
 const Journal = () => {
+    // Use state
+    const columns = ["Journal Id", "Journal Date", "Description", "Debit", "Credit", "Invoice Id", "Currency Id"];
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [data, setData] = useState([]);
+    const [searching, setSearching] = useState("");
+    const [sortOrder, setSortOrder] = useState("asc");
     const [journalForm, setJournalForm] = useState({
         journalId: '',
         journalDate: '',
@@ -16,22 +21,35 @@ const Journal = () => {
         currencyId: '',
         invoiceId: ''
     });
-    const columns = ["Journal Id", "Journal Date", "Description", "Debit", "Credit", "Invoice Id", "Currency Id"];
-    const [data, setData] = useState([]);
-    const [searching, setSearching] = useState("");
-    const [sortOrder, setSortOrder] = useState("asc");
+    const [validation, setValidation] = useState({
+        isOpen: false,
+        type: "warning",
+        title: "",
+        message: "",
+    });
 
 
+    // Open modal function
+    const openModal = () => setIsModalOpen(true);
+
+
+    // Close modal function
+    const closeModal = () => setIsModalOpen(false);
+
+
+    // Data formatting 
     const formatData = (result) => result.map(entry => [
         entry.journal_id || entry.id || '-',
         entry.journal_date || entry.date || '-',
         entry.description || '-',
-        entry.total_debit || 0, // Keep as numeric
-        entry.total_credit || 0, // Keep as numeric
+        entry.total_debit || 0,
+        entry.total_credit || 0,
         entry.invoice_id || '-',
         entry.currency_id || '-'
     ]);
 
+
+    // Fetch data
     const fetchData = () => {
         fetch('http://127.0.0.1:8000/api/journal-entries/')
             .then(response => response.json())
@@ -46,20 +64,14 @@ const Journal = () => {
         fetchData();
     }, []);
 
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
 
+    // Update the report form state when an input field changes
     const handleInputChange = (field, value) => {
         setJournalForm(prevState => ({ ...prevState, [field]: value }));
     };
 
-    const [validation, setValidation] = useState({
-        isOpen: false,
-        type: "warning",
-        title: "",
-        message: "",
-    });
 
+    // Handle submit w/ user validations
     const handleSubmit = () => {
         if (!journalForm.journalDate && !journalForm.journalId && !journalForm.description && !journalForm.invoiceId && !journalForm.currencyId) {
             setValidation({
@@ -71,7 +83,7 @@ const Journal = () => {
             return;
         }
 
-        if(!journalForm.journalDate) {
+        if (!journalForm.journalDate) {
             setValidation({
                 isOpen: true,
                 type: "warning",
@@ -81,7 +93,7 @@ const Journal = () => {
             return;
         }
 
-        if(!journalForm.journalId) {
+        if (!journalForm.journalId) {
             setValidation({
                 isOpen: true,
                 type: "warning",
@@ -91,7 +103,7 @@ const Journal = () => {
             return;
         }
 
-        if(!journalForm.description) {
+        if (!journalForm.description) {
             setValidation({
                 isOpen: true,
                 type: "warning",
@@ -101,7 +113,7 @@ const Journal = () => {
             return;
         }
 
-        if(!journalForm.invoiceId) {
+        if (!journalForm.invoiceId) {
             setValidation({
                 isOpen: true,
                 type: "warning",
@@ -111,7 +123,7 @@ const Journal = () => {
             return;
         }
 
-        if(!journalForm.currencyId) {
+        if (!journalForm.currencyId) {
             setValidation({
                 isOpen: true,
                 type: "warning",
@@ -164,6 +176,7 @@ const Journal = () => {
             });
     };
 
+
     // Function to handle sorting (applies to both debit and credit columns)
     const handleSort = () => {
         const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -188,6 +201,8 @@ const Journal = () => {
         setData(sortedData);
     };
 
+
+    // Search filtering
     const filteredData = data.filter(row =>
         [row[0], row[1], row[2], row[5], row[6]]
             .filter(Boolean)

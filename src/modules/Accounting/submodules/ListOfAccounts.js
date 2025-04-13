@@ -10,7 +10,8 @@ const accounts = [
     "Administrative Expenses",
     "Selling and Distribution Expenses",
     "Other Income",
-    "Other Expenses"
+    "Other Expenses",
+    "Internal Budgetary"
   ]
 
 const sortingChoices = [
@@ -60,7 +61,8 @@ const subAccounts = {
   revenue: [
     "Sales Revenue (Main Product Sales)",
     "Service Revenue (If Offering Custom Services)",
-    "Discounts Allowed (Contra-Revenue)"
+    "Discounts Allowed (Contra-Revenue)",
+    "Sales Return"
   ],
   costOfGoodsSold: [
     "Raw Materials Used",
@@ -92,6 +94,10 @@ const subAccounts = {
     "Interest Expense",
     "Loss on Sale of Assets",
     "Investment Losses"
+  ],
+  internalBudgetary: [
+    "Budgetary Control",
+    "Encumbrance Control",
   ]
 }
 
