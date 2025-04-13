@@ -77,7 +77,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             </div>
                             {bomData.map((item, index) => (
                                 <div key={index}
-                                onClick={() => setPrintBOM(true)}
+                                onClick={() => setIsOpen(true)}
                                 onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
                                 onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0)")}
                                 style={{ cursor: 'pointer', alignSelf: 'stretch', paddingTop: 0.5, paddingBottom: 0.5, background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex' }}
