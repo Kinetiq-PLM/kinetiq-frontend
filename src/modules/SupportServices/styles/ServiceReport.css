@@ -1,0 +1,531 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.service-report  {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.service-report .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+/* Content area */
+.service-report .content-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  border-radius: 8px;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  margin-top: 2rem;
+}
+
+/* Input fields container */
+.service-report .input-fields-container {
+  width: 100%;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.service-report .search-filter-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.service-report .input-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+.service-report .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin: 0;
+}
+
+.service-report .description-group {
+  margin-bottom: 0px;
+}
+
+/* Form elements */
+.service-report label {
+  font-size: 0.75rem;
+  color: #00a8a8;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+}
+
+.service-report input,
+.service-report select {
+  padding: 0.625rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  height: 2.75rem;
+  box-sizing: border-box;
+  width: 100%;
+  color: #000000;
+}
+
+.service-report textarea {
+  padding: 0.625rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  box-sizing: border-box;
+  width: 100%;
+  color: #000000;
+  resize: none;
+}
+
+.service-report textarea.description-textarea {
+  height: 7.8rem; /* Match the height of two input fields plus gap */
+}
+
+.service-report input::placeholder,
+.service-report textarea::placeholder {
+  color: #999;
+}
+
+.service-report input:focus,
+.service-report textarea:focus,
+.service-report select:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 1px #00a8a8;
+}
+
+/* Textarea with custom scrollbar */
+.service-report .textarea-container {
+  position: relative;
+  display: flex;
+}
+
+.service-report .textarea-container textarea {
+  flex: 1;
+  padding-right: 20px; /* Make room for the scrollbar */
+}
+
+.service-report .custom-scrollbar-container {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  bottom: 4px;
+  width: 8px;
+  display: none;
+  flex-direction: column;
+}
+
+/* Only show scrollbar when content overflows and is not empty */
+.service-report .textarea-container textarea:not(:placeholder-shown) {
+  overflow-y: auto;
+}
+
+.service-report .textarea-container textarea.description-textarea:not(:placeholder-shown) {
+  overflow-y: auto;
+}
+
+/* Only show custom scrollbar when content is long enough to need scrolling */
+.service-report .textarea-container textarea.description-textarea:not(:placeholder-shown):not([value=""]):not(:empty) {
+  overflow-y: auto;
+}
+
+.service-report .textarea-container
+  textarea.description-textarea:not(:placeholder-shown):not([value=""]):not(:empty)::-webkit-scrollbar {
+  width: 8px;
+}
+
+.service-report .textarea-container
+  textarea.description-textarea:not(:placeholder-shown):not([value=""]):not(:empty)::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.service-report .textarea-container
+  textarea.description-textarea:not(:placeholder-shown):not([value=""]):not(:empty)::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+  border-radius: 4px;
+}
+
+/* Modal specific styles */
+.service-report .modal-form .description-group textarea.description-textarea {
+  height: 13rem; /* Match the height to align with the renewal ID field */
+}
+
+.service-report .scroll-track {
+  flex: 1;
+  position: relative;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  margin: 2px 0;
+}
+
+.service-report .scroll-thumb {
+  position: absolute;
+  width: 100%;
+  background-color: #00a8a8;
+  border-radius: 4px;
+  top: 0;
+  height: 30%;
+  min-height: 20px;
+}
+
+.service-report .scroll-arrow {
+  background: none;
+  border: none;
+  color: #00a8a8;
+  font-size: 8px;
+  padding: 0;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transform: rotate(180deg);
+}
+
+.service-report .scroll-arrow.scroll-down {
+  transform: rotate(0deg);
+}
+
+.service-report .scroll-arrow:hover {
+  color: #098f8f;
+}
+
+.service-report .filter-button .filter-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.25rem;
+  color: #858585;
+
+}
+
+.service-report .right-filters {
+  display: flex;
+  gap: 20px;
+}
+
+.service-report .filter-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 130px;
+  background-color: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 0.25rem;
+}
+
+.service-report .table-container {
+  width: 100%;
+  margin-bottom: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  max-height: 270px;
+  overflow-y: auto;
+  display: block;
+  position: relative;
+}
+
+.service-report .reports-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inter", sans-serif;
+}
+
+.service-report .reports-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 3;
+}
+
+.service-report .reports-table th {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.service-report .reports-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+}
+
+.service-report tbody tr {
+  background-color: #eff8f9;
+  transition: background-color 0.3s ease;
+}
+
+.service-report tbody tr:hover {
+  background-color: #d6f5f5;
+}
+
+.service-report .reports-table .selected-row {
+  background-color: #d6f5f5;
+}
+
+.service-report tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.service-report .empty-row td {
+  height: 2.5rem;
+}
+
+/* Action buttons */
+.service-report .action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding: 0 0.25rem;
+}
+
+.service-report .right-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.service-report .close-ticket-button {
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  transition: all 0.3s;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+}
+
+.service-report .close-ticket-button.clickable {
+  background-color: #ca4e4e;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.service-report .close-ticket-button.disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
+.service-report .close-ticket-button.clickable:hover {
+  background-color: #a54141;
+}
+
+.service-report .close-ticket-button.clickable:active {
+  background-color: #087d7d;
+}
+
+.service-report .close-ticket-button:hover {
+  background-color: #e4fdfb;
+}
+
+.service-report .update-button,
+.service-report .add-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  min-width: 7rem;
+}
+
+.service-report .update-button:hover,
+.service-report .add-button:hover {
+  background-color: #098f8f;
+}
+
+.service-report .modal-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 850px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.service-report .modal-content {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.service-report .modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.service-report .modal-form .form-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.service-report .modal-form .form-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.service-report .modal-form .form-group {
+  flex: 1;
+}
+
+.service-report .renewal-dropdown-list,
+.service-report .billing-dropdown-list,
+.service-report .technician-dropdown-list,
+.service-report .status-dropdown-list {
+  top: auto !important;
+  bottom: 100% !important;
+}
+
+.service-report  input:disabled {
+  background-color: #f0f0f0; 
+  cursor: not-allowed; 
+  opacity: 0.6; 
+}
+
+.service-report  .select-wrapper input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.service-report .select-arrow input:disabled  {
+  color: #ccc; 
+  cursor: not-allowed;
+}
+
+.service-report .select-wrapper input:disabled + .select-arrow {
+  pointer-events: none;
+}
+.service-report .disabled-input {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .service-report .report-container {
+    min-width: auto;
+    max-height: none;
+    padding: 1.25rem;
+  }
+
+  .service-report .input-fields-container {
+    padding: 1.25rem;
+  }
+
+  .service-report .modal-container {
+    max-width: 90%;
+    max-height: 70%;
+  }
+}
+
+@media (max-width: 768px) {
+  .service-report .input-fields-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .service-report .filter-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .service-report .search-box {
+    max-width: none;
+  }
+
+  .service-report .table-container {
+    overflow-x: auto;
+  }
+
+  .service-report .reports-table {
+    min-width: 600px;
+  }
+
+  .service-report .modal-form .form-row {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: stretch;
+  }
+
+  .service-report .action-buttons {
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  .service-report .right-buttons {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .service-report .report-container {
+    padding: 1rem;
+  }
+
+  .service-report .input-fields-container {
+    padding: 1rem;
+  }
+
+  .service-report .report-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .service-report .modal-header,
+  .service-report .modal-content,
+  .service-report .modal-footer {
+    padding: 1rem;
+  }
+}
+
+
