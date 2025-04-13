@@ -29,7 +29,7 @@ export default function StandaloneLogin() {
         <div className="login-left">
           <div className="login-card">
             <div className="login-form">
-              <h2>Log in</h2>
+              <h2>USER LOGIN</h2>
               <form onSubmit={handleLogin}>
                 <input
                   type="text"
@@ -80,10 +80,6 @@ export default function StandaloneLogin() {
 
                 <button type="submit" className="login-btn">LOGIN</button>
               </form>
-
-              <div className="signup-link">
-                <Link to="/signup">Sign up</Link>
-              </div>
             </div>
           </div>
         </div>
