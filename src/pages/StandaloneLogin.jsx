@@ -95,7 +95,7 @@ export default function StandaloneLogin() {
                   </span>
                 </div>
 
-                <div className="login-options">
+                {/*<div className="login-options">
                   <label className="remember-me">
                     <input
                       type="checkbox"
@@ -105,7 +105,7 @@ export default function StandaloneLogin() {
                     Remember me
                   </label>
                   <a href="#" className="forgot-password">Forgot password?</a>
-                </div>
+                </div>*/}
                 <button type="submit" className="login-btn">Login to Kinetiq</button>
               </form>
             </div>
