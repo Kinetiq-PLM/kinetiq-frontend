@@ -16,6 +16,7 @@ export default function OpportunityTab({ setActiveTab }) {
   const opportunityQuery = useQuery({
     queryKey: ["opportunities"],
     queryFn: async () => await GET("crm/opportunities"),
+    retry: 2,
   });
 
   const columns = [
@@ -105,7 +106,7 @@ export default function OpportunityTab({ setActiveTab }) {
           opportunityQuery.error.message,
       });
     }
-  }, [opportunityQuery.data]);
+  }, [opportunityQuery.data, opportunityQuery.status]);
   return (
     <section className="h-full">
       {/* Header Section */}

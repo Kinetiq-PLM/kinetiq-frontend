@@ -35,6 +35,7 @@ const CustomerListModal = ({
     queryKey: ["customers"],
     queryFn: async () => await GET("sales/customer?status=Active"),
     enabled: isOpen || isNewCustomerModalOpen,
+    retry: 2,
   });
 
   const columns = [
@@ -80,7 +81,7 @@ const CustomerListModal = ({
           customersQuery.error?.message,
       });
     }
-  }, [customersQuery.data]);
+  }, [customersQuery.data, customersQuery.status]);
 
   useEffect(() => {
     const handleEscape = (e) => {

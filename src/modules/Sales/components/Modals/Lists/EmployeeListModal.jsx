@@ -27,6 +27,7 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
     queryKey: ["employees"],
     queryFn: async () => await GET("misc/employee"),
     enabled: isOpen,
+    retry: 2,
   });
 
   const columns = [
@@ -59,7 +60,7 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
           employeesQuery.error?.message,
       });
     }
-  }, [employeesQuery.data]);
+  }, [employeesQuery.data, employeesQuery.status]);
 
   useEffect(() => {
     const handleEscape = (e) => {

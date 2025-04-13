@@ -38,6 +38,7 @@ const DeliveredList = ({
         `sales/delivery?shipment_status=Delivered&customer_id=${selectedCustomer.customer_id}`
       ),
     enabled: isOpen,
+    retry: 2,
   });
 
   const modalRef = useRef(null);
@@ -123,7 +124,7 @@ const DeliveredList = ({
           deliveryQuery.error.message,
       });
     }
-  }, [deliveryQuery.data]);
+  }, [deliveryQuery.data, deliveryQuery.status]);
   if (!isOpen) return null;
 
   return (

@@ -29,6 +29,7 @@ const BlanketAgreementListModal = ({
     queryKey: ["agreementsList"],
     queryFn: async () => await GET("sales/agreement?status=Active"),
     enabled: isOpen,
+    retry: 2,
   });
   const queryClient = useQueryClient();
 
@@ -97,8 +98,10 @@ const BlanketAgreementListModal = ({
       }));
       setFilteredData(formattedData);
       setAgreementList(formattedData);
+    } else if (agreementQuery.status === "error") {
+      showAlert({ type: "error", title: "Failed to fetch Agreements." });
     }
-  }, [agreementQuery.data]);
+  }, [agreementQuery.data, agreementQuery.status]);
   if (!isOpen) return null;
 
   return (

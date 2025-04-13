@@ -5,10 +5,12 @@ import Button from "../Button";
 import BLANKET_AGREEMENT_LIST_DATA from "../../temp_data/ba_list_data";
 import { GET, BASE_API_URL } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
+import { useAlert } from "../Context/AlertContext";
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
 }) {
+  const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -17,6 +19,7 @@ export default function BlanketAgreementsTab({
   const agreementQuery = useQuery({
     queryKey: ["agreements"],
     queryFn: async () => await GET("sales/agreement"),
+    retry: 2,
   });
   const columns = [
     { key: "agreement_id", label: "Agreement ID" },
@@ -78,18 +81,26 @@ export default function BlanketAgreementsTab({
         customer_name: agreement.statement.customer.name,
         address: `${agreement.statement.customer.address_line1} ${agreement.statement.customer.address_line2}`,
         type: agreement.statement.type,
-        total_price: agreement.statement.total_amount,
+        total_price: Number(agreement.statement.total_amount).toLocaleString(
+          "en-US",
+          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        ),
         salesrep: `${agreement.statement.salesrep.first_name} ${agreement.statement.salesrep.last_name}`,
         agreement_method: agreement.agreement_method,
-        date_issued: new Date(agreement.signed_date).toLocaleString(),
-        start_date: new Date(agreement.start_date).toLocaleString(),
-        end_date: new Date(agreement.end_date).toLocaleString(),
+        date_issued: new Date(agreement.signed_date).toLocaleDateString(),
+        start_date: new Date(agreement.start_date).toLocaleDateString(),
+        end_date: new Date(agreement.end_date).toLocaleDateString(),
         status: agreement.status,
         document: `${BASE_API_URL}sales/agreement/${agreement.agreement_id}/document`,
       }));
       setAgreementList(data);
+    } else if (agreementQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Failed to fetch Blanket Agreements.",
+      });
     }
-  }, [agreementQuery.data]);
+  }, [agreementQuery.data, agreementQuery.status]);
   return (
     <section className="h-full">
       {/* Header Section */}

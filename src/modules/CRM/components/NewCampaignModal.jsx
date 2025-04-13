@@ -33,6 +33,12 @@ const NewCampaignModal = ({ isOpen, onClose }) => {
     onSuccess: (data) => {
       queryClient.refetchQueries(["campaigns"]);
     },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title: "An error occurred while creating campaign: " + error.message,
+      });
+    },
   });
 
   const handleConfirm = () => {
