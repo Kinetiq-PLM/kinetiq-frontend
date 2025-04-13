@@ -71,14 +71,14 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
     if (orderQuery.status === "success") {
       const data = orderQuery.data.map((order) => ({
         order_id: order.order_id,
-        customer_id: order.statement.customer.customer_id,
-        customer_name: order.statement.customer.name,
-        address: `${order.statement.customer.address_line1} ${order.statement.customer.address_line2}`,
+        customer_id: order.statement?.customer?.customer_id,
+        customer_name: order.statement?.customer?.name,
+        address: `${order.statement?.customer?.address_line1} ${order.statement?.customer?.address_line2}`,
         order_type: order.order_type,
         order_status: order.completion_status,
         ext_project_request: order.ext_project_request,
-        salesrep: `${order.statement.salesrep.first_name} ${order.statement.salesrep.last_name}`,
-        total_price: Number(order.statement.total_amount).toLocaleString(
+        salesrep: `${order.statement?.salesrep?.first_name} ${order.statement?.salesrep?.last_name}`,
+        total_price: Number(order.statement?.total_amount).toLocaleString(
           "en-US",
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),

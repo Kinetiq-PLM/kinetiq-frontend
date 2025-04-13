@@ -74,15 +74,15 @@ export default function BlanketAgreementsTab({
     if (agreementQuery.status === "success") {
       const data = agreementQuery.data.map((agreement) => ({
         agreement_id: agreement.agreement_id,
-        customer_id: agreement.statement.customer.customer_id,
-        customer_name: agreement.statement.customer.name,
-        address: `${agreement.statement.customer.address_line1} ${agreement.statement.customer.address_line2}`,
-        type: agreement.statement.type,
-        total_price: Number(agreement.statement.total_amount).toLocaleString(
+        customer_id: agreement.statement?.customer?.customer_id,
+        customer_name: agreement.statement?.customer?.name,
+        address: `${agreement.statement?.customer?.address_line1} ${agreement.statement?.customer?.address_line2}`,
+        type: agreement.statement?.type,
+        total_price: Number(agreement.statement?.total_amount).toLocaleString(
           "en-US",
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),
-        salesrep: `${agreement.statement.salesrep.first_name} ${agreement.statement.salesrep.last_name}`,
+        salesrep: `${agreement.statement?.salesrep?.first_name} ${agreement.statement?.salesrep?.last_name}`,
         agreement_method: agreement.agreement_method,
         date_issued: new Date(agreement.signed_date).toLocaleDateString(),
         start_date: new Date(agreement.start_date).toLocaleDateString(),

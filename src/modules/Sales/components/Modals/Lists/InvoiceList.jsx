@@ -82,7 +82,7 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
       const data = invoiceQuery.data;
       const formattedData = data.map((invoice) => ({
         ...invoice,
-        customer_name: invoice.order.statement.customer.name,
+        customer_name: invoice.order?.statement?.customer?.name,
         date_issued: new Date(invoice.invoice_date).toLocaleString(),
       }));
       setInvoiceList(formattedData);

@@ -51,16 +51,15 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
 
   useEffect(() => {
     if (quotationQuery.status === "success") {
-      console.log(quotationQuery.data);
       const data = quotationQuery.data.map((quote) => ({
         quotation_id: quote.quotation_id,
-        customer_id: quote.statement.customer.customer_id,
-        customer_name: quote.statement.customer.name,
-        address: `${quote.statement.customer.address_line1} ${quote.statement.customer.address_line2}`,
-        type: quote.statement.type,
+        customer_id: quote.statement?.customer?.customer_id,
+        customer_name: quote.statement?.customer?.name,
+        address: `${quote.statement?.customer?.address_line1} ${quote.statement?.customer?.address_line2}`,
+        type: quote.statement?.type,
         status: quote.status,
-        salesrep: `${quote.statement.salesrep.first_name} ${quote.statement.salesrep.last_name}`,
-        total_price: Number(quote.statement.total_amount).toLocaleString(
+        salesrep: `${quote.statement?.salesrep?.first_name} ${quote.statement?.salesrep?.last_name}`,
+        total_price: Number(quote.statement?.total_amount).toLocaleString(
           "en-US",
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),

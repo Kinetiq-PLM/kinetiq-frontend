@@ -83,8 +83,8 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
 
       const formattedData = data.map((quotation) => ({
         ...quotation,
-        customer_name: quotation.statement.customer.name,
-        total_price: Number(quotation.statement.total_amount).toLocaleString(
+        customer_name: quotation.statement?.customer?.name,
+        total_price: Number(quotation.statement?.total_amount).toLocaleString(
           "en-US",
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),
