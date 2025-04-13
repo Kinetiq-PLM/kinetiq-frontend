@@ -9,10 +9,10 @@ import NewCustomerModal from "./../../../Sales/components/Modals/NewCustomer";
 import MessageModal from "../MessageModal.jsx";
 import { useAlert } from "../../../Sales/components/Context/AlertContext.jsx";
 import { GET, PATCH } from "../../../Sales/api/api.jsx";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 export default function CampaignContactTab() {
   const { showAlert } = useAlert();
-
+  const queryClient = useQueryClient();
   const [isCampaignListOpen, setIsCampaignListOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState("");
   const [canSave, setCanSave] = useState(false); // Save button state
@@ -38,7 +38,6 @@ export default function CampaignContactTab() {
   const contactsMutation = useMutation({
     mutationFn: async (data) => await GET(`crm/campaigns/${data.campaign}`),
     onSuccess: (data) => {
-      console.log(data);
       const contacts = data.contacts.map((contact) => ({
         customer_id: contact.customer.customer_id,
         name: contact.customer.name,
@@ -47,6 +46,7 @@ export default function CampaignContactTab() {
         contact_person: contact.customer.contact_person,
       }));
       setContactList(contacts);
+      queryClient.refetchQueries(["campaigns"]);
     },
   });
 

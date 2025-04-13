@@ -29,6 +29,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
     queryFn: async () =>
       await GET(encodeURI("sales/order?status=Open,Partially Delivered")),
     enabled: isOpen,
+    retry: 2,
   });
   const columns = [
     { key: "order_id", label: "Order ID" },
@@ -101,8 +102,10 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
         .map((order) => order); // Optional, you can return order directly from filter
       setFilteredData(validData);
       setOrderList(validData);
+    } else if (orderQuery.status === "error") {
+      showAlert({ type: "error", title: "Failed to fetch Orders." });
     }
-  }, [orderQuery.data]);
+  }, [orderQuery.data, orderQuery.status]);
 
   if (!isOpen) return null;
 

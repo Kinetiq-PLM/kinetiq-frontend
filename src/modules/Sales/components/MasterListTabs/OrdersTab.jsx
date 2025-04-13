@@ -5,8 +5,10 @@ import Button from "../Button";
 import ORDER_LIST_DATA from "../../temp_data/order_list_data";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_API_URL, GET } from "../../api/api";
+import { useAlert } from "../Context/AlertContext";
 
 export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
+  const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -14,6 +16,7 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
   const orderQuery = useQuery({
     queryKey: ["orders"],
     queryFn: async () => await GET("sales/order"),
+    retry: 2,
   });
   const columns = [
     { key: "order_id", label: "Order ID" },
@@ -86,8 +89,10 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
         document: `${BASE_API_URL}sales/order/${order.order_id}/document`,
       }));
       setOrderList(data);
+    } else if (orderQuery.status === "error") {
+      showAlert({ type: "error", title: "Failed to fetch Orders" });
     }
-  }, [orderQuery.data]);
+  }, [orderQuery.data, orderQuery.status]);
 
   return (
     <section className="h-full">

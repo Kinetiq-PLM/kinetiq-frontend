@@ -38,6 +38,7 @@ export default function MainTab() {
     queryKey: ["customerOpps"],
     queryFn: async () =>
       await GET(`crm/opportunities?customer=${selectedCustomer.customer_id}`),
+    retry: 2,
   });
 
   const deleteOppMutation = useMutation({
@@ -107,7 +108,7 @@ export default function MainTab() {
           customerOppQuery.error.message,
       });
     }
-  }, [customerOppQuery.data]);
+  }, [customerOppQuery.data, customerOppQuery.status]);
 
   const handleDelete = async () => {
     if (selectedOpportunity === "") {

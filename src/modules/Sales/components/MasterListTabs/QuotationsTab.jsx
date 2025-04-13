@@ -6,8 +6,10 @@ import QUOTATION_LIST_DATA from "../../temp_data/quotation_list_data";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../api/api";
 import { BASE_API_URL } from "../../api/api";
+import { useAlert } from "../Context/AlertContext";
 
 export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
+  const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -17,6 +19,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
   const quotationQuery = useQuery({
     queryKey: ["quotations"],
     queryFn: async () => await GET("sales/quotation/"),
+    retry: 2,
   });
 
   const columns = [
@@ -68,9 +71,9 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
       }));
       setQuotationList(data);
     } else if (quotationQuery.status === "error") {
-      alert("Error while fetching quotations");
+      showAlert({ type: "error", title: "Failed to fetch quotations." });
     }
-  }, [quotationQuery.data]);
+  }, [quotationQuery.data, quotationQuery.status]);
 
   const filteredQuotations = quotationList.filter((quotation) => {
     // Filter by search term

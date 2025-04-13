@@ -24,6 +24,7 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
     queryKey: ["quotationsLIst"],
     queryFn: async () => await GET("sales/quotation?status=Pending"),
     enabled: isOpen,
+    retry: 2,
   });
 
   const queryClient = useQueryClient();
@@ -100,7 +101,7 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
           quotationQuery.error.message,
       });
     }
-  }, [quotationQuery.data]);
+  }, [quotationQuery.data, quotationQuery.status]);
   if (!isOpen) return null;
 
   return (

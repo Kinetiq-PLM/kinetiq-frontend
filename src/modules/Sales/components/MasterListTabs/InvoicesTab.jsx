@@ -6,8 +6,10 @@ import INVOICE_LIST_DATA from "../../temp_data/invoice_list_data";
 import { GET } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_API_URL } from "../../api/api";
+import { useAlert } from "../Context/AlertContext";
 
 export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
+  const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -30,6 +32,7 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
   const invoiceQuery = useQuery({
     queryKey: ["invoices"],
     queryFn: async () => await GET("sales/invoice"),
+    retry: 2,
   });
 
   const dateFilters = [
@@ -101,8 +104,10 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
         document: `${BASE_API_URL}sales/invoice/${invoice.invoice_id}/document`,
       }));
       setInvoiceList(data);
+    } else if (invoiceQuery.status === "error") {
+      showAlert({ type: "error", title: "Failed to fetch Invoices." });
     }
-  }, [invoiceQuery.data]);
+  }, [invoiceQuery.data, invoiceQuery.status]);
 
   return (
     <section className="h-full">

@@ -5,10 +5,12 @@ import Button from "../Button";
 import DELIVERY_LIST_DATA from "../../temp_data/deliveries_list_data";
 import { useQuery } from "@tanstack/react-query";
 import { GET, BASE_API_URL } from "../../api/api";
+import { useAlert } from "../Context/AlertContext";
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
 }) {
+  const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -35,6 +37,7 @@ export default function BlanketAgreementsTab({
   const deliveryQuery = useQuery({
     queryKey: ["deliveries"],
     queryFn: async () => await GET("sales/delivery"),
+    retry: 2,
   });
 
   const dateFilters = [
@@ -110,8 +113,10 @@ export default function BlanketAgreementsTab({
         document: `${BASE_API_URL}sales/delivery/${delivery.delivery_note_id}/document`,
       }));
       setDeliveryList(data);
+    } else if (deliveryQuery.status === "error") {
+      showAlert({ type: "error", title: "Failed to fetch Deliveries." });
     }
-  }, [deliveryQuery.data]);
+  }, [deliveryQuery.data, deliveryQuery.status]);
 
   return (
     <section className="h-full">

@@ -24,6 +24,7 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
     queryKey: ["invoicesList"],
     queryFn: async () => await GET("sales/invoice"),
     enabled: isOpen,
+    retry: 2,
   });
   const queryClient = useQueryClient();
 
@@ -87,8 +88,10 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
       }));
       setInvoiceList(formattedData);
       setFilteredData(formattedData);
+    } else if (invoiceQuery.status === "error") {
+      showAlert({ type: "error", title: "Failed to fetch Invoices." });
     }
-  }, [invoiceQuery.data]);
+  }, [invoiceQuery.data, invoiceQuery.status]);
   if (!isOpen) return null;
 
   return (

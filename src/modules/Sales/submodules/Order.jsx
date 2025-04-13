@@ -96,7 +96,10 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       localStorage.removeItem("TransferOperation");
     },
     onError: (error) => {
-      console.log(error);
+      showAlert({
+        type: "error",
+        title: "An error occurred while creating delivery: " + error.message,
+      });
     },
   });
 

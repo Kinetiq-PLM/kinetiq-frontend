@@ -5,10 +5,12 @@ import Button from "../Button";
 import BLANKET_AGREEMENT_LIST_DATA from "../../temp_data/ba_list_data";
 import { GET, BASE_API_URL } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
+import { useAlert } from "../Context/AlertContext";
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
 }) {
+  const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -17,6 +19,7 @@ export default function BlanketAgreementsTab({
   const agreementQuery = useQuery({
     queryKey: ["agreements"],
     queryFn: async () => await GET("sales/agreement"),
+    retry: 2,
   });
   const columns = [
     { key: "agreement_id", label: "Agreement ID" },
@@ -91,8 +94,13 @@ export default function BlanketAgreementsTab({
         document: `${BASE_API_URL}sales/agreement/${agreement.agreement_id}/document`,
       }));
       setAgreementList(data);
+    } else if (agreementQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Failed to fetch Blanket Agreements.",
+      });
     }
-  }, [agreementQuery.data]);
+  }, [agreementQuery.data, agreementQuery.status]);
   return (
     <section className="h-full">
       {/* Header Section */}

@@ -5,8 +5,9 @@ import Button from "../../../Sales/components/Button";
 import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
 import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
-
+import { useAlert } from "../../../Sales/components/Context/AlertContext";
 export default function SupplierTab() {
+  const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -14,6 +15,7 @@ export default function SupplierTab() {
   const customersQuery = useQuery({
     queryKey: ["suppliers"],
     queryFn: async () => await GET("misc/business-partners?category=Supplier"),
+    retry: 2,
   });
   const columns = [
     { key: "partner_id", label: "Partner ID" },
@@ -68,8 +70,10 @@ export default function SupplierTab() {
         contact_info: customer.contact_info,
       }));
       setCustomers(data);
+    } else if (customersQuery.status === "error") {
+      showAlert({ type: "error", title: "Failed to fetch Customers." });
     }
-  }, [customersQuery.data]);
+  }, [customersQuery.data, customersQuery.status]);
 
   return (
     <section className="h-full">
