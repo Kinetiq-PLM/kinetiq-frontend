@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../styles/PCounts.css";
 import InvPcountForm from "../components/InvPcountForm";
+import DiscrepancyReportForm from "../components/DiscrepancyReportForm";
 
 const BodyContent = () => {
   const [pcounts, setPcounts] = useState([]);
@@ -11,6 +12,7 @@ const BodyContent = () => {
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
   const [showInvPcountForm, setShowInvPcountForm] = useState(false);
+  const [showDiscrepancyForm, setShowDiscrepancyForm] = useState(false);
   const [warehouses, setWarehouses] = useState([]);
   const [inventoryItems, setInventoryItems] = useState({});
   const [countHistory, setCountHistory] = useState({});
@@ -73,11 +75,18 @@ const BodyContent = () => {
         return res.json();
       })
       .then((data) => {
-        console.log("Inventory items data:", data);
+        console.log("Inventory Items API Response:", data);
         const itemsMap = {};
         data.forEach(item => {
-          itemsMap[item.inventory_item_id] = item;
+
+          if (item && item.inventory_item_id) {
+            console.log(`Processing item ${item.inventory_item_id} with type: ${item.item_type}`);
+            itemsMap[item.inventory_item_id] = item;
+          } else {
+            console.warn("Skipping invalid inventory item:", item);
+          }
         });
+        console.log("Final inventoryItems map:", itemsMap);
         setInventoryItems(itemsMap);
       })
       .catch((err) => {
@@ -278,7 +287,7 @@ const BodyContent = () => {
                       </tr>
                     ) : (
                       filteredData.map((item, index) => {
-                        // Get inventory item details if available
+                      
                         const inventoryItem = item.inventory_item_id ? inventoryItems[item.inventory_item_id] : null;
                         return (
                           <tr
@@ -286,7 +295,7 @@ const BodyContent = () => {
                             className="border-b border-gray-300 hover:bg-gray-100"
                             onClick={() => setSelectedRow(item)}
                           >
-                            <td className="p-2">{inventoryItem?.item_type || "Unknown"}</td>
+                            <td className="p-2">{item.item_type || "Unknown"}</td> 
                             <td className="p-2">{item.inventory_item_id || item.item_id || "N/A"}</td>
                             <td className="p-2">{item.item_onhand ?? "-"}</td>
                             <td className="p-2">{item.item_actually_counted ?? "-"}</td>
@@ -361,14 +370,17 @@ const BodyContent = () => {
                       return (
                         <>
                           <div className="mb-4">
-                            <h4 className="text-cyan-600 text-sm font-semibold">Selected Item</h4>
-                            <div className="flex items-center">
-                              <p className="text-gray-500 text-sm">{selectedRow?.inventory_item_id || selectedRow?.item_id || "N/A"}</p>
-                            </div>
-                            {selectedRow.product_name && (
-                              <p className="text-gray-500 text-sm">Product: {selectedRow.product_name}</p>
-                            )}
+                          <h4 className="text-cyan-600 text-sm font-semibold">Selected Item</h4>
+                          <div className="flex items-center">
+                            <p className="text-gray-500 text-sm">{selectedRow?.inventory_item_id || selectedRow?.item_id || "N/A"}</p>
                           </div>
+                          {inventoryItem && (
+                            <p className="text-gray-500 text-sm">
+                              {inventoryItem.item_type ? `Type: ${inventoryItem.item_type}` : ""}
+                            </p>
+                          )}
+                          
+                        </div> 
 
                           <div className="mb-4">
                             <h4 className="text-cyan-600 text-sm font-semibold">Count Information</h4>
@@ -438,7 +450,10 @@ const BodyContent = () => {
                   Add P-counts
                 </button>
 
-                <button className="w-full bg-cyan-600 text-white rounded-lg p-2 hover:bg-cyan-700">
+                <button
+                  className="w-full bg-cyan-600 text-white rounded-lg p-2 hover:bg-cyan-700"
+                  onClick={() => setShowDiscrepancyForm(true)}
+                >
                   Report a Discrepancy
                 </button>
               </div>
@@ -458,6 +473,14 @@ const BodyContent = () => {
             />
           </div>
         </div>
+      )}
+
+      {showDiscrepancyForm && (
+        <DiscrepancyReportForm
+          onClose={() => setShowDiscrepancyForm(false)}
+          selectedItem={selectedRow}
+          inventoryItems={inventoryItems}
+        />
       )}
     </div>
   );

@@ -13,23 +13,22 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
   const [inventoryItemsList, setInventoryItemsList] = useState([]);
   const [selectedInventoryItem, setSelectedInventoryItem] = useState(null);
 
-  // Format date helper function using native JS
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+    return date.toISOString().split('T')[0]; 
   };
 
-  // Success/error messages
+
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Use warehouses passed from parent, or fetch them if not provided
+
   useEffect(() => {
     if (warehouses && warehouses.length > 0) {
       setLocalWarehouses(warehouses);
     } else {
-      // Fetch warehouses if not provided
+
       fetch("http://127.0.0.1:8000/api/warehouses/")
         .then((res) => {
           if (!res.ok) {
@@ -44,20 +43,19 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
         })
         .catch((err) => {
           console.error("Failed to fetch warehouses:", err);
-          // If fetch fails, use a fallback
+
           setLocalWarehouses(["Warehouse 1", "Warehouse 2", "Warehouse 3"]);
         });
     }
   }, [warehouses]);
 
-  // Fetch inventory items if not provided
   useEffect(() => {
     if (Object.keys(inventoryItems).length > 0) {
-      // Convert object to array for dropdown
+
       const itemsList = Object.values(inventoryItems);
       setInventoryItemsList(itemsList);
     } else {
-      // Fetch inventory items if not provided
+ 
       fetch("http://127.0.0.1:8000/api/inventory-items/")
         .then((res) => {
           if (!res.ok) {
@@ -76,43 +74,60 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
     }
   }, [inventoryItems]);
 
-  // Prefill fields from selectedItem if available
-  useEffect(() => {
-    if (selectedItem) {
-      setInventoryItemId(selectedItem.inventory_item_id || "");
-      setQuantity(selectedItem.item_actually_counted || "");
-      setEmployeeId(selectedItem.employee_id || "");
-      setStatus(selectedItem.status || "");
-      setTimePeriod(selectedItem.time_period || "");
-      setWarehouseId(selectedItem.warehouse_id || "");
-      setRemarks(selectedItem.remarks || "");
-
-      // Set the selected inventory item details if available
-      if (selectedItem.inventory_item_id && inventoryItems[selectedItem.inventory_item_id]) {
-        setSelectedInventoryItem(inventoryItems[selectedItem.inventory_item_id]);
+ 
+useEffect(() => {
+  if (selectedItem) {
+  
+    if (selectedItem.inventory_item_id) {
+      setInventoryItemId(selectedItem.inventory_item_id);
+     
+      let itemDetails = inventoryItems[selectedItem.inventory_item_id];
+      
+      if (!itemDetails) {
+      
+        itemDetails = inventoryItemsList.find(item => 
+          item.inventory_item_id === selectedItem.inventory_item_id
+        );
       }
-    } else {
-      handleClear();
+      
+      if (itemDetails) {
+        setSelectedInventoryItem(itemDetails);
+     
+        if (itemDetails.current_quantity) {
+          setQuantity(itemDetails.current_quantity.toString());
+        }
+      }
+    } else if (selectedItem.item_id) {
+    
+      setInventoryItemId(selectedItem.item_id);
     }
-  }, [selectedItem, inventoryItems]);
 
-  // Handle inventory item selection
+    setQuantity(selectedItem.item_actually_counted || "");
+    setEmployeeId(selectedItem.employee || "");
+    setStatus(selectedItem.status || "");
+    setTimePeriod(selectedItem.time_period || "");
+    setWarehouseId(selectedItem.warehouse_id || "");
+    setRemarks(selectedItem.remarks || "");
+  } else {
+    handleClear();
+  }
+}, [selectedItem, inventoryItems, inventoryItemsList]);
+
+ 
   const handleInventoryItemChange = (e) => {
     const selectedId = e.target.value;
     setInventoryItemId(selectedId);
 
-    // Find the selected item in the list
+ 
     const item = inventoryItemsList.find(item => item.inventory_item_id === selectedId);
     setSelectedInventoryItem(item || null);
 
-    // If the item has a current quantity, prefill the onhand value
     if (item && item.current_quantity) {
-      // Set the quantity to the current quantity in inventory
       setQuantity(item.current_quantity.toString());
     }
   };
 
-  // Clear all form fields
+
   const handleClear = () => {
     setInventoryItemId("");
     setQuantity("");
@@ -126,13 +141,12 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
     setErrorMessage("");
   };
 
-  // Submit form to create a new row in inventory_cyclic_counts
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
 
-    // Basic validation
+   
     if (
       !inventoryItemId ||
       !quantity ||
@@ -145,12 +159,10 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
       return;
     }
 
-    // Define item_onhand (using current quantity from inventory) and compute difference_in_qty
     const itemOnHand = selectedInventoryItem?.current_quantity || 0;
     const actualCounted = Number(quantity);
     const diffQty = itemOnHand - actualCounted;
 
-    // Build request payload
     const newRecord = {
       inventory_item_id: inventoryItemId,
       item_onhand: itemOnHand,
@@ -160,7 +172,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
       status: status,
       time_period: timePeriod,
       remarks: remarks,
-      warehouse_id_input: warehouseId, // Use warehouse_id_input to match backend serializer
+      warehouse_id_input: warehouseId, 
     };
 
     try {
@@ -179,7 +191,6 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
       console.log("Successfully inserted new record:", data);
       setSuccessMessage("Successfully inserted new record!");
 
-      // Optionally clear the form or close the modal after success
       setTimeout(() => {
         handleClear();
         onClose();
