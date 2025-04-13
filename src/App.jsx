@@ -374,7 +374,7 @@ function App() {
                       ${hoveredModule === module.id ? "hovered" : ""}`}
                   onClick={() => {
                     setIsSidebarOpen(true);
-                    /*
+
                     if (activeModule === module.id) {
                       // if it's already active, toggle off
                       setActiveModule(null);
@@ -385,9 +385,9 @@ function App() {
                       setActiveSubModule(null);
                       loadMainModule(module.id);
                     }
-                    */
-                    setActiveModule(module.id);
-                    setActiveSubModule(null); // Reset submodule when a main module is clicked
+
+                    /*setActiveModule(module.id);
+                    setActiveSubModule(null); // Reset submodule when a main module is clicked*/
                   }}
                   onMouseEnter={() => setHoveredModule(module.id)}
                   onMouseLeave={() => setHoveredModule(null)}
@@ -441,7 +441,7 @@ function App() {
                             ${activeModule === module.id ? "active" : ""} 
                             ${hoveredModule === module.id ? "hovered" : ""}`}
                   onClick={() => {
-                    /*
+
                     if (activeModule === module.id) {
                       // if it's already active, toggle off
                       setActiveModule(null);
@@ -452,9 +452,9 @@ function App() {
                       setActiveSubModule(null);
                       loadMainModule(module.id);
                     }
-                    */
+                    /*
                     setActiveModule(module.id);
-                    setActiveSubModule(null);
+                    setActiveSubModule(null);*/
                   }}
 
                   onMouseEnter={() => setHoveredModule(module.id)}
