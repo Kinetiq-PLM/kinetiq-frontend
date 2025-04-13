@@ -146,11 +146,20 @@ const BodyContent = () => {
 
   const search = debouncedSearchTerm.toLowerCase().trim();
   const filteredData = currentConfig.data
-    .filter((item) => {
-      const nameVal = (item.Name || "").toLowerCase();
-      return search === "" || nameVal.startsWith(search);
-    })
-    .sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
+  .filter((item) => {
+    const nameVal = (item.Name || "").toLowerCase();
+    return search === "" || nameVal.startsWith(search);
+  })
+  .sort((a, b) => {
+    const stockA = parseInt(a["Available Stock"] || "0");
+    const stockB = parseInt(b["Available Stock"] || "0");
+    
+    if (stockA !== stockB) {
+      return stockA - stockB; // Lower stock comes first
+    }
+    
+    return (a.Name || "").localeCompare(b.Name || "");
+  });
 
   const toggleModal = () => setShowModal(!showModal);
 
