@@ -7,7 +7,7 @@ const BodyContent = () => {
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-};
+  };
 
 
   const productionData = Array(7).fill().map((_, index) => ({
@@ -26,17 +26,17 @@ const BodyContent = () => {
           <div className="costprodheader-section">
             <h1>Cost of Production & Rework Cost</h1>
             <div className="costprodbutton-group">
-            <div className="cpsearch-wrapper">
-                                <img src="/icons/search-icon.png" alt="Search" className="search-icon" />
-                                <input
-                                    type="text"
-                                    className="cpsearch-bar"
-                                    placeholder="Search..."
-                                    value={searchQuery}
-                                    onChange={handleSearchChange}
-                                />
+              <div className="cpsearch-wrapper">
+                <img src="/icons/search-icon.png" alt="Search" className="search-icon" />
+                <input
+                  type="text"
+                  className="cpsearch-bar"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
 
-                            </div>
+              </div>
             </div>
           </div>
 

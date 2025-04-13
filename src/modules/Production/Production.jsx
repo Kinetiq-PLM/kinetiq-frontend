@@ -4,38 +4,26 @@ import "./styles/Production.css";
 const BodyContent = () => {
     const [selectedOption, setSelectedOption] = useState("All Projects");
     const [searchQuery, setSearchQuery] = useState("");
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [statuses, setStatuses] = useState(Array(7).fill("available"));
 
-   
+
+    const handleStatusChange = (index, newStatus) => {
+        const updatedStatuses = [...statuses];
+        updatedStatuses[index] = newStatus;
+        setStatuses(updatedStatuses);
+    };
+
     const handleSelectChange = (event) => {
         setSelectedOption(event.target.value);
     };
 
-   
+
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };
 
 
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
 
-    const [isYes, setIsYes] = useState(false);
-
-    const handleToggle = () => {
-        setIsYes((prev) => !prev);
-    };
-
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-
-    const handleStartDateChange = (e) => {
-        setStartDate(e.target.value);
-    };
-
-    const handleEndDateChange = (e) => {
-        setEndDate(e.target.value);
-    };
 
     return (
         <div className="prod">
@@ -75,39 +63,47 @@ const BodyContent = () => {
 
 
                         <div className="big-container-wrapper">
-  <div className="dashboard-container">
-    <div className="table-container">
-      <table className="production-table">
-        <thead>
-          <tr>
-            <th>Production Order ID</th>
-            <th>Task ID</th>
-            <th>BOM ID</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Target Quantity</th>
-            <th>Remarks</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {[...Array(10)].map((_, index) => (
-            <tr key={index}>
-              <td style={{ fontWeight: "bold" }}>P0OO1</td>
-              <td>111201</td>
-              <td>null</td>
-              <td>2024-03-05</td>
-              <td>2024-03-15</td>
-              <td>10</td>
-              <td>Make it blue.</td>
-              <td><button className="status-btn">Completed</button></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+                            <div className="dashboard-container">
+                                <div className="table-container">
+                                    <table className="production-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Production Order ID</th>
+                                                <th>Task ID</th>
+                                                <th>BOM ID</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Target Quantity</th>
+                                                <th>Remarks</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {[...Array(10)].map((_, index) => (
+                                                <tr key={index}>
+                                                    <td style={{ fontWeight: "bold" }}>P0OO1</td>
+                                                    <td>111201</td>
+                                                    <td>null</td>
+                                                    <td>2024-03-05</td>
+                                                    <td>2024-03-15</td>
+                                                    <td>10</td>
+                                                    <td>Make it blue.</td>
+                                                    <td>  <select
+                                                        className={`availability-dropdown ${statuses[index]}`}
+                                                        value={statuses[index]}
+                                                        onChange={(e) => handleStatusChange(index, e.target.value)}
+                                                    >
+                                                        <option value="available">Available</option>
+                                                        <option value="unavailable">Unavailable</option>
+                                                        <option value="undermaintenance">Under Maintenance</option>
+                                                    </select></td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
@@ -141,360 +137,59 @@ const BodyContent = () => {
                                     </tbody>
                                 </table>
                             </div>
+
+
                         </div>
+
                         <div className="progress-container">
+                            <div className="progress-wheel">
+                                <svg className="circular-progress" viewBox="0 0 36 36">
+                                    <path
+                                        className="circle-background"
+                                        d="M18 2.0845
+           a 15.9155 15.9155 0 1 1 0 31.831
+           a 15.9155 15.9155 0 1 1 0 -31.831"
+                                    />
+                                    <path
+                                        className="circle-progress"
+                                        d="M18 2.0845
+           a 15.9155 15.9155 0 1 1 0 31.831
+           a 15.9155 15.9155 0 1 1 0 -31.831"
+                                        strokeDasharray="50, 100"
+                                    />
+                                </svg>
+                                <div className="progress-text">50%</div>
+                            </div>
 
-
+                            {/* Bars below */}
+                            <div className="progress-details">
+                                <div className="progress-item">
+                                    <span>In Progress</span>
+                                    <div className="bar-container">
+                                        <div className="bar" style={{ width: '50%' }}></div>
+                                    </div>
+                                    <span>50%</span>
+                                </div>
+                                <div className="progress-item">
+                                    <span>Planned</span>
+                                    <div className="bar-container">
+                                        <div className="bar" style={{ width: '19%' }}></div>
+                                    </div>
+                                    <span>19%</span>
+                                </div>
+                                <div className="progress-item">
+                                    <span>Completed</span>
+                                    <div className="bar-container">
+                                        <div className="bar" style={{ width: '30%' }}></div>
+                                    </div>
+                                    <span>30%</span>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>
-
-
-            {isModalOpen && (
-                <div className="modal-overlay" onClick={closeModal}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-
-                        <div className="modal-firstcolumn">
-                            <h1>Production Order Detail ID</h1>
-                            <h2>P0D001</h2>
-                            <h1>Production Order ID</h1>
-                            <h3>PO001</h3>
-                            <h1>Date Ordered</h1>
-                            <h3>2/13/2025</h3>
-                            <h1>Description</h1>
-                            <p>Custom welded frame for Project Delta with Custom Lorem Ipsum</p>
-                            <h1>BOM ID</h1>
-                            <h4>00000</h4>
-                            <h1>Target Quantity</h1>
-                            <h4>2</h4>
-                            <h1>Labor</h1>
-                            <input type="text-labor" />
-                            <h1>Quality Check Status</h1>
-                            <div className="qualitycheckstatus-dropdown">
-                                < select className={`qcdropdown  ${selectedOption === 'Checked'
-                                        ? 'checked'
-                                        : selectedOption === 'Rework In Progress'
-                                            ? 'rework-in-progress'
-                                            : selectedOption === 'Pending'
-                                                ? 'pending'
-                                                : selectedOption === 'Rework'
-                                                    ? 'rework'
-                                                    : ''
-                                    }`}
-                                    value={selectedOption}
-                                    onChange={handleSelectChange}>
-                                    <option value="checked">Checked</option>
-                                    <option value="rework">Rework</option>
-                                    <option value="rework-in-progress">Rework In Progress</option>
-                                    <option value="pending">Pending</option>
-
-                                </select>
-                            </div>
-
-
-                        </div>
-                        <div className="modal-secondcolumn">
-                            <div className="dates-container">
-                                <div className="dates-container">
-                                    <div className="date-row">
-                                        <div className="date-column">
-                                            <h4>Start Date</h4>
-                                            <input type="date" value={startDate} onChange={handleStartDateChange} />
-                                        </div>
-                                        <div className="date-column">
-                                            <h4>End Date</h4>
-                                            <input type="date" value={endDate} onChange={handleEndDateChange} />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="component-dashboard">
-                                    <table>
-                                        <thead>
-                                            <th>Material ID</th>
-                                            <th>Quantity</th>
-                                            <th>Unit of Measure</th>
-                                            <th>Availability</th>
-                                        </thead>
-                                    </table>
-                                    <table>
-
-                                        <div className="table-container">
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>Polyester</td>
-                                                <td>1</td>
-                                                <td>Sheets</td>
-                                                <td>
-
-                                                    <div className="yes-no-container">
-
-                                                        <label className="switch">
-                                                            <input type="checkbox" checked={isYes} onChange={handleToggle} />
-                                                            <span className="slider"></span>
-                                                        </label>
-                                                        <p>{isYes ? "Yes" : "No"}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </div>
-
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="modal-thirdcolumn">
-                            <div className="button-container">
-                                <select
-                                    className={`dropdown ${selectedOption === 'Planned'
-                                            ? 'planned'
-                                            : selectedOption === 'In Progress'
-                                                ? 'in-progress'
-                                                : selectedOption === 'Completed'
-                                                    ? 'completed'
-                                                    : ''
-                                        }`}
-                                    value={selectedOption}
-                                    onChange={handleSelectChange}
-                                >
-                                    <option value="All Projects">All Projects</option>
-                                    <option value="In Progress">In Progress</option>
-                                    <option value="Planned">Planned</option>
-                                    <option value="Completed">Completed</option>
-                                </select>
-
-                                <div className="deletebutton">
-                                    <button>Delete</button>
-                                </div>
-                            </div>
-                            <div className="equipment-dashboard">
-
-                                <table>
-                                    <thead>
-                                        <th>Equipment Needed</th>
-                                        <th>Equipment Status</th>
-                                    </thead>
-                                </table>
-
-                                <table>
-                                    <tbody>
-                                        <tr>
-                                            <td>CNC Milling Machine</td>
-                                            <td><div className="availability-status">Available</div></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Laser Cutter</td>
-                                            <td><div className="availability-status">Available</div></td>
-                                        </tr>
-
-                                    </tbody>
-                                </table>
-
-                            </div>
-                            <h1>Remarks:</h1>
-                            <div className="remarks-container"><h2>Rework Notes will appear here...</h2></div>
-                            <div className="prodsavebuttons">
-                            <button className="cancel-btn">Cancel</button>
-                            <button className="save-btn">Save</button>
-                            </div>
-                        </div>
-
-                        <img
-                            src="/src/modules/Production/icons/Close_square.png"
-                            alt=""
-                            className="close-icon"
-                            onClick={closeModal}
-                        />
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

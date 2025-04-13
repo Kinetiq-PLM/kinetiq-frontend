@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/Equipment&Labor.css";
 
-// Modal Component
+
 const Modal = ({ show, onClose, children }) => {
     if (!show) return null;
 
@@ -18,7 +18,7 @@ const Modal = ({ show, onClose, children }) => {
 const BodyContent = () => {
     const [activeTab, setActiveTab] = useState("equipment");
     const [searchQuery, setSearchQuery] = useState("");
-    const [showModal, setShowModal] = useState(false); 
+    const [showModal, setShowModal] = useState(false);
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
@@ -87,93 +87,93 @@ const BodyContent = () => {
             <Modal show={showModal} onClose={() => setShowModal(false)}>
                 <h1>Project Equipment</h1>
                 <div className="modalsearch-wrapper">
-  <div className="modalsearch-input-wrapper">
-    <img src="/icons/search-icon.png" alt="Search" className="search-icon" />
-    <input
-      type="text"
-      className="modalsearch-bar"
-      placeholder="Search..."
-      value={searchQuery}
-      onChange={handleSearchChange}
-    />
-  </div>
-</div>
+                    <div className="modalsearch-input-wrapper">
+                        <img src="/icons/search-icon.png" alt="Search" className="search-icon" />
+                        <input
+                            type="text"
+                            className="modalsearch-bar"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                        />
+                    </div>
+                </div>
                 <div className="proj-equipment-table">
-                <table>
-                    <thead>
-                        <th>Project Equipment ID</th>
-                        <th>Equipment ID</th>
-                        <th>Product ID</th>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>PROD-PJEQ-2025-cea4b2</td>
-                        <td>CNC Milling Machine (5-axis)</td>
-                        <td>
-  <ul>
-    <li>BeneVision Series</li>
-    <li>Wato EX-35</li>
-    <li>HyBase 3000</li>
-    <li>OEC Elite</li>
-  </ul>
-</td>
-</tr>
+                    <table>
+                        <thead>
+                            <th>Project Equipment ID</th>
+                            <th>Equipment ID</th>
+                            <th>Product ID</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>PROD-PJEQ-2025-cea4b2</td>
+                                <td>CNC Milling Machine (5-axis)</td>
+                                <td>
+                                    <ul>
+                                        <li>BeneVision Series</li>
+                                        <li>Wato EX-35</li>
+                                        <li>HyBase 3000</li>
+                                        <li>OEC Elite</li>
+                                    </ul>
+                                </td>
+                            </tr>
 
-<tr>
-                        <td>PROD-PJEQ-2025-cea4b2</td>
-                        <td>CNC Milling Machine (5-axis)</td>
-                        <td>
-  <ul>
-    <li>BeneVision Series</li>
-    <li>Wato EX-35</li>
-    <li>HyBase 3000</li>
-    <li>OEC Elite</li>
-  </ul>
-</td>
-</tr>
+                            <tr>
+                                <td>PROD-PJEQ-2025-cea4b2</td>
+                                <td>CNC Milling Machine (5-axis)</td>
+                                <td>
+                                    <ul>
+                                        <li>BeneVision Series</li>
+                                        <li>Wato EX-35</li>
+                                        <li>HyBase 3000</li>
+                                        <li>OEC Elite</li>
+                                    </ul>
+                                </td>
+                            </tr>
 
-<tr>
-                        <td>PROD-PJEQ-2025-cea4b2</td>
-                        <td>CNC Milling Machine (5-axis)</td>
-                        <td>
-  <ul>
-    <li>BeneVision Series</li>
-    <li>Wato EX-35</li>
-    <li>HyBase 3000</li>
-    <li>OEC Elite</li>
-  </ul>
-</td>
-</tr>
+                            <tr>
+                                <td>PROD-PJEQ-2025-cea4b2</td>
+                                <td>CNC Milling Machine (5-axis)</td>
+                                <td>
+                                    <ul>
+                                        <li>BeneVision Series</li>
+                                        <li>Wato EX-35</li>
+                                        <li>HyBase 3000</li>
+                                        <li>OEC Elite</li>
+                                    </ul>
+                                </td>
+                            </tr>
 
-<tr>
-                        <td>PROD-PJEQ-2025-cea4b2</td>
-                        <td>CNC Milling Machine (5-axis)</td>
-                        <td>
-  <ul>
-    <li>BeneVision Series</li>
-    <li>Wato EX-35</li>
-    <li>HyBase 3000</li>
-    <li>OEC Elite</li>
-  </ul>
-</td>
-</tr>
+                            <tr>
+                                <td>PROD-PJEQ-2025-cea4b2</td>
+                                <td>CNC Milling Machine (5-axis)</td>
+                                <td>
+                                    <ul>
+                                        <li>BeneVision Series</li>
+                                        <li>Wato EX-35</li>
+                                        <li>HyBase 3000</li>
+                                        <li>OEC Elite</li>
+                                    </ul>
+                                </td>
+                            </tr>
 
-<tr>
-                        <td>PROD-PJEQ-2025-cea4b2</td>
-                        <td>CNC Milling Machine (5-axis)</td>
-                        <td>
-  <ul>
-    <li>BeneVision Series</li>
-    <li>Wato EX-35</li>
-    <li>HyBase 3000</li>
-    <li>OEC Elite</li>
-  </ul>
-</td>
-</tr>
+                            <tr>
+                                <td>PROD-PJEQ-2025-cea4b2</td>
+                                <td>CNC Milling Machine (5-axis)</td>
+                                <td>
+                                    <ul>
+                                        <li>BeneVision Series</li>
+                                        <li>Wato EX-35</li>
+                                        <li>HyBase 3000</li>
+                                        <li>OEC Elite</li>
+                                    </ul>
+                                </td>
+                            </tr>
 
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
                 </div>
             </Modal>
         </div>
