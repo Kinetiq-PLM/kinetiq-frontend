@@ -18,7 +18,8 @@
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.4.1",
-    "rechart": "^0.0.1"
+    "rechart": "^0.0.1",
+    "recharts": "^2.15.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
