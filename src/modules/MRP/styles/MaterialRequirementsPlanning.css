@@ -81,7 +81,7 @@
   background-repeat: no-repeat;
 }
 
-.bom-print-modal {
+.reqplan .bom-print-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -96,7 +96,7 @@
   padding: 2rem;
 }
 
-.bom-print-modal2 {
+.reqplan .bom-print-modal2 {
   position: fixed;
   top: 0;
   left: 0;
@@ -112,7 +112,7 @@
 }
 
 
-.bom-print-content {
+.reqplan .bom-print-content {
   position: relative;
   background: white;
   border-radius: 16px;
@@ -121,7 +121,7 @@
   width: 100%;
 }
 
-.reqplan .title {
+.reqplan .reqplan .title {
   font-size: clamp(24px, 5vw, 35px);
   font-weight: 700;
   text-transform: capitalize;

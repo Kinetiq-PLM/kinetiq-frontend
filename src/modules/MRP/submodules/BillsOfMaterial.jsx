@@ -3,8 +3,16 @@ import "../styles/BillsOfMaterial.css";
 import { useState } from "react";
 
 const BodyContent = ({loadSubModule, setActiveSubModule}) => {
+    const [rawmaterial, setRawMaterial] = useState(false);
+    const [additionalcost, setAdditionalCost] = useState(false);
+    const [additionalcost2, setAdditionalCost2] = useState(false);
+    const [checker, setChecker] = useState(false);
+    const [created, setCreated] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen2, setIsOpen2] = useState(false);
     const [flag, setFlag] = useState(0);
     const [printBOM, setPrintBOM] = useState(false);
+
     const bomData = [
         { number: "000000001", type: "Project", status: "Pending", date: "July 3 2025" },
         { number: "000000002", type: "Non Project", status: "Approved", date: "July 3 2025" },
