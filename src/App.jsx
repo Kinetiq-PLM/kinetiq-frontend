@@ -70,7 +70,19 @@ function App() {
     Management: "Management",
     Administration: "Administration",
     Accounting: "Accounting",
-
+    Financials: "Financials",
+    Purchasing: "Purchasing",
+    Operations: "Operations",
+    Sales: "Sales",
+    CRM: "CRM",
+    "Support & Services": "SupportServices",
+    Inventory: "Inventory",
+    Distribution: "Distribution",
+    Production: "Production",
+    MRP: "MRP",
+    "Project Management": "ProjectManagement",
+    "Human Resources": "HumanResources",
+    "Report Generator": "ReportGenerator",
   };
 
   const moduleSubmoduleFileNames = {
@@ -211,6 +223,7 @@ function App() {
                       ${activeModule === module.id ? "active" : ""} 
                       ${hoveredModule === module.id ? "hovered" : ""}`}
                   onClick={() => {
+                    setIsSidebarOpen(true);
                     if (activeModule === module.id) {
                       // if it's already active, toggle off
                       setActiveModule(null);
