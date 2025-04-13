@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./AuthPages.css"; 
+import "./AuthPages.css";
 
 export default function StandaloneLogin() {
-  const [credentials, setCredentials] = useState({ 
-    username: "", 
-    password: "" 
+  const [credentials, setCredentials] = useState({
+    username: "",
+    password: ""
   });
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -19,8 +19,8 @@ export default function StandaloneLogin() {
   const handleLogin = (e) => {
     e.preventDefault();
     console.log("Logging in:", credentials);
-    // Replace with actual auth logic
-    navigate("/"); // Redirect to home after login
+    // auth logic
+    navigate("/"); // send to app.jsx [route in main.jsx]
   };
 
   return (
@@ -39,7 +39,7 @@ export default function StandaloneLogin() {
                   onChange={handleChange}
                   required
                 />
-                
+
                 <div className="password-wrapper">
                   <input
                     type={showPassword ? "text" : "password"}

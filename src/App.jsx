@@ -2,7 +2,7 @@ import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
 import SearchBar from "./shared/components/SearchBar";
-import { Navigate } from 'react-router-dom'; 
+import { Navigate } from 'react-router-dom';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -12,18 +12,18 @@ function App() {
   const [hoveredModule, setHoveredModule] = useState(null);
   const [hoveredSubModule, setHoveredSubModule] = useState(null);
   const [ModuleComponent, setModuleComponent] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // temp for now: authentication state
 
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
 
 
-  const [isAuthenticated]= useState(false);
-       if(!isAuthenticated) {
-      return <Navigate to="/login" replace />;
-    }
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
 
-  // Sync Scroll
+  // sync Scroll
   const handleScroll = (source) => {
     if (!iconsRef.current || !descsRef.current) return;
 
@@ -155,7 +155,7 @@ function App() {
     Production: {
       "Equipment and Labor": "Equipment&Labor",
       "Quality Control": "QualityControl",
-      "Cost of Production" : "CostOfProduction"
+      "Cost of Production": "CostOfProduction"
     },
     MRP: {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
@@ -224,7 +224,7 @@ function App() {
                       ${hoveredModule === module.id ? "hovered" : ""}`}
                   onClick={() => {
                     setActiveModule(module.id);
-                    setActiveSubModule(null); // Reset submodule when a main module is clicked
+                    setActiveSubModule(null); // reset submodule when a main module is clicked
                     setIsSidebarOpen(true);
                     loadMainModule(module.id); // load active module
                   }}
@@ -235,11 +235,10 @@ function App() {
                 </div>
 
                 <div
-                  className={`sidebar-submodule-empty-container ${
-                    isSidebarOpen && activeModule === module.id ? "opened" : ""
-                  }`}
+                  className={`sidebar-submodule-empty-container ${isSidebarOpen && activeModule === module.id ? "opened" : ""
+                    }`}
                 >
-                  {/* Submodules - Only show if this module is active */}
+                  {/* submodules - only show if this module is active */}
                   {moduleSubmoduleFileNames[module.id] &&
                     Object.keys(moduleSubmoduleFileNames[module.id]).map(
                       (submodule, index) => (
@@ -292,9 +291,8 @@ function App() {
                 </div>
 
                 <div
-                  className={`sidebar-submodule-empty-container ${
-                    isSidebarOpen && activeModule === module.id ? "opened" : ""
-                  }`}
+                  className={`sidebar-submodule-empty-container ${isSidebarOpen && activeModule === module.id ? "opened" : ""
+                    }`}
                 >
                   {/* Submodules - only show if the main module is active */}
                   {moduleSubmoduleFileNames[module.id] &&
@@ -330,18 +328,16 @@ function App() {
         <div className="header-body-container">
           <div className="header-navi">
             <div
-              className={`header-tabs-container ${
-                activeModule ? "visible" : "hidden"
-              }`}
+              className={`header-tabs-container ${activeModule ? "visible" : "hidden"
+                }`}
             >
               <img
                 src={`/icons/header-module-icons/${moduleFileNames[activeModule]}.png`}
                 alt={activeModule}
               />
               <p
-                className={`header-module-name ${
-                  !activeSubModule ? "active" : ""
-                }`}
+                className={`header-module-name ${!activeSubModule ? "active" : ""
+                  }`}
                 onClick={() => {
                   setActiveModule(activeModule);
                   loadMainModule(activeModule);
@@ -361,9 +357,8 @@ function App() {
             <div className="header-right-container">
               <SearchBar />
               <img
-                src={`/icons/Notification-${
-                  hasNotification ? "active-" : ""
-                }logo.png`}
+                src={`/icons/Notification-${hasNotification ? "active-" : ""
+                  }logo.png`}
                 alt="Notificaton-Logo"
                 onClick={() => setHasNotification(!hasNotification)}
               ></img>
