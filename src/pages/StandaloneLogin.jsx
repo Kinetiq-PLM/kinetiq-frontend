@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./AuthPages.css";
 
 export default function StandaloneLogin() {
   const [credentials, setCredentials] = useState({
-    username: "",
+    email: "",
     password: ""
   });
   const [rememberMe, setRememberMe] = useState(false);
@@ -16,11 +17,32 @@ export default function StandaloneLogin() {
     setCredentials(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     console.log("Logging in:", credentials);
-    // auth logic
-    navigate("/"); // send to app.jsx [route in main.jsx]
+
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/login/", {
+        email: credentials.email,
+        password: credentials.password,
+      });
+
+      const data = response.data;
+
+      if (data.success) {
+        console.log("Login successful:", data);
+        // save user info locally for next login?
+        // localStorage.setItem("user", JSON.stringify(data.data));
+
+        navigate("/"); // redirect to homepage or dashboard
+      } else {
+        console.error("Login failed:", data.message);
+        alert(data.message); // Optional: show error to user
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      //alert("Login failed. Please try again.");
+    }
   };
 
   return (
@@ -33,9 +55,9 @@ export default function StandaloneLogin() {
               <form onSubmit={handleLogin}>
                 <input
                   type="text"
-                  name="username"
+                  name="email"
                   placeholder="Username or Email"
-                  value={credentials.username}
+                  value={credentials.email}
                   onChange={handleChange}
                   required
                 />
