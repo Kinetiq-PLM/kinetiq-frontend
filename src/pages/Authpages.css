@@ -2,7 +2,7 @@
 .login-container, .signup-container {
     height: 100vh;
     width: 100vw;
-    background: linear-gradient(135deg, #c0e8e6 0%, #97e2dd 100%);
+    background: linear-gradient(135deg, #016761 0%, #97e2dd 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -39,6 +39,7 @@
     background: #d6f1f0;
     padding: 40px;
   }
+
   
   
   
@@ -171,6 +172,14 @@
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
+input:-webkit-autofill {
+  background-color: white !important; 
+  color: #000 !important;          
+  box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-text-fill-color: #000 !important; 
+  transition: background-color 5000s ease-in-out 0s;
+}
 
 
   .signup-btn {
