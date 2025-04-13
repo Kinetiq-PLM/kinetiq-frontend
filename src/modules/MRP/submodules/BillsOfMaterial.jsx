@@ -13,27 +13,21 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const bomDetails = [
         { no: 1, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar",qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600},
         { no: 1, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar",qtyRawMaterial: 50, unit: "kg", costPerUnit: 12000, totalCost: 6000},
-        
     ];
+
+    const bomCostDetails = {
+        rawMaterial: 40000.80,
+        subtotal: 10000,
+        production: 40000.80,
+        labor: 40000.80,
+        total: 90001.60
+    };
+
     const cellStyle = (width) => ({
-        width,
-        alignSelf: 'stretch',
-        background: 'rgba(255, 255, 255, 0)',
-        borderLeft: '1px #E8E8E8 solid',
-        borderTop: '1px #E8E8E8 solid',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '10px 12px',
-        color: '#585757',
-        fontSize: 18,
-        fontFamily: 'Inter',
-        fontWeight: 400,
-        textAlign: 'center',
-        lineHeight: 1,
-        wordWrap: 'break-word'
+        width, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px 12px', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 400, textAlign: 'center', lineHeight: 1, wordWrap: 'break-word'
     });
     
+    const dynamicHeight = 1191 + (bomDetails.length - 5) * 36;
 
     return (
         <div className="bom">
@@ -121,11 +115,12 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 </div>
             </div>
             {printBOM && (
-                <div className="bom-print-modal">
+                <div className="bom-print-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="bom-print-content" onClick={(e) => e.stopPropagation()}>
-                <div className="fixed inset-0 flex items-center justify-center">
-                <div style={{width: 1128, height: 1191, position: 'relative', background: 'white', boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.08)', overflow: 'hidden'}}>
-                    <div style={{width: 1128, height: 1, left: 0, top: 104, position: 'absolute'}} />
+                <div className="scroll-container">
+
+                <div style={{width: 1128,height: dynamicHeight, position: 'relative', background: 'white', overflow: 'hidden'}}>
+                    <div style={{width: 1128, left: 0, top: 104, position: 'absolute'}} />
                     <div style={{left: 663, top: 67, position: 'absolute', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                         <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 387, display: 'flex'}}>
                             <div style={{width: 231, height: 28}} />
@@ -154,11 +149,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     <div style={{width: 135, left: 728, top: 516, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Status</div>
                     <div style={{width: 127, left: 861, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>Project</div>
                     <div style={{width: 125, left: 863, top: 514, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>Pending</div>
-                    <div data-property-1="Disabled" style={{width: 140, height: 35, padding: 10, left: 935, top: 1107, position: 'absolute', background: '#00A8A8', borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
-                        <div style={{color: 'white', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Download</div>
-                    </div>
-                    <div style={{width: 1047, height: 288, left: 40, top: 577, position: 'absolute', background: 'var(--Background-Default-Default, white)', overflow: 'hidden', borderRadius: 8, outline: '1px #D2D2D2 solid', outlineOffset: '-1px'}}>
-                        <div style={{width: 1047, left: 0, top: 0, position: 'absolute', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+                    
+                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 580}}>
+                        <div style={{width: 1047, marginTop: 40, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                             <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                                 <div style={{alignSelf: 'stretch', background: 'white', overflow: 'hidden', outline: '1px #E8E8E8 solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                                     <div style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
@@ -218,80 +211,40 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div style={{width: 391, left: 684, top: 896, position: 'absolute', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                        <div style={{alignSelf: 'stretch', background: 'white', overflow: 'hidden', borderRadius: 4, outline: '1px white solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
-                            <div style={{alignSelf: 'stretch', height: 36, background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div data-type="Default" style={{width: 223, height: 41, background: 'rgba(255, 255, 255, 0)', borderLeft: '1px white solid', borderTop: '1px white solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', color: '#111111', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>Total Cost of Raw Materials</div>
+                        <div style={{ width: 391, marginTop: 30, alignSelf: 'flex-end', display: 'flex', flexDirection: 'column', paddingRight: 30}}>
+                            <div style={{ background: 'white', overflow: 'hidden', borderRadius: 4, outline: '1px white solid', outlineOffset: '-1px', flexDirection: 'column', display: 'flex' }}>
+                                {[
+                                { label: 'Total Cost of Raw Materials', value: bomCostDetails.rawMaterial, strong: false },
+                                { label: 'Subtotal:', value: bomCostDetails.subtotal, strong: true },
+                                { label: 'Cost of Production', value: bomCostDetails.production, strong: false },
+                                { label: 'Labor Cost', value: bomCostDetails.labor, strong: false },
+                                { label: 'Total Cost:', value: bomCostDetails.total, strong: true }
+                                ].map((item, index) => (
+                                    <div key={index} style={{ display: 'flex', height: 36 }}>
+                                        <div style={{width: 223,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,color: item.strong ? '#1C1C1C' : '#111111',fontFamily: 'Inter',display: 'flex',alignItems: 'center'}}>
+                                            {item.label}
+                                        </div>
+                                        <div style={{ width: 168,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,textAlign: 'right',color: item.strong ? '#1C1C1C' : '#585757',fontFamily: 'Inter',display: 'flex',justifyContent: 'flex-end', alignItems: 'center'}}>
+                                            ₱{item.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        </div>
                                     </div>
-                                </div>
-                                <div data-type="Default" style={{width: 168, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px white solid', borderTop: '1px white solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'right', color: '#585757', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>₱40,000.80</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{alignSelf: 'stretch', height: 36, background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div data-type="Header" style={{width: 223, height: 41, background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px white solid', borderTop: '1px white solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', color: '#1C1C1C', fontSize: 16, fontFamily: 'Inter', fontWeight: '600', lineHeight: 1, wordWrap: 'break-word'}}>Subtotal:</div>
-                                    </div>
-                                </div>
-                                <div data-type="Header" style={{width: 168, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px white solid', borderTop: '1px white solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'right', color: '#1C1C1C', fontSize: 16, fontFamily: 'Inter', fontWeight: '600', lineHeight: 1, wordWrap: 'break-word'}}>₱10,000</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{alignSelf: 'stretch', height: 36, background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div data-type="Default" style={{width: 223, height: 41, background: 'rgba(255, 255, 255, 0)', borderLeft: '1px white solid', borderTop: '1px white solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', color: '#111111', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>Cost of Production</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 168, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px white solid', borderTop: '1px white solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'right', color: '#585757', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>₱40,000.80</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{alignSelf: 'stretch', height: 36, background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div data-type="Default" style={{width: 223, height: 41, background: 'rgba(255, 255, 255, 0)', borderLeft: '1px white solid', borderTop: '1px white solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', color: '#111111', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>Labor Cost</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 168, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px white solid', borderTop: '1px white solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'right', color: '#585757', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>₱40,000.80</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{alignSelf: 'stretch', height: 36, background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div data-type="Default" style={{width: 223, height: 41, background: 'rgba(255, 255, 255, 0)', borderLeft: '1px white solid', borderTop: '1px white solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', color: '#1C1C1C', fontSize: 16, fontFamily: 'Inter', fontWeight: '600', lineHeight: 1, wordWrap: 'break-word'}}>Total Cost:</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 168, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px white solid', borderTop: '1px white solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'right', color: '#1C1C1C', fontSize: 16, fontFamily: 'Inter', fontWeight: '600', lineHeight: 1, wordWrap: 'break-word'}}>₱90,001.60</div>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
-                    </div>
-                    <div style={{width: 115, height: 35, paddingTop: 8, paddingBottom: 8, paddingLeft: 72, paddingRight: 24, left: 52, top: 1107, position: 'absolute', background: 'white', overflow: 'hidden', borderRadius: 8, outline: '1.50px #A4A4A4 solid', outlineOffset: '-1.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                        <button onClick={() => setPrintBOM(false)}><div style={{width: 130, justifyContent: 'center', alignItems: 'center', gap: 13, display: 'inline-flex'}}>
-                            <div style={{justifyContent: 'center', alignItems: 'center', paddingTop: 8, gap: 0, display: 'inline-flex'}}>
-                                <div className="MRPIcon3" style={{width: 15, height: 21, paddingRight: 25 }} />
-                                <div style={{width: 90, paddingLeft: 0, paddingRight: 2, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#969696', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>back</div>
+                        <button onClick={() => setPrintBOM(false)} style={{ marginTop: 30 }}><div style={{width: 115, height: 35, paddingTop: 8, paddingBottom: 8, paddingLeft: 72, paddingRight: 24, left: 52, position: 'absolute', background: 'white', overflow: 'hidden', borderRadius: 8, outline: '1.50px #A4A4A4 solid', outlineOffset: '-1.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                            <div style={{width: 130, justifyContent: 'center', alignItems: 'center', gap: 13, display: 'inline-flex'}}>
+                                <div style={{justifyContent: 'center', alignItems: 'center', gap: 0, display: 'inline-flex'}}>
+                                    <div className="MRPIcon3" style={{width: 15, height: 21, paddingRight: 25 }} />
+                                    <div style={{width: 90, paddingLeft: 0, paddingRight: 2, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                                        <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#969696', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>back</div>
+                                    </div>
                                 </div>
                             </div>
                         </div></button>
+                        <button onClick={() => {window.print();}}><div data-property-1="Disabled" style={{width: 140, height: 35, padding: 10, left: 935, position: 'absolute', background: '#00A8A8', borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
+                            <div style={{color: 'white', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Download</div>
+                        </div></button>
+                        
                     </div>
                     <img style={{width: 132.34, height: 196, left: 91, top: 170, position: 'absolute'}} src="/icons/module-icons/MRP-icons/MRPBOMLogo.png" />
                 </div>

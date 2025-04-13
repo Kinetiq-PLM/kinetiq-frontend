@@ -62,33 +62,39 @@
   background-repeat: no-repeat;
 }
 
-/* Modal wrapper with scroll and grey bg */
 .bom-print-modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  overflow-y: auto;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 9999;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  overflow-y: auto; /* scroll the modal when needed */
+  padding: 2rem 1rem; /* top space */
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Start at top */
-  padding: 2rem;
-   /* optional */
+  align-items: flex-start; /* aligns modal to top */
+  overflow-x: hidden;
 }
 
-/* Inner content wrapper */
-.bom-print-content {
-  position: relative;
+.bom-print-wrapper {
+  width: 1128px;
   background: white;
-  border-radius: 16px;
-  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
-  max-width: 1128px;
-  width: 100%;
+  max-height: 90vh;
+  border-radius: 10px;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.15);
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
 }
 
+.scroll-container {
+  overflow-y: auto;
+  max-height: 85vh;
+  padding: 1rem;
+  overflow-x: hidden;
+}
 
 .bom .title {
   font-size: clamp(24px, 5vw, 35px);
@@ -96,3 +102,42 @@
   text-transform: capitalize;
   letter-spacing: 1.4px;
 }
+
+
+.scroll-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background-color: #c3c3c3;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #00A8A8;
+  border-radius: 8px;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .bom-print-modal, .bom-print-modal * {
+    visibility: visible;
+  }
+
+  .bom-print-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+  }
+
+  button {
+    display: none !important;
+  }
+}
+
