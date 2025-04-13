@@ -1,4 +1,4 @@
-/* REMINDER! All of your elements must use your unique namespace '.prod' at the start to avoid leaking*/
+
 
 .prod {
   display: flex;
@@ -154,7 +154,7 @@
   border: 1px solid #ffffff;
   background-color: #fff;
   border-radius: 8px;
-  width: 625px;
+  width: 730px;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
@@ -171,49 +171,6 @@
   border-color: #a09c9c;
   border: 2px solid #A4A4A4;
   outline: none;
-}
-
-
-.prod .edit-btn {
-  background: #087D7D;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  border: none;
-  padding: 3px 3px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-  width: 96px;
-  height: 37px;
-  gap: 8px;
-  transform: scale(0.98);
-  flex-shrink: 0;
-  transform: scale(0.98);
-
-  .edit-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    /* Adds space between icon & text */
-    padding: 10px;
-  }
-
-  .edit-icon {
-    width: 20px;
-    /* Adjust size as needed */
-    height: 20px;
-  }
-}
-
-.prod .edit-btn:hover {
-  background: #00A8A8;
-}
-
-.prod .edit-btn:active {
-  background: #098F8F;
-  transform: scale(0.98);
 }
 
 
@@ -272,7 +229,6 @@
 }
 
 
-.edit-btn,
 .add-btn {
   border-radius: 10px;
   border: 1.5px solid #00A8A8;
@@ -282,11 +238,13 @@
   transition: 0.3s;
 }
 
-.edit-btn:hover,
 .add-btn:hover {
   background: #00A8A8;
   color: white;
 }
+
+
+
 
 .prod .big-container-wrapper {
   display: flex;

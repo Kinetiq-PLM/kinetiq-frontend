@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./styles/Production.css";
-import EditIcon from "../../modules/Production/icons/Edit-Square-Icon.png";
 
 const BodyContent = () => {
     const [selectedOption, setSelectedOption] = useState("All Projects");
@@ -70,147 +69,46 @@ const BodyContent = () => {
                                     value={searchQuery}
                                     onChange={handleSearchChange}
                                 />
-                                <button className="edit-btn" onClick={openModal}>
-                                    <img src="/icons/Edit-Square-Icon.png" alt="Edit Icon" className="edit-icon" />
-                                    Edit
-                                </button>
 
                             </div>
                         </div>
 
 
                         <div className="big-container-wrapper">
-                            <div className="dashboard-container">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Production Order ID</th>
-                                            <th>Task ID</th>
-                                            <th>BOM ID</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
-                                            <th>Target Quantity</th>
-                                            <th>Remarks</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                                <table>
-                                    <div className="table-container">
-                                        <tr>
-                                            <td style={{ fontWeight: "bold", }}>P0OO1</td>
-                                            <td>111201</td>
-                                            <td>null</td>
-                                            <td>2024-03-05 </td>
-                                            <td>2024-03-15 </td>
-                                            <td>10</td>
-                                            <td>Make it blue.</td>
-                                            <td><button>Completed</button></td>
+  <div className="dashboard-container">
+    <div className="table-container">
+      <table className="production-table">
+        <thead>
+          <tr>
+            <th>Production Order ID</th>
+            <th>Task ID</th>
+            <th>BOM ID</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Target Quantity</th>
+            <th>Remarks</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[...Array(10)].map((_, index) => (
+            <tr key={index}>
+              <td style={{ fontWeight: "bold" }}>P0OO1</td>
+              <td>111201</td>
+              <td>null</td>
+              <td>2024-03-05</td>
+              <td>2024-03-15</td>
+              <td>10</td>
+              <td>Make it blue.</td>
+              <td><button className="status-btn">Completed</button></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
-                                        </tr>
-                                        <tr>
-                                            <td style={{ fontWeight: "bold", }}>P0OO1</td>
-                                            <td>111201</td>
-                                            <td>null</td>
-                                            <td>2024-03-05 </td>
-                                            <td>2024-03-15 </td>
-                                            <td>10</td>
-                                            <td>Make it blue.</td>
-                                            <td><button>Completed</button></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td style={{ fontWeight: "bold", }}>P0OO1</td>
-                                            <td>111201</td>
-                                            <td>null</td>
-                                            <td>2024-03-05 </td>
-                                            <td>2024-03-15 </td>
-                                            <td>10</td>
-                                            <td>Make it blue.</td>
-                                            <td><button>Completed</button></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td style={{ fontWeight: "bold", }}>P0OO1</td>
-                                            <td>111201</td>
-                                            <td>null</td>
-                                            <td>2024-03-05 </td>
-                                            <td>2024-03-15 </td>
-                                            <td>10</td>
-                                            <td>Make it blue.</td>
-                                            <td><button>Completed</button></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td style={{ fontWeight: "bold", }}>P0OO1</td>
-                                            <td>111201</td>
-                                            <td>null</td>
-                                            <td>2024-03-05 </td>
-                                            <td>2024-03-15 </td>
-                                            <td>10</td>
-                                            <td>Make it blue.</td>
-                                            <td><button>Completed</button></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td style={{ fontWeight: "bold", }}>P0OO1</td>
-                                            <td>111201</td>
-                                            <td>null</td>
-                                            <td>2024-03-05 </td>
-                                            <td>2024-03-15 </td>
-                                            <td>10</td>
-                                            <td>Make it blue.</td>
-                                            <td><button>Completed</button></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td style={{ fontWeight: "bold", }}>P0OO1</td>
-                                            <td>111201</td>
-                                            <td>null</td>
-                                            <td>2024-03-05 </td>
-                                            <td>2024-03-15 </td>
-                                            <td>10</td>
-                                            <td>Make it blue.</td>
-                                            <td><button>Completed</button></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td style={{ fontWeight: "bold", }}>P0OO1</td>
-                                            <td>111201</td>
-                                            <td>null</td>
-                                            <td>2024-03-05 </td>
-                                            <td>2024-03-15 </td>
-                                            <td>10</td>
-                                            <td>Make it blue.</td>
-                                            <td><button>Completed</button></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td style={{ fontWeight: "bold", }}>P0OO1</td>
-                                            <td>111201</td>
-                                            <td>null</td>
-                                            <td>2024-03-05 </td>
-                                            <td>2024-03-15 </td>
-                                            <td>10</td>
-                                            <td>Make it blue.</td>
-                                            <td><button>Completed</button></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td style={{ fontWeight: "bold", }}>P0OO1</td>
-                                            <td>111201</td>
-                                            <td>null</td>
-                                            <td>2024-03-05 </td>
-                                            <td>2024-03-15 </td>
-                                            <td>10</td>
-                                            <td>Make it blue.</td>
-                                            <td><button>Completed</button></td>
-                                        </tr>
-
-                                    </div>
-                                </table>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -223,7 +121,7 @@ const BodyContent = () => {
                                 <thead>
                                     <tr>
                                         <th>Task ID</th>
-                                        <th>Date Ordered</th>
+                                        <th>Due Date</th>
                                         <th></th>
                                     </tr>
                                 </thead>

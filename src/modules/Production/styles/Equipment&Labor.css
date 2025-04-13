@@ -1,4 +1,3 @@
-/* REMINDER! All of your elements must use your unique namespace '.manuproc' at the start to avoid leaking */
 
 .equimaprod {
   flex: auto;
@@ -132,7 +131,6 @@
 
 .equimaprodsearch-bar {
   padding: 8px 5px 8px 20px;
-  flex-shrink: 0;
   font-size: 15px;
   font-family: Inter;
   font-style: normal;

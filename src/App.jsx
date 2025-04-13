@@ -129,7 +129,7 @@ function App() {
     },
     Production: {
       "Equipment and Labor": "Equipment&Labor",
-      "Cost of Production" : "CostOfProduction"
+      "Cost of Production" : "CostOfProduction",
     },
     MRP: {
       "Material Requirements Planning": "MaterialRequirementsPlanning",

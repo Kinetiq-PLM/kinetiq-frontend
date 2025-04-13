@@ -20,7 +20,7 @@ const BodyContent = () => {
     return (
         <div className="equimaprod">
             <div className="equimaprod-header-section">
-                <h1>Equipment & Materials</h1>
+                <h1>Equipment & Labor</h1>
             </div>
 
             <div className="equimaprodcolumns">

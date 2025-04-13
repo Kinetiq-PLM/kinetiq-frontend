@@ -5,7 +5,6 @@
 
 .costprodcolumns {
   display: flex;
-  flex: 1;
   padding: 3px;
   gap: 30px;
 }
@@ -18,7 +17,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
-
+width: 100%;
   h1 {
     font-family: Inter;
     font-size: 36px;
@@ -29,12 +28,15 @@
 
 }
 
-
+.column-expanded{
+  max-width: 60%;
+}
 
 .costprodbutton-group {
   display: flex;
   align-items: center;
   gap: 20px;
+  padding-top: 16px;
 }
 
 .costprods-bar {
@@ -48,35 +50,17 @@
   border: 1px solid #ffffff;
   background-color: #fff;
   border-radius: 8px;
-  width: 540px;
+  width: 100%;
   height: 35px;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   display: flex;
-  padding-left: 10px;
-  padding-right: 10px;
   gap: 10px;
-
 }
 
-.costprodrefresh-button {
-  color: #FFF;
-  text-align: center;
-  font-family: Inter;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  width: 230px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  background: #00A8A8;
-
-}
 
 .costprotable {
   background-color: white;
-  width: 800px;
+  width: 100%;
   height: 400px;
   border-radius: 12px;
   padding: 10px;
@@ -165,19 +149,33 @@ border-bottom: 1px solid #ddd;
   background: #007878;
 }
 
-
+.rework-header{
+  color: #000000;
+  padding-bottom: 20PX;
+font-family: Inter;
+font-size: 36px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+}
 
 .rework-cost-container {
   padding: 1rem;
   overflow-x: auto;
-  background-color: white;
-  border-radius: 8px;
+  height: 100%;
+  background-color: rgb(255, 255, 255);
+  padding: 1rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .rework-cost-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed; 
+  background-color: rgb(255, 255, 255);
+ 
+
  
 h1{
   font-weight: 500px;
@@ -205,6 +203,11 @@ h1{
   white-space: normal;
   vertical-align: top;
   font-size: 10px;
+  font-family: Inter;
+font-size: 12px;
+font-style: normal;
+font-weight: 500;
+line-height: normal;
 }
 
 
@@ -216,4 +219,43 @@ h1{
   border-radius: 6px;
   box-sizing: border-box;
   font-family: inherit;
+}
+
+.rework-cost-table input[type="text"]:focus {
+  border-color: #00A8A8;
+  outline: none;
+  background-color: #fff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+}
+
+
+.rework-cost-table {
+  max-height: 400px;
+  overflow-y: auto;
+  display: block;
+  border-collapse: collapse;
+}
+
+
+.rework-cost-table::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rework-cost-table::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 10px;
+}
+
+.rework-cost-table::-webkit-scrollbar-thumb {
+  background-color: #00A8A8;
+  border-radius: 10px;
+  border: 2px solid #f0f0f0;
+}
+
+/* Optional: Make the table headers stick */
+.rework-cost-table thead tr {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 1;
 }

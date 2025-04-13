@@ -5,14 +5,21 @@ const BodyContent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTable, setActiveTable] = useState("costProduction");
 
- 
+  const productionData = Array(7).fill().map((_, index) => ({
+    id: `PO00${index + 1}`,
+    actualQuantity: 10,
+    costProduction: "1,500.00",
+    miscCost: "50.00",
+    reworkRequired: "null",
+    reworkNotes: "null",
+  }));
 
   return (
     <div className="costprod">
       <div className="costprodcolumns">
         <div className="column-expanded">
           <div className="costprodheader-section">
-            <h1>Cost of Production & Miscellaneous Costs</h1>
+            <h1>Cost of Production & Rework Cost</h1>
             <div className="costprodbutton-group">
               <div className="costprods-bar">
                 <img
@@ -27,7 +34,6 @@ const BodyContent = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <button className="costprodrefresh-button">Refresh</button>
             </div>
           </div>
 
@@ -36,78 +42,63 @@ const BodyContent = () => {
               <thead>
                 <tr>
                   <th>Production Order ID</th>
-                  <th>Project ID</th>
                   <th>Actual Quantity</th>
                   <th>Cost of Production</th>
                   <th>Miscellaneous Cost</th>
+                  <th>Rework Required</th>
+                  <th>Rework Notes</th>
                 </tr>
               </thead>
               <tbody>
-                {Array(7)
-                  .fill()
-                  .map((_, index) => (
-                    <tr key={index}>
-                      <td>
-                        <h1>PO00{index + 1}</h1>
-                      </td>
-                      <td>111201</td>
-                      <td>10</td>
-                      <td>1,500.00</td>
-                      <td>50.00</td>
-                    </tr>
-                  ))}
+                {productionData.map((item, index) => (
+                  <tr key={index}>
+                    <td><h1>{item.id}</h1></td>
+                    <td>{item.actualQuantity}</td>
+                    <td>{item.costProduction}</td>
+                    <td>{item.miscCost}</td>
+                    <td>{item.reworkRequired}</td>
+                    <td>{item.reworkNotes}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
 
-
-      <div className="rework-cost-container">
-  <div className="rework-cost">
-    <table className="rework-cost-table">
-      <thead>
-        <tr>
-          <th>Production Order Details ID</th>
-          <th>Rework Cost</th>
-          <th>Total Additional Cost</th>
-          <th>Total Additional Miscellaneous Cost</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><h1>PO001</h1></td>
-          <td><input type="text" value="1,500.00" /></td>
-          <td><input type="text" value="50.00" /></td>
-          <td><input type="text" value="50.00" /></td>
-        </tr>
-
-        <tr>
-          <td><h1>PO001</h1></td>
-          <td><input type="text" value="1,500.00" /></td>
-          <td><input type="text" value="50.00" /></td>
-          <td><input type="text" value="50.00" /></td>
-        </tr>
-
-        <tr>
-          <td><h1>PO001</h1></td>
-          <td><input type="text" value="1,500.00" /></td>
-          <td><input type="text" value="50.00" /></td>
-          <td><input type="text" value="50.00" /></td>
-        </tr>
-        
-      </tbody>
-    </table>
-  </div>
-</div>
-
+        <div className="rework-cost-container">
+          <div className="rework-header">Additional Cost </div>
+          <div className="rework-cost">
+            <table className="rework-cost-table">
+              <thead>
+                <tr>
+                  <th>Production Order ID</th>
+                  <th>Additional Cost</th>
+                  <th>Additional Miscellaneous Cost</th>
+                  <th>Total Rework Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productionData.map((item, index) => (
+                  <tr key={index}>
+                    <td><h1>{item.id}</h1></td>
+                    <td><input type="text" defaultValue={item.costProduction} /></td>
+                    <td><input type="text" defaultValue={item.miscCost} /></td>
+                    <td>
+                      <input
+                        type="text"
+                        defaultValue={(parseFloat(item.costProduction.replace(/,/g, "")) + parseFloat(item.miscCost)).toFixed(2)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
       </div>
     </div>
   );
 };
-
-
-
-
 
 export default BodyContent;
