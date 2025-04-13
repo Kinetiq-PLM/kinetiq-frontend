@@ -37,6 +37,7 @@
     justify-content: center;
     align-items: center;
     background: #d6f1f0;
+    padding: 40px;
   }
   
   
@@ -155,11 +156,13 @@
     font-size: 0.95rem;
   }
   
-  /* Right Side Image */
   .kinetiq-logo {
-    max-width: 180px;
+    width: 400px;
     height: auto;
-  }
+    max-width: 100%; 
+    object-fit: contain; 
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
 
 
 
