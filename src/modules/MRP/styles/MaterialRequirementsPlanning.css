@@ -120,3 +120,10 @@
   max-width: 1128px;
   width: 100%;
 }
+
+.reqplan .title {
+  font-size: clamp(24px, 5vw, 35px);
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 1.4px;
+}
