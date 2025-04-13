@@ -380,7 +380,7 @@ const Reporting = ({ loadSubModule, setActiveSubModule }) => {
 
           <div className="flex-1/5">
             <div className="flex flex-col gap-4 font-medium text-sm">
-              <div className="bg-white rounded-lg p-4 flex flex-col gap-2">
+              <div className="bg-white rounded-lg p-4 flex flex-col gap-2 shadow">
                 <span>Gross Profits</span>
                 <span className="text-xl">
                   {totalProfit.toLocaleString("en-US", {
@@ -389,13 +389,13 @@ const Reporting = ({ loadSubModule, setActiveSubModule }) => {
                   })}
                 </span>
               </div>
-              <div className="bg-white rounded-lg p-4 flex flex-col">
+              <div className="bg-white rounded-lg p-4 flex flex-col shadow">
                 <span>Sold</span>
                 <span className="text-xl">
                   {totalSold.toLocaleString("en-US")}
                 </span>
               </div>
-              <div className="bg-white rounded-lg p-4 flex flex-col">
+              <div className="bg-white rounded-lg p-4 flex flex-col shadow">
                 <span>Top Customer</span>
                 <span className="text-xl">
                   {customerReportData.length > 0
@@ -403,7 +403,7 @@ const Reporting = ({ loadSubModule, setActiveSubModule }) => {
                     : "-"}
                 </span>
               </div>
-              <div className="bg-white rounded-lg p-4 flex flex-col">
+              <div className="bg-white rounded-lg p-4 flex flex-col shadow">
                 <span>Top Sales Employee - Sales Revenue</span>
                 <span className="text-xl">
                   {employeeReportData.length > 0
@@ -411,7 +411,7 @@ const Reporting = ({ loadSubModule, setActiveSubModule }) => {
                     : "-"}
                 </span>
               </div>
-              <div className="bg-white rounded-lg p-4 flex flex-col">
+              <div className="bg-white rounded-lg p-4 flex flex-col shadow">
                 <span>Top Sales Employee - Closed Deals</span>
                 <span className="text-xl">
                   {employeeDealsData.length > 0
@@ -424,7 +424,7 @@ const Reporting = ({ loadSubModule, setActiveSubModule }) => {
         </div>
 
         {/* THIRD ROW */}
-        <div className="bg-white rounded-lg p-6 w-full shadow flex flex-col gap-6">
+        <div className="bg-white rounded-lg p-6 w-full flex flex-col gap-6 shadow">
           <h1 className="font-bold text-2xl text-[#1c1c1c] mt-2 mb-1 text-center">
             Top Sales Employee Report
           </h1>
