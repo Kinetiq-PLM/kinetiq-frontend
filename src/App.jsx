@@ -3,6 +3,7 @@ import "./App.css";
 import "./MediaQueries.css";
 import SearchBar from "./shared/components/SearchBar";
 import { Navigate, useNavigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -120,6 +121,8 @@ function App() {
   }, [activeSubModule]);
 
   // sync Scroll
+  const queryClient = new QueryClient();
+  // Sync Scroll
   const handleScroll = (source) => {
     if (!iconsRef.current || !descsRef.current) return;
 
@@ -141,20 +144,19 @@ function App() {
           /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
         )
       );
-
       setModuleComponent(() => LazyComponent);
     }
   };
 
   // load jsx files for submodules
-  const loadSubModule = (submoduleId) => {
+  const loadSubModule = (submoduleId, mainModule = activeModule) => {
     if (
-      moduleSubmoduleFileNames[activeModule][submoduleId]
-      //&& !(activeSubModule == submoduleId)
+      moduleSubmoduleFileNames[mainModule][submoduleId] &&
+      !(activeSubModule == submoduleId)
     ) {
       const LazyComponent = lazy(() =>
         import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[activeModule]}/submodules/${moduleSubmoduleFileNames[activeModule][submoduleId]}.jsx`
+          /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
         )
       );
 
@@ -231,23 +233,22 @@ function App() {
       "Delivery Receipt": "DeliveryReceipt",
       "Item Removal": "ItemRemoval",
     },
-    "Sales": {
-      "Quotation": "Quotation",
-      "Order": "Order",
-      "Delivery": "Delivery",
-      "Invoice": "Invoice",
+    Sales: {
+      Quotation: "Quotation",
+      Order: "Order",
+      Delivery: "Delivery",
+      // Invoice: "Invoice",
+      // "Blanket Agreement": "BlanketAgreement",
       "Master List": "MasterList",
-      "Dunning": "Dunning",
-      "Reporting": "Reporting",
-      "Returns": "Returns",
-      "Contact Management": "ContactManagement",
-      "Marketing": "Marketing",
-      "Customer Support": "CustomerSupport",
+      Reporting: "Reporting",
+      // Return: "Return",
     },
-    "CRM": {
-      "Contact Management": "ContactManagement",
-      "Marketing": "Marketing",
-      "Customer Support": "CustomerSupport",
+    CRM: {
+      Ticket: "Ticket",
+      Campaign: "Campaign",
+      "Partner Master Data": "PartnerMasterData",
+      Opportunity: "Opportunity",
+      Support: "Support",
     },
     "Support & Services": {
       "Service Ticket": "ServiceTicket",
@@ -532,7 +533,7 @@ function App() {
                 )}
               </div>}
               <div className="header-profile-container">
-                <div className="header-profile-icon-wrapper" onClick={handleLogout}>
+              <div className="header-profile-icon-wrapper" onClick={handleLogout}>
                   <div className="header-profile-icon">
                     {" "}
                     <p>C</p>
@@ -542,16 +543,19 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="body-container">
-            {ModuleComponent && (
-              <Suspense>
-                <ModuleComponent
-                  loadSubModule={loadSubModule}
-                  setActiveSubModule={setActiveSubModule}
-                />
-              </Suspense>
-            )}
-          </div>
+          <QueryClientProvider client={queryClient}>
+            <div className="body-container">
+              {ModuleComponent && (
+                <Suspense>
+                  <ModuleComponent
+                    setActiveModule={setActiveModule}
+                    loadSubModule={loadSubModule}
+                    setActiveSubModule={setActiveSubModule}
+                  />
+                </Suspense>
+              )}
+            </div>
+          </QueryClientProvider>
         </div>
       </div>
     </div>
