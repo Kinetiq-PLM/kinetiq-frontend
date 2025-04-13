@@ -527,6 +527,7 @@ img {
   flex-direction: column;
   -webkit-overflow-scrolling: touch;
   border-radius: 0.3rem;
+  z-index: 999;
 
 
   background: /* Shadow covers */
