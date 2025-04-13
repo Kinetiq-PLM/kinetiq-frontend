@@ -34,7 +34,7 @@ export default function StandaloneLogin() {
                 <input
                   type="text"
                   name="username"
-                  placeholder="Username or email"
+                  placeholder="Username or Email"
                   value={credentials.username}
                   onChange={handleChange}
                   required

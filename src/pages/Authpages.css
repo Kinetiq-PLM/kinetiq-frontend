@@ -2,7 +2,7 @@
 .login-container, .signup-container {
     height: 100vh;
     width: 100vw;
-    background: #d6f1f0;
+    background: linear-gradient(135deg, #c0e8e6 0%, #97e2dd 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -29,7 +29,7 @@
     justify-content: center;
     align-items: center;
     padding: 0rem;
-    border: 1px solid red;
+
 }
   .login-right, .signup-right{
     flex: 1;
@@ -37,7 +37,6 @@
     justify-content: center;
     align-items: center;
     background: #d6f1f0;
-    border: 1px solid blue;
   }
   
   
@@ -48,7 +47,7 @@
     padding: 2.5rem;
     border-radius: 12px;
     width: 100%;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 20px rgba(0, 167, 167, 0.15);
     margin: 0 auto;
     height: 100%;
     display: flex;
@@ -57,12 +56,15 @@
   }
   
   .login-form h2, .signup-form h2 {
-    font-size: 2rem;
-    margin-bottom: 20px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 30px;
     color: #00a7a7;
+    letter-spacing: 1px;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.8rem;
   }
   
   /* Form Elements */
@@ -71,9 +73,10 @@
   input[type="password"] {
     width: 100%;
     padding: 12px 14px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     font-size: 1rem;
     border-radius: 8px;
+    background-color: #f0f0f0;
     border: 1px solid #ccc;
   }
   
@@ -95,18 +98,20 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.95rem;
-    margin-bottom: 20px;
+    margin-bottom: 0.5rem 0 1.5rem;
   }
   
   .remember-me {
     display: flex;
     align-items: center;
     gap: 5px;
+    margin-bottom: 20px;
   }
   
   .forgot-password {
     color: teal;
     text-decoration: none;
+    margin-bottom: 20px;
   }
   
   /* Buttons */
