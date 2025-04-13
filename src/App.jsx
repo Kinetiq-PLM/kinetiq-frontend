@@ -2,6 +2,7 @@ import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
 import SearchBar from "./shared/components/SearchBar";
+import UserProfile from "./shared/components/UserProfile";
 import { Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -17,6 +18,8 @@ function App() {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showUserProfile, setShowUserProfile] = useState(false);
+
   const displayName = user
     ? `${user.first_name} ${user.last_name?.charAt(0)}.`
     : '';
@@ -188,6 +191,7 @@ function App() {
       );
 
       setModuleComponent(() => WrappedComponent);
+      setShowUserProfile(false);
     }
   };
 
@@ -208,6 +212,8 @@ function App() {
         />
       );
       setModuleComponent(() => WrappedComponent);
+
+      setShowUserProfile(false);
     }
   };
 
@@ -346,6 +352,8 @@ function App() {
       "Data Visualization": "DataVisualization",
     },
   };
+
+
 
   const rawPermissions = user?.role?.permissions || "";
   const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
@@ -599,7 +607,7 @@ function App() {
 
                   <div className="dropdown-divider"></div>
 
-                  <div className="dropdown-item" onClick={() => navigate('/settings')}>Settings</div>
+                  <div className="dropdown-item" onClick={() => setShowUserProfile(true)}>Settings</div>
                   <div className="dropdown-item" onClick={handleLogout}>Logout</div>
                 </div>
               )}
@@ -617,17 +625,28 @@ function App() {
           </div>
           <QueryClientProvider client={queryClient}>
             <div className="body-container">
-              {ModuleComponent && (
-                <Suspense>
-                  <ModuleComponent
-                    setActiveModule={setActiveModule}
-                    loadSubModule={loadSubModule}
-                    setActiveSubModule={setActiveSubModule}
-                  />
-                </Suspense>
+              {showUserProfile ? (
+                <UserProfile
+                  user_id={user?.user_id}
+                  employee_id={user?.employee_id}
+                  onBackToModules={() => setShowUserProfile(false)}
+                />
+              ) : (
+                ModuleComponent && (
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <ModuleComponent
+                      setActiveModule={setActiveModule}
+                      loadSubModule={loadSubModule}
+                      setActiveSubModule={setActiveSubModule}
+                      user_id={user?.user_id}
+                      employee_id={user?.employee_id}
+                    />
+                  </Suspense>
+                )
               )}
             </div>
           </QueryClientProvider>
+
         </div>
       </div>
     </div>
