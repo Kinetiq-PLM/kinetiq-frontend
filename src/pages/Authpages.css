@@ -1,0 +1,248 @@
+/* Auth Container */
+.login-container, .signup-container {
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(135deg, #c0e8e6 0%, #97e2dd 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  .login-wrapper, .signup-wrapper {
+    display: flex;
+    flex-direction: row-reverse;
+    background: #d6f1f0;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 1200px;
+    height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .login-left, .signup-left{
+    flex: 0 0 35%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0rem;
+
+}
+  .login-right, .signup-right{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #d6f1f0;
+  }
+  
+  
+  
+  /* Card Styles */
+  .login-card, .signup-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    width: 100%;
+    box-shadow: 0 8px 20px rgba(0, 167, 167, 0.15);
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .login-form h2, .signup-form h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #00a7a7;
+    letter-spacing: 1px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+  }
+  
+  /* Form Elements */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .password-wrapper {
+    position: relative;
+  }
+  
+  .eye-icon {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    cursor: pointer;
+    color: #888;
+  }
+  
+  /* Options */
+  .login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem 0 1.5rem;
+  }
+  
+  .remember-me {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .forgot-password {
+    color: teal;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+  
+  /* Buttons */
+  .login-btn {
+    background-color: #00a7a7;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-weight: bold;
+    width: 70%;
+    min-width: 120px;
+    margin: 0 auto;
+    display: block;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .login-btn:hover {
+    background-color: #008b8b;
+  }
+  
+  /* Links */
+  .signup-link {
+    text-align: center;
+    margin-top: 12px;
+  }
+  
+  .signup-link a {
+    color: teal;
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+  
+  /* Right Side Image */
+  .kinetiq-logo {
+    max-width: 180px;
+    height: auto;
+  }
+
+
+
+  .signup-btn {
+    background-color: #00a7a7;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-weight: bold;
+    width: 100%;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+  
+  /* Terms checkbox */
+  .terms-checkbox {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    gap: 5px;
+    margin: 1rem 0;
+  }
+  
+  .terms-checkbox a {
+    color: teal;
+    text-decoration: none;
+  }
+  
+  /* Modal styles (same for both) */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-content h2 {
+    color: #00a7a7;
+    margin-bottom: 1.5rem;
+  }
+  
+  .modal-body h3 {
+    margin: 1rem 0 0.5rem;
+    color: #333;
+  }
+  
+  .accept-btn {
+    background-color: #00a7a7;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1rem;
+  }
+
+    .auth-switch {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem; 
+    color: #666; 
+  }
+  
+  .auth-switch a {
+    color: #00a7a7; 
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 0.3rem;
+  }
+  
+  .auth-switch a:hover {
+    text-decoration: underline;
+  }
+
+  

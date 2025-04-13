@@ -2,6 +2,7 @@ import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
 import SearchBar from "./shared/components/SearchBar";
+import { Navigate } from 'react-router-dom'; 
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -14,6 +15,13 @@ function App() {
 
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
+
+
+  const [isAuthenticated]= useState(false);
+       if(!isAuthenticated) {
+      return <Navigate to="/login" replace />;
+    }
+
 
   // Sync Scroll
   const handleScroll = (source) => {
@@ -80,7 +88,14 @@ function App() {
   const moduleSubmoduleFileNames = {
     Management: {
       "Dashboard": "ManagementDashboard",
-      "Project Approval": "ManagementApprovals",
+      "Policy Compliance Oversight": "ManagementPolicyComplianceOversight",
+      "Salary Release Approval": "ManagementSalaryReleaseApproval",
+      "Budget Review Approval": "ManagementBudgetReviewApproval",
+      "Purchasing Approval": "ManagementPurchasingApproval",
+      "Project Approval": "ManagementProjectApproval",
+      "Project Monitoring": "ManagementProjectMonitoring",
+      "RecruitmentCandidates": "ManagementRecruitmentCandidates",
+      "AssetRemoval": "ManagementAssetRemoval",
       "User Roles": "UserRoles",
       "Access Control": "AccessControl",
       Settings: "Settings",
