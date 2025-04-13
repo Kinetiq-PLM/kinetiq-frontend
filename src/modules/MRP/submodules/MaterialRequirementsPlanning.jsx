@@ -17,7 +17,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const bomData = [
         { number: "000000001", type: "Project", status: "Pending", date: "July 3 2025" },
         { number: "000000002", type: "Non Project", status: "Approved", date: "July 3 2025" },
-
     ];
 
     return (
@@ -43,7 +42,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             <div style={{alignSelf: 'stretch', height: 40, position: 'relative', overflow: 'hidden'}}>
                                 <div className="MRPSearch" style={{width: 20, height: 20, left: 12, top: 10, position: 'absolute'}} />
                                 <div style={{width: 210, height: 24, left: 40, top: 8, position: 'absolute'}}>
-                                    <input placeholder="Search Order Number..." type="text" style={{width: 210, left: 0, top: 3, position: 'absolute', color: '#969696', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word', border: 'none', outline: 'none', backgroundColor: 'transparent' }}/>
+                                    <input placeholder="Search Order Number..." type="text" style={{ width: 210, left: 0, top: 3, position: 'absolute', color: '#969696', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word', border: 'none', outline: 'none', backgroundColor: 'transparent'}}/>
                                 </div>
                             </div>
                         </div>

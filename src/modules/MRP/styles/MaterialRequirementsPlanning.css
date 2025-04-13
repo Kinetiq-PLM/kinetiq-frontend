@@ -121,7 +121,7 @@
   width: 100%;
 }
 
-.reqplan .reqplan .title {
+.reqplan .title {
   font-size: clamp(24px, 5vw, 35px);
   font-weight: 700;
   text-transform: capitalize;
