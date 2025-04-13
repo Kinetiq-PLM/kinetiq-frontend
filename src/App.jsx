@@ -14,18 +14,31 @@ function App() {
   const [hoveredSubModule, setHoveredSubModule] = useState(null);
   const [ModuleComponent, setModuleComponent] = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // temp for now: authentication state
   const [user, setUser] = useState(null);
+  const displayName = user
+    ? `${user.first_name} ${user.last_name?.charAt(0)}.`
+    : '';
+
 
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
 
   const navigate = useNavigate();
 
-
+  // if you need to just go to shellapp just comment out the 4 lines below: 
+  const isAuthenticated = user !== null;
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+  // up til here ^^
+  // -- then just remove "/login" from the url -- tho u wont have any user data since u didn't log in (unless u'll hard code it)
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");   // clear saved session
+    setUser(null);   // clear local user state 
+    navigate("/login");  // redirect to login
+  };
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -34,14 +47,10 @@ function App() {
       setUser(JSON.parse(storedUser));
       console.log("User data loaded from localStorage:");
       console.log(localStorage.getItem("user"));
+    } else {
+      setUser(null);
     }
   }, []);
-
-  const handleLogout = () => {
-    // logout logic
-    // navigate back to login
-    navigate("/login");
-  };
 
   //dummy notifs
   const notifs = [
@@ -571,7 +580,7 @@ function App() {
                     {" "}
                     <p>C</p>
                   </div>
-                  <p className="header-profile-name">Crusch K.</p>
+                  <p className="header-profile-name">{displayName}</p>
                 </div>
               </div>
             </div>
