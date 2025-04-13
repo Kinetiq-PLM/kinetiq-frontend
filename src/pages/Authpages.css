@@ -45,14 +45,15 @@
   .login-card, .signup-card {
     background: white;
     padding: 2.5rem;
-    border-radius: 12px;
+    border-radius: 0.5rem;
     width: 100%;
-    box-shadow: 0 8px 20px rgba(0, 167, 167, 0.15);
+    box-shadow: 0 0.5rem 1rem rgba(0, 167, 167, 0.15);
     margin: 0 auto;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
   }
   
   .login-form h2, .signup-form h2 {
@@ -64,7 +65,14 @@
     letter-spacing: 1px;
     display: flex;
     flex-direction: column;
-    gap: 1.8rem;
+    justify-content: center;
+  }
+
+  .login-form form, .login-form input{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
   
   /* Form Elements */
@@ -81,6 +89,7 @@
   
   .password-wrapper {
     position: relative;
+    width: 100%;
   }
   
   .eye-icon {
@@ -95,6 +104,7 @@
   .login-options {
     display: flex;
     justify-content: space-between;
+    gap: 2rem;
     align-items: center;
     font-size: 0.95rem;
     margin-bottom: 0.5rem 0 1.5rem;
@@ -118,13 +128,12 @@
     background-color: #00a7a7;
     color: white;
     border: none;
-    padding: 12px;
-    font-weight: bold;
-    width: 70%;
-    min-width: 120px;
-    margin: 0 auto;
+    padding: 0.5rem;
+    margin-top: 1rem;
+    width: 100%;
+    min-width: 3rem;
     display: block;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.2s;

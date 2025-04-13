@@ -29,7 +29,7 @@ export default function StandaloneLogin() {
         <div className="login-left">
           <div className="login-card">
             <div className="login-form">
-              <h2>USER LOGIN</h2>
+              <h2>Login</h2>
               <form onSubmit={handleLogin}>
                 <input
                   type="text"
@@ -78,7 +78,7 @@ export default function StandaloneLogin() {
                   <a href="#" className="forgot-password">Forgot password?</a>
                 </div>
 
-                <button type="submit" className="login-btn">LOGIN</button>
+                <button type="submit" className="login-btn">Login to Kinetiq</button>
               </form>
             </div>
           </div>
