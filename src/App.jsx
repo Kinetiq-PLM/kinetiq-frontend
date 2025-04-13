@@ -141,8 +141,12 @@ function App() {
       "Product Catalog": "ProductCatalog",
     },
     Distribution: {
-      Shipping: "Shipping",
-      "Order Fulfillment": "OrderFulfillment",
+      "External Delivery": "ExternalDelivery",
+      "Internal Delivery": "InternalDelivery",
+      "Picking" : "Picking",
+      "Packing": "Packing",
+      Shipment: "Shipment",
+      "Rework": "Rework",
     },
     Production: {
       "Manufacturing Process": "ManufacturingProcess",
