@@ -133,7 +133,7 @@ function App() {
 
   // sync Scroll
   const queryClient = new QueryClient();
-  // Sync Scroll
+  // sync Scroll
   const handleScroll = (source) => {
     if (!iconsRef.current || !descsRef.current) return;
 
@@ -144,36 +144,47 @@ function App() {
     }
   };
 
-  // load jsx files for main modules
   const loadMainModule = (moduleId) => {
-    if (
-      moduleFileNames[moduleId] && !activeSubModule
-      //!(activeModule == moduleId && !activeSubModule)
-    ) {
+    if (moduleFileNames[moduleId] && !activeSubModule) {
       const LazyComponent = lazy(() =>
         import(
           /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
         )
       );
-      setModuleComponent(() => LazyComponent);
+
+      const WrappedComponent = () => (
+        <LazyComponent
+          loadSubModule={loadSubModule}
+          setActiveSubModule={setActiveSubModule}
+          user_id={user?.user_id}
+          employee_id={user?.employee_id}
+        />
+      );
+
+      setModuleComponent(() => WrappedComponent);
     }
   };
 
-  // load jsx files for submodules
   const loadSubModule = (submoduleId, mainModule = activeModule) => {
-    if (
-      moduleSubmoduleFileNames[mainModule][submoduleId]
-      //&& !(activeSubModule == submoduleId)
-    ) {
+    if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
       const LazyComponent = lazy(() =>
         import(
           /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
         )
       );
 
-      setModuleComponent(() => LazyComponent);
+      const WrappedComponent = () => (
+        <LazyComponent
+          loadSubModule={loadSubModule}
+          setActiveSubModule={setActiveSubModule}
+          user_id={user?.user_id}
+          employee_id={user?.employee_id}
+        />
+      );
+      setModuleComponent(() => WrappedComponent);
     }
   };
+
 
   const moduleFileNames = {
     "Management": "Management",
