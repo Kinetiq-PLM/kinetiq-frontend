@@ -14,9 +14,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [isOpen2, setIsOpen2] = useState(false);
     const [flag, setFlag] = useState(0);
 
-    const bomData = [
-        { number: "000000001", type: "Project", status: "Pending", date: "July 3 2025" },
-        { number: "000000002", type: "Non Project", status: "Approved", date: "July 3 2025" },
+    const mrpData = [
+        { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
+        { number: "000000002", type: "Non Project", details: "Tondo Hospital - Package.. ", date: "July 3 2025" },
     ];
 
     return (
@@ -74,7 +74,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     </div>
                                 </div>
                             </div>
-                            {bomData.map((item, index) => (
+                            {mrpData.map((item, index) => (
                                 <div key={index}
                                 onClick={() => setIsOpen(true)}
                                 onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
@@ -107,6 +107,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     </div>
                 </div>
             </div>
+
             {isOpen && (
                 <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center">
