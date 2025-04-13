@@ -32,7 +32,8 @@ function App() {
 
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-      console.log("User loaded:", JSON.parse(user));
+      console.log("User data loaded from localStorage:");
+      console.log(localStorage.getItem("user"));
     }
   }, []);
 
@@ -175,19 +176,19 @@ function App() {
   };
 
   const moduleFileNames = {
-    Management: "Management",
-    Administration: "Administration",
-    Accounting: "Accounting",
-    Financials: "Financials",
-    Purchasing: "Purchasing",
-    Operations: "Operations",
-    Sales: "Sales",
-    CRM: "CRM",
+    "Management": "Management",
+    "Administration": "Administration",
+    "Accounting": "Accounting",
+    "Financials": "Financials",
+    "Purchasing": "Purchasing",
+    "Operations": "Operations",
+    "Sales": "Sales",
+    "CRM": "CRM",
     "Support & Services": "SupportServices",
-    Inventory: "Inventory",
-    Distribution: "Distribution",
-    Production: "Production",
-    MRP: "MRP",
+    "Inventory": "Inventory",
+    "Distribution": "Distribution",
+    "Production": "Production",
+    "MRP": "MRP",
     "Project Management": "ProjectManagement",
     "Human Resources": "HumanResources",
     "Report Generator": "ReportGenerator",
@@ -309,9 +310,20 @@ function App() {
     },
   };
 
-  const modulesIcons = Object.keys(moduleFileNames).map((module) => ({
+  const rawPermissions = user?.role?.permissions || "";
+  const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
+
+  const filteredModuleFileNames = allowedModules.includes("All")
+    ? moduleFileNames
+    : Object.fromEntries(
+      Object.entries(moduleFileNames).filter(([key]) =>
+        allowedModules.includes(key)
+      )
+    );
+
+  const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
     id: module,
-    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
+    icon: `/icons/module-icons/${filteredModuleFileNames[module]}.png`,
   }));
 
   return (
