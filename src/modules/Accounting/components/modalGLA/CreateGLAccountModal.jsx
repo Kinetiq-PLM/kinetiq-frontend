@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "./ModalInput.css";
-import Button from "./Button";
-import Dropdown from "./Dropdown";
-import Forms from "./Forms";
-import { accounts, subAccounts } from "../submodules/ListOfAccounts";
+import "./../ModalInput.css";
+import Button from "../Button";
+import Dropdown from "../Dropdown";
+import Forms from "../Forms";
+import { accounts, subAccounts } from "../../submodules/ListOfAccounts";
 
 const CreateGLAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
   const [selectedAccount, setSelectedAccount] = useState("");

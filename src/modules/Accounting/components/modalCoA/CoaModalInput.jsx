@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import './ModalInput.css';
-import Forms from './Forms';
-import Dropdown from './Dropdown';
-import Button from '../components/Button';
-import { accounts } from '../submodules/ListOfAccounts';
+import './../ModalInput.css';
+import Forms from '../Forms';
+import Dropdown from '../Dropdown';
+import Button from '../Button';
+import { accounts } from '../../submodules/ListOfAccounts';
 
 const CoaModalInput = ({ isModalOpen, closeModal, coaForm, handleInputChange, handleSubmit }) => {
     const [selectedAccount, setSelectedAccount] = useState("");

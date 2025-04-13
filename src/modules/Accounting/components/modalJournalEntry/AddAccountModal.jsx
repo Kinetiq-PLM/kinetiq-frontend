@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import "./ModalInput.css";
-import Button from "./Button";
-import Dropdown from "./Dropdown";
+import "./../ModalInput.css";
+import Button from "../Button";
+import Dropdown from "../Dropdown";
 
 const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
   const [allAccounts, setAllAccounts] = useState([]);

@@ -3,7 +3,7 @@ import "../styles/accounting-styling.css";
 import Table from "../components/Table";
 import Search from "../components/Search";
 import Button from "../components/Button";
-import CreateReceiptModal from "../components/CreateReceiptModal";
+import CreateReceiptModal from "../components/modalOfficialReceipt/CreateReceiptModal";
 import NotifModal from "../components/modalNotif/NotifModal";
 
 const OfficialReceipts = () => {

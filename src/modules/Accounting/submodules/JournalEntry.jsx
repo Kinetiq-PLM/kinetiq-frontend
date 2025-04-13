@@ -5,7 +5,7 @@ import Button from "../components/Button";
 import Forms from "../components/Forms";
 import NotifModal from "../components/modalNotif/NotifModal";
 import Dropdown from "../components/Dropdown";
-import AddAccountModal from "../components/AddAccountModal";
+import AddAccountModal from "../components/modalJournalEntry/AddAccountModal";
 
 const JournalEntry = () => {
   // Use states

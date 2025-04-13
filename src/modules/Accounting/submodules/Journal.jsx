@@ -3,7 +3,7 @@ import '../styles/accounting-styling.css';
 import Button from '../components/Button';
 import Dropdown from '../components/Dropdown';
 import Table from '../components/Table';
-import JournalModalInput from '../components/JournalModalInput';
+import JournalModalInput from '../components/modalJournal/JournalModalInput';
 import NotifModal from '../components/modalNotif/NotifModal';
 import Search from '../components/Search';
 

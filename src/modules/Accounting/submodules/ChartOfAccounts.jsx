@@ -6,7 +6,7 @@ import Search from "../components/Search";
 import Button from "../components/Button";
 import Dropdown from "../components/Dropdown";
 import Table from "../components/Table";
-import CoaModalInput from "../components/CoaModalInput";
+import CoaModalInput from "../components/modalCoA/CoaModalInput";
 import NotifModal from "../components/modalNotif/NotifModal";
 
 const BodyContent = () => {
