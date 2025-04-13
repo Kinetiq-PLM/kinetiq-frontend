@@ -15,6 +15,7 @@ function App() {
   const [ModuleComponent, setModuleComponent] = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true); // temp for now: authentication state
+  const [user, setUser] = useState(null);
 
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
@@ -25,6 +26,15 @@ function App() {
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      console.log("User loaded:", JSON.parse(user));
+    }
+  }, []);
 
   const handleLogout = () => {
     // logout logic
@@ -151,7 +161,7 @@ function App() {
   // load jsx files for submodules
   const loadSubModule = (submoduleId, mainModule = activeModule) => {
     if (
-      moduleSubmoduleFileNames[mainModule][submoduleId] 
+      moduleSubmoduleFileNames[mainModule][submoduleId]
       //&& !(activeSubModule == submoduleId)
     ) {
       const LazyComponent = lazy(() =>
@@ -203,7 +213,7 @@ function App() {
       "Item Masterlist": "ItemMasterlist",
       "Business Partner Masterlist": "BusinessPartnerMasterlist",
       "Audit Logs": "AuditLogs",
-      "Policy":"Policy",
+      "Policy": "Policy",
       "Currency": "Currency",
       "Notification": "Notification",
     },
@@ -533,7 +543,7 @@ function App() {
                 )}
               </div>}
               <div className="header-profile-container">
-              <div className="header-profile-icon-wrapper" onClick={handleLogout}>
+                <div className="header-profile-icon-wrapper" onClick={handleLogout}>
                   <div className="header-profile-icon">
                     {" "}
                     <p>C</p>
