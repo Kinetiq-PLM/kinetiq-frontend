@@ -2,7 +2,7 @@ import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
 import SearchBar from "./shared/components/SearchBar";
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -17,10 +17,18 @@ function App() {
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
 
+  const navigate = useNavigate();
+
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+
+  const handleLogout = () => {
+    // logout logic
+    // navigate back to login
+    navigate("/login");
+  };
 
 
   // sync Scroll
@@ -377,12 +385,14 @@ function App() {
                 alt="Notificaton-Logo"
                 onClick={() => setHasNotification(!hasNotification)}
               ></img>
-              <div className="header-profile-container">
-                <div className="header-profile-icon">
-                  {" "}
-                  <p>C</p>
+              <div className="header-profile-container" onClick={handleLogout}>
+                <div className="header-profile-icon-wrapper">
+                  <div className="header-profile-icon">
+                    {" "}
+                    <p>C</p>
+                  </div>
+                  <p className="header-profile-name">Crusch K.</p>
                 </div>
-                <p className="header-profile-name">Crusch K.</p>
               </div>
             </div>
           </div>

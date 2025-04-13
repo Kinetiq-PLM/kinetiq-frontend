@@ -420,10 +420,26 @@ img {
   align-items: center;
   justify-content: flex-end;
   width: 100%;
-  pointer-events: none;
+
 }
 
-.header-profile-container p {
+.header-profile-icon-wrapper{
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.2rem;
+
+}
+
+.header-profile-icon-wrapper:hover {
+  cursor: pointer;
+  background-color: rgb(245, 245, 245);
+}
+
+
+.header-profile-container p { 
   white-space: nowrap;
   text-overflow: ellipsis;
 }
