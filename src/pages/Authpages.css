@@ -29,6 +29,7 @@
     justify-content: center;
     align-items: center;
     padding: 0rem;
+    min-width: 350px;
 
 }
   .login-right, .signup-right{
@@ -36,8 +37,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #d6f1f0;
-    padding: 40px;
+    background: #d6f1f0; 
+    min-width: 65%;
   }
   
   
@@ -157,11 +158,11 @@
   }
   
   .kinetiq-logo {
-    width: 400px;
+    width: auto;
     height: auto;
-    max-width: 100%; 
-    object-fit: contain; 
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    max-width: 100%;
+    max-height: 100vh; 
+    object-fit: contain;
 }
 
 
@@ -257,4 +258,49 @@
     text-decoration: underline;
   }
 
-  
+  /* Tablet Layout */
+@media (max-width: 1024px) {
+  .login-wrapper {
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: space-between;
+    border: dashed red;
+  }
+
+  .login-right {
+    order: -1; 
+    width: auto;
+    height: 100%; 
+    background: #d6f1f0; 
+    border-bottom: none;
+  }
+
+  .kinetiq-logo {
+    width: 280px; 
+    height: auto;
+    max-width: 80%;
+    margin: 0 auto; 
+    display: block; 
+  }
+
+  .login-left {
+    padding: 2rem;
+    flex: 1;
+    border-radius: 12px;
+    margin: 0;
+    box-shadow: 0 4px 20px rgba(0,167,167,0.1);
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .login-left {
+    margin-bottom: 10px;
+  }
+  .kinetiq-logo {
+    width: 550px;
+  }
+  .login-container{
+    padding-bottom: 80px;
+  }
+}
