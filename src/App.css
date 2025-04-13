@@ -664,6 +664,35 @@ img {
   font-size: 0.75rem;
 }
 
+.profile-dropdown {
+  position: absolute;
+  right: 10px;
+  top: 60px;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  z-index: 100;
+}
+
+.dropdown-item {
+  padding: 0.5rem 0;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #ddd;
+  margin: 0.5rem 0;
+}
+
+
+
+
 /* body container -- takes remaining space below header */
 .body-container {
   flex: 1;

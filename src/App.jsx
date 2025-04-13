@@ -58,6 +58,17 @@ function App() {
     setIsProfileMenuOpen(!isProfileMenuOpen);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.header-profile-container')) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+
   //dummy notifs
   const notifs = [
     {
@@ -580,8 +591,21 @@ function App() {
                   </div>
                 )}
               </div>}
+              {isProfileMenuOpen && (
+                <div className="profile-dropdown">
+                  <p><strong>{user?.first_name} {user?.last_name}</strong></p>
+                  <p>ID: {user?.employee_id}</p>
+                  <p>Role: {user?.role?.role_name}</p>
+
+                  <div className="dropdown-divider"></div>
+
+                  <div className="dropdown-item" onClick={() => navigate('/settings')}>Settings</div>
+                  <div className="dropdown-item" onClick={handleLogout}>Logout</div>
+                </div>
+              )}
+
               <div className="header-profile-container">
-                <div className="header-profile-icon-wrapper" onClick={handleLogout}>
+                <div className="header-profile-icon-wrapper" onClick={toggleProfileMenu}>
                   <div className="header-profile-icon">
                     {" "}
                     {displayName?.charAt(0)}
