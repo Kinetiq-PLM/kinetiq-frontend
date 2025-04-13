@@ -5,8 +5,9 @@ import Button from "../../../Sales/components/Button";
 import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
 import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
-
+import { useAlert } from "../../../Sales/components/Context/AlertContext";
 export default function VendorTab() {
+  const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter

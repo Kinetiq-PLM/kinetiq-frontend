@@ -5,8 +5,11 @@ import { BarChart, LineChart, PieChart } from "@mui/x-charts";
 import { GET } from "../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { useAlert } from "../components/Context/AlertContext";
 import Dropdown from "../components/Dropdown";
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+import { AlertProvider } from "../components/Context/AlertContext";
+const Reporting = ({ loadSubModule, setActiveSubModule }) => {
+  const { showAlert } = useAlert();
   const [profitReportData, setProfitReportData] = useState([]);
   const [salesReportData, setSalesReportData] = useState([]);
   const [customerReportData, setCustomerReportData] = useState([]);
@@ -25,25 +28,30 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
     queryKey: ["profits"],
     queryFn: async () =>
       await GET(`sales/reporting/profit?period=${profitPeriod}`),
+    retry: 2,
   });
 
   const salesQuery = useQuery({
     queryKey: ["sales"],
     queryFn: async () =>
       await GET(`sales/reporting/operations?period=${salesPeriod}`),
+    retry: 2,
   });
   const customerQuery = useQuery({
     queryKey: ["customers"],
     queryFn: async () => await GET(`sales/reporting/top-customers`),
+    retry: 2,
   });
   const productQuery = useQuery({
     queryKey: ["productReport"],
     queryFn: async () => await GET(`sales/reporting/top-products`),
+    retry: 2,
   });
   const employeeQuery = useQuery({
     queryKey: ["employeeReport"],
     queryFn: async () =>
       await GET(`sales/reporting/top-employees?period=${salesReportPeriod}`),
+    retry: 2,
   });
   const employeeDealsQuery = useQuery({
     queryKey: ["employeeDealsReport"],
@@ -51,6 +59,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
       await GET(
         `sales/reporting/top-employee-conversions?period=${dealsPeriod}`
       ),
+    retry: 2,
   });
   const colors = ["#c084fc", "#2563eb", "#fb923c", "#22c55e"];
   const options = ["day", "month", "year", "all"];
@@ -69,13 +78,14 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
       }));
       setProfitReportData(data);
       setTotalProfit(profitQuery.data.total_profit);
+    } else if (profitQuery.status === "error") {
+      showAlert({ type: "error", title: "Failed to fetch Profit Report." });
     }
-  }, [profitQuery.data]);
+  }, [profitQuery.data, profitQuery.status]);
 
   useEffect(() => {
     if (salesQuery.status === "success") {
       const data = salesQuery.data.data.map((sale) => {
-        console.log(sale.date, new Date(sale.date));
         return {
           date: new Date(sale.date),
           quotations: sale.quotations,
@@ -84,38 +94,62 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
           deliveries: sale.deliveries,
         };
       });
-      console.log(data);
       setSalesReportData(data);
       setTotalOperations(salesQuery.data.total);
+    } else if (salesQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Failed to fetch Sales Operations Report.",
+      });
     }
-  }, [salesQuery.data]);
+  }, [salesQuery.data, salesQuery.status]);
   useEffect(() => {
     if (customerQuery.status === "success") {
       const data = customerQuery.data.top_customers;
       setCustomerReportData(data);
+    } else if (customerQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Failed to fetch Top Customers Report.",
+      });
     }
-  }, [customerQuery.data]);
+  }, [customerQuery.data, customerQuery.status]);
   useEffect(() => {
     if (productQuery.status === "success") {
       const data = productQuery.data.top_products;
       setProductReportData(data);
       setTotalSold(productQuery.data.total_sold);
+    } else if (productQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Failed to fetch Top Products Report.",
+      });
     }
-  }, [productQuery.data]);
+  }, [productQuery.data, productQuery.status]);
 
   useEffect(() => {
     if (employeeQuery.status === "success") {
       const data = employeeQuery.data.top_employees;
       setEmployeeReportData(data);
+    } else if (employeeQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Failed to fetch Top Employee Revenue Report.",
+      });
     }
-  }, [employeeQuery.data]);
+  }, [employeeQuery.data, employeeQuery.status]);
 
   useEffect(() => {
     if (employeeDealsQuery.status === "success") {
       const data = employeeDealsQuery.data.top_employees;
       setEmployeeDealsData(data);
+    } else if (employeeDealsQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Failed to fetch Top Employee Deals Report.",
+      });
     }
-  }, [employeeDealsQuery.data]);
+  }, [employeeDealsQuery.data, employeeDealsQuery.status]);
 
   useEffect(() => {
     profitQuery.refetch();
@@ -490,6 +524,17 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
         </div>
       </div>
     </div>
+  );
+};
+
+const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+  return (
+    <AlertProvider>
+      <Reporting
+        loadSubModule={loadSubModule}
+        setActiveSubModule={setActiveSubModule}
+      />
+    </AlertProvider>
   );
 };
 

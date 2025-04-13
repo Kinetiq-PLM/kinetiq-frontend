@@ -28,6 +28,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
     queryKey: ["products"],
     queryFn: async () => await GET("sales/products"),
     enabled: isOpen,
+    retry: 2,
   });
 
   const columns = [
@@ -68,7 +69,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
           productsQuery.error?.data,
       });
     }
-  }, [productsQuery.data]);
+  }, [productsQuery.data, productsQuery.status]);
 
   useEffect(() => {
     const handleEscape = (e) => {

@@ -21,6 +21,7 @@ const CampaignListModal = ({ isOpen, onClose, setCampaign }) => {
     queryKey: ["campaignList"],
     queryFn: async () => await GET("crm/campaigns?status=Active,Planned"),
     enabled: isOpen,
+    retry: 2,
   });
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -80,8 +81,10 @@ const CampaignListModal = ({ isOpen, onClose, setCampaign }) => {
       }));
       setCampaignList(data);
       setFilteredData(data);
+    } else if (campaignQuery.status === "error") {
+      showAlert({ type: "error", title: "Failed to fetch Campaigns." });
     }
-  }, [campaignQuery.data]);
+  }, [campaignQuery.data, campaignQuery.status]);
 
   // useEffect(() => {
   //   console.log(campaignList);
