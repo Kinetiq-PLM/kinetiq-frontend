@@ -2,7 +2,7 @@
 .login-container, .signup-container {
     height: 100vh;
     width: 100vw;
-    background: linear-gradient(135deg, #c0e8e6 0%, #97e2dd 100%);
+    background: linear-gradient(135deg, #016761 0%, #97e2dd 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -40,6 +40,7 @@
     background: #d6f1f0; 
     min-width: 65%;
   }
+
   
   
   
@@ -115,14 +116,14 @@
   .remember-me {
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin-bottom: 20px;
+    gap: 0.5rem;
+    font-size: 0.8rem;
   }
   
   .forgot-password {
     color: teal;
     text-decoration: none;
-    margin-bottom: 20px;
+    font-size: 0.8rem;
   }
   
   /* Buttons */
@@ -131,7 +132,7 @@
     color: white;
     border: none;
     padding: 0.5rem;
-    margin-top: 1rem;
+    margin-top: 2.5rem;
     width: 100%;
     min-width: 3rem;
     display: block;
@@ -143,6 +144,13 @@
   
   .login-btn:hover {
     background-color: #008b8b;
+  }
+
+  .login-error{
+    color: red;
+    font-size: 0.75rem;
+    font-style: italic;
+    margin-bottom: 0.5rem;
   }
   
   /* Links */
@@ -165,6 +173,14 @@
     object-fit: contain;
 }
 
+input:-webkit-autofill {
+  background-color: white !important; 
+  color: #000 !important;          
+  box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-text-fill-color: #000 !important; 
+  transition: background-color 5000s ease-in-out 0s;
+}
 
 
   .signup-btn {

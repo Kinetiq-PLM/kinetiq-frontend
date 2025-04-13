@@ -11,10 +11,12 @@ export default function StandaloneLogin() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const [loginError, setLoginError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials(prev => ({ ...prev, [name]: value }));
+    setLoginError("");
   };
 
   const handleLogin = async (e) => {
@@ -31,18 +33,22 @@ export default function StandaloneLogin() {
 
       if (data.success) {
         console.log("Login successful:", data);
-        // save user info locally for next login?
-        // localStorage.setItem("user", JSON.stringify(data.data));
-
-        navigate("/"); // redirect to homepage or dashboard
-      } else {
-        console.error("Login failed:", data.message);
-        alert(data.message); // Optional: show error to user
+        localStorage.setItem("user", JSON.stringify(data.data));
+        navigate("/");
       }
     } catch (err) {
-      console.error("Login error:", err);
-      //alert("Login failed. Please try again.");
+      if (err.response && err.response.data) {
+        // catches Django error payload
+        const { message } = err.response.data;
+        console.error("Login failed:", message);
+        setLoginError("*" + message + "*"); // show error message to user
+        //alert(message); // backend error
+      } else {
+        console.error("Login error:", err);
+        alert("Something went wrong. Please try again.");
+      }
     }
+
   };
 
   return (
@@ -52,6 +58,7 @@ export default function StandaloneLogin() {
           <div className="login-card">
             <div className="login-form">
               <h2>Login</h2>
+              <p className="login-error">{loginError}</p>
               <form onSubmit={handleLogin}>
                 <input
                   type="text"
@@ -99,7 +106,6 @@ export default function StandaloneLogin() {
                   </label>
                   <a href="#" className="forgot-password">Forgot password?</a>
                 </div>
-
                 <button type="submit" className="login-btn">Login to Kinetiq</button>
               </form>
             </div>
