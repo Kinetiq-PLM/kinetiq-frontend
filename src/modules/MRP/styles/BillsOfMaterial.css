@@ -79,11 +79,9 @@
 }
 
 .bom-print-wrapper {
-  width: 1128px;
+  min-width: 1128px;
   background: white;
   max-height: 90vh;
-  border-radius: 10px;
-  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.15);
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
