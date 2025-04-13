@@ -41,57 +41,52 @@
 
   .top-section {
     display: flex;
-    align-items: center;
+    align-items: left;
     gap: 10px;
     margin-bottom: 15px;
-
   }
 }
 
-.equimaprodbutton-group-materials {
-  display: flex;
-  gap: 10px;
+
 
  
 
-  .refresh-button,
-  .EMsave-button {
+.project-equipment-button {
     background: #00A8A8;
-    width: 146px;
+    width: 180px;
     height: 36px;
     border: none;
     color: white;
-    padding: 15px;
     font-family: Inter;
-    font-size: 16px;
+    font-size: 14px;
     font-style: normal;
     font-weight: 400;
-    line-height: normal;
     border-radius: 10px;
     cursor: pointer;
-    transition: background 0.3s ease;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
+    padding: 3;
   }
 
-  .refresh-button:hover,
-  .EMsave-button:hover {
+  .project-equipment-button:hover
+  {
     background-color: #098F8F;
   }
 
-}
+
 
 .equimaprod-button-group {
   display: flex;
-  justify-content: center;
   border-radius: 5px;
   background-color: #ffffff;
   box-shadow: 0px -1px 0px 0px #E8E8E8 inset;
   gap: 10px;
   padding: 3px;
-
+width: 20%;
+flex-wrap: wrap;
+height:40px;
 }
 
 .equipment-button,
@@ -129,8 +124,19 @@
   left: 0;
 }
 
-.equimaprodsearch-bar {
-  padding: 8px 5px 8px 20px;
+.equilasearch-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.equilasearch-bar {
+  padding: 8px 10px 8px 40px;
+  flex-shrink: 0;
   font-size: 15px;
   font-family: Inter;
   font-style: normal;
@@ -139,13 +145,32 @@
   border: 1px solid #ffffff;
   background-color: #fff;
   border-radius: 8px;
-  width: 725px;
-  height: 35px;
+  width: 70%;
+  height: 40px;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  display: flex;
-  padding-left: 10px;
-  padding-right: 10px;
-  gap: 10px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  width: 16px; 
+  height: 16px;
+  pointer-events: none;
+}
+
+
+.equilasearch-bar:focus {
+  border-color: #00A8A8;
+  outline: none;
+  background-color: #fff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+}
+
+.equilasearch-bar:hover{
+  border-radius: 10px;
+border: 1.5px solid #A4A4A4;
+background: #ffffff;
+}
 
   .search-icon {
     width: 15px;
@@ -153,45 +178,12 @@
     pointer-events: none;
   }
 
-}
 
-.equimaprod-notification-container {
-  width: 100%;
-  max-width: 500px;
-  height: 450px;
-  margin: 20px auto;
-  padding: 0; 
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #ffffff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  overflow-x: hidden;  
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-
-.header-notification {
-  font-size: 24px;
-  font-weight: bold;
-  padding: 10px;
-  padding-left: 10px;
-  color: #007878;
-  text-align: left;
-  background-color: #ffffff;
-  position: sticky;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10; 
-}
 
 
 
 .EM-table {
-  width: 1300px;
+  width: 100%;
   height: 410px;
   flex-shrink: 0;
   background: #ffffff;
@@ -232,7 +224,6 @@
   .equipment-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 600px;
   }
 
   .equipment-table th,
@@ -250,10 +241,9 @@ font-size: 14px;
 font-style: normal;
 font-weight: 300;
 line-height: normal;
-max-width: 200px;
+max-width: 100%;
 white-space: nowrap;  
-overflow: hidden;     
-text-overflow: ellipsis; 
+text-wrap: wrap;
   }
 
   .equipment-table th {
@@ -300,7 +290,7 @@ text-overflow: ellipsis;
     font-weight: 300;
     line-height: normal;
     text-align: left;
-    max-width: 150px;
+    max-width: 100%;
     white-space: nowrap;  
     overflow: hidden;     
     text-overflow: ellipsis; 
@@ -353,7 +343,7 @@ text-overflow: ellipsis;
       font-style: normal;
       font-weight: 300;
       line-height: normal;
-      max-width: 200px;
+      max-width: 100%;
       white-space: nowrap;  
       overflow: hidden;     
       text-overflow: ellipsis; 
@@ -474,34 +464,162 @@ text-overflow: ellipsis;
   padding: 10px;
 }
 
-
-/* Modal Styles */
-.modal {
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6); /* Dim the world, babe ✨ */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 9999; /* Front and center */
 }
 
 .modal-content {
-  background-color: white;
+  position: relative;
+  background-color: #fff;
   padding: 20px;
-  border-radius: 8px;
-  width: 500px;
-  max-height: 80%;
-  overflow-y: auto;
+  border-radius: 10px;
+  max-height: 600px;
+  width: 90%;
+  max-width: 800px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); 
+  z-index: 10000; 
+  display: flex;
+  flex-direction: column;
 }
 
-.close {
+.modal-content h1 {
+  color: #007878;
+  font-family: Inter;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin-bottom: 10px;
+  flex-shrink: 0; /* Keep it from shrinking */
+}
+
+.proj-equipment-table {
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: 400px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* Make the table fill the scroll area */
+.proj-equipment-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fefefe;
+}
+
+
+.proj-equipment-table td {
+  padding: 10px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+
+.proj-equipment-table th {
+  background-color: #ffffff;
+  color: #404040;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  position: sticky;
+  top: 0; 
+  z-index: 2;
+  border-bottom: 1px solid #007878;
+  padding: 10px 15px;
+}
+
+
+
+.proj-equipment-table::-webkit-scrollbar {
+  width: 8px;
+}
+
+.proj-equipment-table::-webkit-scrollbar-thumb {
+  background: #007878;
+  border-radius: 4px;
+}
+
+.proj-equipment-table::-webkit-scrollbar-track {
+  background: #eee;
+}
+
+/* Close button stays top right */
+.close-button {
   position: absolute;
-  top: 10px;
+  top: 15px;
   right: 20px;
-  font-size: 30px;
+  font-size: 28px;
+  font-weight: bold;
+  background: none;
+  border: none;
+  color: #333;
   cursor: pointer;
+  z-index: 10001;
+  transition: color 0.2s ease-in-out;
+}
+
+.close-button:hover {
+  color: #007878;
+}
+
+
+.modalsearch-wrapper {
+  width: 50%;
+  margin-bottom: 15px;
+}
+
+.modalsearch-input-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.modalsearch-bar {
+  padding: 8px 10px 8px 40px; /* left padding for the icon */
+  font-size: 15px;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  line-height: 24px;
+  border: 1px solid #ffffff;
+  background-color: #fff;
+  border-radius: 8px;
+  width: 100%;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+}
+
+.modalsearch-bar:focus {
+  border-color: #00A8A8;
+  outline: none;
+  background-color: #fff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+}
+
+.modalsearch-bar:hover {
+  border-radius: 10px;
+  border: 1.5px solid #A4A4A4;
+  background: #F5F5F5;
 }

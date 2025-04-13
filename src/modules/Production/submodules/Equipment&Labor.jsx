@@ -1,10 +1,28 @@
 import React, { useState } from "react";
 import "../styles/Equipment&Labor.css";
 
+// Modal Component
+const Modal = ({ show, onClose, children }) => {
+    if (!show) return null;
+
+    return (
+        <div className="modal-overlay">
+            <div className="modal-content">
+                <button className="close-button" onClick={onClose}>×</button>
+                {children}
+            </div>
+        </div>
+    );
+};
+
 const BodyContent = () => {
     const [activeTab, setActiveTab] = useState("equipment");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [selectedValue, setSelectedValue] = useState("available");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [showModal, setShowModal] = useState(false); 
+
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+    };
 
     const renderTable = () => {
         switch (activeTab) {
@@ -15,6 +33,10 @@ const BodyContent = () => {
             default:
                 return null;
         }
+    };
+
+    const handleViewProjectEquipment = () => {
+        setShowModal(true);
     };
 
     return (
@@ -40,34 +62,127 @@ const BodyContent = () => {
                                 Labor
                             </button>
                         </div>
-                        <div className="equimaprodsearch-bar">
-                            <img src="/icons/search-icon.png" alt="Search Icon" className="search-icon" />
+                        <div className="equilasearch-wrapper">
+                            <img src="/icons/search-icon.png" alt="Search" className="search-icon" />
                             <input
                                 type="text"
+                                className="equilasearch-bar"
                                 placeholder="Search..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                value={searchQuery}
+                                onChange={handleSearchChange}
                             />
-                        </div>
-                        <div className="equimaprodbutton-group-materials">
-                            <button className="refresh-button">Refresh</button>
-                            <button className="EMsave-button">Save</button>
+                            <div className="project-equipment-button" onClick={handleViewProjectEquipment}>
+                                View Project Equipment
+                            </div>
                         </div>
                     </div>
+
                     <div className="EM-table">
                         {renderTable()}
                     </div>
                 </div>
             </div>
+
+
+            <Modal show={showModal} onClose={() => setShowModal(false)}>
+                <h1>Project Equipment</h1>
+                <div className="modalsearch-wrapper">
+  <div className="modalsearch-input-wrapper">
+    <img src="/icons/search-icon.png" alt="Search" className="search-icon" />
+    <input
+      type="text"
+      className="modalsearch-bar"
+      placeholder="Search..."
+      value={searchQuery}
+      onChange={handleSearchChange}
+    />
+  </div>
+</div>
+                <div className="proj-equipment-table">
+                <table>
+                    <thead>
+                        <th>Project Equipment ID</th>
+                        <th>Equipment ID</th>
+                        <th>Product ID</th>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>PROD-PJEQ-2025-cea4b2</td>
+                        <td>CNC Milling Machine (5-axis)</td>
+                        <td>
+  <ul>
+    <li>BeneVision Series</li>
+    <li>Wato EX-35</li>
+    <li>HyBase 3000</li>
+    <li>OEC Elite</li>
+  </ul>
+</td>
+</tr>
+
+<tr>
+                        <td>PROD-PJEQ-2025-cea4b2</td>
+                        <td>CNC Milling Machine (5-axis)</td>
+                        <td>
+  <ul>
+    <li>BeneVision Series</li>
+    <li>Wato EX-35</li>
+    <li>HyBase 3000</li>
+    <li>OEC Elite</li>
+  </ul>
+</td>
+</tr>
+
+<tr>
+                        <td>PROD-PJEQ-2025-cea4b2</td>
+                        <td>CNC Milling Machine (5-axis)</td>
+                        <td>
+  <ul>
+    <li>BeneVision Series</li>
+    <li>Wato EX-35</li>
+    <li>HyBase 3000</li>
+    <li>OEC Elite</li>
+  </ul>
+</td>
+</tr>
+
+<tr>
+                        <td>PROD-PJEQ-2025-cea4b2</td>
+                        <td>CNC Milling Machine (5-axis)</td>
+                        <td>
+  <ul>
+    <li>BeneVision Series</li>
+    <li>Wato EX-35</li>
+    <li>HyBase 3000</li>
+    <li>OEC Elite</li>
+  </ul>
+</td>
+</tr>
+
+<tr>
+                        <td>PROD-PJEQ-2025-cea4b2</td>
+                        <td>CNC Milling Machine (5-axis)</td>
+                        <td>
+  <ul>
+    <li>BeneVision Series</li>
+    <li>Wato EX-35</li>
+    <li>HyBase 3000</li>
+    <li>OEC Elite</li>
+  </ul>
+</td>
+</tr>
+
+
+                    </tbody>
+                </table>
+                </div>
+            </Modal>
         </div>
     );
 };
 
 const EquipmentTable = () => {
     const [statuses, setStatuses] = useState(Array(7).fill("available"));
-    const [maintenanceDates, setMaintenanceDates] = useState(
-        Array(7).fill("2024-03-01")
-    );
+    const [maintenanceDates, setMaintenanceDates] = useState(Array(7).fill("2024-03-01"));
     const [costs, setCosts] = useState(Array(7).fill("750,000"));
 
     const handleStatusChange = (index, value) => {
@@ -140,7 +255,6 @@ const EquipmentTable = () => {
     );
 };
 
-
 const LaborTable = () => {
     const [laborStatuses, setLaborStatuses] = useState(Array(7).fill("available"));
     const [datesWorked, setDatesWorked] = useState(Array(7).fill("2024-03-01"));
@@ -184,7 +298,7 @@ const LaborTable = () => {
                             <td><h2>P0001</h2></td>
                             <td>EMO1</td>
                             <td>
-                            <input
+                                <input
                                     type="date"
                                     value={datesWorked[index]}
                                     onChange={(e) => handleDatesWorkedChange(index, e.target.value)}
@@ -216,5 +330,5 @@ const LaborTable = () => {
     );
 };
 
-
 export default BodyContent;
+

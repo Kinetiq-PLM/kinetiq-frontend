@@ -2,8 +2,13 @@ import React, { useState } from "react";
 import "../styles/CostOfProduction.css";
 
 const BodyContent = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeTable, setActiveTable] = useState("costProduction");
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+};
+
 
   const productionData = Array(7).fill().map((_, index) => ({
     id: `PO00${index + 1}`,
@@ -21,19 +26,17 @@ const BodyContent = () => {
           <div className="costprodheader-section">
             <h1>Cost of Production & Rework Cost</h1>
             <div className="costprodbutton-group">
-              <div className="costprods-bar">
-                <img
-                  src="/icons/search-icon.png"
-                  alt="Search Icon"
-                  className="search-icon"
-                />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+            <div className="cpsearch-wrapper">
+                                <img src="/icons/search-icon.png" alt="Search" className="search-icon" />
+                                <input
+                                    type="text"
+                                    className="cpsearch-bar"
+                                    placeholder="Search..."
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                />
+
+                            </div>
             </div>
           </div>
 
