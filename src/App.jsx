@@ -196,9 +196,14 @@ function App() {
       "Access Control": "AccessControl",
       "Settings": "Settings",
     },
-    "Administration": {
-      "Company Policies": "CompanyPolicies",
-      "User Accounts": "UserAccounts",
+    Administration: {
+      "User": "User",
+      "Item Masterlist": "ItemMasterlist",
+      "Business Partner Masterlist": "BusinessPartnerMasterlist",
+      "Audit Logs": "AuditLogs",
+      "Policy":"Policy",
+      "Currency": "Currency",
+      "Notification": "Notification",
     },
     "Accounting": {
       "Chart of Accounts": "ChartOfAccounts",

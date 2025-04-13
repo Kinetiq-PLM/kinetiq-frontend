@@ -23,7 +23,7 @@ function Login({ setActiveModule }) {
                 <div className="login-left">
                     <div className="login-card">
                         <div className="login-form">
-                            <h2>Log in</h2>
+                            <h2>Sign in</h2>
                             <form onSubmit={handleLogin}>
                                 <input
                                     type="text"
