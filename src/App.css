@@ -451,7 +451,6 @@ img {
   align-items: center;
   justify-content: flex-end;
   width: 100%;
-  pointer-events: none;
 }
 
 .header-profile-icon-wrapper{
@@ -512,7 +511,7 @@ img {
 .notif-menu {
   position: absolute;
   top: 3rem;
-  right: 13rem;
+  right: 15.5rem;
   padding-top: 1rem;
   background-color: white;
   width: 20rem;

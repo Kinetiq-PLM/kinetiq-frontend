@@ -31,7 +31,7 @@ function App() {
     navigate("/login");
   };
 
- //dummy notifs
+  //dummy notifs
   const notifs = [
     {
       time: "8:00 PM",
@@ -149,7 +149,7 @@ function App() {
   // load jsx files for submodules
   const loadSubModule = (submoduleId) => {
     if (
-      moduleSubmoduleFileNames[activeModule][submoduleId] 
+      moduleSubmoduleFileNames[activeModule][submoduleId]
       //&& !(activeSubModule == submoduleId)
     ) {
       const LazyComponent = lazy(() =>
@@ -511,8 +511,8 @@ function App() {
                   </div>
                 )}
               </div>}
-              <div className="header-profile-container" onClick={handleLogout}>
-                <div className="header-profile-icon-wrapper">
+              <div className="header-profile-container">
+                <div className="header-profile-icon-wrapper" onClick={handleLogout}>
                   <div className="header-profile-icon">
                     {" "}
                     <p>C</p>
