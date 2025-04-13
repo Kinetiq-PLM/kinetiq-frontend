@@ -151,8 +151,8 @@ function App() {
   // load jsx files for submodules
   const loadSubModule = (submoduleId, mainModule = activeModule) => {
     if (
-      moduleSubmoduleFileNames[mainModule][submoduleId] &&
-      !(activeSubModule == submoduleId)
+      moduleSubmoduleFileNames[mainModule][submoduleId] 
+      //&& !(activeSubModule == submoduleId)
     ) {
       const LazyComponent = lazy(() =>
         import(
