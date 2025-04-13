@@ -5,34 +5,7 @@ import "../styles/InternalTransfer.css";
 const ApprovalTable = () => {
   const [activePrimaryTab, setActivePrimaryTab] = useState("Delivery Request");
 
-  // Sample Data
-  const deliveryData = [
-    { id: 1, date: "03/20/25", project: "Project A", delivery: "Yes", module: "Module X", status: "Approved" },
-    { id: 2, date: "03/18/25", project: "Project B", delivery: "No", module: "Module Y", status: "Pending" },
-    { id: 3, date: "03/15/25", project: "Project C", delivery: "Yes", module: "Module Z", status: "Approved" },
-    { id: 4, date: "03/14/25", project: "Project D", delivery: "Yes", module: "Module A", status: "Pending" },
-    { id: 5, date: "03/13/25", project: "Project E", delivery: "No", module: "Module B", status: "Approved" },
-    { id: 6, date: "03/12/25", project: "Project F", delivery: "Yes", module: "Module C", status: "Pending" },
-    { id: 7, date: "03/11/25", project: "Project G", delivery: "No", module: "Module D", status: "Approved" },
-    { id: 8, date: "03/10/25", project: "Project H", delivery: "Yes", module: "Module E", status: "Pending" },
-    { id: 9, date: "03/09/25", project: "Project I", delivery: "No", module: "Module F", status: "Approved" },
-    { id: 10, date: "03/08/25", project: "Project J", delivery: "Yes", module: "Module G", status: "Pending" }
-  ];
 
-  const reworkData = [
-    { id: 1, reason: "Defective Part", cost: "$200", date: "03/19/25", status: "Approved" },
-    { id: 2, reason: "Wrong Specification", cost: "$350", date: "03/17/25", status: "Pending" },
-    { id: 3, reason: "Defective Part", cost: "$0", date: "03/17/25", status: "Pending" },
-    { id: 4, reason: "Quality Issue", cost: "$150", date: "03/16/25", status: "Approved" },
-    { id: 5, reason: "Wrong Assembly", cost: "$280", date: "03/15/25", status: "Pending" },
-    { id: 6, reason: "Missing Component", cost: "$420", date: "03/14/25", status: "Approved" },
-    { id: 7, reason: "Defective Material", cost: "$180", date: "03/13/25", status: "Pending" },
-    { id: 8, reason: "Wrong Measurement", cost: "$300", date: "03/12/25", status: "Approved" },
-    { id: 9, reason: "Assembly Error", cost: "$250", date: "03/11/25", status: "Pending" },
-    { id: 10, reason: "Component Failure", cost: "$190", date: "03/10/25", status: "Approved" }
-  ];  
-
-  const [selectedRows, setSelectedRows] = useState([]);
   const [deliveryRequestData, setDeliveryRequest] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,11 +14,14 @@ const ApprovalTable = () => {
   const [warehouseList, setWarehouseList] = useState([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
 
+  const [ITReworkOrderData, setITReworkOrder] = useState([]);
+
   const handleCheckboxChange = (index, row) => {
     setSelectedRow(index);
     setSelectedData(row);
     const warehouse = warehouseList.find(w => w.warehouse_id === row.warehouse_id);
     setSelectedWarehouse(warehouse ? warehouse.warehouse_location : "");
+
   };
 
   const fetchWarehouse = async () => {
@@ -80,19 +56,19 @@ const ApprovalTable = () => {
       try {
           setLoading(true);
           setError(null); // Reset error state
- 
+          const syncDataResponse = await fetch("http://127.0.0.1:8000/operation/external-modules/sync-production/");
           const response = await fetch("http://127.0.0.1:8000/operation/internal-transfer-delivery-request/");
-          if (!response.ok) throw new Error("Connection to database failed");
+          const reworkResponse = await fetch("http://127.0.0.1:8000/operation/external-modules/rework-order/");
+          if (!response.ok || !syncDataResponse || !reworkResponse) throw new Error("Connection to database failed");
  
           const data = await response.json();
-          if (!Array.isArray(data)) throw new Error("Invalid delivery request data format");
- 
-          setDeliveryRequest(data);
-          if (data.length > 0){
-              setSelectedRow(0);
-              setSelectedData(data[0]);
+          const reworkorderData = await reworkResponse.json();
+          
+          if (!Array.isArray(data) || !Array.isArray(reworkorderData)) {
+            throw new Error("Invalid data format");
           }
-             
+          setDeliveryRequest(data);
+          setITReworkOrder(reworkorderData)
       } catch (error) {
           if (error.name !== "AbortError") setError(error.message);
       } finally {
@@ -104,8 +80,19 @@ const ApprovalTable = () => {
     fetchDeliveryRequest();
   }, []);
 
+  useEffect(() => {
+    const filteredData = activePrimaryTab === "Delivery Request" ? deliveryRequestData : ITReworkOrderData;
+    if (filteredData.length > 0) {
+      setSelectedRow(0);
+      setSelectedData(filteredData[0]);
+    } else {
+      setSelectedRow(null);
+      setSelectedData(null);
+    }
+  }, [activePrimaryTab, deliveryRequestData, ITReworkOrderData]);
+  
   // Filtered Data
-  const filteredData = activePrimaryTab === "Delivery Request" ? deliveryRequestData : reworkData;
+  const filteredData = activePrimaryTab === "Delivery Request" ? deliveryRequestData : ITReworkOrderData;
 
   useEffect(() => {
     if (filteredData.length > 0) {
@@ -115,11 +102,10 @@ const ApprovalTable = () => {
       setSelectedRow(null);
       setSelectedData(null);
     }
+
   }, [filteredData]);
   
   const updateDeliveryRequest = async () => {
-    console.log(selectedData.content_id)
-    console.log(selectedData.warehouse_id)
     if (!selectedData || !selectedWarehouse) return;
   
     // Find the selected warehouse_id from the location name
@@ -149,7 +135,7 @@ const ApprovalTable = () => {
   
       const result = await response.json();
       console.log("Warehouse updated:", result);
-      const insertResponse = await fetch("http://127.0.0.1:8000/operation/send-to-distribution/", {
+      /*const insertResponse = await fetch("http://127.0.0.1:8000/operation/send-to-distribution/", {
       method: "POST", 
       headers: {
         "Content-Type": "application/json",
@@ -165,7 +151,7 @@ const ApprovalTable = () => {
     }
 
     const insertResult = await insertResponse.json();
-    console.log("Delivery Order Inserted:", insertResult);
+    console.log("Delivery Order Inserted:", insertResult);*/
 
     // Refresh the delivery request data
     fetchDeliveryRequest();
@@ -175,13 +161,57 @@ const ApprovalTable = () => {
     }
   };
 
+  const handleChange = (e, field) => {
+    const newSelectedData = { ...selectedData };
+    newSelectedData.external_module[field] = e.target.value;
+  
+    if (field === 'rework_quantity') {
+      const actualQuantity = newSelectedData.production_order.actual_quantity;
+      const reworkQuantity = parseInt(e.target.value);
+  
+      if (reworkQuantity > actualQuantity) {
+        alert('Error: Rework quantity must not be greater than actual quantity.');
+        return; 
+      }
+    }
+  
+    setSelectedData(newSelectedData);
+  
+    // Only call updateDatabase if validation passed
+    updateDatabase(newSelectedData);
+  };
+  
+  const updateDatabase = async (data) => {
+    try {
+      
+      const response = await fetch('http://127.0.0.1:8000/operation/external-modules/update-rework/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          production_order_detail_id: data.production_order_detail_id,
+          rework_quantity: data.external_module.rework_quantity,
+          reason_rework: data.external_module.reason_rework,
+        }), 
+      });
+  
+      if (response.ok) {
+        const responseData = await response.json();
+        if (responseData.status === 'success') {
+          console.log('Database updated successfully');
+        } else {
+          console.error('Error updating database:', responseData.message);
+        }
+      } else {
+        console.error('Error with the API request');
+      }
+    } catch (error) {
+      console.error('Error sending data to the server:', error);
+    }
+  };
 
-  const modules = [
-    "Inventory",
-    "Production",
-  ];
 
-  const [selectedModule, setSelectedModule] = useState(modules[0]); // Default module
 
   return (
     <div className={`InternalTransfer ${activePrimaryTab === "Rework Order" ? "rework" : ""}`}>
@@ -220,8 +250,8 @@ const ApprovalTable = () => {
                 ) : (
                   <>
                     <th>Reason for Rework</th>
-                    <th>Cost</th>
-                    <th>Date</th>
+                    <th>Actual Quantity</th>
+                    <th>Rework Quantity</th>
                   </>
                 )}
               </tr>
@@ -247,10 +277,10 @@ const ApprovalTable = () => {
                     </>
                   ) : (
                     <>
-                      <td>{row.id}</td>
-                      <td>{row.reason}</td>
-                      <td>{row.cost}</td>
-                      <td>{row.date}</td>
+                      <td>{row.production_order_detail_id}</td>
+                      <td>{row.external_module?.reason_rework || ""}</td>
+                      <td>{row.production_order?.actual_quantity || ""}</td>
+                      <td>{row.external_module?.rework_quantity || ""}</td>
                     </>
                   )}
                 </tr>
@@ -309,15 +339,31 @@ const ApprovalTable = () => {
             <div className="input-row">
               <div className="input-group">
                 <label>Product ID</label>
-                <input type="text" className="short-input" />
+                <input type="text" className="short-input" value={selectedData.production_order_detail_id} readOnly/>
               </div>
               <div className="input-group">
-                <label>Reason</label>
-                <input type="text" className="short-input" />
+                <label>Rework Reason</label>
+                <input 
+                  type="text" 
+                  className="short-input" 
+                  value={selectedData?.external_module?.reason_rework || ''} 
+                  onChange={(e) => handleChange(e, 'reason_rework')}
+  
+                />
               </div>
               <div className="input-group">
-                <label>Quantity</label>
-                <input type="number" className="short-input" min="1" />
+                <label>Actual Quantity</label>
+                <input type="text" className="short-input" value={selectedData?.production_order?.actual_quantity || ''} readOnly/>
+              </div>
+              <div className="input-group">
+                <label>Rework Quantity</label>
+                <input 
+                  type="number" 
+                  className="short-input" 
+                  min="0" 
+                  value={selectedData?.external_module?.rework_quantity || ''} 
+                  onChange={(e) => handleChange(e, 'rework_quantity')}
+                />
               </div>
             </div>
           </div>
