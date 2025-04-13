@@ -30,7 +30,6 @@
     align-items: center;
     padding: 0rem;
     min-width: 350px;
-
 }
   .login-right, .signup-right{
     flex: 1;
@@ -47,7 +46,7 @@
   /* Card Styles */
   .login-card, .signup-card {
     background: white;
-    padding: 2.5rem;
+    padding: 3rem 2.5rem 2.5rem;
     border-radius: 0.5rem;
     width: 100%;
     box-shadow: 0 0.5rem 1rem rgba(0, 167, 167, 0.15);
@@ -277,18 +276,19 @@ input:-webkit-autofill {
   /* Tablet Layout */
 @media (max-width: 1024px) {
   .login-wrapper {
-    flex-direction: column;
-    min-height: 100vh;
-    justify-content: space-between;
-    border: dashed red;
+    height: auto; 
+    margin-top: 2rem; 
+    margin-bottom: 2rem; 
   }
-
+  .login-container{
+    height: auto; 
+    min-height: 100vh; 
+    padding: 2rem 20px; 
+    align-items: flex-start; 
+    justify-content: flex-start; 
+  }
   .login-right {
-    order: -1; 
-    width: auto;
-    height: 100%; 
-    background: #d6f1f0; 
-    border-bottom: none;
+    display: none;
   }
 
   .kinetiq-logo {
@@ -305,6 +305,7 @@ input:-webkit-autofill {
     border-radius: 12px;
     margin: 0;
     box-shadow: 0 4px 20px rgba(0,167,167,0.1);
+
   }
 }
 
