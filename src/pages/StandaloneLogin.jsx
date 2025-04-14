@@ -35,7 +35,7 @@ export default function StandaloneLogin() {
       if (new Date() < lock_date) {
         console.log('too many attempts timer, current attempts: ' + localStorage.getItem('login_attempts'))
         console.log('lock lifts at ' + lock_date.toString())
-        setLoginError(`*Too many failed login attempts. Please try again in ${Math.ceil((lock_date - new Date())/1000)} seconds.*`)
+        setLoginError(`*Too many failed login attempts. Please try again in ${Math.ceil((lock_date - new Date()) / 1000)} seconds.*`)
         return;
       }
 
@@ -227,7 +227,7 @@ export default function StandaloneLogin() {
               )}
             </div>
 
-          
+
           </div>
 
 
