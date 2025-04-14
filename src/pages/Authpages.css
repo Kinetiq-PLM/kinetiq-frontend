@@ -278,12 +278,14 @@ input:-webkit-autofill {
   }
 
   /* Tablet Layout */
-@media (max-width: 1000px) {
+@media (max-width: 800px) {
   .login-wrapper {
-    height: auto; 
+    height: auto !important; 
+    min-height: unset;
     margin-top: 2rem; 
     margin-bottom: 2rem; 
     flex-direction: column;
+
   }
   .login-container{
     height: auto; 
@@ -305,24 +307,11 @@ input:-webkit-autofill {
   }
 
   .login-left {
-    padding: 2rem;
+    padding: 0.8rem;
     flex: 1;
     border-radius: 12px;
     margin: 0;
     box-shadow: 0 4px 20px rgba(0,167,167,0.1);
 
-  }
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-  .login-left {
-    margin-bottom: 10px;
-  }
-  .kinetiq-logo {
-    width: 550px;
-  }
-  .login-container{
-    padding-bottom: 80px;
   }
 }
