@@ -16,7 +16,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:8000/api/warehouse-transfers/");
+                const response = await fetch("http://127.0.0.1:8000/api/warehouse-transfers/");
                 if (!response.ok) throw new Error("Failed to fetch data");
                 const data = await response.json();
                 setWarehouseMovements(data);
@@ -35,7 +35,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchWarehouseItemsData = async () => { 
             try {
-                const response = await fetch("http://localhost:8000/api/warehouse-item-list/");
+                const response = await fetch("http://127.0.0.1:8000/api/warehouse-item-list/");
                 if (!response.ok) throw new Error("Failed to fetch data");
                 const data = await response.json();
                 setWarehouseItemsData(data);
@@ -57,7 +57,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchWarehouseListData = async () => {
             try {
-                const response = await fetch("http://localhost:8000/api/warehouse-list/");
+                const response = await fetch("http://127.0.0.1:8000/api/warehouse-list/");
                 if (!response.ok) throw new Error("Failed to fetch data");
                 const data = await response.json();
                 setWarehouseListData(data);
@@ -176,8 +176,8 @@ const BodyContent = () => {
                 </nav>
 
                 {/* Data Table Section */}
-                <section className="flex w-full h-100 overflow-y-auto rounded-lg">
-                    <div className="flex-1 border min-h-[400px] border-gray-300 rounded-lg scroll-container overflow-y-auto p-3">
+                <section className="flex w-full h-full overflow-y-auto rounded-lg">
+                    <div className="flex-1 border max-h-[1000px] border-gray-300 rounded-lg scroll-container overflow-y-auto p-3">
                         {loading ? (
                             <p className="text-center text-gray-600">Loading data...</p>
                         ) : error ? (
@@ -215,7 +215,7 @@ const BodyContent = () => {
                     </div>
                     
                     {/* side section for filters and item details */}
-                    <div className={`flex flex-col justify-between  rounded-lg min-h-full w-[230px] ml-4 p-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
+                    <div className={`flex flex-col  rounded-lg min-h-full w-[230px] ml-4 p-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
                         <div className="flex flex-col justify-between space-y-2">
                             
                             {/* Warehouse Filter */}
@@ -239,11 +239,11 @@ const BodyContent = () => {
                         </div>
 
                         {/* Selected Items and Item Deatils Label */}
-                        <div>
+                        <div className="mt-4">
                             <h3 className="text-center text-gray-600 mt-2"></h3>
 
                             {/* Selected Items Container */}
-                            <div className="h-[300px] border rounded-lg border-gray-300 p-2">
+                            <div className="h-[350px] border rounded-lg border-gray-300 p-2">
                             {
                                 selectedItem !== null ? (
                                     <>
