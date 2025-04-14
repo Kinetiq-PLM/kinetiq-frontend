@@ -305,7 +305,7 @@ export default function StandaloneLogin() {
 
         </div>
         <div className="login-right">
-          <img src="/icons/logo2.png" alt="Kinetiq Logo" className="kinetiq-logo" />
+          <img src="/icons/logo4.png" alt="Kinetiq Logo" className="kinetiq-logo" />
         </div>
       </div>
     </div>
