@@ -19,17 +19,25 @@ const BodyContent = ({ employee_id }) => {
             <div className="user-details-container">
                 <div className="user-image">{first_name?.charAt(0)}</div>
                 <div className="user-details">
-                    <div className="user-name">{first_name} {last_name}</div>
-                    <div className="user-email">{email}</div>
-                    <p><strong>Status: </strong> {status}</p>
-                    <p><strong>Type: </strong> {type}</p>
-                    <p><strong>Employee ID: </strong> {employee_id}</p>
+                    <div className="user-name-email">
+                        <div className="user-name">{first_name} {last_name}</div>
+                        <div className="user-email">{email}</div>
+                    </div>
+                    <div className="user-position">{role_name}</div>
                 </div>
                 <div className="role-details">
-                    <h3>Role Details</h3>
-                    <p><strong>Position:</strong> {role_name}</p>
-                    <p><strong>Job Description:</strong> {description}</p>
-                    <p><strong>Module Permissions:</strong> {Array.isArray(permissions) ? permissions.join(", ") : permissions}</p>
+                    <p><strong>&gt;&nbsp;Status:&nbsp;</strong> {status}</p>
+                    <p><strong>&gt;&nbsp;Type:&nbsp;</strong> {type}</p>
+                    <p><strong>&gt;&nbsp;Employee ID:&nbsp;</strong> {employee_id}</p>
+
+                    <div className="user-description-item">
+                        <p><strong>&gt;&nbsp;Job Description:</strong></p>
+                        <p className="user-desc">{description}</p>
+                    </div>
+                    <div className="user-description-item">
+                        <p><strong>&gt;&nbsp;Module Permissions:</strong></p>
+                        <p>{Array.isArray(permissions) ? permissions.join(", ") : permissions}</p>
+                    </div>
                 </div>
             </div>
             <div className="password-kinetiq-container">

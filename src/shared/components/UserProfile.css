@@ -47,29 +47,50 @@
 
 .usrprofile .user-details{
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
   justify-content: center;
   width: fit-content;
-  height: 100%;
   font-size: 0.8rem;
   color: #7d7d7d;
+  gap: 1rem;
 }
 
-.usrprofile .user-details strong{
-  font-weight: 600;
+.usrprofile .user-details strong, .usrprofile .role-details strong{
+  font-weight: 700;
+  color: #4eb5b5;
 }
 
 .usrprofile .user-name{
   font-size: 2rem;
   color: #008b8b;
   margin-bottom: 0rem;
+  line-height: 2rem;
 }
 
 .usrprofile .user-email{
   color: rgb(155, 160, 162);
   font-size: 0.85rem;
-  margin: 0rem 0rem 1rem 0rem;
+}
+
+.usrprofile .user-position{
+  border-left:  0.15rem solid #b4c0c0; 
+  padding-left: 0.95rem;
+  font-style: italic;
+  font-size: 1.35rem;
+  color: #7ca2a2;
+}
+
+.usrprofile .role-details{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  width: fit-content;
+  height: 12rem;
+  font-size: 0.8rem;
+  color: #7d7d7d;
+  margin-left: 1rem;
 }
 
 .usrprofile .kinetiq-section{
@@ -82,3 +103,4 @@
   height: 100%;
   border: 1px solid red;
 }
+
