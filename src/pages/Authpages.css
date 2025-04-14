@@ -278,11 +278,12 @@ input:-webkit-autofill {
   }
 
   /* Tablet Layout */
-@media (max-width: 1024px) {
+@media (max-width: 1000px) {
   .login-wrapper {
     height: auto; 
     margin-top: 2rem; 
     margin-bottom: 2rem; 
+    flex-direction: column;
   }
   .login-container{
     height: auto; 
