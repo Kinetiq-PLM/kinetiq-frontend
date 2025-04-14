@@ -112,5 +112,56 @@
   flex-direction: column;
   width: 40rem;
   margin-left: 3rem;
+  align-items: center;
+}
+
+.usrprofile .reset-pass {
+  color: teal;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* .usrprofile input[type="password"] {
+  height: 2.3rem;
+  width: 80%;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+} */
+
+.usrprofile .change-password-btn {
+  background-color: #00a7a7;
+  width: 90%;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.usrprofile .pass-wrapper{
+    position: relative;
+    width: 90%;
+    height: 1.5rem;
+    border-radius: 8px;
+    margin: 0.8rem;
+    font-size: 0.9rem;
+}
+
+.usrprofile input[type="password"], 
+.usrprofile input[type="text"]{
+  font-size: 0.9rem;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  cursor: pointer;
+  color: #888;
 }
 
