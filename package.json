@@ -10,9 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
     "@tailwindcss/vite": "^4.0.11",
+<<<<<<< HEAD
     "datepicker": "^0.0.0",
     "lucide-react": "^0.485.0",
+=======
+    "axios": "^1.8.4",
+>>>>>>> 39a3d91 (updated code with database)
     "react": "^19.0.0",
     "react-datepicker": "^8.2.1",
     "react-dom": "^19.0.0"

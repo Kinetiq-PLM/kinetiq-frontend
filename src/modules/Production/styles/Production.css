@@ -502,6 +502,18 @@
   margin: 6px 0;
 }
 
+<<<<<<< HEAD
+=======
+.progress-item span:first-child {
+  flex: 0 0 100px; /* fix width for the label (adjust as needed) */
+}
+
+.progress-item span:last-child {
+  flex: 0 0 20px; /* fix width for the percentage text (adjust as needed) */
+  text-align: right;
+}
+
+>>>>>>> 39a3d91 (updated code with database)
 .bar-container {
   flex-grow: 1;
   height: 8px;
@@ -535,17 +547,74 @@
 
 }
 
+<<<<<<< HEAD
 .availability-dropdown.available {
+=======
+.availability-dropdown.completed {
+>>>>>>> 39a3d91 (updated code with database)
   background-color: #B0F6B0;
   color: #2DA800;
 }
 
+<<<<<<< HEAD
 .availability-dropdown.unavailable {
+=======
+.availability-dropdown.pending {
+>>>>>>> 39a3d91 (updated code with database)
   background: #FECDBF;
   color: #A80000;
 }
 
+<<<<<<< HEAD
 .availability-dropdown.undermaintenance {
   color: #A4742D;
   background: #FFE3AF;
+=======
+.availability-dropdown.in-progress {
+  color: #A4742D;
+  background: #FFE3AF;
+}
+
+/* Table header styles */
+.production-table th {
+  padding: 10px 12px; /* Increase padding for better spacing */
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  color: #404040;
+  border-bottom: 1px solid #D2D2D2;
+  background-color: #ffffff;
+}
+
+/* Table cell styles */
+.production-table td {
+  padding: 10px 12px; /* Increase padding for better spacing */
+  text-align: left;
+  font-size: 14px;
+  color: #000;
+  word-wrap: break-word;
+  white-space: nowrap; /* Prevent wrapping for short content */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Add ellipsis for overflow */
+}
+
+/* Ensure proper table layout */
+
+
+/* Specific styles for "Task ID" and "BOM ID" columns */
+.production-table td:nth-child(2), /* Task ID */
+.production-table td:nth-child(3) { /* BOM ID */
+  text-align: center; /* Center-align content */
+}
+
+/* Specific styles for the "Remarks" column */
+.production-table td:nth-child(7) {
+  text-align: left; /* Align text to the left */
+  white-space: normal; /* Allow wrapping for long remarks */
+}
+
+/* Specific styles for the "Status" column */
+.production-table td:nth-child(8) {
+  text-align: center; /* Center-align the dropdown */
+>>>>>>> 39a3d91 (updated code with database)
 }
