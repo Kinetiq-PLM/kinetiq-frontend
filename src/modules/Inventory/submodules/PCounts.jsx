@@ -17,6 +17,10 @@ const BodyContent = () => {
   const [inventoryItems, setInventoryItems] = useState({});
   const [countHistory, setCountHistory] = useState({});
   const [currentTime, setCurrentTime] = useState(new Date());
+  // New state variables for the remarks modal
+  const [showRemarksModal, setShowRemarksModal] = useState(false);
+  const [pendingStatusChange, setPendingStatusChange] = useState(null);
+  const [remarksInput, setRemarksInput] = useState("");
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -146,6 +150,68 @@ const BodyContent = () => {
         setLoading(false);
       });
   }, []);
+  
+  // Updated function to open the remarks modal instead of using prompt
+  const updateCountStatus = (newStatus) => {
+    if (!selectedRow || !selectedRow.inventory_count_id) return;
+    
+    // Set up the modal with initial values
+    setPendingStatusChange(newStatus);
+    setRemarksInput(selectedRow.remarks || "");
+    setShowRemarksModal(true);
+  };
+
+  // New function to handle the actual status update after the modal is confirmed
+  const confirmStatusUpdate = () => {
+    if (!pendingStatusChange || !selectedRow) return;
+    
+    fetch(`http://127.0.0.1:8000/api/cyclic_counts/${selectedRow.inventory_count_id}/status/`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        status: pendingStatusChange,
+        remarks: remarksInput
+      }),
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => {
+          throw new Error(err.error || `Status change failed: ${response.status}`);
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Update the selected row and the pcounts array
+      setSelectedRow(data);
+      setPcounts(pcounts.map(item => 
+        item.inventory_count_id === data.inventory_count_id ? data : item
+      ));
+      
+      // Close modal and reset
+      setShowRemarksModal(false);
+      setPendingStatusChange(null);
+      setRemarksInput("");
+    })
+    .catch(error => {
+      setError(error.message);
+      setShowRemarksModal(false);
+    });
+  };
+
+  // Add this function to get valid next statuses
+  const getValidNextStatuses = (currentStatus) => {
+    const transitions = {
+      'Open': ['In Progress', 'Cancelled'],
+      'In Progress': ['Completed', 'Cancelled'],
+      'Completed': ['Closed', 'In Progress'],
+      'Closed': [],
+      'Cancelled': []
+    };
+    return transitions[currentStatus] || [];
+  };
 
   const filterByDateRange = (data, range) => {
     return data.filter((item) => {
@@ -421,7 +487,39 @@ const BodyContent = () => {
                             <p className="text-gray-500 text-sm">Warehouse: {selectedRow?.warehouse_location || selectedRow?.warehouse_id || "-"}</p>
                             <p className="text-gray-500 text-sm">Time Period: {selectedRow?.time_period || "-"}</p>
                           </div>
-
+                          {selectedRow && (
+  <div className="mb-4">
+    <h4 className="text-cyan-600 text-sm font-semibold">Status Management</h4>
+    <p className={`text-sm ${getStatusColorClass(selectedRow.status)}`}>
+      Current Status: {getStatusDisplayValue(selectedRow.status)}
+    </p>
+    
+    {getValidNextStatuses(selectedRow.status).length > 0 && (
+      <div className="mt-2">
+        <p className="text-gray-500 text-xs mb-1">Update Status:</p>
+        <div className="flex flex-wrap gap-1">
+          {getValidNextStatuses(selectedRow.status).map(status => (
+            <button
+              key={status}
+              onClick={() => updateCountStatus(status)}
+              className={`text-xs px-2 py-1 rounded ${
+                status === 'Cancelled' 
+                  ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                  : status === 'Completed' 
+                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                    : status === 'Closed'
+                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+)}
                           {selectedRow.inventory_item_id && (
                             <div className="mb-4">
                               <h4 className="text-cyan-600 text-sm font-semibold">Count History</h4>
@@ -483,6 +581,48 @@ const BodyContent = () => {
           selectedItem={selectedRow}
           inventoryItems={inventoryItems}
         />
+      )}
+
+      {/* Custom remarks modal */}
+      {showRemarksModal && (
+        <div className="modal-overlay">
+          <div className="modal-content w-96">
+            <h3 className="text-lg font-semibold mb-4">Update Status</h3>
+            <p className="mb-2">
+              Changing status to: <span className={getStatusColorClass(pendingStatusChange)}>{pendingStatusChange}</span>
+            </p>
+            
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Add remarks for this status change (optional):
+              </label>
+              <textarea
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                rows="3"
+                value={remarksInput}
+                onChange={(e) => setRemarksInput(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex justify-end">
+              <button
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2"
+                onClick={() => {
+                  setShowRemarksModal(false);
+                  setPendingStatusChange(null);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded"
+                onClick={confirmStatusUpdate}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
