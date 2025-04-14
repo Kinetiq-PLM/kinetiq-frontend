@@ -137,28 +137,57 @@ export default function StandaloneLogin() {
 
               {view === "forgot" && (
                 <>
-                  <p>Enter a valid email, you will be sent a message with a code to reset your password.</p>
-                  <input
-                    type="text"
-                    name="username"
-                    placeholder="Email"
-                    value={resetData.username}
-                    onChange={(e) => setResetData({ ...resetData, username: e.target.value })}
-                    required
-                  />
-                  <div className="login-options">
-                    <button className="login-btn" onClick={() => setView("reset")}>
-                      Reset password
-                    </button>
-                    <button className="login-btn" onClick={() => setView("login")}>
-                      Back
-                    </button>
-                  </div>
+                  <p>Enter your email. We’ll send a code to reset your password.</p>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+
+                      const isValidEmail = /^[^\s@]+@[^\s@]+\.(com)$/.test(resetData.username);
+                      if (!isValidEmail) {
+                        setLoginError("* Please enter a valid email address *");
+                        return;
+                      }
+                      setLoginError(""); // clear any old error
+
+                      //handleResetPassword(resetData.username);
+                      setView("reset");
+
+                    }}
+                  >
+                    <input
+                      type="email"
+                      name="username"
+                      placeholder="Enter your email"
+                      value={resetData.username}
+                      onChange={(e) => {
+                        setResetData({ ...resetData, username: e.target.value });
+                        setLoginError("");
+                      }}
+                      required
+                    />
+                    {loginError && <p className="login-error">{loginError}</p>}
+                    <div className="login-options">
+                      <button type="submit" className="login-btn">
+                        Reset my password
+                      </button>
+                      <button
+                        type="button"
+                        className="login-btn"
+                        onClick={() => {
+                          setLoginError("");
+                          setView("login");
+                        }}
+                      >
+                        Back
+                      </button>
+                    </div>
+                  </form>
                 </>
               )}
 
               {view === "reset" && (
                 <>
+                  <p>We’ve sent a code to <strong>{resetData.username}</strong>. Enter it below with your new password.</p>
                   <input
                     type="text"
                     name="code"
@@ -198,7 +227,7 @@ export default function StandaloneLogin() {
               )}
             </div>
 
-
+          
           </div>
 
 
