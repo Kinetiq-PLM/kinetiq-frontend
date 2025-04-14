@@ -21,7 +21,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
         { number: "000000002", type: "Non Project", details: "Tondo Hospital - Package.. ", date: "July 3 2025" },
         { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
-        
+    ];
+
+    const bomDetails = [
+        { no: 1, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600 },
+        { no: 2, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", qtyRawMaterial: 80, unit: "kg", costPerUnit: 100, totalCost: 800 },
+        { no: 1, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600 },
+        { no: 2, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", qtyRawMaterial: 80, unit: "kg", costPerUnit: 100, totalCost: 800 },
+        { no: 1, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600 },
+        { no: 2, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", qtyRawMaterial: 80, unit: "kg", costPerUnit: 100, totalCost: 800 },
+        { no: 1, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600 },
+        { no: 2, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", qtyRawMaterial: 80, unit: "kg", costPerUnit: 100, totalCost: 800 },
     ];
 
     const cellStyle = (width) => ({width, padding: '10px 12px', textAlign: 'center', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, color: '#585757', borderBottom: '1px solid #E8E8E8', borderLeft: '1px solid #E8E8E8', wordWrap: 'break-word', lineHeight: 1, });
@@ -49,117 +59,43 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
       };
       
     const filteredData = getFilteredData();
-    
+    const buttonStyle = (bg, border, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer', });
+    const buttonStyle2 = (bg, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, border: '0.5px solid #585757', color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer',});
+    const rowCellStyle = {flex: '1 1 14%', minWidth: 120, padding: '12px', textAlign: 'center', fontFamily: 'Inter', fontSize: 15, color: '#585757'};
 
-    return (
-        
+    return (      
         <div className="reqplan">
-            <div style={{
-                width: '100%',
-                height: '100%',
-                padding: '2rem',
-                background: 'white',
-                boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)',
-                overflow: 'hidden',
-                borderRadius: 10,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                rowGap: 25,
-            }}>
+            <div style={{width: '100%', height: '100%', padding: '2rem', background: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)', overflow: 'hidden', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', rowGap: 25,}}>
                 <div className="title">MRP LIST</div>
                 {/* Tabs + Search */}
-                <div style={{
-                width: '100%',
-                maxWidth: 1300,
-                display: 'flex',
-                flexWrap: 'wrap',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                rowGap: 10,
-                paddingLeft: 80,
-                paddingRight: 80,
-                }}>
+                <div style={{width: '100%', maxWidth: 1300, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', rowGap: 10,paddingLeft: 80, paddingRight: 80,}}>
                 {/* Tabs */}
-                <div className="tabs-container" style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 15,
-                    flex: '1 1 auto',
-                    minWidth: 200,
-                }}>
+                <div className="tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 15,flex: '1 1 auto', minWidth: 200,}}>
                     {['All Orders', 'Project Orders', 'Non-Project Orders'].map((label, i) => (
                     <div key={label}
                         onClick={() => setFlag(i)}
                         onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")}
                         onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                        style={{
-                        minWidth: 120,
-                        padding: '10px 16px',
-                        background: 'white',
-                        boxShadow: flag === i ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        display: 'flex',
-                        cursor: 'pointer'
+                        style={{ minWidth: 120, padding: '10px 16px', background: 'white', boxShadow: flag === i ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', justifyContent: 'center', alignItems: 'center', display: 'flex', cursor: 'pointer'
                         }}>
-                        <div className="text-tab" style={{
-                        textAlign: 'center',
-                        color: flag === i ? '#00A8A8' : '#585757',
-                        fontSize: 16,
-                        fontFamily: 'Inter',
-                        fontWeight: '500',
-                        lineHeight: 1
-                        }}>{label}</div>
+                        <div className="text-tab" style={{textAlign: 'center', color: flag === i ? '#00A8A8' : '#585757', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1}}>{label}</div>
                     </div>
                     ))}
                 </div>
 
                 {/* Search Box */}
-                <div className="search-container" style={{
-                    background: '#F7F9FB',
-                    borderRadius: 8,
-                    outline: '1px rgba(132,132,132,0.25) solid',
-                    padding: 5,
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginTop: 10,
-                    paddingRight: 100,
-                    alignItems: 'stretch',
-                }}>
+                <div className="search-container" style={{background: '#F7F9FB', borderRadius: 8, outline: '1px rgba(132,132,132,0.25) solid', padding: 5, display: 'flex', alignItems: 'center', marginTop: 10, paddingRight: 100, alignItems: 'stretch',}}>
                     <input
                     placeholder="Search Order Number..."
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{
-                        flex: 1,
-                        padding: '8px',
-                        border: 'none',
-                        outline: 'none',
-                        backgroundColor: 'transparent',
-                        color: '#969696',
-                        fontSize: 16,
-                        fontFamily: 'Inter'
-                    }}
-                    />
+                    style={{flex: 1, padding: '8px', border: 'none', outline: 'none', backgroundColor: 'transparent', color: '#969696', fontSize: 16, fontFamily: 'Inter'}}/>
                 </div>
                 </div>
 
                 {/* Table Container */}
-                <div className="reqplan-table-scroll" style={{
-                width: '100%',
-                maxWidth: 1159,
-                background: 'white',
-                boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)',
-                overflowY: 'auto',
-                maxHeight: '450px',
-                borderRadius: 20,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 20,
-                padding: '1rem'
-                }}>
+                <div className="reqplan-table-scroll" style={{width: '100%', maxWidth: 1159, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflowY: 'auto', maxHeight: '450px', borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '1rem'}}>
                 {/* Header */}
                 <div className="table-header" style={{
                     display: 'flex',
@@ -170,18 +106,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     <div
                         className="table-cell2"
                         key={label}
-                        data-label={label}
-                        style={{
-                        flex: '1 1 25%',
-                        minWidth: 150,
-                        padding: '12px',
-                        fontWeight: 700,
-                        textAlign: 'center',
-                        color: '#585757',
-                        fontFamily: 'Inter',
-                        fontSize: 18
-                        }}
-                    >
+                        data-label={label} 
+                        style={{flex: '1 1 25%', minWidth: 150, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter',fontSize: 18}}>
                         {label}
                     </div>
                     ))}
@@ -207,16 +133,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         className="table-cell"
                         key={idx}
                         data-label={['Order No.', 'Type', 'Details', 'Date'][idx]}
-                        style={{
-                        flex: '1 1 25%',
-                        minWidth: 150,
-                        padding: '12px',
-                        textAlign: 'center',
-                        fontFamily: 'Inter',
-                        fontSize: 16,
-                        color: '#585757'
-                        }}
-                    >
+                        style={{flex: '1 1 25%', minWidth: 150, padding: '12px', textAlign: 'center', fontFamily: 'Inter', fontSize: 16, color: '#585757'}}>
                         {val}
                     </div>
                     ))}
@@ -225,211 +142,140 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 </div>
             </div>
 
-
-
             {isOpen && (
-                <div className="bom-print-modal">
+            <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center">
-                    <div style={{width: 953, height: 527, position: 'relative', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 10}}>
-                        <button onClick={() => setIsOpen(false)}><div style={{width: 110, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 72, paddingRight: 24, left: 37, top: 460, position: 'absolute', background: 'white', overflow: 'hidden', borderRadius: 8, outline: '1.50px #A4A4A4 solid', outlineOffset: '-1.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                            <div style={{justifyContent: 'center', alignItems: 'center', gap: 0, display: 'inline-flex'}}>
-                                <div className="MRPIcon3" style={{width: 15, height: 21, paddingRight: 25 }} />
-                                <div style={{width: 90, paddingLeft: 0, paddingRight: 2, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#969696', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>back</div>
-                                </div>
-                            </div>
-                        </div></button>
-                        <div style={{width: 92, height: 29, left: 528, top: 161, position: 'absolute', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
-                        <div data-property-1="Disabled" style={{width: 201, height: 40, padding: 10, left: 528, top: 194, position: 'absolute', background: '#E9E9E9', borderRadius: 10, outline: '1.50px #E5E5E5 solid', outlineOffset: '-1.50px', justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
-                            <div style={{color: '#585757', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Project</div>
+                <div className="modal-inner" style={{ width: '90%', maxWidth: 953, background: 'white', borderRadius: 10, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', padding: 24, display: 'flex', flexDirection: 'column', gap: 24, }}>
+                    <div
+                    style={{fontSize: 'clamp(20px, 3vw, 35px)', fontFamily: 'Inter', fontWeight: 500, textAlign: 'center', color: '#130101', paddingTop: 30,}}>Order Details</div>
+
+                    {/* INFO SECTION */}
+                    <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 20, padding: 20,}}>
+                    {[
+                        { label: 'Order No.', value: mrpData[0].number },
+                        { label: 'Type', value: mrpData[0].type },
+                        { label: 'Details', value: mrpData[0].details },
+                        { label: 'Date', value: mrpData[0].date },
+                    ].map((item) => (
+                        <div key={item.label} style={{ flex: '1 1 45%', minWidth: 200}}>
+                        <div style={{fontSize: 'clamp(14px, 2vw, 18px)', fontWeight: '500', color: '#585757', marginBottom: 5,}}>
+                            {item.label}
                         </div>
-                        <div style={{width: 92, height: 29, left: 528, top: 268, position: 'absolute', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Date</div>
-                        <div data-property-1="Disabled" style={{width: 201, height: 40, padding: 10, left: 528, top: 301, position: 'absolute', background: '#E9E9E9', borderRadius: 10, outline: '1.50px #E5E5E5 solid', outlineOffset: '-1.50px', justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
-                            <div style={{color: '#585757', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>July 3 2025</div>
+                        <div style={{ padding: 15, background: '#E9E9E9', borderRadius: 10, fontSize: 'clamp(14px, 2vw, 17px)', color: '#585757', outline: '1.5px solid #E5E5E5',}}>
+                            {item.value}
                         </div>
-                        <div style={{width: 92, height: 29, left: 95, top: 276, position: 'absolute', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Details</div>
-                        <div data-property-1="Disabled" style={{width: 326, height: 92, padding: 10, left: 95, top: 305, position: 'absolute', background: '#E9E9E9', borderRadius: 10, outline: '1.50px #E5E5E5 solid', outlineOffset: '-1.50px', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 30, display: 'inline-flex'}}>
-                            <div style={{color: '#585757', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Tondo Hospital - Package Order</div>
                         </div>
-                        <div style={{width: 92, height: 29, left: 95, top: 161, position: 'absolute', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
-                        <div data-property-1="Disabled" style={{width: 201, height: 40, padding: 10, left: 95, top: 194, position: 'absolute', background: '#E9E9E9', borderRadius: 10, outline: '1.50px #E5E5E5 solid', outlineOffset: '-1.50px', justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
-                            <div style={{color: '#585757', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>000000001</div>
-                        </div>
-                        <div style={{left: 360, top: 60, position: 'absolute', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#130101', fontSize: 35, fontFamily: 'Inter', fontWeight: '400', textTransform: 'capitalize', lineHeight: 1, letterSpacing: 1.40, wordWrap: 'break-word'}}>Order Details</div>
-                        <button onClick={() => {setIsOpen2(true),setIsOpen(false) }}><div style={{width: 110, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 24, paddingRight: 15, left: 813, top: 460, position: 'absolute', background: '#00A8A8', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div style={{justifyContent: 'center', alignItems: 'center', gap: 3, display: 'inline-flex'}}>
-                                <div style={{width: 50, paddingLeft: 2, paddingRight: 10, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, paddingTop: 1, display: 'flex'}}>
-                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: 'white', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Next</div>
-                                </div>
-                                <div className="MRPIcon5" style={{width: 13, height: 21, transformOrigin: 'top left'}} />
-                            </div>
-                        </div></button>
+                    ))}
+                    </div>
+
+                    {/* BUTTONS */}
+                    <div
+                    style={{display: 'flex', justifyContent: 'space-between', marginTop: 'auto', flexWrap: 'wrap', gap: 10,}}>
+                    <button onClick={() => setIsOpen(false)} style={buttonStyle2('#fff', '#A4A4A4')}>
+                        <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
+                        <span style={{ color: '#969696' }}>Back</span>
+                    </button>
+
+                    <button
+                        onClick={() => {setIsOpen2(true); setIsOpen(false);}}
+                        style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                        <span>Next</span>
+                        <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
+                    </button>
                     </div>
                 </div>
                 </div>
+            </div>
             )}
 
             {isOpen2 && (
-                <div className="bom-print-modal">
+            <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center">
-                    <div style={{width: 1361, height: 760, position: 'relative', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 10}}>
-                        <button onClick={() => {setIsOpen2(false),setIsOpen(true) }}><div style={{width: 115, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 72, paddingRight: 24, left: 46, top: 683, position: 'absolute', background: 'white', overflow: 'hidden', borderRadius: 8, outline: '1.50px #A4A4A4 solid', outlineOffset: '-1.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                            <div style={{justifyContent: 'center', alignItems: 'center', gap: 0, display: 'inline-flex'}}>
-                                <div className="MRPIcon3" style={{width: 15, height: 21, paddingRight: 25 }} />
-                                <div style={{width: 90, paddingLeft: 0, paddingRight: 2, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#969696', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>back</div>
+                    <div style={{width: '90vw', maxWidth: 1360, height: '90vh', maxHeight: 760, background: 'white', borderRadius: 10, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem',}}>
+                        {/* Title */}
+                        <div style={{fontSize: 'clamp(24px, 3vw, 35px)', fontFamily: 'Inter', fontWeight: 500, textAlign: 'center',color: '#130101',}}>Product Pricing</div>
+
+                        {/* Table */}
+                        <div className="reqplan-table-scroll" style={{width: '100%', flex: 1, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflowY: 'auto', borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '1rem',}}>
+                        {/* Header */}
+                        <div className="table-header" style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8',}}>
+                            {['No.', 'Product ID', 'Product', 'Product Description', 'Quantity', 'Raw Materials', 'Cost'].map(
+                            (label) => (
+                                <div
+                                key={label}
+                                style={{
+                                    flex: '1 1 14%',
+                                    minWidth: 120,
+                                    padding: '12px',
+                                    fontWeight: 700,
+                                    textAlign: 'center',
+                                    color: '#585757',
+                                    fontFamily: 'Inter',
+                                    fontSize: 16,
+                                }}
+                                >
+                                {label}
                                 </div>
-                            </div>
-                        </div></button>
-                        <button onClick={() => {setIsOpen2(false), setAdditionalCost(true)}}><div style={{width: 110, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 24, paddingRight: 15, left: 1193, top: 683, position: 'absolute', background: '#00A8A8', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div style={{justifyContent: 'center', alignItems: 'center', gap: 3, display: 'inline-flex'}}>
-                                <div style={{width: 50, paddingLeft: 2, paddingRight: 10, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, paddingTop: 2,  display: 'flex'}}>
-                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: 'white', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Next</div>
-                                </div>
-                                <div className="MRPIcon5" style={{width: 13, height: 21, transformOrigin: 'center'}} />
-                            </div>
-                        </div></button>
-                        <div style={{width: 452, height: 70, left: 477, top: 22, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#130101', fontSize: 35, fontFamily: 'Inter', fontWeight: '400', textTransform: 'capitalize', lineHeight: 16, letterSpacing: 1.40, wordWrap: 'break-word'}}>Product Pricing</div>
-                        <div style={{width: 1256, height: 486, paddingTop: 3, paddingBottom: 3, left: 47, top: 106, position: 'absolute', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 20, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 0, display: 'inline-flex'}}>
-                            <div style={{width: 1256, background: 'white', overflow: 'hidden', borderRadius: 4, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                                <div style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div data-type="Header" style={{width: 96, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>No.</div>
-                                        </div>
-                                    </div>
-                                    <div data-type="Header" style={{width: 175, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Product ID</div>
-                                        </div>
-                                    </div>
-                                    <div data-type="Header" style={{width: 176, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Product</div>
-                                        </div>
-                                    </div>
-                                    <div data-type="Header" style={{width: 303, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Product Description</div>
-                                        </div>
-                                    </div>
-                                    <div data-type="Header" style={{width: 139, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 19, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Quantity</div>
-                                        </div>
-                                    </div>
-                                    <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 19, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Raw Materials</div>
-                                        </div>
-                                    </div>
-                                    <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 19, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Cost</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div data-type="Default" style={{width: 96, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>1</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 175, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>PROD0001</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 176, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Hospital Bed</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 303, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>A sturdy bed</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 139, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>12 pcs</div>
-                                    </div>
-                                </div>
-                                <div onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0)")} onClick={() => setRawMaterial(true)} data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#858585', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Show List</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>₱10,000.20</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div data-type="Default" style={{width: 96, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>1</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 175, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>PROD0001</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 176, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Hospital Bed</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 303, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>A sturdy bed</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{width: 139, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>12 pcs</div>
-                                    </div>
-                                </div>
-                                <div onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0)")} onClick={() => setRawMaterial(true)} data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#858585', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Show List</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>₱10,000.20</div>
-                                    </div>
-                                </div>
-                            </div>
+                            )
+                            )}
                         </div>
-                        <div data-property-1="Disabled" style={{width: 201, height: 40, padding: 10, left: 625, top: 683, position: 'absolute', background: '#F5F5F5', borderRadius: 10, outline: '1.50px #E5E5E5 solid', outlineOffset: '-1.50px', justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
-                            <div style={{color: '#585757', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>000000002</div>
-                        </div>
-                        <div style={{width: 92, height: 29, left: 528, top: 688, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
-                        <div style={{width: 587, height: 50, left: 649, top: 613, position: 'absolute', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 20}}>
-                            <div style={{width: 283, height: 40, left: 0, top: 10, position: 'absolute', background: 'white', overflow: 'hidden'}}>
-                                <div style={{width: 258, left: 12.50, top: 8, position: 'absolute', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Total Cost of Products:</div>
+
+                        {/* Rows */}
+                        {bomDetails.map((item, index) => (
+                            <div
+                            key={index}
+                            className="table-row"
+                            style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
+                            <div style={rowCellStyle}>{item.no}</div>
+                            <div style={rowCellStyle}>{`PROD${String(item.no).padStart(4, '0')}`}</div>
+                            <div style={rowCellStyle}>{item.product}</div>
+                            <div style={rowCellStyle}>{`Description of ${item.product}`}</div>
+                            <div style={rowCellStyle}>{item.qtyProduct} pcs</div>
+                            <div onClick={() => setRawMaterial(true)} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
+                            <div style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
                             </div>
-                            <div style={{width: 276, paddingLeft: 24, paddingRight: 24, paddingTop: 8, paddingBottom: 8, left: 277.46, top: 10, position: 'absolute', background: 'white', overflow: 'hidden', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                                <div style={{width: 227, textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>₱40,000.80</div>
-                            </div>
+                        ))}
+
                         </div>
-                        <div style={{width: 472, height: 50, left: 125, top: 613, position: 'absolute', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 20}}>
-                            <div style={{width: 444, left: 15, top: 10, position: 'absolute', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                                <div style={{width: 198, height: 40, position: 'relative', background: 'white', overflow: 'hidden'}}>
-                                    <div style={{width: 177, left: 10.50, top: 8, position: 'absolute', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Total Quantity:</div>
+                            {/* Summary Section */}
+                            <div style={{width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem',}}>
+                            {/* Left: Quantity + Total Cost */}
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
+                                <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                                    <span style={{ fontWeight: 500, color: '#585757' }}>Total Quantity:</span>
+                                    <span style={{ fontWeight: 500, color: '#585757' }}>12</span>
                                 </div>
-                                <div style={{width: 221, height: 40, position: 'relative', background: 'white', overflow: 'hidden'}}>
-                                    <div style={{width: 171, left: 25, top: 8, position: 'absolute', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>12</div>
+                                <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                                    <span style={{ fontWeight: 500, color: '#585757' }}>Total Cost of Products:</span>
+                                    <span style={{ fontWeight: 500, color: '#585757' }}>₱40,000.80</span>
+                                </div>
+
+                                <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10}}>
+                                        <span style={{ fontWeight: 500, color: '#585757' }}>Order No.</span>
+                                    <div
+                                    style={{padding: '6px 24px', background: '#F5F5F5', borderRadius: 10,fontSize: 16, color: '#585757', fontFamily: 'Inter', fontWeight: 500, }}>000000002</div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    {/* Buttons */}
+                    <div
+                    style={{width: '100%',  display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto',}}>
+                        <button onClick={() => { setIsOpen2(false); setIsOpen(true); }} style={buttonStyle2('#fff')}>
+                            <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
+                            <span style={{ color: '#969696' }}>Back</span>
+                        </button>
+
+                        <button onClick={() => { setIsOpen2(false); setAdditionalCost(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                            <span>Next</span>
+                            <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
+                        </button>
+                    </div>
                 </div>
                 </div>
+            </div>
             )}
 
             {rawmaterial && (
@@ -661,7 +507,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             </div>
                         </div></button>
                         <div data-property-1="Disabled" style={{width: 201, height: 40, padding: 10, left: 331, top: 656, position: 'absolute', background: '#F5F5F5', borderRadius: 10, outline: '1.50px #E5E5E5 solid', outlineOffset: '-1.50px', justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
-                            <div style={{color: '#585757', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>000000002</div>
+                            <div style={{color: '#D2D2D2', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>000000002</div>
                         </div>
                         <div style={{width: 92, height: 29, left: 234, top: 661, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
                     </div>

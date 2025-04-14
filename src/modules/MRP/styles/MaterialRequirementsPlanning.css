@@ -137,6 +137,17 @@
     max-width: 95%;
     padding: 1rem;
   }
+  .reqplan .search-container{
+    align-items: stretch ;
+    width: 100%;
+  }
+
+  .reqplan .tabs-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    font-size: 8px;
+  }
 
   
 }
@@ -349,4 +360,58 @@
 
 .reqplan-table-scroll::-webkit-scrollbar-track {
   background-color: #f0f0f0;
+}
+
+
+.reqplan .bom-print-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+}
+
+.reqplan .modal-inner {
+  width: 953px;
+  height: 527px;
+  transition: width 0.3s, height 0.3s, left 0.3s, top 0.3s;
+}
+
+@media (max-width: 860px) {
+  .reqplan .modal-inner {
+    width: 90%;
+    height: auto;
+    left: auto;
+    top: auto;
+    position: relative;
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  .reqplan .modal-inner button,
+  .reqplan .modal-inner div[style="position: 'absolute'"] {
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .reqplan .modal-inner {
+    width: 95%;
+    padding: 0.5rem;
+  }
+  .reqplan .modal-inner button,
+  .reqplan .modal-inner div[style="position: 'absolute'"] {
+    font-size: 14px !important;
+    padding: 4px 6px !important;
+  }
 }
