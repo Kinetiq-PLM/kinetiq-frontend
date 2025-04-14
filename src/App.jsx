@@ -40,7 +40,9 @@ function App() {
       console.log(localStorage.getItem("user"));
     } else {
       setUser(null);
+      navigate("/login", { replace: true }); // redirect to login if no user found
     }
+
   }, []);
 
   const handleLogout = () => {
@@ -48,16 +50,6 @@ function App() {
     setUser(null);   // clear local user state 
     navigate("/login");  // redirect to login
   };
-
-  // if you need to just go to shellapp just comment out the 4 lines below: 
-  const isAuthenticated = user !== null;
-
-  if (!loading && !isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  // up til here ^^
-  // -- then just remove "/login" from the url -- tho u wont have any user data since u didn't log in (unless u'll hard code it)
-
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
