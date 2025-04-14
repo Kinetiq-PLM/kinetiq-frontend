@@ -19,7 +19,7 @@ export default function StandaloneLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState("");
-
+  // localStorage.setItem('login_attemtps', '1')
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials(prev => ({ ...prev, [name]: value }));
@@ -31,6 +31,14 @@ export default function StandaloneLogin() {
     console.log("Logging in:", credentials);
 
     try {
+      const lock_date = new Date(localStorage.getItem('login_lock_time'))
+      if (new Date() < lock_date) {
+        console.log('too many attempts timer, current attempts: ' + localStorage.getItem('login_attempts'))
+        console.log('lock lifts at ' + lock_date.toString())
+        setLoginError(`*Too many failed login attempts. Please try again in ${Math.ceil((lock_date - new Date())/1000)} seconds.*`)
+        return;
+      }
+
       const response = await axios.post("http://127.0.0.1:8000/login/", {
         email: credentials.email,
         password: credentials.password,
@@ -39,12 +47,24 @@ export default function StandaloneLogin() {
       const data = response.data;
 
       if (data.success) {
+        localStorage.setItem('login_attempts', '0');
         console.log("Login successful:", data);
         localStorage.setItem("user", JSON.stringify(data.data));
         navigate("/");
       }
     } catch (err) {
       if (err.response && err.response.data) {
+        localStorage.setItem('login_attempts', (parseInt(localStorage.getItem('login_attempts')) + 1).toString())
+        console.log('attempts' + localStorage.getItem('login_attempts'))
+        if (parseInt(localStorage.getItem('login_attempts')) >= 5 && parseInt(localStorage.getItem('login_attempts')) < 10) {
+          var lock_time = new Date();
+          lock_time.setMinutes(lock_time.getMinutes() + 1)
+          localStorage.setItem('login_lock_time', lock_time.toString())
+        } else if (parseInt(localStorage.getItem('login_attempts')) >= 10) {
+          console.log('sending to forgot page')
+          localStorage.setItem('login_attempts', '0');
+          setView('forgot')
+        }
         // django error payload
         const { message } = err.response.data;
         console.error("Login failed:", message);
