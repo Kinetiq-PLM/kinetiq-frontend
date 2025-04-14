@@ -13,100 +13,219 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isOpen2, setIsOpen2] = useState(false);
     const [flag, setFlag] = useState(0);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const mrpData = [
         { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
         { number: "000000002", type: "Non Project", details: "Tondo Hospital - Package.. ", date: "July 3 2025" },
+        { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
+        { number: "000000002", type: "Non Project", details: "Tondo Hospital - Package.. ", date: "July 3 2025" },
+        { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
+        
     ];
+
+    const cellStyle = (width) => ({width, padding: '10px 12px', textAlign: 'center', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, color: '#585757', borderBottom: '1px solid #E8E8E8', borderLeft: '1px solid #E8E8E8', wordWrap: 'break-word', lineHeight: 1, });
+
+    const getFilteredData = () => {
+        return mrpData.filter((item) => {
+          const matchesFlag =
+            flag === 0 ||
+            (flag === 1 && item.type === "Project") ||
+            (flag === 2 && item.type === "Non Project");
+      
+          const term = (searchTerm || "").toLowerCase(); // prevent null error
+      
+          const number = (item.number || "").toLowerCase();
+          const date = (item.date || "").toLowerCase();
+          const details = (item.details || "").toLowerCase();
+      
+          const searchMatch =
+            number.includes(term) ||
+            date.includes(term) ||
+            details.includes(term);
+      
+          return matchesFlag && searchMatch;
+        });
+      };
+      
+    const filteredData = getFilteredData();
+    
 
     return (
         
         <div className="reqplan">
-            
-            <div style={{width: '100%', height: '100%', paddingLeft: 43, paddingRight: 43, paddingTop: 31, paddingBottom: 31, background: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)', overflow: 'hidden', borderRadius: 10, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', rowGap: 25, display: 'inline-flex'}}>
-            <div className="title">MRP LIST</div>
-            <div style={{width: 1300, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                    <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex',paddingRight: 30}}>
-                        <div onClick={() => setFlag(0)} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0)")} style={{width: 185, padding: 13, background: 'white', boxShadow: flag === 0 ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', overflow: 'hidden', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
-                            <div style={{textAlign: 'center', color: flag === 0 ? '#00A8A8' : '#585757', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>All Orders</div>
-                        </div>
-                        <div onClick={() => setFlag(1)} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0)")} style={{width: 190, height: 43, paddingTop: 8, paddingBottom: 8, background: 'white', boxShadow: flag === 1 ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', overflow: 'hidden', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                            <div style={{textAlign: 'center', color: flag === 1 ? '#00A8A8' : '#585757', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Project Orders</div>
-                        </div>
-                        <div onClick={() => setFlag(2)} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0)")} style={{width: 190, height: 43, paddingTop: 8, paddingBottom: 8, background: 'white', boxShadow: flag === 2 ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', overflow: 'hidden', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                            <div style={{textAlign: 'center', color: flag === 2 ? '#00A8A8' : '#585757', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Non-Project Orders</div>
-                        </div>
+            <div style={{
+                width: '100%',
+                height: '100%',
+                padding: '2rem',
+                background: 'white',
+                boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)',
+                overflow: 'hidden',
+                borderRadius: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                rowGap: 25,
+            }}>
+                <div className="title">MRP LIST</div>
+                {/* Tabs + Search */}
+                <div style={{
+                width: '100%',
+                maxWidth: 1300,
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                rowGap: 10,
+                paddingLeft: 80,
+                paddingRight: 80,
+                }}>
+                {/* Tabs */}
+                <div className="tabs-container" style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 15,
+                    flex: '1 1 auto',
+                    minWidth: 200,
+                }}>
+                    {['All Orders', 'Project Orders', 'Non-Project Orders'].map((label, i) => (
+                    <div key={label}
+                        onClick={() => setFlag(i)}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                        style={{
+                        minWidth: 120,
+                        padding: '10px 16px',
+                        background: 'white',
+                        boxShadow: flag === i ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        display: 'flex',
+                        cursor: 'pointer'
+                        }}>
+                        <div className="text-tab" style={{
+                        textAlign: 'center',
+                        color: flag === i ? '#00A8A8' : '#585757',
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                        fontWeight: '500',
+                        lineHeight: 1
+                        }}>{label}</div>
                     </div>
-                    <div style={{justifyContent: 'flex-end', alignItems: 'flex-start', gap: 25, display: 'flex'}}>
-                        <div style={{width: 250, background: '#F7F9FB', overflow: 'hidden', borderRadius: 8, outline: '1px rgba(132.72, 132.72, 132.72, 0.25) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end', gap: 10, display: 'inline-flex'}}>
-                            <div style={{alignSelf: 'stretch', height: 40, position: 'relative', overflow: 'hidden'}}>
-                                <div className="MRPSearch" style={{width: 20, height: 20, left: 12, top: 10, position: 'absolute'}} />
-                                <div style={{width: 210, height: 24, left: 40, top: 8, position: 'absolute'}}>
-                                    <input placeholder="Search Order Number..." type="text" style={{ width: 210, left: 0, top: 3, position: 'absolute', color: '#969696', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word', border: 'none', outline: 'none', backgroundColor: 'transparent'}}/>
-                                </div>
-                            </div>
-                        </div>
-                        
-                    </div>
+                    ))}
                 </div>
-                <div style={{width: 1156, height: 491, paddingTop: 10, paddingBottom: 10, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 20, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 20, display: 'flex'}}>
-                    <div style={{alignSelf: 'stretch', borderRadius: 20, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', background: 'white', overflow: 'hidden', borderRadius: 4, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
-                            <div style={{alignSelf: 'stretch', paddingTop: 0.50, paddingBottom: 0.50, background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
-                                    </div>
-                                </div>
-                                <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
-                                    </div>
-                                </div>
-                                <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Details</div>
-                                    </div>
-                                </div>
-                                <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Date</div>
-                                    </div>
-                                </div>
-                            </div>
-                            {mrpData.map((item, index) => (
-                                <div key={index}
-                                onClick={() => setIsOpen(true)}
-                                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
-                                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0)")}
-                                style={{ cursor: 'pointer', alignSelf: 'stretch', paddingTop: 0.5, paddingBottom: 0.5, background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex' }}
-                                >
-                                <div data-type="Default" style={{ flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex' }}>
-                                    <div style={{ alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex' }}>
-                                    <div style={{ flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word' }}>{item.number}</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{ flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex' }}>
-                                    <div style={{ alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex' }}>
-                                    <div style={{ flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word' }}>{item.type}</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{ flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex' }}>
-                                    <div style={{ alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex' }}>
-                                    <div style={{ flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word' }}>{item.status}</div>
-                                    </div>
-                                </div>
-                                <div data-type="Default" style={{ flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex' }}>
-                                    <div style={{ alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex' }}>
-                                    <div style={{ flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word' }}>{item.date}</div>
-                                    </div>
-                                </div>
-                                </div>
-                            ))}
-                        </div>
+
+                {/* Search Box */}
+                <div className="search-container" style={{
+                    background: '#F7F9FB',
+                    borderRadius: 8,
+                    outline: '1px rgba(132,132,132,0.25) solid',
+                    padding: 5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginTop: 10,
+                    paddingRight: 100,
+                    alignItems: 'stretch',
+                }}>
+                    <input
+                    placeholder="Search Order Number..."
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{
+                        flex: 1,
+                        padding: '8px',
+                        border: 'none',
+                        outline: 'none',
+                        backgroundColor: 'transparent',
+                        color: '#969696',
+                        fontSize: 16,
+                        fontFamily: 'Inter'
+                    }}
+                    />
+                </div>
+                </div>
+
+                {/* Table Container */}
+                <div className="reqplan-table-scroll" style={{
+                width: '100%',
+                maxWidth: 1159,
+                background: 'white',
+                boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)',
+                overflowY: 'auto',
+                maxHeight: '450px',
+                borderRadius: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 20,
+                padding: '1rem'
+                }}>
+                {/* Header */}
+                <div className="table-header" style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    borderBottom: '1px solid #E8E8E8',
+                }}>
+                    {['Order No.', 'Type', 'Details', 'Date'].map((label, i) => (
+                    <div
+                        className="table-cell2"
+                        key={label}
+                        data-label={label}
+                        style={{
+                        flex: '1 1 25%',
+                        minWidth: 150,
+                        padding: '12px',
+                        fontWeight: 700,
+                        textAlign: 'center',
+                        color: '#585757',
+                        fontFamily: 'Inter',
+                        fontSize: 18
+                        }}
+                    >
+                        {label}
                     </div>
+                    ))}
+                </div>
+
+                {/* Rows */}
+                {filteredData.map((item, index) => (
+                    <div
+                    className="table-row"
+                    key={index}
+                    onClick={() => setIsOpen(true)}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                    style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        cursor: 'pointer',
+                        borderBottom: '1px solid #E8E8E8',
+                    }}
+                    >
+                    {[item.number, item.type, item.details, item.date].map((val, idx) => (
+                    <div
+                        className="table-cell"
+                        key={idx}
+                        data-label={['Order No.', 'Type', 'Details', 'Date'][idx]}
+                        style={{
+                        flex: '1 1 25%',
+                        minWidth: 150,
+                        padding: '12px',
+                        textAlign: 'center',
+                        fontFamily: 'Inter',
+                        fontSize: 16,
+                        color: '#585757'
+                        }}
+                    >
+                        {val}
+                    </div>
+                    ))}
+                    </div>
+                ))}
                 </div>
             </div>
+
+
 
             {isOpen && (
                 <div className="bom-print-modal">

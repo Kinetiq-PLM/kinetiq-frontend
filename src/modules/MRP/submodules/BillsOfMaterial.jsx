@@ -5,6 +5,7 @@ import { useState } from "react";
 const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [flag, setFlag] = useState(0);
     const [printBOM, setPrintBOM] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const bomData = [
         { number: "000000001", type: "Project", status: "Pending", date: "July 3 2025" },
@@ -27,6 +28,31 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const cellStyle = (width) => ({
         width, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px 12px', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 400, textAlign: 'center', lineHeight: 1, wordWrap: 'break-word'
     });
+
+    const getFilteredData = () => {
+        return bomData.filter((item) => {
+          const matchesFlag =
+            flag === 0 ||
+            (flag === 1 && item.type === "Project") ||
+            (flag === 2 && item.type === "Non Project");
+      
+          const term = (searchTerm || "").toLowerCase(); // prevent null error
+      
+          const number = (item.number || "").toLowerCase();
+          const date = (item.date || "").toLowerCase();
+          const status = (item.status || "").toLowerCase();
+      
+          const searchMatch =
+            number.includes(term) ||
+            date.includes(term) ||
+            status.includes(term);
+      
+          return matchesFlag && searchMatch;
+        });
+      };
+      
+    const filteredData = getFilteredData();
+    
     
     const dynamicHeight = 1191 + (bomDetails.length - 5) * 36;
 
@@ -34,28 +60,81 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         <div className="bom">
             <div className="body-content-container">
                 <div className="title">BOM LIST</div>
-                <div style={{width: 1300, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                    <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex',paddingRight: 30}}>
-                        <div onClick={() => setFlag(0)} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0)")} style={{width: 185, padding: 13, background: 'white', boxShadow: flag === 0 ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', overflow: 'hidden', justifyContent: 'center', alignItems: 'center', gap: 5, display: 'flex'}}>
-                            <div style={{textAlign: 'center', color: flag === 0 ? '#00A8A8' : '#585757', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>All BOM</div>
-                        </div>
-                        <div onClick={() => setFlag(1)} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0)")} style={{width: 190, height: 43, paddingTop: 8, paddingBottom: 8, background: 'white', boxShadow: flag === 1 ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', overflow: 'hidden', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                            <div style={{textAlign: 'center', color: flag === 1 ? '#00A8A8' : '#585757', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Project BOM</div>
-                        </div>
-                        <div onClick={() => setFlag(2)} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0)")} style={{width: 190, height: 43, paddingTop: 8, paddingBottom: 8, background: 'white', boxShadow: flag === 2 ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', overflow: 'hidden', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                            <div style={{textAlign: 'center', color: flag === 2 ? '#00A8A8' : '#585757', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Non-Project BOM</div>
-                        </div>
+                <div style={{
+                width: '100%',
+                maxWidth: 1300,
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                rowGap: 10,
+                paddingLeft: 80,
+                paddingRight: 80,
+                }}>
+                {/* Tabs */}
+                <div className="tabs-container" style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 15,
+                    flex: '1 1 auto',
+                    minWidth: 200,
+                }}>
+                    {['All Orders', 'Project Orders', 'Non-Project Orders'].map((label, i) => (
+                    <div key={label}
+                        onClick={() => setFlag(i)}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                        style={{
+                        minWidth: 120,
+                        padding: '10px 16px',
+                        background: 'white',
+                        boxShadow: flag === i ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        display: 'flex',
+                        cursor: 'pointer'
+                        }}>
+                        <div className="text-tab" style={{
+                        textAlign: 'center',
+                        color: flag === i ? '#00A8A8' : '#585757',
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                        fontWeight: '500',
+                        lineHeight: 1
+                        }}>{label}</div>
                     </div>
-                    <div style={{justifyContent: 'flex-end', alignItems: 'flex-start', gap: 25, display: 'flex'}}>
-                        <div style={{width: 250, background: '#F7F9FB', overflow: 'hidden', borderRadius: 8, outline: '1px rgba(132.72, 132.72, 132.72, 0.25) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end', gap: 10, display: 'inline-flex'}}>
-                            <div style={{alignSelf: 'stretch', height: 40, position: 'relative', overflow: 'hidden'}}>
-                                <div className="MRPSearch" style={{width: 20, height: 20, left: 12, top: 10, position: 'absolute'}} />
-                                <div style={{width: 210, height: 24, left: 40, top: 8, position: 'absolute'}}>
-                                    <input placeholder="Search Order Number..." type="text" style={{width: 210, left: 0, top: 3, position: 'absolute', color: '#969696', fontSize: 16, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word', border: 'none', outline: 'none', backgroundColor: 'transparent' }}/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    ))}
+                </div>
+
+                {/* Search Box */}
+                <div className="search-container" style={{
+                    background: '#F7F9FB',
+                    borderRadius: 8,
+                    outline: '1px rgba(132,132,132,0.25) solid',
+                    padding: 5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginTop: 10,
+                    paddingRight: 100,
+                    alignItems: 'stretch',
+                }}>
+                    <input
+                    placeholder="Search Order Number..."
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{
+                        flex: 1,
+                        padding: '8px',
+                        border: 'none',
+                        outline: 'none',
+                        backgroundColor: 'transparent',
+                        color: '#969696',
+                        fontSize: 16,
+                        fontFamily: 'Inter'
+                    }}
+                    />
+                </div>
                 </div>
                 <div style={{width: 1156, height: 491, paddingTop: 10, paddingBottom: 10, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 20, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 20, display: 'flex'}}>
                     <div style={{alignSelf: 'stretch', borderRadius: 20, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
@@ -82,7 +161,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     </div>
                                 </div>
                             </div>
-                            {bomData.map((item, index) => (
+                            {filteredData.map((item, index) => (
                                 <div key={index}
                                 onClick={() => setPrintBOM(true)}
                                 onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
