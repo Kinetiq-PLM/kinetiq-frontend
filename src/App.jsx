@@ -388,7 +388,7 @@ function App() {
     "Distribution": {
       "External Delivery": "ExternalDelivery",
       "Internal Delivery": "InternalDelivery",
-      "Picking" : "Picking",
+      "Picking": "Picking",
       "Packing": "Packing",
       Shipment: "Shipment",
       "Rework": "Rework",
@@ -647,11 +647,11 @@ function App() {
               ></img>
               {notifOpen && <div className="notif-menu">
                 <div className="notif-title"><p>Notifications</p></div>
-                { notifs.length === 0 ? (
+                {notifs.length === 0 ? (
                   <div className="notif-empty">
                     <p className="notif-msg">No notifications to show.</p>
                   </div>
-                  ) : ( notifs.map((notif, i) =>
+                ) : (notifs.map((notif, i) =>
                   <div className={notif.read ? "notif-item" : "notif-item-unread"}
                     onClick={
                       notif.orig_submodule ? () => {
@@ -690,7 +690,7 @@ function App() {
 
                   <div className="dropdown-divider"></div>
                   <div className="dropdown-menu">
-                    <div className="dropdown-item" onClick={() => setShowUserProfile(true)}><img src="/icons/settings.png" /> Settings</div>
+                    <div className="dropdown-item" onClick={() => setShowUserProfile(true)}><img src="/icons/settings.png" />User Profile</div>
                     <div className="dropdown-item" onClick={handleLogout}><img src="/icons/logout.png" /> Logout</div>
                   </div>
 
