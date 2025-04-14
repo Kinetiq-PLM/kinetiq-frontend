@@ -375,7 +375,7 @@ img {
 }
 
 /* header navigation -- fixed height */
-.header-navi {
+.header-navi{
   height: var(--header-navi-height);
   width: 100%;
   display: flex;
@@ -385,6 +385,12 @@ img {
   padding: 1rem 3rem 1rem 2rem;
   gap: 1rem;
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+}
+
+.header-module-names {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .header-tabs-container {
@@ -463,14 +469,12 @@ img {
   justify-content: flex-end;
   padding: 0.2rem 0.5rem;
   border-radius: 0.2rem;
-
 }
 
 .header-profile-icon-wrapper:hover {
   cursor: pointer;
   background-color: rgb(245, 245, 245);
 }
-
 
 .header-profile-container p { 
   white-space: nowrap;
@@ -514,7 +518,7 @@ img {
 .notif-menu {
   position: absolute;
   top: 3rem;
-  right: 15.5rem;
+  right: 12.5rem;
   padding-top: 1rem;
   background-color: white;
   width: 20rem;
@@ -690,9 +694,6 @@ img {
   background: #ddd;
   margin: 0.5rem 0;
 }
-
-
-
 
 /* body container -- takes remaining space below header */
 .body-container {

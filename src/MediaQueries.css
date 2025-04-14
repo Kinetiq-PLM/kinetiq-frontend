@@ -1,12 +1,35 @@
-@media (max-width: 1000px) { 
-    .header-profile-name {
-      display: none;
-    }
+@media (max-width: 40rem) {
+  .header-body-container {
+    max-height: calc(100vh - var(--header-navi-height));
   }
 
-  @media (max-width: 850px) {
-    .header-module-name {
-      display: none;
-    }
+  .notif-menu {
+    width: 90vw;
+    height: 90vh;
+    top: 3rem;
+    right: 0rem;
   }
-  
+
+  .header-profile-name {
+    display: none;
+  }
+
+  .header-module-name {
+    display: none;
+  }
+
+  .header-submodule-name{
+    width: 4.5rem;
+    overflow: hidden;
+  }
+
+  .header-submodule-name p{
+    width: 4.5rem;
+    text-overflow: ellipsis;
+  }
+
+  .header-navi.squished .header-module-names {
+    display: none;
+    transition: 0.3s ease-in-out;
+  }
+}

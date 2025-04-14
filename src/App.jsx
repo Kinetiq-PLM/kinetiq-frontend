@@ -1,7 +1,7 @@
 import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
-import SearchBar from "./shared/components/SearchBar";
+//import SearchBar from "./shared/components/SearchBar";
 import UserProfile from "./shared/components/UserProfile";
 import { Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -429,9 +429,9 @@ function App() {
       )
     );
 
-  const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
+  const modulesIcons = Object.keys(moduleFileNames).map((module) => ({
     id: module,
-    icon: `/icons/module-icons/${filteredModuleFileNames[module]}.png`,
+    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
   }));
 
   return (
@@ -596,7 +596,8 @@ function App() {
 
         {/* adjustable right content */}
         <div className="header-body-container">
-          <div className="header-navi">
+
+        <div className={`header-navi ${isSidebarOpen ? "squished" : ""}`}>
             <div
               className={`header-tabs-container ${activeModule ? "visible" : "hidden"
                 }`}
@@ -605,27 +606,28 @@ function App() {
                 src={`/icons/header-module-icons/${moduleFileNames[activeModule]}.png`}
                 alt={activeModule}
               />
-              <p
-                className={`header-module-name ${!activeSubModule ? "active" : ""
-                  }`}
-                onClick={() => {
-                  setActiveModule(activeModule);
-                  //loadMainModule(activeModule);
-                  setActiveSubModule(null);
-                  //loadSubModule(null);
-                }}
-              >
-                {activeModule}
-              </p>
+              <div className="header-module-names">
+                <p
+                  className={`header-module-name ${!activeSubModule ? "active" : ""
+                    }`}
+                  onClick={() => {
+                    setActiveModule(activeModule);
+                    //loadMainModule(activeModule);
+                    setActiveSubModule(null);
+                    //loadSubModule(null);
+                  }}
+                >
+                  {activeModule}
+                </p>
 
-              <p>{activeSubModule ? ` > ` : ""}</p>
-              <p id="header-submodule-name">
-                {activeSubModule ? activeSubModule : ""}
-              </p>
+                <p>{activeSubModule ? ` > ` : ""}</p>
+                <p id="header-submodule-name">
+                  {activeSubModule ? activeSubModule : ""}
+                </p>
+              </div>
             </div>
 
             <div className="header-right-container">
-              <SearchBar />
               <img
                 src={`/icons/Notification-${hasNotification ? "active-" : ""
                   }logo.png`}
