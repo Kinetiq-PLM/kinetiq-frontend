@@ -200,7 +200,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       });
       return;
     }
-
+    console.log(products);
     const request = {
       statement_data: {
         customer: selectedCustomer.customer_id,
@@ -225,7 +225,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       // },
     };
     setPayload({ ...request, name: selectedCustomer.name });
-    // console.log(request);
     quotationMutation.mutate(request);
   };
 
