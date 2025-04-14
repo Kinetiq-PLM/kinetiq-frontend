@@ -1,7 +1,7 @@
 import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
-import SearchBar from "./shared/components/SearchBar";
+//import SearchBar from "./shared/components/SearchBar";
 import UserProfile from "./shared/components/UserProfile";
 import { Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -40,7 +40,9 @@ function App() {
       console.log(localStorage.getItem("user"));
     } else {
       setUser(null);
+      navigate("/login", { replace: true }); // redirect to login if no user found
     }
+
   }, []);
 
   const handleLogout = () => {
@@ -49,18 +51,9 @@ function App() {
     navigate("/login");  // redirect to login
   };
 
-  // if you need to just go to shellapp just comment out the 4 lines below: 
-  const isAuthenticated = user !== null;
-
-  if (!loading && !isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  // up til here ^^
-  // -- then just remove "/login" from the url -- tho u wont have any user data since u didn't log in (unless u'll hard code it)
-
-
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
+    setNotifOpen(false); // close notification menu if profile menu is opened
   };
 
   useEffect(() => {
@@ -76,7 +69,7 @@ function App() {
   //fetch notifs
   const fetchNotifs = async (user) => {
     console.log("Fetching notifs...")
-    const resp = await fetch(`http://127.0.0.1:8000/api/notifications/?user_id=${user?.user_id}`, {method: 'GET'})
+    const resp = await fetch(`http://127.0.0.1:8000/api/notifications/?user_id=${user?.user_id}`, { method: 'GET' })
     // const resp_text = await resp.text()
     // console.log("resp text")
     // console.log(resp_text)
@@ -89,7 +82,7 @@ function App() {
     notif_items.map((notif_item, i) => {
       origin = notif_item.module.split('/')
       const orig_module = origin[0]
-      const orig_submodule = origin.length == 2 ? origin[1] : null  
+      const orig_submodule = origin.length == 2 ? origin[1] : null
       const time_formatted = new Date(notif_item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       temp_list[i] = {
         id: notif_item.notifications_id,
@@ -105,7 +98,7 @@ function App() {
     console.log(temp_list)
 
     //notif icon toggle (for loop so we can break out)
-    for (var i=0; i<temp_list.length; ++i) {
+    for (var i = 0; i < temp_list.length; ++i) {
       if (temp_list[i].read == false) {
         console.log('found notif')
         setHasNotification(true)
@@ -429,9 +422,9 @@ function App() {
       )
     );
 
-  const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
+  const modulesIcons = Object.keys(moduleFileNames).map((module) => ({
     id: module,
-    icon: `/icons/module-icons/${filteredModuleFileNames[module]}.png`,
+    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
   }));
 
   return (
@@ -596,7 +589,8 @@ function App() {
 
         {/* adjustable right content */}
         <div className="header-body-container">
-          <div className="header-navi">
+
+          <div className={`header-navi ${isSidebarOpen ? "squished" : ""}`}>
             <div
               className={`header-tabs-container ${activeModule ? "visible" : "hidden"
                 }`}
@@ -605,27 +599,29 @@ function App() {
                 src={`/icons/header-module-icons/${moduleFileNames[activeModule]}.png`}
                 alt={activeModule}
               />
-              <p
-                className={`header-module-name ${!activeSubModule ? "active" : ""
-                  }`}
-                onClick={() => {
-                  setActiveModule(activeModule);
-                  //loadMainModule(activeModule);
-                  setActiveSubModule(null);
-                  //loadSubModule(null);
-                }}
-              >
-                {activeModule}
-              </p>
+              <div className="header-module-names">
+                <p
+                  className={`header-module-name ${!activeSubModule ? "active" : ""
+                    }`}
+                  onClick={() => {
+                    setActiveModule(activeModule);
+                    //loadMainModule(activeModule);
+                    setActiveSubModule(null);
+                    //loadSubModule(null);
+                  }}
+                >
+                  {activeModule}
+                </p>
 
-              <p>{activeSubModule ? ` > ` : ""}</p>
-              <p id="header-submodule-name">
-                {activeSubModule ? activeSubModule : ""}
-              </p>
+                <p>{activeSubModule ? ` > ` : ""}</p>
+                <p id="header-submodule-name">
+                  {activeSubModule ? activeSubModule : ""}
+                </p>
+              </div>
             </div>
 
             <div className="header-right-container">
-              <SearchBar />
+              {/*<SearchBar />*/}
               <img
                 src={`/icons/Notification-${hasNotification ? "active-" : ""
                   }logo.png`}
@@ -668,19 +664,24 @@ function App() {
               </div>}
               {isProfileMenuOpen && (
                 <div className="profile-dropdown">
-                  <p><strong>{user?.first_name} {user?.last_name}</strong></p>
-                  <p>ID: {user?.employee_id}</p>
-                  <p>Role: {user?.role?.role_name}</p>
+                  <div className="profile-dropdown-header">
+                    <div className="profile-name">{user?.first_name} {user?.last_name}</div>
+                    <div className="profile-details">ID: {user?.employee_id}</div>
+                    <div className="profile-details">{user?.role?.role_name}</div>
+                  </div>
 
                   <div className="dropdown-divider"></div>
+                  <div className="dropdown-menu">
+                    <div className="dropdown-item" onClick={() => setShowUserProfile(true)}><img src="/icons/settings.png" /> Settings</div>
+                    <div className="dropdown-item" onClick={handleLogout}><img src="/icons/logout.png" /> Logout</div>
+                  </div>
 
-                  <div className="dropdown-item" onClick={() => setShowUserProfile(true)}>Settings</div>
-                  <div className="dropdown-item" onClick={handleLogout}>Logout</div>
                 </div>
               )}
 
               <div className="header-profile-container">
-                <div className="header-profile-icon-wrapper" onClick={toggleProfileMenu}>
+                <div className={`header-profile-icon-wrapper ${isProfileMenuOpen ? "opened" : ""}`}
+                  onClick={toggleProfileMenu}>
                   <div className="header-profile-icon">
                     {" "}
                     {displayName?.charAt(0)}
