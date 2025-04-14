@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./AuthPages.css";
+import emailjs from '@emailjs/browser';
 
 export default function StandaloneLogin() {
   const [credentials, setCredentials] = useState({
@@ -78,6 +79,64 @@ export default function StandaloneLogin() {
 
   };
 
+
+    const generateAndSendCode = async (email) => {
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      localStorage.setItem("reset_code", code);
+      localStorage.setItem("reset_email", email);
+      console.log("Generated code:", code);
+      
+      try {
+        // emailjs.send("service_fpuj34n","template_vcrih1l",{
+        //   code: code,
+        //   email: email,
+        //   });
+        console.log("Email sent successfully! to: ", email);
+
+        console.log("Email not sent, using console.log for testing.");
+
+      } catch (err) {
+        console.error("Failed to send email:", err);
+        alert("Error sending reset code.");
+      }
+    };
+
+
+    const handleChangePassword = async () => {
+      const savedCode = localStorage.getItem("reset_code");
+      const savedEmail = localStorage.getItem("reset_email");
+
+      // Check if the reset code matches
+      if (resetData.code !== savedCode) {
+        setLoginError("Invalid code. Please try again.");
+        return;
+      }
+
+      // Check if the reset email matches (optional but good to verify)
+      if (resetData.username !== savedEmail) {
+        setLoginError("Email does not match the code. Please check and try again.");
+        return;
+      }
+
+      // Check if the new password and confirm password match
+      if (resetData.newPassword !== resetData.confirmNewPassword) {
+        setLoginError("Passwords do not match!");
+        return;
+      }
+
+      // Here, you would call an API to update the password.
+      // For now, just simulate the password update
+      try {
+        console.log("Password successfully updated for:", resetData.username);
+        console.log("Password changed:", resetData);
+        setView("login");
+      } catch (err) {
+        setLoginError("Error resetting password. Please try again.");
+        console.error("Error resetting password:", err);
+      }
+    };
+
+
   return (
     <div className="login-container">
       <div className="login-wrapper">
@@ -138,6 +197,7 @@ export default function StandaloneLogin() {
                 </>
               )}
 
+              { /* ----------------- FORGORR ----------------- */ }
               {view === "forgot" && (
                 <>
                   <p className="login-pass-details">Enter your email. We’ll send a code to reset your password.</p>
@@ -152,7 +212,7 @@ export default function StandaloneLogin() {
                       }
                       setLoginError(""); // clear any old error
 
-                      //handleResetPassword(resetData.username);
+                      generateAndSendCode(resetData.username); // send the code to the email
                       setView("reset");
 
                     }}
@@ -188,6 +248,8 @@ export default function StandaloneLogin() {
                 </>
               )}
 
+
+            { /* ----------------- RESET ----------------- */ }
               {view === "reset" && (
                 <>
                   <p className="login-pass-details">We’ve sent a code to <strong>{resetData.username}</strong>. Enter it below with your new password.</p>
@@ -215,17 +277,24 @@ export default function StandaloneLogin() {
                     onChange={(e) => setResetData({ ...resetData, confirmNewPassword: e.target.value })}
                     required
                   />
+                  <p className="login-error">{loginError}</p>
+                  
                   <div className="button-back-container">
                     <button className="login-btn" onClick={() => {
-                      console.log("Password changed:", resetData);
-                      setView("login");
+                      handleChangePassword()
+
                     }}>
                       Change password
                     </button>
-                    <button className="back-btn" onClick={() => setView("forgot")}>
+                    <button className="back-btn" onClick={() => 
+                     { setView("forgot");
+                      
+                      }}>
                       Back
                     </button>
+                    
                   </div>
+                  
                 </>
               )}
             </div>
