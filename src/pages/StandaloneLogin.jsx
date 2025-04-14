@@ -190,7 +190,7 @@ export default function StandaloneLogin() {
 
               {view === "reset" && (
                 <>
-                  <p>We’ve sent a code to <strong>{resetData.username}</strong>. Enter it below with your new password.</p>
+                  <p className="login-pass-details">We’ve sent a code to <strong>{resetData.username}</strong>. Enter it below with your new password.</p>
                   <input
                     type="text"
                     name="code"
@@ -215,14 +215,14 @@ export default function StandaloneLogin() {
                     onChange={(e) => setResetData({ ...resetData, confirmNewPassword: e.target.value })}
                     required
                   />
-                  <div className="login-options">
+                  <div className="button-back-container">
                     <button className="login-btn" onClick={() => {
                       console.log("Password changed:", resetData);
                       setView("login");
                     }}>
                       Change password
                     </button>
-                    <button className="login-btn" onClick={() => setView("forgot")}>
+                    <button className="back-btn" onClick={() => setView("forgot")}>
                       Back
                     </button>
                   </div>

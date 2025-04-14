@@ -114,6 +114,14 @@
     width: 18rem;
   }
   
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    border: none;
+    box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2); 
+    outline: none;
+  }
+
   .password-wrapper {
     position: relative;
     width: 100%;
@@ -164,7 +172,7 @@
     border: none;
     padding: 0.5rem 1rem;
     margin-top: 1.5rem;
-    width: 100%;
+    width: 15rem;
     min-width: 3rem;
     display: block;
     border-radius: 0.4rem;
