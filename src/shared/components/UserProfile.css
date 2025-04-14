@@ -1,11 +1,5 @@
 /* REMINDER! All of your elements must use your unique namespace '.usrprofile' at the start to avoid leaking */
 .usrprofile {
-    display: flex;
-    width: 100%;
-    height: 100%;
-  }
-  
-.usrprofile .body-content-container {
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
@@ -22,7 +16,7 @@
   padding: 1rem;
 }
 
-.user-details-container{
+.usrprofile .user-details-container, .usrprofile .password-kinetiq-container{
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -30,16 +24,61 @@
   gap: 2rem;
   width: 100%;
   height: 100%;
+  margin-bottom: 2rem
 }
 
-.user-image{
+.usrprofile .user-details-container{
+  padding: 2rem;
+  border-bottom: 0.1rem solid rgb(221, 221, 221);
+}
+.usrprofile .user-image{
   width: 10rem;
   height: 10rem;
-  border-radius: 100%;
-  background-color: rgb(169, 246, 255);
+  border-radius: 500rem;
+  background-color: rgb(178, 238, 242);
   color: rgb(0, 125, 141);
   font-size: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.usrprofile .user-details{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: fit-content;
+  height: 100%;
+  font-size: 0.8rem;
+  color: #7d7d7d;
+}
+
+.usrprofile .user-details strong{
+  font-weight: 600;
+}
+
+.usrprofile .user-name{
+  font-size: 2rem;
+  color: #008b8b;
+  margin-bottom: 0rem;
+}
+
+.usrprofile .user-email{
+  color: rgb(155, 160, 162);
+  font-size: 0.85rem;
+  margin: 0rem 0rem 1rem 0rem;
+}
+
+.usrprofile .kinetiq-section{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 30rem;
+  height: 100%;
+  border: 1px solid red;
 }
