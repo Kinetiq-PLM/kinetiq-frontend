@@ -1,37 +1,18 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-=======
 import React, { useState, useEffect } from "react";
 import axios from "axios";
->>>>>>> 39a3d91 (updated code with database)
 import "../styles/CostOfProduction.css";
 
 const BodyContent = () => {
   const [searchQuery, setSearchQuery] = useState("");
-<<<<<<< HEAD
-  const [activeTable, setActiveTable] = useState("costProduction");
-=======
   const [productionData, setProductionData] = useState([]);
   const [reworkCostData, setReworkCostData] = useState([]); // State for rework_cost data
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
->>>>>>> 39a3d91 (updated code with database)
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-<<<<<<< HEAD
-
-  const productionData = Array(7).fill().map((_, index) => ({
-    id: `PO00${index + 1}`,
-    actualQuantity: 10,
-    costProduction: "1,500.00",
-    miscCost: "50.00",
-    reworkRequired: "null",
-    reworkNotes: "null",
-  }));
-=======
   // Fetch production data from the backend
   useEffect(() => {
     const fetchProductionData = async () => {
@@ -72,7 +53,6 @@ const BodyContent = () => {
       (item.rework_notes && item.rework_notes.toLowerCase().includes(search))
     );
   });
->>>>>>> 39a3d91 (updated code with database)
 
   return (
     <div className="costprod">
@@ -90,10 +70,6 @@ const BodyContent = () => {
                   value={searchQuery}
                   onChange={handleSearchChange}
                 />
-<<<<<<< HEAD
-
-=======
->>>>>>> 39a3d91 (updated code with database)
               </div>
             </div>
           </div>
@@ -111,18 +87,6 @@ const BodyContent = () => {
                 </tr>
               </thead>
               <tbody>
-<<<<<<< HEAD
-                {productionData.map((item, index) => (
-                  <tr key={index}>
-                    <td><h1>{item.id}</h1></td>
-                    <td>{item.actualQuantity}</td>
-                    <td>{item.costProduction}</td>
-                    <td>{item.miscCost}</td>
-                    <td>{item.reworkRequired}</td>
-                    <td>{item.reworkNotes}</td>
-                  </tr>
-                ))}
-=======
                 {loading ? (
                   <tr>
                     <td colSpan="6">Loading...</td>
@@ -143,7 +107,6 @@ const BodyContent = () => {
                     </tr>
                   ))
                 )}
->>>>>>> 39a3d91 (updated code with database)
               </tbody>
             </table>
           </div>
@@ -162,17 +125,6 @@ const BodyContent = () => {
                 </tr>
               </thead>
               <tbody>
-<<<<<<< HEAD
-                {productionData.map((item, index) => (
-                  <tr key={index}>
-                    <td><h1>{item.id}</h1></td>
-                    <td><input type="text" defaultValue={item.costProduction} /></td>
-                    <td><input type="text" defaultValue={item.miscCost} /></td>
-                    <td>
-                      <input
-                        type="text"
-                        defaultValue={(parseFloat(item.costProduction.replace(/,/g, "")) + parseFloat(item.miscCost)).toFixed(2)}
-=======
                 {reworkCostData.map((item, index) => (
                   <tr key={index}>
                     <td><h1>{item.production_order_id}</h1></td>
@@ -182,7 +134,6 @@ const BodyContent = () => {
                       <input
                         type="text"
                         defaultValue={item.total_rework_cost}
->>>>>>> 39a3d91 (updated code with database)
                       />
                     </td>
                   </tr>
@@ -191,17 +142,9 @@ const BodyContent = () => {
             </table>
           </div>
         </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> 39a3d91 (updated code with database)
       </div>
     </div>
   );
 };
 
 export default BodyContent;
-<<<<<<< HEAD
-=======
-
->>>>>>> 39a3d91 (updated code with database)

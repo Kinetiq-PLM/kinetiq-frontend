@@ -502,8 +502,6 @@
   margin: 6px 0;
 }
 
-<<<<<<< HEAD
-=======
 .progress-item span:first-child {
   flex: 0 0 100px; /* fix width for the label (adjust as needed) */
 }
@@ -513,7 +511,6 @@
   text-align: right;
 }
 
->>>>>>> 39a3d91 (updated code with database)
 .bar-container {
   flex-grow: 1;
   height: 8px;
@@ -547,29 +544,16 @@
 
 }
 
-<<<<<<< HEAD
-.availability-dropdown.available {
-=======
 .availability-dropdown.completed {
->>>>>>> 39a3d91 (updated code with database)
   background-color: #B0F6B0;
   color: #2DA800;
 }
 
-<<<<<<< HEAD
-.availability-dropdown.unavailable {
-=======
 .availability-dropdown.pending {
->>>>>>> 39a3d91 (updated code with database)
   background: #FECDBF;
   color: #A80000;
 }
 
-<<<<<<< HEAD
-.availability-dropdown.undermaintenance {
-  color: #A4742D;
-  background: #FFE3AF;
-=======
 .availability-dropdown.in-progress {
   color: #A4742D;
   background: #FFE3AF;
@@ -616,5 +600,4 @@
 /* Specific styles for the "Status" column */
 .production-table td:nth-child(8) {
   text-align: center; /* Center-align the dropdown */
->>>>>>> 39a3d91 (updated code with database)
 }

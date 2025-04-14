@@ -1,36 +1,10 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-=======
 import React, { useState, useEffect } from "react";
 import axios from "axios";
->>>>>>> 39a3d91 (updated code with database)
 import "./styles/Production.css";
 
 const BodyContent = () => {
     const [selectedOption, setSelectedOption] = useState("All Projects");
     const [searchQuery, setSearchQuery] = useState("");
-<<<<<<< HEAD
-    const [statuses, setStatuses] = useState(Array(7).fill("available"));
-
-
-    const handleStatusChange = (index, newStatus) => {
-        const updatedStatuses = [...statuses];
-        updatedStatuses[index] = newStatus;
-        setStatuses(updatedStatuses);
-    };
-
-    const handleSelectChange = (event) => {
-        setSelectedOption(event.target.value);
-    };
-
-
-    const handleSearchChange = (event) => {
-        setSearchQuery(event.target.value);
-    };
-
-
-
-=======
     const [productionData, setProductionData] = useState([]);
     const [statuses, setStatuses] = useState([]); // Initialize as an empty array
     const [loading, setLoading] = useState(true);
@@ -129,7 +103,6 @@ const BodyContent = () => {
     const inProgressPercentage = totalOrders ? (inProgressCount / totalOrders) * 100 : 0;
     const pendingPercentage = totalOrders ? (pendingCount / totalOrders) * 100 : 0;
     const completedPercentage = totalOrders ? (completedCount / totalOrders) * 100 : 0;
->>>>>>> 39a3d91 (updated code with database)
 
     return (
         <div className="prod">
@@ -137,11 +110,6 @@ const BodyContent = () => {
                 <div className="left-column">
                     <div className="body-content-container">
                         <div className="purch-box-container">
-<<<<<<< HEAD
-                            {["Total Project", "In Progress", "Planned", "Completed"].map((label, index) => (
-                                <div className="purch-box" key={index}>
-                                    <span className="purch-number">-</span>
-=======
                             {["Total Project", "In Progress", "Pending", "Completed"].map((label, index) => (
                                 <div className="purch-box" key={index}>
                                     <span className="purch-number">
@@ -152,23 +120,10 @@ const BodyContent = () => {
                                          "-"
                                         }
                                     </span>
->>>>>>> 39a3d91 (updated code with database)
                                     <span className="purch-label">{label}</span>
                                 </div>
                             ))}
                         </div>
-<<<<<<< HEAD
-
-
-                        <div className="search-dropdown-container">
-                            <select className="dropdown" value={selectedOption} onChange={handleSelectChange}>
-                                <option value="All Projects">All Projects</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Planned">Planned</option>
-                                <option value="Completed">Completed</option>
-                            </select>
-
-=======
                         <div className="search-dropdown-container">
                             <select className="dropdown" value={selectedOption} onChange={handleSelectChange}>
                                 <option value="all projects">All Projects</option>
@@ -176,7 +131,6 @@ const BodyContent = () => {
                                 <option value="pending">Pending</option>
                                 <option value="completed">Completed</option>
                             </select>
->>>>>>> 39a3d91 (updated code with database)
                             <div className="search-wrapper">
                                 <img src="/icons/search-icon.png" alt="Search" className="search-icon" />
                                 <input
@@ -186,53 +140,12 @@ const BodyContent = () => {
                                     value={searchQuery}
                                     onChange={handleSearchChange}
                                 />
-<<<<<<< HEAD
-
                             </div>
                         </div>
-
-
-=======
-                            </div>
-                        </div>
->>>>>>> 39a3d91 (updated code with database)
                         <div className="big-container-wrapper">
                             <div className="dashboard-container">
                                 <div className="table-container">
                                     <table className="production-table">
-<<<<<<< HEAD
-                                        <thead>
-                                            <tr>
-                                                <th>Production Order ID</th>
-                                                <th>Task ID</th>
-                                                <th>BOM ID</th>
-                                                <th>Start Date</th>
-                                                <th>End Date</th>
-                                                <th>Target Quantity</th>
-                                                <th>Remarks</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {[...Array(10)].map((_, index) => (
-                                                <tr key={index}>
-                                                    <td style={{ fontWeight: "bold" }}>P0OO1</td>
-                                                    <td>111201</td>
-                                                    <td>null</td>
-                                                    <td>2024-03-05</td>
-                                                    <td>2024-03-15</td>
-                                                    <td>10</td>
-                                                    <td>Make it blue.</td>
-                                                    <td>  <select
-                                                        className={`availability-dropdown ${statuses[index]}`}
-                                                        value={statuses[index]}
-                                                        onChange={(e) => handleStatusChange(index, e.target.value)}
-                                                    >
-                                                        <option value="available">Available</option>
-                                                        <option value="unavailable">Unavailable</option>
-                                                        <option value="undermaintenance">Under Maintenance</option>
-                                                    </select></td>
-=======
                                         <colgroup>
                                             <col style={{ width: "15%" }} />
                                             <col style={{ width: "12%" }} />
@@ -276,7 +189,6 @@ const BodyContent = () => {
                                                             <option value="Completed">Completed</option>
                                                         </select>
                                                     </td>
->>>>>>> 39a3d91 (updated code with database)
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -284,16 +196,8 @@ const BodyContent = () => {
                                 </div>
                             </div>
                         </div>
-<<<<<<< HEAD
-
                     </div>
                 </div>
-
-
-=======
-                    </div>
-                </div>
->>>>>>> 39a3d91 (updated code with database)
                 <div className="right-column">
                     <h2>List of Tasks</h2>
                     <div className="right-small-containers">
@@ -302,36 +206,11 @@ const BodyContent = () => {
                                 <thead>
                                     <tr>
                                         <th>Task ID</th>
-<<<<<<< HEAD
-                                        <th>Due Date</th>
-=======
                                         <th>Task Deadline</th>
->>>>>>> 39a3d91 (updated code with database)
                                         <th></th>
                                     </tr>
                                 </thead>
                             </table>
-<<<<<<< HEAD
-
-
-                            <div className="table-container">
-                                <table>
-                                    <tbody>
-                                        {[...Array(7)].map((_, index) => (
-                                            <tr key={index}>
-                                                <td>11120{index + 1}</td>
-                                                <td>2/1{index + 3}/2025</td>
-                                                <td><button className="add-btn">Add</button></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-
-                        </div>
-
-=======
                             <div className="table-container">
                                 <table>
                                     <tbody>
@@ -356,30 +235,11 @@ const BodyContent = () => {
                                 </table>
                             </div>
                         </div>
->>>>>>> 39a3d91 (updated code with database)
                         <div className="progress-container">
                             <div className="progress-wheel">
                                 <svg className="circular-progress" viewBox="0 0 36 36">
                                     <path
                                         className="circle-background"
-<<<<<<< HEAD
-                                        d="M18 2.0845
-           a 15.9155 15.9155 0 1 1 0 31.831
-           a 15.9155 15.9155 0 1 1 0 -31.831"
-                                    />
-                                    <path
-                                        className="circle-progress"
-                                        d="M18 2.0845
-           a 15.9155 15.9155 0 1 1 0 31.831
-           a 15.9155 15.9155 0 1 1 0 -31.831"
-                                        strokeDasharray="50, 100"
-                                    />
-                                </svg>
-                                <div className="progress-text">50%</div>
-                            </div>
-
-                            {/* Bars below */}
-=======
                                         d="M18 2.0845 a 15.9155 15.9155 0 1 1 0 31.831 a 15.9155 15.9155 0 1 1 0 -31.831"
                                     />
                                     <path
@@ -390,23 +250,10 @@ const BodyContent = () => {
                                 </svg>
                                 <div className="progress-text">100%</div>
                             </div>
->>>>>>> 39a3d91 (updated code with database)
                             <div className="progress-details">
                                 <div className="progress-item">
                                     <span>In Progress</span>
                                     <div className="bar-container">
-<<<<<<< HEAD
-                                        <div className="bar" style={{ width: '50%' }}></div>
-                                    </div>
-                                    <span>50%</span>
-                                </div>
-                                <div className="progress-item">
-                                    <span>Planned</span>
-                                    <div className="bar-container">
-                                        <div className="bar" style={{ width: '19%' }}></div>
-                                    </div>
-                                    <span>19%</span>
-=======
                                         <div className="bar" style={{ width: `${inProgressPercentage}%` }}></div>
                                     </div>
                                     <span>{Math.round(inProgressPercentage)}%</span>
@@ -417,27 +264,16 @@ const BodyContent = () => {
                                         <div className="bar" style={{ width: `${pendingPercentage}%` }}></div>
                                     </div>
                                     <span>{Math.round(pendingPercentage)}%</span>
->>>>>>> 39a3d91 (updated code with database)
                                 </div>
                                 <div className="progress-item">
                                     <span>Completed</span>
                                     <div className="bar-container">
-<<<<<<< HEAD
-                                        <div className="bar" style={{ width: '30%' }}></div>
-                                    </div>
-                                    <span>30%</span>
-                                </div>
-                            </div>
-                        </div>
-
-=======
                                         <div className="bar" style={{ width: `${completedPercentage}%` }}></div>
                                     </div>
                                     <span>{Math.round(completedPercentage)}%</span>
                                 </div>
                             </div>
                         </div>
->>>>>>> 39a3d91 (updated code with database)
                     </div>
                 </div>
             </div>

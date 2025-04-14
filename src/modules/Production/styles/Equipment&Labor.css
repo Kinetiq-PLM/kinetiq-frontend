@@ -378,20 +378,12 @@
   color: #2DA800;
 }
 
-<<<<<<< HEAD
-.availability-dropdown.unavailable {
-=======
 .availability-dropdown.out-of-order {
->>>>>>> 39a3d91 (updated code with database)
   background: #FECDBF;
   color: #A80000;
 }
 
-<<<<<<< HEAD
-.availability-dropdown.undermaintenance {
-=======
 .availability-dropdown.under-maintenance {
->>>>>>> 39a3d91 (updated code with database)
   color: #A4742D;
   background: #FFE3AF;
 }
@@ -634,8 +626,4 @@
   border-radius: 10px;
   border: 1.5px solid #A4A4A4;
   background: #F5F5F5;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 39a3d91 (updated code with database)

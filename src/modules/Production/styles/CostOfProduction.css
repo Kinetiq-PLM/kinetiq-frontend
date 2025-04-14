@@ -59,10 +59,7 @@
 }
 
 
-<<<<<<< HEAD
-=======
 /* General table styling for the first table */
->>>>>>> 39a3d91 (updated code with database)
 .costprotable {
   background-color: white;
   width: 100%;
@@ -72,10 +69,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   position: relative;
-<<<<<<< HEAD
-=======
   text-align: center; /* Center text by default */
->>>>>>> 39a3d91 (updated code with database)
 }
 
 .costprotable h1 {
@@ -85,8 +79,6 @@
   padding-left: 20px;
 }
 
-<<<<<<< HEAD
-=======
 .costprotable thead,
 .costprotable tbody tr {
   display: table;
@@ -116,7 +108,6 @@
   overflow: hidden;
   text-overflow: ellipsis; /* Add ellipsis for overflowed text */
 }
->>>>>>> 39a3d91 (updated code with database)
 
 .costprotable tbody {
   display: block;
@@ -125,17 +116,6 @@
   overflow-x: hidden;
 }
 
-<<<<<<< HEAD
-
-.costprotable thead,
-.costprotable tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
-
-
-=======
 .costprotable tbody tr {
   height: 50px; /* Ensure consistent row height */
 }
@@ -145,7 +125,6 @@
 }
 
 /* Sticky header for the first table */
->>>>>>> 39a3d91 (updated code with database)
 .costprotable thead {
   display: block;
   position: sticky;
@@ -154,40 +133,7 @@
   z-index: 2;
 }
 
-<<<<<<< HEAD
-
-.costprotable td {
-  padding: 12px;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  color: #333;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  border-bottom: 1px solid #ddd;
-}
-
-
-.costprotable th {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  color: #404040;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  border-bottom: 1px solid #007878;
-  width: 200px;
-
-}
-
-
-=======
 /* Scrollbar styling for the first table */
->>>>>>> 39a3d91 (updated code with database)
 .costprotable tbody::-webkit-scrollbar {
   width: 8px;
 }
@@ -206,8 +152,6 @@
   background: #007878;
 }
 
-<<<<<<< HEAD
-=======
 /* General table styling for the second table */
 .rework-cost-table {
   width: 100%;
@@ -280,7 +224,6 @@
   background: #007878;
 }
 
->>>>>>> 39a3d91 (updated code with database)
 .rework-header {
   color: #000000;
   padding-bottom: 20PX;
@@ -345,14 +288,6 @@
 
 
 .rework-cost-table input[type="text"] {
-<<<<<<< HEAD
-  width: 100%;
-  border: 1px solid #ddd;
-  padding: 6px 8px;
-  border-radius: 6px;
-  box-sizing: border-box;
-  font-family: inherit;
-=======
   width: 80%; /* Reduce the width to create space for the first column */
   border: 1px solid #ddd;
   padding: 4px 6px; /* Adjust padding for smaller size */
@@ -363,7 +298,6 @@
   text-align: left; /* Align text inside the input to the right */
   margin: 0 auto; /* Center the input field within the cell */
   display: block;
->>>>>>> 39a3d91 (updated code with database)
 }
 
 .rework-cost-table input[type="text"]:focus {
