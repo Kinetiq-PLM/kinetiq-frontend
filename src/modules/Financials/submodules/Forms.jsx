@@ -296,9 +296,134 @@ const BodyContent = () => {
     }
   };
 
+  // Function to handle budget submission submission
+  // This function is called when the form is submitted
+  const handleSubmitSubmmision = async (subData) => {
+    console.log("Submitting submission:", subData);
+    try {
+      const data = await POST("/form/budget-submission/", subData);
+      console.log("Submission created successfully:", data);
+    } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
+      console.error("Error creating service call:", error.message);
+      console.error(firstError);
+
+      console.error("Error submitting submission: ", error);
+    }
+  };
+
+  // Function to handle budget request submission
+  // This function is called when the form is submitted
+  const handleSubmitRequest = async (requestData) => {
+    console.log("Submitting budget request:", requestData);
+    try {
+      const data = await POST("/form/budget-request-form/", requestData);
+      console.log("Budget request created successfully:", data);
+    } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
+      console.error("Error creating budget request:", error.message);
+      console.error(firstError);
+      console.error("Error submitting budget request:", error);
+    }
+  };
+
+  // Function to handle budget return submission
+  // This function is called when the form is submitted
+  const handleSubmitReturn = async (returnData) => {
+    console.log("Submitting budget return:", returnData);
+    try {
+      const data = await POST("/form/budget-returns-form/", returnData); 
+      console.log("Budget return created successfully:", data);
+    } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+      console.error("Error creating budget return:", error.message);
+      console.error(firstError);
+      console.error("Error submitting budget return:", error);
+    }
+  };
+
+  // It takes the form data and the name of the active tab as arguments
   const handleFormSubmit = (formData, tabName) => {
     setFormSubmitted({ ...formSubmitted, [tabName]: true });
     console.log(`Form data for ${tabName}:`, formData);
+    let subData = {};
+    if (tabName === "Budget Submission Form") {
+      subData = {
+        submitter_name: formData.submitterName,
+        dept_id: formData.departmentId,
+        date_submitted: new Date().toISOString().split('T')[0],
+        proposed_total_budget: formData.totalBudget,
+        start_usage_period: formData.usagePeriod,
+        end_usage_period: formData.endUsagePeriod,
+        //expense_breakdown: formData.expenseBreakdown
+      };
+      handleSubmitSubmmision(subData);
+    } else if (tabName === "Budget Request Form") {
+      subData = {
+        requestor_name: formData.requestorName,
+        dept_id: formData.departmentId,
+        requested_date: new Date().toISOString().split('T')[0],
+        amount_requested: formData.totalAmountNeeded,
+        expected_start_usage_period: formData.usagePeriod,
+        expected_end_usage_period: formData.endUsagePeriod,
+        reason_for_request: formData.requestReason,
+        urgency_level_request: formData.urgencyLevel,
+        //expense_breakdown: formData.expenseBreakdown
+      };
+      handleSubmitRequest(subData);
+    } else if (tabName === "Budget Return Form") {
+      subData = {
+        returner_name: formData.requestorName,
+        dept_id: formData.departmentId,
+        return_date: new Date().toISOString().split('T')[0],
+        budget_request_id: formData.requestId,
+        total_amount_requested: formData.totalRequestAmount,
+        returned_amount: formData.returnedAmount,
+        reason_returned: formData.returnReason,
+        //expense_history_breakdown: formData.expenseHistoryBreakdown
+      };
+      handleSubmitReturn(subData);
+    } else {
+      console.error("Unknown tab name:", tabName);
+    }
   };
 
   const handleClearForm = (tabName) => {
