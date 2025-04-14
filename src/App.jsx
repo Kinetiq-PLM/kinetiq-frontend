@@ -66,6 +66,16 @@ function App() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.notif-icon') && !e.target.closest('.notif-menu')) {
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   //fetch notifs
   const fetchNotifs = async (user) => {
     console.log("Fetching notifs...")
@@ -617,8 +627,8 @@ function App() {
                   {activeModule}
                 </p>
 
-                <p>{activeSubModule ? ` > ` : ""}</p>
-                <p id="header-submodule-name">
+                <p className="fade-in">{activeSubModule ? ` > ` : ""}</p>
+                <p id="header-submodule-name" className="fade-in">
                   {activeSubModule ? activeSubModule : ""}
                 </p>
               </div>
@@ -626,7 +636,7 @@ function App() {
 
             <div className="header-right-container">
               {/*<SearchBar />*/}
-              <img
+              <img className="notif-icon"
                 src={`/icons/Notification-${hasNotification ? "active-" : ""
                   }logo.png`}
                 alt="Notificaton-Logo"
@@ -637,7 +647,11 @@ function App() {
               ></img>
               {notifOpen && <div className="notif-menu">
                 <div className="notif-title"><p>Notifications</p></div>
-                {notifs.map((notif, i) =>
+                { notifs.length === 0 ? (
+                  <div className="notif-empty">
+                    <p className="notif-msg">No notifications to show.</p>
+                  </div>
+                  ) : ( notifs.map((notif, i) =>
                   <div className={notif.read ? "notif-item" : "notif-item-unread"}
                     onClick={
                       notif.orig_submodule ? () => {
@@ -664,7 +678,7 @@ function App() {
                     </div>
                     <div className="notif-msg"><p>{notif.msg}</p></div>
                   </div>
-                )}
+                ))}
               </div>}
               {isProfileMenuOpen && (
                 <div className="profile-dropdown">
