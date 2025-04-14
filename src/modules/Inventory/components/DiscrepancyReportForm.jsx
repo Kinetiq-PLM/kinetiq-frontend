@@ -12,14 +12,36 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
 
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-
+    const [users, setUsers] = useState([]);
+    const [selectedUserId, setSelectedUserId] = useState("");
 
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
         return date.toISOString().split('T')[0];
     };
-
+    useEffect(() => {
+        fetch("http://127.0.0.1:8000/api/users/")
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`Error fetching users: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then((data) => {
+                console.log("Users data:", data);
+                if (data && data.length > 0) {
+                    setUsers(data);
+                    if (data.length > 0 && !selectedUserId) {
+                        setSelectedUserId(data[0].user_id);
+                    }
+                }
+            })
+            .catch((err) => {
+                console.error("Failed to fetch users:", err);
+            });
+    }, []);
+    
     useEffect(() => {
         if (Object.keys(inventoryItems).length > 0) {
 
@@ -44,8 +66,6 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
         }
     }, [inventoryItems]);
 
-    // Prefill fields from selectedItem if available
-    // Prefill fields from selectedItem if available
 useEffect(() => {
     if (selectedItem) {
       // First, ensure the inventory item is set
@@ -114,7 +134,7 @@ useEffect(() => {
             !discrepancyType ||
             !severity ||
             !employeeId ||
-            !description
+            !description || !selectedUserId
         ) {
             setErrorMessage("Please fill in all required fields.");
             return;
@@ -129,7 +149,7 @@ const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Ty
       
         const notification = {
             module: "INVENTORY",
-            to_user_id: "ADMIN-USER-001", // Placeholder admin user ID
+            to_user_id: selectedUserId, 
             message: formattedMessage,
             notifications_status: "Unread"
         };
@@ -217,6 +237,22 @@ const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Ty
                             </div>
                         </div>
                     )}
+
+                    <label>
+                        Notify User <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                        value={selectedUserId}
+                        onChange={(e) => setSelectedUserId(e.target.value)}
+                        required
+                    >
+                        <option value="">Select User to Notify</option>
+                        {users.map((user) => (
+                            <option key={user.user_id} value={user.user_id}>
+                                {user.name}
+                            </option>
+                        ))}
+                    </select>
 
                     <label>
                         Discrepancy Type <span className="text-red-500">*</span>
