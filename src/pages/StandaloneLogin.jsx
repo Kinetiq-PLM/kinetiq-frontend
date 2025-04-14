@@ -87,9 +87,12 @@ export default function StandaloneLogin() {
             <div className="login-form">
               <h2>
                 {view === "login" && "Login"}
+              </h2>
+
+              <h3>
                 {view === "forgot" && "Forgot your password?"}
                 {view === "reset" && "Reset your password"}
-              </h2>
+              </h3>
 
               {view === "login" && (
                 <>
@@ -137,7 +140,7 @@ export default function StandaloneLogin() {
 
               {view === "forgot" && (
                 <>
-                  <p>Enter your email. We’ll send a code to reset your password.</p>
+                  <p className="login-pass-details">Enter your email. We’ll send a code to reset your password.</p>
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -166,13 +169,13 @@ export default function StandaloneLogin() {
                       required
                     />
                     {loginError && <p className="login-error">{loginError}</p>}
-                    <div className="login-options">
+                    <div className="button-back-container">
                       <button type="submit" className="login-btn">
                         Reset my password
                       </button>
                       <button
                         type="button"
-                        className="login-btn"
+                        className="back-btn"
                         onClick={() => {
                           setLoginError("");
                           setView("login");
