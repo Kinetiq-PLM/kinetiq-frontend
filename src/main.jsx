@@ -4,13 +4,17 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import StandaloneLogin from './pages/StandaloneLogin'
-
+import LandingPage from './pages/LandingPage' 
 
 createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/login" element={<StandaloneLogin />} />
-      <Route path="/*" element={<App />} /> {/* All other routes use shell app */}
-    </Routes>
-  </BrowserRouter>
-);
+  <StrictMode>
+    <BrowserRouter>
+      <Routes>
+        {/* <Route path="/" element={<LandingPage />} /> landing page */}
+        <Route path="/login" element={<StandaloneLogin />} />
+        {/* <Route path="/app/*" element={<App />} /> */}
+        <Route path="/*" element={<App />} />{/* Main app shell */}
+      </Routes>
+    </BrowserRouter>
+  </StrictMode>
+)
