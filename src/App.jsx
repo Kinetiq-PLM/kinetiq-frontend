@@ -145,11 +145,11 @@ function App() {
     },
     "Project Management": {
       "DashBoard": "DashBoard",
-      "Project Request": "Project Request",
+      "Project List": "Project List",
       "Project Planning": "ProjectPlanning",
       "Tasks": "TaskMonitoring",
-      "Reports": "Reports",
-      
+      "Report Monitoring": "Reports",
+      "Warranty Monitoring":"Warranties",
     },
     "Human Resources": {
       "Employee Records": "EmployeeRecords",
