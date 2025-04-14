@@ -76,7 +76,7 @@ function App() {
   //fetch notifs
   const fetchNotifs = async (user) => {
     console.log("Fetching notifs...")
-    const resp = await fetch(`http://127.0.0.1:8000/api/notifications/?user_id=${user?.user_id}`, {method: 'GET'})
+    const resp = await fetch(`http://127.0.0.1:8000/api/notifications/?user_id=${user?.user_id}`, { method: 'GET' })
     // const resp_text = await resp.text()
     // console.log("resp text")
     // console.log(resp_text)
@@ -89,7 +89,7 @@ function App() {
     notif_items.map((notif_item, i) => {
       origin = notif_item.module.split('/')
       const orig_module = origin[0]
-      const orig_submodule = origin.length == 2 ? origin[1] : null  
+      const orig_submodule = origin.length == 2 ? origin[1] : null
       const time_formatted = new Date(notif_item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       temp_list[i] = {
         id: notif_item.notifications_id,
@@ -105,7 +105,7 @@ function App() {
     console.log(temp_list)
 
     //notif icon toggle (for loop so we can break out)
-    for (var i=0; i<temp_list.length; ++i) {
+    for (var i = 0; i < temp_list.length; ++i) {
       if (temp_list[i].read == false) {
         console.log('found notif')
         setHasNotification(true)
@@ -597,7 +597,7 @@ function App() {
         {/* adjustable right content */}
         <div className="header-body-container">
 
-        <div className={`header-navi ${isSidebarOpen ? "squished" : ""}`}>
+          <div className={`header-navi ${isSidebarOpen ? "squished" : ""}`}>
             <div
               className={`header-tabs-container ${activeModule ? "visible" : "hidden"
                 }`}
@@ -628,6 +628,7 @@ function App() {
             </div>
 
             <div className="header-right-container">
+              {/*<SearchBar />*/}
               <img
                 src={`/icons/Notification-${hasNotification ? "active-" : ""
                   }logo.png`}
@@ -670,9 +671,9 @@ function App() {
               </div>}
               {isProfileMenuOpen && (
                 <div className="profile-dropdown">
-                  <p><strong>{user?.first_name} {user?.last_name}</strong></p>
-                  <p>ID: {user?.employee_id}</p>
-                  <p>Role: {user?.role?.role_name}</p>
+                  <p className="profile-name"><strong>{user?.first_name} {user?.last_name}</strong></p>
+                  <p className="profile-details">ID: {user?.employee_id}</p>
+                  <p className="profile-details">Role: {user?.role?.role_name}</p>
 
                   <div className="dropdown-divider"></div>
 

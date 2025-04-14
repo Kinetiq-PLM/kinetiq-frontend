@@ -518,7 +518,7 @@ img {
 .notif-menu {
   position: absolute;
   top: 3rem;
-  right: 12.5rem;
+  right: 13rem;
   padding-top: 1rem;
   background-color: white;
   width: 20rem;
@@ -671,13 +671,22 @@ img {
 
 .profile-dropdown {
   position: absolute;
-  right: 10px;
-  top: 60px;
+  right: 1rem;
+  top: 3.5rem;
   background: white;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0.2rem 0.3rem rgba(0,0,0,0.1);
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   z-index: 100;
+  font-size: 0.85rem;
+  border: 1px solid blue;
+}
+
+.profile-name{
+  border: 1px solid red;
+  font-weight: 600;
+  color: #00A8A8;
+  margin-bottom: 0.5rem;
 }
 
 .dropdown-item {
