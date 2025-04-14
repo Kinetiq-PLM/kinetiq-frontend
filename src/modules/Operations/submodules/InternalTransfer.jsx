@@ -130,7 +130,7 @@ const ApprovalTable = () => {
   
       if (!response.ok) {
         const errorData = await response.json();
-          throw new Error(`Warehouse update failed for content_id ${selectedData.content_id}: ${JSON.stringify(errorData)}`);
+        throw new Error(`Warehouse update failed for content_id ${selectedData.content_id}: ${JSON.stringify(errorData)}`);
       }
   
       const result = await response.json();
@@ -371,7 +371,7 @@ const ApprovalTable = () => {
 
 
         <div className="button-container">
-          <button className="send-to-button" onClick={updateDeliveryRequest}>Send To</button>
+          <button className="send-to-button" onClick={updateDeliveryRequest}>Send</button>
         </div>
 
 
