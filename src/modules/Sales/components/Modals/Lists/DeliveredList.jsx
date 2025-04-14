@@ -108,7 +108,7 @@ const DeliveredList = ({
       const data = deliveryQuery.data.map((delivery) => ({
         ...delivery,
         delivery_note_id: delivery.delivery_note_id,
-        customer_name: delivery.statement.customer.name,
+        customer_name: delivery.statement?.customer?.name,
         date_shipped: new Date(delivery.shipping_date).toLocaleString(),
         delivered_date: new Date(
           delivery.actual_delivery_date

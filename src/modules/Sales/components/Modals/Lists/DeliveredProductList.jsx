@@ -54,8 +54,8 @@ const DeliveredProductList = ({
   useEffect(() => {
     if (delivery.statement) {
       const res = delivery.statement.items.map((item) => ({
-        product_id: item.product.product_id,
-        product_name: item.product.product_name,
+        product_id: item.product?.product_id,
+        product_name: item.product?.product_name,
         quantity: Number(item.quantity),
         selling_price: Number(item.unit_price),
         discount: Number(item.discount),

@@ -83,8 +83,8 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
       const data = orderQuery.data;
       const formattedData = data.map((order) => ({
         ...order,
-        customer_name: order.statement.customer.name,
-        total_price: Number(order.statement.total_amount).toLocaleString(
+        customer_name: order.statement?.customer?.name,
+        total_price: Number(order.statement?.total_amount).toLocaleString(
           "en-US",
           {
             minimumFractionDigits: 2,
@@ -95,7 +95,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
       }));
       const validData = formattedData
         .filter((order) =>
-          order.statement.items.some(
+          order.statement?.items?.some(
             (item) => item.quantity - item.quantity_to_deliver !== 0
           )
         )
