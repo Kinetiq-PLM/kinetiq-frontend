@@ -17,6 +17,7 @@ function App() {
   const [ModuleComponent, setModuleComponent] = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isMainModuleCollapsed, setIsMainModuleCollapsed] = useState(true);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showUserProfile, setShowUserProfile] = useState(false);
@@ -480,11 +481,19 @@ function App() {
                     setIsSidebarOpen(true);
 
                     if (activeModule === module.id) {
-                      // if it's already active, toggle off
-                      setActiveModule(null);
-                      setActiveSubModule(null);
+                      // if the main module is active, and is clicked when a submodule is open, go back to main module
+                      if (activeSubModule) {
+                        setActiveSubModule(null);
+                        loadMainModule(module.id);
+                        setIsMainModuleCollapsed(true);
+                      } else { // if it's already active and is the opened module, toggle off
+                        isMainModuleCollapsed ? setIsMainModuleCollapsed(false) : setIsMainModuleCollapsed(true); // open submodules if reclicked
+                        //setActiveModule(null);
+                        setActiveSubModule(null);
+                      }
                     } else {
                       // otherwise, activate it
+                      setIsMainModuleCollapsed(true);
                       setActiveModule(module.id);
                       setActiveSubModule(null);
                       loadMainModule(module.id);
@@ -500,7 +509,7 @@ function App() {
                 </div>
 
                 <div
-                  className={`sidebar-submodule-empty-container ${isSidebarOpen && activeModule === module.id ? "opened" : ""
+                  className={`sidebar-submodule-empty-container ${isMainModuleCollapsed && isSidebarOpen && activeModule === module.id ? "opened" : ""
                     }`}
                 >
                   {/* submodules - only show if this module is active */}
@@ -545,20 +554,27 @@ function App() {
                             ${activeModule === module.id ? "active" : ""} 
                             ${hoveredModule === module.id ? "hovered" : ""}`}
                   onClick={() => {
-
+                    setIsSidebarOpen(true);
                     if (activeModule === module.id) {
-                      // if it's already active, toggle off
-                      setActiveModule(null);
-                      setActiveSubModule(null);
+                      // if the main module is active, and is clicked when a submodule is open, go back to main module
+                      if (activeSubModule) {
+                        setActiveModule(module.id);
+                        setActiveSubModule(null);
+                        loadMainModule(module.id);
+                        setIsMainModuleCollapsed(true);
+                      } else { // if it's already active and is the opened module, toggle off
+                        isMainModuleCollapsed ? setIsMainModuleCollapsed(false) : setIsMainModuleCollapsed(true); // open submodules if reclicked
+                        //setActiveModule(null);
+                        setActiveSubModule(null);
+                      }
                     } else {
                       // otherwise, activate it
+                      setIsMainModuleCollapsed(true);
                       setActiveModule(module.id);
                       setActiveSubModule(null);
                       loadMainModule(module.id);
                     }
-                    /*
-                    setActiveModule(module.id);
-                    setActiveSubModule(null);*/
+
                   }}
 
                   onMouseEnter={() => setHoveredModule(module.id)}
@@ -568,7 +584,7 @@ function App() {
                 </div>
 
                 <div
-                  className={`sidebar-submodule-empty-container ${isSidebarOpen && activeModule === module.id ? "opened" : ""
+                  className={`sidebar-submodule-empty-container ${isMainModuleCollapsed && isSidebarOpen && activeModule === module.id ? "opened" : ""
                     }`}
                 >
                   {/* Submodules - only show if the main module is active */}
@@ -718,7 +734,7 @@ function App() {
                 />
               ) : (
                 ModuleComponent && (
-                  <Suspense fallback={<div>Loading...</div>}>
+                  <Suspense fallback={<div className="loading-suspense">Loading...</div>}>
                     <ModuleComponent
                       setActiveModule={setActiveModule}
                       loadSubModule={loadSubModule}
