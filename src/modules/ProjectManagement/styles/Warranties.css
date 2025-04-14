@@ -1,0 +1,125 @@
+.warrantymonitoring{
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+  }
+  .warrantymonitoring{
+    color: black;
+    font-size: 20px;
+    font-family: 'Inter',sans-serif;
+  }
+  .warrantytable{
+    color: black;
+    font-size: 12px;
+    padding: 5px;
+    font-family: "Inter";
+    width: 1000px; 
+    max-height: 390px; 
+    text-align: center;
+    display: block;
+    position: absolute;
+    top: 200px;
+    left: 300px;
+    align-items: center;
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+  
+  .warrantytable td {
+    border-bottom: 1px solid darkgray;
+    text-align: center;
+    color: #585757;
+    border: 1px solid darkgray;
+    
+    
+  }
+  .warrantytable tbody tr {
+    border-bottom: 1px solid lightgray;
+   
+}
+.warrantytable th{
+  background-color: #C9E7E5;
+}
+.warrantytable table {
+  width: 50%;
+  table-layout: fixed;
+  white-space: nowrap;
+}
+
+.warrantytable th:nth-child(1),
+.warrantytable td:nth-child(1) {
+  width: 42px;
+}
+
+.warrantytable th:nth-child(2),
+.warrantytable td:nth-child(2) {
+  width: 200px;
+  height: 50px;
+}
+
+.warrantytable th:nth-child(3),
+.warrantytable td:nth-child(3) {
+  width: 200px;
+}
+
+.warrantytable th:nth-child(4),
+.warrantytable td:nth-child(4) {
+  width: 200px;
+}
+
+.warrantytable th:nth-child(5),
+.warrantytable td:nth-child(5) {
+  width: 170px;
+}
+
+.warrantytable th:nth-child(6),
+.warrantytable td:nth-child(6) {
+  width: 182px;
+}
+.warrantytable::-webkit-scrollbar-thumb{
+  background-color: #00A8A8;
+  border-radius: 5px;
+}
+.warrantytable::-webkit-scrollbar-track{
+  background-color: lightgray;
+  border-radius: 10px;
+}
+.warrantytable::-webkit-scrollbar{
+  background-color: #00A8A8;
+  width: 5px;
+  height: 5px;
+  border-radius: 10px;
+}
+.delproj{
+  color: black;
+  background-color: #00A8A8;
+  border: 1px solid #E8E8E8;
+  font-size: 14px;
+  font-family: 'Inter',sans-serif;
+  text-align: center;
+  border-radius: 10px;
+  height: 40px;
+  width: 110px;
+  position: absolute;
+  top: 150px;
+  right: 70px;
+}
+.delproj:hover{
+  background-color: darkgray;
+  color: black;
+}
