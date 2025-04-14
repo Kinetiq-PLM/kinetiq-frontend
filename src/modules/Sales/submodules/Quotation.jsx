@@ -225,8 +225,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule }) => {
       // },
     };
     setPayload({ ...request, name: selectedCustomer.name });
-    console.log(request);
-    // quotationMutation.mutate(request);
+    quotationMutation.mutate(request);
   };
 
   useEffect(() => {

@@ -33,7 +33,6 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
   const columns = [
     { key: "employee_id", label: "Employee ID" },
     { key: "name", label: "Name" }, // Company Name
-    { key: "job_title", label: "Job Title" }, // Country
   ];
 
   const handleConfirm = () => {
