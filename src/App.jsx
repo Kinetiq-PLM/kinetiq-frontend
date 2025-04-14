@@ -671,14 +671,18 @@ function App() {
               </div>}
               {isProfileMenuOpen && (
                 <div className="profile-dropdown">
-                  <p className="profile-name"><strong>{user?.first_name} {user?.last_name}</strong></p>
-                  <p className="profile-details">ID: {user?.employee_id}</p>
-                  <p className="profile-details">Role: {user?.role?.role_name}</p>
+                  <div className="profile-dropdown-header">
+                    <div className="profile-name">{user?.first_name} {user?.last_name}</div>
+                    <div className="profile-details">ID: {user?.employee_id}</div>
+                    <div className="profile-details">{user?.role?.role_name}</div>
+                  </div>
 
                   <div className="dropdown-divider"></div>
+                  <div className="dropdown-menu">
+                    <div className="dropdown-item" onClick={() => setShowUserProfile(true)}>Settings</div>
+                    <div className="dropdown-item" onClick={handleLogout}>Logout</div>
+                  </div>
 
-                  <div className="dropdown-item" onClick={() => setShowUserProfile(true)}>Settings</div>
-                  <div className="dropdown-item" onClick={handleLogout}>Logout</div>
                 </div>
               )}
 
