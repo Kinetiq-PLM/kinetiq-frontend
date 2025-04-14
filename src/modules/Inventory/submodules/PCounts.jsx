@@ -304,7 +304,7 @@ const BodyContent = () => {
                             </td>
                             <td className="p-2">{item.time_period || "-"}</td>
                             <td className="p-2">{item.employee || "Unassigned"}</td>
-                            <td className="p-2">{item.warehouse_id || "-"}</td>
+                            <td className="p-2">{item.warehouse_location || item.warehouse_id || "-"}</td>
                             <td className={`p-2 ${getStatusColorClass(item.status)}`}>
                               {getStatusDisplayValue(item.status)}
                             </td>
@@ -329,8 +329,8 @@ const BodyContent = () => {
 >
   <option value="">Select Warehouse</option>
   {warehouses.map((w) => (
-    <option key={w} value={w}>
-      {w}
+    <option key={w.id} value={w.id}>
+      {w.name}
     </option>
   ))}
 </select>
@@ -418,7 +418,7 @@ const BodyContent = () => {
                           <div className="mb-4">
                             <h4 className="text-cyan-600 text-sm font-semibold">Location & Personnel</h4>
                             <p className="text-gray-500 text-sm">Employee: {selectedRow?.employee || "Unassigned"}</p>
-                            <p className="text-gray-500 text-sm">Warehouse: {selectedRow?.warehouse_id || "-"}</p>
+                            <p className="text-gray-500 text-sm">Warehouse: {selectedRow?.warehouse_location || selectedRow?.warehouse_id || "-"}</p>
                             <p className="text-gray-500 text-sm">Time Period: {selectedRow?.time_period || "-"}</p>
                           </div>
 
