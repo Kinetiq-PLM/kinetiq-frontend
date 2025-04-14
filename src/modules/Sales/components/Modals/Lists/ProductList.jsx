@@ -8,6 +8,7 @@ import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../../api/api";
+import { TAX_RATE } from "../../../temp_data/sales_data.jsx";
 
 const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   const { showAlert } = useAlert();
@@ -41,7 +42,8 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   const handleConfirm = () => {
     if (selectedProduct) {
       selectedProduct.quantity = 1;
-      selectedProduct.tax = 0;
+      selectedProduct.tax =
+        TAX_RATE + selectedProduct.quantity * selectedProduct.selling_price;
       selectedProduct.discount = 0;
       selectedProduct.total_price = selectedProduct.selling_price;
       addProduct([...products, selectedProduct]); // Properly update the array
