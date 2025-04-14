@@ -61,6 +61,7 @@ function App() {
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
+    setNotifOpen(false); // close notification menu if profile menu is opened
   };
 
   useEffect(() => {
@@ -679,15 +680,16 @@ function App() {
 
                   <div className="dropdown-divider"></div>
                   <div className="dropdown-menu">
-                    <div className="dropdown-item" onClick={() => setShowUserProfile(true)}>Settings</div>
-                    <div className="dropdown-item" onClick={handleLogout}>Logout</div>
+                    <div className="dropdown-item" onClick={() => setShowUserProfile(true)}><img src="/icons/settings.png" /> Settings</div>
+                    <div className="dropdown-item" onClick={handleLogout}><img src="/icons/logout.png" /> Logout</div>
                   </div>
 
                 </div>
               )}
 
               <div className="header-profile-container">
-                <div className="header-profile-icon-wrapper" onClick={toggleProfileMenu}>
+                <div className={`header-profile-icon-wrapper ${isProfileMenuOpen ? "opened" : ""}`}
+                  onClick={toggleProfileMenu}>
                   <div className="header-profile-icon">
                     {" "}
                     {displayName?.charAt(0)}

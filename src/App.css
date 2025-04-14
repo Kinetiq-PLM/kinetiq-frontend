@@ -469,6 +469,16 @@ img {
   justify-content: flex-end;
   padding: 0.2rem 0.5rem;
   border-radius: 0.2rem;
+  cursor: pointer;
+}
+
+.header-profile-icon-wrapper.opened{
+  background-color: rgb(235, 235, 235);
+  box-shadow: 0rem 0.5rem 0.5rem rgba(162, 162, 162, 0.);
+}
+
+.header-profile-icon-wrapper.opened:hover {
+  background-color: rgb(218, 218, 218);
 }
 
 .header-profile-icon-wrapper p{
@@ -477,7 +487,6 @@ img {
 }
 
 .header-profile-icon-wrapper:hover {
-  cursor: pointer;
   background-color: rgb(245, 245, 245);
 }
 
@@ -520,7 +529,7 @@ img {
 .notif-menu {
   position: absolute;
   top: 3rem;
-  right: 13rem;
+  right: 12rem;
   padding-top: 1rem;
   background-color: white;
   width: 20rem;
@@ -673,7 +682,7 @@ img {
 
 .profile-dropdown {
   position: absolute;
-  right: 3rem;
+  right: 2rem;
   top: 3.5rem;
   width: 11rem;
   background: white;
@@ -682,6 +691,7 @@ img {
   border: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 100;
   font-size: 0.85rem;
+  animation: smooth-appear 0.3s ease;
 }
 
 .profile-dropdown-header{
@@ -709,6 +719,14 @@ img {
   cursor: pointer;
   color: #787878;
   padding: 0.5rem 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.dropdown-item img{
+  height: 0.9rem;
+  width: 0.9rem;
 }
 
 .dropdown-item:hover {
