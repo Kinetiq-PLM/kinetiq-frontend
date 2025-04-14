@@ -376,8 +376,12 @@ function App() {
       "Stock Flow": "StockFlow",
     },
     "Distribution": {
-      "Shipping": "Shipping",
-      "Order Fulfillment": "OrderFulfillment",
+      "External Delivery": "ExternalDelivery",
+      "Internal Delivery": "InternalDelivery",
+      "Picking" : "Picking",
+      "Packing": "Packing",
+      Shipment: "Shipment",
+      "Rework": "Rework",
     },
     "Production": {
       "Equipment and Labor": "Equipment&Labor",
