@@ -115,6 +115,7 @@ const TicketDetail = ({ isOpen, onClose, ticket, setIsTicketResolveOpen }) => {
                 className={"mr-2"}
                 submit={true}
                 onClick={() => setIsTicketResolveOpen(true)}
+                disabled={ticket.status === "Closed"}
               >
                 Resolve
               </Button>
