@@ -58,24 +58,41 @@ function App() {
   };
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest('.header-profile-container')) {
+    if (!isProfileMenuOpen) return;
+
+    const handleClickOutsideProfileDropdown = (e) => {
+      if (
+        !e.target.closest('.header-profile-container') &&
+        !e.target.closest('.profile-dropdown')
+      ) {
         setIsProfileMenuOpen(false);
       }
     };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
+
+    document.addEventListener("click", handleClickOutsideProfileDropdown);
+    return () => {
+      document.removeEventListener("click", handleClickOutsideProfileDropdown);
+    };
+  }, [isProfileMenuOpen]);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest('.notif-icon') && !e.target.closest('.notif-menu')) {
+    if (!notifOpen) return;
+
+    const handleClickOutsideNotif = (e) => {
+      if (
+        !e.target.closest('.notif-icon') &&
+        !e.target.closest('.notif-menu')
+      ) {
         setNotifOpen(false);
       }
     };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
+
+    document.addEventListener("click", handleClickOutsideNotif);
+    return () => {
+      document.removeEventListener("click", handleClickOutsideNotif);
+    };
+  }, [notifOpen]);
+
 
   //fetch notifs
   const fetchNotifs = async (user) => {
@@ -658,6 +675,7 @@ function App() {
                 alt="Notificaton-Logo"
                 onClick={() => {
                   setNotifOpen(!notifOpen)
+                  setIsProfileMenuOpen(false); //close profile menu if notif menu is opened
                   setHasNotification(false)
                 }} //to be replaecd by func for setting notifs as read
               ></img>
@@ -706,7 +724,14 @@ function App() {
 
                   <div className="dropdown-divider"></div>
                   <div className="dropdown-menu">
-                    <div className="dropdown-item" onClick={() => setShowUserProfile(true)}><img src="/icons/settings.png" />User Profile</div>
+                    <div className="dropdown-item"
+                      onClick={() => {
+                        setShowUserProfile(true);
+                        setIsProfileMenuOpen(false);
+                      }}
+                    >
+                      <img src="/icons/settings.png" />User Profile
+                    </div>
                     <div className="dropdown-item" onClick={handleLogout}><img src="/icons/logout.png" /> Logout</div>
                   </div>
 
@@ -750,7 +775,7 @@ function App() {
 
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
