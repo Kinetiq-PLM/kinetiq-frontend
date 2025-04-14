@@ -9,7 +9,6 @@ const BodyContent = ({ employee_id }) => {
         email,
         status,
         type,
-        roles = []
     } = storedUser || {};
 
     const { role_name, description, permissions } = storedUser.role || {};
@@ -17,30 +16,36 @@ const BodyContent = ({ employee_id }) => {
     return (
         <div className="usrprofile">
             <div className="body-content-container">
-                <h2 className="title">User Profile</h2>
+                <div className="user-details-container">
+                    <div className="user-image">{first_name?.charAt(0)}</div>
+                    <div className="user-details">
+                        <p><strong>Name:</strong> {first_name} {last_name}</p>
+                        <p><strong>Email:</strong> {email}</p>
+                        <p><strong>Status:</strong> {status}</p>
+                        <p><strong>Type:</strong> {type}</p>
+                        <p><strong>Employee ID:</strong> {employee_id}</p>
+                    </div>
+                    <div className="role-details">
+                        <h3>Role Details</h3>
+                        <p><strong>Position:</strong> {role_name}</p>
+                        <p><strong>Job Description:</strong> {description}</p>
+                        <p><strong>Module Permissions:</strong> {Array.isArray(permissions) ? permissions.join(", ") : permissions}</p>
+                    </div>
+                </div>
+                <div className="password-kinetiq-container">
+                    <div className="password-section">
+                        <h3>Change Password</h3>
+                        <input type="password" placeholder="Current Password" className="input" />
+                        <input type="password" placeholder="New Password" className="input" />
+                        <input type="password" placeholder="Confirm New Password" className="input" />
+                        <button className="change-password-btn">Change Password</button>
+                    </div>
+                    <div className="kinetiq-section">
 
-                <div className="user-details">
-                    <p><strong>Name:</strong> {first_name} {last_name}</p>
-                    <p><strong>Email:</strong> {email}</p>
-                    <p><strong>Status:</strong> {status}</p>
-                    <p><strong>Type:</strong> {type}</p>
-                    <p><strong>Employee ID:</strong> {employee_id}</p>
+                    </div>
                 </div>
 
-                <div className="role-details">
-                    <h3>Role Details</h3>
-                    <p><strong>Position:</strong> {role_name}</p>
-                    <p><strong>Job Description:</strong> {description}</p>
-                    <p><strong>Module Permissions:</strong> {Array.isArray(permissions) ? permissions.join(", ") : permissions}</p>
-                </div>
 
-                <div className="password-section">
-                    <h3>Change Password</h3>
-                    <input type="password" placeholder="Current Password" className="input" />
-                    <input type="password" placeholder="New Password" className="input" />
-                    <input type="password" placeholder="Confirm New Password" className="input" />
-                    <button className="change-password-btn">Change Password</button>
-                </div>
             </div>
         </div>
     );

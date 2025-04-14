@@ -45,10 +45,10 @@ export default function StandaloneLogin() {
       }
     } catch (err) {
       if (err.response && err.response.data) {
-        // catches Django error payload
+        // django error payload
         const { message } = err.response.data;
         console.error("Login failed:", message);
-        setLoginError("*" + message + "*"); // show error message to user
+        setLoginError("*" + message + "*");
         //alert(message); // backend error
       } else {
         console.error("Login error:", err);
@@ -178,13 +178,13 @@ export default function StandaloneLogin() {
               )}
             </div>
 
-          
+
           </div>
 
 
         </div>
         <div className="login-right">
-          <img src="/icons/logo4.png" alt="Kinetiq Logo" className="kinetiq-logo" />
+          <img src="/icons/logo2.png" alt="Kinetiq Logo" className="kinetiq-logo" />
         </div>
       </div>
     </div>

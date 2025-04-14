@@ -18,39 +18,28 @@
   justify-content: center;
   min-width: 40rem;
   min-height: 30rem;
+  overflow: auto;
+  padding: 1rem;
 }
 
-.usrprofile .title {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.usrprofile .user-details,
-.usrprofile .role-details,
-.usrprofile .password-section {
+.user-details-container{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2rem;
   width: 100%;
-  margin-bottom: 1.5rem;
+  height: 100%;
 }
 
-.usrprofile .password-section input {
-  width: 100%;
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 0.3rem;
-}
-
-.usrprofile .change-password-btn {
-  padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 0.3rem;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  align-self: flex-start;
-}
-
-.usrprofile .change-password-btn:hover {
-  background-color: #0056b3;
+.user-image{
+  width: 10rem;
+  height: 10rem;
+  border-radius: 100%;
+  background-color: rgb(169, 246, 255);
+  color: rgb(0, 125, 141);
+  font-size: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
