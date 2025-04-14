@@ -80,7 +80,7 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
         delivery_note_id: invoice.delivery_note.delivery_note_id,
         customer_id: invoice.delivery_note.statement.customer.customer_id,
         customer_name: invoice.delivery_note.statement.customer.name,
-        invoice_date: new Date(invoice.invoice_date).toLocaleString(),
+        invoice_date: new Date(invoice.invoice_date).toLocaleDateString(),
         delivery_status: invoice.delivery_note.shipment_status,
         total_amount: Number(invoice.total_amount).toLocaleString("en-US", {
           minimumFractionDigits: 2,
