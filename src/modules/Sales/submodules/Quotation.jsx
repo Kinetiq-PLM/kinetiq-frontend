@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "../styles/Index.css";
 
 import { TAX_RATE } from "../temp_data/sales_data";

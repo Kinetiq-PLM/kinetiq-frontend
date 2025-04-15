@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./styles/Index.css";
 import Heading from "./components/Heading";
+
+import { useState } from "react";
+import RequestModal from "./components/Modals/RequestModal";
 
 const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   console.log(employee_id);
@@ -15,8 +18,20 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     // Return: "Return",
   };
 
+  const [requestModal, setRequestModal] = useState("");
+  const [action, setAction] = useState("");
+
+  useEffect(() => {
+    // ADD HERE LOGIC FOR Purchase Request, Project Request, Workforce Request
+  }, [action]);
+
   return (
     <div className="sales">
+      <RequestModal
+        isOpen={requestModal}
+        onClose={() => setRequestModal(false)}
+        setAction={setAction}
+      ></RequestModal>
       <div className="body-content-container">
         <Heading
           Title="Sales Dashboard"
@@ -36,6 +51,14 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
               <span className="font-medium text-gray-800">{key}</span>
             </button>
           ))}
+          <button
+            className="flex items-center justify-center bg-[#FAFAFA] rounded-lg border border-gray-200 p-10 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer font-bold text-xl"
+            onClick={() => {
+              setRequestModal(true);
+            }}
+          >
+            <span className="font-medium text-gray-800">Request</span>
+          </button>
         </div>
       </div>
     </div>
