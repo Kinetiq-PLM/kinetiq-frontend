@@ -24,7 +24,7 @@ import SalesDropup from "../components/SalesDropup.jsx";
 import { useMutation } from "@tanstack/react-query";
 import { GET, POST } from "../api/api.jsx";
 
-const Order = ({ loadSubModule, setActiveSubModule }) => {
+const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const { showAlert } = useAlert();
 
   const copyFromOptions = ["Quotation", "Blanket Agreement"];
@@ -210,7 +210,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       },
       statement_data: {
         customer: selectedCustomer.customer_id,
-        salesrep: selectedEmployee.employee_id,
+        salesrep: employee_id,
         total_amount: Number(parseFloat(orderInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(orderInfo.discount).toFixed(2)),
         total_tax: Number(parseFloat(orderInfo.total_tax).toFixed(2)),
@@ -405,11 +405,11 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsBlanketAgreementListOpen(false)}
           setBlanketAgreement={setSelectedBlanketAgreement}
         ></BlanketAgreementListModal>
-        <EmployeeListModal
+        {/* <EmployeeListModal
           isOpen={isEmployeeListOpen}
           onClose={() => setIsEmployeeListOpen(false)}
           setEmployee={setSelectedEmployee}
-        ></EmployeeListModal>
+        ></EmployeeListModal> */}
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -455,18 +455,8 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
             {/* Employee ID Input */}
             <div className="flex mb-2 w-full mt-4 gap-4 items-center">
               <p className="">Employee ID</p>
-              <div
-                className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
-                onClick={() => setIsEmployeeListOpen(true)}
-              >
-                <p className="text-sm">
-                  {selectedEmployee ? selectedEmployee.employee_id : ""}
-                </p>
-                <img
-                  src="/icons/information-icon.svg"
-                  className="h-[15px]"
-                  alt="info icon"
-                />
+              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded">
+                <p className="text-sm">{employee_id || ""}</p>
               </div>
             </div>
 
@@ -539,12 +529,13 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   );
 };
 
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   return (
     <AlertProvider>
       <Order
         loadSubModule={loadSubModule}
         setActiveSubModule={setActiveSubModule}
+        employee_id={employee_id}
       />
     </AlertProvider>
   );

@@ -19,7 +19,7 @@ import { useMutation } from "@tanstack/react-query";
 import SalesTicketTab from "../components/TicketTabs/SalesTicketTab";
 import ServiceTicketTab from "../components/TicketTabs/ServiceTicketTab";
 
-const Ticket = ({ loadSubModule, setActiveSubModule }) => {
+const Ticket = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const { showAlert } = useAlert();
 
   const [selectedCustomer, setSelectedCustomer] = useState("");
@@ -39,7 +39,7 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
     type: "",
     status: "",
     priority: "",
-    salesrep: "",
+    salesrep: employee_id,
     created_at: new Date().toISOString().split("T")[0],
   });
 
@@ -50,12 +50,12 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
     }));
   }, [selectedCustomer]);
 
-  useEffect(() => {
-    setTicketInfo((prev) => ({
-      ...prev,
-      salesrep: selectedEmployee.employee_id,
-    }));
-  }, [selectedEmployee]);
+  // useEffect(() => {
+  //   setTicketInfo((prev) => ({
+  //     ...prev,
+  //     salesrep: employee_id,
+  //   }));
+  // }, [selectedEmployee]);
 
   const tabs = [
     {
@@ -155,22 +155,23 @@ const Ticket = ({ loadSubModule, setActiveSubModule }) => {
           isOpen={isNewCustomerModalOpen}
           onClose={() => setIsNewCustomerModalOpen(false)}
         ></NewCustomerModal>
-        <EmployeeListModal
+        {/* <EmployeeListModal
           isOpen={isEmployeeListOpen}
           onClose={() => setIsEmployeeListOpen(false)}
           setEmployee={setSelectedEmployee}
-        ></EmployeeListModal>
+        ></EmployeeListModal> */}
       </div>
     </div>
   );
 };
 
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   return (
     <AlertProvider>
       <Ticket
         loadSubModule={loadSubModule}
         setActiveSubModule={setActiveSubModule}
+        employee_id={employee_id}
       />
     </AlertProvider>
   );

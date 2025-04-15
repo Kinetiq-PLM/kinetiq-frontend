@@ -90,13 +90,15 @@ const OpportunityModal = ({
 
     if (errorCount === 0) {
       // Reset form fields
+      const eVal = estimatedValue || details.estimatedValue;
+      const gp = grossProfitTotal || details.grossProfitTotal;
       const request = {
         customer: selectedCustomer.customer_id,
         partner: selectedCustomer.partner.partner_id,
         salesrep: selectedEmployee.employee_id,
         starting_date: startDate,
         expected_closed_date: endDate,
-        estimated_value: Number(estimatedValue.replace(",", "")),
+        estimated_value: Number(eVal.replace(/,/g, "")),
         weighted_amount: Number(weightedAmount),
         gross_profit_percentage: Number(grossProfit),
         gross_profit_total: Number(grossProfitTotal),
@@ -266,6 +268,7 @@ const OpportunityModal = ({
 
   useEffect(() => {
     if (details) {
+      console.log(details);
       setDescription(details.description);
       setStartDate(new Date(details.starting_date).toISOString().split("T")[0]);
       setEndDate(details.expected_closed_date);
@@ -295,11 +298,15 @@ const OpportunityModal = ({
 
   useEffect(() => {
     if (isOpen && grossProfit && estimatedValue) {
-      setGrossProfitTotal(
-        Number(estimatedValue.replace(",", "")) * (Number(grossProfit) / 100)
-      );
+      const compute =
+        Number(estimatedValue.replace(/,/g, "")) * (Number(grossProfit) / 100);
+      console.log("compute ", compute);
+      setGrossProfitTotal(compute);
     }
-  }, [grossProfit, estimatedValue]);
+  }, [grossProfit, estimatedValue, isOpen]);
+  useEffect(() => {
+    console.log(grossProfitTotal);
+  }, [grossProfitTotal]);
   if (!isOpen) return null;
 
   return (

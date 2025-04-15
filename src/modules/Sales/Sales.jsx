@@ -2,7 +2,8 @@ import React from "react";
 import "./styles/Index.css";
 import Heading from "./components/Heading";
 
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
+  console.log(employee_id);
   const salesSubModule = {
     Quotation: "Quotation",
     Order: "Order",

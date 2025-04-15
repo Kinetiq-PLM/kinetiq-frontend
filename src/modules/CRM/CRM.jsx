@@ -2,7 +2,7 @@ import React from "react";
 import "./styles/index.css";
 import Heading from "../Sales/components/Heading";
 
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const crmSubModule = {
     Ticket: "Ticket",
     Campaign: "Campaign",

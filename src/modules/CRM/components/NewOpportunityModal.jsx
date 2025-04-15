@@ -20,7 +20,7 @@ const NewOpportunityModal = ({
   onClose,
   setCanSave,
   selectedCustomer,
-  selectedEmployee,
+  employee_id,
 }) => {
   const { showAlert } = useAlert();
 
@@ -91,7 +91,7 @@ const NewOpportunityModal = ({
       const request = {
         customer: selectedCustomer.customer_id,
         partner: selectedCustomer.partner.partner_id,
-        salesrep: selectedEmployee.employee_id,
+        salesrep: employee_id,
         starting_date: startDate,
         expected_closed_date: endDate,
         estimated_value: estimatedValue,
