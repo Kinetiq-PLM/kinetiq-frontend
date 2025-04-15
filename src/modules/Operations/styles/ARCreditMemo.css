@@ -4,6 +4,7 @@
   height: 100%;
 }
 
+
 .gr .body-content-container {
   width: 100%;
   height: 100%;
@@ -18,6 +19,7 @@
   gap: 1rem;
 }
 
+
 .content-wrapper {
   display: flex;
   flex-direction: column;
@@ -30,6 +32,7 @@
   position: relative;
 }
 
+
 .back-button {
   display: flex;
   align-items: center;
@@ -40,7 +43,7 @@
   margin-bottom: 0.5rem;
   align-self: flex-start;
 }
-
+ 
 .details-grid {
   display: grid;
   grid-template-columns: 250px 1fr;
@@ -48,6 +51,7 @@
   max-width: 100%;
   margin-bottom: 1rem;
 }
+
 
 .details-section {
   background: white;
@@ -57,6 +61,7 @@
   width: 100%;
 }
 
+
 .detail-row {
   display: flex;
   flex-direction: column;
@@ -64,14 +69,17 @@
   margin-bottom: 0.4rem;
 }
 
+
 .detail-row:last-child {
   margin-bottom: 0;
 }
+
 
 .detail-row label {
   color: #4B5563;
   font-size: 0.813rem;
 }
+
 
 .detail-row input,
 .detail-row select,
@@ -86,15 +94,18 @@
   height: 1.5rem;
 }
 
+
 .tabbed-section {
   padding: 0 !important;
 }
+
 
 .section-tabs {
   display: flex;
   border-bottom: 1px solid #E5E7EB;
   background: #F9FAFB;
 }
+
 
 .tab-button {
   flex: 1;
@@ -107,10 +118,12 @@
   position: relative;
 }
 
+
 .tab-button.active {
   color: #0d9488;
   background: white;
 }
+
 
 .tab-button.active::after {
   content: '';
@@ -122,6 +135,7 @@
   background-color: #0d9488;
 }
 
+
 .tab-content {
   padding: 0.5rem;
   background: white;
@@ -131,6 +145,7 @@
   flex: 1;
 }
 
+
 .tab-content .left-column,
 .tab-content .right-column {
   display: flex;
@@ -138,10 +153,12 @@
   gap: 0.4rem;
 }
 
+
 .tab-content .right-column {
   border-left: 1px solid #E5E7EB;
   padding-left: 1rem;
 }
+
 
 .tab-content.credit-details {
   display: grid;
@@ -150,9 +167,11 @@
   padding: 0.5rem;
 }
 
+
 .tab-content.credit-details .detail-row {
   margin-bottom: 0.25rem;
 }
+
 
 .operation_table_container {
   margin-top: 1rem;
@@ -165,6 +184,7 @@
   overflow: hidden;
 }
 
+
 .gr-table {
   height: 100%;
   width: 100%;
@@ -176,23 +196,28 @@
   bottom: 0;
 }
 
+
 .gr-table::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 
 .gr-table::-webkit-scrollbar-thumb {
   background: #0d9488;
   border-radius: 3px;
 }
 
+
 .gr-table::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
 
+
 .gr-table::-webkit-scrollbar-corner {
   background: #f1f5f9;
 }
+
 
 .materials-table {
   width: 100%;
@@ -200,6 +225,7 @@
   border-spacing: 0;
   min-width: max-content;
 }
+
 
 .materials-table th {
   position: sticky;
@@ -213,6 +239,7 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
+
 .materials-table td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #e2e8f0;
@@ -220,16 +247,19 @@
   white-space: nowrap;
 }
 
+
 .button-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+
 .right-buttons {
   display: flex;
   gap: 0.75rem;
 }
+
 
 .copy-from-button,
 .cancel-button {
@@ -242,10 +272,12 @@
   cursor: pointer;
 }
 
+
 .copy-from-button:hover,
 .cancel-button:hover {
   background: #F9FAFB;
 }
+
 
 .send-to-button {
   padding: 0.5rem 1rem;
@@ -257,9 +289,11 @@
   cursor: pointer;
 }
 
+
 .send-to-button:hover {
   background: #0f766e;
 }
+
 
 .date-input {
   position: relative;
@@ -268,14 +302,17 @@
   width: 100%;
 }
 
+
 .date-input.clickable {
   cursor: pointer;
 }
+
 
 .date-input.clickable input {
   cursor: pointer;
   color: #374151;
 }
+
 
 .date-input input[type="date"] {
   padding-right: 2.5rem;
@@ -287,6 +324,7 @@
   background: white;
 }
 
+
 .date-input input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
   width: 100%;
@@ -297,6 +335,7 @@
   cursor: pointer;
 }
 
+
 .calendar-icon {
   position: absolute;
   right: 0.75rem;
@@ -306,6 +345,7 @@
   line-height: 1;
 }
 
+
 .form-select {
   appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -314,3 +354,7 @@
   background-size: 1em;
   padding-right: 2.5rem;
 }
+
+
+
+
