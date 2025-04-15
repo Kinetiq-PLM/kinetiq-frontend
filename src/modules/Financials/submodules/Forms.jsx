@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import "../styles/Forms.css"; // Assuming you have a Forms.css file
+import "../styles/Forms.css"; 
+import { POST } from "../api/api"; 
 
 const tabs = ["Budget Submission Form", "Budget Request Form", "Budget Return Form"];
 
@@ -111,8 +112,8 @@ const FormSubmit = ({ activeTab, departments, onFormSubmit, onClearForm, formSub
                   </div>
                   <div className="form-group">
                     <label>Usage Period (end date): <span className="required">*</span></label>
-                    <input type="text" name="usagePeriod" value={formData.usagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("usagePeriod")} />
-                    {errors.usagePeriod && <p className="error">{errors.usagePeriod}</p>}
+                    <input type="text" name="endUsagePeriod" value={formData.endUsagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("endUsagePeriod")} />
+                    {errors.endUsagePeriod && <p className="error">{errors.endUsagePeriod}</p>}
                   </div>
                   <div className="form-group">
                     <label>Expense Breakdown for the Year: <span className="required">*</span></label>
@@ -164,8 +165,8 @@ const FormSubmit = ({ activeTab, departments, onFormSubmit, onClearForm, formSub
                   </div>
                   <div className="form-group">
                     <label>Usage Period (end date): <span className="required">*</span></label>
-                    <input type="text" name="usagePeriod" value={formData.usagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("usagePeriod")} />
-                    {errors.usagePeriod && <p className="error">{errors.usagePeriod}</p>}
+                    <input type="text" name="endUsagePeriod" value={formData.endUsagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("endUsagePeriod")} />
+                    {errors.endUsagePeriod && <p className="error">{errors.endUsagePeriod}</p>}
                   </div>
                   <div className="form-group">
                     <label>Reason for Request: <span className="required">*</span></label>
@@ -388,6 +389,7 @@ const BodyContent = () => {
     if (tabName === "Budget Submission Form") {
       subData = {
         submitter_name: formData.submitterName,
+        employee_id: formData.employeeId,
         dept_id: formData.departmentId,
         date_submitted: new Date().toISOString().split('T')[0],
         proposed_total_budget: formData.totalBudget,
@@ -399,6 +401,7 @@ const BodyContent = () => {
     } else if (tabName === "Budget Request Form") {
       subData = {
         requestor_name: formData.requestorName,
+        employee_id: formData.employeeId,
         dept_id: formData.departmentId,
         requested_date: new Date().toISOString().split('T')[0],
         amount_requested: formData.totalAmountNeeded,
@@ -412,6 +415,7 @@ const BodyContent = () => {
     } else if (tabName === "Budget Return Form") {
       subData = {
         returner_name: formData.requestorName,
+        employee_id: formData.employeeId,
         dept_id: formData.departmentId,
         return_date: new Date().toISOString().split('T')[0],
         budget_request_id: formData.requestId,
