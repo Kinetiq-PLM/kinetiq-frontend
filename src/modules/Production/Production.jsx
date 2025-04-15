@@ -167,7 +167,7 @@ const BodyContent = () => {
                                                 <th style={{ textAlign: "center" }}>Remarks</th>
                                                 <th style={{ textAlign: "center" }}>Status</th>
                                             </tr>
-                                        </thead>
+                                        </thead> 
                                         <tbody>
                                             {filteredData.map((order, index) => (
                                                 <tr key={order.production_order_id}>
@@ -245,10 +245,10 @@ const BodyContent = () => {
                                     <path
                                         className="circle-progress"
                                         d="M18 2.0845 a 15.9155 15.9155 0 1 1 0 31.831 a 15.9155 15.9155 0 1 1 0 -31.831"
-                                        strokeDasharray="100, 100"
+                                        strokeDasharray={`${completedPercentage}, 100`}
                                     />
                                 </svg>
-                                <div className="progress-text">100%</div>
+                                <div className="progress-text">{Math.round(completedPercentage)}%</div>
                             </div>
                             <div className="progress-details">
                                 <div className="progress-item">
