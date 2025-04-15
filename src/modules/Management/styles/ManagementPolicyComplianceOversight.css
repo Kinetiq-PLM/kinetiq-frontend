@@ -1,0 +1,136 @@
+.policy-compliance-container {
+    font-family: sans-serif;
+    background-color: white; /* White background */
+    padding: 20px;
+    min-height: 100vh;
+  }
+  
+  .policy-compliance-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .policy-compliance-form {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .policy-compliance-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .policy-compliance-form input[type="text"],
+  .policy-compliance-form select,
+  .policy-compliance-form textarea {
+    width: calc(100% - 22px); /* Adjust width to account for padding and border */
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+  }
+  
+  .policy-compliance-form textarea {
+    resize: vertical; /* Allow vertical resizing */
+  }
+  
+  .policy-compliance-form .form-row {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .policy-compliance-form .form-row > div {
+    width: 48%; /* Adjust width for two columns */
+  }
+  
+  .policy-compliance-form .form-actions {
+    text-align: right;
+    margin-top: 20px;
+  }
+  
+  .policy-compliance-form .form-actions button {
+    padding: 10px 20px;
+    background-color: #008080; /* Teal color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .policy-compliance-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .policy-compliance-table th,
+  .policy-compliance-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .policy-compliance-table th {
+    background-color: #e0f2fe; /* Light header background */
+    font-weight: bold;
+  }
+  
+  .policy-compliance-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .policy-compliance-table tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .policy-compliance-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .policy-compliance-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .policy-compliance-actions button.back {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  .policy-compliance-actions button.select {
+    background-color: #008080; /* Teal color */
+    color: white;
+  }
+  
+  .policy-compliance-search-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .policy-compliance-search-bar input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 300px;
+  }
+  
+  .policy-compliance-search-bar select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
