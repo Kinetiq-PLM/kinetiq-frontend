@@ -73,7 +73,7 @@ import { GET } from "../api/api";
       const [isAllocatedBudgetUpdated, setIsAllocatedBudgetUpdated] = useState(false);
       const [initialBudgets, setInitialBudgets] = useState(initialDepartmentBudgets);
       const [isRequestWarningVisible, setIsRequestWarningVisible] = useState(false);
-    
+      
       const closeWarningPopup = () => { setIsWarningPopupVisible(false); };
       const closeApprovedByWarning = () => { setIsApprovedByWarningVisible(false); };
     
@@ -442,7 +442,27 @@ import { GET } from "../api/api";
           //fetchBudgetApprovals();
           //fetchReturns();
         }, []);
-
+      
+          const fetchRejectedApprovals = async () => {
+            try {
+              const data = await GET("/approvals/rejected-budget-submissions/"); 
+                const formattedData = data.map(item => ({
+                requestId: item.budget_submission?.budget_submission_id || "",
+                amount: item.budget_validation?.amount_requested || "",
+                requestDate: item.budget_submission?.date_submitted || "",
+                approvedBy: item.approved_by || "",
+                remarks: item.remarks || "",
+                validationStatus: item.approval_status || "",
+                }));
+              setRejectedData(formattedData);
+            } catch (error) {
+              console.error("Failed to load rejected approvals:", error);
+            }
+          };
+          
+          useEffect(() => {
+          fetchRejectedApprovals();
+        }, []);
 
       return (
         <div className="approvals">
@@ -923,7 +943,7 @@ import { GET } from "../api/api";
                               <tr key={index}>
                                 <td><div className="row-wrapper">{row.requestId}</div></td>
                                 <td><div className="row-wrapper">{row.amount}</div></td>
-                                <td><div className="row-wrapper">{row.requestDate.toLocaleDateString()}</div></td>
+                                <td><div className="row-wrapper">{row.requestDate}</div></td>
                                 <td><div className="row-wrapper">{row.approvedBy}</div></td>
                                 <td><div className="row-wrapper">{row.remarks}</div></td>
                                 <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
