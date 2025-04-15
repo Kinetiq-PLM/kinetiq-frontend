@@ -290,7 +290,7 @@ const BodyContent = () => {
             )}
           </div>
 
-          <div className="border border-gray-300 rounded-lg p-6 mt-2">
+          <div className="min-h-[150px] border border-gray-300 rounded-lg p-6 mt-2">
             <div className="grid grid-cols-5 gap-4">
               {selectedItem ? (
                 <>
