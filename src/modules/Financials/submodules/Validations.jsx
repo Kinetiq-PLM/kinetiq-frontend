@@ -397,6 +397,7 @@ useEffect(() => {
   fetchReturns();
 }, []);
 
+
 const patchEditedRows = async () => {
   try {
     const patchPromises = editedDataForConfirmation.map(async (row) => {
@@ -410,24 +411,24 @@ const patchEditedRows = async () => {
       let payload = {};
 
       if (activeTab === "Budget Submission List" && row.requestId) {
-        endpoint = `/validation/update-submission/${row.requestId}/`;
+        // Add the ID to the endpoint URL
+        endpoint = `/validation/budget-submissions/${row.requestId}/`;
         payload = {
           validated_by: row.validatedBy || "",
           final_approved_amount: row.approvedAmount || "",
         };
       } else if (activeTab === "Budget Request List" && row.reqID) {
-        endpoint = `/validation/update-request/${row.reqID}/`;
+        endpoint = `/validation/budget-requests/${row.reqID}/`;
         payload = {
           validated_by: row.validatedBy || "",
           final_approved_amount: row.approvedAmount || "",
         };
       } else if (activeTab === "Returns List" && row.returnsId) {
-        endpoint = `/validation/update-return/${row.returnsId}/`;
+        endpoint = `/validation/budget-returns/${row.returnsId}/`;
         payload = {
           validated_by: row.validatedBy || "",
           remarks: row.remarks || "",
           comments: row.comments || "N/A",
-          // Include the expense history breakdown if needed
           expense_history_breakdown: row.attachedFile || "",
         };
       } else {
@@ -446,17 +447,20 @@ const patchEditedRows = async () => {
       }
     });
 
-    const results = await Promise.all(patchPromises);
+    const results = await Promise.allSettled(patchPromises);
     console.log("Patch results:", results);
 
     // Close the modal and refresh data
     setIsConfirmationVisible(false);
-    fetch(); // Refresh the data after successful updates
+    fetch();
+    fetchRequests();
+    fetchReturns();
   } catch (error) {
     console.error("Error in patching rows:", error);
     alert("An error occurred while updating rows. Please try again.");
   }
 };
+
 
   return (
     <div className="valid">

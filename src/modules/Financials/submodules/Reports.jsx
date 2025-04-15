@@ -285,6 +285,8 @@ const incomeStatementData = [
             { name: "Net Profit (Loss)", year1: 400000.00, year2: 250000.00, year3: 150000.00 }],
         },
       ];
+
+
       
 const BodyContent = () => {
     const [activeTab, setActiveTab] = useState(tabs[0]);
@@ -348,6 +350,8 @@ const BodyContent = () => {
   { name: '31 - 60', amount: 8050.43 },
   { name: '61 - 90', amount: 5000.00 },
 ];
+
+
     
     return (
         <div className="reports">
