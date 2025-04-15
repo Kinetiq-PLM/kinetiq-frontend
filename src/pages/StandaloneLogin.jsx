@@ -10,12 +10,16 @@ export default function StandaloneLogin() {
     password: ""
   });
   const [view, setView] = useState("login"); // login | forgot | reset
-  const [resetData, setResetData] = useState({
-    username: "",
+
+  const initialResetData = {
+    kinetiq_email: "",
+    valid_email: "",
     code: "",
     newPassword: "",
     confirmNewPassword: "",
-  });
+  };
+  
+  const [resetData, setResetData] = useState(initialResetData);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -90,10 +94,11 @@ export default function StandaloneLogin() {
         // emailjs.send("service_fpuj34n","template_vcrih1l",{
         //   code: code,
         //   email: email,
+        //   kinetiq_email: 
         //   });
         console.log("Email sent successfully! to: ", email);
 
-        console.log("Email not sent, using console.log for testing.");
+        console.log("Email not sent, using console.log for testing bc limited api calls.");
 
       } catch (err) {
         console.error("Failed to send email:", err);
@@ -101,6 +106,22 @@ export default function StandaloneLogin() {
       }
     };
 
+    const checkEmail = async (email) => {
+      const response = await fetch("http://127.0.0.1:8000/check-email/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const result = await response.json();
+      if (result.exists) {
+        return true;
+      }
+        
+      else{
+          setLoginError("* Invalid Kinetiq email address. *");
+          return false;
+        }
+    };
 
     const handleChangePassword = async () => {
       const savedCode = localStorage.getItem("reset_code");
@@ -108,31 +129,52 @@ export default function StandaloneLogin() {
 
       // Check if the reset code matches
       if (resetData.code !== savedCode) {
-        setLoginError("Invalid code. Please try again.");
+        setLoginError("* Invalid code. Please try again.* ");
         return;
       }
 
       // Check if the reset email matches (optional but good to verify)
-      if (resetData.username !== savedEmail) {
-        setLoginError("Email does not match the code. Please check and try again.");
+      if (resetData.valid_email !== savedEmail) {
+        setLoginError("* Email does not match the code. Please check and try again. *");
+        return;
+      }
+
+        // Check password length
+      if (resetData.newPassword.length < 8) {
+        setLoginError("* Password must be at least 8 characters long. *");
         return;
       }
 
       // Check if the new password and confirm password match
       if (resetData.newPassword !== resetData.confirmNewPassword) {
-        setLoginError("Passwords do not match!");
+        setLoginError("* Passwords do not match! *");
         return;
       }
 
       // Here, you would call an API to update the password.
       // For now, just simulate the password update
       try {
-        console.log("Password successfully updated for:", resetData.username);
-        console.log("Password changed:", resetData);
-        setView("login");
-      } catch (err) {
-        setLoginError("Error resetting password. Please try again.");
-        console.error("Error resetting password:", err);
+        const res = await fetch("http://127.0.0.1:8000/reset-password/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: resetData.kinetiq_email,
+            newPassword: resetData.newPassword
+          }),
+        });
+    
+        const result = await res.json();
+        if (result.success) {
+          setLoginError(`* Password change for ${resetData.kinetiq_email} successful. *`);
+          localStorage.removeItem("reset_code");
+          localStorage.removeItem("reset_email");
+          setResetData(initialResetData);
+          setView("login");
+        } else {
+          setLoginError("Error: " + result.error);
+        }
+      } catch (error) {
+        setLoginError("* Something went wrong. Please try again. *");
       }
     };
 
@@ -146,12 +188,10 @@ export default function StandaloneLogin() {
             <div className="login-form">
               <h2>
                 {view === "login" && "Login"}
-              </h2>
-
-              <h3>
                 {view === "forgot" && "Forgot your password?"}
                 {view === "reset" && "Reset your password"}
-              </h3>
+              </h2>
+
 
               {view === "login" && (
                 <>
@@ -202,28 +242,53 @@ export default function StandaloneLogin() {
                 <>
                   <p className="login-pass-details">Enter your email. We’ll send a code to reset your password.</p>
                   <form
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                       e.preventDefault();
 
-                      const isValidEmail = /^[^\s@]+@[^\s@]+\.(com)$/.test(resetData.username);
+                      const isValidEmail = /^[^\s@]+@[^\s@]+\.(com)$/.test(resetData.valid_email);
                       if (!isValidEmail) {
                         setLoginError("* Please enter a valid email address *");
                         return;
                       }
+
+                      const isValidKinetiqAcc = /^[\w.%+-]+@kinetiq\.ph$/.test(resetData.kinetiq_email);
+                      if (!isValidKinetiqAcc) {
+                        setLoginError("* Please enter a valid Kinetiq email address *");
+                        return;
+                      }
+                      
+                      const emailExists = await checkEmail(resetData.kinetiq_email);
+                      if (!emailExists) {
+                        setLoginError("* Invalid Kinetiq email address. *");
+                        return;
+                      }
                       setLoginError(""); // clear any old error
 
-                      generateAndSendCode(resetData.username); // send the code to the email
+                      generateAndSendCode(resetData.valid_email); // send the code to the email
                       setView("reset");
 
                     }}
                   >
+                    <h4>Valid Email: </h4>
                     <input
                       type="email"
                       name="username"
                       placeholder="Enter your email"
-                      value={resetData.username}
+                      value={resetData.valid_email}
                       onChange={(e) => {
-                        setResetData({ ...resetData, username: e.target.value });
+                        setResetData({ ...resetData, valid_email: e.target.value });
+                        setLoginError("");
+                      }}
+                      required
+                    />
+                    <h4>Kinetiq Email: </h4>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Enter your kinetiq email"
+                      value={resetData.kinetiq_email}
+                      onChange={(e) => {
+                        setResetData({ ...resetData, kinetiq_email: e.target.value });
                         setLoginError("");
                       }}
                       required
@@ -252,7 +317,8 @@ export default function StandaloneLogin() {
             { /* ----------------- RESET ----------------- */ }
               {view === "reset" && (
                 <>
-                  <p className="login-pass-details">We’ve sent a code to <strong>{resetData.username}</strong>. Enter it below with your new password.</p>
+                  <p className="login-pass-details">We’ve sent a code to <strong>{resetData.valid_email}</strong>. Enter it below with your new password.</p>
+                  <h4>Email Code: </h4>
                   <input
                     type="text"
                     name="code"
@@ -261,6 +327,7 @@ export default function StandaloneLogin() {
                     onChange={(e) => setResetData({ ...resetData, code: e.target.value })}
                     required
                   />
+                  <h4>New Password: </h4>
                   <input
                     type="password"
                     name="newPassword"
@@ -269,6 +336,7 @@ export default function StandaloneLogin() {
                     onChange={(e) => setResetData({ ...resetData, newPassword: e.target.value })}
                     required
                   />
+                  <h4>Confirm New Password: </h4>
                   <input
                     type="password"
                     name="confirmNewPassword"
