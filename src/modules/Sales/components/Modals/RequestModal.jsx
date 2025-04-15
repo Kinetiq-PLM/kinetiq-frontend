@@ -107,7 +107,7 @@ const RequestModal = ({ isOpen, onClose, setAction }) => {
 
         {/* BODY */}
         <div className="px-6 mt-4">
-          <form action="" className="space-y-4  mb-12">
+          <form action="" className="space-y-4 mb-16">
             <Dropdown
               label="Request Type"
               options={requestTypes}
