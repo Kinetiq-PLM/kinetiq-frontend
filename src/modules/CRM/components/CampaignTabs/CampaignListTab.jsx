@@ -8,7 +8,11 @@ import { useQuery } from "@tanstack/react-query";
 import CAMPAIGN_LIST_DATA from "./../../../Sales/temp_data/campaign_list_data";
 import NewCampaignModal from "../NewCampaignModal";
 
+import loading from "../../../Sales/components/Assets/kinetiq-loading.gif";
+
 export default function CampaignListTab() {
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -75,6 +79,7 @@ export default function CampaignListTab() {
         status: campaign.status,
       }));
       setCampaignList(data);
+      setIsLoading(false);
     }
   }, [campaignQuery.data]);
 
@@ -130,9 +135,15 @@ export default function CampaignListTab() {
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredCampaigns} columns={columns} />
-      </div>
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table data={filteredCampaigns} columns={columns} />
+        </div>
+      )}
     </section>
   );
 }

@@ -13,8 +13,13 @@ import TICKET_LIST_DATA from "../../Sales/temp_data/ticket_list";
 import { GET } from "../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "../../Sales/components/Context/AlertContext";
+
+import loading from "../../Sales/components/Assets/kinetiq-loading.gif";
+
 const Support = () => {
   const showAlert = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("All Time"); // Default date filter
@@ -85,6 +90,7 @@ const Support = () => {
         employee_name: `${ticket.salesrep.first_name} ${ticket.salesrep.last_name}`,
       }));
       setTicketList(data);
+      setIsLoading(false);
     } else if (ticketQuery.status === "error") {
       showAlert({
         type: "error",
@@ -165,14 +171,19 @@ const Support = () => {
             </Button>
           </div>
 
-          {/* Table Section */}
-          <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[570px] rounded-md mt-2 table-layout overflow-auto">
-            <Table
-              data={filteredTickets}
-              columns={columns}
-              onSelect={setSelectedTicket}
-            />
-          </div>
+          {isLoading ? (
+            <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[570px] rounded-md mt-2 table-layout overflow-auto">
+              <Table
+                data={filteredTickets}
+                columns={columns}
+                onSelect={setSelectedTicket}
+              />
+            </div>
+          )}
         </main>
       </div>
     </div>

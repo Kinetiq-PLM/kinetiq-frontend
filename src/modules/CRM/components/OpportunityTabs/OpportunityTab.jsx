@@ -7,7 +7,11 @@ import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "../../../Sales/components/Context/AlertContext";
 
+import loading from "../../../Sales/components/Assets/kinetiq-loading.gif";
+
 export default function OpportunityTab({ setActiveTab }) {
+  const [isLoading, setIsLoading] = useState(true);
+
   const showAlert = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
@@ -98,6 +102,7 @@ export default function OpportunityTab({ setActiveTab }) {
         reason_lost: opp.reason_lost || "-",
       }));
       setCustomers(data);
+      setIsLoading(false);
     } else if (opportunityQuery.status === "error") {
       showAlert({
         type: "error",
@@ -155,9 +160,16 @@ export default function OpportunityTab({ setActiveTab }) {
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
-      </div>
+
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table data={filteredQuotations} columns={columns} />
+        </div>
+      )}
     </section>
   );
 }

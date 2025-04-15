@@ -8,8 +8,12 @@ import { GET } from "../../api/api";
 import { BASE_API_URL } from "../../api/api";
 import { useAlert } from "../Context/AlertContext";
 
+import loading from "../Assets/kinetiq-loading.gif";
+
 export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -70,6 +74,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
         document: `${BASE_API_URL}sales/quotation/${quote.quotation_id}/document`,
       }));
       setQuotationList(data);
+      setIsLoading(false);
     } else if (quotationQuery.status === "error") {
       showAlert({ type: "error", title: "Failed to fetch quotations." });
     }
@@ -144,9 +149,15 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
-      </div>
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table data={filteredQuotations} columns={columns} />
+        </div>
+      )}
     </section>
   );
 }

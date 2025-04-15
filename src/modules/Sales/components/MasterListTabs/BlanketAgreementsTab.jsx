@@ -6,11 +6,16 @@ import BLANKET_AGREEMENT_LIST_DATA from "../../temp_data/ba_list_data";
 import { GET, BASE_API_URL } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "../Context/AlertContext";
+
+import loading from "../Assets/kinetiq-loading.gif";
+
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
 }) {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -94,6 +99,7 @@ export default function BlanketAgreementsTab({
         document: `${BASE_API_URL}sales/agreement/${agreement.agreement_id}/document`,
       }));
       setAgreementList(data);
+      setIsLoading(false);
     } else if (agreementQuery.status === "error") {
       showAlert({
         type: "error",
@@ -149,9 +155,15 @@ export default function BlanketAgreementsTab({
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
-      </div>
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table data={filteredQuotations} columns={columns} />
+        </div>
+      )}
     </section>
   );
 }

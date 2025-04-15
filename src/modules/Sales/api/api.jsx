@@ -1,4 +1,4 @@
-export const BASE_API_URL = "http://localhost:8000/api/";
+export const BASE_API_URL = "http://localhost:8001/api/";
 // export const BASE_API_URL =
 //   "https://ls9h09elei.execute-api.ap-southeast-1.amazonaws.com/dev/api/";
 

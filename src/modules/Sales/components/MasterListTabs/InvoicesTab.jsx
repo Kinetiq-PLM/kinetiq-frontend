@@ -8,8 +8,12 @@ import { useQuery } from "@tanstack/react-query";
 import { BASE_API_URL } from "../../api/api";
 import { useAlert } from "../Context/AlertContext";
 
+import loading from "../Assets/kinetiq-loading.gif";
+
 export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -68,11 +72,6 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
     return true;
   });
 
-  const handleRedirect = () => {
-    loadSubModule("Invoice");
-    setActiveSubModule("Invoice");
-  };
-
   useEffect(() => {
     if (invoiceQuery.status === "success") {
       const data = invoiceQuery.data.map((invoice) => ({
@@ -104,6 +103,7 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
         document: `${BASE_API_URL}sales/invoice/${invoice.invoice_id}/document`,
       }));
       setInvoiceList(data);
+      setIsLoading(false);
     } else if (invoiceQuery.status === "error") {
       showAlert({ type: "error", title: "Failed to fetch Invoices." });
     }
@@ -145,21 +145,18 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-
-        {/* New Quotation Button (No onClick) */}
-        <Button
-          onClick={handleRedirect}
-          type="primary"
-          className={"w-[200px] py-2"}
-        >
-          New Invoice
-        </Button>
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
-      </div>
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table data={filteredQuotations} columns={columns} />
+        </div>
+      )}
     </section>
   );
 }

@@ -11,8 +11,11 @@ import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET } from "../../../api/api.jsx";
 
+import loading from "../../Assets/kinetiq-loading.gif";
+
 const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [invoiceList, setInvoiceList] = useState([]);
 
@@ -141,13 +144,19 @@ const InvoiceListModal = ({ isOpen, onClose, setOrder }) => {
               }}
             />
           </div>
-          <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
-            <Table
-              columns={columns}
-              data={filteredData}
-              onSelect={setSelectedInvoice}
-            />
-          </div>
+          {isLoading ? (
+            <div className="h-[300px] rounded-md flex justify-center items-center">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
+              <Table
+                columns={columns}
+                data={filteredData}
+                onSelect={setSelectedInvoice}
+              />
+            </div>
+          )}
           <div className="mt-4 flex justify-between">
             <div>
               <Button

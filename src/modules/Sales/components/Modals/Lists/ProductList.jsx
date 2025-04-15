@@ -10,8 +10,11 @@ import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../../api/api";
 import { TAX_RATE } from "../../../temp_data/sales_data.jsx";
 
+import loading from "../../Assets/kinetiq-loading.gif";
+
 const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -62,6 +65,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
       if (!hasLoaded) {
         setFilteredData(productsQuery.data);
         setHasLoaded(true);
+        setIsLoading(false);
       }
     } else if (productsQuery.status === "error") {
       showAlert({

@@ -9,8 +9,11 @@ import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../../api/api";
 
+import loading from "../../Assets/kinetiq-loading.gif";
+
 const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   // setEmployee is used to set the selected customer in the parent component
   // setSelectedCustomer is used to set the selected customer in this component
@@ -51,6 +54,7 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
     if (employeesQuery.status === "success") {
       setFilteredData(employeesQuery.data);
       setEmployees(employeesQuery.data);
+      setIsLoading(false);
     } else if (employeesQuery.status === "error") {
       showAlert({
         type: "error",
@@ -136,13 +140,19 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
               }}
             />
           </div>
-          <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
-            <Table
-              columns={columns}
-              data={filteredData}
-              onSelect={setSelectedEmployee}
-            />
-          </div>
+          {isLoading ? (
+            <div className="h-[300px] rounded-md flex justify-center items-center">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
+              <Table
+                columns={columns}
+                data={filteredData}
+                onSelect={setSelectedEmployee}
+              />
+            </div>
+          )}
           <div className="mt-4 flex justify-between">
             <div>
               <Button

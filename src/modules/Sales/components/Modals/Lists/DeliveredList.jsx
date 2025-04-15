@@ -11,6 +11,8 @@ import Button from "../../Button";
 import { GET } from "../../../api/api.jsx";
 import { useQuery } from "@tanstack/react-query";
 
+import loading from "../../Assets/kinetiq-loading.gif";
+
 const DeliveredList = ({
   isOpen,
   onClose,
@@ -25,6 +27,7 @@ const DeliveredList = ({
   // ALL DELIVERED ORDERS TO THE CUSTOMER
   // console.log("Customer ID:", customerID);
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [delivery_list, set_delivery_list] = useState([]);
 
@@ -116,6 +119,7 @@ const DeliveredList = ({
       }));
       set_delivery_list(data);
       setFilteredData(data);
+      setIsLoading(false);
     } else if (deliveryQuery.status === "error") {
       showAlert({
         type: "error",
@@ -174,13 +178,19 @@ const DeliveredList = ({
               }}
             />
           </div>
-          <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
-            <Table
-              columns={columns}
-              data={filteredData}
-              onSelect={setSelectedDelivery}
-            />
-          </div>
+          {isLoading ? (
+            <div className="h-[300px] rounded-md flex justify-center items-center">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
+              <Table
+                columns={columns}
+                data={filteredData}
+                onSelect={setSelectedDelivery}
+              />
+            </div>
+          )}
           <div className="mt-4 flex justify-between">
             <div>
               <Button

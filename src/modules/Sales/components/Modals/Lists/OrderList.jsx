@@ -11,8 +11,11 @@ import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET } from "../../../api/api.jsx";
 
+import loading from "../../Assets/kinetiq-loading.gif";
+
 const OrderListModal = ({ isOpen, onClose, setOrder }) => {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [orderList, setOrderList] = useState([]);
 
@@ -102,6 +105,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
         .map((order) => order); // Optional, you can return order directly from filter
       setFilteredData(validData);
       setOrderList(validData);
+      setIsLoading(false);
     } else if (orderQuery.status === "error") {
       showAlert({ type: "error", title: "Failed to fetch Orders." });
     }
@@ -156,13 +160,19 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
               }}
             />
           </div>
-          <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
-            <Table
-              columns={columns}
-              data={filteredData}
-              onSelect={setSelectedOrder}
-            />
-          </div>
+          {isLoading ? (
+            <div className="h-[300px] rounded-md flex justify-center items-center">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
+              <Table
+                columns={columns}
+                data={filteredData}
+                onSelect={setSelectedOrder}
+              />
+            </div>
+          )}
           <div className="mt-4 flex justify-between">
             <div>
               <Button

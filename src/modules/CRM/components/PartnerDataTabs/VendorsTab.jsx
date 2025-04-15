@@ -6,7 +6,12 @@ import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
 import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "../../../Sales/components/Context/AlertContext";
+
+import loading from "../../../Sales/components/Assets/kinetiq-loading.gif";
+
 export default function VendorTab() {
+  const [isLoading, setIsLoading] = useState(true);
+
   const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
@@ -69,6 +74,7 @@ export default function VendorTab() {
         contact_info: customer.contact_info,
       }));
       setCustomers(data);
+      setIsLoading(false);
     }
   }, [customersQuery.data]);
 
@@ -111,9 +117,15 @@ export default function VendorTab() {
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
-      </div>
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table data={filteredQuotations} columns={columns} />
+        </div>
+      )}
     </section>
   );
 }
