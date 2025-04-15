@@ -21,10 +21,10 @@ const Employees = () => {
     first_name: "",
     last_name: "",
     phone: "",
-    employment_type: "Regular", // Required with default
-    status: "Active", // Required with default
+    employment_type: "Regular",
+    status: "Active",
     reports_to: "",
-    is_supervisor: false,
+    is_supervisor: false
   });
 
   // The employee currently being edited
@@ -112,6 +112,9 @@ const Employees = () => {
     33: [314782, 317930, 321109, 324320, 327563, 330839, 334147, 337488]
   };
 
+  // Add departments state
+  const [departments, setDepartments] = useState([]);
+
   /***************************************************************************
    * 1) Fetch: Employees (active + archived)
    ***************************************************************************/
@@ -152,9 +155,21 @@ const Employees = () => {
     }
   };
 
+  // Add fetchDepartments function
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/departments/");
+      setDepartments(response.data.filter(dept => !dept.is_archived)); // Only fetch active departments
+    } catch (err) {
+      console.error("Fetch departments error", err);
+      showToast("Failed to fetch departments", false);
+    }
+  };
+
   useEffect(() => {
     fetchEmployees();
     fetchPositions();
+    fetchDepartments(); // Fetch departments on component load
   }, []);
 
   /***************************************************************************
@@ -215,7 +230,7 @@ const Employees = () => {
       employment_type: "Regular",
       status: "Active",
       reports_to: "",
-      is_supervisor: false,
+      is_supervisor: false
     });
     setShowEmployeeModal(true);
   };
@@ -641,20 +656,25 @@ const Employees = () => {
   // 1) Employees Table
   const renderEmployeesTable = (rawData, isArchived = false) => {
     const { paginated, totalPages } = filterAndPaginate(rawData);
-
+  
     if (loading) return <div className="hr-no-results">Loading employees...</div>;
     if (!paginated.length) return <div className="hr-no-results">No employees found.</div>;
-
+  
     return (
-      <div className="hr-department-table-wrapper">
-        <div className="hr-department-table-scrollable">
-          <table className="hr-department-table">
+      <>
+        <div className="hr-employee-table-wrapper">
+          <div className="hr-employee-table-scrollable">
+          <table className="hr-employee-table">
             <thead>
               <tr>
                 {isArchived && <th>Select</th>}
                 <th>Employee ID</th>
                 <th>User ID</th>
                 <th>Department ID</th>
+                <th>Department Name</th>
+                <th>Position ID</th>
+                <th>Position Title</th>
+                <th>Salary Grade</th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Phone</th>
@@ -682,51 +702,47 @@ const Employees = () => {
                   <td>{emp.employee_id}</td>
                   <td>{emp.user_id}</td>
                   <td>{emp.dept_id}</td>
+                  <td>{emp.dept_name || "—"}</td>
+                  <td>{emp.position_id || "—"}</td>
+                  <td>{emp.position_title || "—"}</td>
+                  <td>{emp.salary_grade || "—"}</td>
                   <td>{emp.first_name}</td>
                   <td>{emp.last_name}</td>
                   <td>{emp.phone}</td>
+                  <td>{emp.employment_type}</td>
+                  <td>{emp.status}</td>
+                  <td>{emp.reports_to}</td>
                   <td>
-                    <span className={`hr-tag ${emp.employment_type.toLowerCase()}`}>
-                      {emp.employment_type}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`hr-tag ${emp.status.toLowerCase()}`}>
-                      {emp.status}
-                    </span>
-                  </td>
-                  <td>{emp.reports_to || "—"}</td>
-                  <td>
-                    <span className={`hr-tag ${emp.is_supervisor ? 'yes' : 'no'}`}>
+                    <span className={`hr-tag ${emp.is_supervisor ? "yes" : "no"}`}>
                       {emp.is_supervisor ? "Yes" : "No"}
                     </span>
                   </td>
                   <td>{emp.created_at}</td>
                   <td>{emp.updated_at}</td>
-                  <td className="hr-department-actions">
+                  <td className="hr-employee-actions">
                     <div
-                      className="hr-department-dots"
+                      className="hr-employee-dots"
                       onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
                     >
                       ⋮
                       {dotsMenuOpen === index && (
-                        <div className="hr-department-dropdown">
+                        <div className="hr-employee-dropdown">
                           <div
-                            className="hr-department-dropdown-item"
+                            className="hr-employee-dropdown-item"
                             onClick={() => openEditEmployeeModal(emp)}
                           >
                             Edit
                           </div>
                           {!isArchived ? (
                             <div
-                              className="hr-department-dropdown-item"
+                              className="hr-employee-dropdown-item"
                               onClick={() => handleArchiveEmployee(emp.employee_id)}
                             >
                               Archive
                             </div>
                           ) : (
                             <div
-                              className="hr-department-dropdown-item"
+                              className="hr-employee-dropdown-item"
                               onClick={() => confirmUnarchiveEmployee(emp.employee_id)}
                             >
                               Unarchive
@@ -740,46 +756,47 @@ const Employees = () => {
               ))}
             </tbody>
           </table>
-          {/* Pagination */}
-          <div className="hr-pagination">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={i + 1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <select
-              className="hr-pagination-size"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(parseInt(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
           </div>
         </div>
-      </div>
+        <div className="hr-pagination">
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              className={i + 1 === currentPage ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <select
+            className="hr-pagination-size"
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(parseInt(e.target.value));
+              setCurrentPage(1);
+            }}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
+        </div>
+      </>
     );
   };
 
   // 2) Positions Table
   const renderPositionsTable = (rawData, isArchived = false) => {
     const { paginated, totalPages } = filterAndPaginate(rawData);
-
+  
     if (loading) return <div className="hr-no-results">Loading positions...</div>;
     if (!paginated.length) return <div className="hr-no-results">No positions found.</div>;
-
+  
     return (
-      <div className="hr-department-table-wrapper">
-        <div className="hr-department-table-scrollable">
-          <table className="hr-department-table">
+      <>
+        <div className="hr-employee-table-wrapper">
+          <div className="hr-employee-table-scrollable">
+          <table className="hr-employee-table">
             <thead>
               <tr>
                 {isArchived && <th>Select</th>}
@@ -813,43 +830,35 @@ const Employees = () => {
                   <td>{pos.salary_grade}</td>
                   <td>{pos.min_salary}</td>
                   <td>{pos.max_salary}</td>
-                  <td>
-                    <span className={`hr-tag ${pos.employment_type.toLowerCase()}`}>
-                      {pos.employment_type}
-                    </span>
-                  </td>
+                  <td>{pos.employment_type}</td>
                   <td>{pos.typical_duration_days}</td>
-                  <td>
-                    <span className={`hr-tag ${pos.is_active ? 'yes' : 'no'}`}>
-                      {pos.is_active ? "Yes" : "No"}
-                    </span>
-                  </td>
+                  <td>{pos.is_active ? "Yes" : "No"}</td>
                   <td>{pos.created_at}</td>
                   <td>{pos.updated_at}</td>
-                  <td className="hr-department-actions">
+                  <td className="hr-employee-actions">
                     <div
-                      className="hr-department-dots"
+                      className="hr-employee-dots"
                       onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
                     >
                       ⋮
                       {dotsMenuOpen === index && (
-                        <div className="hr-department-dropdown">
+                        <div className="hr-employee-dropdown">
                           <div
-                            className="hr-department-dropdown-item"
+                            className="hr-employee-dropdown-item"
                             onClick={() => openEditPositionModal(pos)}
                           >
                             Edit
                           </div>
                           {!isArchived ? (
                             <div
-                              className="hr-department-dropdown-item"
+                              className="hr-employee-dropdown-item"
                               onClick={() => handleArchivePosition(pos.position_id)}
                             >
                               Archive
                             </div>
                           ) : (
                             <div
-                              className="hr-department-dropdown-item"
+                              className="hr-employee-dropdown-item"
                               onClick={() => confirmUnarchivePosition(pos.position_id)}
                             >
                               Unarchive
@@ -863,32 +872,32 @@ const Employees = () => {
               ))}
             </tbody>
           </table>
-          {/* Pagination */}
-          <div className="hr-pagination">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={i + 1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <select
-              className="hr-pagination-size"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(parseInt(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
           </div>
         </div>
-      </div>
+        <div className="hr-pagination">
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              className={i + 1 === currentPage ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <select
+            className="hr-pagination-size"
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(parseInt(e.target.value));
+              setCurrentPage(1);
+            }}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
+        </div>
+      </>
     );
   };
 
@@ -900,15 +909,15 @@ const Employees = () => {
       <div className="hr-employee-body-content-container">
         <div className="hr-employee-scrollable">
           {/* Page Heading */}
-          <div className="hr-department-heading">
+          <div className="hr-employee-heading">
             <h2><strong>Employees</strong></h2>
-            <div className="hr-department-right-controls">
+            <div className="hr-employee-right-controls">
               {/* Search Field */}
-              <div className="hr-department-search-wrapper">
-                <FiSearch className="hr-department-search-icon" />
+              <div className="hr-employee-search-wrapper">
+                <FiSearch className="hr-employee-search-icon" />
                 <input
                   type="text"
-                  className="hr-department-search"
+                  className="hr-employee-search"
                   placeholder="Search..."
                   onChange={(e) => handleSearch(e.target.value)}
                 />
@@ -916,7 +925,7 @@ const Employees = () => {
 
               {/* Sort Dropdown */}
               <select
-                className="hr-department-filter"
+                className="hr-employee-filter"
                 value={sortField}
                 onChange={(e) => setSortField(e.target.value)}
               >
@@ -929,11 +938,11 @@ const Employees = () => {
               {/* Add Button + View Archived + Bulk Unarchive if needed */}
               {activeTab === "Employees" && (
                 <>
-                  <button className="hr-department-add-btn" onClick={handleAddEmployee}>
+                  <button className="hr-employee-add-btn" onClick={handleAddEmployee}>
                     + Add Employee
                   </button>
                   <button
-                    className="hr-department-add-btn"
+                    className="hr-employee-add-btn"
                     onClick={() => {
                       setShowArchived(!showArchived);
                       setSelectedArchivedEmployees([]);
@@ -942,7 +951,7 @@ const Employees = () => {
                     {showArchived ? "View Active" : "View Archived"}
                   </button>
                   {showArchived && selectedArchivedEmployees.length > 0 && (
-                    <button className="hr-department-add-btn" onClick={bulkUnarchiveEmployees}>
+                    <button className="hr-employee-add-btn" onClick={bulkUnarchiveEmployees}>
                       Unarchive Selected
                     </button>
                   )}
@@ -951,11 +960,11 @@ const Employees = () => {
 
               {activeTab === "Positions" && (
                 <>
-                  <button className="hr-department-add-btn" onClick={handleAddPosition}>
+                  <button className="hr-employee-add-btn" onClick={handleAddPosition}>
                     + Add Position
                   </button>
                   <button
-                    className="hr-department-add-btn"
+                    className="hr-employee-add-btn"
                     onClick={() => {
                       setShowArchived(!showArchived);
                       setSelectedArchivedPositions([]);
@@ -964,7 +973,7 @@ const Employees = () => {
                     {showArchived ? "View Active" : "View Archived"}
                   </button>
                   {showArchived && selectedArchivedPositions.length > 0 && (
-                    <button className="hr-department-add-btn" onClick={bulkUnarchivePositions}>
+                    <button className="hr-employee-add-btn" onClick={bulkUnarchivePositions}>
                       Unarchive Selected
                     </button>
                   )}
@@ -1002,7 +1011,7 @@ const Employees = () => {
           </div>
 
           {/* Table Content */}
-          <div className="hr-department-table-container">
+          <div className="hr-employee-table-container">
             {activeTab === "Employees"
               ? renderEmployeesTable(
                   showArchived ? archivedEmployees : employees,
@@ -1018,28 +1027,10 @@ const Employees = () => {
 
       {/* ========== Employees: Add Modal ========== */}
       {showEmployeeModal && (
-        <div className="hr-department-modal-overlay">
-          <div className="hr-department-modal">
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
             <h3 style={{ marginBottom: "1rem" }}>Add New Employee</h3>
-            <form onSubmit={submitEmployeeModal} className="hr-department-modal-form hr-two-col">
-              <div className="form-group">
-                <label>User ID</label>
-                <input
-                  type="text"
-                  name="user_id"
-                  value={newEmployee.user_id}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, user_id: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>Department ID</label>
-                <input
-                  type="text"
-                  name="dept_id"
-                  value={newEmployee.dept_id}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, dept_id: e.target.value })}
-                />
-              </div>
+            <form onSubmit={submitEmployeeModal} className="hr-employee-modal-form hr-two-col">
               <div className="form-group">
                 <label>First Name *</label>
                 <input
@@ -1071,24 +1062,28 @@ const Employees = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Employment Type</label>
+                <label>Employment Type *</label>
                 <select
                   name="employment_type"
-                  value={newEmployee.employment_type}
+                  value={newEmployee.employment_type || ""}
                   onChange={(e) => setNewEmployee({ ...newEmployee, employment_type: e.target.value })}
+                  required
                 >
+                  <option value="">-- Select Type --</option>
                   <option value="Regular">Regular</option>
                   <option value="Contractual">Contractual</option>
                   <option value="Seasonal">Seasonal</option>
                 </select>
               </div>
               <div className="form-group">
-                <label>Status</label>
+                <label>Status *</label>
                 <select
                   name="status"
-                  value={newEmployee.status}
+                  value={newEmployee.status || ""}
                   onChange={(e) => setNewEmployee({ ...newEmployee, status: e.target.value })}
+                  required
                 >
+                  <option value="">-- Select Status --</option>
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
                 </select>
@@ -1112,11 +1107,11 @@ const Employees = () => {
                 />
               </div>
 
-              <div className="hr-department-modal-buttons hr-two-col-buttons">
+              <div className="hr-employee-modal-buttons hr-two-col-buttons">
                 <button type="submit" className="submit-btn">Add</button>
                 <button
                   type="button"
-                  className="cancel-btn"
+                  className="hr-employee-cancel-btn"
                   onClick={() => setShowEmployeeModal(false)}
                 >
                   Cancel
@@ -1129,34 +1124,16 @@ const Employees = () => {
 
       {/* ========== Employees: Edit Modal ========== */}
       {showEditEmployeeModal && editingEmployee && (
-        <div className="hr-department-modal-overlay">
-          <div className="hr-department-modal">
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
             <h3 style={{ marginBottom: "1rem" }}>Edit Employee</h3>
             <form onSubmit={handleEditEmployeeSubmit} className="hr-department-modal-form hr-two-col">
               <div className="form-group">
-                <label>Employee ID (read-only)</label>
+                <label>Employee ID</label>
                 <input
                   type="text"
                   value={editingEmployee.employee_id}
                   disabled
-                />
-              </div>
-              <div className="form-group">
-                <label>User ID</label>
-                <input
-                  type="text"
-                  name="user_id"
-                  value={editingEmployee.user_id}
-                  onChange={handleEditEmployeeChange}
-                />
-              </div>
-              <div className="form-group">
-                <label>Department ID</label>
-                <input
-                  type="text"
-                  name="dept_id"
-                  value={editingEmployee.dept_id}
-                  onChange={handleEditEmployeeChange}
                 />
               </div>
               <div className="form-group">
@@ -1177,15 +1154,6 @@ const Employees = () => {
                   value={editingEmployee.last_name}
                   onChange={handleEditEmployeeChange}
                   required
-                />
-              </div>
-              <div className="form-group">
-                <label>Phone</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={editingEmployee.phone}
-                  onChange={handleEditEmployeeChange}
                 />
               </div>
               <div className="form-group">
@@ -1211,6 +1179,26 @@ const Employees = () => {
                   <option value="Inactive">Inactive</option>
                 </select>
               </div>
+
+              {/* Commented out less frequently updated fields
+              <div className="form-group">
+                <label>User ID</label>
+                <input
+                  type="text"
+                  name="user_id"
+                  value={editingEmployee.user_id}
+                  onChange={handleEditEmployeeChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Phone</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={editingEmployee.phone}
+                  onChange={handleEditEmployeeChange}
+                />
+              </div>
               <div className="form-group">
                 <label>Reports To</label>
                 <input
@@ -1229,7 +1217,6 @@ const Employees = () => {
                   onChange={handleEditEmployeeChange}
                 />
               </div>
-              {/* If you wish to show created_at and updated_at read-only fields */}
               <div className="form-group">
                 <label>Created At</label>
                 <input type="text" value={editingEmployee.created_at || ""} disabled />
@@ -1238,12 +1225,13 @@ const Employees = () => {
                 <label>Updated At</label>
                 <input type="text" value={editingEmployee.updated_at || ""} disabled />
               </div>
+              */}
 
-              <div className="hr-department-modal-buttons hr-two-col-buttons">
+              <div className="hr-employee-modal-buttons hr-two-col-buttons">
                 <button type="submit" className="submit-btn">Save</button>
                 <button
                   type="button"
-                  className="cancel-btn"
+                  className="hr-employee-cancel-btn"
                   onClick={() => setShowEditEmployeeModal(false)}
                 >
                   Cancel
@@ -1256,11 +1244,11 @@ const Employees = () => {
 
       {/* Confirm Unarchive (Employee) */}
       {showConfirmUnarchiveEmployee && (
-        <div className="hr-department-modal-overlay">
-          <div className="hr-department-modal">
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
             <h3>Unarchive Employee</h3>
             <p>Are you sure you want to unarchive this employee?</p>
-            <div className="hr-department-modal-buttons">
+            <div className="hr-employee-modal-buttons">
               <button
                 className="submit-btn"
                 onClick={() => handleUnarchiveEmployee(showConfirmUnarchiveEmployee)}
@@ -1268,7 +1256,7 @@ const Employees = () => {
                 Yes
               </button>
               <button
-                className="cancel-btn"
+                className="hr-employee-cancel-btn"
                 onClick={() => setShowConfirmUnarchiveEmployee(null)}
               >
                 No
@@ -1280,10 +1268,10 @@ const Employees = () => {
 
       {/* ========== Positions: Add Modal ========== */}
       {showPositionModal && (
-        <div className="hr-department-modal-overlay">
-          <div className="hr-department-modal">
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
             <h3 style={{ marginBottom: "1rem" }}>Add New Position</h3>
-            <form onSubmit={submitPositionModal} className="hr-department-modal-form hr-two-col">
+            <form onSubmit={submitPositionModal} className="hr-employee-modal-form hr-two-col">
               <div className="form-group">
                 <label>Position Title *</label>
                 <input
@@ -1390,11 +1378,11 @@ const Employees = () => {
                 />
               </div>
 
-              <div className="hr-department-modal-buttons hr-two-col-buttons">
+              <div className="hr-employee-modal-buttons hr-two-col-buttons">
                 <button type="submit" className="submit-btn">Add</button>
                 <button
                   type="button"
-                  className="cancel-btn"
+                  className="hr-employee-cancel-btn"
                   onClick={() => setShowPositionModal(false)}
                 >
                   Cancel
@@ -1407,10 +1395,10 @@ const Employees = () => {
 
       {/* ========== Positions: Edit Modal ========== */}
       {showEditPositionModal && editingPosition && (
-        <div className="hr-department-modal-overlay">
-          <div className="hr-department-modal">
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
             <h3 style={{ marginBottom: "1rem" }}>Edit Position</h3>
-            <form onSubmit={handleEditPositionSubmit} className="hr-department-modal-form hr-two-col">
+            <form onSubmit={handleEditPositionSubmit} className="hr-employee-modal-form hr-two-col">
               <div className="form-group">
                 <label>Position ID</label>
                 <input type="text" value={editingPosition.position_id} disabled />
@@ -1516,11 +1504,11 @@ const Employees = () => {
                 <label>Updated At</label>
                 <input type="text" value={editingPosition.updated_at || ""} disabled />
               </div>
-              <div className="hr-department-modal-buttons hr-two-col-buttons">
-                <button type="submit" className="submit-btn">Save</button>
+              <div className="hr-employee-modal-buttons hr-two-col-buttons">
+                <button type="submit" className="hr-employee-submit-btn">Save</button>
                 <button
                   type="button"
-                  className="cancel-btn"
+                  className="hr-employee-cancel-btn"
                   onClick={() => setShowEditPositionModal(false)}
                 >
                   Cancel
@@ -1533,19 +1521,19 @@ const Employees = () => {
 
       {/* Confirm Unarchive (Position) */}
       {showConfirmUnarchivePosition && (
-        <div className="hr-department-modal-overlay">
-          <div className="hr-department-modal">
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
             <h3>Unarchive Position</h3>
             <p>Are you sure you want to unarchive this position?</p>
-            <div className="hr-department-modal-buttons">
+            <div className="hr-employee-modal-buttons">
               <button
-                className="submit-btn"
+                className="hr-employee-submit-btn"
                 onClick={() => handleUnarchivePosition(showConfirmUnarchivePosition)}
               >
                 Yes
               </button>
               <button
-                className="cancel-btn"
+                className="hr-employee-cancel-btn"
                 onClick={() => setShowConfirmUnarchivePosition(null)}
               >
                 No
@@ -1558,7 +1546,7 @@ const Employees = () => {
       {/* Toast Notification */}
       {toast && (
         <div
-          className="hr-department-toast"
+          className="hr-employee-toast"
           style={{ backgroundColor: toast.success ? "#4CAF50" : "#F44336" }}
         >
           {toast.message}

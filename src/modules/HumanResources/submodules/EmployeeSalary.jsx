@@ -158,87 +158,93 @@ const EmployeeSalary = () => {
     if (loading) {
       return <div className="hr-no-results">Loading salary data...</div>;
     }
-
+  
     const { paginated, totalPages, totalCount } = filterAndPaginate(salaryData);
+  
     if (!paginated.length) {
       return <div className="hr-no-results">No salary records found.</div>;
     }
-
+  
     return (
-      <div className="hr-department-no-scroll-wrapper">
-        <div className="hr-department-table-scrollable">
-          <table className="hr-department-table hr-department-no-scroll-table">
-            <thead>
-              <tr>
-                <th>Salary ID</th>
-                <th>Employee ID</th>
-                <th>Employee Name</th>
-                <th>Base Salary</th>
-                <th>Daily Rate</th>
-                <th>Effective Date</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.map((sal, index) => (
-                <tr key={sal.salary_id || index}>
-                  <td>{sal.salary_id}</td>
-                  <td>{sal.employee_id}</td>
-                  <td>{sal.employee_name}</td>
-                  <td>{sal.base_salary || '-'}</td>
-                  <td>{sal.daily_rate || '-'}</td>
-                  <td>{sal.effective_date}</td>
-                  <td className="hr-department-actions">
-                    <div
-                      className="hr-department-dots"
-                      onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                    >
-                      ⋮
-                      {dotsMenuOpen === index && (
-                        <div className="hr-department-dropdown">
-                          <div
-                            className="hr-department-dropdown-item"
-                            onClick={() => handleEditSalary(sal)}
-                          >
-                            Edit
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </td>
+      <>
+        <div className="hr-department-no-scroll-wrapper">
+          <div className="hr-department-table-scrollable">
+            <table className="hr-department-table hr-department-no-scroll-table">
+              <thead>
+                <tr>
+                  <th>Salary ID</th>
+                  <th>Employee ID</th>
+                  <th>Employee Name</th>
+                  <th>Base Salary</th>
+                  <th>Daily Rate</th>
+                  <th>Effective Date</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Pagination Controls */}
-          <div className="hr-pagination">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={i + 1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <select
-              className="hr-pagination-size"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(parseInt(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
+              </thead>
+              <tbody>
+                {paginated.map((sal, index) => (
+                  <tr key={sal.salary_id || index}>
+                    <td>{sal.salary_id}</td>
+                    <td>{sal.employee_id}</td>
+                    <td>{sal.employee_name}</td>
+                    <td>{sal.base_salary || '-'}</td>
+                    <td>{sal.daily_rate || '-'}</td>
+                    <td>{sal.effective_date}</td>
+                    <td className="hr-department-actions">
+                      <div
+                        className="hr-department-dots"
+                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="hr-department-dropdown">
+                            <div
+                              className="hr-department-dropdown-item"
+                              onClick={() => handleEditSalary(sal)}
+                            >
+                              Edit
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
+  
+        {/* Pagination Controls */}
+        <div className="hr-pagination">
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              className={i + 1 === currentPage ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <select
+            className="hr-pagination-size"
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(parseInt(e.target.value));
+              setCurrentPage(1);
+            }}
+          >
+            {[5, 10, 20].map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
+        </div>
+      </>
     );
   };
+  
 
   /******************************************
    * Main Return

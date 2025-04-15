@@ -130,15 +130,16 @@ const EmployeePerformance = () => {
     if (loading) {
       return <div className="hr-no-results">Loading performance data...</div>;
     }
-
+  
     const { paginated, totalPages, totalCount } = filterAndPaginate(performanceData);
     if (!paginated.length) {
       return <div className="hr-no-results">No performance records found.</div>;
     }
-
+  
     return (
-      <div className="hr-department-no-scroll-wrapper">
-        <div className="hr-department-table-scrollable">
+      <>
+        <div className="hr-department-no-scroll-wrapper">
+          <div className="hr-department-table-scrollable">
           <table className="hr-department-table hr-department-no-scroll-table">
             <thead>
               <tr>
@@ -194,33 +195,34 @@ const EmployeePerformance = () => {
               ))}
             </tbody>
           </table>
-
-          {/* Pagination Controls */}
-          <div className="hr-pagination">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={i + 1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <select
-              className="hr-pagination-size"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(parseInt(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
           </div>
         </div>
-      </div>
+  
+        {/* Pagination moved outside */}
+        <div className="hr-pagination">
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              className={i + 1 === currentPage ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <select
+            className="hr-pagination-size"
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(parseInt(e.target.value));
+              setCurrentPage(1);
+            }}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
+        </div>
+      </>
     );
   };
 

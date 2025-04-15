@@ -106,18 +106,17 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  max-height: calc(100vh - 250px);
+  margin-bottom: 1rem; /* Add margin to separate from pagination */
 }
 
 .hr-department-no-scroll-wrapper {
-  border: 1px solid #eee;
+  border: 1px solid #eee; 
   border-radius: 8px;
-  margin-bottom: 1rem;
   flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
 }
+
 
 .hr-department-table-scrollable {
   width: 100%;
@@ -160,10 +159,15 @@
 .hr-pagination {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  margin: 1rem 0;
+  justify-content: center;
   gap: 0.5rem;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  /* border: 1px solid #eee; */
+  margin-top: 1rem;
 }
+
 .hr-pagination button {
   background: white;
   border: 1px solid #ccc;
@@ -325,3 +329,5 @@
 .cancel-btn:hover {
   background-color: #d1d5db;
 }
+
+
