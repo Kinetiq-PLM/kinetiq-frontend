@@ -93,8 +93,8 @@ const EquipmentTable = ({ searchTerm }) => {
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="table-container">
-      <table className="equipment-table">
+    <div className="equilatable-container">
+      <table className="equila-equipment-table">
         <thead>
           <tr>
             <th>Equipment ID</th>
@@ -130,15 +130,15 @@ const EquipmentTable = ({ searchTerm }) => {
               </td>
               <td>
                 <select
-                  className={`availability-dropdown ${equipment.availability_status
+                  className={`equila-equip-availability-dropdown ${equipment.availability_status
                     .replace(/\s+/g, "-")
                     .toLowerCase()}`}
                   value={equipment.availability_status}
                   onChange={(e) => handleStatusChange(index, e.target.value)}
                 >
-                  <option value="Available">Available</option>
-                  <option value="Out of Order">Out of Order</option>
-                  <option value="Under Maintenance">Under Maintenance</option>
+                  <option value="available">Available</option>
+                  <option value="outof0rder">Out of Order</option>
+                  <option value="undermaintenance">Under Maintenance</option>
                 </select>
               </td>
             </tr>
@@ -227,15 +227,15 @@ const LaborTable = ({ searchTerm }) => {
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="table-container">
-      <table className="labor-table">
+    <div className="equila-labor-container">
+      <table className="equila-labor-table">
         <thead>
           <tr>
-            <th className="labor-header">Labor ID</th>
-            <th className="labor-header">Production Order ID</th>
-            <th className="labor-header">Employee ID</th>
-            <th className="labor-header">Date Worked</th>
-            <th className="labor-header">Days Worked</th>
+            <th>Labor ID</th>
+            <th>Production Order ID</th>
+            <th>Employee ID</th>
+            <th>Date Worked</th>
+            <th>Days Worked</th>
           </tr>
         </thead>
         <tbody>
@@ -279,9 +279,9 @@ const LaborTable = ({ searchTerm }) => {
 const Modal = ({ show, onClose, children }) => {
   if (!show) return null;
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="close-button" onClick={onClose}>
+    <div className="equila-modal-overlay">
+      <div className="equila-modal-content">
+        <button className="equila-close-button" onClick={onClose}>
           ×
         </button>
         {children}
@@ -355,17 +355,17 @@ const BodyContent = () => {
         <h1>Equipment & Labor</h1>
       </div>
       <div className="equimaprodcolumns">
-        <div className="column expanded">
-          <div className="top-section">
+        <div className="prod-column-expanded">
+          <div className="prodtop-section">
             <div className="equimaprod-button-group">
               <button
-                className={`equipment-button ${activeTab === "equipment" ? "active" : ""}`}
+                className={`equimaprod-equipment-button ${activeTab === "equipment" ? "active" : ""}`}
                 onClick={() => setActiveTab("equipment")}
               >
                 Equipment
               </button>
               <button
-                className={`labor-button ${activeTab === "labor" ? "active" : ""}`}
+                className={`equimaprod-labor-button ${activeTab === "labor" ? "active" : ""}`}
                 onClick={() => setActiveTab("labor")}
               >
                 Labor
@@ -380,29 +380,29 @@ const BodyContent = () => {
                 value={searchQuery}
                 onChange={handleSearchChange}
               />
-              <div className="project-equipment-button" onClick={handleViewProjectEquipment}>
+              <div className="equilaproject-equipment-button" onClick={handleViewProjectEquipment}>
                 View Project Equipment
               </div>
             </div>
           </div>
-          <div className="EM-table">{renderTable()}</div>
+          <div className="equila-EM-table">{renderTable()}</div>
         </div>
       </div>
       <Modal show={showModal} onClose={() => setShowModal(false)}>
         <h1>Project Equipment</h1>
-        <div className="modalsearch-wrapper">
-          <div className="modalsearch-input-wrapper">
+        <div className="equila-modalsearch-wrapper">
+          <div className="equila-modalsearch-input-wrapper">
             <img src="/icons/search-icon.png" alt="Search" className="search-icon" />
             <input
               type="text"
-              className="modalsearch-bar"
+              className="equila-modalsearch-bar"
               placeholder="Search..."
               value={modalSearchQuery}
               onChange={handleModalSearchChange}
             />
           </div>
         </div>
-        <div className="proj-equipment-table">
+        <div className="equila-proj-equipment">
           {peLoading ? (
             <p>Loading...</p>
           ) : peError ? (

@@ -113,9 +113,9 @@ const BodyContent = () => {
         </div>
 
         <div className="rework-cost-container">
-          <div className="rework-header">Additional Cost </div>
-          <div className="rework-cost">
-            <table className="rework-cost-table">
+          <div className="costrework-header">Additional Cost </div>
+          <div className="costrework-cost">
+            <table className="costrework-cost-table">
               <thead>
                 <tr>
                   <th>Production Order ID</th>
