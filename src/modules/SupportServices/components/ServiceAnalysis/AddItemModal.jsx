@@ -20,7 +20,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
 
   const fetchItems= async () => {
     try {
-      const data = await GET("items/");
+      const data = await GET("order/admin/items/");
       setItems(data);
     } catch (error) {
       console.error("Error fetching items:", error);
@@ -60,7 +60,6 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
 
     onAdd({
       item_id: itemId,
-      principal_item_id: principalItemId,
       item_quantity: quantity,
       item_price: "0.00",
       total_price: "0.00",

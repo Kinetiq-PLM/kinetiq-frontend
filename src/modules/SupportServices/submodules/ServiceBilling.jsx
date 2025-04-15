@@ -26,7 +26,7 @@ const ServiceBilling = () => {
 
   const fetchBillings = async () => {
     try {
-      const data = await GET("service-billings/");
+      const data = await GET("billing/");
       setBillings(data);
     } catch (error) {
       console.error("Error fetching billings:", error)
@@ -99,7 +99,7 @@ const ServiceBilling = () => {
     console.log("Updating billing:", billingData)
 
     try {
-      await PATCH(`service-billing/${billingId}/update/`, billingData);
+      await PATCH(`billing/${billingId}/`, billingData);
       setShowUpdateModal(false);
       fetchBillings();
     } catch (error) {
@@ -126,7 +126,7 @@ const ServiceBilling = () => {
   const handleCreateBilling = async (billingData) => {
     console.log("Creating billing:", billingData)
     try {
-      const data = await POST("service-billings/", billingData);
+      const data = await POST("billing/", billingData);
       console.log("Service billing created successfully:", data);
       setShowCreateModal(false);
       fetchBillings();

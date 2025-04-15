@@ -19,6 +19,7 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
   const [ticketId, setTicketId] = useState("")
   const [ticketSubject, setTicketSubject] = useState("")
   const [ticketDescription, setTicketDescription] = useState("")
+  const [resolutionDetails, setResolutionDetails] = useState("")
   const [status, setStatus] = useState("")
   const [priority, setPriority] = useState("")
   const [activeTab, setActiveTab] = useState("general")
@@ -50,6 +51,8 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
       setCallType(callData.call_type || "")
       setTicketSubject(callData.service_ticket?.subject || "")
       setTicketDescription(callData.service_ticket?.description || "")
+      setResolutionDetails(callData.resolution || "")
+      
     }
   }, [callData])
 
@@ -63,13 +66,14 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
       ticket_id: ticketId,
       call_status: status,
       priority_level: priority,
+      resolution: resolutionDetails
     })
   }
 
   // fetches a list of products
   const fetchProducts = async () => {
     try {
-      const response = await GET("/products/");
+      const response = await GET("call/calls/products/");
       console.log("prods", response)
       setProducts(response);
     } catch (error) {
@@ -94,7 +98,7 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
   // fetches a list of contracts
   const fetchContracts = async () => {
     try {
-      const response = await GET(`/contracts/${productId}/${customerId}`); 
+      const response = await GET(`contract/contracts/${productId}/${customerId}`); 
       console.log("contracts", response)
       setContracts(response);
     } catch (error) {
