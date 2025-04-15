@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../styles/Forms.css"; // Assuming you have a Forms.css file
+import "../styles/Forms.css"; 
 import { POST } from "../api/api"; 
 
 const tabs = ["Budget Submission Form", "Budget Request Form", "Budget Return Form"];
@@ -112,7 +112,7 @@ const FormSubmit = ({ activeTab, departments, onFormSubmit, onClearForm, formSub
                   </div>
                   <div className="form-group">
                     <label>Usage Period (end date): <span className="required">*</span></label>
-                    <input type="text" name="endUsagePeriod" value={formData.endUsagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("usagePeriod")} />
+                    <input type="text" name="endUsagePeriod" value={formData.endUsagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("endUsagePeriod")} />
                     {errors.endUsagePeriod && <p className="error">{errors.endUsagePeriod}</p>}
                   </div>
                   <div className="form-group">
@@ -165,6 +165,8 @@ const FormSubmit = ({ activeTab, departments, onFormSubmit, onClearForm, formSub
                   </div>
                   <div className="form-group">
                     <label>Usage Period (end date): <span className="required">*</span></label>
+                    <input type="text" name="endUsagePeriod" value={formData.endUsagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("endUsagePeriod")} />
+                    {errors.endUsagePeriod && <p className="error">{errors.endUsagePeriod}</p>}
                     <input type="text" name="endUsagePeriod" value={formData.endUsagePeriod || ""} onChange={handleChange} onFocus={() => handleFocus("endUsagePeriod")} />
                     {errors.endUsagePeriod && <p className="error">{errors.endUsagePeriod}</p>}
                   </div>
@@ -297,15 +299,9 @@ const BodyContent = () => {
     }
   };
 
-  const handleClearForm = (tabName) => {
-    setFormSubmitted({ ...formSubmitted, [tabName]: false });
-  };
-
-  const handleBackToForm = (tabName) => {
-    setFormSubmitted({ ...formSubmitted, [tabName]: false });
-  };
-
-  const handleSubmitSubmmision = async (subData) => {
+  // Function to handle budget submission submission
+  // This function is called when the form is submitted
+  const handleSubmitSubmission = async (subData) => {
     console.log("Submitting submission:", subData);
     try {
       const data = await POST("/form/budget-submission/", subData);
@@ -332,8 +328,10 @@ const BodyContent = () => {
     }
   };
 
+  // Function to handle budget request submission
+  // This function is called when the form is submitted
   const handleSubmitRequest = async (requestData) => {
-    console.log("Submitting Budget Request:", requestData);
+    console.log("Submitting budget request:", requestData);
     try {
       const data = await POST("/form/budget-request-form/", requestData);
       console.log("Budget request created successfully:", data);
@@ -358,8 +356,34 @@ const BodyContent = () => {
     }
   };
 
-  //for Budget Return Form
+  // Function to handle budget return submission
+  // This function is called when the form is submitted
+  const handleSubmitReturn = async (returnData) => {
+    console.log("Submitting budget return:", returnData);
+    try {
+      const data = await POST("/form/budget-returns-form/", returnData); 
+      console.log("Budget return created successfully:", data);
+    } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+      console.error("Error creating budget return:", error.message);
+      console.error(firstError);
+      console.error("Error submitting budget return:", error);
+    }
+  };
 
+  // It takes the form data and the name of the active tab as arguments
   const handleFormSubmit = (formData, tabName) => {
     setFormSubmitted({ ...formSubmitted, [tabName]: true });
     console.log(`Form data for ${tabName}:`, formData);
@@ -367,34 +391,55 @@ const BodyContent = () => {
     if (tabName === "Budget Submission Form") {
       subData = {
         submitter_name: formData.submitterName,
+        employee_id: formData.employeeId,
         dept_id: formData.departmentId,
         date_submitted: new Date().toISOString().split('T')[0],
         proposed_total_budget: formData.totalBudget,
         start_usage_period: formData.usagePeriod,
         end_usage_period: formData.endUsagePeriod,
-        // expense_breakdown: formData.expenseBreakdown
+        //expense_breakdown: formData.expenseBreakdown
       };
-      handleSubmitSubmmision(subData);
-
+      handleSubmitSubmission(subData);
     } else if (tabName === "Budget Request Form") {
       subData = {
-        dept_id: formData.departmentId,
-        amount_requested: formData.totalAmountNeeded,
         requestor_name: formData.requestorName,
+        employee_id: formData.employeeId,
+        dept_id: formData.departmentId,
         requested_date: new Date().toISOString().split('T')[0],
+        amount_requested: formData.totalAmountNeeded,
         expected_start_usage_period: formData.usagePeriod,
         expected_end_usage_period: formData.endUsagePeriod,
         reason_for_request: formData.requestReason,
         urgency_level_request: formData.urgencyLevel,
-        // expense_breakdown_period: formData.expenseBreakdown
+        //expense_breakdown: formData.expenseBreakdown
       };
       handleSubmitRequest(subData);
     } else if (tabName === "Budget Return Form") {
-
+      subData = {
+        returner_name: formData.requestorName,
+        employee_id: formData.employeeId,
+        dept_id: formData.departmentId,
+        return_date: new Date().toISOString().split('T')[0],
+        budget_request_id: formData.requestId,
+        total_amount_requested: formData.totalRequestAmount,
+        returned_amount: formData.returnedAmount,
+        reason_returned: formData.returnReason,
+        //expense_history_breakdown: formData.expenseHistoryBreakdown
+      };
+      handleSubmitReturn(subData);
+    } else {
+      console.error("Unknown tab name:", tabName);
+    }
   };
 
+  const handleClearForm = (tabName) => {
+    setFormSubmitted({ ...formSubmitted, [tabName]: false });
+  };
 
-  //for Budget Return Form
+  const handleBackToForm = (tabName) => {
+    setFormSubmitted({ ...formSubmitted, [tabName]: false });
+  };
+
 
   return (
     <div className="forms">
@@ -440,5 +485,4 @@ const BodyContent = () => {
   );
 };
 
-}
 export default BodyContent;

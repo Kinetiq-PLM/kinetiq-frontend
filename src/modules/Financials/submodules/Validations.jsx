@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Validations.css";
 import { GET } from "../api/api";
+import { PATCH } from "../api/api";
 
 const tabs = ["Budget Submission List", "Budget Request List", "Returns List"];
 const departmentIds = {
@@ -94,6 +95,7 @@ const BodyContent = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
   const handlePageChange = (direction) => {
     const currentIndex = tabs.indexOf(activeTab);
     if (direction === "next" && currentIndex < tabs.length - 1) {
@@ -102,6 +104,7 @@ const BodyContent = () => {
       setActiveTab(tabs[currentIndex - 1]);
     }
   };
+
   const filterDataByDate = (data, range, dateField = 'submissionDate') => {
     try {
       const today = new Date();
@@ -294,100 +297,12 @@ const BodyContent = () => {
     setEditedDataForConfirmation(editedDataForConfirmation);
     setIsConfirmationVisible(true);
   };
-  const handleProceedEdit = () => {
-    const currentDate = new Date();
-    if (activeTab === "Budget Submission List") {
-      const updatedOriginalData = originalData.map(row => {
-        if (selectedRows.includes(row.requestId)) {
-          return {
-            ...row,
-            validationStatus: "Validated",
-            validatedBy: editedData[row.requestId]?.validatedBy || "",
-            approvedAmount: editedData[row.requestId]?.approvedAmount || "",
-            validationDate: currentDate,
-            remarks: "Approved"
-          };
-        }
-        return row;
-      });
-      setOriginalData(updatedOriginalData);
-    } else if (activeTab === "Budget Request List") {
-      const updatedOriginalRequestData = originalRequestData.map(row => {
-        if (selectedRows.includes(row.reqID)) {
-          const approvedAmount = parseFloat(editedData[row.reqID]?.approvedAmount.replace(/,/g, '')) || 0;
-          const departmentName = departmentIds[row.departmentId];
-          setDepartmentBudgets(prevBudgets => {
-            const updatedBudgets = { ...prevBudgets };
-            if (updatedBudgets[departmentName]) {
-              updatedBudgets[departmentName] = {
-                ...updatedBudgets[departmentName],
-                totalSpent: updatedBudgets[departmentName].totalSpent + approvedAmount,
-                remainingBudget: updatedBudgets[departmentName].remainingBudget - approvedAmount,
-              };
-            }
-            return updatedBudgets;
-          });
-          return {
-            ...row,
-            validationStatus: "Validated",
-            validatedBy: editedData[row.reqID]?.validatedBy || "",
-            approvedAmount: editedData[row.reqID]?.approvedAmount || "",
-            validationDate: currentDate,
-            remarks: "Approved"
-          };
-        }
-        return row;
-      });
-      setOriginalRequestData(updatedOriginalRequestData);
-    } else if (activeTab === "Returns List") {
-      const updatedOriginalReturnsData = originalReturnsData.map(row => {
-        if (selectedRows.includes(row.returnsId)) {
-          return {
-            ...row,
-            validationStatus: "Validated",
-            validatedBy: editedData[row.returnsId]?.validatedBy || "",
-            remarks: returnRemarks[row.returnsId] || "Approved",
-            comments: returnComments[row.returnsId] || "N/A",
-            validationDate: currentDate,
-          };
-        }
-        return row;
-      });
-      setOriginalReturnsData(updatedOriginalReturnsData);
-    }
+
+  const handleConfirmSubmit = () => {
+    patchEditedRows();
     setIsConfirmationVisible(false);
-    setIsEditModalOpen(false);
-    setSelectedRows([]);
-    setEditedData({});
-    setReturnRemarks({});
-    setReturnComments({});
   };
-  const handleRequestReview = () => {
-    setIsReviewConfirmationVisible(true);
-  }
-  const handleProceedReview = () => {
-    const currentDate = new Date();
-    const updatedOriginalReturnsData = originalReturnsData.map(row => {
-      if (selectedRows.includes(row.returnsId)) {
-        return {
-          ...row,
-          validationStatus: "To Review",
-          validationDate: currentDate,
-          remarks: "For Resubmission",
-          validatedBy: editedData[row.returnsId]?.validatedBy || "",
-          comments: returnComments[row.returnsId] || "N/A",
-        };
-      }
-      return row;
-    });
-    setOriginalReturnsData(updatedOriginalReturnsData);
-    setIsReviewConfirmationVisible(false);
-    setIsEditModalOpen(false);
-    setSelectedRows([]);
-    setEditedData({});
-    setReturnRemarks({});
-    setReturnComments({});
-  }
+  
   const getSortedFilteredData = () => {
     const validated = filteredData.filter(item => item.validationStatus === "Validated");
     const pending = filteredData.filter(item => item.validationStatus === "Pending");
@@ -481,6 +396,67 @@ useEffect(() => {
   fetchRequests();
   fetchReturns();
 }, []);
+
+const patchEditedRows = async () => {
+  try {
+    const patchPromises = editedDataForConfirmation.map(async (row) => {
+      const requestId = row.requestId || row.reqID || row.returnsId;
+      if (!requestId) {
+        console.error("Error: ID is undefined for row:", row);
+        return null;
+      }
+
+      let endpoint = "";
+      let payload = {};
+
+      if (activeTab === "Budget Submission List" && row.requestId) {
+        endpoint = `/validation/update-submission/${row.requestId}/`;
+        payload = {
+          validated_by: row.validatedBy || "",
+          final_approved_amount: row.approvedAmount || "",
+        };
+      } else if (activeTab === "Budget Request List" && row.reqID) {
+        endpoint = `/validation/update-request/${row.reqID}/`;
+        payload = {
+          validated_by: row.validatedBy || "",
+          final_approved_amount: row.approvedAmount || "",
+        };
+      } else if (activeTab === "Returns List" && row.returnsId) {
+        endpoint = `/validation/update-return/${row.returnsId}/`;
+        payload = {
+          validated_by: row.validatedBy || "",
+          remarks: row.remarks || "",
+          comments: row.comments || "N/A",
+          // Include the expense history breakdown if needed
+          expense_history_breakdown: row.attachedFile || "",
+        };
+      } else {
+        console.error("Unsupported tab or missing ID:", row);
+        return null;
+      }
+
+      console.log("Updating row with endpoint:", endpoint, "and payload:", payload);
+
+      try {
+        const response = await PATCH(endpoint, payload);
+        return response;
+      } catch (error) {
+        console.error("Error updating row:", error);
+        throw error;
+      }
+    });
+
+    const results = await Promise.all(patchPromises);
+    console.log("Patch results:", results);
+
+    // Close the modal and refresh data
+    setIsConfirmationVisible(false);
+    fetch(); // Refresh the data after successful updates
+  } catch (error) {
+    console.error("Error in patching rows:", error);
+    alert("An error occurred while updating rows. Please try again.");
+  }
+};
 
   return (
     <div className="valid">
@@ -817,7 +793,7 @@ useEffect(() => {
                         <p><strong>{activeTab === "Budget Submission List" ? "Submission ID:" : activeTab === "Budget Request List" ? "Request ID:" : "Returns ID:"}</strong> {activeRow.requestId || activeRow.reqID || activeRow.returnsId}</p>
                         <p><strong> Department ID:</strong> {activeRow.departmentId}</p>
                         <p> <strong>Amount:</strong> {activeRow.amount || activeRow.returnedAmount}</p>
-                        <p><strong>{activeTab === "Budget Submission List" ? "Submission Date:" : activeTab === "Budget Request List" ? "Request Date:" : "Return Date:"} </strong>{activeRow.submissionDate ? activeRow.submissionDate.toLocaleDateString() : activeRow.requestDate ? activeRow.requestDate.toLocaleDateString() : activeRow.returnDate.toLocaleDateString()}</p>
+                        <p><strong>{activeTab === "Budget Submission List" ? "Submission Date:" : activeTab === "Budget Request List" ? "Request Date:" : "Return Date:"} </strong>{activeRow.submissionDate ? activeRow.submissionDate: activeRow.requestDate ? activeRow.requestDate : activeRow.returnDate}</p>
                         <div className="edit-modal-input-group validated-by-group">
                           <div className="edit-modal-label-input">
                             <label><strong>Validated By:</strong></label>
@@ -886,7 +862,7 @@ useEffect(() => {
               </div>
               <div className="popup-buttons">
                 <button className="cancel-button" onClick={handleCancelConfirmation}>Cancel</button>
-                <button className="proceed-button" onClick={handleProceedEdit}>Proceed</button>
+                <button className="proceed-button" onClick={handleConfirmSubmit}>Proceed</button>
               </div>
             </div>
           </InfoCard>
