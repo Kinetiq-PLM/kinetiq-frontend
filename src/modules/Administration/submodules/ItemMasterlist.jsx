@@ -5,7 +5,6 @@ const units = ["kg", "sh", "bx", "L", "m", "gal", "pcs", "set", "mm", "unit"];
 const manageOptions = ["None", "Serial Number", "Batches"];
 const itemTypes = ["Assets", "Product", "Raw Materials"];
 
-{/* Sample data for the table rows */}
 const rows = [
     {
         unit: "kg",
@@ -135,7 +134,6 @@ const rows = [
     }
 ];
 
-
 const assetRows = [
     { assetId: "AST001", assetName: "Lathe", purchaseDate: "01/01/25", serialNo: "SN001", price: "5000", contentId: "C001" },
     { assetId: "AST002", assetName: "Compressor", purchaseDate: "02/05/25", serialNo: "SN002", price: "3500", contentId: "C002" },
@@ -145,7 +143,6 @@ const assetRows = [
     { assetId: "AST006", assetName: "Mixer", purchaseDate: "06/10/25", serialNo: "SN006", price: "4200", contentId: "C006" },
     { assetId: "AST007", assetName: "Pump", purchaseDate: "07/20/25", serialNo: "SN007", price: "1800", contentId: "C007" }
 ];
-
 
 const productRows = [
     { productId: "PROD001", productName: "Sealant", description: "Waterproof bonding", price: "80", stockLevel: "120" },
@@ -157,7 +154,6 @@ const productRows = [
     { productId: "PROD007", productName: "Glue Gun", description: "Hot glue device", price: "150", stockLevel: "40" }
 ];
 
-
 const rawMaterialRows = [
     { materialId: "MAT001", materialName: "Copper Wire", description: "High grade", unit: "kg", cost: "200", vendorCode: "V001" },
     { materialId: "MAT002", materialName: "Resin", description: "Clear finish", unit: "L", cost: "350", vendorCode: "V002" },
@@ -168,14 +164,14 @@ const rawMaterialRows = [
     { materialId: "MAT007", materialName: "Cloth Tape", description: "Heat resistant", unit: "set", cost: "100", vendorCode: "V007" }
 ];
 
-
 const ItemMasterList = () => {
     const [data, setData] = useState(rows);
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
     const [activeTab, setActiveTab] = useState("Item Masterlist");
 
-    const [modalVisible, setModalVisible] = useState(false);
-    const [modalContent, setModalContent] = useState(null);
+    const toggleMenu = (index) => {
+        setOpenMenuIndex(openMenuIndex === index ? null : index);
+    };
 
     const handleChange = (index, key, value) => {
         const updated = [...data];
@@ -183,33 +179,12 @@ const ItemMasterList = () => {
         setData(updated);
     };
 
-    const toggleMenu = (index) => {
-        setOpenMenuIndex(openMenuIndex === index ? null : index);
-    };
-
-    const openModal = (contentId) => {
-        setModalContent(`goods receipt purchase order`);
-        setModalVisible(true);
-    };
-
-    const closeModal = () => {
-        setModalVisible(false);
-        setModalContent(null);
-    };
-
-    const handleDownload = () => {
-        alert("Downloading content...");
-    };
-
     const renderDropdown = (type) => {
-        let fields = [];
-        if (type === "Product") {
-            fields = ["Product ID", "Product Name", "Description", "Selling Price", "Stock Level", "Warranty Period", "Policy ID", "Batch No.", "Content ID"];
-        } else if (type === "Assets") {
-            fields = ["Asset ID", "Asset Name", "Purchase Date", "Serial No.", "Purchase price", "Content ID"];
-        } else if (type === "Raw Materials") {
-            fields = ["Material ID", "Material Name", "Description", "Cost Per Unit", "Vendor code", "Unit Of Measure"];
-        }
+        const fields = {
+            Product: ["Product ID", "Product Name", "Description", "Selling Price", "Stock Level", "Warranty Period", "Policy ID", "Batch No.", "Content ID"],
+            Assets: ["Asset ID", "Asset Name", "Purchase Date", "Serial No.", "Purchase price", "Content ID"],
+            "Raw Materials": ["Material ID", "Material Name", "Description", "Cost Per Unit", "Vendor code", "Unit Of Measure"]
+        }[type] || [];
 
         return (
             <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-10 w-96">
@@ -236,16 +211,37 @@ const ItemMasterList = () => {
         );
     };
 
+    const renderTable = () => {
+        if (activeTab === "Item Masterlist") {
+            return rows;
+        } else if (activeTab === "Assets") {
+            return assetRows;
+        } else if (activeTab === "Product") {
+            return productRows;
+        } else if (activeTab === "Raw Materials") {
+            return rawMaterialRows;
+        }
+        return [];
+    };
+
     return (
         <div className="p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Item Masterlist</h2>
 
             <div className="flex items-center gap-4 mb-4 border-b">
-                {["Item Masterlist", "Assets", "Product", "Raw Materials"].map((tab, idx) => (
+                {[
+                    "Item Masterlist",
+                    "Assets",
+                    "Product",
+                    "Raw Materials"
+                ].map((tab, idx) => (
                     <button
                         key={idx}
                         onClick={() => setActiveTab(tab)}
-                        className={`py-2 border-b-2 ${activeTab === tab ? "border-teal-500 text-teal-600 font-semibold" : "border-transparent text-gray-600"} px-3`}
+                        className={`py-2 border-b-2 ${activeTab === tab
+                                ? "border-teal-500 text-teal-600 font-semibold"
+                                : "border-transparent text-gray-600"
+                            } px-3`}
                     >
                         {tab}
                     </button>
@@ -263,21 +259,30 @@ const ItemMasterList = () => {
             </div>
 
             <div className="itemmasterlist-table-container">
-                <div className="itemmasterlist-scroll-wrapper">
-                    <table className="itemmasterlist-table">
+                <div className="itemmasterlist-scroll-wrapper" style={{ overflowX: 'auto', maxWidth: '1500px' }}>
+                    <table className="itemmasterlist-table" style={{ minWidth: '1600px' }}>
                         <thead className="bg-gray-100">
-                            {activeTab === "Item Masterlist" && (
-                                <tr>{["Item ID", "Asset ID", "Product ID", "Material ID", "Item Type", "Item Name", "Unit Of Measure", "Manage Item By", "Item Status", "Preferred Vendor", "Purchasing Oum", "Item Per Purchase Unit", "Purchase Quantity Per Package", "Sales Oum", "Items Per Sale Unit", "Sales Quantity Per Package", ""].map((title, i) => (<th key={i} className="min-w-[150px] px-4 py-3 border border-gray-200 text-left">{title}</th>))}</tr>
-                            )}
-                            {activeTab === "Assets" && (
-                                <tr>{["Asset ID", "Asset Name", "Purchase Date", "Serial No.", "Purchased Price", "Content ID", ""].map((col, i) => (<th key={i} className="px-4 py-3 border border-gray-200 text-left">{col}</th>))}</tr>
-                            )}
-                            {activeTab === "Product" && (
-                                <tr>{["Product ID", "Product Name", "Description", "Selling Price", "Stock Level", ""].map((col, i) => (<th key={i} className="px-4 py-3 border border-gray-200 text-left">{col}</th>))}</tr>
-                            )}
-                            {activeTab === "Raw Materials" && (
-                                <tr>{["Material ID", "Material Name", "Description", "Unit Of Measure", "Cost Per Unit", "Vendor Code", ""].map((col, i) => (<th key={i} className="px-4 py-3 border border-gray-200 text-left">{col}</th>))}</tr>
-                            )}
+                            <tr>
+                                {/* Conditionally render headers based on tab */}
+                                {activeTab === "Item Masterlist" && [
+                                    "Item ID", "Asset ID", "Product ID", "Material ID", "Item Type", "Item Name",
+                                    "Unit Of Measure", "Manage Item By", "Item Status", "Preferred Vendor",
+                                    "Purchasing Oum", "Item Per Purchase Unit", "Purchase Quantity Per Package",
+                                    "Sales Oum", "Items Per Sale Unit", "Sales Quantity Per Package", ""
+                                ].map((col, i) => <th key={i} className="min-w-[150px] px-4 py-3 border border-gray-200 text-left">{col}</th>)}
+
+                                {activeTab === "Assets" && [
+                                    "Asset ID", "Asset Name", "Purchase Date", "Serial No.", "Purchased Price", "Content ID", ""
+                                ].map((col, i) => <th key={i} className="min-w-[150px] px-4 py-3 border border-gray-200 text-left">{col}</th>)}
+
+                                {activeTab === "Product" && [
+                                    "Product ID", "Product Name", "Description", "Selling Price", "Stock Level", ""
+                                ].map((col, i) => <th key={i} className="min-w-[150px] px-4 py-3 border border-gray-200 text-left">{col}</th>)}
+
+                                {activeTab === "Raw Materials" && [
+                                    "Material ID", "Material Name", "Description", "Unit Of Measure", "Cost Per Unit", "Vendor Code", ""
+                                ].map((col, i) => <th key={i} className="min-w-[150px] px-4 py-3 border border-gray-200 text-left">{col}</th>)}
+                            </tr>
                         </thead>
 
                         <tbody>
