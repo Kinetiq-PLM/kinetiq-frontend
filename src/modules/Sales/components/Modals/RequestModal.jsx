@@ -16,6 +16,7 @@ const RequestModal = ({ isOpen, onClose, setAction }) => {
     "Project Request",
     "Purchase Request",
     "Workforce Request",
+    "Job Posting Request",
   ];
 
   const validateRequestType = () => {
