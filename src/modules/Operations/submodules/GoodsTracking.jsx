@@ -243,7 +243,7 @@ const GoodsTracking = () => {
                   <th className="checkbox-column"></th>
                   <th>No.</th>
                   <th>Transaction ID</th>
-                  <th>Document No.</th>
+                  {selectedGoods !== "A/R Credit Memo" && <th>Document No.</th>}
                   <th>Status</th>
                   <th>Posting Date</th>
                   <th>Cost</th>
@@ -262,7 +262,7 @@ const GoodsTracking = () => {
                       </td>
                       <td>{index + 1}</td>
                       <td>{row.transaction_id}</td>
-                      <td>{row.document_no}</td>
+                      {selectedGoods !== "A/R Credit Memo" && <td>{row.document_no}</td>}
                       <td className={`operations-gt-status ${row.status.toLowerCase()}`}>
                         {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
                       </td>

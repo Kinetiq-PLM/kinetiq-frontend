@@ -82,23 +82,14 @@
   margin-bottom: 0.4rem;
 }
 
-
-
-
 .detail-row:last-child {
   margin-bottom: 0;
 }
-
-
-
 
 .detail-row label {
   color: #4B5563;
   font-size: 0.813rem;
 }
-
-
-
 
 .detail-row input,
 .detail-row select,
@@ -112,9 +103,19 @@
   font-size: 0.813rem;
   height: 1.5rem;
 }
+.dropdown-scrollbar select::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
+.dropdown-scrollbar select::-webkit-scrollbar-thumb {
+  background: #0d9488;
+  border-radius: 3px;
+}
 
-
+.dropdown-scrollbar select::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
 
 .tabbed-section {
   padding: 0 !important;

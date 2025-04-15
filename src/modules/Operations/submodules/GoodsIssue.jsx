@@ -909,7 +909,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
               {/* Vendor Name Dropdown */}
-              <div className="detail-row">
+              <div className="detail-row dropdown-scrollbar">
                 <label>Vendor Name</label>
                 <select value={selectedVendor} onChange={handleVendorChange}>
                   <option value="">Select Vendor</option>
@@ -1128,7 +1128,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                     <th>Batch No.</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="dropdown-scrollbar">
                 {documentItems.map((item, index) => (
                     <tr key={item.content_id || index}>
                       <td>{index + 1}</td>

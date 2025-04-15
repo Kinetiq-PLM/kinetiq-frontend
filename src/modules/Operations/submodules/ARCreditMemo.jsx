@@ -18,41 +18,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
 
-  const tableData = [
-    {
-      id: 1,
-      invoiceNo: "INV-001",
-      description: "Software License",
-      quantity: "2",
-      unitPrice: "500.00",
-      discountRate: "10%",
-      taxRate: "832095",
-
-
-    },
-    {
-      id: 2,
-      invoiceNo: "INV-002",
-      description: "Consulting Services",
-      quantity: "40",
-      unitPrice: "75.00",
-      discountRate: "5%",
-      taxRate: "10000"
-    },
-    {
-      id: 3,
-      invoiceNo: "INV-003",
-      description: "Hardware Support",
-      quantity: "1",
-      unitPrice: "1200.00",
-      discountRate: "15%",
-      taxRate: "742939",
-   
-    }
-  ];
-
-
-  const ownerOptions = ["Bob Smith", "John Smith", "Sarah Johnson"];
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
 
   const [selectedVendor, setSelectedVendor] = useState("");
@@ -119,7 +84,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         setSelectedOwner(matchedEmployee.employee_name);
       }
     }
-  }, [vendorList, selectedData.customer_id, employeeList, selectedData.employee_id]);
+  }, [vendorList, selectedData.buyer, employeeList, selectedData.employee_id]);
 
 
   const [documentItems, setDocumentItems] = useState(
@@ -143,7 +108,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
     delivery_date: isCreateMode ? today : selectedData.delivery_date || "",
     status: isCreateMode ? "Draft" : selectedStatus,
     posting_date: isCreateMode ? today  : selectedData.posting_date || "",
-    document_no: isCreateMode ? "" : selectedData.document_no || "",
+    document_no: isCreateMode ? "" : selectedData.document_no || null,
     document_date: isCreateMode ? today  : selectedData.document_date || "",
     initialAmount: initialAmount || 0,
     invoice_amount: isCreateMode ? 0 : selectedData.invoice_amount || 0,
@@ -608,7 +573,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
-        document_no: documentDetails.document_no, // Add document_no from state
+        document_no: documentDetails?.document_no || null, // Add document_no from state
         transaction_id: documentDetails.transaction_id,
         ar_credit_memo: documentDetails.ar_credit_memo,
         initial_amount: documentDetails.initialAmount,
@@ -752,7 +717,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         transaction_id: documentDetails.transaction_id,
         invoice_id: documentDetails.invoice_id,
         ar_credit_memo: documentDetails.ar_credit_memo,
-        document_no: documentDetails.document_no,
+        document_no: documentDetails?.document_no || null,
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
@@ -923,7 +888,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                 <label>Customer ID</label>
                 <input type="text" value={vendorID} />
               </div>
-              <div className="detail-row">
+              <div className="detail-row dropdown-scrollbar">
                 <label>Customer Name</label>
                 <select value={selectedVendor} onChange={handleVendorChange}>
                   <option value="">Select Customer</option>
@@ -1126,7 +1091,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                     <th>Total</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="dropdown-scrollbar">
                 {documentItems.map((item, index) => (
                     <tr key={item.content_id || index}>
                       <td>{index + 1}</td>
