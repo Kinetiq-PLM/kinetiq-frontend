@@ -43,7 +43,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
     if (selectedProduct) {
       selectedProduct.quantity = 1;
       selectedProduct.tax =
-        TAX_RATE + selectedProduct.quantity * selectedProduct.selling_price;
+        selectedProduct.quantity * selectedProduct.selling_price * TAX_RATE;
       selectedProduct.discount = 0;
       selectedProduct.total_price = selectedProduct.selling_price;
       addProduct([...products, selectedProduct]); // Properly update the array
