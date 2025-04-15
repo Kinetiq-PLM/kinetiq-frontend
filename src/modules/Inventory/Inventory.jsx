@@ -9,6 +9,7 @@ const BodyContent = () => {
   const [productData, setProductData] = useState([]);
   const [productInventoryData, setProductInventoryData] = useState([]);
   const [assetData, setAssetData] = useState([]);
+  const [assetInventoryData, setAssetInventoryData] = useState([]);
   const [rawMaterialData, setRawMaterialData] = useState([]);
 
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -83,6 +84,9 @@ const BodyContent = () => {
   }, [refreshProducts]);
 
   useEffect(() => {
+    setLoadingAssets(true);
+    
+    // Fetch basic asset data
     fetch("http://127.0.0.1:8000/api/assets/")
       .then((res) => {
         if (!res.ok) {
@@ -92,10 +96,33 @@ const BodyContent = () => {
       })
       .then((data) => {
         setAssetData(data);
-        setLoadingAssets(false);
       })
       .catch((err) => {
         console.error("Error fetching assets:", err);
+        setError("Failed to load asset data");
+      });
+    
+    // Fetch asset inventory data
+    fetch("http://127.0.0.1:8000/api/asset-inventory/")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Asset inventory data received:", data);
+        if (Array.isArray(data)) {
+          setAssetInventoryData(data);
+        } else {
+          console.error("Expected array but got:", data);
+          setError("Invalid asset inventory data format");
+        }
+        setLoadingAssets(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching asset inventory:", err);
+        setError(`Failed to load asset inventory data: ${err.message}`);
         setLoadingAssets(false);
       });
   }, [refreshAssets]);
@@ -151,6 +178,26 @@ const BodyContent = () => {
     };
   });
 
+  // Merge asset data with inventory data
+  const mergedAssetData = assetData.map(asset => {
+    const inventoryInfo = assetInventoryData.find(inv => inv.asset_id === asset.asset_id);
+    return {
+      ...asset,
+      inventory_data: inventoryInfo ? {
+        total_stock: inventoryInfo.total_stock || 0,
+        stock_on_order: inventoryInfo.stock_on_order || 0,
+        minimum_threshold: inventoryInfo.minimum_threshold || 0,
+        maximum_threshold: inventoryInfo.maximum_threshold || 0,
+        last_update: inventoryInfo.last_update
+      } : {
+        total_stock: 0,
+        stock_on_order: 0,
+        minimum_threshold: 0,
+        maximum_threshold: 0
+      }
+    };
+  });
+
   const tableConfigs = {
     Products: {
       columns: [
@@ -190,16 +237,32 @@ const BodyContent = () => {
     },
     
     Assets: {
-      columns: ["Name", "Item ID", "Serial No", "Purchase Date", "Available Stock"],
-      data: assetData.map((asset) => ({
-        item_id: asset.item_id || "???",
-        asset_id: asset.asset_id || "???",
-        Name: asset.asset_name || "Asset Name",
-        "Item ID": asset.item_id || "???",
-        "Serial No": asset.serial_no || "N/A",
-        "Purchase Date": asset.purchase_date || "N/A",
-        "Available Stock": asset.inventory_data?.available_stock || "000",
-      })),
+      columns: ["Name", "Item ID", "Serial No", "Total Stock", "On Order", "Status"],
+      data: mergedAssetData.map((asset) => {
+        const inventoryData = asset.inventory_data || {};
+        
+        let status = "In Stock";
+        if (inventoryData.total_stock === 0) {
+            status = "Out of Stock";
+        } else if (inventoryData.total_stock < inventoryData.minimum_threshold) {
+            status = "Low Stock";
+        }
+        
+        return {
+          item_id: asset.item_id || "???",
+          asset_id: asset.asset_id || "???",
+          Name: asset.asset_name || "Asset Name",
+          "Item ID": asset.item_id || "???",
+          "Serial No": asset.serial_no || "N/A",
+          "Purchase Date": asset.purchase_date || "N/A",
+          "Total Stock": inventoryData.total_stock || 0,
+          "On Order": inventoryData.stock_on_order || 0,
+          "Status": status,
+          "Minimum Threshold": inventoryData.minimum_threshold || 0,
+          "Maximum Threshold": inventoryData.maximum_threshold || 0,
+          "Last Updated": inventoryData.last_update ? new Date(inventoryData.last_update).toLocaleString() : "Unknown"
+        };
+      }),
       loading: loadingAssets,
     },
     
@@ -236,8 +299,19 @@ const BodyContent = () => {
       if (!isLowStockA && isLowStockB) return 1;
     }
     
-    const stockA = parseInt(a["Available Stock"] || "0");
-    const stockB = parseInt(b["Available Stock"] || "0");
+    // If asset tab, show low stock items first
+    if (activeTab === "Assets") {
+      const isLowStockA = (a["Total Stock"] || 0) < (a["Minimum Threshold"] || 0);
+      const isLowStockB = (b["Total Stock"] || 0) < (b["Minimum Threshold"] || 0);
+      
+      if (isLowStockA && !isLowStockB) return -1;
+      if (!isLowStockA && isLowStockB) return 1;
+    }
+    
+    // General stock-based sorting
+    const stockField = activeTab === "Assets" ? "Total Stock" : "Available Stock";
+    const stockA = parseInt(a[stockField] || "0");
+    const stockB = parseInt(b[stockField] || "0");
     
     if (stockA !== stockB) {
       return stockA - stockB; // Lower stock comes first
@@ -315,10 +389,24 @@ const BodyContent = () => {
                     </>
                   )}
                   {activeTab === "Assets" && (
-                    <div>
-                      <p className="text-cyan-600 font-medium">Asset ID</p>
-                      <p>{selectedItem.asset_id || "N/A"}</p>
-                    </div>
+                    <>
+                      <div>
+                        <p className="text-cyan-600 font-medium">Asset ID</p>
+                        <p>{selectedItem.asset_id || "N/A"}</p>
+                      </div>
+                      <div>
+                        <p className="text-cyan-600 font-medium">Minimum Threshold</p>
+                        <p>{selectedItem["Minimum Threshold"] || "N/A"}</p>
+                      </div>
+                      <div>
+                        <p className="text-cyan-600 font-medium">Maximum Threshold</p>
+                        <p>{selectedItem["Maximum Threshold"] || "N/A"}</p>
+                      </div>
+                      <div>
+                        <p className="text-cyan-600 font-medium">Last Updated</p>
+                        <p>{selectedItem["Last Updated"] || "N/A"}</p>
+                      </div>
+                    </>
                   )}
                   {activeTab === "Raw Materials" && (
                     <div>
