@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import Button from "../Button";
 import Dropdown from "../Dropdown.jsx";
 
-const RequestModal = ({ isOpen, onClose }) => {
+const RequestModal = ({ isOpen, onClose, setAction }) => {
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
@@ -39,8 +39,9 @@ const RequestModal = ({ isOpen, onClose }) => {
 
     if (errorCount === 0) {
       // Reset form fields
-      setRequestType("");
+      setAction(requestType);
 
+      setRequestType("");
       onClose();
     }
   };
