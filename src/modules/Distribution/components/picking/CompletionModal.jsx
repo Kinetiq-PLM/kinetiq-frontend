@@ -1,8 +1,25 @@
-// components/picking/CompletionModal.jsx
 import React from 'react';
 import '../../styles/Picking.css';
 
-const CompletionModal = ({ pickingList, onConfirm, onCancel }) => {
+const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCancel }) => {
+  // Function to get employee name from ID
+  const getEmployeeName = (employeeId) => {
+    if (!employeeId) return 'Not assigned';
+    const employee = employees.find(emp => emp.employee_id === employeeId);
+    return employee ? employee.full_name : employeeId;
+  };
+
+  // Function to get warehouse name from ID
+  const getWarehouseName = (warehouseId) => {
+    // First try to use the name directly from the picking list if available
+    if (pickingList.warehouse_name) return pickingList.warehouse_name;
+    
+    // Otherwise look up the name from the warehouses array
+    if (!warehouseId) return 'Not assigned';
+    const warehouse = warehouses?.find(wh => wh.id === warehouseId);
+    return warehouse ? warehouse.name : warehouseId;
+  };
+
   return (
     <div className="modal-overlay">
       <div className="completion-modal">
@@ -23,7 +40,11 @@ const CompletionModal = ({ pickingList, onConfirm, onCancel }) => {
             </div>
             <div className="detail-item">
               <span className="detail-label">Warehouse:</span>
-              <span className="detail-value">{pickingList.warehouse_name || 'Unknown'}</span>
+              <span className="detail-value">{getWarehouseName(pickingList.warehouse_id)}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Assigned To:</span>
+              <span className="detail-value">{getEmployeeName(pickingList.picked_by)}</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Items Count:</span>

@@ -44,6 +44,24 @@ const ShipmentModal = ({
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Apply limits for weight and distance
+    if (name === 'weight_kg' && parseFloat(value) > 2000) {
+      setFormData(prev => ({
+        ...prev,
+        [name]: 2000
+      }));
+      return;
+    }
+    
+    if (name === 'distance_km' && parseFloat(value) > 2000) {
+      setFormData(prev => ({
+        ...prev,
+        [name]: 2000
+      }));
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -53,6 +71,11 @@ const ShipmentModal = ({
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Prevent saving if shipment is not editable
+    if (!isShipmentEditable) {
+      return;
+    }
     
     // Prepare updates object
     const updates = {};
@@ -119,6 +142,9 @@ const ShipmentModal = ({
   // Determine if shipment can be marked as failed
   const canBeFailed = shipment.shipment_status === 'Pending' || shipment.shipment_status === 'Shipped';
   
+  // Determine if shipment is editable (only Pending shipments can be edited)
+  const isShipmentEditable = shipment.shipment_status === 'Pending';
+  
   return (
     <div className="modal-overlay">
       <div className="shipment-modal">
@@ -174,6 +200,14 @@ const ShipmentModal = ({
               </div>
             </div>
             
+            {/* Display message if shipment is not editable */}
+            {!isShipmentEditable && (
+              <div className="info-message" style={{ margin: '10px 0', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px', borderLeft: '4px solid #e9452a' }}>
+                <i className="info-icon" style={{ marginRight: '8px' }}>🔴</i>
+                <span>This shipment has been processed and cannot be edited. You can only view details or manage the delivery receipt.</span>
+              </div>
+            )}
+            
             {/* Carrier Selection Section */}
             <div className="edit-section">
               <h4>Carrier Information</h4>
@@ -183,6 +217,7 @@ const ShipmentModal = ({
                   name="carrier_id"
                   value={formData.carrier_id}
                   onChange={handleInputChange}
+                  disabled={!isShipmentEditable}
                 >
                   <option value="">-- Select Carrier --</option>
                   {carriers.map(carrier => (
@@ -192,7 +227,7 @@ const ShipmentModal = ({
                   ))}
                 </select>
               </div>
-              {!formData.carrier_id && (
+              {!formData.carrier_id && isShipmentEditable && (
                 <p className="info-value" style={{ color: '#dc3545', marginTop: '0.5rem', fontSize: '0.875rem' }}>
                   Warning: No carrier assigned. It's recommended to assign a carrier before shipping.
                 </p>
@@ -212,8 +247,11 @@ const ShipmentModal = ({
                     value={formData.weight_kg}
                     onChange={handleInputChange}
                     min="0"
+                    max="2000"
                     step="0.01"
+                    disabled={!isShipmentEditable}
                   />
+                  <small className="limit-text">Maximum: 2000kg</small>
                 </div>
                 <div className="dimension-item">
                   <span className="dimension-label">Distance (km)</span>
@@ -224,8 +262,11 @@ const ShipmentModal = ({
                     value={formData.distance_km}
                     onChange={handleInputChange}
                     min="0"
+                    max="2000"
                     step="0.01"
+                    disabled={!isShipmentEditable}
                   />
+                  <small className="limit-text">Maximum: 2000km</small>
                 </div>
                 <div className="dimension-item">
                   <span className="dimension-label">Cost per kg (₱)</span>
@@ -237,6 +278,7 @@ const ShipmentModal = ({
                     onChange={handleInputChange}
                     min="0"
                     step="0.01"
+                    disabled={!isShipmentEditable}
                   />
                 </div>
                 <div className="dimension-item">
@@ -249,6 +291,7 @@ const ShipmentModal = ({
                     onChange={handleInputChange}
                     min="0"
                     step="0.01"
+                    disabled={!isShipmentEditable}
                   />
                 </div>
               </div>
@@ -272,6 +315,7 @@ const ShipmentModal = ({
                     onChange={handleInputChange}
                     min="0"
                     step="0.01"
+                    disabled={!isShipmentEditable}
                   />
                 </div>
                 <div className="cost-total-row">
@@ -332,7 +376,20 @@ const ShipmentModal = ({
                 <button
                   type="button"
                   className="status-update-button ship"
-                  onClick={() => onShip(shipment)}
+                  onClick={() => onShip(shipment, {
+                    carrier_id: formData.carrier_id,
+                    shipping_cost_info: {
+                      weight_kg: parseFloat(formData.weight_kg) || 0,
+                      distance_km: parseFloat(formData.distance_km) || 0,
+                      cost_per_kg: parseFloat(formData.cost_per_kg) || 0,
+                      cost_per_km: parseFloat(formData.cost_per_km) || 0,
+                      total_shipping_cost: calculateShippingCost()
+                    },
+                    operational_cost_info: {
+                      additional_cost: parseFloat(formData.additional_cost) || 0,
+                      total_operational_cost: calculateOperationalCost()
+                    }
+                  })}
                 >
                   Mark as Shipped
                 </button>
@@ -370,12 +427,14 @@ const ShipmentModal = ({
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
-              className="save-button"
-            >
-              Save Changes
-            </button>
+            {isShipmentEditable && (
+              <button 
+                type="submit" 
+                className="save-button"
+              >
+                Save Changes
+              </button>
+            )}
           </div>
         </form>
       </div>

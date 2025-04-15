@@ -1,7 +1,24 @@
-// components/shipment/ConfirmShipModal.jsx
 import React from 'react';
 
 const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
+  // Helper function to get carrier name
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP'
+    }).format(value || 0);
+  };
+  
+  // Calculate total cost
+  const totalShippingCost = shipment.shipping_cost_info?.total_shipping_cost || 
+    (shipment.shipping_cost_info?.weight_kg * shipment.shipping_cost_info?.cost_per_kg) +
+    (shipment.shipping_cost_info?.distance_km * shipment.shipping_cost_info?.cost_per_km) || 0;
+    
+  const totalOperationalCost = shipment.operational_cost_info?.total_operational_cost || 
+    (totalShippingCost + 
+    (shipment.packing_list_info?.packing_cost_info?.total_packing_cost || 0) + 
+    (shipment.operational_cost_info?.additional_cost || 0)) || 0;
+  
   return (
     <div className="modal-overlay">
       <div className="confirm-modal">
@@ -12,7 +29,47 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
         
         <div className="modal-body">
           <p>Are you sure you want to mark this shipment as shipped?</p>
-          <p>Tracking Number: <strong>{shipment.tracking_number}</strong></p>
+          
+          <div className="shipping-details">
+            <div className="detail-item">
+              <span className="detail-label">Shipment ID:</span>
+              <span className="detail-value">{shipment.shipment_id}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Tracking Number:</span>
+              <span className="detail-value">{shipment.tracking_number}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Carrier:</span>
+              <span className="detail-value">
+                {shipment.carrier_name || 'Not Assigned'}
+              </span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Weight:</span>
+              <span className="detail-value">
+                {shipment.shipping_cost_info?.weight_kg || 0} kg
+              </span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Distance:</span>
+              <span className="detail-value">
+                {shipment.shipping_cost_info?.distance_km || 0} km
+              </span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Shipping Cost:</span>
+              <span className="detail-value">
+                {formatCurrency(totalShippingCost)}
+              </span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Total Operational Cost:</span>
+              <span className="detail-value">
+                {formatCurrency(totalOperationalCost)}
+              </span>
+            </div>
+          </div>
           
           <div className="info-section" style={{ marginTop: '1rem' }}>
             <h4>What happens next?</h4>
