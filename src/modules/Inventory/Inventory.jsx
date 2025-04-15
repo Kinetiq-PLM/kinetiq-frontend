@@ -11,6 +11,7 @@ const BodyContent = () => {
   const [assetData, setAssetData] = useState([]);
   const [assetInventoryData, setAssetInventoryData] = useState([]);
   const [rawMaterialData, setRawMaterialData] = useState([]);
+  const [materialInventoryData, setMaterialInventoryData] = useState([]);
 
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [loadingAssets, setLoadingAssets] = useState(true);
@@ -128,6 +129,9 @@ const BodyContent = () => {
   }, [refreshAssets]);
 
   useEffect(() => {
+    setLoadingRawMats(true);
+    
+    // Fetch basic raw material data
     fetch("http://127.0.0.1:8000/api/raw-materials/")
       .then((res) => {
         if (!res.ok) {
@@ -137,10 +141,33 @@ const BodyContent = () => {
       })
       .then((data) => {
         setRawMaterialData(data);
-        setLoadingRawMats(false);
       })
       .catch((err) => {
         console.error("Error fetching raw materials:", err);
+        setError("Failed to load raw material data");
+      });
+      
+    // Fetch material inventory data
+    fetch(`http://127.0.0.1:8000/api/material-inventory/`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Material inventory data received:", data);
+        if (Array.isArray(data)) {
+          setMaterialInventoryData(data);
+        } else {
+          console.error("Expected array but got:", data);
+          setError("Invalid material inventory data format");
+        }
+        setLoadingRawMats(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching material inventory:", err);
+        setError(`Failed to load material inventory data: ${err.message}`);
         setLoadingRawMats(false);
       });
   }, [refreshRawMats]);
@@ -183,6 +210,26 @@ const BodyContent = () => {
     const inventoryInfo = assetInventoryData.find(inv => inv.asset_id === asset.asset_id);
     return {
       ...asset,
+      inventory_data: inventoryInfo ? {
+        total_stock: inventoryInfo.total_stock || 0,
+        stock_on_order: inventoryInfo.stock_on_order || 0,
+        minimum_threshold: inventoryInfo.minimum_threshold || 0,
+        maximum_threshold: inventoryInfo.maximum_threshold || 0,
+        last_update: inventoryInfo.last_update
+      } : {
+        total_stock: 0,
+        stock_on_order: 0,
+        minimum_threshold: 0,
+        maximum_threshold: 0
+      }
+    };
+  });
+  
+  // Merge raw material data with inventory data
+  const mergedMaterialData = rawMaterialData.map(material => {
+    const inventoryInfo = materialInventoryData.find(inv => inv.material_id === material.material_id);
+    return {
+      ...material,
       inventory_data: inventoryInfo ? {
         total_stock: inventoryInfo.total_stock || 0,
         stock_on_order: inventoryInfo.stock_on_order || 0,
@@ -267,16 +314,32 @@ const BodyContent = () => {
     },
     
     "Raw Materials": {
-      columns: ["Name", "Item ID", "Description", "Unit", "Available Stock"],
-      data: rawMaterialData.map((mat) => ({
-        item_id: mat.item_id || "???",
-        material_id: mat.material_id || "???",
-        Name: mat.material_name || "Raw Material Name",
-        "Item ID": mat.item_id || "???",
-        "Description": mat.description || "No description available",
-        "Unit": mat.unit_of_measure || "N/A",
-        "Available Stock": mat.inventory_data?.available_stock || "000",
-      })),
+      columns: ["Name", "Item ID", "Description", "Total Stock", "On Order", "Status"],
+      data: mergedMaterialData.map((material) => {
+        const inventoryData = material.inventory_data || {};
+        
+        let status = "In Stock";
+        if (inventoryData.total_stock === 0) {
+            status = "Out of Stock";
+        } else if (inventoryData.total_stock < inventoryData.minimum_threshold) {
+            status = "Low Stock";
+        }
+        
+        return {
+          item_id: material.item_id || "???",
+          material_id: material.material_id || "???",
+          Name: material.material_name || "Raw Material Name",
+          "Item ID": material.item_id || "???",
+          "Description": material.description || "No description available",
+          "Unit": material.unit_of_measure || "N/A",
+          "Total Stock": inventoryData.total_stock || 0,
+          "On Order": inventoryData.stock_on_order || 0,
+          "Status": status,
+          "Minimum Threshold": inventoryData.minimum_threshold || 0,
+          "Maximum Threshold": inventoryData.maximum_threshold || 0,
+          "Last Updated": inventoryData.last_update ? new Date(inventoryData.last_update).toLocaleString() : "Unknown"
+        };
+      }),
       loading: loadingRawMats,
     },
   };
@@ -299,8 +362,8 @@ const BodyContent = () => {
       if (!isLowStockA && isLowStockB) return 1;
     }
     
-    // If asset tab, show low stock items first
-    if (activeTab === "Assets") {
+    // If asset or raw material tab, show low stock items first
+    if (activeTab === "Assets" || activeTab === "Raw Materials") {
       const isLowStockA = (a["Total Stock"] || 0) < (a["Minimum Threshold"] || 0);
       const isLowStockB = (b["Total Stock"] || 0) < (b["Minimum Threshold"] || 0);
       
@@ -309,7 +372,7 @@ const BodyContent = () => {
     }
     
     // General stock-based sorting
-    const stockField = activeTab === "Assets" ? "Total Stock" : "Available Stock";
+    const stockField = (activeTab === "Assets" || activeTab === "Raw Materials") ? "Total Stock" : "Available Stock";
     const stockA = parseInt(a[stockField] || "0");
     const stockB = parseInt(b[stockField] || "0");
     
@@ -409,10 +472,24 @@ const BodyContent = () => {
                     </>
                   )}
                   {activeTab === "Raw Materials" && (
-                    <div>
-                      <p className="text-cyan-600 font-medium">Material ID</p>
-                      <p>{selectedItem.material_id || "N/A"}</p>
-                    </div>
+                    <>
+                      <div>
+                        <p className="text-cyan-600 font-medium">Material ID</p>
+                        <p>{selectedItem.material_id || "N/A"}</p>
+                      </div>
+                      <div>
+                        <p className="text-cyan-600 font-medium">Minimum Threshold</p>
+                        <p>{selectedItem["Minimum Threshold"] || "N/A"}</p>
+                      </div>
+                      <div>
+                        <p className="text-cyan-600 font-medium">Maximum Threshold</p>
+                        <p>{selectedItem["Maximum Threshold"] || "N/A"}</p>
+                      </div>
+                      <div>
+                        <p className="text-cyan-600 font-medium">Last Updated</p>
+                        <p>{selectedItem["Last Updated"] || "N/A"}</p>
+                      </div>
+                    </>
                   )}
                   {Object.entries(selectedItem)
                     .filter(([key]) => !["product_id", "asset_id", "material_id", "item_id", "Minimum Threshold", "Maximum Threshold", "Last Updated"].includes(key))
