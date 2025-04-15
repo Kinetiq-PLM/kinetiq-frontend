@@ -11,6 +11,11 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     Support: "Support",
   };
 
+  const type1 =
+    "transition-all duration-300 ease-in-out transform flex items-center justify-center rounded-lg border p-10 shadow-md cursor-pointer font-bold text-2xl text-white bg-[#00A8A8] hover:scale-105 hover:shadow-md";
+  const type2 =
+    "transition-all duration-300 ease-in-out transform flex items-center justify-center rounded-lg p-10 shadow-md cursor-pointer font-bold text-2xl text-[#00A8A8] bg-[#E4FDFB] hover:scale-105 hover:shadow-lg";
+
   return (
     <div className="crm">
       <div className="body-content-container">
@@ -20,18 +25,21 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-          {Object.entries(crmSubModule).map(([key, value]) => (
-            <button
-              key={value}
-              className="flex items-center justify-center bg-[#FAFAFA] rounded-lg border border-gray-200 p-10 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer font-bold text-xl"
-              onClick={() => {
-                loadSubModule(key);
-                setActiveSubModule(key);
-              }}
-            >
-              <span className="font-medium text-gray-800">{key}</span>
-            </button>
-          ))}
+          {Object.entries(crmSubModule).map(([key, value], index) => {
+            const buttonStyle = index % 2 === 0 ? type1 : type2;
+            return (
+              <button
+                key={value}
+                className={buttonStyle}
+                onClick={() => {
+                  loadSubModule(key);
+                  setActiveSubModule(key);
+                }}
+              >
+                <span className="font-medium">{key}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
