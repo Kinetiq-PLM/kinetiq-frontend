@@ -7,11 +7,9 @@ import "../styles/ARCreditMemo.css";
 const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
-  const [creditMemoId, setCreditMemoId] = useState("");
 
   const [selectedStatus, setSelectedStatus] = useState("Draft");
   const [activeTab, setActiveTab] = useState("document");
-  const [showSerialModal, setShowSerialModal] = useState(false);
   const calculateInitialAmount = () => {
     if (isCreateMode) return 0;
     return selectedData.document_items.reduce((sum, item) => {

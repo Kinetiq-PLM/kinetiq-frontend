@@ -250,7 +250,11 @@ const GoodsTracking = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center">Loading...</td>
+                </tr>
+              ) : filteredData.length > 0 ? (
                   filteredData.map((row, index) => (
                     <tr key={row.document_id}>
                       <td>

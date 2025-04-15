@@ -451,54 +451,37 @@ input[type="checkbox"] {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 1px solid #ddd;
     width: 100%;
-    margin-bottom: 0.5rem; /* Reduced margin */
+    margin-bottom: 0.5rem;
 }
 
 
-
-
-
-
-
-
-/* MAS MALAKI ANG DELIVERY REQUEST & REWORK ORDER */
+/* Tab styling */
 .tab {
-    font-size: 1rem; /* Smaller font size */
-    font-weight: bold;
-    padding: 0.5rem 1rem; /* Reduced padding */
+    font-size: 0.875rem;
+    font-weight: normal;
+    padding: 0.5rem 1rem;
     cursor: pointer;
-    color: #A0A0A0;
+    color: #666;
     position: relative;
     transition: color 0.3s ease;
 }
 
 
-
-
-
-
-
-
 .tab.active {
     color: #00A8A8;
+    font-weight: 500;
 }
-
-
-
-
-
-
 
 
 .tab.active::after {
     content: "";
     position: absolute;
     left: 0;
-    bottom: -2px;
+    bottom: -1px;
     width: 100%;
-    height: 2px;
+    height: 1px;
     background-color: #00A8A8;
 }
 
@@ -537,26 +520,12 @@ input[type="checkbox"] {
 }
 
 
-
-
-/* Add specific styling for checkbox column */
 .InternalTransfer table td:first-child,
 .InternalTransfer table th:first-child {
     width: 50px;
     padding: 0.5rem;
     text-align: center;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

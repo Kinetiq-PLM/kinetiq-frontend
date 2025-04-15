@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "../styles/DeliveryApproval.css";
 
-
-
-
 const BodyContent = () => {
     const [approvalStatus, setApprovalStatus] = useState("Pending");
     const [approvalDate, setApprovalDate] = useState("");
     const [approvedBy, setApprovedBy] = useState("");
 
-
     const current = new Date();
     const current_date = `${current.getFullYear()}-${(current.getMonth() + 1).toString().padStart(2, '0')}-${current.getDate().toString().padStart(2, '0')}`;
-
 
     const [deliveryapproval_data, setTableData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -22,11 +17,11 @@ const BodyContent = () => {
     const [employeeList, setEmployeeList] = useState([]);
     const [selectedApprovalBy, setSelectedApprovalBy] = useState("");
 
-   
     const handleCheckboxChange = (index, row) => {
         setSelectedRow(index);
         setSelectedData(row);
     };
+
 
     //Update logistics
     const handleSubmit = async () => {
@@ -39,6 +34,7 @@ const BodyContent = () => {
         const approval_date = current_date;
         const approved_by = selectedData.approved_by;
 
+
         if (
             approval_date === "" ||
             approved_by === "" ||
@@ -47,6 +43,7 @@ const BodyContent = () => {
             alert("All fields must have a value.");
             return;
         }
+
 
         const updatePayload = {
             approval_status,
@@ -69,8 +66,9 @@ const BodyContent = () => {
             alert("Error updating approval status.");
         }
         fetchData();
-        
+       
     };
+
 
     //Table Data
     const fetchData = async () => {
@@ -101,19 +99,17 @@ const BodyContent = () => {
         fetchData();
     }, []);
 
-
-
     const fetchEmployee = async () => {
         try {
           setLoading(true);
           const response = await fetch("http://127.0.0.1:8000/operation/supplier/");
           if (!response.ok) throw new Error("Connection to database failed");
-    
+   
           const data = await response.json();
-    
+   
           if (!Array.isArray(data.employees)) throw new Error("Invalid goods data format");
           setEmployeeList(data.employees)
-    
+   
         } catch (error) {
           alert(error.message);
         } finally {
@@ -122,17 +118,12 @@ const BodyContent = () => {
       };
       useEffect(() => {
         fetchEmployee();
-        
+       
       }, []);
-      
 
     return (
         <div className="deliveryApproval">
             <div className="body-content-container">
-
-
-
-
                 {/* Table Container */}
                 <div className="table-container">
                     <table>
@@ -147,7 +138,11 @@ const BodyContent = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {deliveryapproval_data.length > 0 ? (
+                            {loading ? (
+                                <tr>
+                                <td colSpan="7" className="text-center">Loading...</td>
+                                </tr>
+                            ) : deliveryapproval_data.length > 0 ? (
                                 deliveryapproval_data.map((row, index) => (
                                 <tr>
                                     <td>
@@ -158,7 +153,7 @@ const BodyContent = () => {
                                     </td>
                                     <td>{row.approval_request_id}</td>
                                     <td>{row.request_date}</td>
-                                    <td>{row.approval_status}</td>
+                                    <td className={`approval-status ${row.approval_status}`}>{row.approval_status}</td>
                                     <td>{row.approval_date}</td>
                                     <td>
                                         {employeeList.find(employee => employee.employee_id === row.approved_by)?.employee_name || "-----"}
@@ -167,23 +162,18 @@ const BodyContent = () => {
                                 ))
                             ) : (
                                 <tr>
-                                <td>No records found.</td>
+                                    <td colSpan="6" className="text-center text-gray-500">No records found.</td>
                                 </tr>
                             )}
                         </tbody>
-
                     </table>
                 </div>
                 {/* End of Table Container */}
-
-
-
-
                 {/* Form Container */}
                 <div className="form-container">
                     <div className="form-row">
                         <div className="form-group">
-                            <label>Delivery Request ID</label>
+                            <label>Request ID</label>
                             <span>{selectedData?.approval_request_id || ""}</span>
                         </div>
                         <div className="form-group date-requested">
@@ -192,9 +182,6 @@ const BodyContent = () => {
                         </div>
                         <div className="form-group spacer"></div> {/* Empty space for alignment */}
                     </div>
-
-
-
 
                     <div className="form-row">
                         <div className="form-group">
@@ -211,11 +198,10 @@ const BodyContent = () => {
                             <label>Approval Date</label>
                             <input
                                 type="date"
-                                value={current_date}
+                                value={selectedData?.approval_date || current_date}
                                 onChange={(e) => setSelectedData({ ...selectedData, approval_date: e.target.value })}
                                 readOnly
                             />
-                            
                         </div>
                         <div className="form-group">
                             <label>Approved By</label>
@@ -236,10 +222,9 @@ const BodyContent = () => {
                             </select>
                         </div>
                     </div>
-                </div>
+                </div>  
                 {/* End of Form Container */}
-
-
+ 
 
 
                 {/* Send To Button (Outside Form Container) */}
@@ -248,17 +233,24 @@ const BodyContent = () => {
                 </div>
 
 
-
-
             </div>
         </div>
     );
 };
 
-
-
-
 export default BodyContent;
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
