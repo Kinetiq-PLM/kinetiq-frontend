@@ -416,6 +416,7 @@ import { GET } from "../api/api";
         setIsAllocatedBudgetUpdated(false)
       },[activeTab])
 
+      
       const fetchApprovals = async () => {
         try {
           const data = await GET("/approvals/budget-submission-approvals/");
@@ -489,10 +490,6 @@ import { GET } from "../api/api";
         fetchRequestsApprovals();
       }, []);
 
-          
-           useEffect(() => {
-            fetchRequestsApprovals();
-          }, []);
 
       return (
         <div className="approvals">
