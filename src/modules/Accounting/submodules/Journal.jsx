@@ -9,12 +9,12 @@ import Search from '../components/Search';
 
 const Journal = () => {
     const columns = ["Journal Id", "Journal Date", "Description", "Debit", "Credit", "Invoice Id", "Currency Id"];
+    const [latestJournalId, setLatestJournalId] = useState(""); 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [data, setData] = useState([]);
-    const [searching, setSearching] = useState("");
     const [sortOrder, setSortOrder] = useState("asc");
-    const [sortBy, setSortBy] = useState("Debit"); // Default sort by Debit
-    const [latestJournalId, setLatestJournalId] = useState(""); // Store the latest journal ID
+    const [searching, setSearching] = useState("");
+    const [sortBy, setSortBy] = useState("Debit");
+    const [data, setData] = useState([]);
     const [journalForm, setJournalForm] = useState({
         journalDate: '',
         description: '',
@@ -28,19 +28,26 @@ const Journal = () => {
         message: "",
     });
 
+
     // Open modal function
     const openModal = () => setIsModalOpen(true);
+
 
     // Close modal function
     const closeModal = () => setIsModalOpen(false);
 
-    // Fetch data and retrieve the latest journal ID
+
+    // Fetch data from the API - Sort by: journal_date descending 
     const fetchData = () => {
         fetch('http://127.0.0.1:8000/api/journal-entries/')
             .then(response => response.json())
             .then(result => {
                 console.log('API Response (fetchData):', result);
-                setData(result.map(entry => [
+    
+                // Sort result by journal_date descending (latest first)
+                const sortedResult = result.sort((a, b) => new Date(b.journal_date || b.date) - new Date(a.journal_date || a.date));
+    
+                setData(sortedResult.map(entry => [
                     entry.journal_id || entry.id || '-',
                     entry.journal_date || entry.date || '-',
                     entry.description || '-',
@@ -49,11 +56,11 @@ const Journal = () => {
                     entry.invoice_id || '-',
                     entry.currency_id || '-'
                 ]));
-
-                // Get the latest journal ID
-                if (result.length > 0) {
-                    const lastJournal = result[result.length - 1];
-                    setLatestJournalId(lastJournal.journal_id || "ACC-JOE-2025-A00000"); // Default if no journal exists
+    
+                // Get the latest journal ID (first after sorting)
+                if (sortedResult.length > 0) {
+                    const latest = sortedResult[0];
+                    setLatestJournalId(latest.journal_id || "ACC-JOE-2025-A00000");
                 }
             })
             .catch(error => {
@@ -66,10 +73,12 @@ const Journal = () => {
                 });
             });
     };
+    
 
     useEffect(() => {
         fetchData();
     }, []);
+
 
     // Generate the next Journal ID
     const generateNextJournalId = () => {
@@ -85,6 +94,7 @@ const Journal = () => {
 
         return "ACC-JOE-2025-A00001"; // Fallback default
     };
+
 
     // Increment an alphanumeric string (e.g., "A1B2C3" -> "A1B2C4")
     const incrementAlphaNumeric = (str) => {
@@ -107,10 +117,12 @@ const Journal = () => {
         return chars.join('');
     };
 
+
     // Update the journal form state when an input field changes
     const handleInputChange = (field, value) => {
         setJournalForm(prevState => ({ ...prevState, [field]: value }));
     };
+
 
     // Handle submit with user validations
     const handleSubmit = () => {
@@ -170,6 +182,7 @@ const Journal = () => {
             });
     };
 
+
     // Handle sorting (applies to both Debit and Credit columns)
     const handleSort = (criteria) => {
         const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -190,6 +203,7 @@ const Journal = () => {
         setData(sortedData);
     };
 
+    
     // Search filtering
     const filteredData = data.filter(row =>
         [row[0], row[1], row[2], row[5], row[6]]
