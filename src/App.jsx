@@ -31,7 +31,7 @@ function App() {
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
 
-    // landing page
+  // landing page
   // const [showLanding, setShowLanding] = useState(false);
 
   // useEffect(() => {
@@ -333,6 +333,10 @@ function App() {
     "Project Management": "ProjectManagement",
     "Human Resources": "HumanResources",
     "Report Generator": "ReportGenerator",
+    // "Purchase Request": "PurchaseRequest",
+    // "Project Request": "ProjectRequest",
+    // "Workforce Request": "WorkforceRequest",
+    // "Job Posting": "JobPosting"
   };
 
   const moduleSubmoduleFileNames = {
