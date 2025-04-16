@@ -177,6 +177,8 @@
   height: auto;
   justify-content: space-between;
   border-radius: 15px;
+  padding-top: 5px;
+  padding-bottom: 10px;
 }
 
 .repgen .text-input {
@@ -187,15 +189,21 @@
   margin-left: 10px;
   outline: none;
   height: auto;
-  min-height: 40px;
-  max-height: 300px;
+  min-height: 40px; /* Fixed minimum height */
+  max-height: 120px; /* Maximum expanded height */
   resize: none;
   overflow-y: auto;
   word-wrap: break-word;
   padding-top: 10px;
   font-size: 16px;
   font-family: inter;
-  padding-top: 15px;
+  transition: min-height 0.2s ease; /* Smooth height transition */
+  line-height: 1.5; /* Ensure consistent line height */
+}
+
+/* Add this new class for expanded state */
+.repgen .text-input.expanded {
+  height: 120px;
 }
 
 .repgen .text-input::placeholder {
@@ -221,7 +229,7 @@
 
 .repgen .chat-history {
   display: flex;
-  width: 100%;
+  max-width: 100vh;
   flex-direction: column;
   gap: 10px;
   padding: 15px;
@@ -478,7 +486,7 @@
     flex: 1;
     overflow-y: scroll;
     padding: 10px;
-    max-height: 430px;
+    max-height: 500px;
 }
 
 .repgen .history-section {

@@ -133,8 +133,6 @@ function App() {
       "Recruitment": "Recruitment",
     },
     "Report Generator": {
-      "Custom Reports": "CustomReports",
-      "Data Visualization": "DataVisualization",
     },
   };
 
@@ -302,8 +300,8 @@ function App() {
               <img src={`/icons/Notification-${hasNotification ? "active-" : ""}logo.png`}
                 alt='Notificaton-Logo' onClick={() => setHasNotification(!hasNotification)}></img>
               <div className='header-profile-container'>
-                <div className='header-profile-icon'> <p>U</p></div>
-                <p className='header-profile-name'>Username</p>
+                <div className='header-profile-icon'> <p>C</p></div>
+                <p className='header-profile-name'>Crusch K.</p>
               </div>
             </div>
 
