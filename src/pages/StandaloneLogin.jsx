@@ -40,7 +40,7 @@ export default function StandaloneLogin() {
       if (new Date() < lock_date) {
         console.log('too many attempts timer, current attempts: ' + localStorage.getItem('login_attempts'))
         console.log('lock lifts at ' + lock_date.toString())
-        setLoginError(`*Too many failed login attempts. Please try again in ${Math.ceil((lock_date - new Date()) / 1000)} seconds.*`)
+        setLoginError(`* Too many failed login attempts. Please try again in ${Math.ceil((lock_date - new Date()) / 1000)} seconds. *`)
         return;
       }
 
@@ -73,7 +73,7 @@ export default function StandaloneLogin() {
         // django error payload
         const { message } = err.response.data;
         console.error("Login failed:", message);
-        setLoginError("*" + message + "*");
+        setLoginError("* " + message + " *");
         //alert(message); // backend error
       } else {
         console.error("Login error:", err);
@@ -165,7 +165,7 @@ export default function StandaloneLogin() {
     
         const result = await res.json();
         if (result.success) {
-          setLoginError(`* Password change for ${resetData.kinetiq_email} successful. *`);
+          setLoginError(`Password change for ${resetData.kinetiq_email} successful.`);
           localStorage.removeItem("reset_code");
           localStorage.removeItem("reset_email");
           setResetData(initialResetData);
@@ -293,7 +293,7 @@ export default function StandaloneLogin() {
                       }}
                       required
                     />
-                    {loginError && <p className="login-error">{loginError}</p>}
+                    {loginError && <p className="login-error" style={{ color: 'green' }}>{loginError}</p>}
                     <div className="button-back-container">
                       <button type="submit" className="login-btn">
                         Reset my password
