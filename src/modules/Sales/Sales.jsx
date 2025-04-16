@@ -7,11 +7,11 @@ const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
     Quotation: "Quotation",
     Order: "Order",
     Delivery: "Delivery",
-    // Invoice: "Invoice",
-    // "Blanket Agreement": "BlanketAgreement",
+    Invoice: "Invoice",
     "Master List": "MasterList",
+    Dunning: "Dunning",
     Reporting: "Reporting",
-    // Return: "Return",
+    Returns: "Returns",
   };
 
   return (

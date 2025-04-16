@@ -1,4 +1,3 @@
-import { AlignCenter } from "lucide-react";
 import React, { useState } from "react";
 
 const SearchBar = () => {
@@ -27,17 +26,14 @@ const SearchBar = () => {
 const styles = {
   container: {
     display: "flex",
-    backgroundColor: "#F7F9FB",
-    border: "1px solid rgb(239, 239, 239)",
-    borderRadius: "0.5rem",
-    width: "100%",
-    height: "2rem",
-    maxWidth: "20rem",
-    justifyContent: "center",
-    transition: "border 0.2s ease, box-shadow 0.2s ease",
-    boxSizing: "border-box",
     alignItems: "center",
-    paddingLeft: "0.5rem",
+    backgroundColor: "#F7F9FB",
+    border:"1px solid rgb(239, 239, 239)",
+    borderRadius: "0.5rem",
+    padding: "0.5rem",
+    width: "100%",
+    maxWidth: "20rem",
+    transition: "border 0.2s ease, box-shadow 0.2s ease",
   },
   icon: {
     width: "1rem",
@@ -51,8 +47,6 @@ const styles = {
     flex: 1,
     fontSize: "0.8rem",
     color: "#787878",
-    height: "100%",
-    margin: "0rem",
   },
 };
 
