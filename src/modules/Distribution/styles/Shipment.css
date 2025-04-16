@@ -290,7 +290,7 @@
 }
 
 .shipment .status-delivered::before {
-  background-color: #28a745;
+  background-color: #00ac28;
 }
 
 .shipment .status-failed::before {
@@ -469,6 +469,21 @@
   border-radius: 4px;
   font-size: 0.875rem;
   background-color: white;
+}
+
+.shipment .carrier-dropdown:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.carriers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 /* Cost editing section */
@@ -934,4 +949,105 @@
   background-color: #00a8a8;
   color: white;
   border-color: #00a8a8;
+}
+
+.map-container {
+  position: relative;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.map-loading, .map-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+  border-radius: 4px;
+  z-index: 10;
+}
+
+.map-error {
+  color: #dc3545;
+}
+
+/* Add these new styles at the end of your Shipment.css file */
+
+.shipment .icon-spacing {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.shipment .button-icon {
+  margin-right: 8px;
+}
+
+.shipment .icon-message {
+  display: flex;
+  align-items: flex-start;
+}
+
+.shipment .info-icon {
+  color: #007bff;
+  font-size: 20px;
+  margin-right: 10px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.shipment .warning-icon {
+  color: #dc3545;
+  font-size: 20px;
+  margin-right: 10px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.shipment .confirmation-message {
+  font-weight: 500;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.shipment .warning-content {
+  flex: 1;
+}
+
+.shipment .warning-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.shipment .warning-list {
+  margin: 0;
+  padding-left: 20px;
+  text-align: left;
+}
+
+.shipment .section-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.shipment .next-steps-list {
+  margin: 8px 0 0;
+  padding-left: 25px;
+}
+
+.shipment .next-steps-list li {
+  margin-bottom: 4px;
+}
+
+.shipment .confirm-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 150px;
+  justify-content: center;
 }

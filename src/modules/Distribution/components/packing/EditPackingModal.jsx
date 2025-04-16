@@ -339,14 +339,14 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           
           {/* Status message for packed items */}
           {isPacked && (
-            <div className="shipped-message">
+            <div className="completed-message">
               <span className="info-text">This packing list has been completed.</span>
             </div>
           )}
           
           {/* Status message for shipped items */}
           {isShipped && (
-            <div className="shipped-message">
+            <div className="completed-message">
               <span className="info-text">This packing list has been shipped and cannot be modified.</span>
             </div>
           )}

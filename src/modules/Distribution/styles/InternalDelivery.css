@@ -239,7 +239,7 @@
   background-color: #17a2b8;
 }
 
-.internal-delivery .status-cancelled::before {
+.internal-delivery .status-rejected::before {
   background-color: #dc3545;
 }
 

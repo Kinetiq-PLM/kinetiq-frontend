@@ -770,3 +770,94 @@
   color: white;
   border-color: #00a8a8;
 }
+
+/* Add these new styles at the end of your Picking.css file */
+
+.picking .icon-spacing {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.picking .button-icon {
+  margin-right: 8px;
+}
+
+.picking .icon-message {
+  display: flex;
+  align-items: flex-start;
+}
+
+.picking .info-icon {
+  color: #007bff;
+  font-size: 20px;
+  margin-right: 10px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.picking .confirmation-message {
+  font-weight: 500;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.picking .info-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.picking .section-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.picking .section-header.status-completed {
+  color: #28a745;
+}
+
+.picking .next-steps-list {
+  margin: 8px 0 0;
+  padding-left: 25px;
+  font-size: .9rem;
+}
+
+.picking .next-steps-list li {
+  margin-bottom: 4px;
+}
+
+.picking .picking-details.enhanced {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.picking .picking-details.enhanced .detail-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.picking .picking-details.enhanced .detail-item:last-child {
+  border-bottom: none;
+}
+
+.picking .detail-value.highlight {
+  font-weight: 600;
+  color: #007bff;
+}
+
+.picking .confirm-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 150px;
+  justify-content: center;
+}
+
