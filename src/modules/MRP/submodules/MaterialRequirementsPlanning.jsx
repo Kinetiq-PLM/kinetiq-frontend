@@ -106,7 +106,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     return (      
         <div className="reqplan">
             <div style={{width: '100%', height: '100%', padding: '2rem', background: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)', overflow: 'hidden', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', rowGap: 25,}}>
-                <div className="title">MRP LIST</div>
+                <div className="title">MATERIAL RESOURCE PLANNING LIST</div>
                 <div style={{width: '100%', maxWidth: 1300, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', rowGap: 10,paddingLeft: 80, paddingRight: 80,}}>
                     <div className="tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 15,flex: '1 1 auto', minWidth: 200,}}>
                         {['All Orders', 'Project Orders', 'Non-Project Orders'].map((label, i) => (
