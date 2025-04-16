@@ -3,16 +3,20 @@ import { useState } from "react";
 
 const InputCustomer = ({ label, value = "", customerListModal }) => {
   return (
-    <div className="flex justify-between mb-2 w-full">
-      <p className="flex-1 text-sm">{label}</p>
+    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
+      <p className="flex-1">{label}</p>
       <div
-        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
-        onClick={() => customerListModal(true)}
+        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded"
+        onClick={() => {
+          customerListModal(true);
+        }}
       >
-        <p className="text-sm">{value}</p>
+        <p className="text-sm truncate overflow-hidden whitespace-nowrap flex-1">
+          {value}
+        </p>
         <img
           src="/icons/information-icon.svg"
-          className="h-[15px]"
+          className="h-[15px] ml-2 flex-shrink-0"
           alt="info icon"
         />
       </div>

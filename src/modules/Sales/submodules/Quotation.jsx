@@ -157,13 +157,13 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
       )
     ).toFixed(2);
 
-    console.log(products);
     const totalDiscount = products.reduce(
       (acc, product) => acc + Number(product.discount),
       0
     );
 
-    const totalPrice = Number(totalBeforeDiscount);
+    const totalPrice =
+      Number(totalBeforeDiscount) + Number(totalTax) - Number(totalDiscount);
 
     setQuotationInfo({
       ...quotationInfo,

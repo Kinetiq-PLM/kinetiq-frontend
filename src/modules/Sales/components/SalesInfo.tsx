@@ -18,10 +18,12 @@ const InputCustomer = ({
           }
         }}
       >
-        <p className="text-sm">{value}</p>
+        <p className="text-sm truncate overflow-hidden whitespace-nowrap flex-1">
+          {value}
+        </p>
         <img
           src="/icons/information-icon.svg"
-          className="h-[15px]"
+          className="h-[15px] ml-2 flex-shrink-0"
           alt="info icon"
         />
       </div>

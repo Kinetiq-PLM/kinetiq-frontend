@@ -238,12 +238,12 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     ).toFixed(2);
 
     const totalDiscount = products.reduce(
-      (acc, product) => acc + product.discount,
+      (acc, product) => acc + Number(product.discount),
       0
     );
 
     const totalPrice =
-      Number(totalBeforeDiscount) - Number(totalDiscount) + Number(totalTax);
+      Number(totalBeforeDiscount) + Number(totalTax) - Number(totalDiscount);
     setDeliveryInfo((prevOrderInfo) => ({
       ...prevOrderInfo,
       customer_id: selectedCustomer.customer_id,
