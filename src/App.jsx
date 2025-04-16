@@ -37,6 +37,9 @@ function App() {
   useEffect(() => {
     if (activeModule || activeSubModule || showUserProfile) {
       setShowLanding(false);
+      localStorage.setItem("activeModule", activeModule);
+      localStorage.setItem("activeSubModule", activeSubModule);
+      localStorage.setItem("showUserProfile", JSON.stringify(showUserProfile));
     }
   }, [activeModule, activeSubModule, showUserProfile]);
 
@@ -49,6 +52,20 @@ function App() {
       setUser(JSON.parse(storedUser));
       console.log("User data loaded from localStorage:");
       console.log(localStorage.getItem("user"));
+
+      const storedModule = localStorage.getItem("activeModule");
+      const storedSubModule = localStorage.getItem("activeSubModule");
+      const storedShowUserProfile = localStorage.getItem("showUserProfile");
+
+      if (storedShowUserProfile === "true") {
+        setShowUserProfile(true);
+        setActiveModule(null);
+        setActiveSubModule(null);
+      } else if (storedModule) {
+        setActiveModule(storedModule);
+        if (storedSubModule && storedSubModule !== "null")
+          setActiveSubModule(storedSubModule);
+      }
     } else {
       setUser(null);
       navigate("/login", { replace: true }); // redirect to login if no user found
@@ -57,6 +74,9 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem("user"); // clear saved session
+    localStorage.removeItem("activeModule");
+    localStorage.removeItem("activeSubModule");
+    localStorage.removeItem("showUserProfile");
     setUser(null); // clear local user state
     navigate("/login"); // redirect to login
   };
@@ -602,7 +622,7 @@ function App() {
           <div className={`header-navi ${isSidebarOpen ? "squished" : ""}`}>
             <div
               className={`header-tabs-container ${
-                activeModule ? "visible" : "hidden"
+                !showUserProfile && activeModule ? "visible" : "hidden"
               }`}
             >
               <img
@@ -726,6 +746,8 @@ function App() {
                       onClick={() => {
                         setShowUserProfile(true);
                         setIsProfileMenuOpen(false);
+                        setActiveModule(null);
+                        setActiveSubModule(null);
                       }}
                     >
                       <img src="/icons/settings.png" />

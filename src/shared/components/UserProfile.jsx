@@ -117,10 +117,12 @@ const BodyContent = ({ employee_id }) => {
           <div className="user-image">{first_name?.charAt(0)}</div>
           <div className="user-details">
             <div className="user-name-pos">
-              <div className="user-name">{first_name} {last_name}</div>
+              <div className="user-name-email-container">
+                <div className="user-name">{first_name} {last_name}</div>
+                <div className="user-email">{email}</div>
+              </div>
               <div className="user-position">{role_name}</div>
             </div>
-            <div className="user-email">{email}</div>
           </div>
         </div>
       </div>

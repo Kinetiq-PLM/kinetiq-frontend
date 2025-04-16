@@ -1,7 +1,7 @@
 /* REMINDER! All of your elements must use your unique namespace '.usrprofile' at the start to avoid leaking */
 .usrprofile {
-  width: auto;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   border-radius: 0.5rem;
   background-color: white;
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
@@ -9,11 +9,27 @@
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  min-width: 100%;
-  min-height: 100%;
   overflow: auto;
   flex-wrap: wrap;
+  scrollbar-width: 1.5rem;
+  scrollbar-color: rgb(39, 164, 164) white; 
 }
+  /* Webkit (Chrome, Edge, Safari) */
+  .usrprofile::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  .usrprofile::-webkit-scrollbar-track {
+    background: white;
+    border-radius: 1rem;
+  }
+
+  .usrprofile::-webkit-scrollbar-thumb {
+    background-color: rgb(39, 164, 164);
+    border-radius: 1rem;
+    border: 0.1rem solid white;
+  }
+    
 
 .usrprofile .user-details-container{
   display: flex;
@@ -22,17 +38,18 @@
   gap: 2rem;
   height: auto;
   flex-wrap: wrap;
-  width: 95%;
+  width: 100%;
   margin: 2rem;
   position: relative;
-  border: 1px solid red;
 }
 
 .usrprofile .password-kinetiq-container {
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-self: center;
   margin-bottom: 2.5rem;
-  /* flex-wrap: wrap-reverse; */
+  padding: 0rem 2rem;
 }
 
 .usrprofile .user-details-container{
@@ -83,24 +100,23 @@
 .usrprofile .user-name-pos{
   display: flex;
   flex-direction: row;
-  border: 1px solid blue;
   margin-right: 2rem;
 }
 
 .usrprofile .user-name{
   font-size: 2rem;
   color: #008b8b;
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
   line-height: 2rem;
   text-align: right;
-  border: 1px solid red;
   width: fit-content;
 }
 
 .usrprofile .user-email{
   color: rgb(155, 160, 162);
   font-size: 0.85rem;
-  border: 1px solid red;
+  text-align: right;
+  margin-right: 0.75rem;
 }
 
 .usrprofile .user-position{
@@ -109,7 +125,6 @@
   font-style: italic;
   font-size: 1.35rem;
   color: #7ca2a2;
-  border: 1px solid red;
   width: fit-content;
 }
 
@@ -122,25 +137,24 @@
   height: auto;
   font-size: 0.8rem;
   color: #7d7d7d;
-  margin-left: 2rem;
+  margin-left: 3rem;
   font-size: 0.85rem;
-  padding: 0rem 3rem;
 }
 
 .usrprofile .role-details h3{
   font-size: 0.85rem;
+  width: 85%;
   color: #a2a2a2;
   margin-bottom: 0.2rem;
   letter-spacing: 0.25rem;
-  border-bottom: 1px solid #b4c0c0;
-  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #c0b4b4;
+  padding-bottom: 0.5rem;
 }
 
 .usrprofile .password-section{
   display: flex;
   flex-direction: column;
   width: 30rem;
-  margin-left: 3rem;
   align-items: center;
 }
 .usrprofile .password-section h3{
@@ -228,9 +242,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  border: 1px solid blue;
   margin-left: auto;
-  z-index: 1;
+  position: relative;
 }
 
 
@@ -280,36 +293,93 @@
 
 
 
-@media (max-width: 57rem) {
+@media (max-width: 1100px) {
   .usrprofile .user-details-container {
-    /* flex-direction: row-reverse; */
     align-items: center;
   }
 
-  .usrprofile .user-details-container img{
-    position: relative;
+  .usrprofile .user-name-pos{
+    flex-direction: column !important;
+    
   }
 
-  .usrprofile .user-name, .usrprofile .user-position {
-    min-width: 11rem;
+  .usrprofile .user-email, .usrprofile .user-name{
+    text-align: left;
+  }
+
+  .usrprofile .role-details{
+    margin-left: 0rem;
+  }
+
+  .usrprofile .user-position{
+    border-left:  none; 
+    padding-left: 0rem;
+    padding-top: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  .usrprofile .user-name-pos{
+    margin-left: 2rem;
+  }
+  .usrprofile .role-details{
+    width: 100% !important;
   }
 
   .usrprofile .password-kinetiq-container {
+    align-items: center!important;
+    flex-direction: column !important;
+    gap: 2rem;
+  }
+
+}
+
+@media (max-width: 880px) {
+  .usrprofile .user-email, 
+  .usrprofile .user-name,
+  .usrprofile .user-position{
+    text-align: center;
+  }
+
+  .usrprofile .user-email{
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+  }
+
+  .usrprofile .user-name{
+    margin-top: 1rem;
+  }
+  .usrprofile .user-name-pos{
     align-items: center;
-    flex-wrap: wrap-reverse;
-    width: 90%;
-    border: 1px solid red;
-    margin: 2rem;
+    justify-content: center;
+    margin: 0rem;
+  }
+  .usrprofile .user-details-container{
+    width: 100% !important;
+    flex-wrap: nowrap !important;
+    padding: 1rem !important;
+    margin: 0rem !important;
+  }
+  .usrprofile .role-details{
+    margin: 0;
+    padding-bottom: 1rem;
+  }
+  .usrprofile .user-info{
+    flex-direction: column !important;
+    width: 100% !important;
+    margin: 0;
+  }
+  
+  .usrprofile .password-section{
+    width: 100% !important;
+    margin-top: 1.5rem !important;
+  }
+  .usrprofile .user-details-container img{
+    display: none!important;
   }
 
-  .password-kinetiq-container .role-details{
-    margin-bottom: 2rem;
-  }
-
-  .password-kinetiq-container .password-section{
-    border: 1px solid red;
-    margin: auto;
-    width: 90%;
+  .usrprofile .password-kinetiq-container {
+    width: 100% !important;
+    margin: 0rem !important;
   }
 }
 
