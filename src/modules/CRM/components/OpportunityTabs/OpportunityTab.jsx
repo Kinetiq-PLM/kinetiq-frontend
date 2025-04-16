@@ -115,48 +115,54 @@ export default function OpportunityTab({ setActiveTab }) {
   return (
     <section className="h-full">
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+      <div className="mb-4">
         {/* Filters */}
-        <div className="flex flex-1/2 items-center space-x-2 gap-2 w-fit flex-wrap">
-          {/* Date Filter Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={dateFilters}
-              onChange={setDateFilter}
-              value={dateFilter}
-            />
+        <div className="flex justify-between gap-2 w-full flex-wrap">
+          <div className="h-fit items-center flex flex-row flex-1 space-x-4">
+            {/* Date Filter Dropdown */}
+            <div className="w-full max-w-[200px]">
+              <Dropdown
+                options={dateFilters}
+                onChange={setDateFilter}
+                value={dateFilter}
+              />
+            </div>
+
+            {/* Search By Dropdown */}
+            <div className="w-full max-w-[200px]">
+              <Dropdown
+                options={searchFields.map((field) => field.label)}
+                onChange={(selected) => {
+                  const field = searchFields.find((f) => f.label === selected);
+                  if (field) setSearchBy(field.key);
+                }}
+                value={searchFields.find((f) => f.key === searchBy)?.label}
+              />
+            </div>
+
+            {/* Search Input */}
+            <div className="flex items-center w-full max-w-[600px]">
+              <div className="h-[40px] w-full">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Search By Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={searchFields.map((field) => field.label)}
-              onChange={(selected) => {
-                const field = searchFields.find((f) => f.label === selected);
-                if (field) setSearchBy(field.key);
-              }}
-              value={searchFields.find((f) => f.key === searchBy)?.label}
-            />
-          </div>
-
-          {/* Search Input */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          {/* New Quotation Button (No onClick) */}
+          <Button
+            onClick={() => setActiveTab("Main Page")}
+            type="primary"
+            className={"!max-w-[200px] py-2 flex-1"}
+          >
+            New Campaign
+          </Button>
         </div>
-
-        {/* New Quotation Button (No onClick) */}
-        <Button
-          onClick={() => setActiveTab("Main Page")}
-          type="primary"
-          className={"w-[200px] py-2"}
-        >
-          New Opportunity
-        </Button>
       </div>
 
       {/* Table Section */}
