@@ -76,27 +76,9 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 167, 167, 0.3);
   } */
+
   
-  @media (max-width: 1200px) {
-    .landing-content {
-      left: 50%;
-      transform: translate(-50%, -50%);
-      max-width: 350px;
-      min-height: 340px;
-      margin-left: 60px; /* Space for sidebar */
-    }
-    
-    .landing-logo {
-      width: 200px;
-      padding-bottom: 2rem;
-    }
-    
-    .landing-content h1 {
-      font-size: 1.8rem;
-    }
-  }
-  
-  @media (max-width: 768px) {
+  @media (max-width: 600px) {
     .landing-content {
       padding: 1.5rem;
       max-width: 280px;
