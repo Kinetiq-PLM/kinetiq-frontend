@@ -31,7 +31,7 @@ function App() {
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
 
-    // landing page
+  // landing page
   const [showLanding, setShowLanding] = useState(true);
 
   useEffect(() => {
@@ -670,7 +670,7 @@ function App() {
                 alt={activeModule}
               />
               <div className="header-module-names">
-                <p 
+                <p
                   className={`header-module-name ${!activeSubModule ? "active" : "inactive"}`}
                   onClick={() => {
                     setActiveModule(activeModule);
