@@ -11,7 +11,7 @@
     overflow: hidden;
   }
   
-  .login-wrapper, .signup-wrapper {
+  .login-container .login-wrapper, .login-container .signup-wrapper {
     display: flex;
     flex-direction: row-reverse;
     background: #d6f1f0;
@@ -23,7 +23,7 @@
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   }
   
-  .login-left, .signup-left{
+  .login-container .login-left,  .login-container .signup-left{
     flex: 0 0 35%;
     display: flex;
     justify-content: center;
@@ -31,7 +31,7 @@
     padding: 0rem;
     min-width: 350px;
 }
-  .login-right, .signup-right{
+.login-container .login-right,  .login-container .signup-right{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -45,7 +45,7 @@
   
   
   /* Card Styles */
-  .login-card, .signup-card {
+  .login-container .login-card,  .login-container .signup-card {
     background: white;
     padding: 3rem 2.5rem 2.5rem;
     border-radius: 0.5rem;
@@ -59,21 +59,21 @@
     align-items: center;
   }
 
-  .login-form{
+  .login-container .login-form{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
   }
   
-  .login-form h2 {
+  .login-container  .login-form h2 {
     font-size: 1.5rem;
     font-weight: 700;
     text-align: center;
     color: #00a7a7;
   }
 
-  .login-form h3 {
+  .login-container .login-form h3 {
     font-size: 1rem;
     font-weight: 700;
     text-align: center;
@@ -81,28 +81,28 @@
     color: #00a7a7;
   }
 
-  .login-form h4 {
+  .login-container .login-form h4 {
     font-size: 0.8rem;
     font-weight: 400;
     margin-bottom: 0rem;
     color: #00a7a7;
   }
 
-  .login-form form, .login-form input{
+  .login-container .login-form form, .login-form input{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
   }
 
-  .login-pass-details {
+  .login-container .login-pass-details {
     font-size: 0.85rem;
     margin-bottom: 1.2rem;
     color: rgb(112, 112, 112);
     text-align: center;
   }
 
-  .email-form{
+  .login-container .email-form{
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -110,17 +110,17 @@
     width: fit-content;
   }
 
-  .email-form h4,
-.email-form input {
+  .login-container .email-form h4,
+  .login-container .email-form input {
   width: 100%;
   text-align: left;
 }
 
   
   /* Form Elements */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"] {
+  .login-container input[type="text"],
+  .login-container input[type="email"],
+  .login-container input[type="password"] {
     width: 100%;
     padding: 0.5rem 0.5rem;
     margin-bottom: 1rem;
@@ -129,34 +129,40 @@
     border: 1px solid #ccc;
   }
 
-  input[type="email"]{
+  .login-container input[type="email"]{
     font-size: 0.85rem;
     width: 18rem;
   }
   
-  input[type="text"]:focus,
-  input[type="email"]:focus,
-  input[type="password"]:focus {
+  .login-container input[type="text"]:focus,
+  .login-container input[type="email"]:focus,
+  .login-container input[type="password"]:focus {
     border: none;
     box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2); 
     outline: none;
   }
 
-  .password-wrapper {
+  .login-container .password-wrapper {
     position: relative;
     width: 100%;
+    display: flex;
+    align-items: center;
   }
-  
-  .eye-icon {
+
+  .login-container .password-wrapper input{
+    flex: 1;
+    padding-right: 2rem;
+  }
+
+  .login-container .password-wrapper .eye-icon {
     position: absolute;
-    right: 12px;
-    top: 12px;
+    right: 0.5rem;
     cursor: pointer;
     color: #888;
   }
   
   /* Options */
-  .login-options {
+  .login-container .login-options {
     display: flex;
     justify-content: space-between;
     gap: 2rem;
@@ -165,20 +171,20 @@
     margin-bottom: 0.5rem 0 1.5rem;
   }
   
-  .remember-me {
+  .login-container .remember-me {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     font-size: 0.8rem;
   }
   
-  .forgot-password {
+  .login-container .forgot-password {
     color: teal;
     text-decoration: none;
     font-size: 0.75rem;
   }
   
-  .button-back-container{
+  .login-container .button-back-container{
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -186,7 +192,7 @@
   }
 
   /* Buttons */
-  .login-btn {
+  .login-container .login-btn {
     background-color: #00a7a7;
     color: white;
     border: none;
@@ -201,11 +207,11 @@
     transition: background-color 0.2s;
   }
   
-  .login-btn:hover {
+  .login-container .login-btn:hover {
     background-color: #008b8b;
   }
 
-  .back-btn {
+  .login-container .back-btn {
     background-color: #b9b9b9;
     color: white;
     padding: 0.3rem 1rem;
@@ -217,30 +223,32 @@
     transition: background-color 0.2s;
   }
 
-  .back-btn:hover {
+  .login-container .back-btn:hover {
     background-color: #9f9f9f;
   }
 
-  .login-error{
+  .login-container .login-error{
     color: rgb(255, 128, 0);
     font-size: 0.75rem;
     font-style: italic;
     margin-bottom: 0.5rem;
+    width: 100%;
+    text-align: center;
   }
   
   /* Links */
-  .signup-link {
+  .login-container .signup-link {
     text-align: center;
     margin-top: 12px;
   }
   
-  .signup-link a {
+  .login-container .signup-link a {
     color: teal;
     text-decoration: none;
     font-size: 0.95rem;
   }
   
-  .kinetiq-logo {
+  .login-container .kinetiq-logo {
     margin-top: 180px;
     position: absolute;
     width: 100%;
@@ -251,7 +259,7 @@
     object-position: center;
 }
 
-input:-webkit-autofill {
+.login-container input:-webkit-autofill {
   background-color: white !important; 
   color: #000 !important;          
   -webkit-text-fill-color: #000 !important; 
@@ -259,7 +267,7 @@ input:-webkit-autofill {
 }
 
 
-  .signup-btn {
+.login-container .signup-btn {
     background-color: #00a7a7;
     color: white;
     border: none;
@@ -271,13 +279,9 @@ input:-webkit-autofill {
     cursor: pointer;
 }
 
-  .button-back-container{
-    
-  }
-
   
   /* Terms checkbox */
-  .terms-checkbox {
+  .login-container .terms-checkbox {
     display: flex;
     align-items: center;
     font-size: 0.9rem;
@@ -285,13 +289,13 @@ input:-webkit-autofill {
     margin: 1rem 0;
   }
   
-  .terms-checkbox a {
+  .login-container .terms-checkbox a {
     color: teal;
     text-decoration: none;
   }
   
   /* Modal styles (same for both) */
-  .modal-overlay {
+  .login-container .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -304,7 +308,7 @@ input:-webkit-autofill {
     z-index: 1000;
   }
   
-  .modal-content {
+  .login-container  .modal-content {
     background: white;
     border-radius: 12px;
     padding: 2rem;
@@ -315,17 +319,17 @@ input:-webkit-autofill {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
   
-  .modal-content h2 {
+  .login-container  .modal-content h2 {
     color: #00a7a7;
     margin-bottom: 1.5rem;
   }
   
-  .modal-body h3 {
+  .login-container .modal-body h3 {
     margin: 1rem 0 0.5rem;
     color: #333;
   }
   
-  .accept-btn {
+  .login-container  .accept-btn {
     background-color: #00a7a7;
     color: white;
     border: none;
@@ -336,14 +340,14 @@ input:-webkit-autofill {
     margin-top: 1rem;
   }
 
-    .auth-switch {
+  .login-container   .auth-switch {
     text-align: center;
     margin-top: 1.5rem;
     font-size: 0.85rem; 
     color: #666; 
   }
   
-  .auth-switch a {
+  .login-container .auth-switch a {
     color: #00a7a7; 
     text-decoration: none;
     font-weight: 500;
@@ -356,7 +360,7 @@ input:-webkit-autofill {
 
   /* Tablet Layout */
 @media (max-width: 800px) {
-  .login-wrapper {
+  .login-container  .login-wrapper {
     height: auto !important; 
     min-height: unset;
     margin-top: 2rem; 
@@ -364,18 +368,18 @@ input:-webkit-autofill {
     flex-direction: column;
 
   }
-  .login-container{
+  .login-container .login-container{
     height: auto; 
     min-height: 100vh; 
     padding: 2rem 20px; 
     align-items: flex-start; 
     justify-content: flex-start; 
   }
-  .login-right {
+  .login-container .login-right {
     display: none;
   }
 
-  .kinetiq-logo {
+  .login-container .kinetiq-logo {
     width: 280px; 
     height: auto;
     max-width: 80%;
@@ -383,7 +387,7 @@ input:-webkit-autofill {
     display: block; 
   }
 
-  .login-left {
+  .login-container  .login-left {
     padding: 0.8rem;
     flex: 1;
     border-radius: 12px;

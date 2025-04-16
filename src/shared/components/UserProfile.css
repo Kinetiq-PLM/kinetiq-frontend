@@ -57,6 +57,7 @@
   font-size: 0.8rem;
   color: #7d7d7d;
   gap: 1rem;
+  margin-left: 2rem ;
 }
 
 .usrprofile .user-details strong, .usrprofile .role-details strong{
@@ -113,6 +114,7 @@
   width: 40rem;
   margin-left: 3rem;
   align-items: center;
+  border: 1px solid red;
 }
 
 .usrprofile .reset-pass {
@@ -165,3 +167,34 @@
   color: #888;
 }
 
+.usrprofile .user-info{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+@media (max-width: 69rem) {
+  .usrprofile .user-details-container {
+    flex-direction: row-reverse;
+  }
+
+  .usrprofile .user-info{
+    position: relative;
+    right: 25%;
+  }
+
+  .usrprofile .user-details-container img{
+    position: absolute;
+    opacity: 70%;
+  }
+}
+
+.usrprofile .login-error{
+  color: rgb(255, 128, 0);
+  font-size: 0.75rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  text-align: center;
+}

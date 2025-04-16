@@ -1,4 +1,4 @@
-@keyframes fadeIn {
+@keyframes fadeInModule {
   from {
     opacity: 0;
     transform: translateX(-0.25rem);
@@ -10,7 +10,19 @@
 }
 
 .fade-in {
-  animation: fadeIn 0.4s ease-in-out;
+  animation: fadeInModule 0.4s ease-in-out;
+}
+
+@media (max-width: 55rem) {
+  .header-module-name.inactive {
+    display: none;
+  }
+}
+
+@media (max-width: 46rem) {
+  .header-navi.squished .header-module-names {
+    display: none;
+  }
 }
 
 @media (max-width: 40rem) {
@@ -30,10 +42,6 @@
     display: none;
   }
 
-  .header-module-name {
-    display: none;
-  }
-
   .header-submodule-name{
     width: 4.5rem;
     overflow: hidden;
@@ -42,9 +50,5 @@
   .header-submodule-name p{
     width: 4.5rem;
     text-overflow: ellipsis;
-  }
-
-  .header-navi.squished .header-module-names {
-    display: none;
   }
 }

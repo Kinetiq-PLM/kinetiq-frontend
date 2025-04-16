@@ -6,6 +6,7 @@ import UserProfile from "./shared/components/UserProfile";
 import { Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { User } from "lucide-react";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -29,6 +30,23 @@ function App() {
 
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
+
+  // landing page
+  const [showLanding, setShowLanding] = useState(true);
+
+  useEffect(() => {
+    if (!localStorage.getItem('landingSeen')) {
+      setShowLanding(true);
+      localStorage.setItem('landingSeen', 'true');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeModule && showLanding) {
+      setShowLanding(false);
+    }
+  }, [activeModule, showLanding]);
+
 
   const navigate = useNavigate();
 
@@ -319,6 +337,10 @@ function App() {
     "Project Management": "ProjectManagement",
     "Human Resources": "HumanResources",
     "Report Generator": "ReportGenerator",
+    // "Purchase Request": "PurchaseRequest",
+    // "Project Request": "ProjectRequest",
+    // "Workforce Request": "WorkforceRequest",
+    // "Job Posting": "JobPosting"
   };
 
   const moduleSubmoduleFileNames = {
@@ -454,13 +476,14 @@ function App() {
       )
     );
 
-  const modulesIcons = Object.keys(moduleFileNames).map((module) => ({
+  const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
     id: module,
-    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
+    icon: `/icons/module-icons/${filteredModuleFileNames[module]}.png`,
   }));
 
   return (
     <div className="shell">
+      {showLanding && <LandingPage />}
       <div className="shell-container">
         {/* collapsible menu */}
 
@@ -648,8 +671,7 @@ function App() {
               />
               <div className="header-module-names">
                 <p
-                  className={`header-module-name ${!activeSubModule ? "active" : ""
-                    }`}
+                  className={`header-module-name ${!activeSubModule ? "active" : "inactive"}`}
                   onClick={() => {
                     setActiveModule(activeModule);
                     //loadMainModule(activeModule);
@@ -659,7 +681,6 @@ function App() {
                 >
                   {activeModule}
                 </p>
-
                 <p className="fade-in">{activeSubModule ? ` > ` : ""}</p>
                 <p id="header-submodule-name" className="fade-in">
                   {activeSubModule ? activeSubModule : ""}

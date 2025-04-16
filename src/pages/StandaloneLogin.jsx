@@ -159,7 +159,9 @@ export default function StandaloneLogin() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: resetData.kinetiq_email,
-          newPassword: resetData.newPassword
+          newPassword: resetData.newPassword,
+          oldPassword: '',
+          passreq: false
         }),
       });
 
