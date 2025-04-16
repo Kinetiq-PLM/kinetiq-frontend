@@ -268,13 +268,6 @@
     font-size: 13px;
   }
 
-  .reqplan .table-cell::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: #444;
-    flex: 1;
-    text-align: left;
-  }
 
   .reqplan .table-cell span {
     flex: 2;
@@ -298,41 +291,15 @@
 }
 
 @media (max-width: 645px) {
-  .reqplan .reqplan-table-scroll {
-    max-width: 420px;
-    width: 100%;
-    overflow-y: auto;
-    max-height: 350px;
-    height: 100%;
-    flex-direction: column;
-  }
-
-  .reqplan .table-cell {
-    font-size: 10px !important;
-    padding: 4px 6px !important;
-    border-bottom: '0px solid #E8E8E8',
-  }
+ 
 }
 
 
 
 @media (max-width: 480px) {
-  .reqplan .table-cell {
-    font-size: 10px !important;
-    padding: 4px 6px !important;
-    border-bottom: '0px solid #E8E8E8',
-  }
-
   .reqplan .table-header{
     border-bottom: '0px solid #E8E8E8';
     display: none;
-  }
-
-  .reqplan .reqplan-table-scroll {
-
-    padding-right: 0rem !important;
-    padding-left: 0rem;
-
   }
 }
 
