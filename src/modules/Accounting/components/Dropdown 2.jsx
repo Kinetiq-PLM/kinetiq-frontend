@@ -3,7 +3,7 @@ import './Dropdown.css';
 
 const Dropdown = ({ options, style, defaultOption, onChange, value }) => { // Add onChange and value
     return (
-        <div className='accounting-dropdown'>
+        <div>
             <select className={`dropdown dropdown-${style}`} value={value} onChange={(e) => onChange(e.target.value)}>
                 <option value="" defaultChecked>{defaultOption}</option>
                 {options.map((option, index) => (

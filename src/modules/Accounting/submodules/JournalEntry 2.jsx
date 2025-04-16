@@ -5,7 +5,7 @@ import Button from "../components/Button";
 import Forms from "../components/Forms";
 import NotifModal from "../components/modalNotif/NotifModal";
 import Dropdown from "../components/Dropdown";
-import AddAccountModal from "../components/AddAccountModal";
+import AddAccountModal from "../components/modalJournalEntry/AddAccountModal";
 
 const JournalEntry = () => {
   // Use states
@@ -27,10 +27,9 @@ const JournalEntry = () => {
   });
 
 
+  // Handle input changes for amount fields
   const handleInputChange = (index, field, value) => {
-    // Allow only digits and decimal point
-    const sanitizedValue = value.replace(/[^0-9.]/g, "");
-  
+    const sanitizedValue = value.replace(/,/g, "");
     setJournalForm((prevState) => {
       const updatedTransactions = prevState.transactions.map((entry, i) =>
         i === index ? { ...entry, [field]: sanitizedValue } : entry
@@ -39,7 +38,6 @@ const JournalEntry = () => {
       return { ...prevState, transactions: updatedTransactions };
     });
   };
-  
 
 
   // Add a new transaction entry
@@ -78,58 +76,19 @@ const JournalEntry = () => {
   };
 
 
+  // Handle adding selected account from modal
   const handleAddAccount = (accountData) => {
     setJournalForm((prevState) => {
       const updatedTransactions = prevState.transactions.map((entry, i) =>
         i === selectedIndex
-          ? {
-              ...entry,
-              glAccountId: accountData.glAccountId,
-              accountName: accountData.accountName,
-            }
+          ? { ...entry, glAccountId: accountData.glAccountId, accountName: accountData.accountName }
           : entry
       );
-  
-      // Check for the specific debit account code
-      const isTargetDebit =
-        accountData.glAccountId === "ACC-COA-2025-AE6010" &&
-        prevState.transactions[selectedIndex].type === "debit";
-  
-      if (isTargetDebit) {
-        const creditEntries = [
-          // CL2060 - Contributions
-          { glAccountId: "ACC-COA-2025-CL2060", accountName: "SSS Contribution" },
-          { glAccountId: "ACC-COA-2025-CL2060", accountName: "Philhealth Contribution" },
-          { glAccountId: "ACC-COA-2025-CL2060", accountName: "Pagibig Contribution" },
-  
-          // CL2030 - Tax
-          { glAccountId: "ACC-COA-2025-CL2030", accountName: "Tax" },
-  
-          // CL2060 - Deductions
-          { glAccountId: "ACC-COA-2025-CL2060", accountName: "Late Deduction" },
-          { glAccountId: "ACC-COA-2025-CL2060", accountName: "Absent Deduction" },
-          { glAccountId: "ACC-COA-2025-CL2060", accountName: "Undertime Deduction" },
-          { glAccountId: "", accountName: "" },
-        ];
-  
-        creditEntries.forEach((credit) => {
-          updatedTransactions.push({
-            type: "credit",
-            glAccountId: credit.glAccountId,
-            amount: "",
-            accountName: credit.accountName,
-          });
-        });
-      }
-  
       return { ...prevState, transactions: updatedTransactions };
     });
-  
     setIsAccountModalOpen(false);
     setSelectedIndex(null);
   };
-  
-  
 
   
   // Submit journal entry to backend without entry_line_id w/ user validations
@@ -252,7 +211,7 @@ const JournalEntry = () => {
 
         <div className="parent-component-container">
           <div className="flex justify-between gap-x-5">
-            <div className="flex items-end gap-x-5 w-auto">
+            <div className="flex gap-x-5 w-auto">
               <div className="flex flex-col">
                 <label htmlFor="journalId">Journal ID*</label>
                 <Dropdown
@@ -318,8 +277,7 @@ const JournalEntry = () => {
               <div className="column debit-column">
                 {entry.type === "debit" && (
                   <Forms
-                    type="text"
-                    inputMode="decimal"
+                    type="number"
                     placeholder="Enter Debit"
                     value={entry.amount}
                     onChange={(e) => handleInputChange(index, "amount", e.target.value)}
@@ -331,8 +289,7 @@ const JournalEntry = () => {
               <div className="column credit-column">
                 {entry.type === "credit" && (
                   <Forms
-                    type="text"
-                    inputMode="decimal"
+                    type="number"
                     placeholder="Enter Credit"
                     value={entry.amount}
                     onChange={(e) => handleInputChange(index, "amount", e.target.value)}

@@ -3,13 +3,12 @@ import "../styles/accounting-styling.css";
 import Table from "../components/Table";
 import Search from "../components/Search";
 
-const AccountsPayable = () => {
-  // Use States
+const AccountsReceivable = () => {
+  // Use states
   const [data, setData] = useState([]);
   const [searching, setSearching] = useState("");
   const columns = [
-    "Entry Line ID",
-    "GL Account ID",
+    "GL Account ID", // Fixed casing to match convention
     "Account Name",
     "Journal ID",
     "Debit",
@@ -18,7 +17,7 @@ const AccountsPayable = () => {
   ];
 
 
-  // Fetch Data
+  // Fetch data
   const fetchData = () => {
     fetch("http://127.0.0.1:8000/api/general-ledger-jel-view/")
       .then((response) => response.json())
@@ -27,12 +26,11 @@ const AccountsPayable = () => {
         const combinedData = result
           .filter(
             (entry) =>
-              (entry.account_name === "Accounts Payable" ||
-                entry.account_name === "Cash in Bank") &&
+              (entry.account_name === "Accounts Receivable" ||
+                entry.account_name === "Sales Revenue") &&
               (entry.debit_amount != 0 || entry.credit_amount != 0)
           )
           .map((entry) => [
-            entry.entry_line_id,
             entry.gl_account_id || "N/A", // 1: GL Account ID
             entry.account_name || "No Account", // 2: Account Name
             entry.journal_id || "-", // 3: Journal ID
@@ -40,7 +38,7 @@ const AccountsPayable = () => {
             parseFloat(entry.credit_amount || "0.00").toFixed(2), // 5: Credit
             entry.description || "-", // 6: Description
           ]);
-        console.log("Combined AP and Cash Data:", combinedData);
+        console.log("Combined AR and Sales Data:", combinedData);
         setData(combinedData);
       })
       .catch((error) => console.error("Error fetching data:", error));
@@ -51,14 +49,14 @@ const AccountsPayable = () => {
   }, []);
 
 
-  // Calculates the total for debit and credit
-  const totalDebit = data.reduce((sum, row) => sum + parseFloat(row[4]) || 0, 0); // Debit (index 3)
-  const totalCredit = data.reduce((sum, row) => sum + parseFloat(row[5]) || 0, 0); // Credit (index 4)
+  // Calculates the total debit and credit
+  const totalDebit = data.reduce((sum, row) => sum + (parseFloat(row[3]) || 0), 0); // Fixed to Debit (index 4)
+  const totalCredit = data.reduce((sum, row) => sum + (parseFloat(row[4]) || 0), 0); // Fixed to Credit (index 5)
+  
 
-
-  // Search Sorting 
+  // Search Filter based on columns
   const filteredData = data.filter((row) =>
-    [row[0], row[1], row[2], row[5]]
+    [row[0], row[1], row[2], row[5]] 
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
@@ -66,18 +64,17 @@ const AccountsPayable = () => {
   );
 
 
-  // Format the money with comma
+  // Format the total with comma
   const formatNumber = (num) =>
     num.toLocaleString("en-US", { minimumFractionDigits: 2 });
   const formattedTotalDebit = formatNumber(totalDebit);
   const formattedTotalCredit = formatNumber(totalCredit);
 
-
   return (
-    <div className="accountsPayable">
+    <div className="accountsReceivable">
       <div className="body-content-container">
         <div className="title-subtitle-container">
-          <h1 className="subModule-title">Accounts Payable</h1>
+          <h1 className="subModule-title">Accounts Receivable</h1>
         </div>
         <div className="parent-component-container">
           <Search
@@ -100,4 +97,4 @@ const AccountsPayable = () => {
   );
 };
 
-export default AccountsPayable;
+export default AccountsReceivable;

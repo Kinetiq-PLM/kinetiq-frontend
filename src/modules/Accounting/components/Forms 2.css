@@ -1,15 +1,15 @@
-.accounting-forms .input-container {
+.input-container {
   display: flex;
   flex-direction: column;
 }
 
-.accounting-forms label {
+label {
   font-size: 12px;
   color: #646464; /* Gray text for label */
   margin-bottom: 5px;
 }
 
-.accounting-forms .input-component {
+.input-component {
   width: 100%;
   padding: 10px 12px;
   border: none;
@@ -23,14 +23,14 @@
   transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-.accounting-forms .input-component:focus {
+.input-component:focus {
   border-color: #006767;
   box-shadow: 0px 2px 4px rgba(0, 103, 103, 0.2);
 }
 
 /* Customize number input spinner buttons */
-.accounting-forms .input-component[type="number"]::-webkit-inner-spin-button,
-.accounting-forms .input-component[type="number"]::-webkit-outer-spin-button {
+.input-component[type="number"]::-webkit-inner-spin-button,
+.input-component[type="number"]::-webkit-outer-spin-button {
   background: white;
   color: black;
   border-radius: 3px;
@@ -38,7 +38,7 @@
   height: 16px;
 }
 
-.accounting-forms .input-component::placeholder {
+.input-component::placeholder {
   color: #969696;
 }
 
@@ -46,10 +46,10 @@
 
 /* Mobile (small) ≤ 480px */
 @media (max-width: 480px) {
-  .accounting-forms label {
+  label {
     font-size: 10px;
   }
-  .accounting-forms .input-component {
+  .input-component {
     font-size: 12px;
     padding: 6px 8px;
   }
@@ -57,7 +57,7 @@
 
 /* Mobile (large) ≤ 768px */
 @media (max-width: 768px) {
-  .accounting-forms .input-component {
+  .input-component {
     font-size: 13px;
     padding: 7px 9px;
   }
@@ -65,7 +65,7 @@
 
 /* Tablet 769px – 1024px */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .accounting-forms .input-component {
+  .input-component {
     font-size: 14px;
     padding: 8px 10px;
   }
@@ -73,7 +73,7 @@
 
 /* Small Desktop 1025px – 1280px */
 @media (min-width: 1025px) and (max-width: 1280px) {
-  .accounting-forms .input-component {
+  .input-component {
     font-size: 15px;
     padding: 8px 10px;
   }

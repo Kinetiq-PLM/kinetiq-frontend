@@ -3,19 +3,19 @@ import '../styles/accounting-styling.css';
 import Button from '../components/Button';
 import Dropdown from '../components/Dropdown';
 import Table from '../components/Table';
-import JournalModalInput from '../components/JournalModalInput';
+import JournalModalInput from '../components/modalJournal/JournalModalInput';
 import NotifModal from '../components/modalNotif/NotifModal';
 import Search from '../components/Search';
 
 const Journal = () => {
+    // Use state
     const columns = ["Journal Id", "Journal Date", "Description", "Debit", "Credit", "Invoice Id", "Currency Id"];
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [data, setData] = useState([]);
     const [searching, setSearching] = useState("");
     const [sortOrder, setSortOrder] = useState("asc");
-    const [sortBy, setSortBy] = useState("Debit"); // Default sort by Debit
-    const [latestJournalId, setLatestJournalId] = useState(""); // Store the latest journal ID
     const [journalForm, setJournalForm] = useState({
+        journalId: '',
         journalDate: '',
         description: '',
         currencyId: '',
@@ -28,93 +28,52 @@ const Journal = () => {
         message: "",
     });
 
+
     // Open modal function
     const openModal = () => setIsModalOpen(true);
+
 
     // Close modal function
     const closeModal = () => setIsModalOpen(false);
 
-    // Fetch data and retrieve the latest journal ID
+
+    // Data formatting 
+    const formatData = (result) => result.map(entry => [
+        entry.journal_id || entry.id || '-',
+        entry.journal_date || entry.date || '-',
+        entry.description || '-',
+        entry.total_debit || 0,
+        entry.total_credit || 0,
+        entry.invoice_id || '-',
+        entry.currency_id || '-'
+    ]);
+
+
+    // Fetch data
     const fetchData = () => {
         fetch('http://127.0.0.1:8000/api/journal-entries/')
             .then(response => response.json())
             .then(result => {
                 console.log('API Response (fetchData):', result);
-                setData(result.map(entry => [
-                    entry.journal_id || entry.id || '-',
-                    entry.journal_date || entry.date || '-',
-                    entry.description || '-',
-                    entry.total_debit || 0,
-                    entry.total_credit || 0,
-                    entry.invoice_id || '-',
-                    entry.currency_id || '-'
-                ]));
-
-                // Get the latest journal ID
-                if (result.length > 0) {
-                    const lastJournal = result[result.length - 1];
-                    setLatestJournalId(lastJournal.journal_id || "ACC-JOE-2025-A00000"); // Default if no journal exists
-                }
+                setData(formatData(result));
             })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                setValidation({
-                    isOpen: true,
-                    type: "error",
-                    title: "Error Fetching Data",
-                    message: "Unable to fetch journal entries. Please try again later.",
-                });
-            });
+            .catch(error => console.error('Error fetching data:', error));
     };
 
     useEffect(() => {
         fetchData();
     }, []);
 
-    // Generate the next Journal ID
-    const generateNextJournalId = () => {
-        if (!latestJournalId) return "ACC-JOE-2025-A00001"; // Default for the first journal ID
 
-        // Extract the alphanumeric part (e.g., "A1B2C3")
-        const matches = latestJournalId.match(/ACC-JOE-2025-([A-Z0-9]+)$/);
-        if (matches && matches[1]) {
-            const lastIncrement = matches[1];
-            const nextIncrement = incrementAlphaNumeric(lastIncrement);
-            return `ACC-JOE-2025-${nextIncrement}`;
-        }
-
-        return "ACC-JOE-2025-A00001"; // Fallback default
-    };
-
-    // Increment an alphanumeric string (e.g., "A1B2C3" -> "A1B2C4")
-    const incrementAlphaNumeric = (str) => {
-        // Validate input (only allow alphanumeric characters)
-        if (!/^[A-Z0-9]+$/.test(str)) {
-            throw new Error("Invalid alphanumeric string");
-        }
-
-        const chars = str.split('');
-        for (let i = chars.length - 1; i >= 0; i--) {
-            if (chars[i] === 'Z') {
-                chars[i] = 'A';
-            } else if (chars[i] === '9') {
-                chars[i] = '0';
-            } else {
-                chars[i] = String.fromCharCode(chars[i].charCodeAt(0) + 1);
-                break;
-            }
-        }
-        return chars.join('');
-    };
-
-    // Update the journal form state when an input field changes
+    // Update the report form state when an input field changes
     const handleInputChange = (field, value) => {
         setJournalForm(prevState => ({ ...prevState, [field]: value }));
     };
 
-    // Handle submit with user validations
+
+    // Handle submit w/ user validations
     const handleSubmit = () => {
-        if (!journalForm.journalDate || !journalForm.description || !journalForm.invoiceId || !journalForm.currencyId) {
+        if (!journalForm.journalDate && !journalForm.journalId && !journalForm.description && !journalForm.invoiceId && !journalForm.currencyId) {
             setValidation({
                 isOpen: true,
                 type: "warning",
@@ -124,11 +83,58 @@ const Journal = () => {
             return;
         }
 
-        // Generate the next journal ID automatically
-        const nextJournalId = generateNextJournalId();
+        if (!journalForm.journalDate) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Journal Date",
+                message: "Please set the journal date.",
+            });
+            return;
+        }
+
+        if (!journalForm.journalId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Journal ID",
+                message: "Please fill in journal ID.",
+            });
+            return;
+        }
+
+        if (!journalForm.description) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Description",
+                message: "Please fill in description.",
+            });
+            return;
+        }
+
+        if (!journalForm.invoiceId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Invoice ID",
+                message: "Please fill in invoice ID.",
+            });
+            return;
+        }
+
+        if (!journalForm.currencyId) {
+            setValidation({
+                isOpen: true,
+                type: "warning",
+                title: "Missing Currency ID",
+                message: "Please fill in currency ID.",
+            });
+            return;
+        }
 
         const payload = {
-            journal_id: nextJournalId, // Auto-generate the journal ID
+            journal_id: journalForm.journalId,
             journal_date: journalForm.journalDate,
             description: journalForm.description,
             total_debit: "0.00",
@@ -147,13 +153,13 @@ const Journal = () => {
             .then(({ ok, data }) => {
                 if (ok) {
                     fetchData();
-                    setJournalForm({ journalDate: '', description: '', currencyId: '', invoiceId: '' });
+                    setJournalForm({ journalId: '', journalDate: '', description: '', currencyId: '', invoiceId: '' });
                     closeModal();
                     setValidation({
                         isOpen: true,
                         type: "success",
-                        title: "Journal Added",
-                        message: "Journal added successfully!",
+                        title: "Journal ID Added",
+                        message: "Journal ID added successfully!",
                     });
                 } else {
                     throw new Error(data.detail || 'Failed to create journal');
@@ -165,30 +171,36 @@ const Journal = () => {
                     isOpen: true,
                     type: "error",
                     title: "Error Adding Journal",
-                    message: "Check your database connection.",
+                    message: "Check you database connection.",
                 });
             });
     };
 
-    // Handle sorting (applies to both Debit and Credit columns)
-    const handleSort = (criteria) => {
+
+    // Function to handle sorting (applies to both debit and credit columns)
+    const handleSort = () => {
         const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
         setSortOrder(newSortOrder);
-        setSortBy(criteria);
 
         const sortedData = [...data].sort((a, b) => {
-            const valueA = parseFloat(a[columns.indexOf(criteria)]) || 0; // Sort by selected criteria
-            const valueB = parseFloat(b[columns.indexOf(criteria)]) || 0;
+            const debitA = parseFloat(a[3]) || 0;
+            const debitB = parseFloat(b[3]) || 0;
+            const creditA = parseFloat(a[4]) || 0;
+            const creditB = parseFloat(b[4]) || 0;
+
+            const sortByDebit = debitA - debitB;
+            const sortByCredit = creditA - creditB;
 
             if (newSortOrder === "asc") {
-                return valueA - valueB;
+                return sortByDebit !== 0 ? sortByDebit : sortByCredit;
             } else {
-                return valueB - valueA;
+                return sortByDebit !== 0 ? -sortByDebit : -sortByCredit;
             }
         });
 
         setData(sortedData);
     };
+
 
     // Search filtering
     const filteredData = data.filter(row =>
@@ -208,22 +220,12 @@ const Journal = () => {
 
                 <div className="parent-component-container">
                     <div className="component-container">
-                        <Dropdown
-                            options={["Debit", "Credit"]}
-                            style="selection"
-                            defaultOption="Sort By.."
-                            onChange={(e) => handleSort(e.target.value)} // Pass sorting criteria
-                        />
-                        <Search
-                            type="text"
-                            placeholder="Search.. "
-                            value={searching}
-                            onChange={(e) => setSearching(e.target.value)}
-                        />
+                        <Dropdown options={["Ascending", "Descending"]} style="selection" defaultOption="Sort Debit Credit.." onChange={handleSort} />
+                        <Search type="text" placeholder="Search.. " value={searching} onChange={(e) => setSearching(e.target.value)} />
                     </div>
 
                     <div className='component-container'>
-                        <Button name="Create Journal Entry" variant="standard2" onclick={openModal} />
+                        <Button name="Create Journal ID" variant="standard2" onclick={openModal} />
                     </div>
                 </div>
 

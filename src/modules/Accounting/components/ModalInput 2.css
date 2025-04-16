@@ -1,4 +1,4 @@
-.accounting-modal .modal-overlay {
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -11,7 +11,7 @@
   z-index: 9999; /* Ensure it's in front of everything */
 }
 
-.accounting-modal .modal-container {
+.modal-container {
   background: white;
   padding: 20px;
   border-radius: 10px;
@@ -21,40 +21,40 @@
   position: relative; /* Ensure stacking inside overlay */
 }
 
-.accounting-modal .modal-header {
+.modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 }
 
-.accounting-modal .form-group {
+.form-group {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.accounting-modal .close-btn {
+.close-btn {
   background: none;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
 }
 
-.accounting-modal .modal-body {
+.modal-body {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-top: 10px;
 }
 
-.accounting-modal .modal-footer {
+.modal-footer {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-.accounting-modal input[type="date"] {
+input[type="date"] {
   text-align: center;
   padding: 0 1rem;
   color: rgb(69, 69, 69);
@@ -62,9 +62,4 @@
   background-color: white; /* White background */
   border-radius: 3px; /* Optional: Rounded corners */
   cursor: pointer;
-}
-
-.accounting-modal label {
-  font-size: 12px;
-  color: #646464; 
 }

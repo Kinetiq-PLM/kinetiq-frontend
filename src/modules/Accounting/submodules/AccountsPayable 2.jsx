@@ -8,7 +8,6 @@ const AccountsPayable = () => {
   const [data, setData] = useState([]);
   const [searching, setSearching] = useState("");
   const columns = [
-    "Entry Line ID",
     "GL Account ID",
     "Account Name",
     "Journal ID",
@@ -32,7 +31,6 @@ const AccountsPayable = () => {
               (entry.debit_amount != 0 || entry.credit_amount != 0)
           )
           .map((entry) => [
-            entry.entry_line_id,
             entry.gl_account_id || "N/A", // 1: GL Account ID
             entry.account_name || "No Account", // 2: Account Name
             entry.journal_id || "-", // 3: Journal ID
@@ -52,8 +50,8 @@ const AccountsPayable = () => {
 
 
   // Calculates the total for debit and credit
-  const totalDebit = data.reduce((sum, row) => sum + parseFloat(row[4]) || 0, 0); // Debit (index 3)
-  const totalCredit = data.reduce((sum, row) => sum + parseFloat(row[5]) || 0, 0); // Credit (index 4)
+  const totalDebit = data.reduce((sum, row) => sum + parseFloat(row[3]) || 0, 0); // Debit (index 3)
+  const totalCredit = data.reduce((sum, row) => sum + parseFloat(row[4]) || 0, 0); // Credit (index 4)
 
 
   // Search Sorting 
