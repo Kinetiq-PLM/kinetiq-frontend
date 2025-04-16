@@ -163,7 +163,8 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
       0
     );
 
-    const totalPrice = Number(totalBeforeDiscount);
+    const totalPrice =
+      Number(totalBeforeDiscount) - Number(totalDiscount) + Number(totalTax);
 
     setQuotationInfo({
       ...quotationInfo,
