@@ -20,10 +20,26 @@
     justify-content: center;
     min-width: 40rem;
     min-height: 30rem;
+    overflow-y: auto;
   }
 
+  .stocklvl .body-content-container::-webkit-scrollbar {
+    width: 12px; /* Scrollbar width */
+    background: #e5e7eb;
+  }
   
-  /* White Scrollbar Styling */
+  .stocklvl .body-content-container::-webkit-scrollbar-thumb {
+    background: rgb(168, 168, 168); /* Scrollbar color */
+    border-radius: 6px; 
+  }
+  
+  .stocklvl .body-content-container::-webkit-scrollbar-thumb:hover {
+    background: #c1c3c6;
+  }
+   
+
+  
+
   .stocklvl .warehouse-filter::-webkit-scrollbar {
     width: 12px; /* Scrollbar width */
     background: #e5e7eb;
@@ -31,10 +47,12 @@
   
   .stocklvl .warehouse-filter::-webkit-scrollbar-thumb {
     background: rgb(168, 168, 168); /* Scrollbar color */
-    border-radius: 6px; /* Rounded edges */
+    border-radius: 6px; 
   }
   
   .stocklvl .warehouse-filter::-webkit-scrollbar-thumb:hover {
-    background: #c1c3c6; /* Light gray on hover */
+    background: #c1c3c6;
   }
+  
+
   

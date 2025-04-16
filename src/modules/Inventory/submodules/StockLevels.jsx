@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../styles/StockLevels.css";
 
 const BodyContent = () => {
-    const [productsData, setProductsData] = useState([]);
+    const [expiringItemsData, setExpiringItemsData] = useState([]);
     const [assetsData, setAssetsData] = useState([]);
     const [warehouseList, setWarehouseList] = useState([]);
 
@@ -17,7 +17,7 @@ const BodyContent = () => {
     const [selectedRow, setSelectedRow] = useState(null); 
 
     // Tab Management
-    const tabs = ["Expiring Items", "Deprecating Assets"];
+    const tabs = ["Expiring Items"];
     const [activeTab, setActiveTab] = useState(tabs[0]);    
     const onTabChange = (tab) => {
         setActiveTab(tab);
@@ -29,15 +29,15 @@ const BodyContent = () => {
     
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/product-depreciation-report/")
+        fetch("http://127.0.0.1:8000/api/expiry-report/")
             .then((res) => res.json())
             .then((data) => {
-                setProductsData(data);
+                setExpiringItemsData(data);
                 setLoading(false);
-                console.log("Fetched products depreication reports:", data);
+                console.log("Fetched Expiring Reports Data:", data);
             })
             .catch((err) => {
-                console.error("Error products depreication reports:", err);
+                console.error("Error Expiring Reports Data:", err);
                 setLoading(false);
             });
     }, []);
@@ -77,14 +77,14 @@ const BodyContent = () => {
     // Filtered Tab Config
     const tableConfig = {
         "Expiring Items": {
-            columns: ["Item Name", "Item Type", "Inventory Item ID", "Expiry Date", "Quantity", "Status"],
-            data: productsData.map((item) => ({
-                "Product Name": item?.product_name || "---",
+            columns: ["Item Name", "Item Type", "Item Management ID", "Expiry Date", "Quantity", "Status"],
+            data: expiringItemsData.map((item) => ({
+                "Item Name": item?.item_name || "---",
                 "Item Type": item?.item_type || "---",
-                "Inventory Item ID": item?.inventory_item_id || "---",
+                "Item Management ID": item?.item_management_id || "---",
                 "Expiry Date": item?.expiry,
-                "Quantity": item?.quantity,
-                "Status": item?.status,
+                "Quantity": item?.current_quantity,
+                "Status": item?.expiry_report_status,
             })),
         },
 
@@ -99,16 +99,6 @@ const BodyContent = () => {
             })),
         },
         
-        // "Raw Materials": {
-        //     columns: ["Material Name", "Inventory Item ID", "Expiry Date", "Quantity", "Status"],
-        //     data: rawMaterialsData.map((item) => ({
-        //         "Material Name": item?.material_name || "---",
-        //         "Inventory Item ID": item?.inventory_item_id || "---",
-        //         "Expiry Date": item?.expiry,
-        //         "Quantity": item?.quantity,
-        //         "Status": item?.status,
-        //     })),
-        // },
     }
 
     // Current Config
@@ -186,7 +176,7 @@ const BodyContent = () => {
             <div className="body-content-container">
 
                 {/* Flex container seperating nav and main content */}
-                <div className="flex w-full h-full flex-col min-h-screen px-3 py-12">
+                <div className="flex w-full  flex-col min-h-screen px-3 py-12">
                     
                     <nav className="md:flex md:flex-wrap justify-between items-center p-2">
                         <div className="invNav flex border-b border-gray-300 mt-1 space-x-8 md:order-1">
@@ -238,7 +228,7 @@ const BodyContent = () => {
                     </div>
 
                     {/* main content */}
-                    <main className="flex flex-col w-full h-full space-x-4 py-2">
+                    <main className="flex flex-row w-full h-full space-x-4 py-2">
 
                         {/* Main Table */}
                         <div className="pcounts-table-container flex-2 border border-gray-300 rounded-lg scroll-container overflow-y-auto min-h-40 w-full p-1">
@@ -261,7 +251,7 @@ const BodyContent = () => {
                                             <tr
                                                 key={index}
                                                 className="border-b border-gray-300 hover:bg-gray-100"
-                                                onClick={() => setSelectedRow(item)} // ← Set selected row
+                                                onClick={() => setSelectedRow(filteredData[index])} // ← Set selected row
                                             >
                                                 {currentConfig.columns.map((col) => (
                                                     <td key={col} className="p-2">{item[col] || "---"}</td>
@@ -276,15 +266,15 @@ const BodyContent = () => {
 
 
                         {/* Selected Item details Details */}
-                        <div className="mt-5">
-                            <p className="text-gray-600 font-bold">ITEM DETAILS</p>
-                            <div className="w-full min-h-[120px] border border-gray-300 rounded-lg p-3 ">
-
+                        <div className="">
+                            
+                            <div className="w-full min-w-[180px] border border-gray-300 rounded-lg p-3 flex-row flex-wrap justify-between">
+                                <p className="text-center text-gray-600 font-bold mb-2">ITEM DETAILS</p>
                                 {selectedRow && (
                                     Object.keys(selectedRow).map((col) => (
                                         <div key={col} className="mb-2">
                                             <h4 className="text-cyan-600 text-sm font-semibold">{col}</h4>
-                                            <p className="text-gray-500 text-sm">{selectedRow[col] || "---"}</p>
+                                            <p className="text-gray-500 text-xs">{selectedRow[col] || "---"}</p>
                                         </div>
                                     ))
                                 )}
@@ -293,47 +283,6 @@ const BodyContent = () => {
 
                             </div>  
                         </div>
-
-
-                        {/* Filters + Details Panel */}
-                        {/* <div className="flex flex-col h-full">
-                            <div className="self-center text-sm text-gray-500">00 - 00 - 0000 / 00:00 UTC</div>
-                            
-                            <div className="flex flex-col  space-y-4 mt-2 w-60"> */}
-
-                                {/* Status Filter */}
-                                {/* <select
-                                    className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
-                                    value={selectedStatus}
-                                    onChange={(e) => setSelectedStatus(e.target.value)}
-                                >
-                                    <option value="">Filter Status Status</option>
-                                    {["Pending", "Approved"].map((s) => (
-                                        <option key={s} value={s}>{s}</option>
-                                    ))}
-                                </select> */}
-
-                                {/* Date Filter */}
-                                {/* <select
-                                    className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
-                                    value={selectedDate}
-                                    onChange={(e) => setSelectedDate(e.target.value)}
-                                >
-                                    <option value="">Filter Date</option>
-                                    {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
-                                        <option key={d} value={d}>{d}</option>
-                                    ))}
-                                </select> */}
-
-                            {/* </div> */}
-
-
-
-                            
-                            
-
-                           
-                        {/* </div> */}
 
                     </main>
 
