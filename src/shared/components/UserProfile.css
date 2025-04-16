@@ -111,9 +111,9 @@
 .usrprofile .password-section{
   display: flex;
   flex-direction: column;
-  width: 40rem;
+  width: 30rem;
   height: 17rem;
-  margin-left: 3rem;
+  margin-left: 4rem;
   align-items: center;
 }
 .usrprofile .password-section h3{
@@ -125,20 +125,24 @@
 
 .usrprofile .change-password-btn {
   background-color: #00a7a7;
-  width: 90%;
+  width: 100%;
   color: white;
   border: none;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
+  padding: 0.25rem 1rem;
+  border-radius: 0.3rem;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 500;
   margin-top: 1.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-.usrprofile .password-input-error-wrapper{
+.password-input-wrapper-item{
+  width: 100%;
+}
+
+.usrprofile .password-input-wrapper{
     position: relative;
-    width: 17rem;
+    width: 100%;
     display: flex;
     align-items: center;
 }
@@ -175,6 +179,24 @@
   color: #888;
 }
 
+.password-input-error-container {
+  margin-top: 0.75rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.75rem;
+}
+
+.usrprofile .login-error{
+  color: rgb(255, 128, 0);  
+  font-size: 0.7rem;
+  font-style: italic;
+  width: 100%;
+  min-height: 0.7rem;
+}
+
 .usrprofile .user-info{
   display: flex;
   flex-direction: row;
@@ -196,12 +218,4 @@
     position: absolute;
     opacity: 70%;
   }
-}
-
-.usrprofile .login-error{
-  color: rgb(255, 128, 0);
-  font-size: 0.7rem;
-  font-style: italic;
-  width: 100%;
-  text-align: center;
 }
