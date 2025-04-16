@@ -345,7 +345,6 @@ const ServiceReport = ({employee_id}) => {
               )}
             </div>
             </div>
-            
           </div>
 
           {/* Table Component */}
