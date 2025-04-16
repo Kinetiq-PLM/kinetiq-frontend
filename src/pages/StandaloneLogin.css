@@ -58,38 +58,34 @@
     justify-content: center;
     align-items: center;
   }
+
+  .login-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
   
   .login-form h2 {
     font-size: 1.5rem;
     font-weight: 700;
     text-align: center;
-
     color: #00a7a7;
-    letter-spacing: 1px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
 
   .login-form h3 {
     font-size: 1rem;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 2rem;
     color: #00a7a7;
-    letter-spacing: 1px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
 
   .login-form h4 {
     font-size: 0.8rem;
     font-weight: 400;
-    text-align: left;
-    margin-bottom: 30px;
+    margin-bottom: 0rem;
     color: #00a7a7;
-    letter-spacing: 1px;
   }
 
   .login-form form, .login-form input{
@@ -105,6 +101,21 @@
     color: rgb(112, 112, 112);
     text-align: center;
   }
+
+  .email-form{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: fit-content;
+  }
+
+  .email-form h4,
+.email-form input {
+  width: 100%;
+  text-align: left;
+}
+
   
   /* Form Elements */
   input[type="text"],
@@ -211,7 +222,7 @@
   }
 
   .login-error{
-    color: red;
+    color: rgb(255, 128, 0);
     font-size: 0.75rem;
     font-style: italic;
     margin-bottom: 0.5rem;
