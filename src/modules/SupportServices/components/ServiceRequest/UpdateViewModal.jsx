@@ -58,7 +58,7 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
   // fetches a list of techs
   const fetchTechnicians = async () => {
     try {
-      const response = await GET("/technicians/");
+      const response = await GET("call/calls/technicians/");
       console.log("techs", response)
       setTechnicians(response);
     } catch (error) {

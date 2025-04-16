@@ -44,7 +44,7 @@ const ServiceReport = () => {
 
   const fetchReports = async () => {
     try {
-      const data = await GET("service-reports/");
+      const data = await GET("report/");
       setReports(data);
     } catch (error) {
       console.error("Error fetching reports:", error)
@@ -58,7 +58,7 @@ const ServiceReport = () => {
   // table row clicking func
   const handleRowClick = async (report) => {
     try {
-      const data = await GET(`service-reports/${report.report_id}`); 
+      const data = await GET(`report/${report.report_id}`); 
       console.log("Fetched data:", data);
 
       setTicketSubject(data.service_ticket?.subject || "");
@@ -107,7 +107,7 @@ const ServiceReport = () => {
     console.log("Updating report:", reportData);
 
     try {
-      await PATCH(`service-reports/${reportId}/update/`, reportData);
+      await PATCH(`report/${reportId}/`, reportData);
       setShowUpdateModal(false);
       fetchReports();
     } catch (error) {
@@ -134,7 +134,7 @@ const ServiceReport = () => {
   const handleSubmitReport = async (reportData) => {
     console.log("Submitting report:", reportData)
     try {
-      const data = await POST("/create-report/", reportData);
+      const data = await POST("report/", reportData);
       console.log("Report created successfully:", data);
       setShowSubmitModal(false);
       fetchReports();
@@ -181,7 +181,7 @@ const ServiceReport = () => {
     }
     console.log("Updating ticket:", ticketData)
     try {
-      await PATCH(`update-ticket/${selectedTicketId}/`, ticketData);
+      await PATCH(`ticket/${selectedTicketId}/`, ticketData);
       setShowModal(false);
       fetchReports();
     } catch (error) {

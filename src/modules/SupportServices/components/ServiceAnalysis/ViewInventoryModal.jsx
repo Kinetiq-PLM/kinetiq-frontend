@@ -13,7 +13,7 @@ const ViewInventoryModal = ({ isOpen, onClose, onSelectItem }) => {
 
   const fetchItems = async () => {
     try {
-      const data = await GET("inventory-items/");
+      const data = await GET("order/inventory/items/");
       setInventoryItems(data);
     } catch (error) {
       console.error("Error fetching inventory items:", error);

@@ -29,7 +29,7 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
   // fetches a list of customers
   const fetchCustomers = async () => {
     try {
-      const response = await GET("/customers/");
+      const response = await GET("ticket/tickets/customers/");
       console.log("asdasd", response)
       setCustomers(response);
     } catch (error) {
@@ -54,7 +54,7 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
 // fetches a list of techs
 const fetchTechnicians = async () => {
   try {
-    const response = await GET("/technicians/");
+    const response = await GET("call/calls/technicians/");
     console.log("techs", response)
     setTechnicians(response);
   } catch (error) {

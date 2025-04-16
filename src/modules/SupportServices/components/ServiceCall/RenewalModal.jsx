@@ -74,7 +74,7 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
   // fetches a list of techs
   const fetchContracts = async () => {
       try {
-        const response = await GET(`contracts/${productId}/${customerId}/`);
+        const response = await GET(`contract/contracts/${productId}/${customerId}/`);
         console.log("contracts", response)
         setContracts(response);
       } catch (error) {

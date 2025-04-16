@@ -25,7 +25,7 @@ const WarrantyRenewal = () => {
   // Fetch service calls from API (mock function)
   const fetchServiceRenewals = async () => {
     try {
-      const data = await GET("warranty-renewals/");
+      const data = await GET("renewal/");
       setRenewals(data);
     } catch (error) {
       console.error("Error fetching renewals:", error)
@@ -56,7 +56,7 @@ const WarrantyRenewal = () => {
     console.log("Updating renewal with:", updatedData);
 
     try {
-      await PATCH(`/renewal/${renewalId}/update/`, updatedData);
+      await PATCH(`renewal/${renewalId}/`, updatedData);
       setShowUpdateModal(false);
       fetchServiceRenewals();
   } catch (error) {

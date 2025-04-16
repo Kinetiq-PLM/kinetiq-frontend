@@ -30,7 +30,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
   
   const fetchRequests = async () => {
     try {
-      const data = await GET("service-requests/");
+      const data = await GET("request/");
       setRequests(data);
     } catch (error) {
       console.error("Error fetching requests:", error);
@@ -63,7 +63,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
 
     const fetchTechnicians = async () => {
       try {
-        const response = await GET("/technicians/");;
+        const response = await GET("call/calls/technicians/");;
         setTechnicians(response);
       } catch (error) {
         console.error("Error fetching technicians:", error);
@@ -112,7 +112,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
 
     const fetchContracts = async () => {
       try {
-        const response = await GET(`/contracts/${productId}/${customerId}`); 
+        const response = await GET(`contract/contracts/${productId}/${customerId}`); 
         console.log("contracts", response)
         setContracts(response);
       } catch (error) {

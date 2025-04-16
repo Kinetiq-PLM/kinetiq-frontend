@@ -37,7 +37,7 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
 
   const fetchItems= async () => {
     try {
-      const data = await GET("items/");
+      const data = await GET("order/admin/items/");
       setItems(data);
     } catch (error) {
       console.error("Error fetching items:", error);
@@ -70,7 +70,7 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
   const fetchPrincipals = async (orderId) => {
     console.log(orderId)
     try {
-      const data = await GET(`principal-items/${orderId}/`);
+      const data = await GET(`order/principal-items/${orderId}/`);
       setPrincipals(data);
     } catch (error) {
       console.error("Error fetching principal items:", error);

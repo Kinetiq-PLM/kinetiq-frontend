@@ -37,7 +37,7 @@ const ServiceTicket = () => {
 
   const fetchTickets = async () => {
     try {
-      const data = await GET("tickets/");
+      const data = await GET("ticket/");
       setTickets(data);
     } catch (error) {
       console.error("Error fetching tickets:", error)
@@ -53,7 +53,7 @@ const ServiceTicket = () => {
   const handleRowClick = async (ticket) => {
     setSelectedTicket(ticket);
     try {
-      const data = await GET(`tickets/${ticket.ticket_id}`); // this fetches specific ticket info from clicked ticket row
+      const data = await GET(`ticket/${ticket.ticket_id}`); // this fetches specific ticket info from clicked ticket row
       console.log("Fetched data:", data);
 
       // for null customer_id
@@ -84,7 +84,7 @@ const ServiceTicket = () => {
   const handleSubmitTicket = async (ticketData) => {
     console.log("Submitting ticket:", ticketData)
     try {
-        const data = await POST("/tickets/", ticketData);
+        const data = await POST("ticket/", ticketData);
         console.log("Ticket created successfully:", data);
         setShowSubmitModal(false);
         fetchTickets();
@@ -118,7 +118,7 @@ const ServiceTicket = () => {
     console.log("Queueing ticket:", queueData)
 
     try {
-      const data = await POST("/queue-call/", queueData);
+      const data = await POST("call/", queueData);
       console.log("Service call created successfully:", data);
       setShowQueueModal(false);
     } catch (error) {

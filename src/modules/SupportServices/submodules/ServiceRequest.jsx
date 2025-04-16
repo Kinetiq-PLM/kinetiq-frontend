@@ -23,7 +23,7 @@ const ServiceRequest = () => {
 
   const fetchRequests = async () => {
     try {
-      const data = await GET("service-requests/");
+      const data = await GET("request/");
       setRequests(data);
     } catch (error) {
       console.error("Error fetching requests:", error)
@@ -64,7 +64,7 @@ const ServiceRequest = () => {
     console.log("Updating request:", updatedRequest)
 
     try {
-      await PATCH(`/service-requests/${requestId}/update/`, updatedRequest);
+      await PATCH(`request/${requestId}/`, updatedRequest);
       setShowUpdateModal(false);
       fetchRequests();
     } catch (error) {

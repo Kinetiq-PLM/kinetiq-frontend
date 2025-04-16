@@ -34,7 +34,7 @@ const ServiceCall = () => {
   // Fetch service calls from API (mock function)
   const fetchServiceCalls = async () => {
     try {
-      const data = await GET("service-calls/");
+      const data = await GET("call/");
       setServiceCalls(data);
     } catch (error) {
       console.error("Error fetching service calls:", error)
@@ -75,7 +75,7 @@ const ServiceCall = () => {
     console.log("Updating service call with:", updatedData);
 
     try {
-      await PATCH(`/service-calls/${serviceCallId}/update/`, updatedData);
+      await PATCH(`call/${serviceCallId}/`, updatedData);
       setShowWithContractModal(false);
       setShowResolutionModal(false);
       fetchServiceCalls();
@@ -136,10 +136,10 @@ const ServiceCall = () => {
 
   const handleSubmitReq = async (reqData) => {
     // submit req
-    console.log("Queueing ticket:", reqData)
+    console.log("Submitting request:", reqData)
 
     try {
-      const data = await POST("/create-request/", reqData);
+      const data = await POST("request/", reqData);
       console.log("Service request created successfully:", data);
       setShowRequestModal(false);
       setShowResolutionModal(true);
@@ -170,7 +170,7 @@ const ServiceCall = () => {
     console.log("Submitting warranty renewal:", renData)
 
     try {
-      const data = await POST("create-renewal/", renData);
+      const data = await POST("renewal/", renData);
       console.log("Warranty renewal created successfully:", data);
       setShowRenewalModal(false);
       setShowResolutionModal(true);
