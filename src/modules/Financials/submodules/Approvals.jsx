@@ -417,52 +417,82 @@ import { GET } from "../api/api";
       },[activeTab])
 
       const fetchApprovals = async () => {
-      try {
-        const data = await GET("/approvals/budget-approvals/");
-        setOriginalData(data.map(sub => ({
-          requestId: sub.validation?.budget_submission?.budget_submission_id || "",
-          departmentId: sub.validation?.budget_submission?.dept_id || "",
-          amount: sub.validation?.amount_requested || "",
-          approvedAmount: sub.validation?.final_approved_amount || "",
-          submissionDate: sub.validation?.budget_submission?.validation_date || "",
-          validatedBy: sub.validation?.validated_by || "",
-          validationDate: sub.validation?.validation_date || "",
-          approvedBy: sub.approved_by || "",
-          approvalDate: sub.approval_date || "",
-          remarks: sub.remarks || "",
-          validationStatus: sub.validation?.validation_status || ""
-        })));
-      } catch (error) {
-        console.error("Error fetching returns:", error);
-      }
-    };
-
-        useEffect(() => {
-          fetchApprovals();
-          //fetchBudgetApprovals();
-          //fetchReturns();
-        }, []);
+        try {
+          const data = await GET("/approvals/budget-submission-approvals/");
+          setOriginalData(data.map(sub => ({
+            requestId: sub.budget_submission?.budget_submission_id || "",
+            departmentId: sub.validation?.budget_submission?.dept_id || "",
+            amount: sub.amount_requested || "",
+            approvedAmount: sub.final_approved_amount || "",
+            submissionDate: sub.budget_submission?.date_submitted || "",
+            validatedBy: sub.validation?.validated_by || "",
+            validationDate: sub.validation?.validation_date || "",
+            approvedBy: sub.validated_by || "",
+            approvalDate: sub.approval_date || "",
+            remarks: sub.remarks || "",
+            validationStatus: sub.approval_status || ""
+          })));
+        } catch (error) {
+          console.error("Error fetching:", error);
+        }
+      };
       
-          const fetchRejectedApprovals = async () => {
-            try {
-              const data = await GET("/approvals/rejected-budget-submissions/"); 
-                const formattedData = data.map(item => ({
-                requestId: item.budget_submission?.budget_submission_id || "",
-                amount: item.budget_validation?.amount_requested || "",
-                requestDate: item.budget_submission?.date_submitted || "",
-                approvedBy: item.approved_by || "",
-                remarks: item.remarks || "",
-                validationStatus: item.approval_status || "",
-                }));
-              setRejectedData(formattedData);
-            } catch (error) {
-              console.error("Failed to load rejected approvals:", error);
-            }
-          };
+      // Define as a separate function outside of fetchApprovals
+      const fetchRejectedApprovals = async () => {
+        try {
+          const data = await GET("/approvals/rejected-budget-submissions/"); 
+          console.log("Raw rejected data:", data);
           
-          useEffect(() => {
-          fetchRejectedApprovals();
-        }, []);
+          // Define processedData as a variable to store the mapped array
+          const processedData = data.map(item => ({
+            requestId: item.budget_approvals_id || "",
+            amount: item.amount_requested || "",
+            submissionDate: item.approval_date || "",
+            approvedBy: item.validated_by || "",
+            remarks: item.remarks || "",
+            validationStatus: item.approval_status || ""
+          }));
+          
+          console.log("Data to be set:", processedData);
+          
+          // Then use the processed data to update state
+          setRejectedData(processedData);
+        } catch (error) {
+          console.error("Failed to load rejected approvals:", error);
+        }
+      };
+
+      const fetchRequestsApprovals = async () => {
+        try{
+          const data = await GET("/approvals/budget-request-approvals/");
+          setOriginalRequestData(data.map(sub => ({
+            requestId: sub.budget_request_form?.budget_request_id || "",
+            departmentId: sub.validation?.budget_request_form?.dept_id || "",
+            amount: sub.validation?.amount_requested || "",
+            approvedAmount: sub.final_approved_amount || "",
+            submissionDate: sub.budget_submission?.date_submitted || "",
+            validatedBy: sub.validation?.validated_by || "",
+            validationDate: sub.validation?.validation_date || "",
+            approvedBy: sub.approved_by || "",
+            approvalDate: sub.approval_date || "",
+            remarks: sub.remarks || "",
+            validationStatus: sub.approval_status || ""
+          })));
+        } catch (error) {
+          console.error("Error fetching requests:", error);
+        }
+      }
+    
+      useEffect(() => {
+        fetchApprovals();
+        fetchRejectedApprovals();
+        fetchRequestsApprovals();
+      }, []);
+
+          
+           useEffect(() => {
+            fetchRequestsApprovals();
+          }, []);
 
       return (
         <div className="approvals">
@@ -706,6 +736,7 @@ import { GET } from "../api/api";
                         <div className="reject-title">
                             <h3> Rejected Submissions</h3>
                             </div>
+                    
                     <table className="validation-table-2-reject">
                       <thead>
                         <tr>
@@ -725,7 +756,7 @@ import { GET } from "../api/api";
                             <td><div className="row-wrapper">{row.submissionDate}</div></td>
                             <td><div className="row-wrapper">{row.approvedBy}</div></td>
                             <td><div className="row-wrapper">{row.remarks === "Rejected" ? "For Resubmission" : row.remarks}</div></td>
-                            <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+                            <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus}`}>{row.validationStatus}</span></div></td>
 
                           </tr>
                         ))}
@@ -846,7 +877,7 @@ import { GET } from "../api/api";
                                 <td><div className="row-wrapper">{row.approvalDate ? row.approvalDate: "N/A"}</div></td>
                                 <td><div className="row-wrapper">{row.approvedBy}</div></td>
                                 <td><div className="row-wrapper">{row.remarks}</div></td>
-                                <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+                                <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus}`}>{row.validationStatus}</span></div></td>
                               </tr>
                             ))}
                           </tbody>
@@ -878,7 +909,7 @@ import { GET } from "../api/api";
                                 <p><strong>Amount Requested:</strong> {row.amount}</p>
                                 <p><strong>Approved Amount:</strong> {row.approvedAmount || row.amount}</p>
                                 <p><strong>Validated By:</strong> {row.validatedBy}</p>
-                                <p><strong>Validation Date:</strong> {row.validationDate ? row.validationDate.toLocaleDateString() : 'N/A'}</p>
+                                <p><strong>Validation Date:</strong> {row.validationDate ? row.validationDate: 'N/A'}</p>
                                 <div className="edit-modal-input-group approved-by-group">
                 <div className="edit-modal-label-input">
                   <label>
@@ -946,7 +977,7 @@ import { GET } from "../api/api";
                                 <td><div className="row-wrapper">{row.requestDate}</div></td>
                                 <td><div className="row-wrapper">{row.approvedBy}</div></td>
                                 <td><div className="row-wrapper">{row.remarks}</div></td>
-                                <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+                                <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus}`}>{row.validationStatus}</span></div></td>
                               </tr>
                             ))}
                           </tbody>
