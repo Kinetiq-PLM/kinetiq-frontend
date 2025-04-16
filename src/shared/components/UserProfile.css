@@ -1,38 +1,52 @@
 /* REMINDER! All of your elements must use your unique namespace '.usrprofile' at the start to avoid leaking */
 .usrprofile {
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: 100vh;
   border-radius: 0.5rem;
   background-color: white;
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 40rem;
-  min-height: 30rem;
-  overflow: auto;
-}
-
-.usrprofile .user-details-container, .usrprofile .password-kinetiq-container{
-  display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
+  min-width: 100%;
+  min-height: 100%;
+  overflow: auto;
+  flex-wrap: wrap;
+}
+
+.usrprofile .user-details-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
   gap: 2rem;
-  width: 100%;
-  height: 100%;
-  margin-bottom: 2rem;
+  height: auto;
+  flex-wrap: wrap;
+  width: 95%;
+  margin: 2rem;
+  position: relative;
+  border: 1px solid red;
+}
+
+.usrprofile .password-kinetiq-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 2.5rem;
+  /* flex-wrap: wrap-reverse; */
 }
 
 .usrprofile .user-details-container{
   border-bottom: 0.05rem solid rgb(207, 207, 207);
+  padding: 1rem;
 }
 
 .usrprofile .user-details-container img{
   height: 10rem;
   width: auto;
+  position: absolute;
+  z-index: 0;
 }
+
 .usrprofile .user-image{
   aspect-ratio: 1 / 1;
   width: 10rem;
@@ -50,14 +64,15 @@
 
 .usrprofile .user-details{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   width: fit-content;
   font-size: 0.8rem;
   color: #7d7d7d;
   gap: 1rem;
-  margin-left: 2rem ;
+  margin-left: 1rem;
+  
 }
 
 .usrprofile .user-details strong, .usrprofile .role-details strong{
@@ -65,16 +80,27 @@
   color: #4eb5b5;
 }
 
+.usrprofile .user-name-pos{
+  display: flex;
+  flex-direction: row;
+  border: 1px solid blue;
+  margin-right: 2rem;
+}
+
 .usrprofile .user-name{
   font-size: 2rem;
   color: #008b8b;
-  margin-bottom: 0rem;
+  margin-right: 0.5rem;
   line-height: 2rem;
+  text-align: right;
+  border: 1px solid red;
+  width: fit-content;
 }
 
 .usrprofile .user-email{
   color: rgb(155, 160, 162);
   font-size: 0.85rem;
+  border: 1px solid red;
 }
 
 .usrprofile .user-position{
@@ -83,6 +109,8 @@
   font-style: italic;
   font-size: 1.35rem;
   color: #7ca2a2;
+  border: 1px solid red;
+  width: fit-content;
 }
 
 .usrprofile .role-details{
@@ -90,8 +118,8 @@
   flex-direction: column;
   justify-content: center;
   gap: 0.5rem;
-  width: 100%;
-  height: 100%;
+  width: 95%;
+  height: auto;
   font-size: 0.8rem;
   color: #7d7d7d;
   margin-left: 2rem;
@@ -111,9 +139,8 @@
 .usrprofile .password-section{
   display: flex;
   flex-direction: column;
-  width: 30rem;
-  height: 17rem;
-  margin-left: 4rem;
+  width: 60%;
+  margin-left: 3rem;
   align-items: center;
 }
 .usrprofile .password-section h3{
@@ -200,22 +227,47 @@
 .usrprofile .user-info{
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
+  border: 1px solid blue;
+  margin-left: auto;
+  z-index: 1;
 }
 
-@media (max-width: 69rem) {
-  .usrprofile .user-details-container {
-    flex-direction: row-reverse;
+/* @media (max-width: 75rem) {
+  .usrprofile .user-email{
+    align-self: center;
   }
+} */
 
-  .usrprofile .user-info{
-    position: relative;
-    right: 25%;
+@media (max-width: 57rem) {
+  .usrprofile .user-details-container {
+    /* flex-direction: row-reverse; */
+    align-items: center;
   }
 
   .usrprofile .user-details-container img{
-    position: absolute;
-    opacity: 70%;
+    position: relative;
+  }
+
+  .usrprofile .user-name, .usrprofile .user-position {
+    min-width: 11rem;
+  }
+
+  .usrprofile .password-kinetiq-container {
+    align-items: center;
+    flex-wrap: wrap-reverse;
+    width: 90%;
+    border: 1px solid red;
+    margin: 2rem;
+  }
+
+  .password-kinetiq-container .role-details{
+    margin-bottom: 2rem;
+  }
+
+  .password-kinetiq-container .password-section{
+    border: 1px solid red;
+    margin: auto;
+    width: 90%;
   }
 }
