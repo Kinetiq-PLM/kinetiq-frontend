@@ -175,10 +175,24 @@ const Distribution = ({ loadSubModule, setActiveSubModule }) => {
 
   // Toggle expanded sections
   const toggleSection = (section) => {
+    const newExpandedState = !expandedSections[section];
+    
     setExpandedSections({
       ...expandedSections,
-      [section]: !expandedSections[section]
+      [section]: newExpandedState
     });
+    
+    // Reinitialize charts when expanding relevant sections
+    if (newExpandedState) {
+      // Only reinitialize if expanding (not collapsing)
+      setTimeout(() => {
+        if (section === 'performanceOverview' || section === 'deliveryAnalysis' || 
+            section === 'carrierAnalysis' || section === 'customerSatisfaction' || 
+            section === 'processingTime' || section === 'costAnalysis') {
+          initializeCharts(dashboardData);
+        }
+      }, 50); // Small timeout to ensure DOM elements are rendered
+    }
   };
 
   // Handle navigation to submodule

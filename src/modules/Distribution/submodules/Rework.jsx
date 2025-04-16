@@ -7,6 +7,8 @@ import TypeFilter from "../components/rework/TypeFilter";
 import ReworkModal from "../components/rework/ReworkModal";
 import AssignModal from "../components/rework/AssignModal";
 import CompleteModal from "../components/rework/CompleteModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Rework = () => {
   // Tab state
@@ -188,10 +190,10 @@ const Rework = () => {
       setRefreshTrigger(prev => prev + 1);
       
       // Show success notification
-      alert('Rework assigned successfully!');
+      toast.success('Rework assigned successfully!');
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -224,10 +226,10 @@ const Rework = () => {
       setRefreshTrigger(prev => prev + 1);
       
       // Show success notification
-      alert('Rework marked as completed successfully!');
+      toast.success('Rework marked as completed successfully!');
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -253,10 +255,10 @@ const Rework = () => {
       setRefreshTrigger(prev => prev + 1);
       
       // Show success notification
-      alert(`Rework status updated to ${newStatus} successfully!`);
+      toast.success(`Rework status updated to ${newStatus} successfully!`);
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
   
@@ -264,6 +266,10 @@ const Rework = () => {
     <div className="rework">
       <div className="body-content-container">
         <h2 className="page-title">Rework Management</h2>
+        
+        {/* Add ToastContainer component */}
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} 
+          newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
         
         {/* Tab Navigation */}
         <div className="tab-navigation">
