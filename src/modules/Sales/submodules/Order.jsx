@@ -214,6 +214,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         salesrep: employee_id,
         total_amount: Number(parseFloat(orderInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(orderInfo.discount).toFixed(2)),
+        subtotal: Number(orderInfo.total_before_discount),
         total_tax: Number(parseFloat(orderInfo.total_tax).toFixed(2)),
       },
     };
