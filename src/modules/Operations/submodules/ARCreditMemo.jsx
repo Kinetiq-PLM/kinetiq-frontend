@@ -32,13 +32,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const [employeeList, setEmployeeList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (selectedData?.status) {
-      setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
-    }
-  }, [selectedData]);
-
+  const [invoices, setInvoices] = useState([]);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
 
   const fetchVendors = async () => {
     try {
@@ -53,10 +48,16 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       const data = await response.json();
       if (!Array.isArray(data)) throw new Error("Invalid customer format");
       setVendorList(data);
+      setLoadingInvoices(true);
+      const responseSalesInvoice = await fetch("http://127.0.0.1:8000/operation/sales-invoice/");
+      if (!responseSalesInvoice.ok) throw new Error("Failed to fetch invoices");
+      const dataInvoice = await responseSalesInvoice.json();
+      setInvoices(dataInvoice);
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
+      setLoadingInvoices(false);
     }
   };
   useEffect(() => {
@@ -64,6 +65,49 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
    
   }, []);
 
+  const handleInvoiceSelect = (invoiceId) => {
+    if (!invoiceId) {
+      setDocumentDetails(prev => ({
+        ...prev,
+        invoice_id: "",
+        invoice_balance: 0,
+        invoice_date: date_today,
+      }));
+      return;
+    }
+  
+    const selectedInvoice = invoices.find(inv => inv.invoice_id === invoiceId);
+    if (!selectedInvoice) return;
+  
+    // Format the date by removing the time portion
+    const formattedDate = selectedInvoice.invoice_date.split('T')[0];
+  
+    setDocumentDetails(prev => ({
+      ...prev,
+      invoice_id: selectedInvoice.invoice_id,
+      invoice_balance: parseFloat(selectedInvoice.total_amount) || 0,
+      invoice_date: formattedDate || date_today,
+    }));
+  };
+  useEffect(() => {
+    if (selectedData?.status) {
+      setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
+    }
+    if (selectedData?.invoice_id) {
+      // Directly update the state instead of calling handleInvoiceSelect
+      const selectedInvoice = invoices.find(inv => inv.invoice_id === selectedData.invoice_id);
+      if (selectedInvoice) {
+        const formattedDate = selectedInvoice.invoice_date?.split('T')[0] || date_today;
+        
+        setDocumentDetails(prev => ({
+          ...prev,
+          invoice_id: selectedInvoice.invoice_id,
+          invoice_balance: parseFloat(selectedInvoice.total_amount) || 0,
+          invoice_date: formattedDate,
+        }));
+      }
+    }
+  }, [selectedData, invoices, date_today]);
 
   const handleVendorChange = (e) => {
     const customerName = e.target.value;
@@ -89,7 +133,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }
   }, [vendorList, selectedData.buyer, employeeList, selectedData.employee_id]);
 
-
+  
   const [documentItems, setDocumentItems] = useState(
     isCreateMode ? [{}] : [...selectedData.document_items, {}]
   );
@@ -850,7 +894,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   }, [isCreateMode]);
  
   useEffect(() => {
-    const invoiceAmount = parseFloat(documentDetails.invoice_amount) || 0;
+    const invoiceAmount = parseFloat(documentDetails.invoice_balance) || 0;
     const taxAmount = (parseFloat(documentDetails.tax_rate) / 100) * initialAmount;
     const initial_amount = parseFloat(initialAmount)
     const total = parseFloat(taxAmount + invoiceAmount + initial_amount).toFixed(2);
@@ -859,7 +903,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       tax_amount: taxAmount,
       transaction_cost: total,
     }));
-  }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, documentDetails.invoice_amount, initialAmount]);
+  }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, documentDetails.invoice_balance, initialAmount]);
 
 
   useEffect(() => {
@@ -963,13 +1007,27 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         style={{ cursor: 'not-allowed' }} 
                       />
                     </div>
-                    <div className="detail-row">
+                    <div className="detail-row dropdown-scrollbar">
                       <label>Invoice ID</label>
-                      <input 
-                        type="text" 
-                        value={selectedData.invoice_id} 
-                        onChange={(e) => handleDocumentDetailChange(e, "invoice_id")}
-                      />
+                      <select 
+                        value={documentDetails.invoice_id || ""} 
+                        onChange={(e) => {
+                          handleDocumentDetailChange(e, "invoice_id");
+                          handleInvoiceSelect(e.target.value);
+                        }}
+                        disabled={loadingInvoices}
+                      >
+                        <option value="">Select Invoice</option>
+                        {loadingInvoices ? (
+                          <option value="">Loading invoices...</option>
+                        ) : (
+                          invoices.map((invoice) => (
+                            <option key={invoice.invoice_id} value={invoice.invoice_id}>
+                              {invoice.invoice_id})
+                            </option>
+                          ))
+                        )}
+                      </select>
                     </div>
                     <div className="detail-row">
                       <label>Status</label>
@@ -990,9 +1048,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <div className="detail-row">
                       <label>Invoice Date</label>
                       <div className="date-input clickable">
-                        <input type="date" 
-                          value={selectedData?.invoice_date?.split('T')[0] || date_today} 
-                          onChange={(e) => setSelectedStatus(e, "invoice_date")}
+                        <input 
+                          type="date" 
+                          value={documentDetails.invoice_date || date_today} 
+                          onChange={(e) => handleDocumentDetailChange(e, "invoice_date")}
                           readOnly
                           style={{ cursor: 'not-allowed' }} 
                         />
@@ -1041,9 +1100,11 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Invoice Balance</label>
                     <input 
                       type="text" 
-                      value={selectedData?.invoice_amount || 0.00} 
+                      value={documentDetails.invoice_balance ? parseFloat(documentDetails.invoice_balance).toFixed(2) : "0.00"} 
+                      onChange={(e) => handleDocumentDetailChange(e, "invoice_balance")}
                       readOnly
-                      style={{ cursor: 'not-allowed' }}/>
+                      style={{ cursor: 'not-allowed' }}
+                    />
                   </div>
                   <div className="detail-row">
                     <label>Sales Tax</label>
