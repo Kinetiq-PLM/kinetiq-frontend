@@ -301,6 +301,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  overflow: hidden; /* Explicitly hide overflow on the table itself */
 }
 
 .hr-performance-table-container thead {
