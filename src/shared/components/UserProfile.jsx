@@ -47,7 +47,7 @@ const BodyContent = ({ employee_id }) => {
       setConPassErr("* Invalid credentials. *")
       return false;
     }
-      setOpenPopup(true);
+    setOpenPopup(true);
     return true;
   }
 

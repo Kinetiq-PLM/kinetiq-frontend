@@ -35,17 +35,10 @@ function App() {
   const [showLanding, setShowLanding] = useState(true);
 
   useEffect(() => {
-    if (!localStorage.getItem('landingSeen')) {
-      setShowLanding(true);
-      localStorage.setItem('landingSeen', 'true');
-    }
-  }, []);
-
-  useEffect(() => {
-    if (activeModule && showLanding) {
+    if (activeModule || activeSubModule || showUserProfile) {
       setShowLanding(false);
     }
-  }, [activeModule, showLanding]);
+  }, [activeModule, activeSubModule, showUserProfile]);
 
 
   const navigate = useNavigate();
@@ -483,7 +476,6 @@ function App() {
 
   return (
     <div className="shell">
-      {showLanding && <LandingPage />}
       <div className="shell-container">
         {/* collapsible menu */}
 
@@ -773,6 +765,7 @@ function App() {
           </div>
           <QueryClientProvider client={queryClient}>
             <div className="body-container">
+              {showLanding && <LandingPage />}
               {showUserProfile ? (
                 <UserProfile
                   user_id={user?.user_id}
