@@ -26,18 +26,18 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
     if (item) {
       console.log("item: ", item)
       setOrderId(item.service_order_item_id || "")
-      setItemId(item.item?.item_id || "")
+      setItemId(item.item?.inventory_item_id || "")
       setPrincipalItemId(item.principal_item?.principal_item_id || "")
       setQuantity(item.item_quantity || "")
-      setMarkupPrice(item.principal_item?.unit_price || "")
-      setItemName(item.item?.item_name || "")
+      setMarkupPrice(item.principal_item?.mark_up_price || "")
+      setItemName(item.item_name || "")
       setTotalPrice(item.total_price || "")
     }
   }, [item]);
 
   const fetchItems= async () => {
     try {
-      const data = await GET("order/admin/items/");
+      const data = await GET("order/inventory/items/");
       setItems(data);
     } catch (error) {
       console.error("Error fetching items:", error);
@@ -53,15 +53,17 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
   };
 
   const handleSelectItem = (item) => {
-    setItemId(item.item_id);
-    setItemName(item.item_name || "");
-
+    setItemId(item.inventory_item_id);
+    setItemName(item?.material?.material_name || item?.productdocu?.product?.product_name || "");
+    setPrincipalItemId("")
     setItemsDropdown(false);
   };
 
   const handleSelectItemInventory = (item) => {
-    setItemId(item.item?.item_id);
-    setItemName(item.item?.item_name || "");
+    setItemId(item.inventory_item_id);
+    setItemName(item?.material?.material_name || item?.productdocu?.product?.product_name || "");
+    setPrincipalItemId("")
+    setShowViewInventoryModal(false)
   };
 
   const [principals, setPrincipals] = useState([]);
@@ -176,11 +178,11 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
                     {items.length > 0 ? (
                       items
                         .filter((item) =>
-                          item.item_id.toLowerCase().includes(itemId.toLowerCase())
+                          item.inventory_item_id.toLowerCase().includes(itemId.toLowerCase())
                         )
                         .map((item) => (
-                          <li key={item.item_id} onClick={() => handleSelectItem(item)}>
-                            {item.item_id}
+                          <li key={item.inventory_item_id} onClick={() => handleSelectItem(item)}>
+                            {item.inventory_item_id}
                           </li>
                         ))
                     ) : (
@@ -201,8 +203,8 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
                     onChange={(e) => setPrincipalItemId(e.target.value)}
                     placeholder="Enter principal item ID"
                   />
-                  <span className="select-arrow" onClick={handleTogglePrincipals} >▼</span>
-                  {isPrincipalDropdown && (
+                  {/* <span className="select-arrow" onClick={handleTogglePrincipals} >▼</span> */}
+                  {/* {isPrincipalDropdown && (
                     <ul className="dropdown-list">
                       {principals.length > 0 ? (
                         principals.map((principal) => (
@@ -214,7 +216,7 @@ const EditItemModal = ({ isOpen, onClose, onEdit, item, onViewInventory }) => {
                             <li>No principal ID found</li>
                           )}
                         </ul>
-                  )} 
+                  )}  */}
                 </div>
               </div>
             </div>

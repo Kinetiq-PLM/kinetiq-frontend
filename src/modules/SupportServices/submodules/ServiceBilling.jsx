@@ -12,7 +12,7 @@ import { GET } from "../api/api"
 import { PATCH } from "../api/api"
 import { POST } from "../api/api"
 
-const ServiceBilling = () => {
+const ServiceBilling = ({employee_id}) => {
   // State for contracts
   const [billings, setBillings] = useState([])
   const [showUpdateModal, setShowUpdateModal] = useState(false)
@@ -26,8 +26,11 @@ const ServiceBilling = () => {
 
   const fetchBillings = async () => {
     try {
-      const data = await GET("billing/");
+      const data = await GET(`billing/billings/technician/${employee_id}/`);
       setBillings(data);
+
+      // all billings version:
+      // const data = await GET("billing/");
     } catch (error) {
       console.error("Error fetching billings:", error)
     }
@@ -225,6 +228,7 @@ const ServiceBilling = () => {
           onClose={() => setShowUpdateModal(false)}
           onUpdate={handleUpdateBilling}
           billing={selectedBilling}
+          technician={employee_id}
         />
       )}
 
@@ -233,6 +237,7 @@ const ServiceBilling = () => {
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
           onCreate={handleCreateBilling}
+          technician={employee_id}
         />
       )}
 

@@ -11,7 +11,7 @@ import WarrantyRenewalIcon from "/icons/SupportServices/WarrantyRenewalIcon.svg"
 import { GET } from "../api/api"
 import { PATCH } from "../api/api"
 
-const WarrantyRenewal = () => {
+const WarrantyRenewal = ({employee_id}) => {
   // State for service calls
   const [renewals, setRenewals] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
@@ -24,8 +24,11 @@ const WarrantyRenewal = () => {
 
   // Fetch service calls from API (mock function)
   const fetchServiceRenewals = async () => {
-    try {
-      const data = await GET("renewal/");
+   try {
+      const data = await GET(`renewal/renewals/technician/${employee_id}/`);
+
+      // all renewals version:
+      // const data = await GET("renewal/");
       setRenewals(data);
     } catch (error) {
       console.error("Error fetching renewals:", error)

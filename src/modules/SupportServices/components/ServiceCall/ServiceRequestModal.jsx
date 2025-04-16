@@ -57,7 +57,10 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
   // fetches a list of techs
   const fetchTechnicians = async () => {
       try {
-        const response = await GET("call/calls/technicians/");
+        // all:
+        // const response = await GET("call/calls/technicians/");
+        // only field techs
+        const response = await GET("call/calls/field-techs/");
         console.log("techs", response)
         setTechnicians(response);
       } catch (error) {

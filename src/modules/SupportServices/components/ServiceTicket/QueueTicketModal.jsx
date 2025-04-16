@@ -58,7 +58,10 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   // fetches a list of techs
   const fetchTechnicians = async () => {
     try {
-      const response = await GET("call/calls/technicians/");
+      // this list all employees:
+      // const response = await GET("call/calls/technicians/");
+      // only list supp specialists:
+      const response = await GET("call/calls/support-specialists/");
       console.log("techs", response)
       setTechnicians(response);
     } catch (error) {

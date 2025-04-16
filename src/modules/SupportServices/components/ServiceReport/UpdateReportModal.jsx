@@ -6,7 +6,7 @@ import ServiceReportIcon from "/icons/SupportServices/ServiceReportIcon.png"
 
 import { GET } from "../../api/api"
 
-const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
+const UpdateReportModal = ({ isOpen, onClose, onUpdate, report, technician }) => {
   const [tickets, setTickets] = useState([]);
   const [isTixDropdown, setOpenTixDD] = useState(false);
   const [calls, setCalls] = useState([]);
@@ -30,7 +30,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
     billingId: "",
     description: "",
     reportStatus: "",
-    technicianId: "",
+    technicianId: technician,
   })
 
   // Update form when report changes
@@ -532,15 +532,16 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
                   <input
                     type="text"
                     id="technicianId"
+                    readOnly
                     value={formData.technicianId}
-                    onChange={(e) => {
-                      handleChange(e); 
-                      setOpenTechDD(true);
-                    }}
-                    onClick={handleToggleDropdownTech}
+                    // onChange={(e) => {
+                    //   handleChange(e); 
+                    //   setOpenTechDD(true);
+                    // }}
+                    // onClick={handleToggleDropdownTech}
                     placeholder="Select technician ID"
                   />
-                  <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
+                  {/* <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
                   {isTechDropdown && (
                       <ul className="technician-dropdown-list dropdown-list">
                         {technicians.length > 0 ? (
@@ -557,7 +558,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
                           <li>No technicians found</li>
                         )}
                       </ul>
-                    )}
+                    )} */}
                 </div>
               </div>
               </div>

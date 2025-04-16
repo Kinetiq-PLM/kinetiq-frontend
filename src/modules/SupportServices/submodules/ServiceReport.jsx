@@ -15,7 +15,7 @@ import { GET } from "../api/api"
 import { POST } from "../api/api"
 import { PATCH } from "../api/api"
 
-const ServiceReport = () => {
+const ServiceReport = ({employee_id}) => {
   // State for form fields
   const [ticketSubject, setTicketSubject] = useState("")
   const [requestType, setRequestType] = useState("")
@@ -44,7 +44,8 @@ const ServiceReport = () => {
 
   const fetchReports = async () => {
     try {
-      const data = await GET("report/");
+      const data = await GET(`report/reports/technician/${employee_id}/`);
+      //const data = await GET("report/");
       setReports(data);
     } catch (error) {
       console.error("Error fetching reports:", error)
@@ -386,12 +387,14 @@ const ServiceReport = () => {
         onClose={() => setShowUpdateModal(false)}
         onUpdate={handleUpdateReport}
         report={selectedReport}
+        technician={employee_id}
       />
 
       <SubmitReportModal
         isOpen={showSubmitModal}
         onClose={() => setShowSubmitModal(false)}
         onSubmit={handleSubmitReport}
+        technician={employee_id}
       />
 
       {showModal && (

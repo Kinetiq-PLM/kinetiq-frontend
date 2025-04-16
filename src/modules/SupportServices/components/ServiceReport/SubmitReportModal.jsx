@@ -6,7 +6,7 @@ import ServiceReportIcon from "/icons/SupportServices/ServiceReportIcon.png"
 
 import { GET } from "../../api/api"
 
-const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
+const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
   const today = new Date().toISOString().split("T")[0];
   const [tickets, setTickets] = useState([]);
   const [isTixDropdown, setOpenTixDD] = useState(false);
@@ -31,7 +31,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
     billingId: "",
     description: "",
     reportStatus: "",
-    technicianId: "",
+    technicianId: technician,
   })
 
   const fetchTickets = async () => {
@@ -515,15 +515,16 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                   <input
                     type="text"
                     id="technicianId"
+                    readOnly
                     value={formData.technicianId}
-                    onChange={(e) => {
-                      handleChange(e); 
-                      setOpenTechDD(true);
-                    }}
-                    onClick={handleToggleDropdownTech}
+                    // onChange={(e) => {
+                    //   handleChange(e); 
+                    //   setOpenTechDD(true);
+                    // }}
+                    // onClick={handleToggleDropdownTech}
                     placeholder="Select technician ID"
                   />
-                  <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
+                  {/* <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
                   {isTechDropdown && (
                       <ul className="technician-dropdown-list dropdown-list">
                         {technicians.length > 0 ? (
@@ -540,7 +541,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                           <li>No technicians found</li>
                         )}
                       </ul>
-                    )}
+                    )} */}
                 </div>
               </div>
               </div>

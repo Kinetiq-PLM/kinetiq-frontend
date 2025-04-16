@@ -7,9 +7,9 @@ import ServiceAnalysisIcon from "/icons/SupportServices/ServiceAnalysisIcon.png"
 
 import { GET } from "../../api/api"
 
-const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
+const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
   const [requestId, setRequestId] = useState("")
-  const [technicianId, setTechnicianId] = useState("")
+  const [technicianId, setTechnicianId] = useState(technician)
   const [analysisDate, setAnalysisDate] = useState("")
   const [analysisStatus, setAnalysisStatus] = useState("")
   const [customerId, setCustomerId] = useState("")
@@ -30,7 +30,9 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
   
   const fetchRequests = async () => {
     try {
-      const data = await GET("request/");
+      const data = await GET(`request/requests/technician/${technician}/`);
+
+      //const data = await GET("request/");
       setRequests(data);
     } catch (error) {
       console.error("Error fetching requests:", error);
@@ -240,14 +242,15 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
                     type="text"
                     id="technicianId"
                     value={technicianId}
-                    onChange={(e) => {
-                      setTechnicianId(e.target.value);
-                      setOpenTechDD(true);
-                    }}
-                    onClick = {handleToggleDropdownTech}
+                    readOnly
+                    // onChange={(e) => {
+                    //   setTechnicianId(e.target.value);
+                    //   setOpenTechDD(true);
+                    // }}
+                    // onClick = {handleToggleDropdownTech}
                     placeholder="Enter technician ID"
                   />
-                  <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
+                  {/* <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
                       {isTechDropdown && (
                         <ul className="dropdown-list">
                           {technicians.length > 0 ? (
@@ -264,7 +267,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd }) => {
                             <li>No technicians ID found</li>
                           )}
                         </ul>
-                      )}
+                      )} */}
                 </div>
               </div>
             </div>

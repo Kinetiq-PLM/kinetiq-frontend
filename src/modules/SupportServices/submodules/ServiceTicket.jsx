@@ -11,8 +11,9 @@ import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 
 import { GET } from "../api/api"
 import { POST } from "../api/api"
+import { PATCH } from "../api/api"
 
-const ServiceTicket = () => {
+const ServiceTicket = ({ user_id, employee_id }) => {
   // State for form fields
   const [ticketId, setTicketId] = useState("")
   const [customerId, setCustomerId] = useState("")
@@ -37,7 +38,10 @@ const ServiceTicket = () => {
 
   const fetchTickets = async () => {
     try {
-      const data = await GET("ticket/");
+      const data = await GET(`ticket/tickets/salesrep/${employee_id}/`);
+
+      // all tix version:
+      // const data = await GET("ticket/");
       setTickets(data);
     } catch (error) {
       console.error("Error fetching tickets:", error)
@@ -109,6 +113,40 @@ const ServiceTicket = () => {
     }
   }
 
+  // Handle submit from modal
+  const inProgTix = async (ticketId) => {
+    console.log("Updating ticket:", ticketId)
+
+    const ticketData = {
+      status: "In Progress"
+    }
+
+    try {
+        const data = await PATCH (`ticket/${ticketId}/`, ticketData);
+        console.log("Ticket updated successfully:", data);
+        
+        fetchTickets();
+    } catch (error) {
+        let firstError = "An unknown error occurred.";
+        if (error && typeof error === "object") {
+          const keys = Object.keys(error);
+          if (keys.length > 0) {
+            const firstKey = keys[0];
+            const firstValue = error[firstKey];
+            if (Array.isArray(firstValue)) {
+              firstError = `${firstKey}: ${firstValue[0]}`;
+            }
+          } else if (typeof error.detail === "string") {
+            firstError = error.detail;
+          }
+        }
+    
+        console.error("Error updating ticket:", firstError);
+        setErrorModalMessage(firstError); 
+        setShowErrorModal(true);          
+    }
+  }
+
   const handleQueueTicket = () => {
     setShowQueueModal(true)
   }
@@ -120,6 +158,7 @@ const ServiceTicket = () => {
     try {
       const data = await POST("call/", queueData);
       console.log("Service call created successfully:", data);
+      inProgTix(ticketId);
       setShowQueueModal(false);
     } catch (error) {
       let firstError = "An unknown error occurred.";
@@ -271,6 +310,8 @@ const ServiceTicket = () => {
         isOpen={showSubmitModal}
         onClose={() => setShowSubmitModal(false)}
         onSubmit={handleSubmitTicket}
+        user_id={user_id}
+        employee_id={employee_id}
       />
 
       <QueueTicketModal isOpen={showQueueModal} onClose={() => setShowQueueModal(false)} onQueue={handleQueueCall} ticket={selectedTicket} />

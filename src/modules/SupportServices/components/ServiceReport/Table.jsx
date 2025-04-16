@@ -1,10 +1,4 @@
 const Table = ({ reports, onRowClick, selectedReport }) => {
-  // Ensure we have at least 5 rows for the table
-  const filledReports = [...reports]
-  while (filledReports.length < 5) {
-    filledReports.push({ empty: true })
-  }
-
   return (
     <div className="table-container">
       <table className="reports-table">
@@ -20,38 +14,32 @@ const Table = ({ reports, onRowClick, selectedReport }) => {
           </tr>
         </thead>
         <tbody>
-          {filledReports.map((report, index) => (
-            <tr
-              key={report.report_id || `report-${index}`}
-              className={`${
-                selectedReport?.report_id === report.report_id ? "selected-row" : ""
-              } ${index % 2 !== 0 ? "alternate-row" : ""}`}
-              onClick={() => onRowClick(report)}
-              style={{ cursor: "pointer" }} 
-            >
-              {!report.empty ? (
-                <>
-                  <td>{report.report_id}</td>
-                  <td>{report.service_ticket?.ticket_id || "Null"}</td>
-                  <td>{report.service_request?.service_request_id || "Null"}</td>
-                  <td>{report.service_call?.service_call_id || "Null"}</td>
-                  <td>{report.technician ? `${report.technician.first_name || ""} ${report.technician.last_name || ""}`.trim() : "Unknown"}</td>
-                  <td>{report.submission_date || "Null"}</td>
-                  <td>{report.report_status}</td>
-                </>
-              ) : (
-                <>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </>
-              )}
-            </tr>
-          ))}
+          {reports.length > 0 ? (
+            reports.map((report, index) => (
+              <tr
+                key={report.report_id || `report-${index}`}
+                className={`${
+                  selectedReport?.report_id === report.report_id ? "selected-row" : ""
+                } ${index % 2 !== 0 ? "alternate-row" : ""}`}
+                onClick={() => onRowClick(report)}
+                style={{ cursor: "pointer" }} 
+              >
+                <td>{report.report_id}</td>
+                <td>{report.service_ticket?.ticket_id || "Null"}</td>
+                <td>{report.service_request?.service_request_id || "Null"}</td>
+                <td>{report.service_call?.service_call_id || "Null"}</td>
+                <td>{report.technician ? `${report.technician.first_name || ""} ${report.technician.last_name || ""}`.trim() : "Unknown"}</td>
+                <td>{report.submission_date || "Null"}</td>
+                <td>{report.report_status}</td>    
+              </tr>
+            ))
+            ) : (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center", padding: "1rem" }}>
+                  No reports available
+                </td>
+              </tr>
+            )}
         </tbody>
       </table>
     </div>

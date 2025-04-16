@@ -14,7 +14,7 @@ import DashboardBillingIcon from "/icons/SupportServices/Dashboard/DashboardBill
 
 import { GET } from "./api/api"
 
-const SupportServices = ({ loadSubModule, setActiveSubModule }) => {
+const SupportServices = ({ loadSubModule, setActiveSubModule, user_id, employee_id }) => {
   // State for service metrics
   const [serviceMetrics, setServiceMetrics] = useState({
     tickets: { total: 0, open: 0, inProgress: 0, closed: 0 },
@@ -60,6 +60,8 @@ const SupportServices = ({ loadSubModule, setActiveSubModule }) => {
           ...prev.renewals,
           total: data.length,
         }
+
+      
       }));
     } catch (error) {
       console.error("Error fetching renewals:", error)

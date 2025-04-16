@@ -7,7 +7,7 @@ import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 
 import { GET } from "../../api/api"
 
-const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
+const SubmitTicketModal = ({ isOpen, onClose, onSubmit, user_id, employee_id }) => {
   const [customers, setCustomers] = useState([]);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [technicians, setTechnicians] = useState([]);
@@ -25,6 +25,8 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
     return new Date().toISOString().split("T")[0]; // yyyy/mm/dd
   });
   const [ticketType, setTicketType] = useState("")
+
+  
 
   // fetches a list of customers
   const fetchCustomers = async () => {
@@ -101,6 +103,8 @@ const handleSelectType = (selectedType) => {
   const prioRef = useRef(null);
 
   useEffect(() => {
+    setTechnicianId(employee_id); // set the technician id to the one currently logged in
+
     const handleClickOutside = (event) => {
       if (customerRef.current && !customerRef.current.contains(event.target)) {
         setDropdownOpen(false);
@@ -128,11 +132,11 @@ const handleSelectType = (selectedType) => {
       priority: priority,
       subject: subject,
       description: description,
-      type: ticketType
+      type: ticketType,
+      salesrep_id: technicianId
     })
     setCustomerId("");
     setName("");
-    setTechnicianId("");
     setPriority("");
     setSubject("");
     setDescription("");
@@ -244,15 +248,16 @@ const handleSelectType = (selectedType) => {
                   <input
                     type="text"
                     id="technicianId"
+                    readOnly
                     value={technicianId}
-                    onChange={(e) => {
-                      setTechnicianId(e.target.value);
-                      setDropdownOpenT(true);
-                    }}
-                    onClick = {handleToggleDropdownTech}
+                    // onChange={(e) => {
+                    //   setTechnicianId(e.target.value);
+                    //   setDropdownOpenT(true);
+                    // }}
+                    // onClick = {handleToggleDropdownTech}
                     placeholder="Select technician ID"
                   />
-                  <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
+                  {/* <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
                     {isDropdownOpenT && (
                         <ul className="dropdown-list">
                           {technicians.length > 0 ? (
@@ -269,7 +274,11 @@ const handleSelectType = (selectedType) => {
                             <li>No technicians ID found</li>
                           )}
                         </ul>
-                      )}
+                      )} 
+                      
+                      DISABLED DROPDOWN OF TECHNICIAN, AUTO FILL OF TECHNICIAN CURRENTLY LOGGED IN
+                      */}
+                      
                 </div>
               </div>
             </div>

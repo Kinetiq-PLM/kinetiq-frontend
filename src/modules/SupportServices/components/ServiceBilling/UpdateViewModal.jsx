@@ -7,7 +7,7 @@ import ServiceBillingIcon from "/icons/SupportServices/ServiceBillingIcon.svg"
 
 import { GET } from "../../api/api"
 
-const UpdateViewModal = ({ isOpen, onClose, onUpdate, billing }) => {
+const UpdateViewModal = ({ isOpen, onClose, onUpdate, billing, technician}) => {
   const [isOpenStatusDD, setOpenStatusDD] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -174,7 +174,8 @@ const [isRenewalDropdown, setOpenRenewal] = useState(false);
 
 const fetchRenewals = async () => {
   try {
-    const response = await GET(`renewal/`); 
+    const response = await GET(`renewal/renewals/technician/${technician}/`);
+    //const response = await GET(`renewal/`); 
     console.log("renewals", response)
     setRenewals(response);
   } catch (error) {
@@ -211,7 +212,8 @@ const [isRequestDropdown, setRequestDropdown] = useState(false);
 
 const fetchRequests = async () => {
   try {
-    const response = await GET(`request/`); 
+    const response = await GET(`request/requests/technician/${technician}/`);
+    // const response = await GET(`request/`); 
     console.log("requests", response)
     setRequests(response);
   } catch (error) {

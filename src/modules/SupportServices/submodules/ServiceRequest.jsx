@@ -11,7 +11,7 @@ import UpdateViewModal from "../components/ServiceRequest/UpdateViewModal"
 import { GET } from "../api/api"
 import { PATCH } from "../api/api"
 
-const ServiceRequest = () => {
+const ServiceRequest = ({employee_id}) => {
   const [requests, setRequests] = useState([])
   const [filterBy, setFilterBy] = useState("")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
@@ -23,7 +23,10 @@ const ServiceRequest = () => {
 
   const fetchRequests = async () => {
     try {
-      const data = await GET("request/");
+      const data = await GET(`request/requests/technician/${employee_id}/`);
+
+      // all calls version:
+      // const data = await GET("request/");
       setRequests(data);
     } catch (error) {
       console.error("Error fetching requests:", error)

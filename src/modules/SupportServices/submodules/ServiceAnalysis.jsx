@@ -17,7 +17,7 @@ import { GET } from "../api/api"
 import { POST } from "../api/api"
 import { PATCH } from "../api/api"
 
-const ServiceAnalysis = () => {
+const ServiceAnalysis = ({employee_id}) => {
   // State for analyses
   const [analyses, setAnalyses] = useState([])
   const [showUpdateModal, setShowUpdateModal] = useState(false)
@@ -82,8 +82,11 @@ const ServiceAnalysis = () => {
 
   const fetchAnalyses = async () => {
     try {
-      const data = await GET("analysis/");
+      const data = await GET(`analysis/analyses/technician/${employee_id}/`);
       setAnalyses(data);
+
+      // all analyses version:
+      // const data = await GET("analysis/");
     } catch (error) {
       console.error("Error fetching analyses:", error)
     }
@@ -451,8 +454,8 @@ const ServiceAnalysis = () => {
       fetchServiceOrderItems(serviceOrderInfo.serviceOrderId);
       
       try {
-        const data = await GET(`order/orders/${selectedAnalysis.analysis_id}/`);
-    
+        const fetchedData = await GET(`order/orders/${selectedAnalysis.analysis_id}/`);
+        const data = fetchedData[0] || {};
         setServiceOrderInfo({
           ...serviceOrderInfo,
           orderTotalPrice: data?.order_total_price || "",
@@ -499,17 +502,17 @@ const ServiceAnalysis = () => {
       console.log("Order item updated successfully:", data);
       setShowEditItemModal(false);
       fetchServiceOrderItems(serviceOrderInfo.serviceOrderId);
-      
+
       try {
-        const data = await GET(`orders/${selectedAnalysis.analysis_id}/`);
-    
+        const fetchedData = await GET(`order/orders/${selectedAnalysis.analysis_id}/`);
+        const data = fetchedData[0] || {};
         setServiceOrderInfo({
           ...serviceOrderInfo,
           orderTotalPrice: data?.order_total_price || "",
         });
 
       } catch (error) {
-        console.error("Error fetching order:", error);
+        console.error("Error fetching order item:", error);
         setServiceOrderInfo({
           ...serviceOrderInfo,
           orderTotalPrice: ""
@@ -944,8 +947,8 @@ const ServiceAnalysis = () => {
                             style={{ cursor: "pointer" }}
                             className={selectedItem === item ? "selected-row" : ""}
                           >
-                            <td>{item.item?.item_id || ""}</td>
-                            <td>{item.item?.item_name || ""}</td>
+                            <td>{item.item?.inventory_item_id || ""}</td>
+                            <td>{item.item_name || ""}</td>
                             <td>{item.item_quantity}</td>
                             <td>{item.item_price}</td>
                             <td>{item.total_price}</td>
@@ -1325,6 +1328,7 @@ const ServiceAnalysis = () => {
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
           onAdd={handleCreateAnalysis}
+          technician={employee_id}
         />
       )}
 

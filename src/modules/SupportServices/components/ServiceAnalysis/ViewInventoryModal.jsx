@@ -27,9 +27,9 @@ const ViewInventoryModal = ({ isOpen, onClose, onSelectItem }) => {
   const filteredItems = inventoryItems.filter((inventoryItem) => {
     const matchesSearch =
     searchQuery === "" ||
-    inventoryItem.item_md_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
-    inventoryItem.item?.item_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
-    inventoryItem.item?.item_name?.toLowerCase().includes(searchQuery.toLowerCase()) 
+    inventoryItem.inventory_item_id?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+    inventoryItem?.productdocu?.product?.product_name?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+    inventoryItem?.material?.material_name?.toLowerCase().includes(searchQuery.toLowerCase()) 
     return matchesSearch;
   });  
 
@@ -73,19 +73,19 @@ const ViewInventoryModal = ({ isOpen, onClose, onSelectItem }) => {
             <table className="inventory-table">
               <thead>
                 <tr>
-                  <th>Item MD ID</th>
                   <th>Item ID</th>
+                  <th>Item Type</th>
                   <th>Item Name</th>
                   <th>Available Stock</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredItems.map((item) => (
-                  <tr key={item.item_md_id} onClick={() => handleSelectItem(item)} style={{ cursor: "pointer" }}>
-                    <td>{item.item_md_id}</td>
-                    <td>{item.item?.item_id || ""}</td>
-                    <td>{item.item?.item_name}</td>
-                    <td>{item.available_stock}</td>
+                  <tr key={item.inventory_item_id} onClick={() => handleSelectItem(item)} style={{ cursor: "pointer" }}>
+                    <td>{item.inventory_item_id}</td>
+                    <td>{item.item_type || ""}</td>
+                    <td>{item?.material?.material_name || item?.productdocu?.product?.product_name || ""}</td>
+                    <td>{item.current_quantity}</td>
                   </tr>
                 ))}
               </tbody>

@@ -15,7 +15,7 @@ import { GET } from "../api/api"
 import { PATCH } from "../api/api"
 import { POST } from "../api/api"
 
-const ServiceCall = () => {
+const ServiceCall = ({user_id, employee_id}) => {
   // State for service calls
   const [serviceCalls, setServiceCalls] = useState([])
   const [filterBy, setFilterBy] = useState("")
@@ -34,7 +34,10 @@ const ServiceCall = () => {
   // Fetch service calls from API (mock function)
   const fetchServiceCalls = async () => {
     try {
-      const data = await GET("call/");
+      const data = await GET(`call/calls/technician/${employee_id}/`);
+
+      // all calls version:
+      // const data = await GET("call/");
       setServiceCalls(data);
     } catch (error) {
       console.error("Error fetching service calls:", error)
@@ -134,6 +137,38 @@ const ServiceCall = () => {
     setShowResolutionModal(true);
   }
 
+  const updateCallStatus = async (serviceCallId) => {
+    const updatedData = {
+      call_status: "Closed"
+    }
+
+    console.log("Updating service call:", serviceCallId);
+
+    try {
+      await PATCH(`call/${serviceCallId}/`, updatedData);
+      fetchServiceCalls();
+      console.log("Updated service call successfully.")
+  } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
+      console.error("Error updating service call:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
+  }
+  }
+
   const handleSubmitReq = async (reqData) => {
     // submit req
     console.log("Submitting request:", reqData)
@@ -141,9 +176,9 @@ const ServiceCall = () => {
     try {
       const data = await POST("request/", reqData);
       console.log("Service request created successfully:", data);
+      updateCallStatus(data.service_call?.service_call_id);
       setShowRequestModal(false);
       setShowResolutionModal(true);
-      fetchServiceCalls();
     } catch (error) {
       let firstError = "An unknown error occurred.";
       if (error && typeof error === "object") {
@@ -172,9 +207,9 @@ const ServiceCall = () => {
     try {
       const data = await POST("renewal/", renData);
       console.log("Warranty renewal created successfully:", data);
+      updateCallStatus(data.service_call?.service_call_id);
       setShowRenewalModal(false);
       setShowResolutionModal(true);
-      fetchServiceCalls();
     } catch (error) {
       let firstError = "An unknown error occurred.";
       if (error && typeof error === "object") {
