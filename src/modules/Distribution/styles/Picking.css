@@ -492,9 +492,9 @@
   background-color: #007bff;
 }
 
-.picking .status-update-button.status-in-progress:hover {
+/* .picking .status-update-button.status-in-progress:hover {
   background-color: #0069d9;
-}
+} */
 
 .picking .status-update-button.status-completed {
   background-color: #28a745;
@@ -709,6 +709,11 @@
 }
 
 .picking .save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.picking .status-update-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }

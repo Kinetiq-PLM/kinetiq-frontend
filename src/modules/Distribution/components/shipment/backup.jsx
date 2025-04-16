@@ -1,114 +1,109 @@
-// components/shipment/ShipmentModal.jsx
 import React, { useState, useEffect } from 'react';
 
-const ShipmentModal = ({ 
-  shipment, 
-  carriers, 
-  employees,               
-  getEmployeeFullName,     
-  onClose, 
-  onSave, 
-  onShip,
-  onShowDeliveryReceipt,
-  onReportFailure
-}) => {
-  // Create state for editable fields
-  const [formData, setFormData] = useState({
-    carrier_id: shipment.carrier_id || '',
-    weight_kg: shipment.shipping_cost_info?.weight_kg || 0,
-    distance_km: shipment.shipping_cost_info?.distance_km || 0,
-    cost_per_kg: shipment.shipping_cost_info?.cost_per_kg || 150,
-    cost_per_km: shipment.shipping_cost_info?.cost_per_km || 20,
-    additional_cost: shipment.operational_cost_info?.additional_cost || 0,
-  });
+const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [deliveryReceipt, setDeliveryReceipt] = useState(null);
+  const [error, setError] = useState(null);
+  const [customerName, setCustomerName] = useState(''); // Add state for customer name
   
-  // Calculate total shipping cost
-  const calculateShippingCost = () => {
-    const weight = parseFloat(formData.weight_kg) || 0;
-    const distance = parseFloat(formData.distance_km) || 0;
-    const costPerKg = parseFloat(formData.cost_per_kg) || 0;
-    const costPerKm = parseFloat(formData.cost_per_km) || 0;
-    
-    return (weight * costPerKg) + (distance * costPerKm);
-  };
+  // Form state
+  const [signature, setSignature] = useState('');
+  const [rejectReason, setRejectReason] = useState('');
+  const [isRejecting, setIsRejecting] = useState(false);
   
-  // Calculate total operational cost
-  const calculateOperationalCost = () => {
-    const additionalCost = parseFloat(formData.additional_cost) || 0;
-    const shippingCost = calculateShippingCost();
-    const packingCost = shipment.packing_list_info?.packing_cost_info?.total_packing_cost || 0;
+  // Fetch delivery receipt on component mount
+  useEffect(() => {
+    const fetchDeliveryReceipt = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        if (!shipment.delivery_receipt_id) {
+          throw new Error('No delivery receipt found for this shipment');
+        }
+        
+        const response = await fetch(`http://127.0.0.1:8000/api/delivery-receipts/${shipment.delivery_receipt_id}/`);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || 'Failed to fetch delivery receipt');
+        }
+        
+        const data = await response.json();
+        setDeliveryReceipt(data);
+        
+        // Initialize form state with existing data
+        if (data.signature) {
+          setSignature(data.signature);
+        }
+        
+        // Fetch customer name if received_by appears to be a customer ID
+        if (data.received_by && data.received_by.startsWith('SALES-CUST-')) {
+          fetchCustomerName(data.received_by);
+        }
+        
+        setIsLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setIsLoading(false);
+      }
+    };
     
-    return additionalCost + shippingCost + packingCost;
-  };
-  
-  // Handle input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    
-    // Apply limits for weight and distance
-    if (name === 'weight_kg' && parseFloat(value) > 2000) {
-      setFormData(prev => ({
-        ...prev,
-        [name]: 2000
-      }));
-      return;
+    fetchDeliveryReceipt();
+  }, [shipment.delivery_receipt_id]);
+
+  // New function to fetch customer name
+  const fetchCustomerName = async (customerId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/customers/${customerId}/`);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch customer details');
+        // Extract customer name from ID as fallback
+        if (customerId.startsWith('SALES-CUST-')) {
+          // Just display the ID as fallback
+          setCustomerName(`Customer ${customerId}`);
+        }
+        return;
+      }
+      
+      const customerData = await response.json();
+      if (customerData && customerData.name) {
+        setCustomerName(customerData.name);
+      }
+    } catch (err) {
+      console.error('Error fetching customer details:', err);
     }
-    
-    if (name === 'distance_km' && parseFloat(value) > 2000) {
-      setFormData(prev => ({
-        ...prev,
-        [name]: 2000
-      }));
-      return;
-    }
-    
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
   };
   
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Prevent saving if shipment is not editable
-    if (!isShipmentEditable) {
-      return;
-    }
+    if (!deliveryReceipt) return;
     
-    // Prepare updates object
-    const updates = {};
+    const updates = {
+      ...deliveryReceipt,
+      signature: signature,
+      receipt_status: 'Received'
+    };
     
-    // Only include fields that have changed
-    if (formData.carrier_id !== shipment.carrier_id) {
-      updates.carrier_id = formData.carrier_id;
-    }
+    onSave(updates);
+  };
+  
+  // Handle rejection form submission
+  const handleReject = (e) => {
+    e.preventDefault();
     
-    // Check if shipping cost fields have changed
-    const shippingCostChanged = 
-      formData.weight_kg != shipment.shipping_cost_info?.weight_kg ||
-      formData.distance_km != shipment.shipping_cost_info?.distance_km ||
-      formData.cost_per_kg != shipment.shipping_cost_info?.cost_per_kg ||
-      formData.cost_per_km != shipment.shipping_cost_info?.cost_per_km;
+    if (!deliveryReceipt) return;
     
-    if (shippingCostChanged) {
-      updates.shipping_cost = {
-        weight_kg: parseFloat(formData.weight_kg),
-        distance_km: parseFloat(formData.distance_km),
-        cost_per_kg: parseFloat(formData.cost_per_kg),
-        cost_per_km: parseFloat(formData.cost_per_km),
-        total_shipping_cost: calculateShippingCost()
-      };
-    }
+    const updates = {
+      ...deliveryReceipt,
+      receipt_status: 'Rejected',
+      rejection_reason: rejectReason
+    };
     
-    // Check if additional cost has changed
-    if (formData.additional_cost != shipment.operational_cost_info?.additional_cost) {
-      updates.additional_cost = parseFloat(formData.additional_cost);
-    }
-    
-    // Save changes
-    onSave(shipment, updates);
+    onSave(updates);
   };
   
   // Format date
@@ -121,325 +116,184 @@ const ShipmentModal = ({
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      day: 'numeric'
     });
   };
   
-  // Get carrier name by ID
-  const getCarrierName = (carrierId) => {
-    const carrier = carriers.find(c => c.carrier_id === carrierId);
-    return carrier ? carrier.carrier_name : 'Not Assigned';
+  // Determine if receipt can be updated
+  const canBeUpdated = deliveryReceipt && 
+                       deliveryReceipt.receipt_status !== 'Received' && 
+                       deliveryReceipt.receipt_status !== 'Rejected';
+  
+  // Helper function to display receiver with customer name if available
+  const getReceiverDisplay = () => {
+    if (customerName) {
+      return customerName;
+    } else if (deliveryReceipt?.received_by) {
+      return deliveryReceipt.received_by;
+    }
+    return 'Not Yet Received';
   };
-  
-  // Determine if shipment can be marked as shipped
-  const canBeShipped = shipment.shipment_status === 'Pending';
-  
-  // Determine if delivery receipt can be accessed
-  const hasDeliveryReceipt = shipment.shipment_status === 'Shipped' || shipment.shipment_status === 'Delivered';
-  
-  // Determine if shipment can be marked as failed
-  const canBeFailed = shipment.shipment_status === 'Pending' || shipment.shipment_status === 'Shipped';
-  
-  // Determine if shipment is editable (only Pending shipments can be edited)
-  const isShipmentEditable = shipment.shipment_status === 'Pending';
   
   return (
     <div className="modal-overlay">
-      <div className="shipment-modal">
+      <div className="delivery-receipt-modal">
         <div className="modal-header">
-          <h3>Shipment Details</h3>
-          <button className="close-button" onClick={onClose}>&times;</button>
+          <h3>Delivery Receipt</h3>
+          <button className="close-button" onClick={onCancel}>&times;</button>
         </div>
         
-        <form onSubmit={handleSubmit}>
-          <div className="modal-body">
-            {/* Shipment Information Section */}
-            <div className="info-section">
-              <h4>Shipment Information</h4>
-              <div className="info-grid">
-                <div className="info-item">
-                  <span className="info-label">Shipment ID</span>
-                  <span className="info-value">{shipment.shipment_id}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Tracking Number</span>
-                  <span className="info-value">{shipment.tracking_number}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Status</span>
-                  <span className={`info-value status-${shipment.shipment_status.toLowerCase()}`}>
-                    {shipment.shipment_status}
-                  </span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Shipment Date</span>
-                  <span className="info-value">{formatDate(shipment.shipment_date)}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Estimated Arrival</span>
-                  <span className="info-value">{formatDate(shipment.estimated_arrival_date)}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Actual Arrival</span>
-                  <span className="info-value">{formatDate(shipment.actual_arrival_date)}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Delivery Type</span>
-                  <span className="info-value">{shipment.delivery_type || 'Unknown'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">From</span>
-                  <span className="info-value">{shipment.source_location || 'Unknown'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Destination</span>
-                  <span className="info-value">{shipment.destination_location || 'Unknown'}</span>
-                </div>
-              </div>
+        <div className="modal-body">
+          {isLoading ? (
+            <div className="loading-container">
+              <div className="spinner"></div>
+              <p>Loading delivery receipt...</p>
             </div>
-            
-            {/* Display message if shipment is not editable */}
-            {!isShipmentEditable && (
-              <div className="info-message" style={{ margin: '10px 0', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px', borderLeft: '4px solid #e9452a' }}>
-                <i className="info-icon" style={{ marginRight: '8px' }}>🔴</i>
-                <span>This shipment has been processed and cannot be edited. You can only view details or manage the delivery receipt.</span>
-              </div>
-            )}
-            
-            {/* Carrier Selection Section */}
-            <div className="edit-section">
-              <h4>Carrier Information</h4>
-              <div className="carrier-selection">
-                <select
-                  className="carrier-dropdown"
-                  name="carrier_id"
-                  value={formData.carrier_id}
-                  onChange={handleInputChange}
-                  disabled={!isShipmentEditable}
-                >
-                  <option value="">-- Select Carrier --</option>
-                  {carriers.map(carrier => (
-                    <option key={carrier.carrier_id} value={carrier.carrier_id}>
-                      {getEmployeeFullName(carrier.carrier_name)} - {carrier.service_type || 'Standard'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {!formData.carrier_id && isShipmentEditable && (
-                <p className="info-value" style={{ color: '#dc3545', marginTop: '0.5rem', fontSize: '0.875rem' }}>
-                  Warning: No carrier assigned. It's recommended to assign a carrier before shipping.
-                </p>
-              )}
+          ) : error ? (
+            <div className="error-container">
+              <p className="error-message">Error: {error}</p>
             </div>
-            
-            {/* Shipping Cost Section */}
-            <div className="edit-section">
-              <h4>Shipping Details & Cost</h4>
-              <div className="dimensions-grid">
-                <div className="dimension-item">
-                  <span className="dimension-label">Weight (kg)</span>
-                  <input
-                    type="number"
-                    className="dimension-input"
-                    name="weight_kg"
-                    value={formData.weight_kg}
-                    onChange={handleInputChange}
-                    min="0"
-                    max="2000"
-                    step="0.01"
-                    disabled={!isShipmentEditable}
-                  />
-                  <small className="limit-text">Maximum: 2000kg</small>
-                </div>
-                <div className="dimension-item">
-                  <span className="dimension-label">Distance (km)</span>
-                  <input
-                    type="number"
-                    className="dimension-input"
-                    name="distance_km"
-                    value={formData.distance_km}
-                    onChange={handleInputChange}
-                    min="0"
-                    max="2000"
-                    step="0.01"
-                    disabled={!isShipmentEditable}
-                  />
-                  <small className="limit-text">Maximum: 2000km</small>
-                </div>
-                <div className="dimension-item">
-                  <span className="dimension-label">Cost per kg (₱)</span>
-                  <input
-                    type="number"
-                    className="dimension-input"
-                    name="cost_per_kg"
-                    value={formData.cost_per_kg}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    disabled={!isShipmentEditable}
-                  />
-                </div>
-                <div className="dimension-item">
-                  <span className="dimension-label">Cost per km (₱)</span>
-                  <input
-                    type="number"
-                    className="dimension-input"
-                    name="cost_per_km"
-                    value={formData.cost_per_km}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    disabled={!isShipmentEditable}
-                  />
+          ) : !deliveryReceipt ? (
+            <div className="error-container">
+              <p className="error-message">No delivery receipt found</p>
+            </div>
+          ) : (
+            <>
+              <div className="info-section">
+                <h4>Receipt Information</h4>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <span className="info-label">Receipt ID</span>
+                    <span className="info-value">{deliveryReceipt.delivery_receipt_id}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Delivery Date</span>
+                    <span className="info-value">{formatDate(deliveryReceipt.delivery_date)}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Status</span>
+                    <span className={`info-value status-${deliveryReceipt.receipt_status?.toLowerCase()}`}>
+                      {deliveryReceipt.receipt_status}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Receiver</span>
+                    <span className="info-value">{getReceiverDisplay()}</span>
+                  </div>
+                  {deliveryReceipt.receiving_module && (
+                    <div className="info-item">
+                      <span className="info-label">Receiving Module</span>
+                      <span className="info-value">{deliveryReceipt.receiving_module}</span>
+                    </div>
+                  )}
+                  {deliveryReceipt.total_amount && (
+                    <div className="info-item">
+                      <span className="info-label">Total Amount</span>
+                      <span className="info-value">₱ {deliveryReceipt.total_amount}</span>
+                    </div>
+                  )}
                 </div>
               </div>
               
-              <div className="cost-editing">
-                <div className="cost-input-row">
-                  <span className="cost-label">Shipping Cost:</span>
-                  <span className="cost-value">₱ {calculateShippingCost().toFixed(2)}</span>
-                </div>
-                <div className="cost-input-row">
-                  <span className="cost-label">Packing Cost:</span>
-                  <span className="cost-value">₱ {(shipment.packing_list_info?.packing_cost_info?.total_packing_cost || 0).toFixed(2)}</span>
-                </div>
-                <div className="cost-input-row">
-                  <span className="cost-label">Additional Cost:</span>
-                  <input
-                    type="number"
-                    className="cost-input"
-                    name="additional_cost"
-                    value={formData.additional_cost}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    disabled={!isShipmentEditable}
-                  />
-                </div>
-                <div className="cost-total-row">
-                  <span className="cost-total-label">Total Operational Cost:</span>
-                  <span className="cost-total-value">₱ {calculateOperationalCost().toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Related Information Section */}
-            <div className="info-section">
-              <h4>Related Information</h4>
-              <div className="info-grid">
-                <div className="info-item">
-                  <span className="info-label">Packing List ID</span>
-                  <span className="info-value">{shipment.packing_list_id || 'Not Available'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Packing Status</span>
-                  <span className="info-value">{shipment.packing_list_info?.packing_status || 'Not Available'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Delivery Receipt ID</span>
-                  <span className="info-value">{shipment.delivery_receipt_id || 'Not Available'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Receipt Status</span>
-                  <span className="info-value">{shipment.delivery_receipt_info?.receipt_status || 'Not Available'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Delivery Order Type</span>
-                  <span className="info-value">{shipment.delivery_type || 'Unknown'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Delivery Reference</span>
-                  <span className="info-value">{shipment.delivery_id || 'Not Available'}</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Status Action Section */}
-            <div className="status-section">
-              <h4>Status Actions</h4>
-              
-              {shipment.shipment_status === 'Delivered' && (
-                <div className="delivered-message">
-                  This shipment has been delivered successfully. No further actions required.
+              {canBeUpdated ? (
+                isRejecting ? (
+                  // Rejection Form
+                  <form onSubmit={handleReject}>
+                    <div className="delivery-receipt-section">
+                      <h4>Rejection Details</h4>
+                      <div className="form-row">
+                        <label className="form-label">Reason for Rejection:</label>
+                        <textarea
+                          className="form-textarea"
+                          value={rejectReason}
+                          onChange={(e) => setRejectReason(e.target.value)}
+                          required
+                          placeholder="Please provide a detailed reason for rejecting this delivery"
+                        />
+                      </div>
+                      
+                      <div className="receipt-status-buttons">
+                        <button
+                          type="button"
+                          className="cancel-button"
+                          onClick={() => setIsRejecting(false)}
+                          style={{ flex: 1 }}
+                        >
+                          Cancel Rejection
+                        </button>
+                        <button
+                          type="submit"
+                          className="danger-button"
+                          style={{ flex: 1 }}
+                          disabled={!rejectReason.trim()}
+                        >
+                          Confirm Rejection
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                ) : (
+                  // Delivery Signature Form
+                  <form onSubmit={handleSubmit}>
+                    <div className="delivery-receipt-section">
+                      <h4>Delivery Confirmation</h4>
+                      <div className="form-row">
+                        <label className="form-label">Receiver Signature:</label>
+                        <div className="signature-box">
+                          <input
+                            className="signature-input"
+                            value={signature}
+                            onChange={(e) => setSignature(e.target.value)}
+                            placeholder="Type signature or confirmation code here"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="receipt-status-buttons">
+                        <button
+                          type="submit"
+                          className="receipt-status-button receive"
+                          disabled={!signature.trim()}
+                        >
+                          Confirm Receipt
+                        </button>
+                        <button
+                          type="button"
+                          className="receipt-status-button reject"
+                          onClick={() => setIsRejecting(true)}
+                        >
+                          Reject Delivery
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                )
+              ) : (
+                <div className={deliveryReceipt.receipt_status === 'Received' ? 'delivered-message' : 'failed-message'}>
+                  {deliveryReceipt.receipt_status === 'Received' ? (
+                    <p>This delivery has been confirmed as received. No further action is required.</p>
+                  ) : (
+                    <p>This delivery has been rejected. Please check the rework orders for further processing.</p>
+                  )}
                 </div>
               )}
-              
-              {shipment.shipment_status === 'Failed' && (
-                <div className="failed-message">
-                  This shipment has failed. Please check the failure details.
-                </div>
-              )}
-              
-              {canBeShipped && (
-                <button
-                  type="button"
-                  className="status-update-button ship"
-                  onClick={() => onShip(shipment, {
-                    carrier_id: formData.carrier_id,
-                    shipping_cost_info: {
-                      weight_kg: parseFloat(formData.weight_kg) || 0,
-                      distance_km: parseFloat(formData.distance_km) || 0,
-                      cost_per_kg: parseFloat(formData.cost_per_kg) || 0,
-                      cost_per_km: parseFloat(formData.cost_per_km) || 0,
-                      total_shipping_cost: calculateShippingCost()
-                    },
-                    operational_cost_info: {
-                      additional_cost: parseFloat(formData.additional_cost) || 0,
-                      total_operational_cost: calculateOperationalCost()
-                    }
-                  })}
-                >
-                  Mark as Shipped
-                </button>
-              )}
-              
-              {hasDeliveryReceipt && (
-                <button
-                  type="button"
-                  className="status-update-button delivery"
-                  onClick={() => onShowDeliveryReceipt(shipment)}
-                  style={{ marginTop: canBeShipped ? '0.5rem' : '0' }}
-                >
-                  Manage Delivery Receipt
-                </button>
-              )}
-              
-              {canBeFailed && (
-                <button
-                  type="button"
-                  className="status-update-button failure"
-                  onClick={() => onReportFailure(shipment)}
-                  style={{ marginTop: (canBeShipped || hasDeliveryReceipt) ? '0.5rem' : '0' }}
-                >
-                  Report Failure
-                </button>
-              )}
-            </div>
-          </div>
-          
-          <div className="modal-footer">
-            <button 
-              type="button" 
-              className="cancel-button"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            {isShipmentEditable && (
-              <button 
-                type="submit" 
-                className="save-button"
-              >
-                Save Changes
-              </button>
-            )}
-          </div>
-        </form>
+            </>
+          )}
+        </div>
+        
+        <div className="modal-footer">
+          <button 
+            type="button" 
+            className="cancel-button"
+            onClick={onCancel}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default ShipmentModal;
+export default DeliveryReceiptModal;

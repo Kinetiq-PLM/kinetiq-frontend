@@ -550,9 +550,9 @@
   background-color: #007bff;
 }
 
-.packing .status-update-button.status-packed:hover {
+/* .packing .status-update-button.status-packed:hover {
   background-color: #0069d9;
-}
+} */
 
 .packing .status-update-button.status-shipped {
   background-color: #28a745;
@@ -560,6 +560,11 @@
 
 .packing .status-update-button.status-shipped:hover {
   background-color: #218838;
+}
+
+.picking .status-update-button:disabled {
+  background-color: #cccccc !important;
+  cursor: not-allowed;
 }
 
 /* Action buttons */
@@ -594,6 +599,11 @@
 }
 
 .packing .save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.packing .status-update-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }

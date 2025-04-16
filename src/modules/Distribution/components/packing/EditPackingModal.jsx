@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaUser, FaBox, FaMoneyBillWave, FaClipboardCheck, FaInfoCircle, FaTags } from "react-icons/fa";
 
 const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSave, onStatusUpdate }) => {
   // State for edited values
@@ -108,6 +109,26 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return packingList.packing_status === 'Pending';
   };
   
+  // Check if status update button should be disabled
+  const isStatusUpdateDisabled = () => {
+    // Need an employee assigned
+    if (!editedValues.packed_by && !packingList.packed_by) {
+      return true;
+    }
+    
+    // Need a packing type selected
+    if (!editedValues.packing_type && !packingList.packing_type) {
+      return true;
+    }
+    
+    // Make sure there are valid costs
+    if (packingCost.material_cost <= 0 && packingCost.labor_cost <= 0) {
+      return true;
+    }
+    
+    return false;
+  };
+  
   // Handle status update button click
   const handleStatusUpdate = () => {
     if (isNotEditable) return;
@@ -141,7 +162,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
         <div className="modal-body">
           {/* Basic Information */}
           <div className="info-section">
-            <h4>Packing Information</h4>
+            <h4><FaBox className="icon-spacing" /> Packing Information</h4>
             <div className="info-grid">
               <div className="info-item">
                 <span className="info-label">Packing ID:</span>
@@ -173,7 +194,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           {/* Related Picking List */}
           {packingList.picking_list_info && (
             <div className="info-section">
-              <h4>Related Picking List</h4>
+              <h4><FaClipboardCheck className="icon-spacing" /> Related Picking List</h4>
               <div className="info-grid">
                 <div className="info-item">
                   <span className="info-label">Picking ID:</span>
@@ -201,7 +222,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           
           {/* Packing Assignment Section */}
           <div className="edit-section">
-            <h4>Assign Packer</h4>
+            <h4><FaUser className="icon-spacing" /> Assign Packer</h4>
             {isNotEditable ? (
               <div className="employee-display">
                 <span className="employee-value">
@@ -229,7 +250,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           
           {/* Packing Type Section */}
           <div className="edit-section">
-            <h4>Packing Type</h4>
+            <h4><FaTags className="icon-spacing" /> Packing Type</h4>
             {isNotEditable ? (
               <div className="packing-type-display">
                 <span className="packing-type-value">
@@ -257,7 +278,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           
           {/* Packing Cost Section */}
           <div className="edit-section">
-            <h4>Packing Costs</h4>
+            <h4><FaMoneyBillWave className="icon-spacing" /> Packing Costs</h4>
             {isNotEditable ? (
               <div className="cost-display">
                 <div className="cost-info-row">
@@ -331,15 +352,29 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                   // Call onStatusUpdate with all the edited values
                   onStatusUpdate(packingList, getNextStatus(), updatedValues);
                 }}
+                disabled={isStatusUpdateDisabled()}
               >
                 {getNextStatusLabel()}
-            </button>
+              </button>
+              
+              {isStatusUpdateDisabled() && (
+                <div className="validation-message" style={{
+                  color: '#dc3545',
+                  fontSize: '0.8rem',
+                  marginTop: '0.5rem'
+                }}>
+                  {!editedValues.packed_by && !packingList.packed_by ? 'Please assign an employee for packing' : 
+                   (!editedValues.packing_type && !packingList.packing_type) ? 'Please select a packing type' : 
+                   (packingCost.material_cost <= 0 && packingCost.labor_cost <= 0) ? 'Please enter valid packing costs' : ''}
+                </div>
+              )}
             </div>
           )}
           
           {/* Status message for packed items */}
           {isPacked && (
             <div className="completed-message">
+              <FaClipboardCheck className="icon-spacing" />
               <span className="info-text">This packing list has been completed.</span>
             </div>
           )}
@@ -347,7 +382,28 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           {/* Status message for shipped items */}
           {isShipped && (
             <div className="completed-message">
+              <FaClipboardCheck className="icon-spacing" />
               <span className="info-text">This packing list has been shipped and cannot be modified.</span>
+            </div>
+          )}
+          
+          {/* Next steps info section for pending packing lists */}
+          {canUpdateStatus() && !isStatusUpdateDisabled() && (
+            <div className="info-section">
+              <div className="icon-message">
+                <FaInfoCircle className="info-icon" />
+                <div>
+                  <p className="confirmation-message">
+                    What happens when you mark as packed?
+                  </p>
+                  <ul className="next-steps-list">
+                    <li>The packing list status will change to "Packed"</li>
+                    <li>The packing costs will be recorded</li>
+                    <li>A new shipment record will be created automatically</li>
+                    <li>The item will move to the shipping stage</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
         </div>

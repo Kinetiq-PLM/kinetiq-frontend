@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { GoogleMap, LoadScript, Marker, useLoadScript } from '@react-google-maps/api';
-//import useRef
-
+import { GoogleMap, LoadScript, Marker, Polyline, useLoadScript } from '@react-google-maps/api';
 
 const ShipmentModal = ({ 
   shipment, 
@@ -30,15 +28,14 @@ const ShipmentModal = ({
   // Use the useLoadScript hook instead of LoadScript component
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "AIzaSyAby5p9XBIsWC1aoy1_RyHxrnlzHhjIoOU",
-    // Prevent the script from loading again if it's already loaded
     preventGoogleFontsLoading: true
   });
 
   // Map state
-  const [mapCoordinates, setMapCoordinates] = useState(null);
+  const [sourceCoordinates, setSourceCoordinates] = useState(null);
+  const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState(null);
-  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
 
   // Map styles and settings
   const mapContainerStyle = {
@@ -53,45 +50,106 @@ const ShipmentModal = ({
     lng: 120.9842
   };
 
-  // Geocode the destination address when script is loaded and component mounts
+  // Geocode both source and destination addresses
   useEffect(() => {
-    if (!shipment.destination_location || !isLoaded || mapsInitializedRef.current) return;
+    if (!isLoaded || mapsInitializedRef.current) return;
     
     setMapLoading(true);
     setMapError(null);
     
-    try {
-      const geocoder = new window.google.maps.Geocoder();
+    const geocodeLocation = async (locationString, setCoordinates) => {
+      if (!locationString) return null;
       
-      geocoder.geocode({ address: shipment.destination_location }, (results, status) => {
-        if (status === "OK" && results && results.length > 0) {
-          const location = results[0].geometry.location;
-          setMapCoordinates({
-            lat: location.lat(),
-            lng: location.lng()
+      try {
+        const geocoder = new window.google.maps.Geocoder();
+        
+        return new Promise((resolve, reject) => {
+          geocoder.geocode({ address: locationString }, (results, status) => {
+            if (status === "OK" && results && results.length > 0) {
+              const location = results[0].geometry.location;
+              const coordinates = {
+                lat: location.lat(),
+                lng: location.lng()
+              };
+              setCoordinates(coordinates);
+              resolve(coordinates);
+            } else {
+              console.error(`Geocoding failed for ${locationString}: ${status}`);
+              reject(`Geocoding failed: ${status}`);
+            }
           });
-          setMapLoading(false);
-          mapsInitializedRef.current = true;
-        } else {
-          setMapError(`Geocoding failed: ${status}`);
-          setMapLoading(false);
-          console.error("Geocoding failed:", status);
+        });
+      } catch (error) {
+        console.error("Geocoding error:", error);
+        return null;
+      }
+    };
+
+    const initializeLocations = async () => {
+      try {
+        let sourceCoords = null;
+        let destCoords = null;
+        
+        // Geocode source location if available
+        if (shipment.source_location) {
+          sourceCoords = await geocodeLocation(shipment.source_location, setSourceCoordinates);
         }
-      });
-    } catch (error) {
-      setMapError(`Error: ${error.message}`);
-      setMapLoading(false);
-      console.error("Geocoding error:", error);
-    }
-  }, [shipment.destination_location, isLoaded]);
+        
+        // Geocode destination location if available
+        if (shipment.destination_location) {
+          destCoords = await geocodeLocation(shipment.destination_location, setDestinationCoordinates);
+        }
+        
+        // If both coordinates are available, calculate straight-line distance
+        if (sourceCoords && destCoords) {
+          // Calculate distance using the Haversine formula
+          const R = 6371; // Radius of the earth in km
+          const dLat = (destCoords.lat - sourceCoords.lat) * Math.PI / 180;
+          const dLon = (destCoords.lng - sourceCoords.lng) * Math.PI / 180;
+          const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(sourceCoords.lat * Math.PI / 180) * Math.cos(destCoords.lat * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          const distance = R * c; // Distance in km
+          
+          // Only update distance if it's currently zero
+          if (parseFloat(formData.distance_km) === 0) {
+            setFormData(prev => ({
+              ...prev,
+              distance_km: parseFloat(distance.toFixed(2))
+            }));
+          }
+        }
+        
+        setMapLoading(false);
+        mapsInitializedRef.current = true;
+      } catch (error) {
+        setMapError(`Error: ${error}`);
+        setMapLoading(false);
+      }
+    };
+    
+    initializeLocations();
+  }, [shipment.source_location, shipment.destination_location, isLoaded, formData.distance_km]);
 
   // Handle map load
   const onMapLoad = useCallback((map) => {
-    if (mapCoordinates) {
-      map.setCenter(mapCoordinates);
+    // Set appropriate center and zoom based on available coordinates
+    if (destinationCoordinates && sourceCoordinates) {
+      // Create bounds that include both points
+      const bounds = new window.google.maps.LatLngBounds();
+      bounds.extend(sourceCoordinates);
+      bounds.extend(destinationCoordinates);
+      map.fitBounds(bounds);
+    } else if (destinationCoordinates) {
+      map.setCenter(destinationCoordinates);
+    } else if (sourceCoordinates) {
+      map.setCenter(sourceCoordinates);
     }
+    
     setMapLoading(false);
-  }, [mapCoordinates]);
+  }, [sourceCoordinates, destinationCoordinates]);
 
   const calculateShippingCost = () => {
     const weight = parseFloat(formData.weight_kg) || 0;
@@ -215,6 +273,29 @@ const ShipmentModal = ({
   // Determine if shipment is editable (only Pending shipments can be edited)
   const isShipmentEditable = shipment.shipment_status === 'Pending';
   
+  // Check if shipping details are valid
+  const hasValidShippingDetails = 
+    parseFloat(formData.weight_kg) > 0 && 
+    parseFloat(formData.distance_km) > 0;
+  
+  // Combined validation for action buttons
+  const isActionDisabled = !formData.carrier_id || !hasValidShippingDetails;
+  
+  // Determine if we should show the map section
+  const shouldShowMap = shipment.destination_location || shipment.source_location;
+  
+  // Create polyline path (straight line between source and destination)
+  const polylinePath = sourceCoordinates && destinationCoordinates ? 
+    [sourceCoordinates, destinationCoordinates] : [];
+  
+  // Polyline options for the route line
+  const polylineOptions = {
+    strokeColor: "#4285F4", // Google Maps blue
+    strokeOpacity: 0.8,
+    strokeWeight: 5,
+    geodesic: true, // Follow the curvature of the earth
+  };
+  
   return (
     <div className="modal-overlay">
       <div className="shipment-modal">
@@ -269,19 +350,87 @@ const ShipmentModal = ({
               </div>
             </div>
             
-            {/* Destination Map Section - Using loadscript for rendering closed modal*/}
-            {shipment.destination_location && (
+            {/* Shipping Route Map Section */}
+            {shouldShowMap && (
               <div className="info-section">
-                <h4>Destination Map</h4>
+                <h4>Shipping Route</h4>
                 <div className="map-container" style={{ position: 'relative' }}>
                   {isLoaded ? (
                     <GoogleMap
                       mapContainerStyle={mapContainerStyle}
-                      center={mapCoordinates || defaultCenter}
+                      center={destinationCoordinates || sourceCoordinates || defaultCenter}
                       zoom={15}
                       onLoad={onMapLoad}
                     >
-                      {mapCoordinates && <Marker position={mapCoordinates} />}
+                      {/* Draw straight line between points if both exist */}
+                      {sourceCoordinates && destinationCoordinates && (
+                        <Polyline
+                          path={polylinePath}
+                          options={polylineOptions}
+                        />
+                      )}
+                      
+                      {/* Add the thick blue glow effect under the main line */}
+                      {sourceCoordinates && destinationCoordinates && (
+                        <Polyline
+                          path={polylinePath}
+                          options={{
+                            strokeColor: "#4285F4",
+                            strokeOpacity: 0.4,
+                            strokeWeight: 9,
+                            geodesic: true,
+                            zIndex: 1
+                          }}
+                        />
+                      )}
+                      
+                      {/* Add the main line on top */}
+                      {sourceCoordinates && destinationCoordinates && (
+                        <Polyline
+                          path={polylinePath}
+                          options={{
+                            strokeColor: "#4285F4",
+                            strokeOpacity: 1,
+                            strokeWeight: 5,
+                            geodesic: true,
+                            zIndex: 2
+                          }}
+                        />
+                      )}
+                      
+                      {/* Render source marker if coordinates are available */}
+                      {sourceCoordinates && (
+                        <Marker
+                          position={sourceCoordinates}
+                          icon={{
+                            url: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                            labelOrigin: new window.google.maps.Point(15, -10)
+                          }}
+                          label={{
+                            text: "Source",
+                            color: "#333",
+                            fontSize: "12px",
+                            fontWeight: "bold"
+                          }}
+                        />
+                      )}
+                      
+                      {/* Render destination marker if coordinates are available */}
+                      {destinationCoordinates && (
+                        <Marker
+                          position={destinationCoordinates}
+                          icon={{
+                            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                            labelOrigin: new window.google.maps.Point(15, -10)
+                          }}
+                          label={{
+                            text: "Destination",
+                            color: "#333",
+                            fontSize: "12px",
+                            fontWeight: "bold"
+                          }}
+                        />
+                      )}
                     </GoogleMap>
                   ) : (
                     <div className="map-loading" style={{ 
@@ -397,32 +546,6 @@ const ShipmentModal = ({
                   />
                   <small className="limit-text">Maximum: 2000km</small>
                 </div>
-                <div className="dimension-item">
-                  <span className="dimension-label">Cost per kg (₱)</span>
-                  <input
-                    type="number"
-                    className="dimension-input"
-                    name="cost_per_kg"
-                    value={formData.cost_per_kg}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    disabled={!isShipmentEditable}
-                  />
-                </div>
-                <div className="dimension-item">
-                  <span className="dimension-label">Cost per km (₱)</span>
-                  <input
-                    type="number"
-                    className="dimension-input"
-                    name="cost_per_km"
-                    value={formData.cost_per_km}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    disabled={!isShipmentEditable}
-                  />
-                </div>
               </div>
               
               <div className="cost-editing">
@@ -453,7 +576,11 @@ const ShipmentModal = ({
                 </div>
               </div>
             </div>
-            
+            {!hasValidShippingDetails && isShipmentEditable && (
+                <p className="info-value" style={{ color: '#dc3545', marginTop: '0.5rem', fontSize: '0.875rem' }}>
+                  Warning: Weight and distance must be greater than zero for shipping.
+                </p>
+              )}
             {/* Related Information Section */}
             <div className="info-section">
               <h4>Related Information</h4>
@@ -504,7 +631,7 @@ const ShipmentModal = ({
               {canBeShipped && (
                 <button
                   type="button"
-                  className="status-update-button ship"
+                  className={`status-update-button ship ${isActionDisabled ? 'disabled' : ''}`}
                   onClick={() => onShip(shipment, {
                     carrier_id: formData.carrier_id,
                     shipping_cost_info: {
@@ -519,6 +646,8 @@ const ShipmentModal = ({
                       total_operational_cost: calculateOperationalCost()
                     }
                   })}
+                  disabled={!formData.carrier_id}
+                  style={{ cursor: !formData.carrier_id ? 'not-allowed' : 'pointer' }}
                 >
                   Mark as Shipped
                 </button>
@@ -538,13 +667,18 @@ const ShipmentModal = ({
               {canBeFailed && (
                 <button
                   type="button"
-                  className="status-update-button failure"
+                  className={`status-update-button failure ${!formData.carrier_id ? 'disabled' : ''}`}
                   onClick={() => onReportFailure(shipment)}
-                  style={{ marginTop: (canBeShipped || hasDeliveryReceipt) ? '0.5rem' : '0' }}
+                  style={{ 
+                    marginTop: (canBeShipped || hasDeliveryReceipt) ? '0.5rem' : '0',
+                    cursor: !formData.carrier_id ? 'not-allowed' : 'pointer'
+                  }}
+                  disabled={!formData.carrier_id}
                 >
                   Report Failure
                 </button>
               )}
+              
             </div>
           </div>
           

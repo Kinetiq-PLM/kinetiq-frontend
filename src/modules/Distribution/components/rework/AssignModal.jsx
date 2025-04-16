@@ -68,7 +68,9 @@ const AssignModal = ({ rework, employees, onAssign, onCancel }) => {
                   key={employee.employee_id} 
                   value={employee.employee_id}
                 >
-                  {employee.full_name} - {employee.job_title || 'N/A'}
+                  {employee.full_name}
+                  {/* {employee.full_name} - {employee.job_title || 'N/A'} */}
+
                 </option>
               ))}
             </select>
