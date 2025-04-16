@@ -1,6 +1,8 @@
 import React from "react";
 import "./UserProfile.css";
 import { useState } from "react";
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 
 const BodyContent = ({ employee_id }) => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -22,24 +24,30 @@ const BodyContent = ({ employee_id }) => {
   const [currPassErr, setCurrPassErr] = useState('');
   const [newPassErr, setNewPassErr] = useState('');
   const [conPassErr, setConPassErr] = useState('');
+  const [openPopup, setOpenPopup] = useState(false);
+  const [popupContent, setPopupContent] = useState('Are you sure you want to change your password?');
+  const [isPassChanged, setIsPassChanged] = useState(false);
 
-  const handleChangePassword = async () => {
-    console.log("change func fired")
-    var err = false;
+  const arePassFieldsValid = () => {
     if (!newPassword) {
-      setNewPassErr("* Password cannot be empty. *")
+      setNewPassErr("* Password cannot be empty. *");
+      return false;
     }
     if (newPassword.length < 8) {
-      err = true;
-      console.log("pass too short err")
-      setNewPassErr("* Password must be at least 8 characters long. *")
+      setNewPassErr("* Password must be at least 8 characters long. *");
+      return false;
     }
-    if (newPassword != conPassword) {
-      err = true;
-      console.log("pass not match err")
-      setConPassErr("* Passwords do not match. *")
+    if (newPassword !== conPassword) {
+      setConPassErr("* Passwords do not match. *");
+      return false;
     }
-    if (!err) {
+
+    setOpenPopup(true);
+    return true;
+  }
+
+  const handleChangePassword = async () => {
+    if (!isPassChanged) {
       try {
         const res = await fetch("http://127.0.0.1:8000/reset-password/", {
           method: "POST",
@@ -48,24 +56,22 @@ const BodyContent = ({ employee_id }) => {
             email: email,
             newPassword: newPassword,
             oldPassword: currPassword,
-            passreq: true
+            passreq: true,
           }),
         });
 
         const result = await res.json();
         if (result.success) {
-          alert("Successfully changed password.")
+          setPopupContent("Password changed successfully.");
         } else {
-          console.log("invalid creds err")
-          setCurrPassErr('* ' + result.error + ' *')
+          setCurrPassErr("* " + result.error + " *");
+          setPopupContent("Failed to change password: " + result.error);
         }
       } catch (error) {
-        alert("Something went wrong. Please try again.");
+        setPopupContent("Something went wrong. Please try again.");
       }
     }
-  }
-
-
+  };
 
   return (
     <div className="usrprofile">
@@ -75,8 +81,8 @@ const BodyContent = ({ employee_id }) => {
           <div className="user-image">{first_name?.charAt(0)}</div>
           <div className="user-details">
             <div className="user-name-pos">
-                <div className="user-name">{first_name} {last_name}</div>
-                <div className="user-position">{role_name}</div>
+              <div className="user-name">{first_name} {last_name}</div>
+              <div className="user-position">{role_name}</div>
             </div>
             <div className="user-email">{email}</div>
           </div>
@@ -144,7 +150,7 @@ const BodyContent = ({ employee_id }) => {
             </div>
           </div>
 
-          <button className="change-password-btn" onClick={() => handleChangePassword()}>Confirm</button>
+          <button className="change-password-btn" onClick={() => arePassFieldsValid()}>Confirm</button>
         </div>
         <div className="role-details">
           <h3>EMPLOYEE DETAILS</h3>
@@ -164,7 +170,28 @@ const BodyContent = ({ employee_id }) => {
       </div>
 
 
-
+      <Popup open={openPopup} closeOnDocumentClick onClose={() => setOpenPopup(false)} modal>
+        {(close) => (
+          <div className="modal">
+            <div className="header">Change Password Confirmation</div>
+            <div className="content">
+              {popupContent}
+            </div>
+            <div className="actions">
+              {popupContent === "Are you sure you want to change your password?" ? (
+                <>
+                  <button className="confirm-btn" onClick={() => { handleChangePassword(); }}>
+                    "Yes, Change Password"
+                  </button>
+                  <button className="cancel-btn" onClick={() => close()}>Cancel</button>
+                </>
+              ) : (
+                <button className="ok-btn" onClick={() => close()}>OK</button>
+              )}
+            </div>
+          </div>
+        )}
+      </Popup>
     </div>
   );
 };
