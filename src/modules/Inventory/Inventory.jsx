@@ -42,7 +42,7 @@ const BodyContent = () => {
   useEffect(() => {
     setError(null);
     setLoadingProducts(true);
-    
+
     // Fetch basic product data
     fetch("http://127.0.0.1:8000/api/products/")
       .then((res) => {
@@ -58,7 +58,7 @@ const BodyContent = () => {
         console.error("Error fetching products:", err);
         setError("Failed to load product data");
       });
-      
+
     // Fetch product inventory data from new endpoint
     fetch(`http://127.0.0.1:8000/api/product-inventory/`)
       .then((res) => {
@@ -86,7 +86,7 @@ const BodyContent = () => {
 
   useEffect(() => {
     setLoadingAssets(true);
-    
+
     // Fetch basic asset data
     fetch("http://127.0.0.1:8000/api/assets/")
       .then((res) => {
@@ -102,7 +102,7 @@ const BodyContent = () => {
         console.error("Error fetching assets:", err);
         setError("Failed to load asset data");
       });
-    
+
     // Fetch asset inventory data
     fetch("http://127.0.0.1:8000/api/asset-inventory/")
       .then((res) => {
@@ -130,7 +130,7 @@ const BodyContent = () => {
 
   useEffect(() => {
     setLoadingRawMats(true);
-    
+
     // Fetch basic raw material data
     fetch("http://127.0.0.1:8000/api/raw-materials/")
       .then((res) => {
@@ -146,7 +146,7 @@ const BodyContent = () => {
         console.error("Error fetching raw materials:", err);
         setError("Failed to load raw material data");
       });
-      
+
     // Fetch material inventory data
     fetch(`http://127.0.0.1:8000/api/material-inventory/`)
       .then((res) => {
@@ -224,7 +224,7 @@ const BodyContent = () => {
       }
     };
   });
-  
+
   // Merge raw material data with inventory data
   const mergedMaterialData = rawMaterialData.map(material => {
     const inventoryInfo = materialInventoryData.find(inv => inv.material_id === material.material_id);
@@ -251,50 +251,50 @@ const BodyContent = () => {
         "Name",
         "Item ID",
         "Total Stock",
-        "Committed Stock", 
+        "Committed Stock",
         "Available Stock",
         "Status"
       ],
       data: mergedProductData.map((product) => {
         const itemId = product.item_id || "???";
         const inventoryData = product.inventory_data || {};
-        
+
         let status = "In Stock";
         if (inventoryData.available_stock === 0) {
-            status = "Out of Stock";
+          status = "Out of Stock";
         } else if (inventoryData.available_stock < inventoryData.minimum_threshold) {
-            status = "Low Stock";
+          status = "Low Stock";
         }
 
         return {
-            product_id: product.product_id || "???",
-            item_id: itemId,
-            Name: product.product_name,
-            "Item ID": itemId,
-            "Total Stock": inventoryData.total_stock || 0,
-            "Committed Stock": inventoryData.stock_committed || 0, 
-            "Available Stock": inventoryData.available_stock || 0,
-            "Status": status,
-            "Minimum Threshold": inventoryData.minimum_threshold || 0,
-            "Maximum Threshold": inventoryData.maximum_threshold || 0,
-            "Last Updated": inventoryData.last_update ? new Date(inventoryData.last_update).toLocaleString() : "Unknown"
+          product_id: product.product_id || "???",
+          item_id: itemId,
+          Name: product.product_name,
+          "Item ID": itemId,
+          "Total Stock": inventoryData.total_stock || 0,
+          "Committed Stock": inventoryData.stock_committed || 0,
+          "Available Stock": inventoryData.available_stock || 0,
+          "Status": status,
+          "Minimum Threshold": inventoryData.minimum_threshold || 0,
+          "Maximum Threshold": inventoryData.maximum_threshold || 0,
+          "Last Updated": inventoryData.last_update ? new Date(inventoryData.last_update).toLocaleString() : "Unknown"
         };
       }),
       loading: loadingProducts,
     },
-    
+
     Assets: {
       columns: ["Name", "Item ID", "Serial No", "Total Stock", "On Order", "Status"],
       data: mergedAssetData.map((asset) => {
         const inventoryData = asset.inventory_data || {};
-        
+
         let status = "In Stock";
         if (inventoryData.total_stock === 0) {
-            status = "Out of Stock";
+          status = "Out of Stock";
         } else if (inventoryData.total_stock < inventoryData.minimum_threshold) {
-            status = "Low Stock";
+          status = "Low Stock";
         }
-        
+
         return {
           item_id: asset.item_id || "???",
           asset_id: asset.asset_id || "???",
@@ -312,19 +312,19 @@ const BodyContent = () => {
       }),
       loading: loadingAssets,
     },
-    
+
     "Raw Materials": {
       columns: ["Name", "Item ID", "Description", "Total Stock", "On Order", "Status"],
       data: mergedMaterialData.map((material) => {
         const inventoryData = material.inventory_data || {};
-        
+
         let status = "In Stock";
         if (inventoryData.total_stock === 0) {
-            status = "Out of Stock";
+          status = "Out of Stock";
         } else if (inventoryData.total_stock < inventoryData.minimum_threshold) {
-            status = "Low Stock";
+          status = "Low Stock";
         }
-        
+
         return {
           item_id: material.item_id || "???",
           material_id: material.material_id || "???",
@@ -348,40 +348,40 @@ const BodyContent = () => {
 
   const search = debouncedSearchTerm.toLowerCase().trim();
   const filteredData = currentConfig.data
-  .filter((item) => {
-    const nameVal = (item.Name || "").toLowerCase();
-    return search === "" || nameVal.startsWith(search);
-  })
-  .sort((a, b) => {
-    // If product tab, show low stock items first
-    if (activeTab === "Products") {
-      const isLowStockA = (a["Available Stock"] || 0) < (a["Minimum Threshold"] || 0);
-      const isLowStockB = (b["Available Stock"] || 0) < (b["Minimum Threshold"] || 0);
-      
-      if (isLowStockA && !isLowStockB) return -1;
-      if (!isLowStockA && isLowStockB) return 1;
-    }
-    
-    // If asset or raw material tab, show low stock items first
-    if (activeTab === "Assets" || activeTab === "Raw Materials") {
-      const isLowStockA = (a["Total Stock"] || 0) < (a["Minimum Threshold"] || 0);
-      const isLowStockB = (b["Total Stock"] || 0) < (b["Minimum Threshold"] || 0);
-      
-      if (isLowStockA && !isLowStockB) return -1;
-      if (!isLowStockA && isLowStockB) return 1;
-    }
-    
-    // General stock-based sorting
-    const stockField = (activeTab === "Assets" || activeTab === "Raw Materials") ? "Total Stock" : "Available Stock";
-    const stockA = parseInt(a[stockField] || "0");
-    const stockB = parseInt(b[stockField] || "0");
-    
-    if (stockA !== stockB) {
-      return stockA - stockB; // Lower stock comes first
-    }
-    
-    return (a.Name || "").localeCompare(b.Name || "");
-  });
+    .filter((item) => {
+      const nameVal = (item.Name || "").toLowerCase();
+      return search === "" || nameVal.startsWith(search);
+    })
+    .sort((a, b) => {
+      // If product tab, show low stock items first
+      if (activeTab === "Products") {
+        const isLowStockA = (a["Available Stock"] || 0) < (a["Minimum Threshold"] || 0);
+        const isLowStockB = (b["Available Stock"] || 0) < (b["Minimum Threshold"] || 0);
+
+        if (isLowStockA && !isLowStockB) return -1;
+        if (!isLowStockA && isLowStockB) return 1;
+      }
+
+      // If asset or raw material tab, show low stock items first
+      if (activeTab === "Assets" || activeTab === "Raw Materials") {
+        const isLowStockA = (a["Total Stock"] || 0) < (a["Minimum Threshold"] || 0);
+        const isLowStockB = (b["Total Stock"] || 0) < (b["Minimum Threshold"] || 0);
+
+        if (isLowStockA && !isLowStockB) return -1;
+        if (!isLowStockA && isLowStockB) return 1;
+      }
+
+      // General stock-based sorting
+      const stockField = (activeTab === "Assets" || activeTab === "Raw Materials") ? "Total Stock" : "Available Stock";
+      const stockA = parseInt(a[stockField] || "0");
+      const stockB = parseInt(b[stockField] || "0");
+
+      if (stockA !== stockB) {
+        return stockA - stockB; // Lower stock comes first
+      }
+
+      return (a.Name || "").localeCompare(b.Name || "");
+    });
 
   const toggleModal = () => setShowModal(!showModal);
 
@@ -411,7 +411,7 @@ const BodyContent = () => {
         />
 
         <div className="w-full hidden md:block">
-          <div className="flex justify-between items-center p-3 h-15">
+          {/* <div className="flex justify-between items-center p-3 h-15">
             <h2 className="text-lg font-semibold mt-6">
               Selected Item Details
             </h2>
@@ -425,7 +425,7 @@ const BodyContent = () => {
                 Restock Request
               </button>
             )}
-          </div>
+          </div> */}
 
           <div className="min-h-[150px] border border-gray-300 rounded-lg p-6 mt-2">
             <div className="grid grid-cols-5 gap-4">
@@ -523,7 +523,7 @@ const BodyContent = () => {
             refreshInventory();
           }}
           selectedItem={selectedItem}
-          activeTab={activeTab} 
+          activeTab={activeTab}
         />
       )}
     </div>
