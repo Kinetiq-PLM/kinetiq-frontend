@@ -1,8 +1,8 @@
-// Shipment.jsx
 import React, { useState, useEffect } from "react";
 import "../styles/Shipment.css";
 import ShipmentTable from "../components/shipment/ShipmentTable";
 import FailedShipmentsTable from "../components/shipment/FailedShipmentsTable";
+import DeliveredShipmentsTable from "../components/shipment/DeliveredShipmentsTable";
 import StatusFilter from "../components/shipment/StatusFilter";
 import CarrierFilter from "../components/shipment/CarrierFilter";
 import DeliveryTypeFilter from "../components/shipment/DeliveryTypeFilter";
@@ -15,16 +15,17 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Shipment = () => {
-  // New tab state
-  const [activeTab, setActiveTab] = useState("shipments"); // "shipments" or "failed"
+  // Tab state - now with three options
+  const [activeTab, setActiveTab] = useState("shipments"); // "shipments", "delivered", or "failed"
   
   // State for data management
   const [shipments, setShipments] = useState([]);
   const [failedShipments, setFailedShipments] = useState([]);
+  const [deliveredShipments, setDeliveredShipments] = useState([]); // New state for delivered shipments
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [carriers, setCarriers] = useState([]);
-  const [employees, setEmployees] = useState([]); // Added state for employees
+  const [employees, setEmployees] = useState([]);
   
   // State for filtering
   const [statusFilter, setStatusFilter] = useState("All");
@@ -60,9 +61,12 @@ const Shipment = () => {
         
         const data = await response.json();
         
-        // Only get regular shipments 
-        const regular = data.filter(s => s.shipment_status !== 'Failed');
-        setShipments(regular);
+        // Separate shipments by status
+        const delivered = data.filter(s => s.shipment_status === 'Delivered');
+        const active = data.filter(s => s.shipment_status !== 'Failed' && s.shipment_status !== 'Delivered');
+        
+        setDeliveredShipments(delivered);
+        setShipments(active);
       } catch (err) {
         setError(err.message);
         setLoading(false);
@@ -106,7 +110,7 @@ const Shipment = () => {
       }
     };
 
-    // Added function to fetch employees
+    // Function to fetch employees
     const fetchEmployees = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/employees/');
@@ -124,7 +128,7 @@ const Shipment = () => {
     };
   
     fetchShipments();
-    fetchFailedShipments(); // Add this new fetch call
+    fetchFailedShipments();
     fetchCarriers();
     fetchEmployees();
   }, [refreshTrigger]);
@@ -138,6 +142,13 @@ const Shipment = () => {
   // Handle tab change
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+    
+    // Reset filters when changing tabs
+    if (tab !== 'shipments') {
+      setStatusFilter('All');
+      setCarrierFilter('All');
+      setDeliveryTypeFilter('All');
+    }
   };
   
   // Handle search input change
@@ -160,25 +171,24 @@ const Shipment = () => {
     setDeliveryTypeFilter(type);
   };
   
-  // Apply filters to shipments
+  // Apply filters to active shipments
   const filteredShipments = shipments.filter(shipment => {
     // Apply status filter
     if (statusFilter !== "All" && shipment.shipment_status !== statusFilter) {
       return false;
     }
     
-    // Apply carrier filter (carrier_id or carrier_name)
-    if (carrierFilter !== "All" && 
-        shipment.carrier_id !== carrierFilter) {
+    // Apply carrier filter
+    if (carrierFilter !== "All" && shipment.carrier_id !== carrierFilter) {
       return false;
     }
     
-    // Apply delivery type filter (internal/external)
+    // Apply delivery type filter
     if (deliveryTypeFilter !== "All" && shipment.delivery_type !== deliveryTypeFilter) {
       return false;
     }
     
-    // Apply search filter (search by shipment_id, tracking_number, or delivery_id)
+    // Apply search filter
     if (searchTerm && 
         !shipment.shipment_id.toLowerCase().includes(searchTerm.toLowerCase()) &&
         !shipment.tracking_number.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -189,8 +199,18 @@ const Shipment = () => {
     return true;
   });
   
-  // Apply only search filter to failed shipments
-  // Apply only search filter to failed shipments
+  // Apply search filter to delivered shipments
+  const filteredDeliveredShipments = deliveredShipments.filter(shipment => {
+    if (!searchTerm) return true;
+    
+    return (
+      shipment.shipment_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      shipment.tracking_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(shipment.delivery_id || '').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+  
+  // Apply search filter to failed shipments
   const filteredFailedShipments = failedShipments.filter(failedShipment => {
     if (!searchTerm) return true;
     
@@ -212,207 +232,28 @@ const Shipment = () => {
     setShowShipmentModal(true);
   };
   
-  // Handle closing the shipment modal
-  const handleCloseShipmentModal = () => {
-    setShowShipmentModal(false);
-  };
-  
-  // Handle save changes from the shipment modal
-  const handleSaveChanges = async (shipment, updates) => {
-    if (Object.keys(updates).length === 0) {
-      setShowShipmentModal(false);
-      return;
-    }
-    
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/api/shipments/${shipment.shipment_id}/update/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updates),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update shipment');
-      }
-      
-      // Refresh the list after successful update
-      setRefreshTrigger(prev => prev + 1);
-      setShowShipmentModal(false);
-      toast.success("Shipment updated successfully!");
-      
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
-    }
-  };
-  
-  // Handle ship status update
-  const handleShipStatusUpdate = async (shipment, formData = {}) => {
-    try {
-      // First, save any changes to the shipment
-      if (Object.keys(formData).length > 0) {
-        const updateResponse = await fetch(`http://127.0.0.1:8000/api/shipments/${shipment.shipment_id}/update/`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
-        
-        if (!updateResponse.ok) {
-          const errorData = await updateResponse.json();
-          throw new Error(errorData.error || 'Failed to update shipment details');
-        }
-        
-        // Update the selected shipment with the new values
-        // This ensures the confirmation modal has the latest data
-        const updatedShipment = {
-          ...shipment,
-          ...formData
-        };
-        
-        // If carrier_id was updated, find the carrier name
-        if (formData.carrier_id) {
-          const carrier = carriers.find(c => c.carrier_id === formData.carrier_id);
-          if (carrier) {
-            updatedShipment.carrier_name = getEmployeeFullName(carrier.carrier_name);
-          }
-        }
-        
-        setSelectedShipment(updatedShipment);
-      }
-      
-      // Now show the confirmation modal
-      setShowShipmentModal(false);
-      setShowConfirmShipModal(true);
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
-    }
-  };
-  
-  // Handle confirming shipment
-  const handleConfirmShipment = async () => {
-    if (!selectedShipment) return;
-    
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/api/shipments/${selectedShipment.shipment_id}/ship/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          shipment_status: 'Shipped'
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to mark shipment as shipped');
-      }
-      
-      // Close modal and refresh the list
-      setShowConfirmShipModal(false);
-      setRefreshTrigger(prev => prev + 1);
-      
-      // Show success notification
-      toast.success('Shipment marked as Shipped successfully! A delivery receipt has been created.', {
-        autoClose: 5000 // Keep this message visible a bit longer
-      });
-      
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
-    }
-  };
-  
-  // Handle showing delivery receipt modal
-  const handleShowDeliveryReceipt = (shipment) => {
-    setSelectedShipment(shipment);
-    setShowShipmentModal(false);
-    setShowDeliveryReceiptModal(true);
-  };
-  
-  // Handle updating delivery receipt
-  const handleUpdateDeliveryReceipt = async (deliveryReceipt) => {
-    if (!selectedShipment) return;
-    
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/api/delivery-receipts/${deliveryReceipt.delivery_receipt_id}/update/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(deliveryReceipt),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update delivery receipt');
-      }
-      
-      // Close modal and refresh the list
-      setShowDeliveryReceiptModal(false);
-      setRefreshTrigger(prev => prev + 1);
-      toast.success("Delivery receipt updated successfully!");
-      
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
-    }
-  };
-  
-  // Handle report failure
-  const handleReportFailure = (shipment) => {
-    setSelectedShipment(shipment);
-    setShowShipmentModal(false);
-    setShowFailureReportModal(true);
-  };
-  
-  // Handle submitting failure report
-  const handleSubmitFailureReport = async (failureDetails) => {
-    if (!selectedShipment) return;
-    
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/api/shipments/${selectedShipment.shipment_id}/fail/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          shipment_status: 'Failed',
-          failure_reason: failureDetails.failure_reason
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to report shipment failure');
-      }
-      
-      // Close modal and refresh the list
-      setShowFailureReportModal(false);
-      setRefreshTrigger(prev => prev + 1);
-      toast.warning(`Shipment marked as failed: ${failureDetails.failure_reason}`);
-      
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
-    }
-  };
-  
-  // Refresh carriers
-  const refreshCarriers = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
-  
-  // Calculate stats for the shipments tab
+  // Calculate stats
   const shipmentStats = {
     total: shipments.length,
     pending: shipments.filter(shipment => shipment.shipment_status === 'Pending').length,
-    shipped: shipments.filter(shipment => shipment.shipment_status === 'Shipped').length,
-    delivered: shipments.filter(shipment => shipment.shipment_status === 'Delivered').length
+    shipped: shipments.filter(shipment => shipment.shipment_status === 'Shipped').length
   };
   
-  // Calculate stats for the failed shipments tab
+  const deliveredStats = {
+    total: deliveredShipments.length,
+    onTime: deliveredShipments.filter(s => 
+      s.actual_arrival_date && s.estimated_arrival_date &&
+      new Date(s.actual_arrival_date) <= new Date(s.estimated_arrival_date)
+    ).length,
+    late: deliveredShipments.filter(s => 
+      s.actual_arrival_date && s.estimated_arrival_date &&
+      new Date(s.actual_arrival_date) > new Date(s.estimated_arrival_date)
+    ).length,
+    rejected: deliveredShipments.filter(s => 
+      s.delivery_receipt_info?.receipt_status === 'Rejected'
+    ).length
+  };
+  
   const failedStats = {
     total: failedShipments.length,
     pending: failedShipments.filter(shipment => 
@@ -441,6 +282,12 @@ const Shipment = () => {
             Active Shipments
           </div>
           <div 
+            className={`tab ${activeTab === "delivered" ? "active" : ""}`}
+            onClick={() => handleTabChange("delivered")}
+          >
+            Delivered Shipments
+          </div>
+          <div 
             className={`tab ${activeTab === "failed" ? "active" : ""}`}
             onClick={() => handleTabChange("failed")}
           >
@@ -448,16 +295,20 @@ const Shipment = () => {
           </div>
         </div>
         
-        {/* Filters Row - slightly different for each tab */}
+        {/* Filters Row */}
         <div className="filters-row">
           <div className="search-container">
             <span className="search-icon">🔍</span>
             <input
               type="text"
               className="search-input"
-              placeholder={activeTab === "shipments" 
-                ? "Search by Shipment ID, Tracking #, or Delivery ID..." 
-                : "Search failed shipments..."}
+              placeholder={
+                activeTab === "shipments" 
+                  ? "Search by Shipment ID, Tracking #, or Delivery ID..." 
+                  : activeTab === "delivered"
+                    ? "Search delivered shipments..."
+                    : "Search failed shipments..."
+              }
               value={searchTerm}
               onChange={handleSearchChange}
             />
@@ -469,6 +320,7 @@ const Shipment = () => {
               <StatusFilter 
                 selectedStatus={statusFilter}
                 onStatusChange={handleStatusFilterChange}
+                showDelivered={false} 
               />
               
               <CarrierFilter 
@@ -501,7 +353,7 @@ const Shipment = () => {
           {activeTab === "shipments" ? (
             <>
               <div className="stat-box">
-                <span className="stat-label">Total Shipments:</span>
+                <span className="stat-label">Total Active Shipments:</span>
                 <span className="stat-value">{shipmentStats.total}</span>
               </div>
               <div className="stat-box">
@@ -509,12 +361,27 @@ const Shipment = () => {
                 <span className="stat-value">{shipmentStats.pending}</span>
               </div>
               <div className="stat-box">
-                <span className="stat-label">Shipped:</span>
+                <span className="stat-label">In Transit:</span>
                 <span className="stat-value">{shipmentStats.shipped}</span>
               </div>
+            </>
+          ) : activeTab === "delivered" ? (
+            <>
               <div className="stat-box">
-                <span className="stat-label">Delivered:</span>
-                <span className="stat-value">{shipmentStats.delivered}</span>
+                <span className="stat-label">Total Deliveries:</span>
+                <span className="stat-value">{deliveredStats.total}</span>
+              </div>
+              <div className="stat-box">
+                <span className="stat-label">On-Time:</span>
+                <span className="stat-value">{deliveredStats.onTime}</span>
+              </div>
+              <div className="stat-box">
+                <span className="stat-label">Late:</span>
+                <span className="stat-value">{deliveredStats.late}</span>
+              </div>
+              <div className="stat-box">
+                <span className="stat-label">Rejected:</span>
+                <span className="stat-value">{deliveredStats.rejected}</span>
               </div>
             </>
           ) : (
@@ -560,6 +427,15 @@ const Shipment = () => {
                 employees={employees}
                 getEmployeeFullName={getEmployeeFullName}
               />
+            ) : activeTab === "delivered" ? (
+              <DeliveredShipmentsTable
+                shipments={filteredDeliveredShipments}
+                onShipmentSelect={handleShipmentSelect}
+                selectedShipment={selectedShipment}
+                carriers={carriers}
+                employees={employees}
+                getEmployeeFullName={getEmployeeFullName}
+              />
             ) : (
               <FailedShipmentsTable 
                 failedShipments={filteredFailedShipments}
@@ -573,14 +449,14 @@ const Shipment = () => {
           </div>
         )}
         
-        {/* Modals - these stay the same */}
+        {/* Modals remain the same */}
         {showShipmentModal && selectedShipment && (
           <ShipmentModal 
             shipment={selectedShipment}
             carriers={carriers}
             employees={employees}
             getEmployeeFullName={getEmployeeFullName}
-            onClose={handleCloseShipmentModal}
+            onClose={() => setShowShipmentModal(false)}
             onSave={handleSaveChanges}
             onShip={handleShipStatusUpdate}
             onShowDeliveryReceipt={handleShowDeliveryReceipt}
