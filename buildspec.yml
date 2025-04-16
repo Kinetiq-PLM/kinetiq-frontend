@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - npm install
+
+  build:
+    commands:
+      - npm run build        # For React Vite build
+      - npm run test         # If you want to run tests too
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: dist       # Uploads everything in dist/ to S3
