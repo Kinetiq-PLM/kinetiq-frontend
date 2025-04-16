@@ -1,4 +1,4 @@
-@keyframes fadeIn {
+@keyframes fadeInModule {
   from {
     opacity: 0;
     transform: translateX(-0.25rem);
@@ -10,11 +10,11 @@
 }
 
 .fade-in {
-  animation: fadeIn 0.4s ease-in-out;
+  animation: fadeInModule 0.4s ease-in-out;
 }
 
 @media (max-width: 55rem) {
-  .header-module-name.active {
+  .header-module-name.inactive {
     display: none;
   }
 }

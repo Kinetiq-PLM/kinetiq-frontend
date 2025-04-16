@@ -671,7 +671,7 @@ function App() {
               />
               <div className="header-module-names">
                 <p 
-                  className={`header-module-name ${!activeSubModule ? "active" : ""}`}
+                  className={`header-module-name ${!activeSubModule ? "active" : "inactive"}`}
                   onClick={() => {
                     setActiveModule(activeModule);
                     //loadMainModule(activeModule);
