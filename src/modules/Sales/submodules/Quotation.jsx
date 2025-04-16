@@ -28,7 +28,7 @@ import generateRandomID from "../components/GenerateID";
 const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const { showAlert } = useAlert();
   const copyFromOptions = [];
-  const copyToOptions = ["Order", "Blanket Agreement"];
+  const copyToOptions = ["Order"];
   const [q_id, setQ_id] = useState("");
   const quotationMutation = useMutation({
     mutationFn: async (data) => await POST("sales/quotation/", data),
