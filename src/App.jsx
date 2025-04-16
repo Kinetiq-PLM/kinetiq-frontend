@@ -670,9 +670,8 @@ function App() {
                 alt={activeModule}
               />
               <div className="header-module-names">
-                <p
-                  className={`header-module-name ${!activeSubModule ? "active" : ""
-                    }`}
+                <p 
+                  className={`header-module-name ${!activeSubModule ? "active" : ""}`}
                   onClick={() => {
                     setActiveModule(activeModule);
                     //loadMainModule(activeModule);
@@ -682,7 +681,6 @@ function App() {
                 >
                   {activeModule}
                 </p>
-
                 <p className="fade-in">{activeSubModule ? ` > ` : ""}</p>
                 <p id="header-submodule-name" className="fade-in">
                   {activeSubModule ? activeSubModule : ""}
