@@ -15,6 +15,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [flag, setFlag] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [showHelpOptions, setShowHelpOptions] = useState(false);
+    const [selectedProductId, setSelectedProductId] = useState(null);
     
 
     const mrpData = [
@@ -26,12 +27,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     ];
 
     const bomDetails = [
-        { no: 1, bomId: "BOM001", projectId: "PRJ001", productMatsId: "MAT001", qtyRawMaterial: 50, costPerUnit: 120, totalCostOfRawMaterials: 6000, productionOrderDetailId: "POD001", laborCostId: "LAB001", totalCost: 7000, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", unit: "kg" },
-        { no: 2, bomId: "BOM002", projectId: "PRJ002", productMatsId: "MAT002", qtyRawMaterial: 80, costPerUnit: 100, totalCostOfRawMaterials: 8000, productionOrderDetailId: "POD002", laborCostId: "LAB002", totalCost: 9500, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", unit: "kg" },
-        { no: 3, bomId: "BOM003", projectId: "PRJ001", productMatsId: "MAT003", qtyRawMaterial: 50, costPerUnit: 120, totalCostOfRawMaterials: 6000, productionOrderDetailId: "POD003", laborCostId: "LAB003", totalCost: 7100, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", unit: "kg" },
+        { no: 1, bomId: "BOM001", projectId: "PRJ001", product_id: "ADMIN-PROD-2025-a6d292", productMatsId: "MAT001", qtyRawMaterial: 50, costPerUnit: 120, totalCostOfRawMaterials: 6000, productionOrderDetailId: "POD001", laborCostId: "LAB001", totalCost: 7000, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", unit: "kg" },
+        { no: 2, bomId: "BOM002", projectId: "PRJ002", product_id: "ADMIN-PROD-2025-a6a292", productMatsId: "MAT002", qtyRawMaterial: 80, costPerUnit: 100, totalCostOfRawMaterials: 8000, productionOrderDetailId: "POD002", laborCostId: "LAB002", totalCost: 9500, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", unit: "kg" },
+        { no: 3, bomId: "BOM003", projectId: "PRJ001", product_id: "ADMIN-PROD-2025-a62ass", productMatsId: "MAT003", qtyRawMaterial: 50, costPerUnit: 120, totalCostOfRawMaterials: 6000, productionOrderDetailId: "POD003", laborCostId: "LAB003", totalCost: 7100, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", unit: "kg" },
     ];
 
-    const cellStyle = (width) => ({width, padding: '10px 12px', textAlign: 'center', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, color: '#585757', borderBottom: '1px solid #E8E8E8', borderLeft: '1px solid #E8E8E8', wordWrap: 'break-word', lineHeight: 1, });
+    const rawMats = [
+        { "product_id": "ADMIN-PROD-2025-a6d292", "raw_material": "Carbon Fiber", "material_id": "ADMIN-MATERIAL-2025-fa9377", "rm_quantity": "80.70", "units": "kg", "unit_cost": "2500.00", "total_cost": "201750.00"},
+        { "product_id": "ADMIN-PROD-2025-a6d292", "raw_material": "Hydraulic Oil", "material_id": "ADMIN-MATERIAL-2025-b1aac1", "rm_quantity": "22.22", "units": "kg", "unit_cost": "190.00", "total_cost": "4221.80"},
+        { "product_id": "ADMIN-PROD-2025-a6d292", "raw_material": "Medical-Grade Silicone", "material_id": "ADMIN-MATERIAL-2025-23d783", "rm_quantity": "37.77", "units": "kg", "unit_cost": "2932.00", "total_cost": "110741.64"},
+        { "product_id": "ADMIN-PROD-2025-a6d292", "raw_material": "Stainless Steel", "material_id": "ADMIN-MATERIAL-2025-37d86c", "rm_quantity": "109.90","units": "kg", "unit_cost": "100.00", "total_cost": "10990.00"}
+    ]
 
     const getFilteredData = () => {
         return mrpData.filter((item) => {
@@ -257,11 +263,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 className="table-row"
                                 style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
                                 <div style={rowCellStyle}>{item.no}</div>
-                                <div style={rowCellStyle}>{`PROD${String(item.no).padStart(4, '0')}`}</div>
+                                <div style={rowCellStyle}>{item.product_id}</div>
                                 <div style={rowCellStyle}>{item.product}</div>
                                 <div style={rowCellStyle}>{`Description of ${item.product}`}</div>
                                 <div style={rowCellStyle}>{item.qtyProduct} pcs</div>
-                                <div onClick={() => setRawMaterial(true)} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
+                                <div onClick={() => { setRawMaterial(true); setSelectedProductId(item.product_id); }} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
                                 <div style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
                                 </div>
                             ))}
@@ -331,19 +337,19 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {bomDetails.map((item, idx) => {
-                                const totalCost = item.unitCost * item.quantity;
+                                {rawMats.filter(mat => mat.product_id === selectedProductId).map((item, idx) => {
+                                const totalCost = parseFloat(item.unit_cost) * parseFloat(item.rm_quantity);
                                 return (
                                     <tr key={idx} style={{ borderBottom: '1px solid #E8E8E8' }}>
-                                        <td style={tdStyle}>{item.rawMaterial}</td>
-                                        <td style={tdStyle}>{item.productMatsId}</td>
-                                        <td style={tdStyle}>{item.qtyRawMaterial}</td>
-                                        <td style={tdStyle}>{item.unit}</td>
-                                        <td style={tdStyle}>₱{item.costPerUnit}</td>
-                                        <td style={tdStyle}>₱{item.totalCost}</td>
+                                    <td style={tdStyle}>{item.raw_material}</td>
+                                    <td style={tdStyle}>{item.material_id}</td>
+                                    <td style={tdStyle}>{item.rm_quantity}</td>
+                                    <td style={tdStyle}>{item.units}</td>
+                                    <td style={tdStyle}>₱{parseFloat(item.unit_cost).toFixed(2)}</td>
+                                    <td style={tdStyle}>₱{totalCost.toFixed(2)}</td>
                                     </tr>
-                                    );
-                                    })}
+                                );
+                                })}
                             </tbody>
                         </table>
                     </div>
@@ -359,7 +365,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </div>
 
                         {/* Back Button */}
-                        <button onClick={() => { setRawMaterial(false); }} style={{height: 40, padding: '8px 24px', background: 'white', borderRadius: 8, outline: '1.5px #A4A4A4 solid', display: 'flex', alignItems: 'center', gap: 10}}>
+                        <button onClick={() => { setRawMaterial(false); setSelectedProductId(null); }} style={{height: 40, padding: '8px 24px', background: 'white', borderRadius: 8, outline: '1.5px #A4A4A4 solid', display: 'flex', alignItems: 'center', gap: 10}}>
                             <div className="MRPIcon3" style={{ width: 15, height: 21 }} />
                             <span style={{ color: '#969696', fontSize: 20, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize'}}>Back</span>
                         </button>
