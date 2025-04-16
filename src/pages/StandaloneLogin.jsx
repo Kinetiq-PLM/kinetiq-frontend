@@ -22,6 +22,8 @@ export default function StandaloneLogin() {
   const [resetData, setResetData] = useState(initialResetData);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState("");
   // localStorage.setItem('login_attemtps', '1')
@@ -283,6 +285,7 @@ export default function StandaloneLogin() {
                         setLoginError("");
                       }}
                       required
+                      style={{ color: 'gray' }}
                     />
                     <h4>Kinetiq Email: </h4>
                     <input
@@ -332,23 +335,59 @@ export default function StandaloneLogin() {
                       required
                     />
                     <h4>New Password: </h4>
-                    <input
-                      type="password"
-                      name="newPassword"
-                      placeholder="Enter new password"
-                      value={resetData.newPassword}
-                      onChange={(e) => setResetData({ ...resetData, newPassword: e.target.value })}
-                      required
-                    />
+                    <div className="password-wrapper">
+
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        name="newPassword"
+                        placeholder="Enter new password"
+                        value={resetData.newPassword}
+                        onChange={(e) => setResetData({ ...resetData, newPassword: e.target.value })}
+                        required
+                        style={{ color: 'gray' }}
+                      />
+                      <span className="eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
+                          {showNewPassword ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                              <path fill="none" stroke="currentColor" strokeWidth="2" d="M3 3l18 18M10.5 10.5a3 3 0 004.5 4.5M12 5c-4.418 0-8.209 2.865-10 6.5a10.05 10.05 0 002.015 2.881M12 19c4.418 0 8.209-2.865 10-6.5a10.05 10.05 0 00-2.015-2.881" />
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                              <path fill="none" stroke="currentColor" strokeWidth="2" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                              <circle fill="none" stroke="currentColor" strokeWidth="2" cx="12" cy="12" r="3" />
+                            </svg>
+                          )}
+                        </span>
+
+                    </div>
+
                     <h4>Confirm New Password: </h4>
-                    <input
-                      type="password"
-                      name="confirmNewPassword"
-                      placeholder="Confirm new password"
-                      value={resetData.confirmNewPassword}
-                      onChange={(e) => setResetData({ ...resetData, confirmNewPassword: e.target.value })}
-                      required
-                    />
+
+                    <div className="password-wrapper">
+
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="confirmNewPassword"
+                        placeholder="Confirm new password"
+                        value={resetData.confirmNewPassword}
+                        onChange={(e) => setResetData({ ...resetData, confirmNewPassword: e.target.value })}
+                        required
+                        style={{ color: 'gray' }}
+                      />
+                      <span className="eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                          {showConfirmPassword ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                              <path fill="none" stroke="currentColor" strokeWidth="2" d="M3 3l18 18M10.5 10.5a3 3 0 004.5 4.5M12 5c-4.418 0-8.209 2.865-10 6.5a10.05 10.05 0 002.015 2.881M12 19c4.418 0 8.209-2.865 10-6.5a10.05 10.05 0 00-2.015-2.881" />
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                              <path fill="none" stroke="currentColor" strokeWidth="2" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                              <circle fill="none" stroke="currentColor" strokeWidth="2" cx="12" cy="12" r="3" />
+                            </svg>
+                          )}
+                        </span>
+
+                    </div>
                     <p className="login-error">{loginError}</p>
                   </div>
 
