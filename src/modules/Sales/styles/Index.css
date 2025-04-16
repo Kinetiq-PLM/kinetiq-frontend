@@ -2,6 +2,7 @@
 .dunning,
 .invoice,
 .master-list,
+.blanket-agreement,
 .order,
 .quotation,
 .reporting,
@@ -16,19 +17,135 @@
 .dunning .body-content-container,
 .invoice .body-content-container,
 .master-list .body-content-container,
+.blanket-agreement .body-content-container,
 .order .body-content-container,
 .quotation .body-content-container,
-.reporting .body-content-container,
 .returns .body-content-container,
 .sales .body-content-container {
   width: 100%;
   height: 100%;
+  overflow: auto;
   border-radius: 0.5rem;
   background-color: white;
   padding: 2rem;
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
-  min-width: 40rem;
   min-height: 30rem;
+}
+
+/* If width is smaller than 1000 */
+@media (max-width: 1300px) {
+  .table-layout {
+    max-width: 85vw;
+  }
+}
+@media (max-width: 1000px) {
+  .table-layout {
+    max-width: 80vw;
+  }
+}
+
+@media (max-width: 900px) {
+  .table-layout {
+    max-width: 85vw;
+  }
+}
+@media (max-width: 860px) {
+  .table-layout {
+    max-width: 78vw;
+  }
+}
+@media (max-width: 800px) {
+  .table-layout {
+    max-width: 75vw;
+  }
+}
+
+@media (max-width: 700px) {
+  .table-layout {
+    max-width: 72vw;
+  }
+}
+@media (max-width: 600px) {
+  .table-layout {
+    max-width: 70vw;
+  }
+}
+
+@media (max-width: 564px) {
+  .table-layout {
+    max-width: 400px;
+  }
+}
+
+/* Minimalist custom scrollbar for body-content-container */
+.delivery .body-content-container::-webkit-scrollbar,
+.dunning .body-content-container::-webkit-scrollbar,
+.invoice .body-content-container::-webkit-scrollbar,
+.master-list .body-content-container::-webkit-scrollbar,
+.blanket-agreement .body-content-container::-webkit-scrollbar,
+.order .body-content-container::-webkit-scrollbar,
+.quotation .body-content-container::-webkit-scrollbar,
+.reporting .body-content-container::-webkit-scrollbar,
+.returns .body-content-container::-webkit-scrollbar,
+.sales .body-content-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.delivery .body-content-container::-webkit-scrollbar-track,
+.dunning .body-content-container::-webkit-scrollbar-track,
+.invoice .body-content-container::-webkit-scrollbar-track,
+.master-list .body-content-container::-webkit-scrollbar-track,
+.blanket-agreement .body-content-container::-webkit-scrollbar-track,
+.order .body-content-container::-webkit-scrollbar-track,
+.quotation .body-content-container::-webkit-scrollbar-track,
+.reporting .body-content-container::-webkit-scrollbar-track,
+.returns .body-content-container::-webkit-scrollbar-track,
+.sales .body-content-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.delivery .body-content-container::-webkit-scrollbar-thumb,
+.dunning .body-content-container::-webkit-scrollbar-thumb,
+.invoice .body-content-container::-webkit-scrollbar-thumb,
+.master-list .body-content-container::-webkit-scrollbar-thumb,
+.blanket-agreement .body-content-container::-webkit-scrollbar-thumb,
+.order .body-content-container::-webkit-scrollbar-thumb,
+.quotation .body-content-container::-webkit-scrollbar-thumb,
+.reporting .body-content-container::-webkit-scrollbar-thumb,
+.returns .body-content-container::-webkit-scrollbar-thumb,
+.sales .body-content-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.delivery .body-content-container:hover::-webkit-scrollbar-thumb,
+.dunning .body-content-container:hover::-webkit-scrollbar-thumb,
+.invoice .body-content-container:hover::-webkit-scrollbar-thumb,
+.master-list .body-content-container:hover::-webkit-scrollbar-thumb,
+.blanket-agreement .body-content-container:hover::-webkit-scrollbar-thumb,
+.order .body-content-container:hover::-webkit-scrollbar-thumb,
+.quotation .body-content-container:hover::-webkit-scrollbar-thumb,
+.reporting .body-content-container:hover::-webkit-scrollbar-thumb,
+.returns .body-content-container:hover::-webkit-scrollbar-thumb,
+.sales .body-content-container:hover::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+}
+
+/* Firefox scrollbar support */
+.delivery .body-content-container,
+.dunning .body-content-container,
+.invoice .body-content-container,
+.master-list .body-content-container,
+.blanket-agreement .body-content-container,
+.order .body-content-container,
+.quotation .body-content-container,
+.reporting .body-content-container,
+.returns .body-content-container,
+.sales .body-content-container {
+  scrollbar-width: thin;
+  scrollbar-color: #00a8a8 transparent;
 }
