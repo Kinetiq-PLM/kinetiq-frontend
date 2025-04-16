@@ -4,16 +4,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import StandaloneLogin from './pages/StandaloneLogin'
-import LandingPage from './pages/LandingPage' 
 import emailjs from '@emailjs/browser';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        {/* landing page */}
-        {/* <Route path="/" element={<LandingPage />} />  */}
         <Route path="/login" element={<StandaloneLogin />} />
-        {/* <Route path="/app/*" element={<App />} /> */}
         <Route path="/*" element={<App />} />
       </Routes>
     </BrowserRouter>

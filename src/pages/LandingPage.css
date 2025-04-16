@@ -16,22 +16,24 @@
     transform: translate(-50%, -50%);
     background: white;
     padding: 2rem;
-    border-radius: 8px;
+    border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     opacity: 1;
     transition: opacity 0.3s ease-out;
     text-align: center;
     max-width: 400px;
+    min-height: 380px;
     width: 90%;
     animation: fadeIn 0.3s ease-out;
   }
   
   .landing-logo {
     width: 250px;
-    margin: 0 auto; /* Removes the extra space in your original '2 rem' */
+    margin: 0 auto; 
     display: block;
-    padding-bottom: 5rem; /* Reduced from 5rem for better spacing */
+    padding-top: 1.3rem;
+    padding-bottom: 3rem; 
   }
   
 
@@ -47,6 +49,7 @@
     font-size: 0.9rem;
     margin: 0;
     text-align: center;
+    padding-bottom: 2rem;
   }
   
 @keyframes fadeIn {
@@ -73,18 +76,27 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 167, 167, 0.3);
   } */
+
   
-  /* tablet view */
-  @media (max-width: 768px) {
+  @media (max-width: 600px) {
     .landing-content {
       padding: 1.5rem;
+      max-width: 280px;
+      min-height: 300px;
+      margin-left: 1.5rem;
     }
     
     .landing-content h1 {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
     }
     
     .landing-logo {
       width: 150px;
+      padding-bottom: 1.5rem;
+    }
+    
+    .landing-subtext {
+      font-size: 0.8rem;
+      padding-bottom: 1.5rem;
     }
   }

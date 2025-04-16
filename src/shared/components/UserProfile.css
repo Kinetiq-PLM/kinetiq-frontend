@@ -57,6 +57,7 @@
   font-size: 0.8rem;
   color: #7d7d7d;
   gap: 1rem;
+  margin-left: 2rem ;
 }
 
 .usrprofile .user-details strong, .usrprofile .role-details strong{
@@ -165,3 +166,25 @@
   color: #888;
 }
 
+.usrprofile .user-info{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+@media (max-width: 69rem) {
+  .usrprofile .user-details-container {
+    flex-direction: row-reverse;
+  }
+
+  .usrprofile .user-info{
+    position: relative;
+    right: 25%;
+  }
+
+  .usrprofile .user-details-container img{
+    position: absolute;
+    opacity: 70%;
+  }
+}
