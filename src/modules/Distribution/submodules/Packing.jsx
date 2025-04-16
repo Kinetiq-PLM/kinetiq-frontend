@@ -171,15 +171,44 @@ const Packing = () => {
   };
   
   // Handle status update
-  const handleStatusUpdate = async (list, newStatus) => {
+  const handleStatusUpdate = async (list, newStatus, updatedValues = {}) => {
     try {
-      // If trying to mark as Packed, show the confirmation modal first
+      // If trying to mark as Packed, first save any changes
       if (newStatus === 'Packed') {
+        // Prepare all the data to save first
+        const updateData = {
+          ...updatedValues
+        };
+        
+        // Only send non-empty updates to backend
+        if (Object.keys(updateData).length > 0) {
+          const updateResponse = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateData),
+          });
+          
+          if (!updateResponse.ok) {
+            const errorData = await updateResponse.json();
+            throw new Error(errorData.error || 'Failed to update packing list details');
+          }
+          
+          // Update selectedList with the new values for completion modal
+          setSelectedList(prev => ({
+            ...prev,
+            ...updateData
+          }));
+        }
+        
+        // Now show the completion modal
         setShowEditModal(false);
         setShowCompletionModal(true);
         return;
       }
       
+      // For other status changes, just update the status
       const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
         method: 'PUT',
         headers: {
@@ -336,6 +365,8 @@ const Packing = () => {
         {showCompletionModal && selectedList && (
           <CompletionModal 
             packingList={selectedList}
+            employees={employees}
+            packingTypes={packingTypes}
             onConfirm={handleConfirmCompletion}
             onCancel={() => setShowCompletionModal(false)}
           />

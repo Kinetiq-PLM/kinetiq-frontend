@@ -7,7 +7,7 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(9);
+  const [itemsPerPage] = useState(7);
   
   // Handle sort change
   const handleSort = (field) => {
