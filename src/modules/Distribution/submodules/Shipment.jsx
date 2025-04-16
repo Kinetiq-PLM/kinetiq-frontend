@@ -210,7 +210,7 @@ const Shipment = () => {
     );
   });
   
-  // Apply search filter to failed shipments
+  // Apply only search filter to failed shipments
   const filteredFailedShipments = failedShipments.filter(failedShipment => {
     if (!searchTerm) return true;
     
@@ -232,28 +232,207 @@ const Shipment = () => {
     setShowShipmentModal(true);
   };
   
-  // Calculate stats
+  // Handle closing the shipment modal
+  const handleCloseShipmentModal = () => {
+    setShowShipmentModal(false);
+  };
+  
+  // Handle save changes from the shipment modal
+  const handleSaveChanges = async (shipment, updates) => {
+    if (Object.keys(updates).length === 0) {
+      setShowShipmentModal(false);
+      return;
+    }
+    
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/shipments/${shipment.shipment_id}/update/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update shipment');
+      }
+      
+      // Refresh the list after successful update
+      setRefreshTrigger(prev => prev + 1);
+      setShowShipmentModal(false);
+      toast.success("Shipment updated successfully!");
+      
+    } catch (err) {
+      toast.error(`Error: ${err.message}`);
+    }
+  };
+  
+  // Handle ship status update
+  const handleShipStatusUpdate = async (shipment, formData = {}) => {
+    try {
+      // First, save any changes to the shipment
+      if (Object.keys(formData).length > 0) {
+        const updateResponse = await fetch(`http://127.0.0.1:8000/api/shipments/${shipment.shipment_id}/update/`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+        
+        if (!updateResponse.ok) {
+          const errorData = await updateResponse.json();
+          throw new Error(errorData.error || 'Failed to update shipment details');
+        }
+        
+        // Update the selected shipment with the new values
+        // This ensures the confirmation modal has the latest data
+        const updatedShipment = {
+          ...shipment,
+          ...formData
+        };
+        
+        // If carrier_id was updated, find the carrier name
+        if (formData.carrier_id) {
+          const carrier = carriers.find(c => c.carrier_id === formData.carrier_id);
+          if (carrier) {
+            updatedShipment.carrier_name = getEmployeeFullName(carrier.carrier_name);
+          }
+        }
+        
+        setSelectedShipment(updatedShipment);
+      }
+      
+      // Now show the confirmation modal
+      setShowShipmentModal(false);
+      setShowConfirmShipModal(true);
+    } catch (err) {
+      toast.error(`Error: ${err.message}`);
+    }
+  };
+  
+  // Handle confirming shipment
+  const handleConfirmShipment = async () => {
+    if (!selectedShipment) return;
+    
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/shipments/${selectedShipment.shipment_id}/ship/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          shipment_status: 'Shipped'
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to mark shipment as shipped');
+      }
+      
+      // Close modal and refresh the list
+      setShowConfirmShipModal(false);
+      setRefreshTrigger(prev => prev + 1);
+      
+      // Show success notification
+      toast.success('Shipment marked as Shipped successfully! A delivery receipt has been created.', {
+        autoClose: 5000 // Keep this message visible a bit longer
+      });
+      
+    } catch (err) {
+      toast.error(`Error: ${err.message}`);
+    }
+  };
+  
+  // Handle showing delivery receipt modal
+  const handleShowDeliveryReceipt = (shipment) => {
+    setSelectedShipment(shipment);
+    setShowShipmentModal(false);
+    setShowDeliveryReceiptModal(true);
+  };
+  
+  // Handle updating delivery receipt
+  const handleUpdateDeliveryReceipt = async (deliveryReceipt) => {
+    if (!selectedShipment) return;
+    
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/delivery-receipts/${deliveryReceipt.delivery_receipt_id}/update/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(deliveryReceipt),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update delivery receipt');
+      }
+      
+      // Close modal and refresh the list
+      setShowDeliveryReceiptModal(false);
+      setRefreshTrigger(prev => prev + 1);
+      toast.success("Delivery receipt updated successfully!");
+      
+    } catch (err) {
+      toast.error(`Error: ${err.message}`);
+    }
+  };
+  
+  // Handle report failure
+  const handleReportFailure = (shipment) => {
+    setSelectedShipment(shipment);
+    setShowShipmentModal(false);
+    setShowFailureReportModal(true);
+  };
+  
+  // Handle submitting failure report
+  const handleSubmitFailureReport = async (failureDetails) => {
+    if (!selectedShipment) return;
+    
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/shipments/${selectedShipment.shipment_id}/fail/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          shipment_status: 'Failed',
+          failure_reason: failureDetails.failure_reason
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to report shipment failure');
+      }
+      
+      // Close modal and refresh the list
+      setShowFailureReportModal(false);
+      setRefreshTrigger(prev => prev + 1);
+      toast.warning(`Shipment marked as failed: ${failureDetails.failure_reason}`);
+      
+    } catch (err) {
+      toast.error(`Error: ${err.message}`);
+    }
+  };
+  
+  // Refresh carriers
+  const refreshCarriers = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+  
+  // Calculate stats for the shipments tab
   const shipmentStats = {
     total: shipments.length,
     pending: shipments.filter(shipment => shipment.shipment_status === 'Pending').length,
-    shipped: shipments.filter(shipment => shipment.shipment_status === 'Shipped').length
+    shipped: shipments.filter(shipment => shipment.shipment_status === 'Shipped').length,
+    delivered: shipments.filter(shipment => shipment.shipment_status === 'Delivered').length
   };
   
-  const deliveredStats = {
-    total: deliveredShipments.length,
-    onTime: deliveredShipments.filter(s => 
-      s.actual_arrival_date && s.estimated_arrival_date &&
-      new Date(s.actual_arrival_date) <= new Date(s.estimated_arrival_date)
-    ).length,
-    late: deliveredShipments.filter(s => 
-      s.actual_arrival_date && s.estimated_arrival_date &&
-      new Date(s.actual_arrival_date) > new Date(s.estimated_arrival_date)
-    ).length,
-    rejected: deliveredShipments.filter(s => 
-      s.delivery_receipt_info?.receipt_status === 'Rejected'
-    ).length
-  };
-  
+  // Calculate stats for the failed shipments tab
   const failedStats = {
     total: failedShipments.length,
     pending: failedShipments.filter(shipment => 
