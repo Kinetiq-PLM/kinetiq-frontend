@@ -1049,7 +1049,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                   <div className="detail-row">
                     <label>Total</label>
                     <input type="text" value={
-                      (documentDetails.transaction_cost).toFixed(2)
+                      documentDetails.transaction_cost
                     }  />
                   </div>
                   </div>

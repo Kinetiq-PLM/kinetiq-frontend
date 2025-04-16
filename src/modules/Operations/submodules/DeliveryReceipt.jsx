@@ -223,7 +223,7 @@ const TabSystem = () => {
                                         <th>Goods ID</th>
                                         <th>Issued Date</th>
                                         <th>Issued By</th>
-                                        <th>Product ID</th>
+                                        <th>Item Name</th>
                                         <th>Quantity</th>
                                     </tr>
                                 </thead>
@@ -234,8 +234,8 @@ const TabSystem = () => {
                                             <td>{row.goods_issue_id}</td>
                                             <td>{row.issue_date}</td>
                                             <td>{row.issued_by}</td>
-                                            <td>{row.product_id}</td>
-                                            <td>{row.quantity}</td>
+                                            <td>{row.item_name}</td>
+                                            <td>{row.item_quantity}</td>
                                         </tr>
                                     ))}
                                 </tbody>

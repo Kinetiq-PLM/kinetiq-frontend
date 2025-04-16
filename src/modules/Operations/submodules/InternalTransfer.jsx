@@ -284,7 +284,7 @@ const ApprovalTable = () => {
                       <td>{row.delivery_id}</td>
                       <td>{row.request_date}</td>
                       <td>{row.delivery_type}</td>
-                      {warehouseList.find(w => w.warehouse_id === row.warehouse_id)?.warehouse_location || "N/A"}
+                      <td>{warehouseList.find(w => w.warehouse_id === row.warehouse_id)?.warehouse_location || "N/A"}</td>
                       <td>{row.module_name}</td>
                     </>
                   ) : (
@@ -407,7 +407,13 @@ const ApprovalTable = () => {
               </div>
               <div className="input-group">
                 <label>Actual Quantity</label>
-                <input type="text" className="short-input" value={selectedData?.production_order?.actual_quantity || ''} readOnly/>
+                <input 
+                  type="text" 
+                  className="short-input" 
+                  value={selectedData?.production_order?.actual_quantity || ''} 
+                  style={{ cursor: 'not-allowed' }}
+                  readOnly
+                />
               </div>
               <div className="input-group">
                 <label>Rework Quantity</label>

@@ -1077,7 +1077,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                   <div className="detail-row">
                     <label>Total</label>
                     <input type="text" value={
-                      documentDetails.total.toFixed(2)
+                      documentDetails.total
                     }  
                     style={{ cursor: 'not-allowed' }}
                     readOnly
@@ -1140,7 +1140,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                         onChange={(e) => handleItemSelection(index, e.target.value)}
                       >
                         <option value="">-- Select Item --</option>
-                        {itemOptions.map((opt, i) => (
+                        {itemOptions.filter(opt => opt.type === 'product' || opt.type === 'asset').map((opt, i) => (
                           <option key={i} value={opt.name}>
                             {opt.name} ({opt.type})
                           </option>

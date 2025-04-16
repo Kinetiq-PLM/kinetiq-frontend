@@ -103,20 +103,20 @@ const ItemRemoval = () => {
         
           <div className="tabs">
             <button
-              className={`tab ${activeTab === 'all' ? 'active' : ''}`}
-              onClick={() => setActiveTab('all')}
+              className={`tab ${activeTab === 'All' ? 'active' : ''}`}
+              onClick={() => setActiveTab('All')}
             >
               All
             </button>
             <button
-              className={`tab ${activeTab === 'approved' ? 'active' : ''}`}
-              onClick={() => setActiveTab('approved')}
+              className={`tab ${activeTab === 'Approved' ? 'active' : ''}`}
+              onClick={() => setActiveTab('Approved')}
             >
               Approved
             </button>
             <button
-              className={`tab ${activeTab === 'pending' ? 'active' : ''}`}
-              onClick={() => setActiveTab('pending')}
+              className={`tab ${activeTab === 'Pending' ? 'active' : ''}`}
+              onClick={() => setActiveTab('Pending')}
             >
               Pending
             </button>
@@ -145,7 +145,7 @@ const ItemRemoval = () => {
                         <td>
                         <input type="checkbox"  checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row)}/>
                         </td>
-                        <td>{row.deprecation_report_id}</td>
+                        <td>{row.report_id}</td>
                         <td>{row.item_id}</td>
                         <td>{row.item_name}</td>
                         <td>{row.reported_date}</td>

@@ -1235,7 +1235,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                   <div className="detail-row">
                     <label>Total</label>
                     <input type="text" value={
-                      documentDetails.total.toFixed(2)
+                      documentDetails.total
                     }  
                     style={{ cursor: 'not-allowed' }}
                     readOnly
