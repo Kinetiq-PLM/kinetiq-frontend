@@ -36,8 +36,11 @@ const BodyContent = () => {
         setShowModal(!showModal
     )};
 
+    useEffect(() => {
+        setSelectedItem(null);
+    }, [activeTab]);
 
-      
+
 
 
     // Fetch data from Warehouse Movements view 
@@ -112,9 +115,9 @@ const BodyContent = () => {
         
         const now = new Date();
         return items.filter(item => {
-            if (!item.expiry_date) return false;
+            if (!item.expiry) return false;
             
-            const expiryDate = new Date(item.expiry_date);
+            const expiryDate = new Date(item.expiry);
             if (isNaN(expiryDate)) return false;
 
             switch (range) {
@@ -216,7 +219,7 @@ const BodyContent = () => {
 
                 {/* Data Table Section */}
                 <section className="flex flex-wrap w-full h-full  rounded-lg">
-                    <div className="flex-1 border max-h-[1000px] border-gray-300 rounded-lg scroll-container overflow-y-auto p-3">
+                    <div className="flex-1 border max-h-[800px] border-gray-300 rounded-lg scroll-container overflow-y-auto p-3">
                         {loading ? (
                             <p className="text-center text-gray-600">Loading data...</p>
                         ) : error ? (
@@ -239,7 +242,7 @@ const BodyContent = () => {
                                         </tr>
                                     ) : (
                                         activeConfig.Data.map((item, index) => (
-                                            <tr key={index} className="border-b border-gray-300" onClick={() => setSelectedItem(index) }>
+                                            <tr key={index} className="border-b border-gray-300" onClick={() => setSelectedItem(filteredData[index])}>
                                                 {activeConfig.Columns.map((col) => (
                                                     <td key={col} className="text-sm p-2">
                                                         {item[col]} {/* Convert column names to match API keys */}
@@ -259,7 +262,10 @@ const BodyContent = () => {
                             
                             {/* Warehouse Filter */}
                             
-                            <select name="" id="" className="border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => setWarehouse(e.target.value)}>
+                            <select name="" id="" className="border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
+                                    setWarehouse(e.target.value);
+                                    setSelectedItem(null);
+                            }}>
                                 <option value="" className="text-gray-600">Select Warehouse</option>
                                 {warehouseList.map((warehouse) => (
                                     <option className="text-gray-600 cursor-pointer" key={warehouse.warehouse_location} value={warehouse.warehouse_location}>
@@ -269,7 +275,11 @@ const BodyContent = () => {
                             </select>
 
                             {/* Expiry */}
-                            <select name="" id="" className="border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => setExpiry(e.target.value)}>
+                            <select name="" id="" className="border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
+                                    setExpiry(e.target.value);
+                                    setSelectedItem(null);
+                                    }
+                                }>
                                 <option value="" >Select Expiry</option>
                                 {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
                                         <option key={d} value={d}>{d}</option>
@@ -295,12 +305,12 @@ const BodyContent = () => {
                                 selectedItem !== null ? (
                                     <>
                                         {[
-                                            {label: "Selected Item", value: warehouseItemsData[selectedItem]?.inventory_item_id || "Unknown"},
-                                            {label: "Item Type", value: warehouseItemsData[selectedItem]?.item_type},
-                                            {label: "Item Management", value: warehouseItemsData[selectedItem]?.item_management + ": " + warehouseItemsData[selectedItem]?.item_management_id},
-                                            {label: "Quantity", value: warehouseItemsData[selectedItem]?.current_quantity},
-                                            {label: "Expiry", value: warehouseItemsData[selectedItem]?.expiry},
-                                            {label: "Warehouse Location", value: warehouseItemsData[selectedItem]?.warehouse_location || "Unknown"}
+                                            {label: "Selected Item", value: selectedItem?.item_name || "Unknown"},
+                                            {label: "Item Type", value: selectedItem?.item_type},
+                                            {label: "Item Management", value: selectedItem?.item_management + ": " + selectedItem?.item_management_id},
+                                            {label: "Quantity", value: selectedItem?.current_quantity},
+                                            {label: "Expiry", value: selectedItem?.expiry},
+                                            {label: "Warehouse Location", value: selectedItem?.warehouse_location || "Unknown"}
                                         ].map(({label, value}) => (
                                             <div key={label} className="mb-1">
                                                 <h5 className="text-gray-700 text-[15px] font-semibold">{label}</h5>
@@ -323,6 +333,7 @@ const BodyContent = () => {
                 <InvRestockForm
                     onClose={() => {
                         toggleModal();
+                        setSelectedItem(null);
                         // refreshInventory();
                     }}
                     selectedItem={warehouseItemsData[selectedItem]}

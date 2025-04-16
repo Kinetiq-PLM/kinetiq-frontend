@@ -120,75 +120,83 @@ const TransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="">
+        {selectedItem ? (
+            <form onSubmit={handleSubmit} className="">
 
-          
-          <label>Item ID</label>
-          <input
-            type="text"
-            value={selectedItem.inventory_item_id}
-            disabled
-            className=""
-          />
-
-          <label>Inventory Item Name</label>
-          <input
-            type="text"
-            value={inventoryItemName}
-            disabled
-          />
-
-          <label>Quantity</label>
-          <input
-            type="number"
-            placeholder=""
-            value={inputQuantity}
-            onChange={(e) => setinputQuantity(e.target.value)}
-            required
-          />
-
-          <label>Current Warehouse</label>
-          <input
-            type="text"
-            placeholder={selectedItem}
-            value={warehouseOrigin}
-            disabled
             
-          />
+            <label>Item ID</label>
+            <input
+              type="text"
+              value={selectedItem.inventory_item_id}
+              disabled
+              className=""
+            />
 
-          <label>Warehouse Destination <span className="text-red-500">*</span></label>
-            <select name="" id="" className="border rounded-lg border-gray-300 h-[50px] text-gray-600 cursor-pointer p-1" onChange={(e) => setWarehouseDestination(e.target.value)}>
-              <option value="" className="text-gray-600">Select Warehouse</option>
-                 {warehouseList.map((warehouse) => (
-                    <option className="text-gray-600 cursor-pointer" key={warehouse.warehouse_location} value={warehouse.warehouse_id} onChange={(e) => setWarehouseDestination(e.target.value)}>
-                     {warehouse.warehouse_location}
-                    </option>
-                  ))}
-            </select>
+            <label>Inventory Item Name</label>
+            <input
+              type="text"
+              value={inventoryItemName}
+              disabled
+            />
 
-          <label>Comment</label>
-          <textarea
-            placeholder="Enter item description"
-            value={comments}
-            onChange={(e) => setComments(e.target.value)}
-            rows="1"
-          />
+            <label>Quantity</label>
+            <input
+              type="number"
+              placeholder=""
+              value={inputQuantity}
+              onChange={(e) => setinputQuantity(e.target.value)}
+              required
+            />
+
+            <label>Current Warehouse</label>
+            <input
+              type="text"
+              placeholder={selectedItem}
+              value={warehouseOrigin}
+              disabled
+              
+            />
+
+            <label>Warehouse Destination <span className="text-red-500">*</span></label>
+              <select name="" id="" className="border rounded-lg border-gray-300 h-[50px] text-gray-600 cursor-pointer p-1" onChange={(e) => setWarehouseDestination(e.target.value)}>
+                <option value="" className="text-gray-600">Select Warehouse</option>
+                  {warehouseList.map((warehouse) => (
+                      <option className="text-gray-600 cursor-pointer" key={warehouse.warehouse_location} value={warehouse.warehouse_id} onChange={(e) => setWarehouseDestination(e.target.value)}>
+                      {warehouse.warehouse_location}
+                      </option>
+                    ))}
+              </select>
+
+            <label>Comment</label>
+            <textarea
+              placeholder="Enter item description"
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              rows="1"
+            />
 
 
 
-          <div className="form-actions">
-            {/* <button
-              type="button"
-              onClick={handleClear}
-              className="clear-btn"
-            >
-              Reset Forms
-            </button> */}
-            <button type="submit" className="submit-btn">
-              Submit Request
-            </button>
+            <div className="form-actions">
+              {/* <button
+                type="button"
+                onClick={handleClear}
+                className="clear-btn"
+              >
+                Reset Forms
+              </button> */}
+              <button type="submit" className="submit-btn">
+                Submit Request
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="text-center mt-6 text-red-500 font-medium">
+            You must select an item first, to make a transfer.
           </div>
-        </form>
+          )}
+
+        
       </div>
     </div>
   );
