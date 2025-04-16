@@ -11,7 +11,8 @@
     justify-content: center;
     overflow: auto;
     padding: 1rem;
-    scrollbar-width: 2rem;
+    scrollbar-width: 1.5rem;
+    
     scrollbar-color: rgb(39, 164, 164) white; 
     box-sizing: border-box;
   }
