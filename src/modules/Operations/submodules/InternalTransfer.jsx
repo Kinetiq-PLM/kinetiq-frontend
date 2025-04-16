@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import "../styles/InternalTransfer.css";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Slide } from 'react-toastify';
 
 const ApprovalTable = () => {
   const [activePrimaryTab, setActivePrimaryTab] = useState("Delivery Request");
@@ -123,9 +126,8 @@ const ApprovalTable = () => {
  
     // Find the selected warehouse_id from the location name
     const selected = warehouseList.find(w => w.warehouse_location === selectedWarehouse);
-    console.log(selected.warehouse_id)
     if (!selected) {
-      alert("Invalid warehouse selection.");
+      toast.error("Invalid warehouse selection.");
       return;
     }
  
@@ -147,12 +149,11 @@ const ApprovalTable = () => {
       }
  
       const result = await response.json();
-      console.log("Warehouse updated:", result);
+      toast.success("Warehouse updated:", result);
 
     fetchDeliveryRequest();
     } catch (error) {
-      console.error(`Error updating: ${error.message}`);
-      alert(`Failed to update data. Details: ${error.message}`);
+      toast.error(`Failed to update data. Details: ${error.message}`);
     }
   };
 
@@ -166,20 +167,24 @@ const ApprovalTable = () => {
       const reworkQuantity = parseInt(e.target.value);
  
       if (reworkQuantity > actualQuantity) {
-        alert('Error: Rework quantity must not be greater than actual quantity.');
+        toast.error('Error: Rework quantity must not be greater than actual quantity.');
         return;
       }
     }
  
     setSelectedData(newSelectedData);
- 
-    // Only call updateDatabase if validation passed
-    updateDatabase(newSelectedData);
   };
  
-  const updateDatabase = async (data) => {
+  const updateRework = async (data) => {
+    const actualQuantity = selectedData.production_order.actual_quantity;
+    const reworkQuantity = parseInt(selectedData.external_module.rework_quantity);
     try {
-     
+  
+      if (reworkQuantity > actualQuantity) {
+        toast.error('Error: Rework quantity must not be greater than actual quantity.');
+        return;
+      }
+      
       const response = await fetch('http://127.0.0.1:8000/operation/external-modules/update-rework/', {
         method: 'POST',
         headers: {
@@ -195,22 +200,32 @@ const ApprovalTable = () => {
       if (response.ok) {
         const responseData = await response.json();
         if (responseData.status === 'success') {
-          console.log('Database updated successfully');
+          toast.success('Data updated successfully');
         } else {
-          console.error('Error updating database:', responseData.message);
+          toast.error('Error updating database:', responseData.message);
         }
       } else {
-        console.error('Error with the API request');
+        toast.error('Error with the API request');
       }
     } catch (error) {
-      console.error('Error sending data to the server:', error);
+      toast.error('Error sending data to the server:', error);
     }
   };
 
+  const handleSendClick = () => {
+    if (activePrimaryTab === "Delivery Request") {
+      updateDeliveryRequest();
+    } else if (activePrimaryTab === "Rework Order") {
+      updateRework(selectedData);
+    }
+  };
+  
 
   return (
     <div className={`InternalTransfer ${activePrimaryTab === "Rework Order" ? "rework" : ""}`}>
       <div className="body-content-container">
+      <ToastContainer transition={Slide} />
+
         {/* Primary Tabs */}
         <div className="tabs">
           <div
@@ -243,8 +258,8 @@ const ApprovalTable = () => {
                 ) : (
                   <>
                     <th>Reason for Rework</th>
-                    <th>Cost</th>
-                    <th>Quantity</th>
+                    <th>Actual Quantity</th>
+                    <th>Rework Quantity</th>
                   </>
                 )}
               </tr>
@@ -290,12 +305,30 @@ const ApprovalTable = () => {
           <div className="input-container">
             <div className="input-row first-row">
               <div className="input-group">
-                <label>ID</label>
-                <input type="text" className="short-input"  value={selectedData?.delivery_id || "" } readOnly/>
+                <label>Delivery ID</label>
+                <input 
+                  type="text" 
+                  className="short-input"  
+                  value={selectedData?.delivery_id || "" } 
+                  readOnly
+                  style={{
+                    backgroundColor: '#f8f8f8', 
+                    cursor: 'not-allowed'
+                  }}
+                />
               </div>
               <div className="input-group">
                 <label>Date</label>
-                <input type="date" className="short-input" value={selectedData?.request_date || ""} readOnly/>
+                <input 
+                  type="date" 
+                  className="short-input" 
+                  value={selectedData?.request_date || ""} 
+                  readOnly
+                  style={{
+                    backgroundColor: '#f8f8f8', 
+                    cursor: 'not-allowed'
+                  }}
+                />
               </div>
             </div>
 
@@ -303,11 +336,29 @@ const ApprovalTable = () => {
             <div className="input-row">
               <div className="input-group">
                 <label>Delivery Type</label>
-                <input type="text" className="short-input" value={selectedData?.delivery_type || ""} readOnly/>
+                <input 
+                  type="text" 
+                  className="short-input" 
+                  value={selectedData?.delivery_type || ""} 
+                  readOnly
+                  style={{
+                    backgroundColor: '#f8f8f8', 
+                    cursor: 'not-allowed'
+                  }}
+                />
               </div>
               <div className="input-group">
                 <label>Module</label>
-                <input type="text" className="short-input"  value={selectedData?.module_name || ""} readOnly/>
+                <input 
+                  type="text" 
+                  className="short-input"  
+                  value={selectedData?.module_name || ""} 
+                  readOnly
+                  style={{
+                    backgroundColor: '#f8f8f8', 
+                    cursor: 'not-allowed'
+                  }}
+                />
               </div>
               <div className="input-group">
                 <label>Warehouse Location</label>
@@ -333,7 +384,16 @@ const ApprovalTable = () => {
             <div className="input-row">
               <div className="input-group">
                 <label>Product ID</label>
-                <input type="text" className="short-input" value={selectedData.production_order_detail_id} readOnly/>
+                <input 
+                  type="text" 
+                  className="short-input" 
+                  value={selectedData.production_order_detail_id} 
+                  readOnly
+                  style={{
+                    backgroundColor: '#f8f8f8',
+                    cursor: 'not-allowed'
+                  }}
+                />
               </div>
               <div className="input-group">
                 <label>Rework Reason</label>
@@ -363,7 +423,7 @@ const ApprovalTable = () => {
           </div>
         )}
         <div className="button-container">
-          <button className="send-to-button" onClick={updateDeliveryRequest}>Send</button>
+          <button className="send-to-button" onClick={handleSendClick}>Save</button>
         </div>
       </div>
     </div>

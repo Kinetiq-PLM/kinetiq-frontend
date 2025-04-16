@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
 import '../styles/ItemRemoval.css';
 
 
@@ -26,25 +28,18 @@ const ItemRemoval = () => {
     };
 
     const handleSentButton = async () => {
-      console.log("External ID:", selectedData.external_id);
-
-
-
 
       if (!selectedData) {
-          alert("Please select a record to update.");
+          toast.error("Please select a record to update.");
           return;
       }
       if (selectedData.deprecation_status !== 'Pending') {
-        alert("Only records with status 'Pending' can be sent to management.");
+        toast.error("Only records with status 'Pending' can be sent to Management.");
         return;
       }
       const updatePayload = {
           external_id: selectedData.external_id
       }
-
-
-      console.log("Sending payload:", updatePayload);
 
 
       try {
@@ -58,9 +53,9 @@ const ItemRemoval = () => {
   
           if (!response.ok) throw new Error("Failed to update record.");
           fetchData();
+          toast.success("Record sent to management."); 
       } catch (error) {
-          console.error("Update error:", error);
-          alert("Error updating approval status.");
+          toast.error("Error updating approval status.", error);
       }
     };
 
@@ -68,7 +63,6 @@ const ItemRemoval = () => {
         const filteredData = activeTab === "All"
             ? asset_removal_data
             : asset_removal_data.filter(row => row.status === activeTab);
-        console.log("Filtered Data after tab change:", filteredData);
     }, [activeTab, asset_removal_data]);
 
 
@@ -88,7 +82,6 @@ const ItemRemoval = () => {
               setSelectedRow(0);
               setSelectedData(data[0]);
           }
-          console.log(data)
       } catch (error) {
           if (error.name !== "AbortError") setError(error.message);
       } finally {
@@ -105,7 +98,7 @@ const ItemRemoval = () => {
 
   return (
     <div className="ItemRemoval">
-     
+     <ToastContainer />
       <div className="body-content-container">
         
           <div className="tabs">

@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Slide } from 'react-toastify';
+
 import "../styles/DeliveryApproval.css";
 
 const BodyContent = () => {
@@ -27,7 +31,7 @@ const BodyContent = () => {
     const handleSubmit = async () => {
 
         if (!selectedData) {
-            alert("Please select a record to update.");
+            toast.error("Please select a record to update. ")
             return;
         }
         const approval_status = selectedData.approval_status;
@@ -40,7 +44,7 @@ const BodyContent = () => {
             approved_by === "" ||
             approved_by === null
         ) {
-            alert("All fields must have a value.");
+            toast.error("All fields must have a value.");
             return;
         }
 
@@ -61,9 +65,9 @@ const BodyContent = () => {
    
             if (!response.ok) throw new Error("Failed to update record.");
             fetchData();
+            toast.success("Data updated sucessfully");
         } catch (error) {
-            console.error("Update error:", error);
-            alert("Error updating approval status.");
+            toast.error("Error updating approval status:", error);
         }
         fetchData();
        
@@ -111,7 +115,7 @@ const BodyContent = () => {
           setEmployeeList(data.employees)
    
         } catch (error) {
-          alert(error.message);
+            toast.error(error.message);
         } finally {
           setLoading(false);
         }
@@ -126,6 +130,7 @@ const BodyContent = () => {
             <div className="body-content-container">
                 {/* Table Container */}
                 <div className="table-container">
+                <ToastContainer transition={Slide} />
                     <table>
                         <thead>
                             <tr>
@@ -229,7 +234,7 @@ const BodyContent = () => {
 
                 {/* Send To Button (Outside Form Container) */}
                 <div className="send-to-button-container">
-                    <button className="send-to-button" onClick={handleSubmit}>Send</button>
+                    <button className="send-to-button" onClick={handleSubmit}>Save</button>
                 </div>
 
 

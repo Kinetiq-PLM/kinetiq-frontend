@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../styles/GoodsReceiptPO.css";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Slide } from 'react-toastify';
 
 const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) => {
   const date_today = new Date().toISOString().split('T')[0];
@@ -148,7 +151,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
           }));
          
         } catch (error) {
-          console.error('Error fetching next document IDs:', error);
+          toast.error('Error fetching next document IDs:', error);
           return
         }
       }
@@ -196,7 +199,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
           }),
         });
       } catch (error) {
-        console.error('Error deleting row from database:', error);
+        toast.error('Error deleting row from database:', error);
       }
  
       // Remove the item from local state
@@ -217,7 +220,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
       const updatedData = await response.json();
       return updatedData.document_items;
     } catch (error) {
-      console.error('Reload error:', error);
+      toast.error('Reload error:', error);
       return [];
     }
   };
@@ -356,8 +359,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
         setDocumentItems(updatedDoc.document_items);  
       }
       } catch (error) {
-        console.error('Error in handleAddRow:', error);
-        alert(`Failed to add item: ${error.message}`);
+        toast.error(`Failed to add item: ${error.message}`);
       } finally {
         setIsAddingRow(false);
       }
@@ -391,7 +393,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
         const sorted = data.sort((a, b) => a.warehouse_location.localeCompare(b.warehouse_location));
         setWarehouseOptions(sorted);
       })
-      .catch((err) => console.error('Error fetching warehouse options:', err));
+      .catch((err) => toast.error('Error fetching warehouse options:', err));
   }, []);
  
   const [itemOptions, setItemOptions] = useState([]);
@@ -490,7 +492,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
 
 
         } catch (error) {
-          console.error('Error deleting row from database:', error);
+          toast.error('Error deleting row from database:', error);
           return;
         }
  
@@ -566,9 +568,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
     try {
       if (!selectedOwner || !documentDetails.buyer){
         if(!selectedOwner){
-          alert("Owner is required")
+          toast.error("Owner is required")
         }else if(!documentDetails.buyer){
-          alert("Buyer Required")
+          toast.error("Buyer Required")
         }
         return
       }
@@ -606,7 +608,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
           ...(item.item_id.startsWith("ADMIN-MATERIAL") && { material_id: item.item_id }),
         }))
       };
-      console.log('PAYLOAD', payload)
       // Call the create API
       const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
         method: 'POST',
@@ -628,14 +629,13 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
 
 
       const result = await response.json();
-      console.log('Create successful:', result);
+      toast.success('Create successful:', result);
      
       // Call onSuccess with the created data if needed
       onSuccess(result);
      
     } catch (error) {
-      console.error('Error in handleCreateDocument:', error);
-      alert(`Failed to create document: ${error.message}`);
+      toast.error(`Failed to create document: ${error.message}`);
     }
   };
 
@@ -649,9 +649,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
-    console.log("Update");
-    console.log(updatedDocumentItems);
-    console.log(allProductDetails);
  
     try {
       if (isCreateMode) {
@@ -663,8 +660,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
         const updatedDocumentItemData = {
           product_id: item.item_id,
         };
-        console.log(item.productdocu_id);
-        console.log(updatedDocumentItemData);
         const documentItemResponse = await fetch(`http://127.0.0.1:8000/operation/product-docu-item/${item.productdocu_id}/`, {
           method: 'PUT',
           headers: {
@@ -763,8 +758,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
         onBack();  // Navigate back to GoodsTracking
       }
     } catch (error) {
-      console.error(`Error updating: ${error.message}`);
-      alert(`Failed to update data. Details: ${error.message}`);
+      toast.error(`Failed to update data. Details: ${error.message}`);
     }
   };
  
@@ -787,7 +781,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
       const data = await response.json();
       setPurchaseOrders(data);
     } catch (error) {
-      console.error("Error fetching purchase orders:", error);
+      toast.error("Error fetching purchase orders:", error);
       setError(error.message);
     }
   };
@@ -847,8 +841,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
       setDocumentItems([...poItems, {}]);
  
     } catch (error) {
-      console.error("Error handling PO selection:", error);
-      alert(`Failed to load PO data: ${error.message}`);
+      toast.error(`Failed to load PO data: ${error.message}`);
     }
   };
  
@@ -888,6 +881,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton  }) =>
     <div className="grpo">
       <div className="body-content-container">
         <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
+        <ToastContainer transition={Slide} />
+
         <div className="content-wrapper">
           <div className="details-grid">
             <div className="details-section">

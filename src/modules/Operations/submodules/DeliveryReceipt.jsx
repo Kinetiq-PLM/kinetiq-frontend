@@ -242,12 +242,6 @@ const TabSystem = () => {
                             </table>
                         </div>
                     )}
-
-
-                    {/* Send to */}
-                    <div className="send-to-container">
-                        <button className="send-to-button">Send To</button>
-                    </div>
                 </div>
             </div>
         </div>
