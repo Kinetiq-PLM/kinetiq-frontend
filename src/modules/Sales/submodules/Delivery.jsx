@@ -211,7 +211,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         total_amount: Number(parseFloat(deliveryInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(deliveryInfo.discount).toFixed(2)),
         total_tax: Number(parseFloat(deliveryInfo.total_tax).toFixed(2)),
-        subtotal: Number(deliveryInfo.total_before_discount),
+        subtotal: Number(deliveryInfo.total_before_discount.toFixed(2)),
       },
     };
     deliveryMutation.mutate(request);

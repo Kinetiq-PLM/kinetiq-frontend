@@ -208,7 +208,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         total_amount: Number(parseFloat(quotationInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(quotationInfo.discount).toFixed(2)),
         total_tax: Number(quotationInfo.total_tax.toFixed(2)),
-        subtotal: Number(quotationInfo.total_before_discount),
+        subtotal: Number(quotationInfo.total_before_discount.toFixed(2)),
         items: products.map((product) => {
           if (product.special_requests !== null) {
             setDisableCopyTo(true);
