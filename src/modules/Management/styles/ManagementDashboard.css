@@ -1,8 +1,7 @@
 .dashboard-container {
+  background-color: white; /* Add white background */
   padding: 20px;
-  font-family: sans-serif;
-  background-color: white;
-  min-height: 100vh;
+   font-family: sans-serif;
 }
 
 .top-section {
@@ -12,47 +11,49 @@
 }
 
 .status-box {
-  border: 1px solid #ddd;
-  padding: 20px;
+ padding: 35px;
+  border-radius: 20px;
   text-align: center;
-  width: 150px;
-  border-radius: 8px;
+   width: 150px;
 }
 
 .status-box p {
-  margin: 0 0 5px;
+  margin: 0;
   font-weight: bold;
 }
 
 .status-box span {
   font-size: 2em;
+  font-weight: bold;
 }
 
-.approved {
+.status-box.approved {
   background-color: #e6f7e9;
   color: #389e0d;
 }
 
-.pending {
+.status-box.pending {
   background-color: #fffbe6;
   color: #d48806;
 }
 
-.denied {
-  background-color: #fff1f0;
-  color: #a61d24;
+.status-box.rejected {
+  background-color: #fdecea; /* Light red background */
+  color: #d93025; /* Dark red text */
 }
 
 .requests-section {
   margin-top: 20px;
 }
 
-.requests-table-container {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow-y: auto;
-  max-height: 300px; /* Adjust as needed */
+.requests-section h2 {
+  margin-bottom: 15px;
 }
+
+.requests-table-container {
+  overflow-x: auto;
+}
+
 
 .requests-table {
   width: 100%;
@@ -70,9 +71,29 @@
   background-color: #f2f2f2;
 }
 
+.requests-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
 .requests-table-container {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow-y: auto; /* Enables vertical scrollbar */
-  max-height: 300px; /* Adjust as needed */
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 400px; /* Set a maximum height for the table container */
+}
+
+
+.table-body-scroll {
+  overflow-y: auto; /* Add vertical scrollbar */
+  max-height: 300px; /* Set a maximum height for the scrollable area */
+}
+/* Scrollbar styling */
+.requests-table-container::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.requests-table-container::-webkit-scrollbar-thumb {
+  background-color: #00A8A8; /* Color of the scrollbar thumb */
+  border-radius: 4px; /* Rounded corners for the scrollbar thumb */
+}
+
+.requests-table-container::-webkit-scrollbar-track {
+  background-color: #f2f2f2; /* Color of the scrollbar track */
 }
