@@ -160,7 +160,7 @@ export default function OpportunityTab({ setActiveTab }) {
             type="primary"
             className={"!max-w-[200px] py-2 flex-1"}
           >
-            New Campaign
+            New Opportunity
           </Button>
         </div>
       </div>

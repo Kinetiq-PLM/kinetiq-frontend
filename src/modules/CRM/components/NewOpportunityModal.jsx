@@ -285,6 +285,7 @@ const NewOpportunityModal = ({
     setWeightedAmount("");
     setGrossProfitTotal("");
     setInterestLevel("");
+    setProbability("");
     setIsValidationVisible(false);
   }, [isOpen]);
 

@@ -132,7 +132,7 @@ export default function CustomerTab() {
             type="primary"
             className={"!max-w-[200px] py-2 flex-1"}
           >
-            New Campaign
+            New Customer
           </Button>
         </div>
       </div>

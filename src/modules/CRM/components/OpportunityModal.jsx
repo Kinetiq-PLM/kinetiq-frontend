@@ -44,6 +44,8 @@ const OpportunityModal = ({
   const [grossProfit, setGrossProfit] = useState("");
   const [grossProfitTotal, setGrossProfitTotal] = useState("");
   const [interestLevel, setInterestLevel] = useState("");
+  const [probability, setProbability] = useState("");
+
   const opportunityMutation = useMutation({
     mutationFn: async (data) =>
       await PATCH(`crm/opportunities/${details.opportunity_id}/`, data),
@@ -75,6 +77,7 @@ const OpportunityModal = ({
       validateEstimatedValue,
       validateWeightedAmount,
       validateGrossProfit,
+      validateProbability,
       // validateGrossProfitTotal,
       validateLevelOfInterest,
     ];
@@ -102,6 +105,7 @@ const OpportunityModal = ({
         weighted_amount: Number(weightedAmount),
         gross_profit_percentage: Number(grossProfit),
         gross_profit_total: Number(grossProfitTotal),
+        probability: probability,
         stage,
         status,
         description,
@@ -119,6 +123,7 @@ const OpportunityModal = ({
       setWeightedAmount("");
       setGrossProfit("");
       setGrossProfitTotal("");
+      setProbability("");
       setInterestLevel("");
       setIsValidationVisible(false);
 
@@ -132,6 +137,13 @@ const OpportunityModal = ({
         title: "Please complete the form correctly.",
       });
     }
+  };
+
+  const validateProbability = () => {
+    if (!probability.trim()) {
+      return "Probability is required.";
+    }
+    return "";
   };
 
   const validateDescription = () => {
@@ -277,6 +289,7 @@ const OpportunityModal = ({
       setLostReason(details.reason_lost);
       setGrossProfit(details.gross_profit_percentage.replace(".00", ""));
       setGrossProfitTotal(details.gross_profit_total);
+      setProbability(details.probability);
       setEstimatedValue(details.estimated_value);
       setWeightedAmount(details.weighted_amount);
       setInterestLevel(details.interest_level);
@@ -292,6 +305,7 @@ const OpportunityModal = ({
       setGrossProfit("");
       setGrossProfitTotal("");
       setInterestLevel("");
+      setProbability("");
     }
     setIsValidationVisible(false);
   }, [isOpen]);
@@ -424,6 +438,18 @@ const OpportunityModal = ({
                 value={grossProfitTotal}
                 disabled={true}
               />
+            </div>
+
+            <div className="flex gap-2">
+              <NumberInputField
+                label={"Probabiility"}
+                value={probability}
+                setValue={setProbability}
+                validation={validateProbability}
+                isValidationVisible={isValidationVisible}
+                isPercent={true}
+              />
+              <div className="flex-1"></div>
             </div>
             <Dropup
               label="Level of Interest"
