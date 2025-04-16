@@ -13,22 +13,16 @@
   animation: fadeInModule 0.4s ease-in-out;
 }
 
-@media (max-width: 55rem) {
+@media (max-width: 46rem) {
   .header-module-name.inactive {
     display: none;
   }
-}
-
-@media (max-width: 46rem) {
   .header-navi.squished .header-module-names {
     display: none;
   }
 }
 
 @media (max-width: 40rem) {
-  .header-body-container {
-    max-height: calc(100vh - var(--header-navi-height));
-  }
 
   .notif-menu {
     width: 20rem;
