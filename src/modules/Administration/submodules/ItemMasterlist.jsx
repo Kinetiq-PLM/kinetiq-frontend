@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "../styles/ItemMasterlist.css";
+
 
 const units = ["kg", "sh", "bx", "L", "m", "gal", "pcs", "set", "mm", "unit"];
 const manageOptions = ["None", "Serial Number", "Batches"];
@@ -164,10 +165,83 @@ const rawMaterialRows = [
     { materialId: "MAT007", materialName: "Cloth Tape", description: "Heat resistant", unit: "set", cost: "100", vendorCode: "V007" }
 ];
 
+
 const ItemMasterList = () => {
     const [data, setData] = useState(rows);
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
     const [activeTab, setActiveTab] = useState("Item Masterlist");
+    const [showAddDropdown, setShowAddDropdown] = useState(false);
+    const AddDropdownRef = useRef(null);
+
+    const [editTab, setEditTab] = useState(null);
+    const [editDataIndex, setEditDataIndex] = useState(null);
+    const [editDataValues, setEditDataValues] = useState({});
+
+    const [editIndex, setEditIndex] = useState(null);
+    const [editValues, setEditValues] = useState({ itemName: "", unit: "", purchasing: "" });
+
+    const [showAssetAddForm, setShowAssetAddForm] = useState(false);
+    const assetAddRef = useRef(null);
+
+
+    const openDataEdit = (tab, index, rowData) => {
+        setEditTab(tab);
+        setEditDataIndex(index);
+        setEditDataValues({ ...rowData });
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (!e.target.closest(".dropdown-asset-raw")) {
+                setOpenMenuIndex(null);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+    
+    const saveDataEdit = () => {
+        if (editTab === "Assets") {
+            const updated = [...assetRows];
+            updated[editDataIndex] = editDataValues;
+            setAssetRows(updated);
+        } else if (editTab === "Product") {
+            const updated = [...productRows];
+            updated[editDataIndex] = editDataValues;
+            setProductRows(updated);
+        } else if (editTab === "Raw Materials") {
+            const updated = [...rawMaterialRows];
+            updated[editDataIndex] = editDataValues;
+            setRawMaterialRows(updated);
+        }
+        setEditTab(null);
+        setEditDataIndex(null);
+        setEditDataValues({});
+    };
+
+    const openEditForm = (index) => {
+        const item = data[index];
+        setEditValues({
+            itemName: item.itemName,
+            unit: item.unit,
+            purchasing: item.purchasing
+        });
+        setEditIndex(index);
+    };
+
+    const handleEditChange = (field, value) => {
+        setEditValues({ ...editValues, [field]: value });
+    };
+
+    const saveEdit = () => {
+        const updated = [...data];
+        updated[editIndex] = {
+            ...updated[editIndex],
+            ...editValues
+        };
+        setData(updated);
+        setEditIndex(null);
+    };
 
     const toggleMenu = (index) => {
         setOpenMenuIndex(openMenuIndex === index ? null : index);
@@ -179,37 +253,259 @@ const ItemMasterList = () => {
         setData(updated);
     };
 
-    const renderDropdown = (type) => {
-        const fields = {
-            Product: ["Product ID", "Product Name", "Description", "Selling Price", "Stock Level", "Warranty Period", "Policy ID", "Batch No.", "Content ID"],
-            Assets: ["Asset ID", "Asset Name", "Purchase Date", "Serial No.", "Purchase price", "Content ID"],
-            "Raw Materials": ["Material ID", "Material Name", "Description", "Cost Per Unit", "Vendor code", "Unit Of Measure"]
-        }[type] || [];
-
-        return (
-            <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded p-4 z-10 w-96">
-                <h3 className="font-semibold text-lg mb-2">{type}</h3>
-                <div className="grid grid-cols-2 gap-3">
-                    {fields.map((label, i) => (
-                        <div key={i}>
-                            <label className="text-sm text-gray-700 mb-1 block">{label}</label>
-                            <input
-                                type="text"
-                                placeholder={`Please select ${label}`}
-                                className="w-full border px-2 py-1 rounded-md"
-                            />
-                        </div>
-                    ))}
-                </div>
-                <div className="flex justify-end gap-2 mt-4">
-                    <button className="bg-teal-500 text-white px-4 py-1 rounded-md">Add</button>
-                    <button className="border border-teal-500 text-teal-600 px-4 py-1 rounded-md">Alter</button>
-                    <button className="border border-teal-500 text-teal-600 px-4 py-1 rounded-md">Delete</button>
-                    <button className="border border-gray-300 text-gray-600 px-4 py-1 rounded-md">Cancel</button>
-                </div>
-            </div>
-        );
+    useEffect(() => {
+    const handleClickOutside = (event) => {
+        if (formDropdownRef.current && !formDropdownRef.current.contains(event.target)) {
+        setShowAddDropdown(false);
+        }
     };
+    
+
+    if (showAddDropdown) {
+        document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+    };
+    }, [showAddDropdown]);
+
+
+    const renderDropdown = (type) => {
+        if (type === "Assets") {
+            return (
+                <div className="dropdown-asset-raw absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-lg p-6 z-50 w-[460px] max-h-[90vh] overflow-y-auto">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Assets</h3>
+                    <div className="flex flex-col gap-4">
+                        {[
+                            { label: "Asset ID*", placeholder: "Please enter document name" },
+                            { label: "Asset Name", placeholder: "Please select category" },
+                            { label: "Purchase Date", placeholder: "Please select category" },
+                            { label: "Serial No.", placeholder: "Please select category" },
+                            { label: "Purchase price", placeholder: "Please select category" },
+                            { label: "Content ID", placeholder: "Please select category" }
+                        ].map((field, index) => (
+                            <div key={index}>
+                                <label className="block text-sm font-semibold text-teal-700 mb-1">{field.label}</label>
+                                <input
+                                    type="text"
+                                    placeholder={field.placeholder}
+                                    className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-end gap-3 mt-6">
+                        <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
+                        <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">Edit</button>
+                        <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Archive</button>
+                    </div>
+                </div>
+            );
+        }
+
+        if (type === "Raw Materials") {
+            return (
+                <div className="dropdown-asset-raw absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-lg p-6 z-50 w-[460px] max-h-[90vh] overflow-y-auto">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Raw Materials</h3>
+                    <div className="flex flex-col gap-4">
+                        {[
+                            { label: "Material ID*", placeholder: "Item ID" },
+                            { label: "Material Name", placeholder: "Please select Material Name" },
+                            { label: "Description", placeholder: "Please select Description" },
+                            { label: "Unit Of Measure", isSelect: true },
+                            { label: "Cost Per Unit", placeholder: "Please select Cost per Unit" },
+                            { label: "Vendor code", placeholder: "Please select Unit Of measure" }
+                        ].map((field, index) => (
+                            <div key={index}>
+                                <label className="block text-sm font-semibold text-teal-700 mb-1">{field.label}</label>
+                                {field.isSelect ? (
+                                    <select className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm text-gray-600 focus:outline-none">
+                                        <option value="">unit of measure</option>
+                                        {units.map((unit, i) => (
+                                            <option key={i} value={unit}>{unit}</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        placeholder={field.placeholder}
+                                        className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                                    />
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-end gap-3 mt-6">
+                        <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
+                        <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">Edit</button>
+                        <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Archive</button>
+                    </div>
+                </div>
+            );
+        }
+
+        if (type === "Product"){
+            return (
+                <div className="dropdown-asset-raw absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-lg p-6 z-50 w-[460px] max-h-[90vh] overflow-y-auto">
+                    <h3 className="text-xl font-semibold text-teal-600 mb-4 border-b pb-2">Product</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        {[
+                            "Item Id", "Asset Id", "Product Id", "Material Id", "Item Type", "Item Name",
+                            "Unit of Measure", "Manage Item", "Sales quantity per package",
+                            "Item Status", "Preferred Vendor", "Item per purchase unit",
+                            "Purchasing Oum", "purchase quantity per package", "Sale Oum", "items per sale unit"
+                        ].map((label, i) => (
+                            <div key={i}>
+                                <label className="block text-sm font-semibold text-teal-600 mb-1">{label}</label>
+                                {["Item Type", "Unit of Measure", "Manage Item", "Purchasing Oum", "Sale Oum"].includes(label) ? (
+                                    <select className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm">
+                                        <option>Select {label}</option>
+                                        {units.map(u => <option key={u}>{u}</option>)}
+                                    </select>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        placeholder="Enter Description"
+                                        className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                                    />
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-end mt-6 gap-3">
+                        <button className="bg-teal-500 text-white px-6 py-2 rounded-md">Add</button>
+                        <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md">Edit</button>
+                        <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md">Archive</button>
+                    </div>
+                </div>)
+        }
+        return null;
+    };
+
+    const renderAddDropdownContent = () => {
+        const tabToType = {
+            "Item Masterlist": "Product",
+            "Assets": "Assets",
+            "Product": "Product",
+            "Raw Materials": "Raw Materials",
+        };
+
+        const type = tabToType[activeTab];
+
+        if (type === "Assets") {
+            return (
+                <div className="dropdown-asset-raw absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-lg p-6 z-50 w-[460px] max-h-[90vh] overflow-y-auto">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Assets</h3>
+                    <div className="flex flex-col gap-4">
+                        {[
+                            { label: "Asset ID*", placeholder: "Please enter document name" },
+                            { label: "Asset Name", placeholder: "Please select category" },
+                            { label: "Purchase Date", placeholder: "Please select category" },
+                            { label: "Serial No.", placeholder: "Please select category" },
+                            { label: "Purchase price", placeholder: "Please select category" },
+                            { label: "Content ID", placeholder: "Please select category" }
+                        ].map((field, index) => (
+                            <div key={index}>
+                                <label className="block text-sm font-semibold text-teal-700 mb-1">{field.label}</label>
+                                <input
+                                    type="text"
+                                    placeholder={field.placeholder}
+                                    className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-end gap-3 mt-6">
+                        <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
+                        <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">Edit</button>
+                        <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Archive</button>
+                    </div>
+                </div>
+            );
+        }
+
+        if (type === "Raw Materials") {
+            return (
+                <div className="dropdown-asset-raw absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-lg p-6 z-50 w-[460px] max-h-[90vh] overflow-y-auto">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Raw Materials</h3>
+                    <div className="flex flex-col gap-4">
+                        {[
+                            { label: "Material ID*", placeholder: "Item ID" },
+                            { label: "Material Name", placeholder: "Please select Material Name" },
+                            { label: "Description", placeholder: "Please select Description" },
+                            { label: "Unit Of Measure", isSelect: true },
+                            { label: "Cost Per Unit", placeholder: "Please select Cost per Unit" },
+                            { label: "Vendor code", placeholder: "Please select Unit Of measure" }
+                        ].map((field, index) => (
+                            <div key={index}>
+                                <label className="block text-sm font-semibold text-teal-700 mb-1">{field.label}</label>
+                                {field.isSelect ? (
+                                    <select className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm text-gray-600 focus:outline-none">
+                                        <option value="">unit of measure</option>
+                                        {units.map((unit, i) => (
+                                            <option key={i} value={unit}>{unit}</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        placeholder={field.placeholder}
+                                        className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                                    />
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-end gap-3 mt-6">
+                        <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
+                        <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">Edit</button>
+                        <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Archive</button>
+                    </div>
+                </div>
+            );
+        }
+
+        if (type === "Product") {
+            return (
+                <div className="dropdown-asset-raw absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-lg p-6 z-50 w-[700px] max-h-[90vh] overflow-y-auto">
+                    <h3 className="text-xl font-semibold text-teal-600 mb-4 border-b pb-2">Product</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        {[
+                            "Item Id", "Asset Id", "Product Id", "Material Id", "Item Type", "Item Name",
+                            "Unit of Measure", "Manage Item", "Sales quantity per package",
+                            "Item Status", "Preferred Vendor", "Item per purchase unit",
+                            "Purchasing Oum", "purchase quantity per package", "Sale Oum", "items per sale unit"
+                        ].map((label, i) => (
+                            <div key={i}>
+                                <label className="block text-sm font-semibold text-teal-600 mb-1">{label}</label>
+                                {["Item Type", "Unit of Measure", "Manage Item", "Purchasing Oum", "Sale Oum"].includes(label) ? (
+                                    <select className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm">
+                                        <option>Select {label}</option>
+                                        {units.map(u => <option key={u}>{u}</option>)}
+                                    </select>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        placeholder="Enter Description"
+                                        className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                                    />
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-end mt-6 gap-3">
+                        <button className="bg-teal-500 text-white px-6 py-2 rounded-md">Add</button>
+                        <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md">Edit</button>
+                        <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md">Archive</button>
+                    </div>
+                </div>
+            );
+        }
+
+        return null;
+    };
+
 
     const renderTable = () => {
         if (activeTab === "Item Masterlist") {
@@ -246,21 +542,28 @@ const ItemMasterList = () => {
                         {tab}
                     </button>
                 ))}
-                <div className="ml-auto flex items-center gap-2">
+                <div className="ml-auto flex items-center gap-2 relative">
                     <input
                         type="text"
                         placeholder="Search"
                         className="border border-gray-300 px-3 py-2 rounded-md text-sm"
                     />
-                    <button className="border border-gray-300 px-3 py-2 rounded-md text-sm flex items-center gap-1">
-                        {activeTab} <span>&#9662;</span>
-                    </button>
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowAddDropdown(prev => !prev)}
+                            className="bg-teal-500 text-white px-4 py-2 rounded-md text-sm"
+                        >
+                            Add
+                        </button>
+                        {showAddDropdown && renderAddDropdownContent()}
+                    </div>
                 </div>
             </div>
 
             <div className="itemmasterlist-table-container">
-                <div className="itemmasterlist-scroll-wrapper" style={{ overflowX: 'auto', maxWidth: '1500px' }}>
-                    <table className="itemmasterlist-table" style={{ minWidth: '1600px' }}>
+                {/* Table rendering is unchanged; your full table logic goes here */}
+                <div className="itemmasterlist-scroll-wrapper" style={{ overflowX: 'auto', maxWidth: '1800px' }}>
+                    <table className="itemmasterlist-table" style={{ minWidth: '2000px' }}>
                         <thead className="bg-gray-100">
                             <tr>
                                 {/* Conditionally render headers based on tab */}
@@ -288,27 +591,14 @@ const ItemMasterList = () => {
                         <tbody>
                             {activeTab === "Item Masterlist" && data.map((row, index) => (
                                 <tr key={index} className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100">
-                                    <td className="px-4 py-3 border border-gray-200"><input type="checkbox" className="mr-2" />{row.itemId}</td>
+                                    <td className="px-4 py-3 border border-gray-200">{row.itemId}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.assetId}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.productId}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.materialId}</td>
-                                    <td className="px-4 py-3 border border-gray-200">
-                                        <select value={row.itemType} onChange={(e) => handleChange(index, "itemType", e.target.value)} className="w-full border px-2 py-1 rounded-md">
-                                            <option value="">Item Type</option>
-                                            {itemTypes.map((t) => (<option key={t} value={t}>{t}</option>))}
-                                        </select>
-                                    </td>
+                                    <td className="px-4 py-3 border border-gray-200">{row.itemType}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.itemName}</td>
-                                    <td className="px-4 py-3 border border-gray-200">
-                                        <select value={row.unit} onChange={(e) => handleChange(index, "unit", e.target.value)} className="w-full border px-2 py-1 rounded-md">
-                                            {units.map((u) => (<option key={u}>{u}</option>))}
-                                        </select>
-                                    </td>
-                                    <td className="px-4 py-3 border border-gray-200">
-                                        <select value={row.manageBy} onChange={(e) => handleChange(index, "manageBy", e.target.value)} className="w-full border px-2 py-1 rounded-md">
-                                            {manageOptions.map((opt) => (<option key={opt}>{opt}</option>))}
-                                        </select>
-                                    </td>
+                                    <td className="px-4 py-3 border border-gray-200">{row.unit}</td>
+                                    <td className="px-4 py-3 border border-gray-200">{row.manageBy}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.status}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.vendor}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.purchasing}</td>
@@ -317,16 +607,15 @@ const ItemMasterList = () => {
                                     <td className="px-4 py-3 border border-gray-200">{row.saleUom}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.itemPerSaleUnit}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.saleQtyPerPack}</td>
-                                    <td className="px-4 py-3 border border-gray-200 relative">
-                                        <button onClick={() => toggleMenu(index)} className="text-xl hover:bg-gray-200 px-2 rounded">⋮</button>
-                                        {openMenuIndex === index && renderDropdown("Product")}
+                                        <td className="px-4 py-3 border border-gray-200 relative text-right">
+                                        <button onClick={() => setShowAddDropdown(prev => !prev)} className="text-xl hover:bg-gray-200 px-2 rounded">⋮</button>
                                     </td>
                                 </tr>
                             ))}
 
                             {activeTab === "Assets" && assetRows.map((row, idx) => (
                                 <tr key={idx} className="odd:bg-gray-50 hover:bg-gray-100">
-                                    <td className="px-4 py-3 border border-gray-200"><input type="checkbox" className="mr-2" />{row.assetId}</td>
+                                    <td className="px-4 py-3 border border-gray-200">{row.assetId}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.assetName}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.purchaseDate}</td>
                                     <td className="px-4 py-3 border border-gray-200">{row.serialNo}</td>
@@ -335,23 +624,39 @@ const ItemMasterList = () => {
                                         {row.contentId}
                                     </td>
                                     <td className="px-4 py-3 border border-gray-200 relative">
-                                        <button onClick={() => toggleMenu(idx)} className="text-xl hover:bg-gray-200 px-2 rounded">⋮</button>
+                                        <button
+                                            onClick={() => {
+                                                openDataEdit("Assets", idx, row);
+                                                setOpenMenuIndex(idx);
+                                            }}
+                                            className="text-xl hover:bg-gray-200 px-2 rounded"
+                                        >
+                                            ⋮
+                                        </button>
                                         {openMenuIndex === idx && renderDropdown("Assets")}
                                     </td>
-                                </tr>
+                                </tr>   
                             ))}
 
                             {/* Product Table */}
                             {activeTab === "Product" &&
                                 productRows.map((row, idx) => (
                                     <tr key={idx} className="odd:bg-gray-50 hover:bg-gray-100">
-                                        <td className="px-4 py-3 border border-gray-200"><input type="checkbox" className="mr-2" />{row.productId}</td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.productId}</td>
                                         <td className="px-4 py-3 border border-gray-200">{row.productName}</td>
                                         <td className="px-4 py-3 border border-gray-200">{row.description}</td>
                                         <td className="px-4 py-3 border border-gray-200">{row.price}</td>
                                         <td className="px-4 py-3 border border-gray-200">{row.stockLevel}</td>
                                         <td className="px-4 py-3 border border-gray-200 relative">
-                                            <button onClick={() => toggleMenu(idx)} className="text-xl hover:bg-gray-200 px-2 rounded">⋮</button>
+                                            <button
+                                                onClick={() => {
+                                                    openDataEdit("Product", idx, row);
+                                                    setOpenMenuIndex(idx); 
+                                                }}
+                                                className="text-xl hover:bg-gray-200 px-2 rounded"
+                                            >
+                                                ⋮
+                                            </button>
                                             {openMenuIndex === idx && renderDropdown("Product")}
                                         </td>
                                     </tr>
@@ -361,18 +666,22 @@ const ItemMasterList = () => {
                             {activeTab === "Raw Materials" &&
                                 rawMaterialRows.map((row, idx) => (
                                     <tr key={idx} className="odd:bg-gray-50 hover:bg-gray-100">
-                                        <td className="px-4 py-3 border border-gray-200"><input type="checkbox" className="mr-2" />{row.materialId}</td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.materialId}</td>
                                         <td className="px-4 py-3 border border-gray-200">{row.materialName}</td>
                                         <td className="px-4 py-3 border border-gray-200">{row.description}</td>
-                                        <td className="px-4 py-3 border border-gray-200">
-                                            <select className="w-full border px-2 py-1 rounded-md" defaultValue={row.unit}>
-                                                {units.map((u) => <option key={u}>{u}</option>)}
-                                            </select>
-                                        </td>
+                                        <td className="px-4 py-3 border border-gray-200">{row.unit}</td>
                                         <td className="px-4 py-3 border border-gray-200">{row.cost}</td>
                                         <td className="px-4 py-3 border border-gray-200">{row.vendorCode}</td>
                                         <td className="px-4 py-3 border border-gray-200 relative">
-                                            <button onClick={() => toggleMenu(idx)} className="text-xl hover:bg-gray-200 px-2 rounded">⋮</button>
+                                            <button
+                                                onClick={() => {
+                                                    openDataEdit("Raw Materials", idx, row);
+                                                    setOpenMenuIndex(idx); 
+                                                }}
+                                                className="text-xl hover:bg-gray-200 px-2 rounded"
+                                            >
+                                                ⋮
+                                            </button>
                                             {openMenuIndex === idx && renderDropdown("Raw Materials")}
                                         </td>
                                     </tr>

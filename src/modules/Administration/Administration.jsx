@@ -143,7 +143,6 @@ const Table = ({ headers, data, withCheckbox = false, highlightDisabledRow = fal
             <tr className="bg-gray-100 text-gray-700">
                 {withCheckbox && (
                     <th className="p-3 border border-gray-200 text-left">
-                        <input type="checkbox" className="h-4 w-4" />
                     </th>
                 )}
                 {headers.map((header, index) => (
@@ -158,7 +157,6 @@ const Table = ({ headers, data, withCheckbox = false, highlightDisabledRow = fal
                 <tr key={rowIndex} className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100">
                     {withCheckbox && (
                         <td className="p-3 border border-gray-200">
-                            <input type="checkbox" className="h-4 w-4" onClick={(e) => e.stopPropagation()} />
                         </td>
                     )}
                     {row.map((cell, cellIndex) => (
