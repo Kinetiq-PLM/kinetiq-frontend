@@ -6,7 +6,7 @@ import { Slide } from 'react-toastify';
 
 
 
-const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
+const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
 
@@ -23,7 +23,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
 
   const [selectedVendor, setSelectedVendor] = useState("");
-  const [selectedOwner, setSelectedOwner] = useState("");
+  const [selectedOwner, setSelectedOwner] = useState(
+      isCreateMode ? employee_id : selectedData.employee_name || employee_id
+  );
   const [contactPerson, setContactPerson] = useState("");
   const [vendorID, setVendorID] = useState("");
   const [vendorList, setVendorList] = useState([]);
@@ -103,7 +105,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
     vendor_name: isCreateMode ? "" : selectedVendor,
     contact_person: isCreateMode ? "" : contactPerson,
     buyer: isCreateMode ? "" : selectedData.buyer || "",
-    owner: isCreateMode ? "" : selectedOwner,
+    owner: isCreateMode ? employee_id : selectedOwner,
     transaction_id: isCreateMode ? "" : selectedData.transaction_id || "",
     ar_credit_memo: isCreateMode ? "" : selectedData.ar_credit_memo || "",
     delivery_date: isCreateMode ? today : selectedData.delivery_date || "",
@@ -569,7 +571,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         status: selectedStatus,
         vendor_code: null,
         buyer: vendorID,
-        employee_id: employeeList.find(emp => emp.employee_name === selectedOwner)?.employee_id,
+        employee_id: employee_id,
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
@@ -636,7 +638,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
-
+    if (!vendorID){
+      toast.error("Customer Required")
+      return
+    }
     try {
       if (isCreateMode) {
         await handleCreateDocument();
@@ -878,7 +883,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
             <div className="details-section">
               <div className="detail-row">
                 <label>Customer ID</label>
-                <input type="text" value={vendorID} />
+                <input type="text" value={vendorID} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
               <div className="detail-row dropdown-scrollbar">
                 <label>Customer Name</label>
@@ -898,22 +903,23 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
               </div>
               <div className="detail-row">
                 <label>Contact Person</label>
-                <input type="text" value={contactPerson} />
+                <input type="text" value={contactPerson} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
               <div className="detail-row">
                 <label>Owner</label>
-                <select value={selectedOwner} onChange={(e) => setSelectedOwner(e.target.value)}>
-                  <option value="">Select Owner</option>
-                  {loading ? (
-                    <option value="">Loading employees...</option>
-                  ) : (
-                    employeeList.map((employee) => (
-                      <option key={employee.employee_id} value={employee.employee_name}>
-                        {employee.employee_name}
-                      </option>
-                    ))
-                  )}
-                </select>
+                <input
+                  type="text"
+                  readOnly
+                  value={
+                    selectedData?.employee_id
+                      ? employeeList.find(e => e.employee_id === selectedData.employee_id)?.employee_name || selectedData.employee_id
+                      : employeeList.find(e => e.employee_id === employee_id)?.employee_name || employee_id
+                  }
+                  style={{
+                    cursor: 'not-allowed',
+                    backgroundColor: '#f8f8f8'
+                  }}
+                />
               </div>
               <div className="detail-row">
                 <label>Credit Memo ID</label>
@@ -985,8 +991,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                       <label>Invoice Date</label>
                       <div className="date-input clickable">
                         <input type="date" 
-                          value={selectedData?.invoice_date || date_today} 
+                          value={selectedData?.invoice_date?.split('T')[0] || date_today} 
                           onChange={(e) => setSelectedStatus(e, "invoice_date")}
+                          readOnly
+                          style={{ cursor: 'not-allowed' }} 
                         />
                         <span className="calendar-icon">📅</span>
                       </div>
@@ -1102,7 +1110,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                         onChange={(e) => handleItemSelection(index, e.target.value)}
                       >
                         <option value="">-- Select Item --</option>
-                        {itemOptions.map((opt, i) => (
+                        {itemOptions.filter(opt => opt.type === 'product').map((opt, i) => (
                           <option key={i} value={opt.name}>
                             {opt.name} ({opt.type})
                           </option>

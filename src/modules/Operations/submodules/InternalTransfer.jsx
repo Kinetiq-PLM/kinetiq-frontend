@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
 
-const ApprovalTable = () => {
+const ApprovalTable = ({employee_id}) => {
   const [activePrimaryTab, setActivePrimaryTab] = useState("Delivery Request");
 
 

@@ -5,7 +5,7 @@ import { Slide } from 'react-toastify';
 
 import "../styles/DeliveryApproval.css";
 
-const BodyContent = () => {
+const BodyContent = ({employee_id}) => {
     const [approvalStatus, setApprovalStatus] = useState("Pending");
     const [approvalDate, setApprovalDate] = useState("");
     const [approvedBy, setApprovedBy] = useState("");
@@ -149,7 +149,7 @@ const BodyContent = () => {
                                 </tr>
                             ) : deliveryapproval_data.length > 0 ? (
                                 deliveryapproval_data.map((row, index) => (
-                                <tr>
+                                <tr key = {row.approval_request_id}>
                                     <td>
                                         <input
                                             type="checkbox"  
@@ -210,21 +210,10 @@ const BodyContent = () => {
                         </div>
                         <div className="form-group">
                             <label>Approved By</label>
-                            <select
-                                value={selectedData?.approved_by || ""}
-                                onChange={(e) => setSelectedData({ ...selectedData, approved_by: e.target.value })}
-                            >
-                                <option value="">Approved by</option>
-                                {loading ? (
-                                    <option value="">Loading employees...</option>
-                                ) : (
-                                    employeeList.map((employee) => (
-                                    <option key={employee.employee_id} value={employee.employee_id}>
-                                        {employee.employee_name}
-                                    </option>
-                                    ))
-                                )}
-                            </select>
+                            <span>
+                                {employeeList.find(emp => emp.employee_id === (selectedData?.approved_by ?? employee_id))
+                                    ?.employee_name || "-----"}
+                            </span>
                         </div>
                     </div>
                 </div>  

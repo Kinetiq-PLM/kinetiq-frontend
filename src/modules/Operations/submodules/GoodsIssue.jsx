@@ -6,7 +6,7 @@ import { Slide } from 'react-toastify';
 
 
 
-const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
+const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
 
@@ -26,7 +26,9 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
 
   const [selectedVendor, setSelectedVendor] = useState("");
-  const [selectedOwner, setSelectedOwner] = useState("");
+  const [selectedOwner, setSelectedOwner] = useState(
+      isCreateMode ? employee_id : selectedData.employee_name || employee_id
+    );
   const [contactPerson, setContactPerson] = useState("");
   const [vendorID, setVendorID] = useState("");
   const [vendorList, setVendorList] = useState([]);
@@ -117,7 +119,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
     vendor_name: isCreateMode ? "" : selectedVendor,
     contact_person: isCreateMode ? "" : contactPerson,
     buyer: isCreateMode ? "" : selectedData.buyer || "",
-    owner: isCreateMode ? "" : selectedOwner,
+    owner: isCreateMode ? employee_id : selectedOwner,
     transaction_id: isCreateMode ? "" : selectedData.transaction_id || "",
     delivery_date: isCreateMode ? today : selectedData.delivery_date || "",
     status: isCreateMode ? "Draft" : selectedStatus,
@@ -584,7 +586,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         status: selectedStatus,
         vendor_code: vendorID || null,
         buyer: documentDetails.buyer,
-        employee_id: employeeList.find(emp => emp.employee_name === selectedOwner)?.employee_id,
+        employee_id: employee_id,
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
@@ -720,7 +722,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         status: selectedStatus,
         vendor_code: vendorID,
         buyer: documentDetails.buyer,
-        employee_id: employeeList.find(emp => emp.employee_name === selectedOwner)?.employee_id,
+        employee_id: isCreateMode ? employee_id : selectedData?.employee_id || employee_id,
         transaction_id: documentDetails.transaction_id,
         document_no: documentDetails.document_no,
         delivery_date: documentDetails.delivery_date,
@@ -940,18 +942,19 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
               <div className="detail-row">
                 <label>Owner</label>
-                <select value={selectedOwner} onChange={(e) => setSelectedOwner(e.target.value)}>
-                  <option value="">Select Owner</option>
-                  {loading ? (
-                    <option value="">Loading employees...</option>
-                  ) : (
-                    employeeList.map((employee) => (
-                      <option key={employee.employee_id} value={employee.employee_name}>
-                        {employee.employee_name}
-                      </option>
-                    ))
-                  )}
-                </select>
+                <input
+                  type="text"
+                  readOnly
+                  value={
+                    selectedData?.employee_id
+                      ? employeeList.find(e => e.employee_id === selectedData.employee_id)?.employee_name || selectedData.employee_id
+                      : employeeList.find(e => e.employee_id === employee_id)?.employee_name || employee_id
+                  }
+                  style={{
+                    cursor: 'not-allowed',
+                    backgroundColor: '#f8f8f8'
+                  }}
+                />
               </div>
             </div>
             {/* Details Document */}

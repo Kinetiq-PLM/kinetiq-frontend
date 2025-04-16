@@ -4,10 +4,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
 
-const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => {
+const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
-
+  
   const [selectedStatus, setSelectedStatus] = useState("Open");
   const [activeTab, setActiveTab] = useState("document");
   const [showSerialModal, setShowSerialModal] = useState(false);
@@ -24,7 +24,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
 
   const [selectedVendor, setSelectedVendor] = useState("");
-  const [selectedOwner, setSelectedOwner] = useState("");
+  const [selectedOwner, setSelectedOwner] = useState(
+      isCreateMode ? employee_id : selectedData.employee_name || employee_id
+  );
   const [contactPerson, setContactPerson] = useState("");
   const [vendorID, setVendorID] = useState("");
   const [vendorList, setVendorList] = useState([]);
@@ -101,7 +103,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
     vendor_name: isCreateMode ? "" : selectedVendor,
     contact_person: isCreateMode ? "" : contactPerson,
     buyer: isCreateMode ? "" : selectedData.buyer || "",
-    owner: isCreateMode ? "" : selectedOwner,
+    owner: isCreateMode ? employee_id : selectedOwner,
     transaction_id: isCreateMode ? "" : selectedData.transaction_id || "",
     delivery_date: isCreateMode ? today : selectedData.delivery_date || "",
     status: isCreateMode ? "Draft" : selectedStatus,
@@ -533,7 +535,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
         status: selectedStatus,
         vendor_code: vendorID || null,
         buyer: documentDetails.buyer,
-        employee_id: employeeList.find(emp => emp.employee_name === selectedOwner)?.employee_id,
+        employee_id: employee_id,
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
@@ -661,7 +663,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
         status: selectedStatus,
         vendor_code: vendorID,
         buyer: documentDetails.buyer,
-        employee_id: employeeList.find(emp => emp.employee_name === selectedOwner)?.employee_id,
+        employee_id: isCreateMode ? employee_id : selectedData?.employee_id || employee_id,
         transaction_id: documentDetails.transaction_id,
         document_no: documentDetails.document_no,
         delivery_date: documentDetails.delivery_date,
@@ -792,8 +794,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0).toFixed(2);
- 
+    const total = (
+      parseFloat(initialAmount) +
+      parseFloat(tax_amount) -
+      parseFloat(discount_amount) +
+      parseFloat(documentDetails.freight || 0)
+    ).toFixed(2); 
     setDocumentDetails(prev => ({
       ...prev,
       tax_amount: tax_amount,
@@ -862,18 +868,19 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
 
               <div className="detail-row">
                 <label>Owner</label>
-                <select value={selectedOwner} onChange={(e) => setSelectedOwner(e.target.value)}>
-                  <option value="">Select Owner</option>
-                  {loading ? (
-                    <option value="">Loading employees...</option>
-                  ) : (
-                    employeeList.map((employee) => (
-                      <option key={employee.employee_id} value={employee.employee_name}>
-                        {employee.employee_name}
-                      </option>
-                    ))
-                  )}
-                </select>
+                <input
+                  type="text"
+                  readOnly
+                  value={
+                    selectedData?.employee_id
+                      ? employeeList.find(e => e.employee_id === selectedData.employee_id)?.employee_name || selectedData.employee_id
+                      : employeeList.find(e => e.employee_id === employee_id)?.employee_name || employee_id
+                  }
+                  style={{
+                    cursor: 'not-allowed',
+                    backgroundColor: '#f8f8f8'
+                  }}
+                />
               </div>
             </div>
             {/* Details Document */}
@@ -999,7 +1006,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
                   <div className="detail-row">
                     <label>Total</label>
                     <input type="text" value={
-                      documentDetails.total
+                      documentDetails.transaction_cost
                     }  
                     style={{ cursor: 'not-allowed' }}
                     readOnly
