@@ -6,6 +6,7 @@ import UserProfile from "./shared/components/UserProfile";
 import { Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { User } from "lucide-react";
+// import LandingPage from "./pages/LandingPage";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -29,6 +30,17 @@ function App() {
 
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
+
+    // landing page
+  // const [showLanding, setShowLanding] = useState(false);
+
+  // useEffect(() => {
+  //   if (!sessionStorage.getItem('landingSeen')) {
+  //     setShowLanding(true);
+  //     sessionStorage.setItem('landingSeen', 'true');
+  //   }
+  // }, []);
+
 
   const navigate = useNavigate();
 
@@ -461,6 +473,7 @@ function App() {
 
   return (
     <div className="shell">
+      {/* {showLanding && <LandingPage />} */}
       <div className="shell-container">
         {/* collapsible menu */}
 
