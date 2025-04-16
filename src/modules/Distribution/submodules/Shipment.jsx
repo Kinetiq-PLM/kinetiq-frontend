@@ -442,6 +442,14 @@ const Shipment = () => {
     resolved: failedShipments.filter(shipment => 
       shipment.failed_shipment_info?.resolution_status === 'Resolved').length
   };
+
+  // Calculate stats for the delivered shipments tab
+  const deliveredStats = {
+    total: deliveredShipments.length,
+    onTime: deliveredShipments.filter(shipment => shipment.delivery_status === 'On Time').length,
+    late: deliveredShipments.filter(shipment => shipment.delivery_status === 'Late').length,
+    rejected: deliveredShipments.filter(shipment => shipment.delivery_status === 'Rejected').length
+  };
   
   return (
     <div className="shipment">
