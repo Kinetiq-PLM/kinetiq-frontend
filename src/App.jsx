@@ -59,6 +59,8 @@ function App() {
 
       if (storedShowUserProfile === "true") {
         setShowUserProfile(true);
+        setActiveModule(null);
+        setActiveSubModule(null);
       } else if (storedModule) {
         setActiveModule(storedModule);
         if (storedSubModule && storedSubModule !== "null") setActiveSubModule(storedSubModule);
@@ -689,6 +691,8 @@ function App() {
                       onClick={() => {
                         setShowUserProfile(true);
                         setIsProfileMenuOpen(false);
+                        setActiveModule(null);
+                        setActiveSubModule(null);
                       }}
                     >
                       <img src="/icons/settings.png" />User Profile
