@@ -16,22 +16,24 @@
     transform: translate(-50%, -50%);
     background: white;
     padding: 2rem;
-    border-radius: 8px;
+    border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     opacity: 1;
     transition: opacity 0.3s ease-out;
     text-align: center;
     max-width: 400px;
+    min-height: 380px;
     width: 90%;
     animation: fadeIn 0.3s ease-out;
   }
   
   .landing-logo {
     width: 250px;
-    margin: 0 auto; /* Removes the extra space in your original '2 rem' */
+    margin: 0 auto; 
     display: block;
-    padding-bottom: 5rem; /* Reduced from 5rem for better spacing */
+    padding-top: 1.3rem;
+    padding-bottom: 3rem; 
   }
   
 
@@ -47,6 +49,7 @@
     font-size: 0.9rem;
     margin: 0;
     text-align: center;
+    padding-bottom: 2rem;
   }
   
 @keyframes fadeIn {

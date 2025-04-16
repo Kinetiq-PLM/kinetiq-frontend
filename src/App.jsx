@@ -6,7 +6,7 @@ import UserProfile from "./shared/components/UserProfile";
 import { Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { User } from "lucide-react";
-// import LandingPage from "./pages/LandingPage";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -31,15 +31,21 @@ function App() {
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
 
-  // landing page
-  // const [showLanding, setShowLanding] = useState(false);
+    // landing page
+  const [showLanding, setShowLanding] = useState(true);
 
-  // useEffect(() => {
-  //   if (!sessionStorage.getItem('landingSeen')) {
-  //     setShowLanding(true);
-  //     sessionStorage.setItem('landingSeen', 'true');
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (!localStorage.getItem('landingSeen')) {
+      setShowLanding(true);
+      localStorage.setItem('landingSeen', 'true');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeModule && showLanding) {
+      setShowLanding(false);
+    }
+  }, [activeModule, showLanding]);
 
 
   const navigate = useNavigate();
@@ -477,7 +483,7 @@ function App() {
 
   return (
     <div className="shell">
-      {/* {showLanding && <LandingPage />} */}
+      {showLanding && <LandingPage />}
       <div className="shell-container">
         {/* collapsible menu */}
 
