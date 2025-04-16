@@ -44,9 +44,15 @@ const BodyContent = ({ employee_id }) => {
     const pass_valid = await checkPassword()
     console.log(pass_valid)
     if (!pass_valid) {
-      setConPassErr("* Invalid credentials. *")
+      setCurrPassErr("* Invalid credentials. *")
       return false;
     }
+
+    if (currPassword === newPassword) {
+      setConPassErr("* New password cannot be the same as the current password. *");
+      return false;
+    }
+
     setOpenPopup(true);
     return true;
   }

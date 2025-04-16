@@ -139,7 +139,7 @@
 .usrprofile .password-section{
   display: flex;
   flex-direction: column;
-  width: 60%;
+  width: 30rem;
   margin-left: 3rem;
   align-items: center;
 }
@@ -271,7 +271,6 @@
     width: 90%;
   }
 }
-
 
 
 .modal {

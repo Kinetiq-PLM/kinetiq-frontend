@@ -23,9 +23,6 @@
 }
 
 @media (max-width: 40rem) {
-  .header-body-container {
-    max-height: calc(100vh - var(--header-navi-height));
-  }
 
   .notif-menu {
     width: 20rem;

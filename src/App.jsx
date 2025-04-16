@@ -786,7 +786,6 @@ function App() {
               )}
             </div>
           </QueryClientProvider>
-
         </div>
       </div>
     </div >
