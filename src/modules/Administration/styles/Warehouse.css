@@ -1,0 +1,111 @@
+.warehouse-container {
+    padding: 24px;
+}
+
+.warehouse-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.warehouse-controls input,
+.warehouse-controls select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-left: 8px;
+}
+
+.warehouse-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+.warehouse-table th,
+.warehouse-table td {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.warehouse-modal {
+    position: fixed;
+    top: 20%;
+    left: 30%;
+    background: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 40%;
+    z-index: 100;
+}
+
+.warehouse-modal input {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.warehouse-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.btn-submit {
+    background-color: #14b8a6;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+}
+
+.btn-edit {
+    background-color: #38bdf8;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+}
+
+.btn-delete {
+    background-color: #ef4444;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+}
+
+.warehouse-preview {
+    position: fixed;
+    top: 10%;
+    left: 25%;
+    width: 50%;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    z-index: 999;
+    padding: 24px;
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ccc;
+    font-weight: bold;
+}
+
+.preview-body {
+    padding-top: 12px;
+    font-size: 14px;
+}
+
+.preview-body div {
+    margin-bottom: 12px;
+}

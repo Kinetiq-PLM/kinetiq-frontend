@@ -446,6 +446,7 @@ img {
 }
 
 /* body container -- takes remaining space below header */
+
 .body-container {
   flex: 1;
   width: 100%;
