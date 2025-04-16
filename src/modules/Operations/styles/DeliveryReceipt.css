@@ -1,9 +1,9 @@
+/* Main Wrapper */
 .delivery-receipt-wrapper {
     display: flex;
     width: 100%;
     height: 100%;
 }
-
 
 .delivery-receipt-wrapper .body-content-container {
     width: 100%;
@@ -16,8 +16,8 @@
     flex-direction: column;
     min-width: 40rem;
     min-height: 30rem;
+    overflow: hidden; /* Hide overflow for the main container */
 }
-
 
 /* Tabs */
 .delivery-receipt-wrapper .tab-container {
@@ -29,14 +29,12 @@
     background: white;
 }
 
-
 .delivery-receipt-wrapper .tab-header {
     display: flex;
     border-bottom: 2px solid #ddd;
     margin-bottom: 12px;
     flex-wrap: wrap;
 }
-
 
 .delivery-receipt-wrapper .tab-button {
     background: none !important;
@@ -51,13 +49,11 @@
     white-space: nowrap !important;
 }
 
-
 .delivery-receipt-wrapper .tab-button.active {
     color: #00A8A8 !important;
     font-weight: 500 !important;
     border-radius: 0.375rem 0.375rem 0 0;
 }
-
 
 .delivery-receipt-wrapper .tab-button.active::after {
     content: '' !important;
@@ -69,161 +65,33 @@
     background-color: #00A8A8 !important;
 }
 
-
 /* Table Layout */
 .delivery-receipt-wrapper .table-container {
     width: 100%;
     margin-bottom: 20px;
-    overflow-x: auto;
-    max-height: 390px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #0d9488 #f1f1f1;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden; /* Ensure no overflow from the container */
 }
 
-
-.delivery-receipt-wrapper .table-container::-webkit-scrollbar {
-    width: 8px !important;
-    height: 8px !important;
+.delivery-receipt-wrapper .table-wrapper {
+    max-height: 420px; /* Adjust height of table here */
+    overflow-y: auto;  /* Allow vertical scrolling */
+    overflow-x: auto;  /* Allow horizontal scrolling */
 }
 
-
-.delivery-receipt-wrapper .table-container::-webkit-scrollbar-track {
-    background: #f1f1f1 !important;
-    border-radius: 4px !important;
-}
-
-
-.delivery-receipt-wrapper .table-container::-webkit-scrollbar-thumb {
-    background: #0d9488 !important;
-    border-radius: 4px !important;
-    border: 2px solid white;
-}
-
-
-.delivery-receipt-wrapper .table-container::-webkit-scrollbar-thumb:hover {
-    background: #0f766e !important;
-}
-
-
-/* Table Styles */
-.delivery-receipt-wrapper .billing-table {
+.delivery-receipt-wrapper .table-container table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
 }
 
-
-.delivery-receipt-wrapper .billing-table th,
-.delivery-receipt-wrapper .billing-table td {
-    padding: 10px;
+.delivery-receipt-wrapper .table-container th,
+.delivery-receipt-wrapper .table-container td {
+    padding: 12px;
     text-align: left;
-    border-bottom: 1px solid #eee;
-    height: 48px;
-    box-sizing: border-box;
-    word-wrap: break-word;
-    white-space: normal;
+    font-size: 13px;
 }
 
-
-.delivery-receipt-wrapper .billing-table th {
-    font-weight: 500;
-    color: #333;
-    background-color: #f8f9fa;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-
-
-.delivery-receipt-wrapper .billing-table tr:hover {
-    background-color: #eef6f6;
-    transition: background-color 0.2s ease;
-}
-
-
-/* Column Widths */
-.delivery-receipt-wrapper .billing-table th:first-child,
-.delivery-receipt-wrapper .billing-table td:first-child {
-    width: 50px;
-    position: sticky;
-    left: 0;
-    background-color: inherit;
-}
-
-
-/* Billing Receipt */
-.delivery-receipt-wrapper [data-activetab="Billing Receipt"] .billing-table th:nth-child(2),
-.delivery-receipt-wrapper [data-activetab="Billing Receipt"] .billing-table td:nth-child(2),
-.delivery-receipt-wrapper [data-activetab="Billing Receipt"] .billing-table th:nth-child(3),
-.delivery-receipt-wrapper [data-activetab="Billing Receipt"] .billing-table td:nth-child(3),
-.delivery-receipt-wrapper [data-activetab="Billing Receipt"] .billing-table th:nth-child(4),
-.delivery-receipt-wrapper [data-activetab="Billing Receipt"] .billing-table td:nth-child(4),
-.delivery-receipt-wrapper [data-activetab="Billing Receipt"] .billing-table th:nth-child(5),
-.delivery-receipt-wrapper [data-activetab="Billing Receipt"] .billing-table td:nth-child(5) {
-    width: calc((100% - 50px) / 4);
-}
-
-
-/* Delivery Receipt */
-.delivery-receipt-wrapper [data-activetab="Delivery Receipt"] .billing-table th:nth-child(2),
-.delivery-receipt-wrapper [data-activetab="Delivery Receipt"] .billing-table td:nth-child(2),
-.delivery-receipt-wrapper [data-activetab="Delivery Receipt"] .billing-table th:nth-child(3),
-.delivery-receipt-wrapper [data-activetab="Delivery Receipt"] .billing-table td:nth-child(3),
-.delivery-receipt-wrapper [data-activetab="Delivery Receipt"] .billing-table th:nth-child(4),
-.delivery-receipt-wrapper [data-activetab="Delivery Receipt"] .billing-table td:nth-child(4) {
-    width: calc((100% - 50px) / 3);
-}
-
-
-/* Rework Order */
-.delivery-receipt-wrapper [data-activetab="Rework Order"] .billing-table th:nth-child(2),
-.delivery-receipt-wrapper [data-activetab="Rework Order"] .billing-table td:nth-child(2),
-.delivery-receipt-wrapper [data-activetab="Rework Order"] .billing-table th:nth-child(3),
-.delivery-receipt-wrapper [data-activetab="Rework Order"] .billing-table td:nth-child(3),
-.delivery-receipt-wrapper [data-activetab="Rework Order"] .billing-table th:nth-child(4),
-.delivery-receipt-wrapper [data-activetab="Rework Order"] .billing-table td:nth-child(4),
-.delivery-receipt-wrapper [data-activetab="Rework Order"] .billing-table th:nth-child(5),
-.delivery-receipt-wrapper [data-activetab="Rework Order"] .billing-table td:nth-child(5) {
-    width: calc((100% - 50px) / 4);
-}
-
-
-/* Goods Issue */
-.delivery-receipt-wrapper [data-activetab="Goods Issue"] .billing-table th:nth-child(2),
-.delivery-receipt-wrapper [data-activetab="Goods Issue"] .billing-table td:nth-child(2),
-.delivery-receipt-wrapper [data-activetab="Goods Issue"] .billing-table th:nth-child(3),
-.delivery-receipt-wrapper [data-activetab="Goods Issue"] .billing-table td:nth-child(3),
-.delivery-receipt-wrapper [data-activetab="Goods Issue"] .billing-table th:nth-child(4),
-.delivery-receipt-wrapper [data-activetab="Goods Issue"] .billing-table td:nth-child(4),
-.delivery-receipt-wrapper [data-activetab="Goods Issue"] .billing-table th:nth-child(5),
-.delivery-receipt-wrapper [data-activetab="Goods Issue"] .billing-table td:nth-child(5) {
-    width: calc((100% - 50px) / 4);
-}
-
-
-/* Internal Transfer */
-.delivery-receipt-wrapper [data-activetab="Internal Transfer"] .billing-table th:nth-child(2),
-.delivery-receipt-wrapper [data-activetab="Internal Transfer"] .billing-table td:nth-child(2),
-.delivery-receipt-wrapper [data-activetab="Internal Transfer"] .billing-table th:nth-child(3),
-.delivery-receipt-wrapper [data-activetab="Internal Transfer"] .billing-table td:nth-child(3),
-.delivery-receipt-wrapper [data-activetab="Internal Transfer"] .billing-table th:nth-child(4),
-.delivery-receipt-wrapper [data-activetab="Internal Transfer"] .billing-table td:nth-child(4),
-.delivery-receipt-wrapper [data-activetab="Internal Transfer"] .billing-table th:nth-child(5),
-.delivery-receipt-wrapper [data-activetab="Internal Transfer"] .billing-table td:nth-child(5) {
-    width: calc((100% - 50px) / 4);
-}
-
-
-/* Checkbox Styling */
-.delivery-receipt-wrapper .checkbox-cell {
-    width: 40px;
-    text-align: center;
-}
-
-
-.delivery-receipt-wrapper .checkbox-cell input[type="checkbox"] {
+/* Checkbox input (clean look) */
+.delivery-receipt-wrapper .checkbox-input {
     width: 16px;
     height: 16px;
     cursor: pointer;
@@ -234,15 +102,16 @@
     border-radius: 3px;
     position: relative;
     outline: none;
+    transition: background-color 0.3s ease;
 }
 
-
-.delivery-receipt-wrapper .checkbox-cell input[type="checkbox"]:checked {
+/* When checkbox is checked */
+.delivery-receipt-wrapper .checkbox-input:checked {
     background-color: #00A8A8;
 }
 
-
-.delivery-receipt-wrapper .checkbox-cell input[type="checkbox"]:checked::after {
+/* Checkmark styling when checked */
+.delivery-receipt-wrapper .checkbox-input:checked::after {
     content: '';
     position: absolute;
     left: 4px;
@@ -254,44 +123,37 @@
     transform: rotate(45deg);
 }
 
-
-/* Send To Button */
-.delivery-receipt-wrapper .send-to-container {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: auto;
-    padding-top: 20px;
+.delivery-receipt-wrapper .no-records {
+    text-align: center;
+    color: #888;
+    font-size: 1rem;
 }
 
-
-.delivery-receipt-wrapper .send-to-button {
-    padding: 0.5rem 1rem;
-    background: #0d9488;
-    border: none;
-    border-radius: 0.375rem;
-    color: white;
-    font-size: 0.875rem;
-    cursor: pointer;
+.delivery-receipt-wrapper .checkbox-cell {
+    width: 40px;
+    text-align: center;
 }
 
-
-.delivery-receipt-wrapper .send-to-button:hover {
-    background: #0f766e;
+/* Sticky Header */
+.delivery-receipt-wrapper .table-wrapper thead {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+    box-shadow: 0 2px 2px -2px gray;
 }
 
-
-/* Responsive */
-@media (max-width: 768px) {
-    .delivery-receipt-wrapper .tab-header {
-        gap: 4px;
-    }
-
-
-    .delivery-receipt-wrapper .tab-button {
-        padding: 10px 12px !important;
-        font-size: 13px !important;
-    }
+/* ✅ Teal Scrollbar Styling */
+.delivery-receipt-wrapper .table-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
+.delivery-receipt-wrapper .table-wrapper::-webkit-scrollbar-thumb {
+    background-color: #00A8A8;
+    border-radius: 4px;
+}
 
-
+.delivery-receipt-wrapper .table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}

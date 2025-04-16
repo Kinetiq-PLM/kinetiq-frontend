@@ -433,18 +433,6 @@ const ApprovalTable = () => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 export default ApprovalTable;
 
 

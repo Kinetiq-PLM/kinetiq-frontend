@@ -1,17 +1,10 @@
 .InternalTransfer {
     display: flex;
     width: 100%;
-    height: calc(100vh - 140px); /* Increased height by reducing subtraction */
+    height: calc(100vh - 140px);
     flex-direction: column;
-    overflow: hidden; /* Prevent outer scrolling */
+    overflow: hidden;
 }
-
-
-
-
-
-
-
 
 .InternalTransfer .body-content-container {
     width: 100%;
@@ -25,18 +18,10 @@
     align-items: center;
     justify-content: flex-start;
     min-width: 400px;
-    min-height: unset; /* Remove min-height */
-    overflow: hidden; /* Prevent container scroll */
+    min-height: unset;
+    overflow: hidden;
 }
 
-
-
-
-
-
-
-
-/* Common table container styles for both Delivery Request and Rework Order */
 .InternalTransfer .table-container,
 .InternalTransfer.rework .table-container {
     width: 100%;
@@ -49,58 +34,40 @@
     margin-top: 0.5rem;
     font-size: 0.875rem;
     max-width: 100%;
-    overflow: hidden; /* Changed from auto to hidden */
+    overflow: hidden;
 }
 
-
-
-
-.table-container table {
+.InternalTransfer .table-container table {
     width: 100%;
     height: 100%;
     border-collapse: collapse;
 }
 
-
-
-
-.table-container thead {
+.InternalTransfer .table-container thead {
     position: sticky;
     top: 0;
     background: #f8f9fa;
     z-index: 2;
 }
 
-
-
-
-.table-container tbody {
+.InternalTransfer .table-container tbody {
     display: block;
     overflow-y: auto;
-    height: calc(100% - 40px); /* Changed to use percentage */
+    height: calc(100% - 40px);
     width: 100%;
 }
 
-
-
-
-.table-container thead tr {
+.InternalTransfer .table-container thead tr {
     display: table;
     width: 100%;
     table-layout: fixed;
 }
 
-
-
-
-.table-container tbody tr {
+.InternalTransfer .table-container tbody tr {
     display: table;
     width: 100%;
     table-layout: fixed;
 }
-
-
-
 
 .InternalTransfer table th {
     background: #f8f9fa;
@@ -112,9 +79,6 @@
     border-bottom: 1px solid #dee2e6;
 }
 
-
-
-
 .InternalTransfer table td {
     padding: 0.75rem;
     font-size: 0.875rem;
@@ -122,14 +86,7 @@
     border-bottom: 1px solid #f1f1f1;
 }
 
-
-
-
-
-
-
-
-.input-container {
+.InternalTransfer .input-container {
     width: 100%;
     margin-top: 1.5rem;
     padding: 1rem;
@@ -138,32 +95,25 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-
-
-
-
-
-
-
-input[type="checkbox"] {
-    appearance: none; /* Tinatanggal ang default checkbox style */
+.InternalTransfer input[type="checkbox"] {
+    appearance: none;
     width: 16px;
     height: 16px;
-    border: 2px solid #008080; /* Teal Border */
-    background-color: white; /* White Background */
+    border: 2px solid #008080;
+    background-color: white;
     border-radius: 3px;
     cursor: pointer;
     margin: 0 auto;
     display: block;
-  }
- 
-  input[type="checkbox"]:checked {
-    background-color: #008080; /* Kapag naka-check, magiging teal */
+}
+
+.InternalTransfer input[type="checkbox"]:checked {
+    background-color: #008080;
     border-color: #006666;
     position: relative;
-  }
- 
-  input[type="checkbox"]:checked::after {
+}
+
+.InternalTransfer input[type="checkbox"]:checked::after {
     content: "✔";
     font-size: 12px;
     color: white;
@@ -171,151 +121,66 @@ input[type="checkbox"] {
     position: absolute;
     left: 3px;
     top: 0px;
-  }
-
-
-
-
-
-
-
-
-/* Input Group */
-.input-group {
-    display: flex;
-    flex-direction: column;
-    width: 30%; /* Mas maliit */
 }
 
+.InternalTransfer .input-group {
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+}
 
-
-
-
-
-
-
-/* Labels */
-.input-group label {
-    font-size: 0.875rem; /* Mas maliit na font */
+.InternalTransfer .input-group label {
+    font-size: 0.875rem;
     font-weight: bold;
     margin-bottom: 0.2rem;
 }
 
-
-
-
-
-
-
-
-/* Row Layout */
-.input-row {
+.InternalTransfer .input-row {
     display: flex;
     justify-content: space-between;
     margin-bottom: 1rem;
     align-items: center;
-    gap: 3.9rem; /* Space between inputs */
+    gap: 3.9rem;
 }
 
-
-
-
-
-
-
-
-.input-container-wrapper {
+.InternalTransfer .input-container-wrapper {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     width: 100%;
 }
 
-
-
-
-
-
-
-
-/* Para sa mobile */
 @media only screen and (max-width: 600px) {
-    .input-container {
+    .InternalTransfer .input-container {
         grid-template-columns: repeat(6, 1fr);
     }
-    .send-to-button {
+    .InternalTransfer .send-to-button {
         width: 100%;
         text-align: center;
     }
 }
 
-
-
-
-
-
-
-
-/* Para sa tablet */
 @media only screen and (min-width: 600px) {
-    .input-container {
+    .InternalTransfer .input-container {
         grid-template-columns: repeat(6, 1fr);
     }
 }
 
-
-
-
-
-
-
-
-/* Para sa desktop */
 @media only screen and (min-width: 768px) {
-    .input-container {
+    .InternalTransfer .input-container {
         grid-template-columns: repeat(6, 1fr);
     }
 }
 
-
-
-
-
-
-
-
-.first-row {
-    justify-content: flex-start; /* Align items to the left */
+.InternalTransfer .first-row {
+    justify-content: flex-start;
 }
 
-
-
-
-
-
-
-
-.short-input {
-    width: 14rem !important; /* Palitan ang value kung gusto mong mas maikli o mahaba */
-
-
-
-
-
-
-
-
+.InternalTransfer .short-input {
+    width: 14rem !important;
 }
 
-
-
-
-
-
-
-
-/* Text Box Fields */
-.input-group input {
+.InternalTransfer .input-group input {
     padding: 0.2rem 0.5rem;
     border: 0.0625rem solid #ccc;
     border-radius: 0.25rem;
@@ -323,15 +188,7 @@ input[type="checkbox"] {
     width: 100%;
 }
 
-
-
-
-
-
-
-
-/* Date Picker Input */
-.input-group input[type="date"] {
+.InternalTransfer .input-group input[type="date"] {
     position: relative;
     background: white url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABeoAAADyCAYAAAAyRvX6AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjw') no-repeat;
     background-position: right 0.5rem center;
@@ -340,39 +197,20 @@ input[type="checkbox"] {
     padding-right: 1.875rem;
 }
 
-
-
-
-
-
-
-
-.button-container {
+.InternalTransfer .button-container {
     display: flex;
     justify-content: center;
     margin-top: 1rem;
 }
 
-
-
-
-
-
-
-
-/* Button Container - Align to Right */
-.button-container {
+.InternalTransfer .button-container {
     display: flex;
-    justify-content: flex-end; /* Para sa gilid (kanan) */
+    justify-content: flex-end;
     margin-top: 1rem;
     width: 100%;
-   
 }
 
-
-
-
-.send-to-button {
+.InternalTransfer .send-to-button {
     padding: 0.5rem 1rem;
     background: #0d9488;
     border: none;
@@ -380,46 +218,24 @@ input[type="checkbox"] {
     color: white;
     font-size: 0.875rem;
     cursor: pointer;
-  }
- 
-  .send-to-button:hover {
+}
+
+.InternalTransfer .send-to-button:hover {
     background: #0f766e;
-  }
- 
+}
 
-
-
-
- /* Style for Module Dropdown */
- .module-dropdown {
+.InternalTransfer .module-dropdown {
     width: 250px;
-    height: 30px; /* Adjust height */
+    height: 30px;
     padding: 5px;
-
-
-
-
-
-
-
-
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: white;
-    appearance: auto; /* Siguraduhing may default dropdown arrow */
+    appearance: auto;
     font-size: 14px;
-  }
- 
+}
 
-
-
-
-
-
-
-
-/* Dropdown Arrow */
-.module-dropdown::after {  
+.InternalTransfer .module-dropdown::after {
     content: "▼";
     position: absolute;
     right: 10px;
@@ -428,26 +244,11 @@ input[type="checkbox"] {
     pointer-events: down;
 }
 
-
-
-
-
-
-
-
-/* Hover Effect */
-.module-dropdown:hover {
+.InternalTransfer .module-dropdown:hover {
     border-color: #000000;
 }
 
-
-
-
-
-
-
-
-.tabs {
+.InternalTransfer .tabs {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -456,9 +257,7 @@ input[type="checkbox"] {
     margin-bottom: 0.5rem;
 }
 
-
-/* Tab styling */
-.tab {
+.InternalTransfer .tab {
     font-size: 0.875rem;
     font-weight: normal;
     padding: 0.5rem 1rem;
@@ -468,14 +267,12 @@ input[type="checkbox"] {
     transition: color 0.3s ease;
 }
 
-
-.tab.active {
+.InternalTransfer .tab.active {
     color: #00A8A8;
     font-weight: 500;
 }
 
-
-.tab.active::after {
+.InternalTransfer .tab.active::after {
     content: "";
     position: absolute;
     left: 0;
@@ -485,40 +282,22 @@ input[type="checkbox"] {
     background-color: #00A8A8;
 }
 
-
-
-
-
-
-
-
-/* Scrollbar styling for both views */
 .InternalTransfer .table-container tbody::-webkit-scrollbar {
     width: 6px;
 }
 
-
-
-
 .InternalTransfer .table-container tbody::-webkit-scrollbar-track {
     background: #f1f1f1;
 }
-
-
-
 
 .InternalTransfer .table-container tbody::-webkit-scrollbar-thumb {
     background: #00A8A8;
     border-radius: 3px;
 }
 
-
-
-
 .InternalTransfer .table-container tbody::-webkit-scrollbar-thumb:hover {
     background: #008080;
 }
-
 
 .InternalTransfer table td:first-child,
 .InternalTransfer table th:first-child {
@@ -526,8 +305,3 @@ input[type="checkbox"] {
     padding: 0.5rem;
     text-align: center;
 }
-
-
-
-
-
