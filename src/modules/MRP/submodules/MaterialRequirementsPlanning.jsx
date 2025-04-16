@@ -16,6 +16,10 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showHelpOptions, setShowHelpOptions] = useState(false);
     const [selectedProductId, setSelectedProductId] = useState(null);
+
+    const costOfProducts = 40000.00;
+    const costOfProduction = 15000.00;
+    const laborCost = 8000.00;
     
 
     const mrpData = [
@@ -69,30 +73,37 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const [additionalCosts, setAdditionalCosts] = useState([
         { type: "Cost of Production", amount: 0 }
-      ]);
+    ]);
       
-      const handleAddCostRow = () => {
+    const handleAddCostRow = () => {
         setAdditionalCosts([...additionalCosts, { type: "Cost of Production", amount: 0 }]);
-      };
+    };
       
-      const handleTypeChange = (index, newType) => {
+    const handleTypeChange = (index, newType) => {
         const updated = [...additionalCosts];
         updated[index].type = newType;
         setAdditionalCosts(updated);
-      };
+    };
       
-      const handleAmountChange = (index, newAmount) => {
+    const handleAmountChange = (index, newAmount) => {
         const updated = [...additionalCosts];
         updated[index].amount = parseFloat(newAmount || 0);
         setAdditionalCosts(updated);
-      };
+    };
       
-      const totalCost = additionalCosts.reduce((acc, item) => acc + item.amount, 0);
-      const handleRemoveCostRow = (index) => {
+    const totalCost = additionalCosts.reduce((acc, item) => acc + item.amount, 0);
+    const handleRemoveCostRow = (index) => {
         setAdditionalCosts((prev) => prev.filter((_, i) => i !== index));
-      };
+    };
 
-      return (      
+    const filteredMats = rawMats.filter(mat => mat.product_id === selectedProductId);
+    const totalRawCost = filteredMats.reduce((sum, mat) => {
+        const unitCost = parseFloat(mat.unit_cost) || 0;
+        const quantity = parseFloat(mat.rm_quantity) || 0;
+    return sum + (unitCost * quantity);
+    }, 0);
+
+    return (      
         <div className="reqplan">
             <div style={{width: '100%', height: '100%', padding: '2rem', background: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)', overflow: 'hidden', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', rowGap: 25,}}>
                 <div className="title">MRP LIST</div>
@@ -359,7 +370,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost Of Raw Material:</b></span>
-                                        <span style={{ fontWeight: 500, color: '#585757' }}>₱12</span>
+                                        <span style={{ fontWeight: 500, color: '#585757' }}>₱{totalRawCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+
                                     </div>
                                 </div>
                         </div>
@@ -387,51 +399,68 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         Additional Costs
                         </div>
 
-                        <div className="reqplan-table-scroll" style={{width: '100%', maxWidth: 1159, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflowY: 'auto', maxHeight: '450px', borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '1rem'}}>
+                        <div className="reqplan-table-scroll2" style={{width: '100%', maxHeight: 450, overflowY: 'auto', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', padding: 0}}>
                             {/* Header */}
-                            <div className="table-header" style={{display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8',}}>
-                                {['Type', 'Cost'].map((label, i) => (
-                                <div
-                                    className="table-cell2"
-                                    key={label}
-                                    style={{flex: '1 1 50%', minWidth: 150, padding: '12px', fontWeight: 700,
-                                    textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 18 }}>
-                                    {label}
+                            <div style={{alignSelf: 'stretch', background: 'rgba(255,255,255,0.05)', display: 'inline-flex', width: '100%'}}>
+                                <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 700, lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
                                 </div>
-                                ))}
-                            </div>
-
-                            {/* Rows */}
-                            {additionalCosts.map((item, index) => (
-                            <div key={index} className="table-row" style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8', alignItems: 'center' }}>
-                                <div className="table-cell" style={{ flex: '1 1 50%', minWidth: 150, padding: '12px', textAlign: 'center', fontFamily: 'Inter', fontSize: 16, color: '#585757' }}>
-                                {index === 0 ? 'Cost of Production' : (
-                                    <select value={item.type} onChange={(e) => handleTypeChange(index, e.target.value)} style={{ width: '100%', padding: '0.5rem', borderRadius: 6, border: '1px solid #ccc', fontFamily: 'Inter', fontSize: 15 }}>
-                                    <option value="Cost of Production">Cost of Production</option>
-                                    <option value="Labor Cost">Labor Cost</option>
-                                    </select>
-                                )}
                                 </div>
-                                <div className="table-cell" style={{ flex: '1 1 50%', minWidth: 150, padding: '12px', textAlign: 'center', fontFamily: 'Inter', fontSize: 16, color: '#585757' }}>
-                                {index === 0 ? `₱${item.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : (
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                                    <input type="number" value={item.amount} onChange={(e) => handleAmountChange(index, e.target.value)} style={{ width: '100%', padding: '0.5rem', borderRadius: 6, border: '1px solid #ccc', fontFamily: 'Inter', fontSize: 15 }} />
-                                    <button onClick={() => handleRemoveCostRow(index)} style={{ background: 'transparent', border: 'none', color: '#888', fontSize: 18, cursor: 'pointer' }} title="Remove row">×</button>
-                                    </div>
-                                )}
+                                <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 19, fontFamily: 'Inter', fontWeight: 700, lineHeight: 1, wordWrap: 'break-word'}}>Cost</div>
+                                </div>
                                 </div>
                             </div>
-                            ))}
 
-                            {/* Add Button */}
-                            <div onClick={handleAddCostRow} style={{ padding: '1rem', textAlign: 'center', fontWeight: 500, color: '#00A8A8', cursor: 'pointer', fontSize: 16}}>+ Add</div>
+                            {/* Cost of Products */}
+                            <div style={{alignSelf: 'stretch', background: 'white', display: 'inline-flex', width: '100%'}}>
+                                <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>Cost of Products</div>
+                                </div>
+                                </div>
+                                <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(costOfProducts).toFixed(2)}</div>
+                                </div>
+                                </div>
+                            </div>
+
+                            {/* Cost of Production */}
+                            <div style={{alignSelf: 'stretch', background: 'white', display: 'inline-flex', width: '100%'}}>
+                                <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>Cost of Production</div>
+                                </div>
+                                </div>
+                                <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(costOfProduction).toFixed(2)}</div>
+                                </div>
+                                </div>
+                            </div>
+
+                            {/* Labor Cost */}
+                            <div style={{alignSelf: 'stretch', background: 'white', display: 'inline-flex', width: '100%'}}>
+                                <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>Labor Cost</div>
+                                </div>
+                                </div>
+                                <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(laborCost).toFixed(2)}</div>
+                                </div>
+                                </div>
+                            </div>
                         </div>
-
                         
                         <div style={{width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem',}}>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
-                                        <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Product: </b></span>
+                                        <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Whole Order: </b></span>
                                         <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500, }}>₱{totalCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                     </div>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -448,7 +477,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <span style={{ color: '#969696' }}>Back</span>
                             </button>
 
-                            <button onClick={() => { setAdditionalCost(false), setAdditionalCost2(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                            <button onClick={() => { setChecker(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                                 <span>Next</span>
                                 <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                             </button>
@@ -459,136 +488,58 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             </div>
             )}
 
-            {additionalcost2 && (
-                <div className="bom-print-modal">
-                <div className="fixed inset-0 flex items-center justify-center">
-                    <div style={{width: 767, height: 727, position: 'relative', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 10}}>
-                        <div style={{width: 115, height: 40, paddingTop: 12, paddingBottom: 8, paddingLeft: 72, paddingRight: 24, left: 46, top: 656, position: 'absolute', background: 'white', overflow: 'hidden', borderRadius: 8, outline: '1.50px #A4A4A4 solid', outlineOffset: '-1.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                            <button onClick={() => {setAdditionalCost(true), setAdditionalCost2(false)}}><div style={{width: 130, justifyContent: 'center', alignItems: 'center', gap: 13, display: 'inline-flex'}}>
-                                <div style={{justifyContent: 'center', alignItems: 'center', gap: 0, display: 'inline-flex'}}>
-                                    <div className="MRPIcon3" style={{width: 15, height: 21, paddingRight: 25 }} />
-                                    <div style={{width: 90, paddingLeft: 0, paddingRight: 2, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                                        <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#969696', fontSize: 20, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>back</div>
-                                    </div>
-                                </div>
-                            </div></button>
-                        </div>
-                        <div style={{width: 452, height: 70, left: 154, top: 17, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#130101', fontSize: 35, fontFamily: 'Inter', fontWeight: '400', textTransform: 'capitalize', lineHeight: 1, letterSpacing: 1.40, wordWrap: 'break-word'}}>Additional Costs</div>
-                        <div style={{width: 671, height: 440, left: 47, top: 106, position: 'absolute', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 20}}>
-                            <div style={{width: 671, height: 485, left: 0, top: 0, position: 'absolute'}}>
-                                <div style={{width: 671, left: 0, top: 0, position: 'absolute', background: 'white', overflow: 'hidden', outline: '1px #E8E8E8 solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
-                                    <div style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                                <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
-                                            </div>
-                                        </div>
-                                        <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                                <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 19, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Cost</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                                <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Cost of Products</div>
-                                            </div>
-                                        </div>
-                                        <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                            <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                                <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>₱40,000.80</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style={{width: 600, height: 37, left: 84, top: 582, position: 'absolute', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 20}}>
-                            <div style={{width: 257, paddingLeft: 24, paddingRight: 24, paddingTop: 8, paddingBottom: 8, left: 33, top: 0, position: 'absolute', background: 'white', overflow: 'hidden', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                                <div style={{width: 244, textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Total Cost of Order:</div>
-                            </div>
-                            <div style={{width: 234, paddingLeft: 24, paddingRight: 24, paddingTop: 8, paddingBottom: 8, left: 329, top: 0, position: 'absolute', background: 'white', overflow: 'hidden', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                                <div style={{width: 191, textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>₱850,000,000,000</div>
-                            </div>
-                        </div>
-                        <button onClick={() => {setChecker(true)}}><div style={{width: 166, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 17, paddingRight: 15, left: 545, top: 656, position: 'absolute', background: '#00A8A8', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div style={{justifyContent: 'center', alignItems: 'center', gap: 3, display: 'inline-flex'}}>
-                                <div style={{width: 116, paddingLeft: 0, paddingRight: 10, justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
-                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: 'white', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Create BOM</div>
-                                </div>
-                                <div className="MRPIcon5" style={{width: 13, height: 21, transformOrigin: 'center'}} />
-                            </div>
-                        </div></button>
-                        <div data-property-1="Disabled" style={{width: 201, height: 40, padding: 10, left: 331, top: 656, position: 'absolute', background: '#F5F5F5', borderRadius: 10, outline: '1.50px #E5E5E5 solid', outlineOffset: '-1.50px', justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
-                            <div style={{color: '#585757', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>000000002</div>
-                        </div>
-                        <div style={{width: 92, height: 29, left: 234, top: 661, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
-                    </div>  
-                </div>
-                </div>
-            )}
-
             {checker && (
-                <div className="bom-print-modal2">
-                <div className="fixed inset-0 flex items-center justify-center">
-                    <div style={{width: 660, height: 345, position: 'relative', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 10}}>
-                        <div style={{width: 618, height: 153, left: 21, top: 31, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#130101', fontSize: 45, fontFamily: 'Inter', fontWeight: '400', textTransform: 'capitalize', lineHeight: 1, letterSpacing: 1.80, wordWrap: 'break-word'}}>Are you sure you want to create a BOM?</div>
-                        <button onClick={() => {setCreated(true), setChecker(false), setAdditionalCost(false), setAdditionalCost2(false), setIsOpen(false), setIsOpen2(false)}}><div style={{width: 166, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 18, paddingRight: 15, left: 452, top: 273, position: 'absolute', background: '#00A8A8', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div style={{justifyContent: 'center', alignItems: 'center', gap: 3, display: 'inline-flex'}}>
-                                <div style={{width: 116, paddingLeft: 0, paddingRight: 10, justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
-                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: 'white', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Create BOM</div>
-                                </div>
-                                <div className="MRPIcon5" style={{width: 13, height: 21, transformOrigin: 'center'}} />
-                            </div>
-                        </div></button>
-                        <button onClick={() => {setChecker(false)}}><div style={{width: 115, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 72, paddingRight: 24, left: 41, top: 273, position: 'absolute', background: 'white', overflow: 'hidden', borderRadius: 8, outline: '1.50px #A4A4A4 solid', outlineOffset: '-1.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                            <div style={{justifyContent: 'center', alignItems: 'center', gap: 0, display: 'inline-flex'}}>
-                                <div className="MRPIcon3" style={{width: 15, height: 21, paddingRight: 25 }} />
-                                <div style={{width: 90, paddingLeft: -5, paddingRight: 2, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#969696', fontSize: 20, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>back</div>
-                                </div>
-                            </div>
-                        </div></button>
-                        <div data-property-1="Disabled" style={{width: 201, height: 40, padding: 10, left: 281, top: 193, position: 'absolute', background: '#F5F5F5', borderRadius: 10, outline: '1.50px #E5E5E5 solid', outlineOffset: '-1.50px', justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
-                            <div style={{color: '#585757', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>000000002</div>
+            <div className="bom-print-modal2">
+                <div className="fixed inset-0 flex items-center justify-center px-4">
+                <div style={{width: '100%', maxWidth: 660, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', borderRadius: 10, padding: 24, display: 'flex', flexDirection: 'column', gap: 24}}>
+                    <div style={{textAlign: 'center', fontSize: 55, fontFamily: 'Inter', fontWeight: 400, color: '#130101', lineHeight: 1.2, letterSpacing: 1.2}}>Are you sure you want <br></br> to create a BOM?</div>
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
+                        <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                            <span style={{ fontWeight: 500, color: '#585757' }}><b>Order No.: </b></span>
+                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>000000002</span>
                         </div>
-                        <div style={{width: 92, height: 29, left: 178, top: 199, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
+                    </div>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
+                    <button onClick={() => setChecker(false)} style={buttonStyle2('#fff')}>
+                        <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
+                        <span style={{color: '#969696'}}>Back</span>
+                    </button>
+                    <button onClick={() => {setCreated(true), setChecker(false), setAdditionalCost(false), setAdditionalCost2(false), setIsOpen(false), setIsOpen2(false)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                        <span>Create BOM</span>
+                        <div className="MRPIcon5" style={{width: 13, height: 21, marginLeft: 8}} />
+                    </button>
                     </div>
                 </div>
                 </div>
+            </div>
             )}
 
             {created && (
-                <div className="bom-print-modal">
-                <div className="fixed inset-0 flex items-center justify-center">
-                    <div style={{width: 525, height: 485, position: 'relative', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 10}}>
-                        <button onClick={() => {setCreated(false)}}><div style={{width: 115, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 62, paddingRight: 24, left: 39, top: 414, position: 'absolute', background: 'white', overflow: 'hidden', borderRadius: 8, outline: '1.50px #A4A4A4 solid', outlineOffset: '-1.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                            <div style={{justifyContent: 'center', alignItems: 'center', gap: 0, display: 'inline-flex'}}>
-                                <div className="MRPIcon3" style={{width: 15, height: 21, paddingRight: 25 }} />
-                                <div style={{width: 90, paddingLeft: 0, paddingRight: 2, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#969696', fontSize: 20, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Close</div>
-                                </div>
-                            </div>
-                        </div></button>
-                        <button onClick={() => {setIsOpen2(false); setIsOpen(false); setChecker(false); setCreated(false); setAdditionalCost(false); setAdditionalCost2(false); setRawMaterial(false); setCreated(false); setActiveSubModule("Bills Of Material"); loadSubModule("Bills Of Material"); }}><div style={{width: 156, height: 40, paddingTop: 8, paddingBottom: 8, paddingLeft: 12, paddingRight: 15, left: 327, top: 414, position: 'absolute', background: '#00A8A8', overflow: 'hidden', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                            <div style={{justifyContent: 'center', alignItems: 'center', gap: 3, display: 'inline-flex'}}>
-                                <div style={{width: 116, paddingTop: 2, paddingLeft: 0, paddingRight: 10, justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
-                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: 'white', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Go to BOM</div>
-                                </div>
-                                <div className="MRPIcon5" style={{width: 13, height: 21, transformOrigin: 'center'}} />
-                            </div>
-                        </div></button>
-                        <div style={{width: 452, height: 70, left: 39, top: 218, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#130101', fontSize: 35, fontFamily: 'Inter', fontWeight: '400', textTransform: 'capitalize', lineHeight: 1, letterSpacing: 1.40, wordWrap: 'break-word'}}>Bills of Material Created</div>
-                        <div style={{width: 423, height: 35, left: 53, top: 288, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#130101', fontSize: 14, fontFamily: 'Inter', fontWeight: '400', textTransform: 'capitalize', lineHeight: 1, letterSpacing: 0.56, wordWrap: 'break-word'}}>The BOM is sent to the sales for approval, <br/>go to pending for more information</div>
-                        <div data-property-1="Disabled" style={{width: 201, height: 40, padding: 10, left: 212, top: 349, position: 'absolute', background: '#F5F5F5', borderRadius: 10, outline: '1.50px #E5E5E5 solid', outlineOffset: '-1.50px', justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
-                            <div style={{color: '#585757', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>000000002</div>
+            <div className="bom-print-modal">
+                <div className="fixed inset-0 flex items-center justify-center px-4">
+                <div style={{width: '100%', maxWidth: 525, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', borderRadius: 10, padding: 24, display: 'flex', flexDirection: 'column', gap: 24, position: 'relative'}}>
+                    <img style={{width: 171, height: 171, margin: '0 auto'}} src="public/icons/module-icons/MRP-icons/MRPCheck.png" />
+                    <div style={{textAlign: 'center', fontSize: 28, fontFamily: 'Inter', fontWeight: 400, color: '#130101', letterSpacing: 1.2, textTransform: 'capitalize'}}>Bills of Material Created</div>
+                    <div style={{textAlign: 'center', fontSize: 14, fontFamily: 'Inter', fontWeight: 400, color: '#130101', textTransform: 'capitalize', letterSpacing: 0.56}}>The BOM is sent to the sales for approval, <br />go to pending for more information</div>
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
+                        <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                            <span style={{ fontWeight: 500, color: '#585757' }}><b>Order No.: </b></span>
+                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>000000002</span>
                         </div>
-                        <div style={{width: 92, height: 29, left: 109, top: 355, position: 'absolute', textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
-                        <img style={{width: 171, height: 171, left: 175, top: 35, position: 'absolute'}} src="public/icons/module-icons/MRP-icons/MRPCheck.png" />
+                    </div>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
+                    <button onClick={() => setCreated(false)} style={buttonStyle2('#fff')}>
+                        <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
+                        <span style={{color: '#969696'}}>Close</span>
+                    </button>
+                    <button onClick={() => {setIsOpen2(false), setIsOpen(false), setChecker(false), setCreated(false), setAdditionalCost(false), setAdditionalCost2(false), setRawMaterial(false), setActiveSubModule('Bills Of Material'), loadSubModule('Bills Of Material')}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                        <span>Go to BOM</span>
+                        <div className="MRPIcon5" style={{width: 13, height: 21, marginLeft: 8}} />
+                    </button>
                     </div>
                 </div>
                 </div>
+            </div>
             )}
 
 
