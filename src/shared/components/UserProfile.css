@@ -114,6 +114,7 @@
   width: 40rem;
   margin-left: 3rem;
   align-items: center;
+  border: 1px solid red;
 }
 
 .usrprofile .reset-pass {
@@ -187,4 +188,13 @@
     position: absolute;
     opacity: 70%;
   }
+}
+
+.usrprofile .login-error{
+  color: rgb(255, 128, 0);
+  font-size: 0.75rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  text-align: center;
 }
