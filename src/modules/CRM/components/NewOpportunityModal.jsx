@@ -102,7 +102,7 @@ const NewOpportunityModal = ({
         weighted_amount: weightedAmount,
         gross_profit_percentage: grossProfit,
         gross_profit_total: grossProfitTotal,
-        probability: probability,
+        probability_percentage: probability,
         stage,
         status,
         description,
@@ -300,6 +300,14 @@ const NewOpportunityModal = ({
     }
   }, [grossProfit, estimatedValue]);
 
+  useEffect(() => {
+    const gp = parseFloat(grossProfitTotal.replace(/,/g, ""));
+    const prob = parseFloat(probability.replace(/,/g, ""));
+    if (!isNaN(grossProfitTotal) && !isNaN(prob)) {
+      setWeightedAmount((gp * (prob / 100)).toFixed(2));
+    }
+  }, [probability, grossProfitTotal]);
+
   if (!isOpen) return null;
 
   return (
@@ -398,8 +406,8 @@ const NewOpportunityModal = ({
               <NumberInputField
                 label={"Weighted Amount"}
                 value={weightedAmount}
-                setValue={setWeightedAmount}
                 validation={validateWeightedAmount}
+                disabled={true}
                 isValidationVisible={isValidationVisible}
               />
             </div>
