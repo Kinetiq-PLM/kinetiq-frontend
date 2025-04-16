@@ -223,7 +223,7 @@ const Employees = () => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/departments/departments/");
+      const response = await axios.get("http://127.0.0.1:8000/api/departments/department/");
       
       // Handle both array and object responses
       const departmentsData = response.data;

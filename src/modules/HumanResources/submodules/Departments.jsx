@@ -74,8 +74,8 @@ const Departments = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/departments/departments/"),
-        axios.get("http://127.0.0.1:8000/api/departments/departments/archived/"),
+        axios.get("http://127.0.0.1:8000/api/departments/department/"),
+        axios.get("http://127.0.0.1:8000/api/departments/department/archived/"),
       ]);
       setDepartments(activeRes.data);
       setArchivedDepartments(archivedRes.data);
@@ -137,32 +137,50 @@ const Departments = () => {
     };
   };
   const handleSearch = debounce((value) => {
-    setSearchTerm(value.toLowerCase());
+    setSearchTerm((value || '').toLowerCase());
     setCurrentPage(1);
   }, 300);
 
   /**************************************
    * 4) Filter + Sort + Paginate
    **************************************/
+  // Update the filterAndPaginate function to handle undefined values
   const filterAndPaginate = (data, sortField) => {
-    const term = searchTerm.toLowerCase();
-    let filtered = data.filter((item) =>
-      Object.values(item).some((val) => val?.toString().toLowerCase().includes(term))
-    );
-
-    // Sorting example
+    // Handle undefined or null data
+    if (!data || !Array.isArray(data)) {
+      return { data: [], totalPages: 0, totalFiltered: 0 };
+    }
+    
+    // Handle undefined searchTerm
+    const term = (searchTerm || '').toLowerCase();
+    
+    let filtered = data.filter(item => {
+      if (!item) return false;
+      return Object.values(item).some(val => {
+        if (val == null) return false;
+        try {
+          return val.toString().toLowerCase().includes(term);
+        } catch (err) {
+          return false;
+        }
+      });
+    });
+  
+    // Sorting
     if (sortField !== "all") {
       filtered.sort((a, b) => {
-        const valA = a[sortField]?.toString().toLowerCase() || "";
-        const valB = b[sortField]?.toString().toLowerCase() || "";
+        if (!a || !b) return 0;
+        const valA = a[sortField] != null ? a[sortField].toString().toLowerCase() : '';
+        const valB = b[sortField] != null ? b[sortField].toString().toLowerCase() : '';
         return valA.localeCompare(valB);
       });
     }
-
+    
     // Pagination
     const start = (currentPage - 1) * itemsPerPage;
     const paginated = filtered.slice(start, start + itemsPerPage);
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+    
     return {
       data: paginated,
       totalPages,

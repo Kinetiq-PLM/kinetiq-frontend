@@ -56,30 +56,38 @@ const Recruitment = () => {
   }, []);
 
   // Utility functions
-  const showToast = (message, success = true) => {
-    setToast({ message, success });
-    setTimeout(() => setToast(null), 3000);
-  };
-
   const filterAndPaginate = (data) => {
-    const filtered = data.filter(item =>
-      Object.values(item).some(val =>
-        val?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-
+    if (!data || !Array.isArray(data)) {
+      return { paginated: [], totalPages: 0 };
+    }
+  
+    const term = (searchTerm || '').toLowerCase();
+    
+    const filtered = data.filter(item => {
+      if (!item) return false;
+      return Object.values(item).some(val => {
+        if (val == null) return false;
+        try {
+          return val.toString().toLowerCase().includes(term);
+        } catch (err) {
+          return false;
+        }
+      });
+    });
+  
     if (sortField !== "all") {
       filtered.sort((a, b) => {
-        const valA = a[sortField]?.toString().toLowerCase() || "";
-        const valB = b[sortField]?.toString().toLowerCase() || "";
+        if (!a || !b) return 0;
+        const valA = a[sortField] != null ? a[sortField].toString().toLowerCase() : '';
+        const valB = b[sortField] != null ? b[sortField].toString().toLowerCase() : '';
         return valA.localeCompare(valB);
       });
     }
-
+  
     const startIndex = (currentPage - 1) * itemsPerPage;
     const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
-
+    const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+  
     return { paginated, totalPages };
   };
 
@@ -132,8 +140,8 @@ const Recruitment = () => {
                       <td>{posting.duration_days}</td>
                       <td>{posting.finance_approval_status}</td>
                       <td>
-                        <span className={`recruitment-tag ${posting.posting_status.toLowerCase()}`}>
-                          {posting.posting_status}
+                        <span className={`recruitment-tag ${posting.status ? posting.status.toLowerCase() : 'unknown'}`}>
+                          {posting.status || 'Unknown'}
                         </span>
                       </td>
                       <td>{posting.created_at}</td>
@@ -200,8 +208,8 @@ const Recruitment = () => {
                   <td>{candidate.email}</td>
                   <td>{candidate.phone}</td>
                   <td>
-                    <span className={`recruitment-tag ${candidate.status.toLowerCase()}`}>
-                      {candidate.status}
+                    <span className={`recruitment-tag ${candidate.status ? candidate.status.toLowerCase() : 'unknown'}`}>
+                      {candidate.status || 'Unknown'}
                     </span>
                   </td>
                   <td>{candidate.applied_position}</td>
@@ -241,12 +249,12 @@ const Recruitment = () => {
             <thead>
               <tr>
                 <th>Resignation ID</th>
-                <th>Employee Name</th>
-                <th>Department</th>
-                <th>Reason</th>
-                <th>Resignation Date</th>
-                <th>Notice Period</th>
-                <th>Status</th>
+                <th>Employee ID</th>
+                <th>Submission Date</th>
+                <th>Notice Period (Days)</th>
+                <th>HR Approver</th>
+                <th>Approval Status</th>
+                <th>Clearance Status</th>
                 <th></th>
               </tr>
             </thead>
@@ -254,14 +262,18 @@ const Recruitment = () => {
               {paginated.map((resignation, index) => (
                 <tr key={resignation.resignation_id}>
                   <td>{resignation.resignation_id}</td>
-                  <td>{resignation.employee_name}</td>
-                  <td>{resignation.department}</td>
-                  <td>{resignation.reason}</td>
-                  <td>{resignation.resignation_date}</td>
-                  <td>{resignation.notice_period}</td>
+                  <td>{resignation.employee_id}</td>
+                  <td>{resignation.submission_date ? new Date(resignation.submission_date).toLocaleDateString() : 'N/A'}</td>
+                  <td>{resignation.notice_period_days || 'N/A'}</td>
+                  <td>{resignation.hr_approver_id || 'Pending'}</td>
                   <td>
-                    <span className={`recruitment-tag ${resignation.status.toLowerCase()}`}>
-                      {resignation.status}
+                    <span className={`recruitment-tag ${resignation.approval_status ? resignation.approval_status.toLowerCase() : 'unknown'}`}>
+                      {resignation.approval_status || 'Unknown'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`recruitment-tag ${resignation.clearance_status ? resignation.clearance_status.toLowerCase() : 'unknown'}`}>
+                      {resignation.clearance_status || 'Unknown'}
                     </span>
                   </td>
                   <td className="recruitment-actions">
