@@ -273,7 +273,7 @@ const BodyContent = () => {
 
   const getDifferenceColorClass = (diff) => {
     if (diff === 0) return 'text-gray-600';
-    return diff < 0 ? 'text-red-600' : 'text-green-600';
+    return diff > 0 ? 'text-red-600' : 'text-green-600';
   };
 
   // Simple history representation without charts
