@@ -51,7 +51,11 @@ const OrderedProductList = ({
   useEffect(() => {
     if (order) {
       const products = order.statement.items
-        .filter((item) => item.quantity - item.quantity_delivered !== 0)
+        .filter(
+          (item) =>
+            item.quantity - item.quantity_delivered > 0 &&
+            Number(item.quantity) - Number(item.quantity_to_deliver) > 0
+        )
         .map((item) => ({
           product_id: item.product.product_id,
           product_name: item.product.product_name,
@@ -62,7 +66,10 @@ const OrderedProductList = ({
           total_price: Number(item.total_price),
           special_requests: item.special_requests,
         }));
+      console.log("filtered");
+      console.log(products);
       setProductList(products);
+      // setFilteredData(products);
     }
   }, [order]);
 
@@ -94,6 +101,8 @@ const OrderedProductList = ({
 
   useEffect(() => {
     // Exclude products that are already in the selected products list
+    console.log("prdoucts");
+    console.log(products);
     const filtered = productList.filter(
       (product) => !products.some((p) => p.product_id === product.product_id)
     );

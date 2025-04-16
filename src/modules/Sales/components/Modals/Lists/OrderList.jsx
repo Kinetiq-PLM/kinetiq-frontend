@@ -101,10 +101,11 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
       const validData = formattedData
         .filter((order) =>
           order.statement?.items?.some(
-            (item) => item.quantity - item.quantity_to_deliver !== 0
+            (item) => item.quantity - item.quantity_to_deliver > 0
           )
         )
         .map((order) => order); // Optional, you can return order directly from filter
+
       setFilteredData(validData);
       setOrderList(validData);
       setIsLoading(false);

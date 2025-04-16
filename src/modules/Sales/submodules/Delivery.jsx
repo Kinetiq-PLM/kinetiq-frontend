@@ -97,7 +97,11 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
       await GET(`sales/${data.transferOperation}/${data.transferID}`),
     onSuccess: async (data, variables, context) => {
       const prods = data.statement.items
-        .filter((item) => item.quantity - item.quantity_to_deliver !== 0)
+        .filter(
+          (item) =>
+            item.quantity - item.quantity_to_deliver > 0 &&
+            Number(item.quantity) - Number(item.quantity_to_deliver) > 0
+        )
         .map((item) => ({
           product_id: item.product.product_id,
           product_name: item.product.product_name,
