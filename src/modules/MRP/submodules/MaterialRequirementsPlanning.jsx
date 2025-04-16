@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/MaterialRequirementsPlanning.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 const BodyContent = ({loadSubModule, setActiveSubModule}) => {
@@ -15,26 +15,186 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [flag, setFlag] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [showHelpOptions, setShowHelpOptions] = useState(false);
-    const [selectedProductId, setSelectedProductId] = useState(null);
 
     const costOfProducts = 40000.00;
-    const costOfProduction = 15000.00;
+    //const costOfProduction = 15000.00;
     const laborCost = 8000.00;
+
+    const [selectedRowData, setSelectedRowData] = useState(null); // State to store selected row data
+    const [selectedOrderNo, setSelectedOrderNo] = useState([]); // State to store only the Order No. as a string
+    const [bomDetails, setBomDetails] = useState([]);
+    const [selectedProductId, setSelectedProductId] = useState(null); // New state to store selected product_id
+    const [rawMaterials, setRawMaterials] = useState([]);
+    const [costOfProduction, setCostOfProduction] = useState([]);
+    const totalCostofRawMaterial = rawMaterials.reduce((sum,item) => sum + parseFloat(item.rmtotalCost),0);
+    const overallTotalCost = bomDetails.reduce((sum, item) => sum + parseFloat(item.totalCost),0).toFixed(2);
+    const [selectedStatementId, setSelectedStatementId] = useState(null);
+    const [mrpData, setMrpData] = useState([]);
+    const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
+    const [totalLaborCost, setTotalLaborCost] = useState(0);
+    const [totalOrderCost, setTotalOrderCost] = useState(0);
+
+
+    useEffect(() => {
+        const fetchMrpData = async () => {
+            try {
+                const response = await fetch("http://127.0.0.1:8000/bills_of_material/orderlist/"); // Replace with your API endpoint
+                if (!response.ok) {
+                    throw new Error("Failed to fetch MRP data");
+                }
+                const data = await response.json();
+
+                // Map the API response to match the expected structure
+                const formattedData = data.map((item) => ({
+                    number: item.order_no,
+                    type: item.type,
+                    details: item.details,
+                    date: item.date.trim(), // Trim any extra spaces in the date
+                }));
+
+                setMrpData(formattedData); // Update the state with the fetched data
+            } catch (error) {
+                console.error("Error fetching MRP data:", error);
+            }
+        };
+
+        fetchMrpData();
+    }, []);
+
+    const fetchOrderStatement = async (orderId) => {
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/bills_of_material/orderstatements/by-order/${orderId}/`); // Replace with your API endpoint
+            if (!response.ok) {
+                throw new Error("Failed to fetch order statements");
+            }
+            const data = await response.json();
+            const statementIds = data.map((item) => item.statement_id);
+
+            console.log(statementIds); // Log the statement IDs to verify
+
+            if (statementIds.length > 0) {
+                // Use the first statementid to fetch BOM details
+                fetchBomDetails(statementIds[0]);
+            } else {
+                console.warn("No statement IDs found.");
+            }
+
+            setSelectedOrderNo(statementIds);
+        } catch (error) {
+            console.error("Error fetching Order Statements", error);
+        }
+    };
     
+const fetchBomDetails = async (statementId) => {
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/bills_of_material/productpricing/by-statement/${statementId}/`); // Replace with your API endpoint
+            if (!response.ok) {
+                throw new Error("Failed to fetch BOM details");
+            }
+            const data = await response.json();
 
-    const mrpData = [
-        { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
-        { number: "000000002", type: "Non Project", details: "Tondo Hospital - Package.. ", date: "July 3 2025" },
-        { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
-        { number: "000000002", type: "Non Project", details: "Tondo Hospital - Package.. ", date: "July 3 2025" },
-        { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
-    ];
+            // Map the API response to match the expected structure
+            const formattedData = data.map((item, index) => ({
+                no: index + 1, // Add a sequential number
+                product_id: item.product_id,
+                product_name: item.product_name,
+                product_description: item.product_description,
+                qtyProduct: item.quantity, // Assuming this is the raw material
+                totalCost: parseFloat(item.cost), // Total cost
+            }));
 
-    const bomDetails = [
-        { no: 1, bomId: "BOM001", projectId: "PRJ001", product_id: "ADMIN-PROD-2025-a6d292", productMatsId: "MAT001", qtyRawMaterial: 50, costPerUnit: 120, totalCostOfRawMaterials: 6000, productionOrderDetailId: "POD001", laborCostId: "LAB001", totalCost: 7000, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", unit: "kg" },
-        { no: 2, bomId: "BOM002", projectId: "PRJ002", product_id: "ADMIN-PROD-2025-a6a292", productMatsId: "MAT002", qtyRawMaterial: 80, costPerUnit: 100, totalCostOfRawMaterials: 8000, productionOrderDetailId: "POD002", laborCostId: "LAB002", totalCost: 9500, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", unit: "kg" },
-        { no: 3, bomId: "BOM003", projectId: "PRJ001", product_id: "ADMIN-PROD-2025-a62ass", productMatsId: "MAT003", qtyRawMaterial: 50, costPerUnit: 120, totalCostOfRawMaterials: 6000, productionOrderDetailId: "POD003", laborCostId: "LAB003", totalCost: 7100, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", unit: "kg" },
-    ];
+            setBomDetails(formattedData); // Update the state with the fetched data
+        } catch (error) {
+            console.error("Error fetching BOM details:", error);
+        }
+    };
+
+
+const fetchRawMaterials = async (productId) => {
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/bills_of_material/costofrawmats/by-product/${productId}/`); // Replace with your API endpoint
+        if (!response.ok) {
+            throw new Error("Failed to fetch raw materials");
+        }
+        const data = await response.json();
+        const formattedData = data.map((item) => ({
+            rawMaterial: item.raw_material,
+            materialId: item.material_id,
+            rmquantity: item.rm_quantity,
+            rmunits: item.units,
+            rmunitCost: parseFloat(item.unit_cost).toFixed(2),
+            rmtotalCost: parseFloat(item.total_cost).toFixed(2),
+        }));
+
+        setRawMaterials(formattedData); // Update the state with fetched raw materials
+    } catch (error) {
+        console.error("Error fetching raw materials:", error);
+    }
+};
+
+const fetchCostProduction = async (orderId) => {
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/bills_of_material/orderproductioncost/${orderId}/`); // Replace with your API endpoint
+        if (!response.ok) {
+            throw new Error("Failed to fetch production costs");
+        }
+        const data = await response.json();
+        const formattedData = data.map((item) => ({
+            productioncost: parseFloat(item.cost_of_production),
+        }));
+
+        setCostOfProduction(formattedData);
+
+        const totalCost = formattedData.reduce((sum, item) => sum + item.productioncost, 0);
+        setTotalCostOfProduction(totalCost);
+        
+    } catch (error) {
+        console.error("Error fetching production costs:", error);
+    }
+};
+
+const fetchCostLabor = async (orderId) => {
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/bills_of_material/employeeorder/${orderId}/`); // Replace with your API endpoint
+        if (!response.ok) {
+            throw new Error("Failed to fetch employee order");
+        }
+        const data = await response.json();
+        const formattedData = data.map((item) => ({
+            days_worked: item.days_worked,
+            daily_rate: parseFloat(item.daily_rate)
+        }));
+
+        const totalCost = formattedData.reduce(
+            (sum, item) => sum + item.days_worked * item.daily_rate,
+            0
+        );
+
+        setTotalLaborCost(totalCost);
+        
+    } catch (error) {
+        console.error("Error fetching labor costs:", error);
+    }
+};
+
+    useEffect(() => {
+        const total = (parseFloat(overallTotalCost) + totalCostOfProduction + totalLaborCost).toFixed(2);
+        setTotalOrderCost(total);
+    }, [overallTotalCost, totalCostOfProduction, totalLaborCost]);
+
+    // const mrpData = [
+    //     { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
+    //     { number: "000000002", type: "Non Project", details: "Tondo Hospital - Package.. ", date: "July 3 2025" },
+    //     { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
+    //     { number: "000000002", type: "Non Project", details: "Tondo Hospital - Package.. ", date: "July 3 2025" },
+    //     { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
+    // ];
+
+    // const bomDetails = [
+    //     { no: 1, bomId: "BOM001", projectId: "PRJ001", product_id: "ADMIN-PROD-2025-a6d292", productMatsId: "MAT001", qtyRawMaterial: 50, costPerUnit: 120, totalCostOfRawMaterials: 6000, productionOrderDetailId: "POD001", laborCostId: "LAB001", totalCost: 7000, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", unit: "kg" },
+    //     { no: 2, bomId: "BOM002", projectId: "PRJ002", product_id: "ADMIN-PROD-2025-a6a292", productMatsId: "MAT002", qtyRawMaterial: 80, costPerUnit: 100, totalCostOfRawMaterials: 8000, productionOrderDetailId: "POD002", laborCostId: "LAB002", totalCost: 9500, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", unit: "kg" },
+    //     { no: 3, bomId: "BOM003", projectId: "PRJ001", product_id: "ADMIN-PROD-2025-a62ass", productMatsId: "MAT003", qtyRawMaterial: 50, costPerUnit: 120, totalCostOfRawMaterials: 6000, productionOrderDetailId: "POD003", laborCostId: "LAB003", totalCost: 7100, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", unit: "kg" },
+    // ];
 
     const rawMats = [
         { "product_id": "ADMIN-PROD-2025-a6d292", "raw_material": "Carbon Fiber", "material_id": "ADMIN-MATERIAL-2025-fa9377", "rm_quantity": "80.70", "units": "kg", "unit_cost": "2500.00", "total_cost": "201750.00"},
@@ -148,7 +308,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     <div
                     className="table-row"
                     key={index}
-                    onClick={() => setIsOpen(true)}
+                    onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchCostProduction(item.number); fetchCostLabor(item.number); setIsOpen(true);}}
                     onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                     style={{display: 'flex', flexWrap: 'wrap', cursor: 'pointer',borderBottom: '1px solid #E8E8E8',}}>
@@ -177,7 +337,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 </div>
             </div>
 
-            {isOpen && (
+            {isOpen && selectedRowData &&(
             <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center">
                 <div className="modal-inner" style={{ width: '90%', maxWidth: 953, background: 'white', borderRadius: 10, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', padding: 24, display: 'flex', flexDirection: 'column', gap: 24, }}>
@@ -185,10 +345,10 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
                     <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 20, padding: 20,}}>
                     {[
-                        { label: 'Order No.', value: mrpData[0].number },
-                        { label: 'Type', value: mrpData[0].type },
-                        { label: 'Details', value: mrpData[0].details },
-                        { label: 'Date', value: mrpData[0].date },
+                        { label: 'Order No.', value: selectedRowData.number },
+                        { label: 'Type', value: selectedRowData.type },
+                        { label: 'Details', value: selectedRowData.details },
+                        { label: 'Date', value: selectedRowData.date },
                     ].map((item) => (
                         <div key={item.label} style={{ flex: '1 1 45%', minWidth: 200}}>
                         <div style={{fontSize: 'clamp(14px, 2vw, 18px)', fontWeight: '500', color: '#585757', marginBottom: 5,}}>
@@ -246,10 +406,10 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
                                     <div style={rowCellStyle}>{item.no}</div>
                                     <div style={rowCellStyle}>{item.product_id}</div>
-                                    <div style={rowCellStyle}>{item.product}</div>
-                                    <div style={rowCellStyle}>{`Description of ${item.product}`}</div>
+                                    <div style={rowCellStyle}>{item.product_name}</div>
+                                    <div style={rowCellStyle}>{item.product_description}</div>
                                     <div style={rowCellStyle}>{item.qtyProduct} pcs</div>
-                                    <div onClick={() => { setRawMaterial(true); setSelectedProductId(item.product_id); }} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
+                                    <div onClick={() => {setSelectedProductId(item.product_id); fetchRawMaterials(item.product_id); setRawMaterial(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
                                     <div style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
                                     </div>
                                 ))}
@@ -261,14 +421,14 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱40,000.80</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{overallTotalCost}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 10}}>
                                             <span style={{ fontWeight: 500, color: '#585757' }}><b>Order No.</b></span>
                                         <div
-                                        style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500}}>000000002</div>
+                                        style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500}}>{selectedRowData.number}</div>
                                     </div>
                                 </div>
                             </div>
@@ -306,16 +466,16 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {rawMats.filter(mat => mat.product_id === selectedProductId).map((item, idx) => {
-                                const totalCost = parseFloat(item.unit_cost) * parseFloat(item.rm_quantity);
+                                {rawMaterials.map((item, idx) => {
+                                //const totalCost = parseFloat(item.unit_cost) * parseFloat(item.rm_quantity);
                                 return (
                                     <tr key={idx} style={{ borderBottom: '1px solid #E8E8E8' }}>
-                                    <td style={tdStyle}>{item.raw_material}</td>
-                                    <td style={tdStyle}>{item.material_id}</td>
-                                    <td style={tdStyle}>{item.rm_quantity}</td>
-                                    <td style={tdStyle}>{item.units}</td>
-                                    <td style={tdStyle}>₱{parseFloat(item.unit_cost).toFixed(2)}</td>
-                                    <td style={tdStyle}>₱{totalCost.toFixed(2)}</td>
+                                    <td style={tdStyle}>{item.rawMaterial}</td>
+                                    <td style={tdStyle}>{item.materialId}</td>
+                                    <td style={tdStyle}>{item.rmquantity}</td>
+                                    <td style={tdStyle}>{item.rmunits}</td>
+                                    <td style={tdStyle}>₱{parseFloat(item.rmunitCost).toFixed(2)}</td>
+                                    <td style={tdStyle}>₱{parseFloat(item.rmtotalCost).toFixed(2)}</td>
                                     </tr>
                                 );
                                 })}
@@ -327,7 +487,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost Of Raw Material:</b></span>
-                                        <span style={{ fontWeight: 500, color: '#585757' }}>₱{totalRawCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        <span style={{ fontWeight: 500, color: '#585757' }}>₱{totalCostofRawMaterial}</span>
 
                                     </div>
                                 </div>
@@ -372,7 +532,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(costOfProducts).toFixed(2)}</div>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{overallTotalCost}</div>
                                 </div>
                                 </div>
                             </div>
@@ -385,7 +545,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(costOfProduction).toFixed(2)}</div>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{totalCostOfProduction}</div>
                                 </div>
                                 </div>
                             </div>
@@ -398,7 +558,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                     <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(laborCost).toFixed(2)}</div>
+                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{totalLaborCost}</div>
                                     </div>
                                 </div>
                             </div>
@@ -408,11 +568,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Whole Order: </b></span>
-                                        <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500, }}>₱{totalCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500, }}>₱{totalOrderCost}</span>
                                     </div>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Order No.: </b></span>
-                                        <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>000000002</span>
+                                        <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>{selectedRowData.number}</span>
                                     </div>
                                 </div>
                         </div>
@@ -443,7 +603,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
                         <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                             <span style={{ fontWeight: 500, color: '#585757' }}><b>Order No.: </b></span>
-                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>000000002</span>
+                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>{selectedRowData.number}</span>
                         </div>
                     </div>
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
@@ -471,7 +631,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
                         <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                             <span style={{ fontWeight: 500, color: '#585757' }}><b>Order No.: </b></span>
-                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>000000002</span>
+                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>{selectedRowData.number}</span>
                         </div>
                     </div>
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
