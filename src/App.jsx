@@ -108,7 +108,7 @@ function App() {
   //fetch notifs
   const fetchNotifs = async (user) => {
     console.log("Fetching notifs...")
-    const resp = await fetch(`http://127.0.0.1:8000/api/notifications/?user_id=${user?.user_id}`, { method: 'GET' })
+    const resp = await fetch(`https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/?user_id=${user?.user_id}`, { method: 'GET' })
     // const resp_text = await resp.text()
     // console.log("resp text")
     // console.log(resp_text)
@@ -148,7 +148,7 @@ function App() {
 
   //func for marking notifs as read
   const readNotif = async (notif_id) => {
-    const resp = await fetch(`http://127.0.0.1:8000/api/notifications/`, {
+    const resp = await fetch(`https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/`, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json"

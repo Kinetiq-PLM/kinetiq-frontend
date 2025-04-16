@@ -46,7 +46,7 @@ export default function StandaloneLogin() {
         return;
       }
 
-      const response = await axios.post("http://127.0.0.1:8000/login/", {
+      const response = await axios.post("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/login/", {
         email: credentials.email,
         password: credentials.password,
       });
@@ -109,7 +109,7 @@ export default function StandaloneLogin() {
   };
 
   const checkEmail = async (email) => {
-    const response = await fetch("http://127.0.0.1:8000/check-email/", {
+    const response = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/check-email/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
@@ -154,7 +154,7 @@ export default function StandaloneLogin() {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/reset-password/", {
+      const res = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/reset-password/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

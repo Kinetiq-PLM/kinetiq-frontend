@@ -55,7 +55,7 @@ const BodyContent = ({ employee_id }) => {
     if (!isPassChanged) {
       try {
         console.log('new pass ' + newPassword)
-        const res = await fetch("http://127.0.0.1:8000/reset-password/", {
+        const res = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/reset-password/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -79,7 +79,7 @@ const BodyContent = ({ employee_id }) => {
 
   const checkPassword = async () => {
     console.log("checking password")
-    const res = await fetch("http://127.0.0.1:8000/check-password/", {
+    const res = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/check-password/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
