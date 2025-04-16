@@ -7,7 +7,6 @@ import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 import { GET } from "../../api/api"
 
 const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
-  console.log("aaaa tx data", ticket)
   const [technicians, setTechnicians] = useState([]);
   const [isTechDropdown, setOpenTechDD] = useState(false);
   const [products, setProducts] = useState([]);
