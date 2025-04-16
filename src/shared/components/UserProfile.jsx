@@ -29,12 +29,24 @@ const BodyContent = ({ employee_id }) => {
   const [isPassChanged, setIsPassChanged] = useState(false);
 
   const arePassFieldsValid = async () => {
-    if (!newPassword) {
-      setNewPassErr("* Password cannot be empty. *");
+    if (!newPassword || !conPassword || !currPassword) {
+      if (!currPassword) {
+        setCurrPassErr("* This field cannot be empty. *");
+      }
+      if (!newPassword) {
+        setNewPassErr("* This field cannot be empty. *");
+      }
+      if (!conPassword) {
+        setConPassErr("* This field cannot be empty. *");
+      }
       return false;
     }
     if (newPassword.length < 8) {
       setNewPassErr("* Password must be at least 8 characters long. *");
+      return false;
+    }
+    if (currPassword === newPassword) {
+      setNewPassErr("* New password cannot be the same as the current password. *");
       return false;
     }
     if (newPassword !== conPassword) {
@@ -44,12 +56,7 @@ const BodyContent = ({ employee_id }) => {
     const pass_valid = await checkPassword()
     console.log(pass_valid)
     if (!pass_valid) {
-      setCurrPassErr("* Invalid credentials. *")
-      return false;
-    }
-
-    if (currPassword === newPassword) {
-      setConPassErr("* New password cannot be the same as the current password. *");
+      setCurrPassErr("* Incorrect password. *")
       return false;
     }
 
@@ -201,7 +208,7 @@ const BodyContent = ({ employee_id }) => {
 
       <Popup open={openPopup} closeOnDocumentClick onClose={() => setOpenPopup(false)} modal>
         {(close) => (
-          <div className="modal">
+          <div className="usrprofile-modal">
             <div className="header">Change Password Confirmation</div>
             <div className="content">
               {popupContent}
@@ -210,7 +217,7 @@ const BodyContent = ({ employee_id }) => {
               {popupContent === "Are you sure you want to change your password?" ? (
                 <>
                   <button className="confirm-btn" onClick={() => { handleChangePassword(); }}>
-                    "Yes, Change Password"
+                    Yes, Change Password
                   </button>
                   <button className="cancel-btn" onClick={() => close()}>Cancel</button>
                 </>

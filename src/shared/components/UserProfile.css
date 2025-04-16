@@ -234,28 +234,51 @@
 }
 
 
-.modal {
+.usrprofile-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   font-family: Arial;
-  padding: 20px;
+  padding: 2rem;
+  border-radius: 1rem;
+  gap: 1rem;
+  font: 'Inter', sans-serif;
 }
-.modal .header {
-  font-size: 18px;
+
+.usrprofile-modal .header {
+  font-size: 1.1rem;
+  color: #008b8b;
   font-weight: bold;
-  margin-bottom: 10px;
 }
-.modal .actions button {
-  margin: 10px 5px 0;
-  padding: 8px 12px;
+.usrprofile-modal .actions{
+  display: flex;
+  gap: 1rem;
+}
+.usrprofile-modal .actions button {
+  padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
+  transition: 0.2s ease-in-out;
 }
-.confirm-btn {
-  background-color: #4caf50;
+
+.usrprofile-modal .confirm-btn {
+  background-color: #008b8b;
   color: white;
 }
-.cancel-btn, .ok-btn {
-  background-color: #ccc;
+.usrprofile-modal .confirm-btn:hover {
+  background-color: #007b7b;
 }
+
+.usrprofile-modal .cancel-btn, .usrprofile-modal .ok-btn {
+  background-color: #dedede;
+}
+
+.usrprofile-modal .cancel-btn:hover, .usrprofile-modal .ok-btn:hover {
+  background-color: #c5c5c5;
+}
+
+
 
 @media (max-width: 57rem) {
   .usrprofile .user-details-container {

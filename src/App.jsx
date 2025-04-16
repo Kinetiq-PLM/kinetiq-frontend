@@ -172,74 +172,6 @@ function App() {
     }
   }, [user]);
 
-  //dummy notifs
-  // const notifs = [
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "Ur phone ringing!!!",
-  //     orig_module: "Administration",
-  //     orig_submodule: null,
-  //     read: false
-  //   },
-  //   {
-  //     time: "9:00 PM",
-  //     msg: "keep urself safe!!!",
-  //     orig_module: "Sales",
-  //     orig_submodule: null,
-  //     read: false
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "bibidi bobidi boo wah",
-  //     orig_module: "Management",
-  //     orig_submodule: "Access Control",
-  //     read: false
-
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Manufacturing Process",
-  //     read: false
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "wowee!",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Accounts Receivable",
-  //     read: false
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "Non incididunt commodo consequat occaecat proident consequat non.",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Accounts Receivable",
-  //     read: true
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Manufacturing Process",
-  //     read: true
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "yippee!",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Accounts Receivable",
-  //     read: true
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "Minim amet et non irure quis ea Lorem et dolor et tempor excepteur est.",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Accounts Receivable",
-  //     read: true
-  //   }
-  // ];
-
   // hooks for loading modules
   useEffect(() => {
     console.log("(debug) main hook");
@@ -337,7 +269,7 @@ function App() {
     "Purchase Request": "PurchaseRequest",
     "Project Request": "ProjectRequest",
     "Workforce Request": "WorkforceRequest",
-    "Job Posting": "JobPosting"
+    "Job Posting": "JobPosting",
   };
 
   const moduleSubmoduleFileNames = {
