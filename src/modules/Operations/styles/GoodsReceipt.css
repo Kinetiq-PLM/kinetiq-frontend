@@ -1,27 +1,23 @@
-.grpo {
+.gr {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
 
-
-
-.grpo .body-content-container {
+.gr .body-content-container {
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
   background-color: white;
-  padding: 1rem;
-  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 1.5rem;
+  box-shadow: 0 1px 2px  rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   min-width: 40rem;
   min-height: 30rem;
   gap: 1rem;
 }
-
-
 
 
 .content-wrapper {
@@ -37,8 +33,6 @@
 }
 
 
-
-
 .back-button {
   display: flex;
   align-items: center;
@@ -51,8 +45,6 @@
 }
 
 
-
-
 .details-grid {
   display: grid;
   grid-template-columns: 250px 1fr;
@@ -60,8 +52,6 @@
   max-width: 100%;
   margin-bottom: 1rem;
 }
-
-
 
 
 .details-section {
@@ -73,16 +63,12 @@
 }
 
 
-
-
 .detail-row {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
-  margin-bottom: 0.3rem;
+  gap: 0.15rem;
+  margin-bottom: 0.4rem;
 }
-
-
 
 
 .detail-row:last-child {
@@ -90,41 +76,23 @@
 }
 
 
-
-
 .detail-row label {
   color: #4B5563;
-  font-size: 0.75rem;
+  font-size: 0.813rem;
 }
-
-
 
 
 .detail-row input,
 .detail-row select,
 .date-input input {
   width: 100%;
-  padding: 0.15rem 0.4rem;
+  padding: 0.2rem 0.4rem;
   border: 1px solid #E5E7EB;
   border-radius: 0.25rem;
   background: #F9FAFB;
   color: #374151;
   font-size: 0.813rem;
-  height: 1.4rem;
-}
-
-.dropdown-scrollbar select::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.dropdown-scrollbar select::-webkit-scrollbar-thumb {
-  background: #0d9488;
-  border-radius: 3px;
-}
-
-.dropdown-scrollbar select::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  height: 1.5rem;
 }
 
 
@@ -133,15 +101,11 @@
 }
 
 
-
-
 .section-tabs {
   display: flex;
   border-bottom: 1px solid #E5E7EB;
   background: #F9FAFB;
 }
-
-
 
 
 .tab-button {
@@ -156,14 +120,10 @@
 }
 
 
-
-
 .tab-button.active {
   color: #0d9488;
   background: white;
 }
-
-
 
 
 .tab-button.active::after {
@@ -177,8 +137,6 @@
 }
 
 
-
-
 .tab-content {
   padding: 0.5rem;
   background: white;
@@ -189,8 +147,6 @@
 }
 
 
-
-
 .tab-content.cost-details {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -199,28 +155,26 @@
 }
 
 
-
-
 .tab-content.cost-details .detail-row {
   margin-bottom: 0.25rem;
 }
 
 
-
-
 .operation_table_container {
-  width: 100%;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
+  flex: 1;
+  min-height: 0;
   position: relative;
-  height: 350px;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
 
-
-
-.grpo-table {
-  min-width: 100%;
+.gr-table {
   height: 100%;
+  width: 100%;
   overflow: auto;
   position: absolute;
   top: 0;
@@ -230,222 +184,55 @@
 }
 
 
-
-
-.grpo-table::-webkit-scrollbar {
+.gr-table::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 
-
-
-.grpo-table::-webkit-scrollbar-thumb {
+.gr-table::-webkit-scrollbar-thumb {
   background: #0d9488;
   border-radius: 3px;
 }
 
 
-
-
-.grpo-table::-webkit-scrollbar-track {
+.gr-table::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
 
 
-
-
-.table-container {
-  margin-top: 1rem;
-  flex: 1;
-  min-height: 0;
-  position: relative;
-  overflow: auto;
+.gr-table::-webkit-scrollbar-corner {
+  background: #f1f5f9;
 }
 
 
-
-
-.table-container table {
+.materials-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  min-width: max-content;
 }
 
 
-
-
-.table-container thead {
+.materials-table th {
   position: sticky;
   top: 0;
+  background: white;
   z-index: 1;
-  background-color: #f8fafc;
-}
-
-
-
-
-.table-container th {
+  padding: 0.75rem 1rem;
   text-align: left;
-  padding: 1rem;
-  background-color: #f8fafc;
   font-weight: 500;
   color: #64748b;
   border-bottom: 1px solid #e2e8f0;
 }
 
 
-
-
-.table-container td {
-  padding: 1rem;
+.materials-table td {
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid #e2e8f0;
   color: #334155;
-  background-color: white;
-}
-
-
-
-
-.table-container tbody tr:hover {
-  background-color: #f8fafc;
-}
-
-
-
-
-.materials-table {
-  width: 100%;
-  min-width: 1200px;
-  border-collapse: collapse;
-}
-
-
-
-
-.materials-table thead {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background-color: #F9FAFB;
-}
-
-
-
-
-.materials-table th,
-.materials-table td {
-  padding: 0.25rem 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid #E5E7EB;
   white-space: nowrap;
-  font-size: 12px;
-  height: 32px;
-  vertical-align: middle;
 }
-
-
-
-
-.materials-table th {
-  background-color: #F9FAFB;
-  font-weight: 500;
-  color: #374151;
-}
-
-
-
-
-.materials-table td {
-  color: #4B5563;
-}
-
-
-
-
-.table-header .materials-table th:nth-child(1),
-.table-body .materials-table td:nth-child(1) {
-  width: 60px; /* No. */
-}
-
-
-
-
-.table-header .materials-table th:nth-child(2),
-.table-body .materials-table td:nth-child(2) {
-  width: 120px; /* Material ID */
-}
-
-
-
-
-.table-header .materials-table th:nth-child(3),
-.table-body .materials-table td:nth-child(3),
-.table-header .materials-table th:nth-child(4),
-.table-body .materials-table td:nth-child(4) {
-  width: 200px; /* Item Name & Material Name */
-}
-
-
-
-
-.table-header .materials-table th:nth-child(5),
-.table-body .materials-table td:nth-child(5) {
-  width: 80px; /* UoM */
-}
-
-
-
-
-.table-header .materials-table th:nth-child(6),
-.table-body .materials-table td:nth-child(6) {
-  width: 100px; /* Quantity */
-}
-
-
-
-
-.table-header .materials-table th:nth-child(7),
-.table-body .materials-table td:nth-child(7),
-.table-header .materials-table th:nth-child(8),
-.table-body .materials-table td:nth-child(8) {
-  width: 120px; /* Cost Per Unit & Total */
-}
-
-
-
-
-.table-header .materials-table th:nth-child(9),
-.table-body .materials-table td:nth-child(9),
-.table-header .materials-table th:nth-child(10),
-.table-body .materials-table td:nth-child(10) {
-  width: 150px; /* Manufacturing Date & Expiry Date */
-}
-
-
-
-
-.table-header .materials-table th:nth-child(11),
-.table-body .materials-table td:nth-child(11) {
-  width: 150px; /* Warehouse Location */
-}
-
-
-
-
-.table-header .materials-table th:nth-child(12),
-.table-body .materials-table td:nth-child(12) {
-  width: 120px; /* Serial No. */
-}
-
-
-
-
-.materials-table tbody tr:hover td {
-  background: #f8fafc;
-}
-
-
 
 
 .button-section {
@@ -455,14 +242,10 @@
 }
 
 
-
-
 .right-buttons {
   display: flex;
   gap: 0.75rem;
 }
-
-
 
 
 .copy-from-button,
@@ -477,14 +260,10 @@
 }
 
 
-
-
 .copy-from-button:hover,
 .cancel-button:hover {
   background: #F9FAFB;
 }
-
-
 
 
 .send-to-button {
@@ -498,49 +277,9 @@
 }
 
 
-
-
 .send-to-button:hover {
   background: #0f766e;
 }
-
-
-
-
-.teal-checkbox {
-  appearance: none;
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid #0d9488;
-  border-radius: 0.25rem;
-  cursor: pointer;
-  position: relative;
-  margin: 0;
-}
-
-
-
-
-.teal-checkbox:checked {
-  background: #0d9488;
-}
-
-
-
-
-.teal-checkbox:checked::after {
-  content: '';
-  position: absolute;
-  left: 4px;
-  top: 1px;
-  width: 4px;
-  height: 8px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-
 
 
 .date-input {
@@ -551,21 +290,15 @@
 }
 
 
-
-
 .date-input.clickable {
   cursor: pointer;
 }
-
-
 
 
 .date-input.clickable input {
   cursor: pointer;
   color: #374151;
 }
-
-
 
 
 .date-input input[type="date"] {
@@ -579,8 +312,6 @@
 }
 
 
-
-
 .date-input input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
   width: 100%;
@@ -590,8 +321,6 @@
   left: 0;
   cursor: pointer;
 }
-
-
 
 
 .calendar-icon {
@@ -604,8 +333,6 @@
 }
 
 
-
-
 .form-select {
   appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -616,17 +343,36 @@
 }
 
 
-
-
-.table-section,
-.table-header,
-.table-body {
-  display: none;
+.table-container {
+  flex: 1;
+  overflow: auto;
+  max-height: calc(100vh - 400px);
+  min-height: 200px;
+  margin-top: 1rem;
 }
 
 
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
 
 
+.table-container th,
+.table-container td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+
+.table-container thead {
+  position: sticky;
+  top: 0;
+  background-color: #F9FAFB;
+  z-index: 1;
+}
 
 
 

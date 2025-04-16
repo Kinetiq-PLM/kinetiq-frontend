@@ -163,7 +163,7 @@ const ItemRemoval = () => {
           
         </div>
         <div className="send-to">
-          <button onClick={handleSentButton}>Send To</button>
+          <button onClick={handleSentButton}>Send</button>
         </div>
       </div>
     </div>

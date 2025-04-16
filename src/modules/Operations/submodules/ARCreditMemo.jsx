@@ -229,7 +229,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
           updatedItems[updatedItems.length - 1] = {
             ...lastRow,
             // Calculate total for display
-            total: (parseFloat(lastRow.quantity) * (parseFloat(lastRow.cost)))
+            total: (parseFloat(lastRow.quantity) * (parseFloat(lastRow.cost))).toFixed(2)
           };
          
           // Add new empty row
@@ -533,7 +533,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
     const taxRate = parseFloat(documentDetails.tax_rate) || 0;
 
     const tax_amount = (taxRate / 100) * invoiceAmount;
-    const total = invoiceAmount + invoiceAmount +tax_amount;
+    const total = parseFloat(invoiceAmount + invoiceAmount +tax_amount).toFixed(2);
     setDocumentDetails(prev => ({
       ...prev,
       tax_amount: tax_amount,
@@ -573,7 +573,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
-        document_no: documentDetails?.document_no || null, // Add document_no from state
+        document_no: documentDetails?.document_no || null, 
         transaction_id: documentDetails.transaction_id,
         ar_credit_memo: documentDetails.ar_credit_memo,
         initial_amount: documentDetails.initialAmount,
@@ -848,7 +848,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
     const invoiceAmount = parseFloat(documentDetails.invoice_amount) || 0;
     const taxAmount = (parseFloat(documentDetails.tax_rate) / 100) * initialAmount;
     const initial_amount = parseFloat(initialAmount)
-    const total = taxAmount + invoiceAmount + initial_amount;
+    const total = parseFloat(taxAmount + invoiceAmount + initial_amount).toFixed(2);
     setDocumentDetails(prev => ({
       ...prev,
       tax_amount: taxAmount,

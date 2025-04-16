@@ -238,7 +238,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
           updatedItems[updatedItems.length - 1] = {
             ...lastRow,
             // Calculate total for display
-            total: (parseFloat(lastRow.quantity) * (parseFloat(lastRow.cost)))
+            total: (parseFloat(lastRow.quantity) * (parseFloat(lastRow.cost))).toFixed(2)
           };
          
           // Add new empty row
@@ -540,7 +540,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0);
+    const total = parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0).toFixed(2);
  
     setDocumentDetails(prev => ({
       ...prev,
@@ -686,7 +686,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         const updateDocomentItems = {
           quantity: parseInt(item.quantity) || 0,
           cost: parseFloat(item.cost) || 0,
-          total: parseFloat(item.quantity * item.cost) || 0,
+          total: (parseFloat(item.quantity * item.cost)).toFixed(2) || 0,
           warehouse_id: item.warehouse_id || "",
         };
         if (item.item_id?.startsWith("ADMIN-MATERIAL")) {
@@ -859,7 +859,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0);
+    const total = (parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0)).toFixed(2);
  
     setDocumentDetails(prev => ({
       ...prev,
@@ -1140,7 +1140,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                         onChange={(e) => handleItemSelection(index, e.target.value)}
                       >
                         <option value="">-- Select Item --</option>
-                        {itemOptions.filter(opt => opt.type === 'product' || opt.type === 'asset').map((opt, i) => (
+                        {itemOptions.map((opt, i) => (
                           <option key={i} value={opt.name}>
                             {opt.name} ({opt.type})
                           </option>
