@@ -16,6 +16,56 @@ const BodyContent = ({ employee_id }) => {
   const [showCurrPassword, setShowCurrPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConPassword, setShowConPassword] = useState(false);
+  const [currPassword, setCurrPassword] = useState();
+  const [newPassword, setNewPassword] = useState();
+  const [conPassword, setConPassword] = useState();
+  const [currPassErr, setCurrPassErr] = useState('');
+  const [newPassErr, setNewPassErr] = useState('');
+  const [conPassErr, setConPassErr] = useState('');
+
+  const handleChangePassword = async () => {
+    console.log("change func fired")
+    var err = false;
+    if (!newPassword) {
+      setNewPassErr("* Password cannot be empty. *")
+    }
+    if (newPassword.length < 8) {
+      err = true;
+      console.log("pass too short err")
+      setNewPassErr("* Password must be at least 8 characters long. *")
+    }
+    if (newPassword != conPassword) {
+      err = true;
+      console.log("pass not match err")
+      setConPassErr("* Passwords do not match. *")
+    }
+    if (!err) {
+      try {
+        const res = await fetch("http://127.0.0.1:8000/reset-password/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: email,
+            newPassword: newPassword,
+            oldPassword: currPassword,
+            passreq: true
+          }),
+        });
+  
+        const result = await res.json();
+        if (result.success) {
+          alert("Successfully changed password.")
+        } else {
+          console.log("invalid creds err")
+          setCurrPassErr('* ' + result.error + ' *')
+        }
+      } catch (error) {
+        alert("Something went wrong. Please try again.");
+      }
+    }
+  }
+
+  
 
     return (
         <div className="usrprofile">
@@ -35,8 +85,9 @@ const BodyContent = ({ employee_id }) => {
             <div className="password-kinetiq-container">
                 <div className="password-section">
                     <h3 className="reset-pass">Change Password</h3>
+                    <p className="login-error">{currPassErr}</p>
                     <div className="pass-wrapper">
-                    <input type={showCurrPassword ? "text" : "password"} name="curr-pass" placeholder="Current Password" className="input" />
+                    <input type={showCurrPassword ? "text" : "password"} name="curr-pass" placeholder="Current Password" className="input" value={currPassword} onChange={(e) => {setCurrPassword(e.target.value); setCurrPassErr('');}} />
                     <span className="eye-icon" onClick={() => setShowCurrPassword(!showCurrPassword)}>
                         {showCurrPassword ? (
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
@@ -50,9 +101,10 @@ const BodyContent = ({ employee_id }) => {
                         )}
                       </span>
                     </div>
-
+          <p className="login-error">{currPassErr}</p>
           <div className="pass-wrapper">
-            <input type={showNewPassword ? "text" : "password"} name="new-pass" placeholder="New Password" className="input" />
+            <p className="login-error">{newPassErr}</p>
+            <input type={showNewPassword ? "text" : "password"} name="new-pass" placeholder="New Password" className="input" value={newPassword} onChange={(e) => {setNewPassword(e.target.value); setNewPassErr('');}} />
             <span className="eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
               {showNewPassword ? (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
@@ -66,8 +118,10 @@ const BodyContent = ({ employee_id }) => {
               )}
             </span>
           </div>
+          <p className="login-error">{currPassErr}</p>
           <div className="pass-wrapper">
-            <input type={showConPassword ? "text" : "password"} name="con-pass" placeholder="Confirm New Password" className="input" />
+            <p className="login-error">{conPassErr}</p>
+            <input type={showConPassword ? "text" : "password"} name="con-pass" placeholder="Confirm New Password" className="input" value={conPassword} onChange={(e) => {setConPassword(e.target.value); setConPassErr('');}} />
             <span className="eye-icon" onClick={() => setShowConPassword(!showConPassword)}>
               {showConPassword ? (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
@@ -82,7 +136,7 @@ const BodyContent = ({ employee_id }) => {
             </span>
           </div>
 
-          <button className="change-password-btn">Confirm</button>
+          <button className="change-password-btn" onClick={()=>handleChangePassword()}>Confirm</button>
         </div>
         <div className="role-details">
           <h3>EMPLOYEE DETAILS</h3>
