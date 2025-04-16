@@ -1,12 +1,50 @@
-@media (max-width: 1000px) { 
-    .header-profile-name {
-      display: none;
-    }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@media (max-width: 40rem) {
+  .header-body-container {
+    max-height: calc(100vh - var(--header-navi-height));
   }
 
-  @media (max-width: 850px) {
-    .header-module-name {
-      display: none;
-    }
+  .notif-menu {
+    width: 20rem;
+    height: fit-content;
+    max-height: 90vh;
+    top: 3.5rem;
+    right: 0.4rem;
   }
-  
+
+  .header-profile-name {
+    display: none;
+  }
+
+  .header-module-name {
+    display: none;
+  }
+
+  .header-submodule-name{
+    width: 4.5rem;
+    overflow: hidden;
+  }
+
+  .header-submodule-name p{
+    width: 4.5rem;
+    text-overflow: ellipsis;
+  }
+
+  .header-navi.squished .header-module-names {
+    display: none;
+  }
+}

@@ -1,0 +1,772 @@
+/* REMINDER! All of your elements must use your unique namespace '.picking' at the start to avoid leaking */
+
+.picking {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.picking .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+  overflow: auto;
+}
+
+/* Page title styling */
+.picking .page-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+/* Filters section */
+.picking .filters-row {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.picking .search-container {
+  position: relative;
+  width: 300px;
+}
+
+.picking .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 14px;
+}
+
+.picking .search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.picking .search-input:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.picking .filter-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.picking .filter-label {
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.picking .status-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.picking .status-button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.picking .status-button:hover {
+  background-color: #f8f9fa;
+  border-color: #c8cfd6;
+}
+
+.picking .status-button.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+.picking .status-button.not-started.active {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.picking .status-button.in-progress.active {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.picking .status-button.completed.active {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.picking .warehouse-filter {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.picking .warehouse-filter:focus {
+  outline: none;
+  border-color: #00a8a8;
+}
+
+/* Stats Row */
+.picking .stats-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.picking .stat-box {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+}
+
+.picking .stat-label {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 0.25rem;
+}
+
+.picking .stat-value {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Picking Content (Table and Actions) */
+.picking .picking-content {
+  display: flex;
+  gap: 1.5rem;
+  height: 100%;
+  flex: 1;
+}
+
+/* Table styling */
+.picking .picking-table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+  min-width: 0; /* Ensure table can shrink if needed */
+}
+
+.picking .table-metadata {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.picking .table-wrapper {
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  flex: 1;
+}
+
+.picking .picking-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: center;
+}
+
+.picking .picking-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 500;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  color: #495057;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.picking .picking-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.picking .picking-table th.sortable:hover {
+  background-color: #e9ecef;
+}
+
+.picking .sort-icon {
+  margin-left: 0.25rem;
+  color: #00a8a8;
+}
+
+.picking .picking-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.875rem;
+}
+
+.picking .picking-table tr:last-child td {
+  border-bottom: none;
+}
+
+.picking .centered-cell {
+  text-align: center;
+}
+
+.picking .even-row {
+  background-color: #fff;
+}
+
+.picking .odd-row {
+  background-color: #f8f9fa;
+}
+
+.picking .selected-row {
+  background-color: rgba(0, 168, 168, 0.1) !important;
+}
+
+.picking .picking-table tbody tr:hover {
+  background-color: rgba(0, 168, 168, 0.05);
+  cursor: pointer;
+}
+
+/* Status cell styling */
+.picking .status-cell {
+  position: relative;
+  padding-left: 1.75rem;
+}
+
+.picking .status-cell::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.picking .status-not-started::before {
+  background-color: #6c757d;
+}
+
+.picking .status-in-progress::before {
+  background-color: #007bff;
+}
+
+.picking .status-completed::before {
+  background-color: #28a745;
+}
+
+.picking .no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Picking Actions */
+.picking .picking-actions {
+  width: 300px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.picking .actions-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.picking .picking-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.picking .detail-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.picking .detail-label {
+  color: #555;
+  font-weight: 500;
+}
+
+.picking .detail-value {
+  color: #333;
+}
+
+.picking .detail-value.status-not-started {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.picking .detail-value.status-in-progress {
+  color: #007bff;
+  font-weight: 500;
+}
+
+.picking .detail-value.status-completed {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.picking .action-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.picking .action-section h4 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.picking .employee-selection {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.picking .employee-dropdown {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+}
+
+.picking .assign-button {
+  padding: 0.5rem 0.75rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .assign-button:hover:not(:disabled) {
+  background-color: #009191;
+}
+
+.picking .assign-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Warehouse Selection */
+.picking .warehouse-selection {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.picking .warehouse-dropdown {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+}
+
+.picking .update-button {
+  padding: 0.5rem 0.75rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .update-button:hover:not(:disabled) {
+  background-color: #009191;
+}
+
+.picking .update-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Warehouse Display (for internal orders) */
+.picking .warehouse-display {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.75rem;
+}
+
+.picking .warehouse-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.picking .warehouse-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.picking .warehouse-value {
+  font-size: 0.875rem;
+  color: #333;
+}
+
+.picking .warehouse-note {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+}
+
+.picking .status-update-button {
+  width: 100%;
+  padding: 0.5rem;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background-color: #00a8a8;
+}
+
+.picking .status-update-button {
+  width: 100%;
+  padding: 0.5rem;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .status-update-button.status-in-progress {
+  background-color: #007bff;
+}
+
+.picking .status-update-button.status-in-progress:hover {
+  background-color: #0069d9;
+}
+
+.picking .status-update-button.status-completed {
+  background-color: #28a745;
+}
+
+.picking .status-update-button.status-completed:hover {
+  background-color: #218838;
+}
+
+.picking .completed-message {
+  text-align: center;
+  color: #28a745;
+  font-weight: 500;
+  padding: 0.5rem;
+  background-color: rgba(40, 167, 69, 0.1);
+  border-radius: 4px;
+}
+
+/* Loading and error states */
+.picking .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #666;
+}
+
+.picking .spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #00a8a8;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.picking .error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+}
+
+.picking .error-message {
+  color: #dc3545;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: #f8d7da;
+}
+
+/* Completion Modal */
+.picking .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.picking .completion-modal {
+  background-color: white;
+  border-radius: 6px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.picking .modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.picking .modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.picking .modal-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.picking .modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.picking .cancel-button {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .cancel-button:hover {
+  background-color: #f8f9fa;
+}
+
+.picking .confirm-button {
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .confirm-button:hover {
+  background-color: #218838;
+}
+
+.picking .edit-picking-modal {
+  background-color: white;
+  border-radius: 6px;
+  width: 500px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.picking .modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picking .close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.picking .close-button:hover {
+  color: #333;
+}
+
+.picking .edit-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.picking .edit-section h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.picking .employee-selection,
+.picking .warehouse-selection {
+  width: 100%;
+}
+
+.picking .employee-dropdown,
+.picking .warehouse-dropdown {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+}
+
+.picking .save-button {
+  padding: 0.5rem 1rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .save-button:hover:not(:disabled) {
+  background-color: #009191;
+}
+
+.picking .save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.picking .pagination-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  align-items: center;
+}
+
+.picking .pagination-button {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.picking .pagination-button:hover:not(:disabled) {
+  background-color: #e9ecef;
+  border-color: #c8cfd6;
+}
+
+.picking .pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.picking .page-numbers {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.picking .page-number {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.picking .page-number:hover:not(.active) {
+  background-color: #e9ecef;
+  border-color: #c8cfd6;
+}
+
+.picking .page-number.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}

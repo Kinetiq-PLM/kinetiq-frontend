@@ -1,0 +1,149 @@
+/* Standardized scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Standardized sticky header */
+.hr-shared-table-header {
+  position: sticky;
+  top: 0;
+  background-color: #f3f9fa;
+  z-index: 5;
+}
+
+/* Standardized table container */
+.hr-shared-table-container {
+  overflow: auto;
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  margin-bottom: 1rem;
+}
+
+/* Standardized table */
+.hr-shared-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.hr-shared-table th,
+.hr-shared-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Standardized search and filter controls */
+.hr-shared-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hr-shared-search-wrapper {
+  position: relative;
+  margin-right: 0.5rem;
+}
+
+.hr-shared-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 1rem;
+}
+
+.hr-shared-search {
+  width: 250px;
+  height: 36px;
+  padding-left: 32px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.hr-shared-filter {
+  height: 36px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  padding: 0 0.75rem;
+}
+
+/* Standardized pagination */
+.hr-shared-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 1rem 0;
+  gap: 0.5rem;
+}
+
+.hr-shared-pagination button {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.hr-shared-pagination button.active {
+  background-color: #00b0b5;
+  color: white;
+  border-color: #00b0b5;
+}
+
+.hr-shared-pagination-size {
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+}
+
+/* Standardized module layout */
+.hr-shared-module {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.hr-shared-module-container {
+  width: 100%;
+  height: 38.1rem;
+  max-width: 1222px;
+  margin: 0 auto;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.hr-shared-scrollable {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
