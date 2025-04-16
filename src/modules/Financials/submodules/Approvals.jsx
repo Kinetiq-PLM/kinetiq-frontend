@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
     import "../styles/Approvals.css";
 import { GET } from "../api/api";
+import { PATCH } from "../api/api";
 
     
     const tabs = ["Budget Allocation Plan", "Budget Submission List", "Budget Request List"];
@@ -416,12 +417,12 @@ import { GET } from "../api/api";
         setIsAllocatedBudgetUpdated(false)
       },[activeTab])
 
-      
+
       const fetchApprovals = async () => {
         try {
           const data = await GET("/approvals/budget-submission-approvals/");
           setOriginalData(data.map(sub => ({
-            requestId: sub.budget_submission?.budget_submission_id || "",
+            requestId: sub.validaiton?.budget_submission?.budget_submission_id || "",
             departmentId: sub.validation?.budget_submission?.dept_id || "",
             amount: sub.amount_requested || "",
             approvedAmount: sub.final_approved_amount || "",
@@ -467,7 +468,7 @@ import { GET } from "../api/api";
         try{
           const data = await GET("/approvals/budget-request-approvals/");
           setOriginalRequestData(data.map(sub => ({
-            requestId: sub.budget_request_form?.budget_request_id || "",
+            requestId: sub.validation?.budget_request_form?.budget_request_id || "",
             departmentId: sub.validation?.budget_request_form?.dept_id || "",
             amount: sub.validation?.amount_requested || "",
             approvedAmount: sub.final_approved_amount || "",
@@ -483,12 +484,82 @@ import { GET } from "../api/api";
           console.error("Error fetching requests:", error);
         }
       }
-    
+
       useEffect(() => {
         fetchApprovals();
         fetchRejectedApprovals();
         fetchRequestsApprovals();
       }, []);
+    
+      const patchEditedRows = async () => {
+        try {
+          // Ensure there are rows to patch
+          if (editingRows.length === 0) {
+            console.warn("No rows selected for editing.");
+            return;
+          }
+      
+          // Ensure approver's name is provided
+          if (!editedApprovedBy.trim()) {
+            console.error("Approver's name is required.");
+            setIsApprovedByWarningVisible(true);
+            return;
+          }
+      
+          // Create promises for each row to be patched
+          const patchPromises = editingRows.map(async (row) => {
+            const requestId = row.requestId;
+            if (!requestId) {
+              console.error("Error: ID is undefined for row:", row);
+              return null;
+            }
+      
+            let endpoint = `/validation/budget-submissions/${requestId}/`;
+            let payload = {
+              validated_by: editedApprovedBy, // Approver's name
+              final_approved_amount: row.approvedAmount || "", // Approved amount
+              approval_status: row.approvalStatus || "Pending", // Status: Approved or Rejected
+              remarks: row.remarks || "", // Remarks for rejection
+            };
+      
+            console.log("Updating row with endpoint:", endpoint, "and payload:", payload);
+      
+            try {
+              // Make the PATCH request
+              const response = await PATCH(endpoint, payload);
+              return response;
+            } catch (error) {
+              console.error("Error updating row:", error);
+              throw error;
+            }
+          });
+      
+          // Wait for all PATCH requests to complete
+          const results = await Promise.allSettled(patchPromises);
+          console.log("Patch results:", results);
+      
+          // Filter successful updates
+          const successfulUpdates = results
+            .filter((result) => result.status === "fulfilled")
+            .map((result) => result.value);
+      
+          console.log("Successful updates:", successfulUpdates);
+      
+          // Refresh data after successful updates
+          if (successfulUpdates.length > 0) {
+            fetchApprovals(); // Refresh the approvals list
+            fetchRejectedApprovals(); // Refresh the rejected list
+      
+            // Clear editing state
+            setEditingRows([]);
+            setSelectedRows([]);
+            setEditedApprovedBy("");
+          }
+        } catch (error) {
+          console.error("Error in patching edited rows:", error);
+        }
+      };
+
 
 
       return (
