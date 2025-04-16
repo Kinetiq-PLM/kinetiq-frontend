@@ -30,7 +30,9 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
   const orderQuery = useQuery({
     queryKey: ["ordersList"],
     queryFn: async () =>
-      await GET(encodeURI("sales/order?status=Open,Partially Delivered")),
+      await GET(
+        encodeURI("sales/order?status=Open for Delivery,Partially Delivered")
+      ),
     enabled: isOpen,
     retry: 2,
   });

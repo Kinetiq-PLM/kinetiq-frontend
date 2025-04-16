@@ -60,8 +60,8 @@ const OrderedProductList = ({
           discount: Number(item.discount),
           tax: Number(item.tax_amount),
           total_price: Number(item.total_price),
+          special_requests: item.special_requests,
         }));
-
       setProductList(products);
     }
   }, [order]);

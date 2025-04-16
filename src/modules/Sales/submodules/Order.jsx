@@ -59,6 +59,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
 
+  const [canEditTable, setCanEditTable] = useState(true);
   const [isBlanketAgreementListOpen, setIsBlanketAgreementListOpen] =
     useState(false);
   const [selectedBlanketAgreement, setSelectedBlanketAgreement] =
@@ -114,8 +115,8 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
-    { key: "special_requests", label: "Specification" },
-    { key: "quantity", label: "Quantity" },
+    { key: "special_requests", label: "Specification", editable: canEditTable },
+    { key: "quantity", label: "Quantity", editable: canEditTable },
     { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
@@ -248,6 +249,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         transferID: selectedQuotation.quotation_id,
         transferOperation: "quotation",
       });
+      setCanEditTable(false);
     } else if (
       copyFromModal === "Blanket Agreement" &&
       selectedBlanketAgreement
@@ -345,6 +347,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     setSelectedEmployee("");
     setAddress("");
     setDeliveryDate("");
+    setCanEditTable(true);
     setOrderInfo({
       customer_id: "",
       quotation_id: "",
@@ -420,6 +423,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             operationID={orderID}
             setDeliveryDate={setDeliveryDate}
             setAddress={setAddress}
+            enabled={canEditTable}
           />
         </div>
         {/* TABLE */}
@@ -444,10 +448,15 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                   setCanClear(true);
                   setIsProductListOpen(true);
                 }}
+                disabled={!canEditTable}
               >
                 Add Item
               </Button>
-              <Button type="outline" onClick={() => handleDelete()}>
+              <Button
+                type="outline"
+                onClick={() => handleDelete()}
+                disabled={!canEditTable}
+              >
                 Delete Item
               </Button>
             </div>

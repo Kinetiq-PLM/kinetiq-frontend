@@ -30,6 +30,16 @@ const Table = ({ columns, data, onSelect = () => {}, minWidth = false }) => {
         <tbody>
           {data.map((row, index) => {
             const isSelected = selectedRow === row;
+            const canView = [
+              "Ready",
+              "Approved",
+              "Open for Delivery",
+              "Partially Delivered",
+              "Delivered",
+              "Shipped",
+              "Pending",
+              "Completed",
+            ].includes(row.status);
             return (
               <tr
                 key={index}
@@ -46,13 +56,22 @@ const Table = ({ columns, data, onSelect = () => {}, minWidth = false }) => {
                       </td>
                     );
                   } else {
+                    if (canView) {
+                      return (
+                        <td key={colIndex} className="px-4 py-3 text-center">
+                          <a
+                            href={row[column.key]}
+                            className="underline text-[#00a8a8]"
+                          >
+                            View
+                          </a>
+                        </td>
+                      );
+                    }
                     return (
                       <td key={colIndex} className="px-4 py-3 text-center">
-                        <a
-                          href={row[column.key]}
-                          className="underline text-[#00a8a8]"
-                        >
-                          View
+                        <a href={row[column.key]} className="text-[#00a8a8]">
+                          Unavailable
                         </a>
                       </td>
                     );

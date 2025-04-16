@@ -61,9 +61,15 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
 
   useEffect(() => {
     if (productsQuery.status === "success") {
-      setProductList(productsQuery.data);
+      const prods = productsQuery.data.map((prod) => ({
+        ...prod,
+        backup_price: prod.selling_price,
+        special_requests: null,
+      }));
+
+      setProductList(prods);
       if (!hasLoaded) {
-        setFilteredData(productsQuery.data);
+        setFilteredData(prods);
         setHasLoaded(true);
         setIsLoading(false);
       }

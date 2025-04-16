@@ -90,6 +90,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [disableCopyTo, setDisableCopyTo] = useState(false);
   const [isBlanketAgreementDetailsOpen, setIsBlanketAgreementDetailsOpen] =
     useState(false);
 
@@ -162,8 +163,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
       0
     );
 
-    const totalPrice =
-      Number(totalBeforeDiscount) - Number(totalDiscount) + Number(totalTax);
+    const totalPrice = Number(totalBeforeDiscount);
 
     setQuotationInfo({
       ...quotationInfo,
@@ -200,6 +200,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
       return;
     }
     console.log(products);
+
     const request = {
       statement_data: {
         customer: selectedCustomer.customer_id,
@@ -207,17 +208,24 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         total_amount: Number(parseFloat(quotationInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(quotationInfo.discount).toFixed(2)),
         total_tax: Number(quotationInfo.total_tax.toFixed(2)),
-        items: products.map((product) => ({
-          product: product.product_id,
-          quantity: parseInt(product.quantity),
-          special_requests: product.special_requests
-            ? product.special_requests
-            : null,
-          unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
-          total_price: Number(parseFloat(product.total_price).toFixed(2)),
-          discount: Number(parseFloat(product.discount).toFixed(2)),
-          tax_amount: Number(parseFloat(product.tax).toFixed(2)),
-        })),
+        items: products.map((product) => {
+          if (product.special_requests !== null) {
+            setDisableCopyTo(true);
+          }
+          return {
+            product: product.product_id,
+            quantity: parseInt(product.quantity),
+            special_requests: product.special_requests
+              ? product.special_requests
+              : null,
+            unit_price: Number(parseFloat(product.selling_price).toFixed(2)),
+            total_price:
+              Number(parseFloat(product.selling_price).toFixed(2)) *
+              parseInt(product.quantity),
+            discount: Number(parseFloat(product.discount).toFixed(2)),
+            tax_amount: Number(parseFloat(product.tax).toFixed(2)),
+          };
+        }),
       },
       // quotation_data: {
       //   date_issued: new Date().toISOString(),
@@ -325,6 +333,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             updateData={setProducts}
             onSelect={setSelectedProduct}
             minWidth={true}
+            isQuotation={true}
           />
         </section>
 
@@ -429,7 +438,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                 label=""
                 placeholder="Copy To"
                 options={copyToOptions}
-                disabled={!submitted}
+                disabled={!submitted || disableCopyTo}
                 loadSubModule={loadSubModule}
                 setActiveSubModule={setActiveSubModule}
                 setOption={setCopyToModal}

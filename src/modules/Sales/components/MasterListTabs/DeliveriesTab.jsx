@@ -29,7 +29,7 @@ export default function BlanketAgreementsTab({
     { key: "address", label: "Address" },
     { key: "tracking_num", label: "Tracking Number" },
     { key: "shipping_method", label: "Shipping Method" },
-    { key: "shipment_status", label: "Status" },
+    { key: "status", label: "Status" },
     { key: "preferred_delivery_date", label: "Preferred Delivery Date" },
     { key: "shipping_date", label: "Shipping Date" },
     { key: "estimated_delivery", label: "Estimated Delivery Date" },
@@ -92,7 +92,7 @@ export default function BlanketAgreementsTab({
         tracking_num: delivery.tracking_num,
         shipping_method: delivery.shipping_method,
         customer_name: delivery.statement?.customer?.name,
-        shipment_status: delivery.shipment_status,
+        status: delivery.shipment_status,
         address: `${delivery.statement?.customer?.address_line1} ${delivery.statement?.customer?.address_line2}`,
         type: delivery.order?.order_type,
         total_price: Number(delivery.statement?.total_amount).toLocaleString(
