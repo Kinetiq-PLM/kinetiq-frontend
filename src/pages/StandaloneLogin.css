@@ -1,402 +1,389 @@
 /* Auth Container */
-.login-container, .signup-container {
-    height: 100vh;
-    width: 100vw;
-    background: linear-gradient(135deg, #016761 0%, #97e2dd 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    padding: 20px;
-    overflow: hidden;
-  }
-  
-  .login-wrapper, .signup-wrapper {
-    display: flex;
-    flex-direction: row-reverse;
-    background: #d6f1f0;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 1200px;
-    height: 90vh;
-    overflow: hidden;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  }
-  
-  .login-left, .signup-left{
-    flex: 0 0 35%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0rem;
-    min-width: 350px;
+
+.login-container {
+  width: 100vw;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #016761 0%, #97e2dd 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2.2rem 2.2rem;
+  box-sizing: border-box;
 }
-  .login-right, .signup-right{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #d6f1f0; 
-    min-width: 65%;
-    overflow: hidden;
-    position: relative;
-  }
 
-  
-  
-  
-  /* Card Styles */
-  .login-card, .signup-card {
-    background: white;
-    padding: 3rem 2.5rem 2.5rem;
-    border-radius: 0.5rem;
-    width: 100%;
-    box-shadow: 0 0.5rem 1rem rgba(0, 167, 167, 0.15);
-    margin: 0 auto;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+.login-container .login-wrapper {
+  display: flex;
+  flex-direction: row-reverse;
+  background: #d6f1f0;
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 80rem;
+  height: 37rem;
+  overflow: hidden;
+  box-shadow: 0 0.2rem 2rem rgba(0, 0, 0, 0.1);
+  flex: 1 0 auto;
+}
 
-  .login-form{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .login-form h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    text-align: center;
-    color: #00a7a7;
-  }
+.login-container .login-left {
+  flex: 0 0 35%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0rem;
+  min-width: 350px;
+}
 
-  .login-form h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #00a7a7;
-  }
+.login-container .login-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #d6f1f0;
+  min-width: 65%;
+  overflow: hidden;
+  position: relative;
+}
 
-  .login-form h4 {
-    font-size: 0.8rem;
-    font-weight: 400;
-    margin-bottom: 0rem;
-    color: #00a7a7;
-  }
+.login-container .login-right img {
+  object-fit: cover;
+}
 
-  .login-form form, .login-form input{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
 
-  .login-pass-details {
-    font-size: 0.85rem;
-    margin-bottom: 1.2rem;
-    color: rgb(112, 112, 112);
-    text-align: center;
-  }
+/* Card Styles */
+.login-container .login-card {
+  background: white;
+  padding: 3rem 2.5rem 2.5rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  box-shadow: 0 0.5rem 1rem rgba(0, 167, 167, 0.15);
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
-  .email-form{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: fit-content;
-  }
+.login-container .login-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
-  .email-form h4,
-.email-form input {
+.login-container .login-form h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  color: #00a7a7;
+}
+
+.login-container .login-form h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #00a7a7;
+}
+
+.login-container .login-form h4 {
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-bottom: 0rem;
+  color: #00a7a7;
+}
+
+.login-container .login-form form,
+.login-form input {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: grey;
+}
+
+.login-container .login-pass-details {
+  font-size: 0.85rem;
+  margin-bottom: 1.2rem;
+  color: rgb(112, 112, 112);
+  text-align: center;
+}
+
+.login-container .email-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: fit-content;
+}
+
+.login-container .email-form h4,
+.login-container .email-form input {
   width: 100%;
   text-align: left;
 }
 
-  
-  /* Form Elements */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"] {
-    width: 100%;
-    padding: 0.5rem 0.5rem;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
 
-  input[type="email"]{
-    font-size: 0.85rem;
-    width: 18rem;
-  }
-  
-  input[type="text"]:focus,
-  input[type="email"]:focus,
-  input[type="password"]:focus {
-    border: none;
-    box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2); 
-    outline: none;
-  }
-
-  .password-wrapper {
-    position: relative;
-    width: 100%;
-    display: flex;
-    align-items: center;
-  }
-
-  .password-wrapper input{
-    flex: 1;
-    padding-right: 2rem;
-  }
-
-  .password-wrapper .eye-icon {
-    position: absolute;
-    right: 0.5rem;
-    cursor: pointer;
-    color: #888;
-  }
-  
-  /* Options */
-  .login-options {
-    display: flex;
-    justify-content: space-between;
-    gap: 2rem;
-    align-items: center;
-    font-size: 0.95rem;
-    margin-bottom: 0.5rem 0 1.5rem;
-  }
-  
-  .remember-me {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-  }
-  
-  .forgot-password {
-    color: teal;
-    text-decoration: none;
-    font-size: 0.75rem;
-  }
-  
-  .button-back-container{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  /* Buttons */
-  .login-btn {
-    background-color: #00a7a7;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    margin-top: 1.5rem;
-    width: 15rem;
-    min-width: 3rem;
-    display: block;
-    border-radius: 0.4rem;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .login-btn:hover {
-    background-color: #008b8b;
-  }
-
-  .back-btn {
-    background-color: #b9b9b9;
-    color: white;
-    padding: 0.3rem 1rem;
-    margin-top: 1.5rem;
-    width: 5rem;
-    border-radius: 0.3rem;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-
-  .back-btn:hover {
-    background-color: #9f9f9f;
-  }
-
-  .login-error{
-    color: rgb(255, 128, 0);
-    font-size: 0.75rem;
-    font-style: italic;
-    margin-bottom: 0.5rem;
-    width: 100%;
-    text-align: center;
-  }
-  
-  /* Links */
-  .signup-link {
-    text-align: center;
-    margin-top: 12px;
-  }
-  
-  .signup-link a {
-    color: teal;
-    text-decoration: none;
-    font-size: 0.95rem;
-  }
-  
-  .kinetiq-logo {
-    margin-top: 180px;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%; 
-    object-fit: contain;
-    object-position: center;
+/* Form Elements */
+.login-container input[type="text"],
+.login-container input[type="email"],
+.login-container input[type="password"] {
+  width: 100%;
+  padding: 0.5rem 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  border-radius: 0.3rem;
+  border: 1px solid #ccc;
+  color: grey;
 }
 
-input:-webkit-autofill {
-  background-color: white !important; 
-  color: #000 !important;          
-  -webkit-text-fill-color: #000 !important; 
+.login-container input[type="email"] {
+  font-size: 0.85rem;
+  width: 18rem;
+  color: grey;
+}
+
+.login-container input[type="text"]:focus,
+.login-container input[type="email"]:focus,
+.login-container input[type="password"]:focus {
+  border: none;
+  box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2);
+  outline: none;
+  color: grey;
+}
+
+.login-container .password-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: fit-content;
+}
+
+.login-container .password-wrapper input {
+  flex: 1;
+  padding-right: 2rem;
+  margin: 0rem;
+  color: grey;
+}
+
+.login-container .password-wrapper .eye-icon {
+  position: absolute;
+  right: 0.5rem;
+  cursor: pointer;
+  color: #888;
+}
+
+/* Options */
+.login-container .login-options {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: center;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem 0 1.5rem;
+}
+
+.login-container .remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.login-container .forgot-password {
+  color: teal;
+  text-decoration: none;
+  font-size: 0.75rem;
+  margin-top: 1rem;
+}
+
+.login-container .button-back-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Buttons */
+.login-container .login-btn {
+  background-color: #00a7a7;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-top: 1.5rem;
+  width: 15rem;
+  min-width: 3rem;
+  display: block;
+  border-radius: 0.4rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-container .login-btn:hover {
+  background-color: #008b8b;
+}
+
+.login-container .back-btn {
+  background-color: #b9b9b9;
+  color: white;
+  padding: 0.3rem 1rem;
+  margin-top: 1.5rem;
+  width: 5rem;
+  border-radius: 0.3rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-container .back-btn:hover {
+  background-color: #9f9f9f;
+}
+
+.login-container .login-error {
+  color: rgb(255, 128, 0);
+  font-size: 0.75rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  text-align: center;
+}
+
+/* Links */
+.login-container .kinetiq-logo {
+  margin-top: 180px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.login-container input:-webkit-autofill {
+  background-color: white !important;
+  color: grey !important;
+  -webkit-text-fill-color: grey !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
-
-  .signup-btn {
-    background-color: #00a7a7;
-    color: white;
-    border: none;
-    padding: 12px;
-    font-weight: bold;
-    width: 100%;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
+/* Terms checkbox */
+.login-container .terms-checkbox {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  gap: 5px;
+  margin: 1rem 0;
 }
 
-  .button-back-container{
-    
-  }
+.login-container .terms-checkbox a {
+  color: teal;
+  text-decoration: none;
+}
 
-  
-  /* Terms checkbox */
-  .terms-checkbox {
-    display: flex;
-    align-items: center;
-    font-size: 0.9rem;
-    gap: 5px;
-    margin: 1rem 0;
-  }
-  
-  .terms-checkbox a {
-    color: teal;
-    text-decoration: none;
-  }
-  
-  /* Modal styles (same for both) */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    width: 90%;
-    max-width: 500px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .modal-content h2 {
-    color: #00a7a7;
-    margin-bottom: 1.5rem;
-  }
-  
-  .modal-body h3 {
-    margin: 1rem 0 0.5rem;
-    color: #333;
-  }
-  
-  .accept-btn {
-    background-color: #00a7a7;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-top: 1rem;
-  }
+/* Modal styles (same for both) */
+.login-container .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-    .auth-switch {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 0.85rem; 
-    color: #666; 
-  }
-  
-  .auth-switch a {
-    color: #00a7a7; 
-    text-decoration: none;
-    font-weight: 500;
-    margin-left: 0.3rem;
-  }
-  
-  .auth-switch a:hover {
-    text-decoration: underline;
-  }
+.login-container .modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
 
-  /* Tablet Layout */
-@media (max-width: 800px) {
-  .login-wrapper {
-    height: auto !important; 
+.login-container .modal-content h2 {
+  color: #00a7a7;
+  margin-bottom: 1.5rem;
+}
+
+.login-container .modal-body h3 {
+  margin: 1rem 0 0.5rem;
+  color: #333;
+}
+
+.login-container .accept-btn {
+  background-color: #00a7a7;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+.login-container .auth-switch {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.login-container .auth-switch a {
+  color: #00a7a7;
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 0.3rem;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+/* Tablet Layout */
+@media (max-width: 900px) {
+  .login-container .login-wrapper {
+    height: auto !important;
     min-height: unset;
-    margin-top: 2rem; 
-    margin-bottom: 2rem; 
+    margin-top: 2rem;
+    margin-bottom: 2rem;
     flex-direction: column;
 
   }
-  .login-container{
-    height: auto; 
-    min-height: 100vh; 
-    padding: 2rem 20px; 
-    align-items: flex-start; 
-    justify-content: flex-start; 
+
+  .login-container .login-container {
+    height: auto;
+    min-height: 100vh;
+    padding: 2rem 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
   }
-  .login-right {
+
+  .login-container .login-right {
     display: none;
   }
 
-  .kinetiq-logo {
-    width: 280px; 
+  .login-container .kinetiq-logo {
+    width: 280px;
     height: auto;
     max-width: 80%;
-    margin: 0 auto; 
-    display: block; 
+    margin: 0 auto;
+    display: block;
   }
 
-  .login-left {
+  .login-container .login-left {
     padding: 0.8rem;
     flex: 1;
     border-radius: 12px;
     margin: 0;
-    box-shadow: 0 4px 20px rgba(0,167,167,0.1);
+    box-shadow: 0 4px 20px rgba(0, 167, 167, 0.1);
 
   }
 }
