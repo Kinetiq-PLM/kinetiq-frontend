@@ -107,9 +107,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         <div className="reqplan">
             <div style={{width: '100%', height: '100%', padding: '2rem', background: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)', overflow: 'hidden', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', rowGap: 25,}}>
                 <div className="title">MRP LIST</div>
-                {/* Tabs + Search */}
                 <div style={{width: '100%', maxWidth: 1300, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', rowGap: 10,paddingLeft: 80, paddingRight: 80,}}>
-                {/* Tabs */}
                     <div className="tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 15,flex: '1 1 auto', minWidth: 200,}}>
                         {['All Orders', 'Project Orders', 'Non-Project Orders'].map((label, i) => (
                         <div key={label}
@@ -123,15 +121,13 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         ))}
                     </div>
 
-                    {/* Search Box */}
                     <div className="search-container" style={{background: '#F7F9FB', borderRadius: 8, outline: '1px rgba(132,132,132,0.25) solid', padding: 5, display: 'flex', alignItems: 'center', marginTop: 10, paddingRight: 100, alignItems: 'stretch',}}>
                         <input placeholder="Search Order Number..." type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{flex: 1, padding: '8px', border: 'none', outline: 'none', backgroundColor: 'transparent', color: '#969696', fontSize: 16, fontFamily: 'Inter'}}/>
                     </div>
                 </div>
 
-                {/* Table Container */}
                 <div className="reqplan-table-scroll" style={{width: '100%', maxWidth: 1159, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflowY: 'auto', maxHeight: '450px', borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '1rem'}}>
-                {/* Header */}
+
                 <div className="table-header" style={{
                     display: 'flex',
                     flexWrap: 'wrap',
@@ -148,7 +144,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     ))}
                 </div>
 
-                {/* Rows */}
                 {filteredData.map((item, index) => (
                     <div
                     className="table-row"
@@ -156,13 +151,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     onClick={() => setIsOpen(true)}
                     onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        cursor: 'pointer',
-                        borderBottom: '1px solid #E8E8E8',
-                    }}
-                    >
+                    style={{display: 'flex', flexWrap: 'wrap', cursor: 'pointer',borderBottom: '1px solid #E8E8E8',}}>
                     {[item.number, item.type, item.details, item.date].map((val, idx) => (
                     <div
                         className="table-cell"
@@ -184,28 +173,16 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <button onClick={() => alert('Workforce Request')} className="reqplan-help-option">👷 Workforce Request</button>
                         </div>
                     )}
-                    
-                    <button
-                        className="reqplan-help-button"
-                        onClick={() => setShowHelpOptions(prev => !prev)}
-                        aria-label="Help"
-                    >
-                        ?
-                    </button>
-
-                    
+                    <button className="reqplan-help-button"onClick={() => setShowHelpOptions(prev => !prev)} aria-label="Help">?</button>
                 </div>
-
             </div>
 
             {isOpen && (
             <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center">
                 <div className="modal-inner" style={{ width: '90%', maxWidth: 953, background: 'white', borderRadius: 10, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', padding: 24, display: 'flex', flexDirection: 'column', gap: 24, }}>
-                    <div
-                    style={{fontSize: 'clamp(20px, 3vw, 35px)', fontFamily: 'Inter', fontWeight: 500, textAlign: 'center', color: '#130101', paddingTop: 30,}}>Order Details</div>
+                    <div style={{fontSize: 'clamp(20px, 3vw, 35px)', fontFamily: 'Inter', fontWeight: 500, textAlign: 'center', color: '#130101', paddingTop: 30,}}>Order Details</div>
 
-                    {/* INFO SECTION */}
                     <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 20, padding: 20,}}>
                     {[
                         { label: 'Order No.', value: mrpData[0].number },
@@ -224,7 +201,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     ))}
                     </div>
 
-                    {/* BUTTONS */}
                     <div
                     style={{display: 'flex', justifyContent: 'space-between', marginTop: 'auto', flexWrap: 'wrap', gap: 10,}}>
                     <button onClick={() => setIsOpen(false)} style={buttonStyle2('#fff', '#A4A4A4')}>
@@ -248,46 +224,40 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center">
                     <div style={{width: '90vw', maxWidth: 1360, height: '90vh', maxHeight: 760, background: 'white', borderRadius: 10, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem',}}>
-                        {/* Title */}
                         <div style={{fontSize: 'clamp(24px, 3vw, 35px)', fontFamily: 'Inter', fontWeight: 500, textAlign: 'center',color: '#130101',}}>Product Pricing</div>
-
-                        {/* Table */}
                         <div className="reqplan-table-scroll2" style={{flex: 1, overflowY: 'auto', overflowX: 'auto', marginBottom: 30, borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.15)',padding: 0,}}>
                             <div style={{width: '100%', flex: 1, background: 'white',borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '0.5rem',}}>
-                            {/* Header */}
-                            <div className="table-header" style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8',}}>
-                                {['No.', 'Product ID', 'Product', 'Product Description', 'Quantity', 'Raw Materials', 'Cost'].map(
-                                (label) => (
-                                    <div
-                                    key={label}
-                                    style={{ flex: '1 1 14%', minWidth: 120, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 16 }}>
-                                    {label}
-                                    </div>
-                                )
-                                )}
-                            </div>
-
-                            {/* Rows */}
-                            {bomDetails.map((item, index) => (
-                                <div
-                                key={index}
-                                className="table-row"
-                                style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
-                                <div style={rowCellStyle}>{item.no}</div>
-                                <div style={rowCellStyle}>{item.product_id}</div>
-                                <div style={rowCellStyle}>{item.product}</div>
-                                <div style={rowCellStyle}>{`Description of ${item.product}`}</div>
-                                <div style={rowCellStyle}>{item.qtyProduct} pcs</div>
-                                <div onClick={() => { setRawMaterial(true); setSelectedProductId(item.product_id); }} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
-                                <div style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
+                                <div className="table-header" style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8',}}>
+                                    {['No.', 'Product ID', 'Product', 'Product Description', 'Quantity', 'Raw Materials', 'Cost'].map(
+                                    (label) => (
+                                        <div
+                                        key={label}
+                                        style={{ flex: '1 1 14%', minWidth: 120, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 16 }}>
+                                        {label}
+                                        </div>
+                                    )
+                                    )}
                                 </div>
-                            ))}
+
+                                {bomDetails.map((item, index) => (
+                                    <div
+                                    key={index}
+                                    className="table-row"
+                                    style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
+                                    <div style={rowCellStyle}>{item.no}</div>
+                                    <div style={rowCellStyle}>{item.product_id}</div>
+                                    <div style={rowCellStyle}>{item.product}</div>
+                                    <div style={rowCellStyle}>{`Description of ${item.product}`}</div>
+                                    <div style={rowCellStyle}>{item.qtyProduct} pcs</div>
+                                    <div onClick={() => { setRawMaterial(true); setSelectedProductId(item.product_id); }} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
+                                    <div style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
+                                    </div>
+                                ))}
+                                </div>
                             </div>
 
-                            </div>
-                                {/* Summary Section */}
                             <div style={{width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem',}}>
-                                {/* Left: Quantity + Total Cost */}
+                           
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
@@ -322,20 +292,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
             {rawmaterial && (
             <div className="bom-print-modal2 fixed inset-0 flex items-center justify-center z-50 px-4">
-                <div
-                style={{width: 967, maxHeight: '90vh', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', borderRadius: 10, display: 'flex', flexDirection: 'column', padding: '25px 20px', overflow: 'hidden', position: 'relative',}}>
-                {/* Title */}
-                <div style={{
-                    width: '100%', textAlign: 'center',
-                    color: '#130101', fontSize: 35, fontFamily: 'Inter',
-                    fontWeight: '400', textTransform: 'capitalize',
-                    letterSpacing: 1.4, marginBottom: 25
-                }}>
-                    Cost of Raw Materials
-                </div>
-
-                {/* Scrollable Table Section */}
-                
+                <div style={{width: 967, maxHeight: '90vh', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', borderRadius: 10, display: 'flex', flexDirection: 'column', padding: '25px 20px', overflow: 'hidden', position: 'relative',}}>
+                    <div style={{width: '100%', textAlign: 'center', color: '#130101', fontSize: 35, fontFamily: 'Inter',fontWeight: '400', textTransform: 'capitalize', letterSpacing: 1.4, marginBottom: 25}}>Cost of Raw Materials</div>
                     <div className="reqplan-table-scroll2"style={{flex: 1, overflowY: 'auto', overflowX: 'auto', marginBottom: 30, borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.15)', padding: 0,}}>
                         <table style={{minWidth: 800, width: '100%', borderCollapse: 'collapse', fontFamily: 'Inter'}}>
                             <thead>
@@ -366,7 +324,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     </div>
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12,width: '100%'}}>
                         <div style={{width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem',}}>
-                                {/* Left: Quantity + Total Cost */}
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost Of Raw Material:</b></span>
@@ -376,7 +333,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                         </div>
 
-                        {/* Back Button */}
                         <button onClick={() => { setRawMaterial(false); setSelectedProductId(null); }} style={{height: 40, padding: '8px 24px', background: 'white', borderRadius: 8, outline: '1.5px #A4A4A4 solid', display: 'flex', alignItems: 'center', gap: 10}}>
                             <div className="MRPIcon3" style={{ width: 15, height: 21 }} />
                             <span style={{ color: '#969696', fontSize: 20, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize'}}>Back</span>
@@ -391,30 +347,23 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             {additionalcost && (
             <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center">
-                    <div style={{
-                        width: '90vw', maxWidth: 767, background: 'white', borderRadius: 10, padding: '2rem',
-                        boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
-                        {/* Title */}
-                        <div style={{ fontSize: 'clamp(22px, 3vw, 35px)', fontWeight: 500, textAlign: 'center', color: '#130101' }}>
-                        Additional Costs
-                        </div>
+                    <div style={{width: '90vw', maxWidth: 767, background: 'white', borderRadius: 10, padding: '2rem', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
+                        <div style={{ fontSize: 'clamp(22px, 3vw, 35px)', fontWeight: 500, textAlign: 'center', color: '#130101' }}>Additional Costs</div>
 
                         <div className="reqplan-table-scroll2" style={{width: '100%', maxHeight: 450, overflowY: 'auto', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', padding: 0}}>
-                            {/* Header */}
                             <div style={{alignSelf: 'stretch', background: 'rgba(255,255,255,0.05)', display: 'inline-flex', width: '100%'}}>
                                 <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 700, lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
-                                </div>
+                                    <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 700, lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
+                                    </div>
                                 </div>
                                 <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 19, fontFamily: 'Inter', fontWeight: 700, lineHeight: 1, wordWrap: 'break-word'}}>Cost</div>
-                                </div>
+                                    <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 19, fontFamily: 'Inter', fontWeight: 700, lineHeight: 1, wordWrap: 'break-word'}}>Cost</div>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Cost of Products */}
                             <div style={{alignSelf: 'stretch', background: 'white', display: 'inline-flex', width: '100%'}}>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
@@ -428,7 +377,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                             </div>
 
-                            {/* Cost of Production */}
                             <div style={{alignSelf: 'stretch', background: 'white', display: 'inline-flex', width: '100%'}}>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
@@ -442,17 +390,16 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                             </div>
 
-                            {/* Labor Cost */}
                             <div style={{alignSelf: 'stretch', background: 'white', display: 'inline-flex', width: '100%'}}>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>Labor Cost</div>
-                                </div>
+                                    <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>Labor Cost</div>
+                                    </div>
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(laborCost).toFixed(2)}</div>
-                                </div>
+                                    <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(laborCost).toFixed(2)}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
