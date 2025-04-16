@@ -1,13 +1,29 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
 @media (max-width: 40rem) {
   .header-body-container {
     max-height: calc(100vh - var(--header-navi-height));
   }
 
   .notif-menu {
-    width: 90vw;
-    height: 90vh;
-    top: 3rem;
-    right: 0rem;
+    width: 20rem;
+    height: fit-content;
+    max-height: 90vh;
+    top: 3.5rem;
+    right: 0.4rem;
   }
 
   .header-profile-name {
@@ -30,6 +46,5 @@
 
   .header-navi.squished .header-module-names {
     display: none;
-    transition: 0.3s ease-in-out;
   }
 }

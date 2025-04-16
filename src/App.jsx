@@ -17,6 +17,7 @@ function App() {
   const [ModuleComponent, setModuleComponent] = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isMainModuleCollapsed, setIsMainModuleCollapsed] = useState(true);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showUserProfile, setShowUserProfile] = useState(false);
@@ -57,14 +58,41 @@ function App() {
   };
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest('.header-profile-container')) {
+    if (!isProfileMenuOpen) return;
+
+    const handleClickOutsideProfileDropdown = (e) => {
+      if (
+        !e.target.closest('.header-profile-container') &&
+        !e.target.closest('.profile-dropdown')
+      ) {
         setIsProfileMenuOpen(false);
       }
     };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
+
+    document.addEventListener("click", handleClickOutsideProfileDropdown);
+    return () => {
+      document.removeEventListener("click", handleClickOutsideProfileDropdown);
+    };
+  }, [isProfileMenuOpen]);
+
+  useEffect(() => {
+    if (!notifOpen) return;
+
+    const handleClickOutsideNotif = (e) => {
+      if (
+        !e.target.closest('.notif-icon') &&
+        !e.target.closest('.notif-menu')
+      ) {
+        setNotifOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutsideNotif);
+    return () => {
+      document.removeEventListener("click", handleClickOutsideNotif);
+    };
+  }, [notifOpen]);
+
 
   //fetch notifs
   const fetchNotifs = async (user) => {
@@ -378,7 +406,7 @@ function App() {
     "Distribution": {
       "External Delivery": "ExternalDelivery",
       "Internal Delivery": "InternalDelivery",
-      "Picking" : "Picking",
+      "Picking": "Picking",
       "Packing": "Packing",
       Shipment: "Shipment",
       "Rework": "Rework",
@@ -470,11 +498,19 @@ function App() {
                     setIsSidebarOpen(true);
 
                     if (activeModule === module.id) {
-                      // if it's already active, toggle off
-                      setActiveModule(null);
-                      setActiveSubModule(null);
+                      // if the main module is active, and is clicked when a submodule is open, go back to main module
+                      if (activeSubModule) {
+                        setActiveSubModule(null);
+                        loadMainModule(module.id);
+                        setIsMainModuleCollapsed(true);
+                      } else { // if it's already active and is the opened module, toggle off
+                        isMainModuleCollapsed ? setIsMainModuleCollapsed(false) : setIsMainModuleCollapsed(true); // open submodules if reclicked
+                        //setActiveModule(null);
+                        setActiveSubModule(null);
+                      }
                     } else {
                       // otherwise, activate it
+                      setIsMainModuleCollapsed(true);
                       setActiveModule(module.id);
                       setActiveSubModule(null);
                       loadMainModule(module.id);
@@ -490,7 +526,7 @@ function App() {
                 </div>
 
                 <div
-                  className={`sidebar-submodule-empty-container ${isSidebarOpen && activeModule === module.id ? "opened" : ""
+                  className={`sidebar-submodule-empty-container ${isMainModuleCollapsed && isSidebarOpen && activeModule === module.id ? "opened" : ""
                     }`}
                 >
                   {/* submodules - only show if this module is active */}
@@ -535,20 +571,27 @@ function App() {
                             ${activeModule === module.id ? "active" : ""} 
                             ${hoveredModule === module.id ? "hovered" : ""}`}
                   onClick={() => {
-
+                    setIsSidebarOpen(true);
                     if (activeModule === module.id) {
-                      // if it's already active, toggle off
-                      setActiveModule(null);
-                      setActiveSubModule(null);
+                      // if the main module is active, and is clicked when a submodule is open, go back to main module
+                      if (activeSubModule) {
+                        setActiveModule(module.id);
+                        setActiveSubModule(null);
+                        loadMainModule(module.id);
+                        setIsMainModuleCollapsed(true);
+                      } else { // if it's already active and is the opened module, toggle off
+                        isMainModuleCollapsed ? setIsMainModuleCollapsed(false) : setIsMainModuleCollapsed(true); // open submodules if reclicked
+                        //setActiveModule(null);
+                        setActiveSubModule(null);
+                      }
                     } else {
                       // otherwise, activate it
+                      setIsMainModuleCollapsed(true);
                       setActiveModule(module.id);
                       setActiveSubModule(null);
                       loadMainModule(module.id);
                     }
-                    /*
-                    setActiveModule(module.id);
-                    setActiveSubModule(null);*/
+
                   }}
 
                   onMouseEnter={() => setHoveredModule(module.id)}
@@ -558,7 +601,7 @@ function App() {
                 </div>
 
                 <div
-                  className={`sidebar-submodule-empty-container ${isSidebarOpen && activeModule === module.id ? "opened" : ""
+                  className={`sidebar-submodule-empty-container ${isMainModuleCollapsed && isSidebarOpen && activeModule === module.id ? "opened" : ""
                     }`}
                 >
                   {/* Submodules - only show if the main module is active */}
@@ -617,8 +660,8 @@ function App() {
                   {activeModule}
                 </p>
 
-                <p>{activeSubModule ? ` > ` : ""}</p>
-                <p id="header-submodule-name">
+                <p className="fade-in">{activeSubModule ? ` > ` : ""}</p>
+                <p id="header-submodule-name" className="fade-in">
                   {activeSubModule ? activeSubModule : ""}
                 </p>
               </div>
@@ -626,18 +669,23 @@ function App() {
 
             <div className="header-right-container">
               {/*<SearchBar />*/}
-              <img
+              <img className="notif-icon"
                 src={`/icons/Notification-${hasNotification ? "active-" : ""
                   }logo.png`}
                 alt="Notificaton-Logo"
                 onClick={() => {
                   setNotifOpen(!notifOpen)
+                  setIsProfileMenuOpen(false); //close profile menu if notif menu is opened
                   setHasNotification(false)
                 }} //to be replaecd by func for setting notifs as read
               ></img>
               {notifOpen && <div className="notif-menu">
                 <div className="notif-title"><p>Notifications</p></div>
-                {notifs.map((notif, i) =>
+                {notifs.length === 0 ? (
+                  <div className="notif-empty">
+                    <p className="notif-msg">No notifications to show.</p>
+                  </div>
+                ) : (notifs.map((notif, i) =>
                   <div className={notif.read ? "notif-item" : "notif-item-unread"}
                     onClick={
                       notif.orig_submodule ? () => {
@@ -664,7 +712,7 @@ function App() {
                     </div>
                     <div className="notif-msg"><p>{notif.msg}</p></div>
                   </div>
-                )}
+                ))}
               </div>}
               {isProfileMenuOpen && (
                 <div className="profile-dropdown">
@@ -676,7 +724,14 @@ function App() {
 
                   <div className="dropdown-divider"></div>
                   <div className="dropdown-menu">
-                    <div className="dropdown-item" onClick={() => setShowUserProfile(true)}><img src="/icons/settings.png" /> Settings</div>
+                    <div className="dropdown-item"
+                      onClick={() => {
+                        setShowUserProfile(true);
+                        setIsProfileMenuOpen(false);
+                      }}
+                    >
+                      <img src="/icons/settings.png" />User Profile
+                    </div>
                     <div className="dropdown-item" onClick={handleLogout}><img src="/icons/logout.png" /> Logout</div>
                   </div>
 
@@ -704,7 +759,7 @@ function App() {
                 />
               ) : (
                 ModuleComponent && (
-                  <Suspense fallback={<div>Loading...</div>}>
+                  <Suspense fallback={<div className="loading-suspense">Loading...</div>}>
                     <ModuleComponent
                       setActiveModule={setActiveModule}
                       loadSubModule={loadSubModule}
@@ -720,7 +775,7 @@ function App() {
 
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 

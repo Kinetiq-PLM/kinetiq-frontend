@@ -59,8 +59,20 @@
     align-items: center;
   }
   
-  .login-form h2, .signup-form h2 {
+  .login-form h2 {
     font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+
+    color: #00a7a7;
+    letter-spacing: 1px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .login-form h3 {
+    font-size: 1rem;
     font-weight: 700;
     text-align: center;
     margin-bottom: 30px;
@@ -71,11 +83,27 @@
     justify-content: center;
   }
 
+  .login-form h4 {
+    font-size: 0.8rem;
+    font-weight: 400;
+    text-align: left;
+    margin-bottom: 30px;
+    color: #00a7a7;
+    letter-spacing: 1px;
+  }
+
   .login-form form, .login-form input{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+
+  .login-pass-details {
+    font-size: 0.85rem;
+    margin-bottom: 1.2rem;
+    color: rgb(112, 112, 112);
+    text-align: center;
   }
   
   /* Form Elements */
@@ -83,13 +111,26 @@
   input[type="email"],
   input[type="password"] {
     width: 100%;
-    padding: 12px 14px;
-    margin-bottom: 20px;
-    font-size: 1rem;
+    padding: 0.5rem 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
     border-radius: 8px;
     border: 1px solid #ccc;
   }
+
+  input[type="email"]{
+    font-size: 0.85rem;
+    width: 18rem;
+  }
   
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    border: none;
+    box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2); 
+    outline: none;
+  }
+
   .password-wrapper {
     position: relative;
     width: 100%;
@@ -123,20 +164,27 @@
   .forgot-password {
     color: teal;
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
   
+  .button-back-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
   /* Buttons */
   .login-btn {
     background-color: #00a7a7;
     color: white;
     border: none;
-    padding: 0.5rem;
-    margin-top: 1rem;
-    width: 100%;
+    padding: 0.5rem 1rem;
+    margin-top: 1.5rem;
+    width: 15rem;
     min-width: 3rem;
     display: block;
-    border-radius: 0.5rem;
+    border-radius: 0.4rem;
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -144,6 +192,22 @@
   
   .login-btn:hover {
     background-color: #008b8b;
+  }
+
+  .back-btn {
+    background-color: #b9b9b9;
+    color: white;
+    padding: 0.3rem 1rem;
+    margin-top: 1.5rem;
+    width: 5rem;
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .back-btn:hover {
+    background-color: #9f9f9f;
   }
 
   .login-error{
@@ -179,8 +243,6 @@
 input:-webkit-autofill {
   background-color: white !important; 
   color: #000 !important;          
-  box-shadow: 0 0 0px 1000px white inset !important;
-  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
   -webkit-text-fill-color: #000 !important; 
   transition: background-color 5000s ease-in-out 0s;
 }
@@ -197,6 +259,10 @@ input:-webkit-autofill {
     font-size: 1rem;
     cursor: pointer;
 }
+
+  .button-back-container{
+    
+  }
 
   
   /* Terms checkbox */
