@@ -31,6 +31,7 @@
     padding: 0rem;
     min-width: 350px;
 }
+
 .login-container .login-right,  .login-container .signup-right{
     display: flex;
     justify-content: center;
@@ -41,7 +42,9 @@
     position: relative;
   }
 
-  
+.login-container .login-right img { 
+  object-fit: cover;
+}
   
   
   /* Card Styles */
@@ -363,7 +366,7 @@
   }
 
   /* Tablet Layout */
-@media (max-width: 800px) {
+@media (max-width: 860px) {
   .login-container  .login-wrapper {
     height: auto !important; 
     min-height: unset;
