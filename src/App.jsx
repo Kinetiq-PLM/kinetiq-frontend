@@ -83,6 +83,7 @@ function App() {
       "Project Approval": "ManagementApprovals",
       "User Roles": "UserRoles",
       "Access Control": "AccessControl",
+      "API": "API",
       Settings: "Settings",
     },
     Administration: {
