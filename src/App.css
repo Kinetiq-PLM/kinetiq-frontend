@@ -497,7 +497,7 @@ img {
 
 .header-profile-name { /*separate thing to avoid messing up the placeholder pfp */
   overflow: hidden;
-  width: 4.5rem;
+  width: 5rem;
 }
 
 .header-profile-icon {
@@ -529,7 +529,7 @@ img {
 .notif-menu {
   position: absolute;
   top: 3.5rem;
-  right: 12rem;
+  right: 12.5rem;
   padding-top: 1rem;
   background-color: white;
   width: 20rem;
