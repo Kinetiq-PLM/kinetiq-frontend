@@ -63,17 +63,25 @@ const PurchaseOrderUI = ({
         ]);
 
         // Process items
-        const items = quotationContent.map((item, index) => ({
-          id: item.id || `item-${index}`,
-          name: materialsResponse.data.find((m) => m.material_id === item.material_id)?.material_name || 
-               assetsResponse.data.find((a) => a.asset_id === item.asset_id)?.asset_name || "N/A",
-          quantity: item.purchase_quantity || 0,
-          price: materialsResponse.data.find((m) => m.material_id === item.material_id)?.cost_per_unit || 
-               assetsResponse.data.find((a) => a.asset_id === item.asset_id)?.purchase_price || 0,
-          discount: quotation.discount_percent || 0,
-          taxCode: item.tax_code || "N/A",
-          total: item.unit_price || 0,
-        }));
+        const items = quotationContent.map((item, index) => {
+          const price =
+              materialsResponse.data.find((m) => m.material_id === item.material_id)?.cost_per_unit ||
+              assetsResponse.data.find((a) => a.asset_id === item.asset_id)?.purchase_price ||
+              0;
+      
+          return {
+              id: item.id || `item-${index}`,
+              name:
+                  materialsResponse.data.find((m) => m.material_id === item.material_id)?.material_name ||
+                  assetsResponse.data.find((a) => a.asset_id === item.asset_id)?.asset_name ||
+                  "N/A",
+              quantity: item.purchase_quantity || 0,
+              price: price,
+              discount: quotation.discount_percent || 0,
+              taxCode: item.tax_code || "N/A",
+              total: price * (item.purchase_quantity || 0),
+          };
+      });
 
         // Fetch vendor data
         const vendorCode = quotation.vendor_code || "N/A";

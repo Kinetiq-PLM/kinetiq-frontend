@@ -121,12 +121,21 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
 
   // Calculate total amount whenever items change
   useEffect(() => {
-    const total = items.reduce((sum, item) => sum + (parseFloat(item.unit_price) || 0), 0);
+    const total = items.reduce((sum, item) => {
+        const unitPrice = item.material_id
+            ? materials.find((m) => m.material_id === item.material_id)?.cost_per_unit || 0
+            : assets.find((a) => a.asset_id === item.asset_id)?.purchase_price || 0;
+
+        const quantity = item.purchase_quantity || 0;
+
+        return sum + unitPrice * quantity;
+    }, 0);
+
     setFormData((prev) => ({
-      ...prev,
-      totalAmount: total.toFixed(2),
+        ...prev,
+        totalAmount: total.toFixed(2), // Ensure the result is a string with 2 decimal places
     }));
-  }, [items]);
+}, [items, materials, assets]);
 
   useEffect(() => {
   const computeTotalPaymentDue = () => {
@@ -538,7 +547,9 @@ const handleSendTo = async () => {
                           : getItemName(item.asset_id, "asset")}
                       </td>
                       <td>{item.purchase_quantity}</td>
-                      <td>{item.unit_price} </td>
+                      <td>{item.material_id
+                           ? materials.find((m) => m.material_id === item.material_id)?.cost_per_unit || "N/A"
+                           : assets.find((a) => a.asset_id === item.asset_id)?.purchase_price || "N/A"} </td>
                     </tr>
                   ))}
                 </tbody>
