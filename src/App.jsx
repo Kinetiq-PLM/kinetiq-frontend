@@ -330,10 +330,10 @@ function App() {
     "Project Management": "ProjectManagement",
     "Human Resources": "HumanResources",
     "Report Generator": "ReportGenerator",
-    // "Purchase Request": "PurchaseRequest",
-    // "Project Request": "ProjectRequest",
-    // "Workforce Request": "WorkforceRequest",
-    // "Job Posting": "JobPosting"
+    "Purchase Request": "PurchaseRequest",
+    "Project Request": "ProjectRequest",
+    "Workforce Request": "WorkforceRequest",
+    "Job Posting": "JobPosting"
   };
 
   const moduleSubmoduleFileNames = {
