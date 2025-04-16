@@ -13,7 +13,7 @@ import { GET } from "../../../api/api.jsx";
 
 import loading from "../../Assets/kinetiq-loading.gif";
 
-const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
+const QuotationListModal = ({ isOpen, onClose, setQuotation, query }) => {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -24,8 +24,8 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
   const [filteredData, setFilteredData] = useState([]);
 
   const quotationQuery = useQuery({
-    queryKey: ["quotationsLIst"],
-    queryFn: async () => await GET("sales/quotation?status=Ready"),
+    queryKey: ["quotationsList"],
+    queryFn: async () => await GET(`sales/quotation?${query}`),
     enabled: isOpen,
     retry: 2,
   });

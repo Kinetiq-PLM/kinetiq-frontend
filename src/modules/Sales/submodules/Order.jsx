@@ -401,6 +401,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           isOpen={isQuotationListOpen}
           onClose={() => setIsQuotationListOpen(false)}
           setQuotation={setSelectedQuotation}
+          query={"status=Ready"}
         ></QuotationListModal>
 
         <BlanketAgreementListModal

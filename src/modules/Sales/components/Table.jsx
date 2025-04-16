@@ -39,6 +39,9 @@ const Table = ({ columns, data, onSelect = () => {}, minWidth = false }) => {
               "Shipped",
               "Pending",
               "Completed",
+              "Planned",
+              "Active",
+              "Expired",
             ].includes(row.status);
             return (
               <tr

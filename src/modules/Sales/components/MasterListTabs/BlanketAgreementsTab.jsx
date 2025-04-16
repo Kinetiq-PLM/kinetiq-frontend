@@ -12,6 +12,7 @@ import loading from "../Assets/kinetiq-loading.gif";
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
+  setIsQuotationListOpen,
 }) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
@@ -75,8 +76,7 @@ export default function BlanketAgreementsTab({
   });
 
   const handleRedirect = () => {
-    loadSubModule("Blanket Agreement");
-    setActiveSubModule("Blanket Agreement");
+    setIsQuotationListOpen(true);
   };
   useEffect(() => {
     if (agreementQuery.status === "success") {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/Index.css";
 import Heading from "../components/Heading";
 import Button from "../components/Button";
@@ -10,12 +10,22 @@ import DeliveriesTab from "./../components/MasterListTabs/DeliveriesTab";
 import InvoicesTab from "./../components/MasterListTabs/InvoicesTab";
 import BlanketAgreementsTab from "./../components/MasterListTabs/BlanketAgreementsTab";
 import { AlertProvider } from "../components/Context/AlertContext";
+import BlanketAgreementDetailsModal from "../components/Modals/BlanketAgreementDetails";
+import QuotationListModal from "../components/Modals/Lists/QuotationList";
 
 const BodyContent = ({
   setActiveModule,
   loadSubModule,
   setActiveSubModule,
+  newBlanketAgreement,
+  employee_id,
 }) => {
+  console.log(employee_id);
+  const [isBlanketAgreementDetailsOpen, setIsBlanketAgreementDetailsOpen] =
+    useState(false);
+  const [selectedQuotation, setSelectedQuotation] = useState(null);
+  const [isQuotationListOpen, setIsQuotationListOpen] = useState(false);
+
   const tabs = [
     {
       name: "Quotations",
@@ -59,11 +69,19 @@ const BodyContent = ({
         <BlanketAgreementsTab
           loadSubModule={loadSubModule}
           setActiveSubModule={setActiveSubModule}
+          setIsQuotationListOpen={setIsQuotationListOpen}
         />
       ),
     },
   ];
   const [activeTab, setActiveTab] = useState(tabs[0].name); // Default to first tab
+
+  useEffect(() => {
+    if (selectedQuotation) {
+      setIsBlanketAgreementDetailsOpen(true);
+    }
+  }, [selectedQuotation]);
+
   return (
     <AlertProvider>
       <div className="master-list">
@@ -72,7 +90,6 @@ const BodyContent = ({
             Title="Master List"
             SubTitle="Comprehensive lists regarding various information used in sales."
           />
-
           <main className="">
             {/* Tab Selector */}
             <div className="mt-4 flex flex-col md:flex-row lg:hidden md:justify-between md:items-center gap-4">
@@ -91,6 +108,19 @@ const BodyContent = ({
                 </div>
               </div>
             </div>
+            <BlanketAgreementDetailsModal
+              isOpen={isBlanketAgreementDetailsOpen}
+              onClose={() => setIsBlanketAgreementDetailsOpen(false)}
+              quotationInfo={selectedQuotation}
+              employee_id={employee_id}
+            ></BlanketAgreementDetailsModal>
+
+            <QuotationListModal
+              isOpen={isQuotationListOpen}
+              onClose={() => setIsQuotationListOpen(false)}
+              setQuotation={setSelectedQuotation}
+              query={"get_null=True"}
+            ></QuotationListModal>
 
             <div className="hidden lg:flex mt-4 border-b border-[#E8E8E8] w-fit gap-2">
               {tabs.map((tab) => (
