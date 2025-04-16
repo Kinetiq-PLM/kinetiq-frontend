@@ -53,7 +53,7 @@ const SupportServices = ({ loadSubModule, setActiveSubModule }) => {
   
   const fetchServiceRenewals = async () => {
     try {
-      const data = await GET("warranty-renewals/");
+      const data = await GET("renewal/");
       setServiceMetrics(prev => ({
         ...prev,
         renewals: {
@@ -67,13 +67,13 @@ const SupportServices = ({ loadSubModule, setActiveSubModule }) => {
   }
 
   useEffect(() => {
-    fetchDataAndUpdateMetrics("tickets/", "status", "tickets", ["open", "in progress", "closed"]);
-    fetchDataAndUpdateMetrics("service-calls/", "call_status", "calls", ["open", "in progress", "closed"]);
-    fetchDataAndUpdateMetrics("service-requests/", "request_status", "requests", ["approved", "in progress", "pending", "rejected"]);
-    fetchDataAndUpdateMetrics("service-analyses/", "analysis_status", "analyses", ["scheduled", "done"]);
-    fetchDataAndUpdateMetrics("service-billings/", "billing_status", "billings", ["paid", "unpaid"]);
-    fetchDataAndUpdateMetrics("service-reports/", "report_status", "reports", ["draft", "submitted", "reviewed"]);
-    fetchDataAndUpdateMetrics("service-contracts/", "contract_status", "contracts", ["active", "expired", "terminated"]);
+    fetchDataAndUpdateMetrics("ticket/", "status", "tickets", ["open", "in progress", "closed"]);
+    fetchDataAndUpdateMetrics("call/", "call_status", "calls", ["open", "in progress", "closed"]);
+    fetchDataAndUpdateMetrics("request/", "request_status", "requests", ["approved", "in progress", "pending", "rejected"]);
+    fetchDataAndUpdateMetrics("analysis/", "analysis_status", "analyses", ["scheduled", "done"]);
+    fetchDataAndUpdateMetrics("billing/", "billing_status", "billings", ["paid", "unpaid"]);
+    fetchDataAndUpdateMetrics("report/", "report_status", "reports", ["draft", "submitted", "reviewed"]);
+    fetchDataAndUpdateMetrics("contract/", "contract_status", "contracts", ["active", "expired", "terminated"]);
     fetchServiceRenewals();
   }, []);
 
@@ -85,8 +85,8 @@ const SupportServices = ({ loadSubModule, setActiveSubModule }) => {
   }
 
   return (
-    <div className="servdash">
-      <div className="body-content-container fixed">
+    <div className="serv servdash">
+      <div className="body-content-container">
         <div className="header">
           <div className="icon-container">
             <img

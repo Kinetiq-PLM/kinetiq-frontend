@@ -20,11 +20,6 @@
   position: relative;
 }
 
-.servdash .body-content-container.fixed {
-  min-width: 40rem;
-  max-height: 47rem;
-}
-
 /* Header styling */
 .servdash .header {
   display: flex;
@@ -76,12 +71,19 @@
   margin: 0.5rem 0 1.5rem 0;
 }
 
-/* Dashboard grid layout */
 .servdash .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem; /* Slightly reduced from 1.5rem */
-  overflow: visible; /* Changed from auto to visible to prevent scrolling */
+  gap: 1.25rem;
+  
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  border-radius: 8px;
+  box-shadow: 0 0 0.5rem 0.1rem rgba(162, 162, 162, 0.2);
+  padding: 1.5rem;
+  border: 1px solid #e0e0e0;
+  margin-top: 2rem;
 }
 
 /* Dashboard card styling */
@@ -308,6 +310,8 @@
   }
 }
 
+/* ============ SERV ================ */
+
 .serv  {
   display: flex;
   width: 100%;
@@ -444,6 +448,7 @@
   background-color: #f5f5f5;
   width: auto;
   min-width: 350px;
+  margin-bottom: 0px;
 }
 
 .serv .search-input:focus {
