@@ -1,10 +1,10 @@
-// components/shipment/DeliveryReceiptModal.jsx
 import React, { useState, useEffect } from 'react';
 
 const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [deliveryReceipt, setDeliveryReceipt] = useState(null);
   const [error, setError] = useState(null);
+  const [customerName, setCustomerName] = useState(''); // Add state for customer name
   
   // Form state
   const [signature, setSignature] = useState('');
@@ -37,6 +37,11 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
           setSignature(data.signature);
         }
         
+        // Fetch customer name if received_by appears to be a customer ID
+        if (data.received_by && data.received_by.startsWith('SALES-CUST-')) {
+          fetchCustomerName(data.received_by);
+        }
+        
         setIsLoading(false);
       } catch (err) {
         setError(err.message);
@@ -46,6 +51,30 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
     
     fetchDeliveryReceipt();
   }, [shipment.delivery_receipt_id]);
+
+  // New function to fetch customer name
+  const fetchCustomerName = async (customerId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/customers/${customerId}/`);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch customer details');
+        // Extract customer name from ID as fallback
+        if (customerId.startsWith('SALES-CUST-')) {
+          // Just display the ID as fallback
+          setCustomerName(`Customer ${customerId}`);
+        }
+        return;
+      }
+      
+      const customerData = await response.json();
+      if (customerData && customerData.name) {
+        setCustomerName(customerData.name);
+      }
+    } catch (err) {
+      console.error('Error fetching customer details:', err);
+    }
+  };
   
   // Handle form submission
   const handleSubmit = (e) => {
@@ -96,6 +125,16 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
                        deliveryReceipt.receipt_status !== 'Received' && 
                        deliveryReceipt.receipt_status !== 'Rejected';
   
+  // Helper function to display receiver with customer name if available
+  const getReceiverDisplay = () => {
+    if (customerName) {
+      return customerName;
+    } else if (deliveryReceipt?.received_by) {
+      return deliveryReceipt.received_by;
+    }
+    return 'Not Yet Received';
+  };
+  
   return (
     <div className="modal-overlay">
       <div className="delivery-receipt-modal">
@@ -139,7 +178,7 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
                   </div>
                   <div className="info-item">
                     <span className="info-label">Receiver</span>
-                    <span className="info-value">{deliveryReceipt.received_by || 'Not Yet Received'}</span>
+                    <span className="info-value">{getReceiverDisplay()}</span>
                   </div>
                   {deliveryReceipt.receiving_module && (
                     <div className="info-item">

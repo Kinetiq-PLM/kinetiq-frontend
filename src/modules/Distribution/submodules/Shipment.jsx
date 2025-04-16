@@ -249,10 +249,47 @@ const Shipment = () => {
   };
   
   // Handle ship status update
-  const handleShipStatusUpdate = (shipment) => {
-    setSelectedShipment(shipment);
-    setShowShipmentModal(false);
-    setShowConfirmShipModal(true);
+  const handleShipStatusUpdate = async (shipment, formData = {}) => {
+    try {
+      // First, save any changes to the shipment
+      if (Object.keys(formData).length > 0) {
+        const updateResponse = await fetch(`http://127.0.0.1:8000/api/shipments/${shipment.shipment_id}/update/`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+        
+        if (!updateResponse.ok) {
+          const errorData = await updateResponse.json();
+          throw new Error(errorData.error || 'Failed to update shipment details');
+        }
+        
+        // Update the selected shipment with the new values
+        // This ensures the confirmation modal has the latest data
+        const updatedShipment = {
+          ...shipment,
+          ...formData
+        };
+        
+        // If carrier_id was updated, find the carrier name
+        if (formData.carrier_id) {
+          const carrier = carriers.find(c => c.carrier_id === formData.carrier_id);
+          if (carrier) {
+            updatedShipment.carrier_name = getEmployeeFullName(carrier.carrier_name);
+          }
+        }
+        
+        setSelectedShipment(updatedShipment);
+      }
+      
+      // Now show the confirmation modal
+      setShowShipmentModal(false);
+      setShowConfirmShipModal(true);
+    } catch (err) {
+      toast.error(`Error: ${err.message}`);
+    }
   };
   
   // Handle confirming shipment

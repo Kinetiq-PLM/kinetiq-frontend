@@ -614,14 +614,13 @@
 }
 
 /* Shipped message */
-.packing .shipped-message {
-  background-color: rgba(40, 167, 69, 0.1);
-  color: #28a745;
-  padding: 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
+.packing .completed-message {
   text-align: center;
+  color: #28a745;
   font-weight: 500;
+  padding: 0.5rem;
+  background-color: rgba(40, 167, 69, 0.1);
+  border-radius: 4px;
 }
 
 /* Loading and error states */
@@ -720,4 +719,96 @@
   background-color: #00a8a8;
   color: white;
   border-color: #00a8a8;
+}
+
+/* Add these new styles at the end of your Packing.css file */
+
+.packing .icon-spacing {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.packing .button-icon {
+  margin-right: 8px;
+}
+
+.packing .icon-message {
+  display: flex;
+  align-items: flex-start;
+}
+
+.packing .info-icon {
+  color: #007bff;
+  font-size: 20px;
+  margin-right: 10px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.packing .confirmation-message {
+  font-weight: 500;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.packing .info-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.packing .section-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.packing .section-header.status-packed {
+  color: #007bff;
+}
+
+.packing .completion-modal {
+  width: 480px;
+  max-width: 95%;
+}
+
+.packing .detail-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+}
+
+.packing .detail-value.highlight {
+  font-weight: 600;
+  color: #007bff;
+}
+
+.packing .next-steps-list {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  font-size: 0.9rem;
+}
+
+.packing .next-steps-list li {
+  margin-bottom: 4px;
+}
+
+.packing .warning-note {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: #dc3545;
+}
+
+.packing .confirm-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  justify-content: center;
 }

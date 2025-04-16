@@ -317,23 +317,36 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
               <h4>Status Update</h4>
               <button
                 className={`status-update-button status-${getNextStatus().toLowerCase()}`}
-                onClick={handleStatusUpdate}
+                onClick={() => {
+                  // Create an object with all current edited values
+                  const updatedValues = {
+                    ...editedValues,
+                    packed_by: editedValues.packed_by || packingList.packed_by,
+                    packing_type: editedValues.packing_type || packingList.packing_type,
+                    material_cost: packingCost.material_cost,
+                    labor_cost: packingCost.labor_cost,
+                    total_packing_cost: packingCost.total_packing_cost
+                  };
+                  
+                  // Call onStatusUpdate with all the edited values
+                  onStatusUpdate(packingList, getNextStatus(), updatedValues);
+                }}
               >
                 {getNextStatusLabel()}
-              </button>
+            </button>
             </div>
           )}
           
           {/* Status message for packed items */}
           {isPacked && (
-            <div className="shipped-message">
-              <span className="info-text">This packing list has been completed. Shipment processing will occur in the Shipment module.</span>
+            <div className="completed-message">
+              <span className="info-text">This packing list has been completed.</span>
             </div>
           )}
           
           {/* Status message for shipped items */}
           {isShipped && (
-            <div className="shipped-message">
+            <div className="completed-message">
               <span className="info-text">This packing list has been shipped and cannot be modified.</span>
             </div>
           )}

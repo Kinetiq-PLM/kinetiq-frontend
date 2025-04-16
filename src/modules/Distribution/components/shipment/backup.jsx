@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { GoogleMap, LoadScript, Marker, useLoadScript } from '@react-google-maps/api';
-//import useRef
-
+// components/shipment/ShipmentModal.jsx
+import React, { useState, useEffect } from 'react';
 
 const ShipmentModal = ({ 
   shipment, 
@@ -14,7 +12,6 @@ const ShipmentModal = ({
   onShowDeliveryReceipt,
   onReportFailure
 }) => {
-  
   // Create state for editable fields
   const [formData, setFormData] = useState({
     carrier_id: shipment.carrier_id || '',
@@ -25,74 +22,7 @@ const ShipmentModal = ({
     additional_cost: shipment.operational_cost_info?.additional_cost || 0,
   });
   
-  const mapsInitializedRef = useRef(false);
-
-  // Use the useLoadScript hook instead of LoadScript component
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "AIzaSyAby5p9XBIsWC1aoy1_RyHxrnlzHhjIoOU",
-    // Prevent the script from loading again if it's already loaded
-    preventGoogleFontsLoading: true
-  });
-
-  // Map state
-  const [mapCoordinates, setMapCoordinates] = useState(null);
-  const [mapLoading, setMapLoading] = useState(true);
-  const [mapError, setMapError] = useState(null);
-  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
-
-  // Map styles and settings
-  const mapContainerStyle = {
-    width: '100%',
-    height: '300px',
-    borderRadius: '4px'
-  };
-
-  // Philippines center (default)
-  const defaultCenter = {
-    lat: 14.5995,
-    lng: 120.9842
-  };
-
-  // Geocode the destination address when script is loaded and component mounts
-  useEffect(() => {
-    if (!shipment.destination_location || !isLoaded || mapsInitializedRef.current) return;
-    
-    setMapLoading(true);
-    setMapError(null);
-    
-    try {
-      const geocoder = new window.google.maps.Geocoder();
-      
-      geocoder.geocode({ address: shipment.destination_location }, (results, status) => {
-        if (status === "OK" && results && results.length > 0) {
-          const location = results[0].geometry.location;
-          setMapCoordinates({
-            lat: location.lat(),
-            lng: location.lng()
-          });
-          setMapLoading(false);
-          mapsInitializedRef.current = true;
-        } else {
-          setMapError(`Geocoding failed: ${status}`);
-          setMapLoading(false);
-          console.error("Geocoding failed:", status);
-        }
-      });
-    } catch (error) {
-      setMapError(`Error: ${error.message}`);
-      setMapLoading(false);
-      console.error("Geocoding error:", error);
-    }
-  }, [shipment.destination_location, isLoaded]);
-
-  // Handle map load
-  const onMapLoad = useCallback((map) => {
-    if (mapCoordinates) {
-      map.setCenter(mapCoordinates);
-    }
-    setMapLoading(false);
-  }, [mapCoordinates]);
-
+  // Calculate total shipping cost
   const calculateShippingCost = () => {
     const weight = parseFloat(formData.weight_kg) || 0;
     const distance = parseFloat(formData.distance_km) || 0;
@@ -202,7 +132,7 @@ const ShipmentModal = ({
     const carrier = carriers.find(c => c.carrier_id === carrierId);
     return carrier ? carrier.carrier_name : 'Not Assigned';
   };
-
+  
   // Determine if shipment can be marked as shipped
   const canBeShipped = shipment.shipment_status === 'Pending';
   
@@ -218,14 +148,15 @@ const ShipmentModal = ({
   return (
     <div className="modal-overlay">
       <div className="shipment-modal">
-      <div className="modal-header">
+        <div className="modal-header">
           <h3>Shipment Details</h3>
           <button className="close-button" onClick={onClose}>&times;</button>
         </div>
         
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
-          <div className="info-section">
+            {/* Shipment Information Section */}
+            <div className="info-section">
               <h4>Shipment Information</h4>
               <div className="info-grid">
                 <div className="info-item">
@@ -269,66 +200,6 @@ const ShipmentModal = ({
               </div>
             </div>
             
-            {/* Destination Map Section - Using loadscript for rendering closed modal*/}
-            {shipment.destination_location && (
-              <div className="info-section">
-                <h4>Destination Map</h4>
-                <div className="map-container" style={{ position: 'relative' }}>
-                  {isLoaded ? (
-                    <GoogleMap
-                      mapContainerStyle={mapContainerStyle}
-                      center={mapCoordinates || defaultCenter}
-                      zoom={15}
-                      onLoad={onMapLoad}
-                    >
-                      {mapCoordinates && <Marker position={mapCoordinates} />}
-                    </GoogleMap>
-                  ) : (
-                    <div className="map-loading" style={{ 
-                      position: 'absolute', 
-                      top: '50%', 
-                      left: '50%', 
-                      transform: 'translate(-50%, -50%)',
-                      background: 'rgba(255, 255, 255, 0.8)',
-                      padding: '10px',
-                      borderRadius: '4px'
-                    }}>
-                      Loading Google Maps...
-                    </div>
-                  )}
-                  
-                  {mapLoading && isLoaded && (
-                    <div className="map-loading" style={{ 
-                      position: 'absolute', 
-                      top: '50%', 
-                      left: '50%', 
-                      transform: 'translate(-50%, -50%)',
-                      background: 'rgba(255, 255, 255, 0.8)',
-                      padding: '10px',
-                      borderRadius: '4px'
-                    }}>
-                      Loading map...
-                    </div>
-                  )}
-                  
-                  {(mapError || loadError) && (
-                    <div className="map-error" style={{ 
-                      position: 'absolute', 
-                      top: '50%', 
-                      left: '50%', 
-                      transform: 'translate(-50%, -50%)',
-                      background: 'rgba(255, 255, 255, 0.8)',
-                      padding: '10px',
-                      borderRadius: '4px',
-                      color: '#dc3545'
-                    }}>
-                      Error: {mapError || "Failed to load Google Maps"}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
             {/* Display message if shipment is not editable */}
             {!isShipmentEditable && (
               <div className="info-message" style={{ margin: '10px 0', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px', borderLeft: '4px solid #e9452a' }}>

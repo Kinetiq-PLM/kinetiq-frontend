@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { GoogleMap, LoadScript, Marker, useLoadScript } from '@react-google-maps/api';
-//import useRef
-
+import React, { useState, useEffect, useCallback } from 'react';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 const ShipmentModal = ({ 
   shipment, 
@@ -25,15 +23,6 @@ const ShipmentModal = ({
     additional_cost: shipment.operational_cost_info?.additional_cost || 0,
   });
   
-  const mapsInitializedRef = useRef(false);
-
-  // Use the useLoadScript hook instead of LoadScript component
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "AIzaSyAby5p9XBIsWC1aoy1_RyHxrnlzHhjIoOU",
-    // Prevent the script from loading again if it's already loaded
-    preventGoogleFontsLoading: true
-  });
-
   // Map state
   const [mapCoordinates, setMapCoordinates] = useState(null);
   const [mapLoading, setMapLoading] = useState(true);
@@ -53,9 +42,9 @@ const ShipmentModal = ({
     lng: 120.9842
   };
 
-  // Geocode the destination address when script is loaded and component mounts
+  // Geocode the destination address when component mounts or destination changes
   useEffect(() => {
-    if (!shipment.destination_location || !isLoaded || mapsInitializedRef.current) return;
+    if (!shipment.destination_location || !googleMapsLoaded) return;
     
     setMapLoading(true);
     setMapError(null);
@@ -71,7 +60,6 @@ const ShipmentModal = ({
             lng: location.lng()
           });
           setMapLoading(false);
-          mapsInitializedRef.current = true;
         } else {
           setMapError(`Geocoding failed: ${status}`);
           setMapLoading(false);
@@ -83,7 +71,13 @@ const ShipmentModal = ({
       setMapLoading(false);
       console.error("Geocoding error:", error);
     }
-  }, [shipment.destination_location, isLoaded]);
+  }, [shipment.destination_location, googleMapsLoaded]);
+
+  // Handle Google Maps script loading
+  const handleGoogleMapsLoad = useCallback(() => {
+    setGoogleMapsLoaded(true);
+    setMapLoading(true);
+  }, []);
 
   // Handle map load
   const onMapLoad = useCallback((map) => {
@@ -93,6 +87,7 @@ const ShipmentModal = ({
     setMapLoading(false);
   }, [mapCoordinates]);
 
+  // The rest of your component code...
   const calculateShippingCost = () => {
     const weight = parseFloat(formData.weight_kg) || 0;
     const distance = parseFloat(formData.distance_km) || 0;
@@ -269,12 +264,15 @@ const ShipmentModal = ({
               </div>
             </div>
             
-            {/* Destination Map Section - Using loadscript for rendering closed modal*/}
+            {/* Destination Map Section */}
             {shipment.destination_location && (
               <div className="info-section">
                 <h4>Destination Map</h4>
                 <div className="map-container" style={{ position: 'relative' }}>
-                  {isLoaded ? (
+                  <LoadScript 
+                    googleMapsApiKey="AIzaSyAby5p9XBIsWC1aoy1_RyHxrnlzHhjIoOU"
+                    onLoad={handleGoogleMapsLoad}
+                  >
                     <GoogleMap
                       mapContainerStyle={mapContainerStyle}
                       center={mapCoordinates || defaultCenter}
@@ -283,21 +281,9 @@ const ShipmentModal = ({
                     >
                       {mapCoordinates && <Marker position={mapCoordinates} />}
                     </GoogleMap>
-                  ) : (
-                    <div className="map-loading" style={{ 
-                      position: 'absolute', 
-                      top: '50%', 
-                      left: '50%', 
-                      transform: 'translate(-50%, -50%)',
-                      background: 'rgba(255, 255, 255, 0.8)',
-                      padding: '10px',
-                      borderRadius: '4px'
-                    }}>
-                      Loading Google Maps...
-                    </div>
-                  )}
+                  </LoadScript>
                   
-                  {mapLoading && isLoaded && (
+                  {mapLoading && (
                     <div className="map-loading" style={{ 
                       position: 'absolute', 
                       top: '50%', 
@@ -311,7 +297,7 @@ const ShipmentModal = ({
                     </div>
                   )}
                   
-                  {(mapError || loadError) && (
+                  {mapError && (
                     <div className="map-error" style={{ 
                       position: 'absolute', 
                       top: '50%', 
@@ -322,7 +308,7 @@ const ShipmentModal = ({
                       borderRadius: '4px',
                       color: '#dc3545'
                     }}>
-                      Error: {mapError || "Failed to load Google Maps"}
+                      Error: {mapError}
                     </div>
                   )}
                 </div>

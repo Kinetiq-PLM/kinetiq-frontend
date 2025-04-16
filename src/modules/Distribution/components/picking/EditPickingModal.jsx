@@ -202,11 +202,16 @@ const EditPickingModal = ({
             <div className="status-action">
               {!isCompleted ? (
                 <button 
-                  className={`status-update-button status-${getNextStatus(pickingList.picked_status)?.toLowerCase().replace(' ', '-')}`}
-                  onClick={() => onStatusUpdate(pickingList, getNextStatus(pickingList.picked_status))}
-                >
-                  {getStatusActionLabel(pickingList.picked_status)}
-                </button>
+                className={`status-update-button status-${getNextStatus(pickingList.picked_status)?.toLowerCase().replace(' ', '-')}`}
+                onClick={() => onStatusUpdate(
+                  pickingList, 
+                  getNextStatus(pickingList.picked_status), 
+                  selectedEmployee, 
+                  selectedWarehouse
+                )}
+              >
+                {getStatusActionLabel(pickingList.picked_status)}
+              </button>
               ) : (
                 <div className="completed-message">
                   This picking list is completed and cannot be modified.
