@@ -105,70 +105,72 @@ const WorkforceAllocation = () => {
     if (!paginated.length) return <div className="hr-no-results">No allocations found.</div>;
 
     return (
-      <div className="hr-department-table-wrapper">
-        <div className="hr-department-table-scrollable">
-          <table className="hr-department-table">
-            <thead>
-              <tr>
-                <th>Allocation ID</th>
-                <th>Request ID</th>
-                <th>Requesting Dept ID</th>
-                <th>Current Dept ID</th>
-                <th>HR Approver</th>
-                <th>Employee ID</th>
-                <th>Employee Name</th>
-                <th>Required Skills</th>
-                <th>Task Description</th>
-                <th>Approval Status</th>
-                <th>Status</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Rejection Reason</th>
-                <th>Submitted At</th>
-                <th>Approved At</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.map((allocation, index) => (
-                <tr key={allocation.allocation_id || index}>
-                  <td>{allocation.allocation_id}</td>
-                  <td>{allocation.request_id}</td>
-                  <td>{allocation.requesting_dept_id}</td>
-                  <td>{allocation.current_dept_id}</td>
-                  <td>{allocation.hr_approver}</td>
-                  <td>{allocation.employee_id}</td>
-                  <td>{allocation.employee_name}</td>
-                  <td>{allocation.required_skills}</td>
-                  <td>{allocation.task_description}</td>
-                  <td>
-                    <span className={`hr-tag ${allocation.approval_status?.toLowerCase() || 'pending'}`}>
-                      {allocation.approval_status || 'Pending'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`hr-tag ${allocation.status?.toLowerCase() || 'pending'}`}>
-                      {allocation.status || 'Pending'}
-                    </span>
-                  </td>
-                  <td>{allocation.start_date}</td>
-                  <td>{allocation.end_date}</td>
-                  <td>{allocation.rejection_reason}</td>
-                  <td>{allocation.submitted_at}</td>
-                  <td>{allocation.approved_at}</td>
-                  <td className="hr-department-actions">
-                    {!showArchived ? (
-                      <button onClick={() => handleArchive(allocation.allocation_id)}>Archive</button>
-                    ) : (
-                      <button onClick={() => handleUnarchive(allocation.allocation_id)}>Unarchive</button>
-                    )}
-                  </td>
+      <>
+        <div className="workforceallocation-table-wrapper">
+          <div className="workforceallocation-table-scrollable">
+            <table className="workforceallocation-table">
+              <thead>
+                <tr>
+                  <th>Allocation ID</th>
+                  <th>Request ID</th>
+                  <th>Requesting Dept ID</th>
+                  <th>Current Dept ID</th>
+                  <th>HR Approver</th>
+                  <th>Employee ID</th>
+                  <th>Employee Name</th>
+                  <th>Required Skills</th>
+                  <th>Task Description</th>
+                  <th>Approval Status</th>
+                  <th>Status</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Rejection Reason</th>
+                  <th>Submitted At</th>
+                  <th>Approved At</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {paginated.map((allocation, index) => (
+                  <tr key={allocation.allocation_id || index}>
+                    <td>{allocation.allocation_id}</td>
+                    <td>{allocation.request_id}</td>
+                    <td>{allocation.requesting_dept_id}</td>
+                    <td>{allocation.current_dept_id}</td>
+                    <td>{allocation.hr_approver}</td>
+                    <td>{allocation.employee_id}</td>
+                    <td>{allocation.employee_name}</td>
+                    <td>{allocation.required_skills}</td>
+                    <td>{allocation.task_description}</td>
+                    <td>
+                      <span className={`hr-tag ${allocation.approval_status?.toLowerCase() || 'pending'}`}>
+                        {allocation.approval_status || 'Pending'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`hr-tag ${allocation.status?.toLowerCase() || 'pending'}`}>
+                        {allocation.status || 'Pending'}
+                      </span>
+                    </td>
+                    <td>{allocation.start_date}</td>
+                    <td>{allocation.end_date}</td>
+                    <td>{allocation.rejection_reason}</td>
+                    <td>{allocation.submitted_at}</td>
+                    <td>{allocation.approved_at}</td>
+                    <td className="hr-department-actions">
+                      {!showArchived ? (
+                        <button onClick={() => handleArchive(allocation.allocation_id)}>Archive</button>
+                      ) : (
+                        <button onClick={() => handleUnarchive(allocation.allocation_id)}>Unarchive</button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div className="hr-pagination">
+        <div className="workforceallocation-pagination">
           {[...Array(totalPages)].map((_, i) => (
             <button
               key={i}
@@ -179,7 +181,7 @@ const WorkforceAllocation = () => {
             </button>
           ))}
           <select
-            className="hr-pagination-size"
+            className="workforceallocation-pagination-size"
             value={itemsPerPage}
             onChange={(e) => {
               setItemsPerPage(parseInt(e.target.value));
@@ -191,7 +193,7 @@ const WorkforceAllocation = () => {
             <option value={20}>20</option>
           </select>
         </div>
-      </div>
+      </>
     );
   };
 

@@ -288,3 +288,79 @@
   background-color: #e2e3e5;
   color: #343a40;
 }
+
+/* Performance table scrollable styling */
+.hr-performance-table-container {
+  display: flex;
+  flex-direction: column;
+  height: 200px; /* Fixed height for the table container */
+  overflow: hidden; /* Hide overflow to prevent double scrollbars */
+}
+
+.hr-performance-table-container table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.hr-performance-table-container thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #f3f9fa;
+}
+
+.hr-performance-table-container th {
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  background-color: #f3f9fa;
+}
+
+.hr-performance-tbody {
+  display: block;
+  overflow-y: auto;
+  max-height: 170px; /* Set max height to leave room for the header */
+  width: 100%;
+}
+
+/* Scrollbar styling for performance table */
+.hr-performance-tbody::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-performance-tbody::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-performance-tbody::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Rating tag styles */
+.hr-tag.rating-5 {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.hr-tag.rating-4 {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.hr-tag.rating-3 {
+  background-color: #e2e3e5;
+  color: #343a40;
+}
+
+.hr-tag.rating-2 {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.hr-tag.rating-1 {
+  background-color: #f8d7da;
+  color: #842029;
+}
