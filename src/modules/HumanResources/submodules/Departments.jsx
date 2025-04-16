@@ -74,8 +74,8 @@ const Departments = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/departments/"),
-        axios.get("http://127.0.0.1:8000/api/departments/archived/"),
+        axios.get("http://127.0.0.1:8000/api/departments/departments/"),
+        axios.get("http://127.0.0.1:8000/api/departments/departments/archived/"),
       ]);
       setDepartments(activeRes.data);
       setArchivedDepartments(archivedRes.data);
@@ -94,8 +94,8 @@ const Departments = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/department_superiors/"),
-        axios.get("http://127.0.0.1:8000/api/department_superiors/archived/"),
+        axios.get("http://127.0.0.1:8000/api/department_superiors/department-superiors/"),
+        axios.get("http://127.0.0.1:8000/api/department_superiors/department-superiors/archived/"),
       ]);
       setSuperiors(activeRes.data);
       setArchivedSuperiors(archivedRes.data);
@@ -112,7 +112,7 @@ const Departments = () => {
    **************************************/
   const fetchPositions = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/positions/");
+      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/admin/positions/position/");
       setPositions(res.data);
     } catch (err) {
       console.error("Fetch positions error:", err);
@@ -186,7 +186,7 @@ const Departments = () => {
     // if you need to handle newDeptId, do so here
     try {
       // If your backend auto-generates dept_id, you can just pass dept_name
-      await axios.post("http://127.0.0.1:8000/api/departments/", { dept_name: newDeptName });
+      await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/admin/departments/department/", { dept_name: newDeptName });
       setShowDeptModal(false);
       showToast("Department added successfully");
       fetchDepartments();
@@ -291,7 +291,7 @@ const Departments = () => {
         is_archived: false
       };
 
-      await axios.post("http://127.0.0.1:8000/api/department_superiors/", formData);
+      await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/admin/department_superiors/department_superior/", formData);
       setShowSuperiorModal(false);
       showToast("Department superior added successfully");
       fetchDepartmentSuperiors();

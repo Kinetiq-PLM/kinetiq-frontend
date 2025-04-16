@@ -229,7 +229,7 @@
   background-color: #f3f9fa;
   position: sticky;
   top: 0;
-  z-index: 1;
+  /* z-index: 1; */
 }
 /* Leave type tags */
 .hr-tag.sick {

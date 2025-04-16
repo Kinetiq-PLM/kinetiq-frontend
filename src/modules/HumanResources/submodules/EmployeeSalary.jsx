@@ -1,6 +1,5 @@
 /*******************************************************
  *         EMPLOYEESALARY.JSX
- * (FIRST HALF) - Imports, State, Fetch, Logic
  *******************************************************/
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -8,42 +7,32 @@ import "../styles/EmployeeSalary.css";
 import { FiSearch } from "react-icons/fi";
 
 const EmployeeSalary = () => {
-  /******************************************
-   * State & Hooks
-   ******************************************/
+  // State management
   const [salaryData, setSalaryData] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Search & Sort
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("all");
-
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-
-  // Toast (optional, if needed)
   const [toast, setToast] = useState(null);
+  const [editingSalary, setEditingSalary] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [dotsMenuOpen, setDotsMenuOpen] = useState(null);
+
+  // Toast notification helper
   const showToast = (message, success = true) => {
     setToast({ message, success });
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Edit Modal
-  const [editingSalary, setEditingSalary] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false); // Fix typo in state declaration
-  const [dotsMenuOpen, setDotsMenuOpen] = useState(null);
-
-  /******************************************
-   * 1) Fetch Salary Data
-   ******************************************/
+  // Fetch salary data
   const fetchSalaryData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/employee_salary/");
+      const res = await axios.get("http://127.0.0.1:8000/api/employee_salary/employee_salary/");
       setSalaryData(res.data);
     } catch (err) {
-      console.error("Failed to fetch employee salary data:", err);
+      console.error("Failed to fetch salary data:", err);
       showToast("Failed to fetch salary data", false);
     } finally {
       setLoading(false);
@@ -54,9 +43,7 @@ const EmployeeSalary = () => {
     fetchSalaryData();
   }, []);
 
-  /******************************************
-   * 2) Searching + Debounce
-   ******************************************/
+  // Search functionality with debounce
   const debounce = (fn, delay) => {
     let timeout;
     return (...args) => {
@@ -64,21 +51,22 @@ const EmployeeSalary = () => {
       timeout = setTimeout(() => fn(...args), delay);
     };
   };
+
   const handleSearch = debounce((value) => {
     setSearchTerm(value.toLowerCase());
     setCurrentPage(1);
   }, 300);
 
-  /******************************************
-   * 3) Sorting + Pagination + Filtering
-   ******************************************/
+  // Filter, sort and paginate data
   const filterAndPaginate = (dataArray) => {
-    // Filter by searchTerm
+    // Filter by search term
     const filtered = dataArray.filter((item) =>
-      Object.values(item).some((val) => val?.toString().toLowerCase().includes(searchTerm))
+      Object.values(item).some((val) => 
+        val?.toString().toLowerCase().includes(searchTerm)
+      )
     );
 
-    // Sorting if needed
+    // Sort if needed
     if (sortField !== "all") {
       filtered.sort((a, b) => {
         const valA = a[sortField]?.toString().toLowerCase() || "";
@@ -87,17 +75,15 @@ const EmployeeSalary = () => {
       });
     }
 
-    // Pagination
+    // Paginate
     const startIndex = (currentPage - 1) * itemsPerPage;
     const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
-    return { paginated, totalPages, totalCount: filtered.length };
+    return { paginated, totalPages };
   };
 
-  /******************************************
-   * 4) Edit Salary Logic
-   ******************************************/
+  // Edit salary handlers
   const handleEditSalary = (salary) => {
     setEditingSalary(salary);
     setShowEditModal(true);
@@ -123,53 +109,45 @@ const EmployeeSalary = () => {
       }
 
       await axios.patch(
-        `http://127.0.0.1:8000/api/employee_salary/${editingSalary.salary_id}/`,
+        `http://127.0.0.1:8000/api/employee_salary/employee_salary/${editingSalary.salary_id}/`,
         payload
       );
       setShowEditModal(false);
       showToast("Salary updated successfully");
       fetchSalaryData();
     } catch (err) {
-      console.error("Update salary error:", err.response?.data || err); // Log detailed error
-      showToast(err.response?.data?.detail || "Failed to update salary", false); // Show detailed error message
+      console.error("Update salary error:", err);
+      showToast("Failed to update salary", false);
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     setEditingSalary(prev => ({
       ...prev,
       base_salary: name === 'base_salary' ? value : null,
       daily_rate: name === 'daily_rate' ? value : null,
-      [name]: value === '' ? null : value // Convert empty string to null
+      [name]: value === '' ? null : value
     }));
   };
 
-/*******************************************************
- *         EMPLOYEESALARY.JSX
- * (SECOND HALF) - Render & Export
- *******************************************************/
-
-  /******************************************
-   * Render Table
-   ******************************************/
+  // Render salary table
   const renderSalaryTable = () => {
     if (loading) {
-      return <div className="hr-no-results">Loading salary data...</div>;
+      return <div className="hr-employee-salary-no-results">Loading salary data...</div>;
     }
-  
-    const { paginated, totalPages, totalCount } = filterAndPaginate(salaryData);
-  
+
+    const { paginated, totalPages } = filterAndPaginate(salaryData);
+
     if (!paginated.length) {
-      return <div className="hr-no-results">No salary records found.</div>;
+      return <div className="hr-employee-salary-no-results">No salary records found.</div>;
     }
-  
+
     return (
       <>
-        <div className="hr-department-no-scroll-wrapper">
-          <div className="hr-department-table-scrollable">
-            <table className="hr-department-table hr-department-no-scroll-table">
+        <div className="hr-employee-salary-no-scroll-wrapper">
+          <div className="hr-employee-salary-table-scrollable">
+            <table className="hr-employee-salary-table hr-employee-salary-no-scroll-table">
               <thead>
                 <tr>
                   <th>Salary ID</th>
@@ -182,25 +160,25 @@ const EmployeeSalary = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginated.map((sal, index) => (
-                  <tr key={sal.salary_id || index}>
-                    <td>{sal.salary_id}</td>
-                    <td>{sal.employee_id}</td>
-                    <td>{sal.employee_name}</td>
-                    <td>{sal.base_salary || '-'}</td>
-                    <td>{sal.daily_rate || '-'}</td>
-                    <td>{sal.effective_date}</td>
-                    <td className="hr-department-actions">
-                      <div
-                        className="hr-department-dots"
+                {paginated.map((salary, index) => (
+                  <tr key={salary.salary_id}>
+                    <td>{salary.salary_id}</td>
+                    <td>{salary.employee_id}</td>
+                    <td>{salary.employee_name}</td>
+                    <td>{salary.base_salary || '-'}</td>
+                    <td>{salary.daily_rate || '-'}</td>
+                    <td>{salary.effective_date}</td>
+                    <td className="hr-employee-salary-actions">
+                      <div 
+                        className="hr-employee-salary-dots"
                         onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
                       >
                         ⋮
                         {dotsMenuOpen === index && (
-                          <div className="hr-department-dropdown">
-                            <div
-                              className="hr-department-dropdown-item"
-                              onClick={() => handleEditSalary(sal)}
+                          <div className="hr-employee-salary-dropdown">
+                            <div 
+                              className="hr-employee-salary-dropdown-item"
+                              onClick={() => handleEditSalary(salary)}
                             >
                               Edit
                             </div>
@@ -214,9 +192,8 @@ const EmployeeSalary = () => {
             </table>
           </div>
         </div>
-  
-        {/* Pagination Controls */}
-        <div className="hr-pagination">
+
+        <div className="hr-employee-salary-pagination">
           {[...Array(totalPages)].map((_, i) => (
             <button
               key={i}
@@ -227,50 +204,40 @@ const EmployeeSalary = () => {
             </button>
           ))}
           <select
-            className="hr-pagination-size"
+            className="hr-employee-salary-pagination-size"
             value={itemsPerPage}
             onChange={(e) => {
               setItemsPerPage(parseInt(e.target.value));
               setCurrentPage(1);
             }}
           >
-            {[5, 10, 20].map((num) => (
-              <option key={num} value={num}>
-                {num}
-              </option>
-            ))}
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
           </select>
         </div>
       </>
     );
   };
-  
 
-  /******************************************
-   * Main Return
-   ******************************************/
   return (
     <div className="hr-employee-salary">
       <div className="hr-employee-salary-body-content-container">
         <div className="hr-employee-salary-scrollable">
-          {/* Page Heading */}
-          <div className="hr-department-heading">
+          <div className="hr-employee-salary-heading">
             <h2><strong>Employee Salary</strong></h2>
-            <div className="hr-department-right-controls">
-              {/* Search Field */}
-              <div className="hr-department-search-wrapper">
-                <FiSearch className="hr-department-search-icon" />
+            <div className="hr-employee-salary-right-controls">
+              <div className="hr-employee-salary-search-wrapper">
+                <FiSearch className="hr-employee-salary-search-icon" />
                 <input
                   type="text"
-                  className="hr-department-search"
+                  className="hr-employee-salary-search"
                   placeholder="Search..."
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
-
-              {/* Sort Dropdown */}
               <select
-                className="hr-department-filter"
+                className="hr-employee-salary-filter"
                 value={sortField}
                 onChange={(e) => setSortField(e.target.value)}
               >
@@ -279,34 +246,21 @@ const EmployeeSalary = () => {
                 <option value="employee_name">Sort by Employee Name</option>
                 <option value="effective_date">Sort by Effective Date</option>
               </select>
-
-              {/* No Add Button, No Archive Button */}
             </div>
           </div>
 
-          {/* Table Content */}
-          <div className="hr-department-table-container">
+          <div className="hr-employee-salary-table-container">
             {renderSalaryTable()}
           </div>
         </div>
       </div>
 
-      {/* Optional Toast Notification */}
-      {toast && (
-        <div
-          className="hr-department-toast"
-          style={{ backgroundColor: toast.success ? "#4CAF50" : "#F44336" }}
-        >
-          {toast.message}
-        </div>
-      )}
-
       {/* Edit Modal */}
       {showEditModal && editingSalary && (
-        <div className="hr-department-modal-overlay">
-          <div className="hr-department-modal">
+        <div className="hr-employee-salary-modal-overlay">
+          <div className="hr-employee-salary-modal">
             <h3>Edit Salary Details</h3>
-            <form onSubmit={handleEditSubmit} className="hr-department-modal-form">
+            <form onSubmit={handleEditSubmit} className="hr-employee-salary-modal-form">
               <div className="form-group">
                 <label>Employee</label>
                 <input type="text" value={editingSalary.employee_name} disabled />
@@ -318,9 +272,9 @@ const EmployeeSalary = () => {
                   name="base_salary"
                   value={editingSalary.base_salary || ''}
                   onChange={handleInputChange}
-                  disabled={editingSalary.daily_rate !== null && editingSalary.daily_rate !== ''}
+                  disabled={editingSalary.daily_rate !== null}
                   step="0.01"
-                  placeholder="Enter base salary"
+                  min="0"
                 />
               </div>
               <div className="form-group">
@@ -330,16 +284,12 @@ const EmployeeSalary = () => {
                   name="daily_rate"
                   value={editingSalary.daily_rate || ''}
                   onChange={handleInputChange}
-                  disabled={editingSalary.base_salary !== null && editingSalary.base_salary !== ''}
+                  disabled={editingSalary.base_salary !== null}
                   step="0.01"
-                  placeholder="Enter daily rate"
+                  min="0"
                 />
               </div>
-              <div className="form-group">
-                <label>Effective Date</label>
-                <input type="text" value={editingSalary.effective_date} disabled />
-              </div>
-              <div className="hr-department-modal-buttons">
+              <div className="hr-employee-salary-modal-buttons">
                 <button type="submit" className="submit-btn">Save</button>
                 <button
                   type="button"
@@ -351,6 +301,16 @@ const EmployeeSalary = () => {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          className="hr-employee-salary-toast"
+          style={{ backgroundColor: toast.success ? "#4CAF50" : "#F44336" }}
+        >
+          {toast.message}
         </div>
       )}
     </div>

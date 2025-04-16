@@ -84,12 +84,38 @@
     border-radius: 6px;
     font-size: 0.95rem;
   }
+  .hr-employee-search:hover {
+    border-color: #00b0b5;
+  }
+  .hr-employee-search:focus {
+    outline: none;
+    border-color: #00b0b5;
+    box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.1);
+  }
   .hr-employee-filter {
     height: 36px;
+    min-width: 200px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 0.95rem;
     padding: 0 0.75rem;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .hr-employee-filter:hover {
+    border-color: #00b0b5;
+  }
+
+  .hr-employee-filter:focus {
+    outline: none;
+    border-color: #00b0b5;
+    box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.1);
+  }
+
+  .hr-employee-filter option {
+    padding: 8px;
   }
   
   /* Shared button style */
@@ -164,7 +190,8 @@
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    margin-bottom: 1rem; /* Add margin to separate from pagination */
+    margin-bottom: 1rem;
+    max-height: calc(100vh - 250px); /* Limit max height to enable scrolling */
   }
   
   /* For the 'Positions' table (horizontal scroll if wide) */
@@ -174,38 +201,46 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* Hide overflow to prevent double scrollbars */
   }
   
   .hr-employee-table-scrollable {
     width: 100%;
-    overflow: auto; /* Enable both horizontal and vertical scrolling */
+    overflow: auto;
     flex: 1;
     min-height: 0;
+    position: relative; /* Enable sticky header positioning */
   }
   
   /* Table itself */
   .hr-employee-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate; /* Changed from collapse to enable sticky header */
+    border-spacing: 0; /* Maintain same visual appearance */
     font-size: 0.95rem;
     min-width: 1400px; /* Force minimum width */
   }
   
   /* Sticky table header */
-  .hr-employee-table thead th {
-    position: sticky;
-    top: 0;
-    background-color: #f3f9fa;
-    z-index: 10;
-    border-bottom: 1px solid #eee;
-  }
-  
   .hr-employee-table thead {
     position: sticky;
     top: 0;
+    /* z-index: 2; */
+    background-color: #f3f9fa;
   }
   
-  .hr-employee-table th,
+  .hr-employee-table th {
+    position: sticky;
+    top: 0;
+    background-color: #f3f9fa;
+    z-index: 2;
+    border-bottom: 1px solid #eee;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    white-space: nowrap;
+  }
+  
+  /* Table body styles */
   .hr-employee-table td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid #eee;
@@ -229,7 +264,7 @@
   }
   
   /* No results message */
-  .hr-no-results {
+  .hr-employee-no-results {
     text-align: center;
     font-style: italic;
     padding: 2rem;
@@ -325,7 +360,7 @@
   /* ---------------------------------------------------------
      PAGINATION
      --------------------------------------------------------- */
-  .hr-pagination {
+  .hr-employee-pagination {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -333,20 +368,33 @@
     gap: 0.5rem;
     background-color: white;
     border-radius: 8px;
+    flex-wrap: wrap; /* Allow wrapping */
+    max-width: 100%; /* Ensure it stays within container */
   }
-  .hr-pagination button {
+
+  /* Add container specifically for the numbered buttons */
+  .hr-employee-pagination-numbers {
+    display: flex;
+    flex-wrap: wrap; /* Allow numbers to wrap */
+    gap: 0.5rem;
+    justify-content: center;
+    max-width: calc(100% - 100px); /* Leave space for the select */
+    margin-right: 0.5rem;
+  }
+  
+  .hr-employee-pagination button {
     background: white;
     border: 1px solid #ccc;
     padding: 0.4rem 0.8rem;
     border-radius: 4px;
     cursor: pointer;
   }
-  .hr-pagination button.active {
+  .hr-employee-pagination button.active {
     background-color: #00b0b5;
     color: white;
     border-color: #00b0b5;
   }
-  .hr-pagination-size {
+  .hr-employee-pagination-size {
     padding: 0.4rem;
     font-size: 0.9rem;
     border-radius: 4px;
@@ -377,19 +425,24 @@
   }
   
   .hr-employee-modal {
-    width: 800px; /* Increased width to accommodate columns */
+    width: 1000px;
     max-width: 90vw;
+    max-height: 90vh;
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); /* Match departments */
     background-color: white;
-    text-align: left;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Change from 'hidden' to 'auto' to enable vertical scrolling */
   }
   
   .hr-employee-modal-buttons {
     display: flex;
     justify-content: flex-end;
+    gap: 1rem;
     margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
   }
   
   .hr-employee-submit-btn,
@@ -420,8 +473,18 @@
   }
   
   /* Form grouping */
+  .hr-employee-modal-form {
+    height: auto; /* Remove fixed height */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-right: 1rem;
+    margin-bottom: 1rem; /* Add space before buttons */
+    overflow-y: visible; /* Ensure the form content flows naturally */
+  }
+
   .hr-employee-modal-form .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
   }
 
   /* Specific fields that should span both columns */
@@ -438,18 +501,58 @@
   .hr-employee-modal-form select,
   .hr-employee-modal-form input[type="text"],
   .hr-employee-modal-form input[type="number"],
-  .hr-employee-modal-form input[type="email"] {
+  .hr-employee-modal-form input[type="email"],
+  .hr-employee-modal-form input[type="tel"] {
     width: 100%;
-    padding: 0.75rem; /* Match departments */
+    padding: 0.75rem;
     font-size: 1rem;
-    border: 1px solid #d1d5db; /* Match departments */
-    border-radius: 0.5rem; /* Match departments */
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
     background-color: white;
   }
 
+  /* Disabled input styling */
   .hr-employee-modal-form input:disabled {
-    background-color: #f3f4f6; /* Disabled state */
+    background-color: #f3f4f6;
     cursor: not-allowed;
+    color: #666;
+  }
+
+  /* Select styling */
+  .hr-employee-modal-form select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: white;
+    cursor: pointer;
+  }
+
+  /* Checkbox container */
+  .hr-employee-modal-form .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hr-employee-modal-form input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+  }
+
+  /* Adjust the scrollbar styling for the modal */
+  .hr-employee-modal::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .hr-employee-modal::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+  }
+
+  .hr-employee-modal::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.05);
   }
   
   /* ---------------------------------------------------------
@@ -506,8 +609,9 @@
   /* Two-column form layout */
   .hr-two-col {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Creates two equal columns */
-    gap: 1rem 2rem; /* Row gap 1rem, column gap 2rem */
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2.5rem;
+    margin-bottom: 1.5rem;
   }
   
   /* Make buttons span full width */

@@ -7,10 +7,8 @@ const WorkforceAllocation = () => {
   // States for data
   const [allocations, setAllocations] = useState([]);
   const [archivedAllocations, setArchivedAllocations] = useState([]);
-  const [availabilityData, setAvailabilityData] = useState([]);
 
   // UI States
-  const [activeTab, setActiveTab] = useState("Allocation");
   const [showArchived, setShowArchived] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,8 +33,8 @@ const WorkforceAllocation = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/workforce_allocation/"),
-        axios.get("http://127.0.0.1:8000/api/workforce_allocation/archived/")
+        axios.get("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/"),
+        axios.get("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/archived/")
       ]);
       setAllocations(activeRes.data);
       setArchivedAllocations(archivedRes.data);
@@ -78,7 +76,7 @@ const WorkforceAllocation = () => {
   // CRUD operations
   const handleArchive = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/workforce_allocation/${id}/archive/`);
+      await axios.post(`http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${id}/archive/`);
       showToast("Allocation archived successfully");
       fetchAllocations();
     } catch (err) {
@@ -89,7 +87,7 @@ const WorkforceAllocation = () => {
 
   const handleUnarchive = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/workforce_allocation/${id}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${id}/unarchive/`);
       showToast("Allocation unarchived successfully");
       fetchAllocations();
     } catch (err) {
@@ -112,42 +110,58 @@ const WorkforceAllocation = () => {
           <table className="hr-department-table">
             <thead>
               <tr>
-                <th>Employee ID</th>
                 <th>Allocation ID</th>
-                <th>Requesting Dept</th>
-                <th>Current Dept</th>
-                <th>Reason</th>
+                <th>Request ID</th>
+                <th>Requesting Dept ID</th>
+                <th>Current Dept ID</th>
+                <th>HR Approver</th>
+                <th>Employee ID</th>
+                <th>Employee Name</th>
+                <th>Required Skills</th>
+                <th>Task Description</th>
                 <th>Approval Status</th>
                 <th>Status</th>
                 <th>Start Date</th>
                 <th>End Date</th>
-                <th>Approval Date</th>
+                <th>Rejection Reason</th>
+                <th>Submitted At</th>
+                <th>Approved At</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {paginated.map((allocation, index) => (
-                <tr key={allocation.id}>
-                  <td>{allocation.empId}</td>
-                  <td>{allocation.allocationId}</td>
-                  <td>{allocation.requestDeptId}</td>
-                  <td>{allocation.currentDeptId}</td>
-                  <td>{allocation.reason}</td>
+                <tr key={allocation.allocation_id || index}>
+                  <td>{allocation.allocation_id}</td>
+                  <td>{allocation.request_id}</td>
+                  <td>{allocation.requesting_dept_id}</td>
+                  <td>{allocation.current_dept_id}</td>
+                  <td>{allocation.hr_approver}</td>
+                  <td>{allocation.employee_id}</td>
+                  <td>{allocation.employee_name}</td>
+                  <td>{allocation.required_skills}</td>
+                  <td>{allocation.task_description}</td>
                   <td>
-                    <span className={`hr-tag ${allocation.approvalStatus.toLowerCase()}`}>
-                      {allocation.approvalStatus}
+                    <span className={`hr-tag ${allocation.approval_status?.toLowerCase() || 'pending'}`}>
+                      {allocation.approval_status || 'Pending'}
                     </span>
                   </td>
                   <td>
-                    <span className={`hr-tag ${allocation.status.toLowerCase()}`}>
-                      {allocation.status}
+                    <span className={`hr-tag ${allocation.status?.toLowerCase() || 'pending'}`}>
+                      {allocation.status || 'Pending'}
                     </span>
                   </td>
-                  <td>{allocation.startDate}</td>
-                  <td>{allocation.endDate}</td>
-                  <td>{allocation.approvalDate}</td>
+                  <td>{allocation.start_date}</td>
+                  <td>{allocation.end_date}</td>
+                  <td>{allocation.rejection_reason}</td>
+                  <td>{allocation.submitted_at}</td>
+                  <td>{allocation.approved_at}</td>
                   <td className="hr-department-actions">
-                    <button onClick={() => handleArchive(allocation.id)}>Archive</button>
+                    {!showArchived ? (
+                      <button onClick={() => handleArchive(allocation.allocation_id)}>Archive</button>
+                    ) : (
+                      <button onClick={() => handleUnarchive(allocation.allocation_id)}>Unarchive</button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -203,32 +217,6 @@ const WorkforceAllocation = () => {
                 onClick={() => setShowArchived(!showArchived)}
               >
                 {showArchived ? "View Active" : "View Archived"}
-              </button>
-            </div>
-          </div>
-
-          {/* Tab Navigation */}
-          <div className="hr-employee-header">
-            <div className="hr-employee-tabs">
-              <button
-                className={activeTab === "Allocation" ? "active" : ""}
-                onClick={() => {
-                  setActiveTab("Allocation");
-                  setShowArchived(false);
-                  setCurrentPage(1);
-                }}
-              >
-                Allocation <span className="hr-employee-count">{allocations.length}</span>
-              </button>
-              <button
-                className={activeTab === "Availability" ? "active" : ""}
-                onClick={() => {
-                  setActiveTab("Availability");
-                  setShowArchived(false);
-                  setCurrentPage(1);
-                }}
-              >
-                Employee Availability <span className="hr-employee-count">{availabilityData.length}</span>
               </button>
             </div>
           </div>

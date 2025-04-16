@@ -107,7 +107,7 @@
   position: sticky;
   top: 0;
   background-color: #f3f9fa;
-  z-index: 2;
+  /* z-index: 2; */
 }
 
 .workforceallocation-table th,
