@@ -112,25 +112,16 @@
   display: flex;
   flex-direction: column;
   width: 40rem;
+  height: 17rem;
   margin-left: 3rem;
   align-items: center;
-  border: 1px solid red;
 }
-
-.usrprofile .reset-pass {
-  color: teal;
-  font-size: 1.1rem;
+.usrprofile .password-section h3{
+  color: rgb(24, 172, 172);
+  font-size: 1rem;
   font-weight: 700;
   text-align: center;
 }
-
-/* .usrprofile input[type="password"] {
-  height: 2.3rem;
-  width: 80%;
-  font-size: 0.9rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-} */
 
 .usrprofile .change-password-btn {
   background-color: #00a7a7;
@@ -145,24 +136,41 @@
   font-size: 0.9rem;
 }
 
-.usrprofile .pass-wrapper{
+.usrprofile .password-input-error-wrapper{
     position: relative;
-    width: 90%;
-    height: 1.5rem;
-    border-radius: 8px;
-    margin: 0.8rem;
-    font-size: 0.9rem;
+    width: 17rem;
+    display: flex;
+    align-items: center;
 }
 
 .usrprofile input[type="password"], 
 .usrprofile input[type="text"]{
-  font-size: 0.9rem;
+  color: #7d7d7d;
+  font-size: 0.85rem;
+  width: 100%;
+  padding: 0.2rem 2.5rem 0.2rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.3rem;
 }
 
-.eye-icon {
+.usrprofile input[type="text"]:focus,
+.usrprofile input[type="password"]:focus {
+  border: none;
+  box-shadow: 0 0 0.1rem 0.1rem rgba(0, 128, 128, 0.25); 
+  outline: none;
+}
+
+.usrprofile input:-webkit-autofill {
+  background-color: white !important; 
+  color: #7d7d7d !important;          
+  -webkit-text-fill-color: #7d7d7d !important; 
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+
+.usrprofile .eye-icon {
   position: absolute;
-  right: 12px;
-  top: 12px;
+  right: 0.65rem;
   cursor: pointer;
   color: #888;
 }
@@ -192,9 +200,8 @@
 
 .usrprofile .login-error{
   color: rgb(255, 128, 0);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-style: italic;
-  margin-bottom: 0.5rem;
   width: 100%;
   text-align: center;
 }

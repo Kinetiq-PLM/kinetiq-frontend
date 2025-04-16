@@ -84,9 +84,9 @@ const BodyContent = ({ employee_id }) => {
       </div>
       <div className="password-kinetiq-container">
         <div className="password-section">
-          <h3 className="reset-pass">Change Password</h3>
+          <h3>Change Password</h3>
           <p className="login-error">some password error 1</p>{/*currPassErr*/}
-          <div className="pass-wrapper">
+          <div className="password-input-error-wrapper">
             <input type={showCurrPassword ? "text" : "password"} name="curr-pass" placeholder="Current Password" className="input" value={currPassword} onChange={(e) => { setCurrPassword(e.target.value); setCurrPassErr(''); }} />
             <span className="eye-icon" onClick={() => setShowCurrPassword(!showCurrPassword)}>
               {showCurrPassword ? (
@@ -101,9 +101,8 @@ const BodyContent = ({ employee_id }) => {
               )}
             </span>
           </div>
-          <p className="login-error">some password error 1</p>{/*currPassErr*/}
-          <div className="pass-wrapper">
-            <p className="login-error">{newPassErr}</p>
+          <p className="login-error">some password error 2</p>{/*newPassErr*/}
+          <div className="password-input-error-wrapper">
             <input type={showNewPassword ? "text" : "password"} name="new-pass" placeholder="New Password" className="input" value={newPassword} onChange={(e) => { setNewPassword(e.target.value); setNewPassErr(''); }} />
             <span className="eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
               {showNewPassword ? (
@@ -118,9 +117,8 @@ const BodyContent = ({ employee_id }) => {
               )}
             </span>
           </div>
-          <p className="login-error">some password error 1</p>{/*currPassErr*/}
-          <div className="pass-wrapper">
-            <p className="login-error">{conPassErr}</p>
+          <p className="login-error">some password error 3</p>{/*conPassErr*/}
+          <div className="password-input-error-wrapper">
             <input type={showConPassword ? "text" : "password"} name="con-pass" placeholder="Confirm New Password" className="input" value={conPassword} onChange={(e) => { setConPassword(e.target.value); setConPassErr(''); }} />
             <span className="eye-icon" onClick={() => setShowConPassword(!showConPassword)}>
               {showConPassword ? (
