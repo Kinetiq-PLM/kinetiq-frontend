@@ -162,8 +162,6 @@ export default function StandaloneLogin() {
         body: JSON.stringify({
           email: resetData.kinetiq_email,
           newPassword: resetData.newPassword,
-          oldPassword: '',
-          passreq: false
         }),
       });
 

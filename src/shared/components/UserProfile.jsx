@@ -28,7 +28,7 @@ const BodyContent = ({ employee_id }) => {
   const [popupContent, setPopupContent] = useState('Are you sure you want to change your password?');
   const [isPassChanged, setIsPassChanged] = useState(false);
 
-  const arePassFieldsValid = () => {
+  const arePassFieldsValid = async () => {
     if (!newPassword) {
       setNewPassErr("* Password cannot be empty. *");
       return false;
@@ -41,22 +41,26 @@ const BodyContent = ({ employee_id }) => {
       setConPassErr("* Passwords do not match. *");
       return false;
     }
-
-    setOpenPopup(true);
+    const pass_valid = await checkPassword()
+    console.log(pass_valid)
+    if (!pass_valid) {
+      setConPassErr("* Invalid credentials. *")
+      return false;
+    }
+      setOpenPopup(true);
     return true;
   }
 
   const handleChangePassword = async () => {
     if (!isPassChanged) {
       try {
+        console.log('new pass ' + newPassword)
         const res = await fetch("http://127.0.0.1:8000/reset-password/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: email,
             newPassword: newPassword,
-            oldPassword: currPassword,
-            passreq: true,
           }),
         });
 
@@ -72,6 +76,25 @@ const BodyContent = ({ employee_id }) => {
       }
     }
   };
+
+  const checkPassword = async () => {
+    console.log("checking password")
+    const res = await fetch("http://127.0.0.1:8000/check-password/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email,
+        password: currPassword,
+      }),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      return true
+    } else {
+      return false
+    }
+  }
 
   return (
     <div className="usrprofile">
