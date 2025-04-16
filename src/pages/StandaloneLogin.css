@@ -145,12 +145,18 @@
   .password-wrapper {
     position: relative;
     width: 100%;
+    display: flex;
+    align-items: center;
   }
-  
-  .eye-icon {
+
+  .password-wrapper input{
+    flex: 1;
+    padding-right: 2rem;
+  }
+
+  .password-wrapper .eye-icon {
     position: absolute;
-    right: 12px;
-    top: 12px;
+    right: 0.5rem;
     cursor: pointer;
     color: #888;
   }
