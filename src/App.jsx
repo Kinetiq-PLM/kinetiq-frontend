@@ -454,9 +454,9 @@ function App() {
       )
     );
 
-  const modulesIcons = Object.keys(moduleFileNames).map((module) => ({
+  const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
     id: module,
-    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
+    icon: `/icons/module-icons/${filteredModuleFileNames[module]}.png`,
   }));
 
   return (
