@@ -1,0 +1,102 @@
+/* .landing-container {
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(135deg, #016761 0%, #97e2dd 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+  } */
+  
+  .landing-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+    text-align: center;
+    max-width: 400px;
+    min-height: 380px;
+    width: 90%;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .landing-logo {
+    width: 250px;
+    margin: 0 auto; 
+    display: block;
+    padding-top: 1.3rem;
+    padding-bottom: 3rem; 
+  }
+  
+
+  
+  .landing-content h1 {
+    font-size: 2.2rem;
+    color: #016761;
+    margin-bottom: 1rem;
+  }
+  
+  .landing-subtext {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+    text-align: center;
+    padding-bottom: 2rem;
+  }
+  
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -40%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+  
+  /* .landing-button {
+    background-color: #00a7a7;
+    color: white;
+    border: none;
+    padding: 0.5rem 3rem;
+    font-size: 1.0rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 500;
+  }
+  
+  .landing-button:hover {
+    background-color: #016761;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 167, 167, 0.3);
+  } */
+
+  
+  @media (max-width: 600px) {
+    .landing-content {
+      padding: 1.5rem;
+      max-width: 280px;
+      min-height: 300px;
+      margin-left: 1.5rem;
+    }
+    
+    .landing-content h1 {
+      font-size: 1.5rem;
+    }
+    
+    .landing-logo {
+      width: 150px;
+      padding-bottom: 1.5rem;
+    }
+    
+    .landing-subtext {
+      font-size: 0.8rem;
+      padding-bottom: 1.5rem;
+    }
+  }
