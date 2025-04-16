@@ -26,37 +26,78 @@ function App() {
     }
   };
 
-  // load jsx files for main modules
-  const loadMainModule = (moduleId) => {
-    if (
-      moduleFileNames[moduleId] &&
-      !(activeModule == moduleId && !activeSubModule)
-    ) {
-      const LazyComponent = lazy(() =>
-        import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
-        )
-      );
+  const mainModules = import.meta.glob('./modules/*/*.jsx');
+  const subModules = import.meta.glob('./modules/*/submodules/*.jsx');
 
-      setModuleComponent(() => LazyComponent);
-    }
-  };
+    // load jsx files for main modules
+    const loadMainModule = (moduleId) => {
+      if (
+        moduleFileNames[moduleId] &&
+        !(activeModule === moduleId && !activeSubModule)
+      ) {
+        const path = `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`;
+  
+        const importFunc = mainModules[path];
+  
+        if (importFunc) {
+          const LazyComponent = lazy(importFunc);
+          setModuleComponent(() => LazyComponent);
+        } else {
+          console.error(`Main module not found: ${path}`);
+        }
+      }
+    };
+  
+    // load jsx files for submodules
+    const loadSubModule = (submoduleId) => {
+      if (
+        moduleSubmoduleFileNames[activeModule][submoduleId] &&
+        !(activeSubModule === submoduleId)
+      ) {
+        const path = `./modules/${moduleFileNames[activeModule]}/submodules/${moduleSubmoduleFileNames[activeModule][submoduleId]}.jsx`;
+    
+        const importFunc = subModules[path];
+    
+        if (importFunc) {
+          const LazyComponent = lazy(importFunc);
+          setModuleComponent(() => LazyComponent);
+        } else {
+          console.error(`Submodule not found: ${path}`);
+        }
+      }
+    };
 
-  // load jsx files for submodules
-  const loadSubModule = (submoduleId) => {
-    if (
-      moduleSubmoduleFileNames[activeModule][submoduleId] &&
-      !(activeSubModule == submoduleId)
-    ) {
-      const LazyComponent = lazy(() =>
-        import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[activeModule]}/submodules/${moduleSubmoduleFileNames[activeModule][submoduleId]}.jsx`
-        )
-      );
+// // OLD WAY to load jsx files for main modules
+// const loadMainModule = (moduleId) => {
+//   if (
+//     moduleFileNames[moduleId] &&
+//     !(activeModule == moduleId && !activeSubModule)
+//   ) {
+//     const LazyComponent = lazy(() =>
+//       import(
+//         /* @vite-ignore */ ./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx
+//       )
+//     );
 
-      setModuleComponent(() => LazyComponent);
-    }
-  };
+//     setModuleComponent(() => LazyComponent);
+//   }
+// };
+
+// // OLD WAY to load jsx files for submodules
+// const loadSubModule = (submoduleId) => {
+//   if (
+//     moduleSubmoduleFileNames[activeModule][submoduleId] &&
+//     !(activeSubModule == submoduleId)
+//   ) {
+//     const LazyComponent = lazy(() =>
+//       import(
+//         /* @vite-ignore */ ./modules/${moduleFileNames[activeModule]}/submodules/${moduleSubmoduleFileNames[activeModule][submoduleId]}.jsx
+//       )
+//     );
+
+//     setModuleComponent(() => LazyComponent);
+//   }
+// };
 
   const moduleFileNames = {
     Management: "Management",
