@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../styles/PurchaseAPInvoice.css";
-import PurchaseOrders from "./PurchaseOrders"; // Import the PurchaseOrders component
+import "../styles/PurchaseOrdStat.css";
+import PurchaseOrders from "./PurchaseOrders";
+import PurchaseOrderEdit from "./PurchaseOrdedit"; // Import the edit component
 
 // Define the formatDate function
 const formatDate = (dateString) => {
@@ -10,11 +12,12 @@ const formatDate = (dateString) => {
 };
 
 const PurchaseOrdStatBody = () => {
-  const [purchaseOrders, setPurchaseOrders] = useState([]); // State to store purchase orders
-  const [selectedOrder, setSelectedOrder] = useState(null); // State to store the selected order
-  const [loading, setLoading] = useState(true); // State to manage loading status
-  const [error, setError] = useState(null); // State to handle errors
-  const [orderDetails, setOrderDetails] = useState(null); // State to store fetched order details
+  const [purchaseOrders, setPurchaseOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [editingOrder, setEditingOrder] = useState(null); // State for the order being edited
 
   // Fetch purchase orders from the API
   useEffect(() => {
@@ -38,38 +41,50 @@ const PurchaseOrdStatBody = () => {
   }, []);
 
   const handleBack = () => {
-    setSelectedOrder(null); // Reset the selected order
-    setOrderDetails(null); // Reset the fetched order details
+    setSelectedOrder(null);
+    setOrderDetails(null);
   };
 
   const handleRowClick = async (order) => {
-    console.log("Selected Order (PurchaseOrdStat):", order); // Debugging
-    setSelectedOrder(order); // Set the clicked order
+    console.log("Selected Order (PurchaseOrdStat):", order);
+    setSelectedOrder(order);
   
     try {
-      // Fetch the list of purchase orders
       const response = await fetch("http://127.0.0.1:8000/api/purchase-orders/list/");
       if (!response.ok) {
         throw new Error("Failed to fetch purchase orders");
       }
       const data = await response.json();
   
-      // Find the specific order by purchase_id
       const orderDetails = data.find((item) => item.purchase_id === order.purchase_id);
       if (!orderDetails) {
         throw new Error("Purchase order not found");
       }
   
-      console.log("Fetched Order Details:", orderDetails); // Debugging
-      setOrderDetails(orderDetails); // Store the fetched order details
+      console.log("Fetched Order Details:", orderDetails);
+      setOrderDetails(orderDetails);
     } catch (error) {
       console.error("Error fetching order details:", error);
       setError("Failed to load order details");
     }
   };
-  
+
+  const handleEditClick = (order, e) => {
+    e.stopPropagation(); // Prevent row click from triggering
+    setEditingOrder(order);
+  };
+
+  const handleUpdateSuccess = (updatedOrder) => {
+    // Update the local state with the edited order
+    setPurchaseOrders(prevOrders =>
+      prevOrders.map(order =>
+        order.purchase_id === updatedOrder.purchase_id ? updatedOrder : order
+      )
+    );
+    setEditingOrder(null);
+  };
+
   if (orderDetails) {
-    // If order details are fetched, render the PurchaseOrders component
     return (
       <PurchaseOrders
         quotation_id={orderDetails.quotation_id}
@@ -95,12 +110,13 @@ const PurchaseOrdStatBody = () => {
         <div className="apinvoice-content">
           <div className="apinvoice-table">
             <div className="apinvoice-table-header">
-              <div className="apinvoice-checkbox"><input type="checkbox" /></div>
+             
               <div>Purchase Order</div>
               <div>Ref: RFQ</div>
               <div>Status</div>
               <div>Delivery Date</div>
               <div>Order Date</div>
+              <div>Actions</div> {/* New column for actions */}
             </div>
 
             <div className="apinvoice-table-rows">
@@ -108,25 +124,41 @@ const PurchaseOrdStatBody = () => {
                 <div
                   className="apinvoice-row"
                   key={order.purchase_id}
-                  onClick={() => handleRowClick(order)} // Handle row click
-                  style={{ cursor: "pointer" }} // Add pointer cursor for better UX
+                  onClick={() => handleRowClick(order)}
+                  style={{ cursor: "pointer" }}
                 >
-                  <div className="apinvoice-checkbox">
-                    <input type="checkbox" />
-                  </div>
                   <div>{order.purchase_id}</div>
                   <div>{order.quotation_id}</div>
                   <div>
-                    <span className={`status-${order.status.toLowerCase()}`}>{order.status}</span>
+                    <span className={`status-${order.status.toLowerCase()}`}>
+                      {order.status}
+                    </span>
                   </div>
                   <div>{order.delivery_date ? formatDate(order.delivery_date) : "N/A"}</div>
                   <div>{order.order_date ? formatDate(order.order_date) : "N/A"}</div>
+                  <div className="apinvoice-actions">
+                    <button 
+                      className="apinvoice-edit-button"
+                      onClick={(e) => handleEditClick(order, e)}
+                    >
+                      Edit
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {editingOrder && (
+        <PurchaseOrderEdit
+          purchaseOrder={editingOrder}
+          onClose={() => setEditingOrder(null)}
+          onSuccess={handleUpdateSuccess}
+        />
+      )}
     </div>
   );
 };

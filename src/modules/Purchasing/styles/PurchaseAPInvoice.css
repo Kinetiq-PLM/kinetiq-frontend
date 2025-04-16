@@ -3,6 +3,31 @@
     width: 100%;
     height: auto;
 }
+
+.apinvoice-table-header > div:last-child,
+.apinvoice-row > div:last-child {
+  width: 100px; /* Fixed width for actions column */
+  text-align: center;
+}
+
+.apinvoice-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.apinvoice-edit-button {
+  padding: 4px 8px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  margin: 0 2px;
+}
+
+.apinvoice-edit-button:hover {
+  background-color: #e0e0e0;
+}
   
 .apinvoice .body-content-container {
     width: 100%;

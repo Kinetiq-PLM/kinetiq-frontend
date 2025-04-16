@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/PurchForQuotForm.css";
 
-const PurchForQuotForm = ({ onClose, request, quotation }) => {
+const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   const requestId = request?.request_id; // Access request_id from the passed request object
   const employeeName = request?.employee_name || "Unknown"; // Access employee_name from the request object
 
@@ -270,57 +270,135 @@ const PurchForQuotForm = ({ onClose, request, quotation }) => {
   };
 
   const handleAddToList = async () => {
-    try {
-      // Fetch existing document numbers to check for duplicates
-      const response = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/document/list/");
-      const existingDocuments = response.data.map((doc) => doc.document_no);
-  
-      // Check if the current document number already exists
-      if (existingDocuments.includes(formData.documentNumber)) {
-        alert(`Document number ${formData.documentNumber} already exists. Please generate a new one.`);
-        return; // Exit the function
-      }
-  
-      // Prepare the payload
-      const payload = {
-        quotation_id: formData.quotation_id || null,
-        document_no: formData.documentNumber || null,
-        status: formData.status || "Pending", // Use the current status (Pending or Rejected)
-        valid_date: formData.validUntil || null,
-        document_date: formData.documentDate || null,
-        required_date: formData.requiredDate || null,
-        total_before_discount: formData.totalAmount || null,
-        discount_percent: formData.discountPercentage || null,
-        freight: formData.freight || null,
-        tax: formData.tax || null,
-        total_payment: formData.totalPaymentDue || null,
-        vendor_code: formData.vendor || null,
-        request_id: formData.request_id || null, // Ensure request_id is included
-        remarks: formData.remarks || null,
-        delivery_loc: formData.delivery_loc || null,
-        downpayment_request: formData.downpayment_request.enabled
-          ? parseInt(formData.downpayment_request.value, 10) || null
-          : null, // Ensure it's an integer or null
-      };
-  
-      console.log("Request ID in formData:", formData.request_id);
-      console.log("Payload being sent:", payload);
+  try {
+    // 1. First get ALL existing quotations to check for duplicates
+    const checkResponse = await axios.get(
+      `http://127.0.0.1:8000/api/purchase_quotation/list/`
+    );
+    
+    // 2. Find if this exact document_no exists (with same request_id)
+    const existingQuotation = checkResponse.data.find(
+      q => q.document_no === formData.documentNumber && 
+           q.request_id === requestId
+    );
 
-      console.log("📤 Sending Payload to Add to List:", payload);
-  
-      // Send the payload to the API
-      const createResponse = await axios.post(
+    // 3. Prepare the payload
+    const payload = {
+      document_no: parseInt(formData.documentNumber),
+      status: formData.status || "Pending",
+      valid_date: formData.validUntil || null,
+      document_date: formData.documentDate || null,
+      required_date: formData.requiredDate || null,
+      total_before_discount: formData.totalAmount || null,
+      discount_percent: formData.discountPercentage || null,
+      freight: formData.freight || null,
+      tax: formData.tax || null,
+      total_payment: formData.totalPaymentDue || null,
+      vendor_code: formData.vendor || null,
+      request_id: requestId || null,
+      remarks: formData.remarks || null,
+      delivery_loc: formData.delivery_loc || null,
+      downpayment_request: formData.downpayment_request.enabled
+        ? parseFloat(formData.downpayment_request.value) || 0
+        : null,
+    };
+
+    // 4. Debug log before making the request
+    console.log('Existing quotation check:', {
+      exists: !!existingQuotation,
+      document_no: formData.documentNumber,
+      request_id: requestId
+    });
+
+    let apiResponse;
+    if (existingQuotation) {
+      console.log("Updating existing quotation ID:", existingQuotation.quotation_id);
+      apiResponse = await axios.put(
+        `http://127.0.0.1:8000/api/purchase_quotation/edit/${existingQuotation.quotation_id}/`,
+        payload
+      );
+    } else {
+      console.log("Creating new quotation");
+      apiResponse = await axios.post(
         "http://127.0.0.1:8000/api/purchase_quotation/create/",
         payload
       );
-      console.log("✅ Response from server:", createResponse.data);
-      alert(`Quotation with status "${formData.status}" added to the list successfully!`);
-      window.location.reload(); // Reload the page after successful submission
-    } catch (error) {
-      console.error("❌ Error adding quotation to the list:", error.response?.data || error.message);
-      alert("Failed to add quotation to the list. Check the console for details.");
     }
-  };
+
+    console.log("API Response:", apiResponse.data);
+    window.location.reload();
+    alert("Quotation added successfully!");
+    
+    return apiResponse.data;
+
+  } catch (error) {
+    console.error("Full error details:", {
+      message: error.message,
+      response: error.response?.data,
+      config: error.config
+    });
+    throw error; // Re-throw to be caught by the calling function
+  }
+};
+
+  
+
+const handleSendTo = async () => {
+  try {
+    setIsPopupVisible(false);
+    
+    // First update/create the quotation
+    const quotationResponse = await handleAddToList();
+    
+    if (!quotationResponse?.quotation_id) {
+      throw new Error("Failed to get valid quotation ID");
+    }
+
+    // Prepare purchase order payload with proper data types
+    const poPayload = {
+      quotation_id: quotationResponse.quotation_id,
+      order_date: new Date().toISOString().split('T')[0],
+      delivery_date: formData.deliveryDate || new Date().toISOString().split('T')[0],
+      document_date: formData.documentDate || new Date().toISOString().split('T')[0],
+      status: "Pending"
+    };
+
+    console.log("Purchase Order Payload:", JSON.stringify(poPayload, null, 2));
+
+    // Create purchase order
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/purchase-orders/list/",
+      poPayload,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+
+    console.log("Purchase Order Response:", response.data);
+    alert("Purchase order created successfully!");
+
+  } catch (error) {
+    console.error("Purchase Order Error Details:", {
+      message: error.message,
+      responseData: error.response?.data,
+      status: error.response?.status,
+      headers: error.response?.headers,
+      config: error.config
+    });
+    
+    let errorMessage = "Failed to create purchase order. ";
+    if (error.response?.data) {
+      // Display backend validation errors if available
+      errorMessage += JSON.stringify(error.response.data);
+    }
+    
+    alert(errorMessage);
+    setIsPopupVisible(true); // Reopen popup to try again
+  }
+};
+  
 
   const getItemName = (id, type) => {
     if (type === "material") {
@@ -335,26 +413,26 @@ const PurchForQuotForm = ({ onClose, request, quotation }) => {
 
   return (
     <div className="purchquoteform">
-      <div className="body-content-container">
-        <div className="purchquoteform-header">
-          <button className="purchquoteform-back" onClick={onClose}>← Back</button>
-          <h2 className="purchquoteform-title">Request For Quotation Form</h2>
-          {formData.status === "Pending" || formData.status === "Rejected" ? (
-            <button
-              className="purchquoteform-send"
-              onClick={handleAddToList} // Call the function
-            >
-              Add to List
-            </button>
-          ) : (
-            <button
-              className="purchquoteform-send"
-              onClick={() => setIsPopupVisible(true)}
-            >
-              Send To
-            </button>
-          )}
-        </div>
+    <div className="body-content-container">
+      <div className="purchquoteform-header">
+        <button className="purchquoteform-back" onClick={onClose}>← Back</button>
+        <h2 className="purchquoteform-title">Request For Quotation Form</h2>
+        {formData.status === "Pending" || formData.status === "Rejected" ? (
+        <button
+          className="purchquoteform-send"
+          onClick={handleAddToList}
+        >
+          Add to List
+        </button>
+      ) : (
+        <button
+        className="purchquoteform-send"
+          onClick={() => setIsPopupVisible(true)} // Just show popup first
+>
+          Send To
+        </button>
+      )}
+      </div>
 
           <div className="purchquoteform-content">
             <div className="purchquoteform-grid">
@@ -606,7 +684,7 @@ const PurchForQuotForm = ({ onClose, request, quotation }) => {
     <div className="popup-form-content">
       <h3>Purchase Order</h3>
       <br></br>
-      <p>Please fill in to proceed.</p>
+      <p>Please confirm delivery details</p>
       <br></br>
 
       {/* Delivery Date Field */}
@@ -646,65 +724,23 @@ const PurchForQuotForm = ({ onClose, request, quotation }) => {
         </select>
       </div>
 
-      {/* Close Button */}
-      <button
-        className="popup-close-button"
-        onClick={() => setIsPopupVisible(false)}
-      >
-        Close
-      </button>
-
-      {/* Submit Button */}
-      <button
-        className="popup-submit-button"
-        onClick={async () => {
-          try {
-            // Fetch the quotation_id dynamically
-            const quotationResponse = await axios.get(
-              "http://127.0.0.1:8000/api/purchase_quotation/list/"
-            );
-            const quotation = quotationResponse.data.find(
-              (q) => q.document_no === formData.documentNumber
-            );
-
-            if (!quotation) {
-              alert("Quotation not found for the provided document number.");
-              return;
-            }
-
-            // Prepare the payload
-            const payload = {
-              purchase_id: "", // Auto-generated by the backend
-              quotation_id: quotation.quotation_id, // Use the fetched quotation_id
-              order_date: new Date().toISOString().split("T")[0], // Today's date
-              delivery_date: formData.deliveryDate || null, // Delivery date from the form
-              document_date: new Date().toISOString().split("T")[0], // Today's date
-              status: formData.popupStatus || null, // Status from the form
-            };
-
-            console.log("📤 Sending Purchase Order Payload:", payload);
-
-            // Make the POST request
-            const response = await axios.post(
-              "http://127.0.0.1:8000/api/purchase-orders/list/",
-              payload
-            );
-
-            console.log("✅ Purchase Order Created Successfully:", response.data);
-            alert("Purchase order created successfully!");
-            setIsPopupVisible(false); // Close the popup
-          } catch (error) {
-            console.error("❌ Error creating purchase order:", error.response?.data || error.message);
-            alert("Failed to create purchase order. Check the console for details.");
-          }
-        }}
-      >
-        Submit
-      </button>
-
-    </div>
-  </div>
-)}
+      <div className="popup-buttons">
+                <button 
+                  className="popup-close-button" 
+                  onClick={() => setIsPopupVisible(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="popup-submit-button" 
+                  onClick={handleSendTo}
+                >
+                  Confirm & Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
           <div className="purchquoteform-footer">
             <button className="purchquoteform-copy">Copy From</button>

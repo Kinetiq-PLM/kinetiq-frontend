@@ -53,10 +53,17 @@ const PurchaseQuotBody = () => {
         setView("form"); // Switch to the PurchForQuotForm view
     };
 
-    const filteredQuotations = filterByDate(selectedDate).filter((q) =>
-        q.document_no.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (q.status && q.status.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const filteredQuotations = filterByDate(selectedDate)
+        .filter((q) =>
+            q.document_no.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (q.status && q.status.toLowerCase().includes(searchTerm.toLowerCase()))
+        )
+        .sort((a, b) => {
+            // Convert document numbers to numbers for proper numeric sorting
+            const docA = parseInt(a.document_no, 10);
+            const docB = parseInt(b.document_no, 10);
+            return docA - docB; // Ascending order
+        });
 
     return (
         <div className="purchquote">

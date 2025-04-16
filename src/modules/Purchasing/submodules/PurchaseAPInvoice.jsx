@@ -4,10 +4,13 @@ import PurchaseAPInvoiceForm from "./PurchaseAPInvoiceForm";
 
 const PurchaseAPInvoiceBody = () => {
     const [invoices, setInvoices] = useState([]);
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [showDateDropdown, setShowDateDropdown] = useState(false);
+    const [filteredInvoices, setFilteredInvoices] = useState([]);
+    const [selectedInvoice, setSelectedInvoice] = useState(null); // Selected invoice
     const [selectedDate, setSelectedDate] = useState("Last 30 days");
-    const [showNewForm, setShowNewForm] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState("All");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [showDateDropdown, setShowDateDropdown] = useState(false);
+    const [showStatusFilter, setShowStatusFilter] = useState(false);
 
     const timeOptions = [
         "Last 30 days",
@@ -17,37 +20,60 @@ const PurchaseAPInvoiceBody = () => {
         "Last 1 day"
     ];
 
+    const statusOptions = [
+        "All",
+        "Pending",
+        "Rejected",
+        "Paid",
+    ];
+
     useEffect(() => {
         // Fetch invoices from the API
         fetch("http://127.0.0.1:8000/api/invoices/list/")
             .then((response) => response.json())
             .then((data) => {
-                console.log("Fetched data:", data); // Log to check API response structure
+                console.log("Fetched data:", data);
                 setInvoices(data);
+                setFilteredInvoices(data); // Initialize filtered invoices
             })
             .catch((error) => {
                 console.error("Error fetching invoices:", error);
             });
     }, []);
 
-    const handleBack = () => {
-        // Add navigation logic here
-        console.log("Back button clicked");
-    };
+    useEffect(() => {
+        // Apply all filters whenever any filter changes
+        applyFilters();
+    }, [selectedDate, selectedStatus, searchTerm, invoices]);
 
-    const handleFilter = () => {
-        // Add filter logic here
-        console.log("Filter clicked");
-    };
+    const applyFilters = () => {
+        let result = [...invoices];
 
-    const handleSearch = (e) => {
-        // Add search logic here
-        console.log("Searching for:", e.target.value);
-    };
+        // 1. Apply date filter
+        if (selectedDate !== "All") {
+            const days = parseInt(selectedDate.match(/\d+/)[0], 10);
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - days);
+            result = result.filter(invoice => new Date(invoice.document_date) >= cutoffDate);
+        }
 
-    const handleCompare = () => {
-        // Add compare logic here
-        console.log("Compare clicked");
+        // 2. Apply status filter
+        if (selectedStatus !== "All") {
+            result = result.filter(invoice => invoice.status === selectedStatus);
+        }
+
+        // 3. Apply search filter
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            result = result.filter(invoice => 
+                (invoice.invoice_id && invoice.invoice_id.toString().toLowerCase().includes(term)) ||
+                (invoice.purchase_order && invoice.purchase_order.toString().toLowerCase().includes(term)) ||
+                (invoice.document_date && invoice.document_date.toString().toLowerCase().includes(term)) ||
+                (invoice.status && invoice.status.toLowerCase().includes(term))
+            );
+        }
+
+        setFilteredInvoices(result);
     };
 
     const handleDateOptionSelect = (option) => {
@@ -55,23 +81,30 @@ const PurchaseAPInvoiceBody = () => {
         setShowDateDropdown(false);
     };
 
-    const handleNewForm = () => {
-        setShowNewForm(true);
+    const handleStatusSelect = (status) => {
+        setSelectedStatus(status);
+        setShowStatusFilter(false);
     };
 
-    const handleSendTo = () => {
-        // Add send to logic here
-        console.log("Send to clicked");
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleInvoiceClick = (invoice) => {
+        setSelectedInvoice(invoice); // Set the selected invoice
     };
 
     return (
         <div className="apinvoice">
-            {showNewForm ? (
-                <PurchaseAPInvoiceForm onClose={() => setShowNewForm(false)} />
+            {selectedInvoice ? (
+                <PurchaseAPInvoiceForm 
+                    invoiceData={selectedInvoice} 
+                    onClose={() => setSelectedInvoice(null)} 
+                />
             ) : (
                 <div className="body-content-container">
                     <div className="apinvoice-header">
-                        <button className="apinvoice-back" onClick={handleBack}>← Back</button>
+                        <button className="apinvoice-back">← Back</button>
                         <div className="apinvoice-filters">
                             <div className="apinvoice-date-filter">
                                 <div 
@@ -95,14 +128,28 @@ const PurchaseAPInvoiceBody = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="apinvoice-filter-btn" onClick={handleFilter}>
-                                <span>Filter by</span>
+                            <div className="apinvoice-filter-btn" onClick={() => setShowStatusFilter(!showStatusFilter)}>
+                                <span>Filter by: {selectedStatus}</span>
                                 <span>▼</span>
+                                {showStatusFilter && (
+                                    <div className="status-options-dropdown">
+                                        {statusOptions.map((status) => (
+                                            <div
+                                                key={status}
+                                                className="status-option"
+                                                onClick={() => handleStatusSelect(status)}
+                                            >
+                                                {status}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             <div className="apinvoice-search">
                                 <input 
                                     type="text" 
-                                    placeholder="Search for RQF number, supplier, date"
+                                    placeholder="Search for Invoice ID, PO, Status, Date"
+                                    value={searchTerm}
                                     onChange={handleSearch}
                                 />
                             </div>
@@ -116,38 +163,36 @@ const PurchaseAPInvoiceBody = () => {
                                 <div>Invoice ID</div>
                                 <div>Purchase Order</div>
                                 <div>Status</div>
-                                <div>Due Date</div> {/* Updated header */}
+                                <div>Due Date</div>
                                 <div>Document Date</div>
                             </div>
 
                             <div className="apinvoice-table-rows">
-                                {invoices.length > 0 ? invoices.map((invoice) => (
-                                    <div key={invoice.id} className="apinvoice-row">
-                                        <div className="apinvoice-checkbox">
-                                            <input type="checkbox" />
+                                {filteredInvoices.length > 0 ? (
+                                    filteredInvoices.map((invoice) => (
+                                        <div 
+                                            key={invoice.id} 
+                                            className="apinvoice-row"
+                                            onClick={() => handleInvoiceClick(invoice)} // Handle row click
+                                        >
+                                            <div className="apinvoice-checkbox">
+                                                <input type="checkbox" />
+                                            </div>
+                                            <div>{invoice.invoice_id}</div>
+                                            <div>{invoice.purchase_order}</div>
+                                            <div>
+                                                <span className={`status-${invoice.status.toLowerCase()}`}>
+                                                    {invoice.status}
+                                                </span>
+                                            </div>
+                                            <div>{invoice.due_date}</div>
+                                            <div>{invoice.document_date}</div>
                                         </div>
-                                        <div>{invoice.invoice_id}</div> {/* Display invoice_id */}
-                                        <div>{invoice.purchase_order}</div>
-                                        <div>
-                                            <span className={`status-${invoice.status.toLowerCase()}`}>
-                                                {invoice.status}
-                                            </span>
-                                        </div>
-                                        <div>{invoice.due_date}</div> {/* Updated to display due_date */}
-                                        <div>{invoice.document_date}</div> {/* Display document_date */}
-                                    </div>
-                                )) : (
-                                    <div>No invoices found</div>
+                                    ))
+                                ) : (
+                                    <div className="apinvoice-no-data">No invoices found matching your criteria</div>
                                 )}
                             </div>
-                        </div>
-                    </div>
-
-                    <div className="apinvoice-footer">
-                        <button className="apinvoice-new-form" onClick={handleNewForm}>New Form</button>
-                        <div className="apinvoice-footer-right">
-                            <button className="apinvoice-compare" onClick={handleCompare}>Compare</button>
-                            <button className="apinvoice-send-to" onClick={handleSendTo}>Send to</button>
                         </div>
                     </div>
                 </div>

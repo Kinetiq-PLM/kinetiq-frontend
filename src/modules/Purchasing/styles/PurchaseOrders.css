@@ -3,7 +3,177 @@
   width: 100%;
   height: auto;
 }
+.po-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
 
+.po-confirm-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+}
+
+.po-confirm-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.confirm-yes,
+.confirm-no {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.confirm-yes {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.confirm-no {
+  background-color: #f44336;
+  color: white;
+}
+.purchord-qc-button {
+  margin-left: 1rem;
+  padding: 6px 12px;
+  background-color: #3c91e6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.purchord-qc-form label {
+  display: block;
+  margin: 10px 0;
+}
+
+.purchord-qc-form input,
+.purchord-qc-form textarea {
+  width: 100%;
+  padding: 6px;
+  margin-top: 4px;
+  box-sizing: border-box;
+}
+.po-edit-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.po-edit-content {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.po-edit-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+
+.po-edit-content h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.po-edit-form-group {
+  margin-bottom: 20px;
+}
+
+.po-edit-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #444;
+}
+
+.po-edit-form-group select,
+.po-edit-form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.po-edit-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.po-edit-cancel,
+.po-edit-submit {
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.po-edit-cancel {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #333;
+}
+
+.po-edit-submit {
+  background-color: #0066cc;
+  color: white;
+  border: none;
+}
+
+.po-edit-submit:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.purchord-edit-button {
+  margin-left: 10px;
+  padding: 2px 8px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.purchord-edit-button:hover {
+  background-color: #e0e0e0;
+}
 .purchord .body-content-container {
   width: 100%;
   height: 100%;

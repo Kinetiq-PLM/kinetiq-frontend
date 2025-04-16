@@ -1,10 +1,22 @@
 import React from "react";
 import "../styles/PurchaseCredMemoForm.css";
 
-const PurchaseCredMemoForm = ({ onClose }) => {
+const PurchaseCredMemoForm = ({ memoData, onClose }) => {
     const handleBack = () => {
         onClose?.();
     };
+
+    // Destructure the memoData to extract relevant fields
+    const {
+        credit_memo_id,
+        purchase_order,
+        document_no,
+        document_date,
+        due_date,
+        total_credit,
+        balance_due,
+        items = []  // assuming the credit memo items are passed as an array
+    } = memoData || {};
 
     return (
         <div className="purchase-cred-memo-form">
@@ -44,19 +56,19 @@ const PurchaseCredMemoForm = ({ onClose }) => {
                                 <div className="memo-details">
                                     <div className="detail-row">
                                         <span>CREDIT MEMO NO.</span>
-                                        <span>INT-001</span>
+                                        <span>{credit_memo_id}</span>
                                     </div>
                                     <div className="detail-row">
                                         <span>CREDIT MEMO DATE</span>
-                                        <span>01/01/2025</span>
+                                        <span>{document_date}</span>
                                     </div>
                                     <div className="detail-row">
                                         <span>DOCUMENT NO.</span>
-                                        <span>00001</span>
+                                        <span>{document_no}</span>
                                     </div>
                                     <div className="detail-row">
                                         <span>DUE DATE</span>
-                                        <span>01/01/2025</span>
+                                        <span>{due_date}</span>
                                     </div>
                                 </div>
                             </div>
@@ -66,7 +78,7 @@ const PurchaseCredMemoForm = ({ onClose }) => {
                     {/* Credit Memo Total */}
                     <div className="total-section">
                         <h2>Credit Memo Total</h2>
-                        <h2>200.00</h2>
+                        <h2>{total_credit}</h2>
                     </div>
 
                     {/* Items Table */}
@@ -85,36 +97,20 @@ const PurchaseCredMemoForm = ({ onClose }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Chair</td>
-                                    <td>Comfortable Wooden Chair</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Table</td>
-                                    <td>Comfortable Wooden Table</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Door</td>
-                                    <td>Comfortable Woode Door</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                </tr>
+                                {items.length > 0 ? items.map((item, index) => (
+                                    <tr key={index}>
+                                        <td>{index + 1}</td>
+                                        <td>{item.material_name}</td>
+                                        <td>{item.description}</td>
+                                        <td>{item.unit_price}</td>
+                                        <td>{item.quantity}</td>
+                                        <td>{item.uom}</td>
+                                        <td>{item.downpayment_rate}</td>
+                                        <td>{item.tax_rate}</td>
+                                    </tr>
+                                )) : (
+                                    <tr><td colSpan="8">No items found</td></tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -132,49 +128,22 @@ const PurchaseCredMemoForm = ({ onClose }) => {
                         </div>
 
                         <div className="totals-section">
+                            {/* Assuming all the totals data like subtotal, discount, etc., comes from the API as well */}
                             <div className="total-row">
                                 <span>Subtotal:</span>
-                                <span>1.00</span>
+                                <span>{total_credit}</span>
                             </div>
                             <div className="total-row">
                                 <span>Discount (20%):</span>
-                                <span>1.00</span>
+                                <span>{total_credit * 0.2}</span>
                             </div>
                             <div className="total-row">
-                                <span>Downpayment Rate</span>
-                                <span>1.00</span>
+                                <span>Total Credit:</span>
+                                <span>{total_credit - total_credit * 0.2}</span>
                             </div>
                             <div className="total-row">
-                                <span>Total Downpayment</span>
-                                <span>1.00</span>
-                            </div>
-                            <div className="total-row">
-                                <span>Shipping Cost:</span>
-                                <span>1.00</span>
-                            </div>
-                            <div className="total-row">
-                                <span>Tax Amount:</span>
-                                <span>1.00</span>
-                            </div>
-                            <div className="total-row">
-                                <span>Total:</span>
-                                <span>1.00</span>
-                            </div>
-                            <div className="total-row">
-                                <span>Amount Paid:</span>
-                                <span>1.00</span>
-                            </div>
-                            <div className="total-row">
-                                <span>Total Credit</span>
-                                <span>1.00</span>
-                            </div>
-                            <div className="total-row">
-                                <span>Credit Balance</span>
-                                <span>1.00</span>
-                            </div>
-                            <div className="total-row balance-due">
                                 <span>Balance Due:</span>
-                                <span>1.00</span>
+                                <span>{balance_due}</span>
                             </div>
                         </div>
                     </div>
