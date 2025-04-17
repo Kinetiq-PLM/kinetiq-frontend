@@ -1,29 +1,30 @@
 /* Auth Container */
-.login-container, .signup-container {
-    height: 100vh;
-    width: 100vw;
-    background: linear-gradient(135deg, #016761 0%, #97e2dd 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    padding: 20px;
-    overflow: hidden;
-  }
-  
-  .login-container .login-wrapper, .login-container .signup-wrapper {
-    display: flex;
-    flex-direction: row-reverse;
-    background: #d6f1f0;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 1200px;
-    height: 90vh;
-    overflow: hidden;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  }
-  
-  .login-container .login-left,  .login-container .signup-left{
+
+.login-container {
+  width: 100vw;
+  min-height: 100vh; 
+  background: linear-gradient(135deg, #016761 0%, #97e2dd 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2.2rem 2.2rem;
+  box-sizing: border-box;
+}
+
+.login-container .login-wrapper {
+  display: flex;
+  flex-direction: row-reverse;
+  background: #d6f1f0;
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 80rem;
+  height: 37rem;
+  overflow: hidden;
+  box-shadow: 0 0.2rem 2rem rgba(0, 0, 0, 0.1);
+  flex: 1 0 auto;
+}
+
+  .login-container .login-left{
     flex: 0 0 35%;
     display: flex;
     justify-content: center;
@@ -31,7 +32,8 @@
     padding: 0rem;
     min-width: 350px;
 }
-.login-container .login-right,  .login-container .signup-right{
+
+.login-container .login-right{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -41,11 +43,13 @@
     position: relative;
   }
 
-  
+.login-container .login-right img { 
+  object-fit: cover;
+}
   
   
   /* Card Styles */
-  .login-container .login-card,  .login-container .signup-card {
+  .login-container .login-card{
     background: white;
     padding: 3rem 2.5rem 2.5rem;
     border-radius: 0.5rem;
@@ -93,6 +97,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    color: grey;
   }
 
   .login-container .login-pass-details {
@@ -127,11 +132,13 @@
     font-size: 0.95rem;
     border-radius: 0.3rem;
     border: 1px solid #ccc;
+    color: grey;
   }
 
   .login-container input[type="email"]{
     font-size: 0.85rem;
     width: 18rem;
+    color: grey;
   }
   
   .login-container input[type="text"]:focus,
@@ -140,6 +147,7 @@
     border: none;
     box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2); 
     outline: none;
+    color: grey;
   }
 
   .login-container .password-wrapper {
@@ -155,6 +163,7 @@
     flex: 1;
     padding-right: 2rem;
     margin: 0rem;
+    color: grey;
   }
 
   .login-container .password-wrapper .eye-icon {
@@ -241,17 +250,6 @@
   }
   
   /* Links */
-  .login-container .signup-link {
-    text-align: center;
-    margin-top: 12px;
-  }
-  
-  .login-container .signup-link a {
-    color: teal;
-    text-decoration: none;
-    font-size: 0.95rem;
-  }
-  
   .login-container .kinetiq-logo {
     margin-top: 180px;
     position: absolute;
@@ -265,25 +263,10 @@
 
 .login-container input:-webkit-autofill {
   background-color: white !important; 
-  color: #000 !important;          
-  -webkit-text-fill-color: #000 !important; 
+  color: grey !important;          
+  -webkit-text-fill-color: grey !important; 
   transition: background-color 5000s ease-in-out 0s;
 }
-
-
-.login-container .signup-btn {
-    background-color: #00a7a7;
-    color: white;
-    border: none;
-    padding: 12px;
-    font-weight: bold;
-    width: 100%;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-  
   /* Terms checkbox */
   .login-container .terms-checkbox {
     display: flex;
@@ -363,7 +346,7 @@
   }
 
   /* Tablet Layout */
-@media (max-width: 800px) {
+@media (max-width: 900px) {
   .login-container  .login-wrapper {
     height: auto !important; 
     min-height: unset;
