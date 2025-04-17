@@ -430,7 +430,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
         </button>
 
         {isLoading ? (
-          <div className="h-[300px] rounded-md flex justify-center items-center">
+          <div className="h-full rounded-md flex justify-center items-center">
             <img src={loading} alt="loading" className="h-[100px]" />
           </div>
         ) : (
