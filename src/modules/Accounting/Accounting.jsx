@@ -117,12 +117,6 @@ const BodyContent = () => {
                     <h1 className="subModule-title">Accounting Dashboard</h1>
                 </div>
 
-                <div className="flex justify-center space-x-10 mb-6 space-y-3 max-sm:flex-col">
-                    <Button name="Project Request" variant="standard2" />
-                    <Button name="Purchase Request" variant="standard2" />
-                    <Button name="Workforce Allocation" variant="standard2" />
-                </div>
-
 
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
