@@ -1,5 +1,6 @@
 .equimaprod {
   flex: auto;
+  align-items: left;
 }
 
 
@@ -17,6 +18,7 @@
     font-weight: 700;
     line-height: normal;
     flex-wrap: wrap;
+    padding-bottom: 10px;
   }
 
 }
@@ -25,20 +27,16 @@
   display: flex;
   gap: 20px;
 
-  .column {
+  .prod-column-expanded {
     flex: 1;
-    background-color: #EFF8F9;
     padding: 2px;
     border-radius: 5px;
     flex-wrap: wrap;
-  }
-
-  .expanded {
     flex-grow: 2;
   }
 
 
-  .top-section {
+  .prodtop-section {
     display: flex;
     align-items: left;
     gap: 10px;
@@ -50,7 +48,7 @@
 
 
 
-.project-equipment-button {
+.equilaproject-equipment-button {
   background: #087D7D;
   width: 180px;
   height: 36px;
@@ -69,7 +67,7 @@
   padding: 3;
 }
 
-.project-equipment-button:hover {
+.equilaproject-equipment-button:hover {
   background-color: #098F8F;
 }
 
@@ -82,13 +80,13 @@
   box-shadow: 0px -1px 0px 0px #E8E8E8 inset;
   gap: 10px;
   padding: 3px;
-  width: 20%;
+  width: 250px;
   flex-wrap: wrap;
   height: 40px;
 }
 
-.equipment-button,
-.labor-button {
+.equimaprod-equipment-button,
+.equimaprod-labor-button {
   background: none;
   border: none;
   font-size: 16px;
@@ -99,19 +97,19 @@
   transition: color 0.3s ease;
 }
 
-.equipment-button:hover,
-.labor-button:hover {
+.equimaprod-equipment-button:hover,
+.equimaprod-labor-button:hover {
   color: #00a6c7;
 }
 
-.equipment-button.active,
-.labor-button.active {
+.equimaprod-equipment-button.active,
+.equimaprod-labor-button.active {
   color: #00a6c7;
 
 }
 
-.equipment-button.active::after,
-.labor-button.active::after {
+.equimaprod-equipment-button.active::after,
+.equimaprod-labor-button.active::after {
   content: "";
   display: block;
   width: 100%;
@@ -180,7 +178,7 @@
 
 
 
-.EM-table {
+.equila-EM-table {
   width: 100%;
   height: 410px;
   flex-shrink: 0;
@@ -193,7 +191,7 @@
   padding: 10px;
   box-shadow: 0px 4px 7.5px 1px rgba(0, 0, 0, 0.25);
 
-  .table-container {
+  .equilatable-container {
     overflow-x: auto;
     max-height: 400px;
     border: 1px solid #ddd;
@@ -202,37 +200,38 @@
   }
 
 
-  .table-container::-webkit-scrollbar {
+  .equilatable-container::-webkit-scrollbar {
     width: 8px;
   }
 
 
-  .table-container::-webkit-scrollbar-track {
+  .equilatable-container::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
   }
 
 
-  .table-container::-webkit-scrollbar-thumb {
+  .equilatable-container::-webkit-scrollbar-thumb {
     background: #00A8A8;
     border-radius: 10px;
   }
 
 
-  .equipment-table {
+
+  .equila-equipment-table {
     width: 100%;
     border-collapse: collapse;
   }
 
-  .equipment-table th,
-  .equipment-table td {
+  .equila-equipment-tableth,
+  .equila-equipment-table td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #D2D2D2;
     padding-bottom: 10px;
   }
 
-  .equipment-table td {
+  .equila-equipment-table td {
     color: #000;
     font-family: Inter;
     font-size: 14px;
@@ -240,11 +239,12 @@
     font-weight: 300;
     line-height: normal;
     max-width: 100%;
-    white-space: nowrap;
-    text-wrap: wrap;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    text-align: center;
   }
 
-  .equipment-table th {
+  .equila-equipment-table th {
     background-color: #ffffff;
     position: sticky;
     top: 0;
@@ -255,9 +255,10 @@
     font-family: Inter;
     font-size: 14px;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 800;
     line-height: normal;
     border-bottom: 1px solid #D2D2D2;
+    text-align: center;
   }
 
 
@@ -268,6 +269,7 @@
     font-style: normal;
     font-weight: 700;
     line-height: normal;
+    text-align: left;
   }
 
   h2 {
@@ -277,6 +279,7 @@
     font-style: normal;
     font-weight: 300;
     line-height: normal;
+    text-align: center;
   }
 
   p {
@@ -291,71 +294,52 @@
     max-width: 100%;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    word-wrap: break-word;
   }
 
-
-
-  .labor-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px;
-
-    th {
-      background-color: #ffffff;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      padding-top: 10px;
-      padding-bottom: 10px;
-      color: #404040;
-      font-family: Inter;
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: normal;
-      border-bottom: 1px solid #D2D2D2;
-    }
-
-    td {
-      padding: 20px;
-      color: #000;
-      font-family: Inter;
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 300;
-      line-height: normal;
-      max-width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      border-bottom: 1px solid #D2D2D2;
-    }
-
-    h1 {
-      color: var(--Black, #000000);
-      font-family: Inter;
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 700;
-      line-height: normal;
-    }
-
-    h2 {
-      color: var(--Black, #000000);
-      font-family: Inter;
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 300;
-      line-height: normal;
-    }
-
-  }
-
+  .equila-equipment-table input[type="text"] {
+    width: 70%; 
+    padding: 8px; 
+    font-size: 14px; 
+    border: 1px solid #D2D2D2; 
+    border-radius: 5px; 
+    box-sizing: border-box; 
+    background-color: #f9f9f9; 
+    color: #404040;
+    text-align: center; 
 
 }
 
-.availability-dropdown {
+.equila-equipment-table input[type="text"]:focus {
+    border-color: #00A8A8; 
+    outline: none; 
+    background-color: #ffffff; 
+    box-shadow: 0 0 4px rgba(0, 168, 168, 0.5); 
+}
+
+.equila-equipment-table input[type="text"]:hover {
+  border-color: #9cd4d4; 
+  background-color: #ffffff; 
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  cursor: pointer; 
+}
+
+
+
+.equila-equipment-table input[type="date"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  width: 100%;
+  background-color: #d2d2d2;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  color: #404040;
+}
+
+
+.equila-equip-availability-dropdown  {
   display: flex;
   width: 118px;
   height: 33px;
@@ -373,61 +357,24 @@
 
 }
 
-.availability-dropdown.available {
+.equila-equip-availability-dropdown.available {
   background-color: #B0F6B0;
   color: #2DA800;
 }
 
-.availability-dropdown.out-of-order {
+.equila-equip-availability-dropdown.out-of-order {
   background: #FECDBF;
   color: #A80000;
 }
 
-.availability-dropdown.under-maintenance {
+.equila-equip-availability-dropdown.under-maintenance {
   color: #A4742D;
   background: #FFE3AF;
 }
 
-.equipment-table input[type="text"] {
-  padding: 6px 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  width: 100%;
-  background-color: #f9f9f9;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-}
-
-.equipment-table input[type="date"] {
-  padding: 6px 10px;
-  font-size: 14px;
-  border: 1px solid #ffffff;
-  border-radius: 8px;
-  width: 100%;
-  background-color: #d2d2d2;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-  color: #404040;
-}
-
-.equipment-table input[type="text"]:focus {
-  border-color: #00A8A8;
-  outline: none;
-  background-color: #fff;
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
-}
 
 
-.equipment-table td {
-  vertical-align: middle;
-  padding: 10px;
-}
-
-
-
-
-.labor-table input[type="date"] {
+.equila-labor-table input[type="date"] {
   padding: 6px 10px;
   font-size: 14px;
   border: 1px solid #ffffff;
@@ -439,52 +386,175 @@
   color: #404040;
 }
 
-.labor-table input[type="text"] {
-  padding: 6px 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  width: 100%;
-  background-color: #f9f9f9;
-  transition: all 0.3s ease;
+
+.equila-labor-table input[type="text"] {
+  width: 30%; 
+  padding: 8px; 
+  font-size: 14px; 
+  border: 1px solid #D2D2D2; 
   box-sizing: border-box;
+  background-color: #f9f9f9; 
+  color: #404040; 
+  text-align: center;
+  border-radius: 8px;
 }
 
 
-.labor-table input[type="text"]:focus {
-  border-color: #00A8A8;
-  outline: none;
-  background-color: #fff;
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+.equila-labor-table input[type="text"]:focus {
+  border-color: #00A8A8; 
+  outline: none; 
+  background-color: #ffffff; 
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5); 
+}
+
+.equila-labor-table input[type="text"]:hover {
+  border-color: #9cd4d4; 
+  outline: none; 
+  background-color: #ffffff; 
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5); 
 }
 
 
-.labor-table td {
+.equila-labor-table td {
   vertical-align: middle;
   padding: 10px;
 }
 
-.modal-overlay {
+  .equila-labor-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+
+    th {
+      background-color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      color: #404040;
+      font-family: Inter;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 800;
+      line-height: normal;
+      border-bottom: 1px solid #D2D2D2;
+    }
+    
+    td {
+      color: #000;
+      font-family: Inter;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 300;
+      line-height: normal;
+      max-width: 100%;
+      word-wrap: break-word;
+      border-bottom: 1px solid #D2D2D2;
+    }
+    
+    h1 {
+      color: var(--Black, #000000);
+      font-family: Inter;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: normal;
+      text-align: center;
+    }
+    
+    h2 {
+      color: var(--Black, #000000);
+      font-family: Inter;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 300;
+      line-height: normal;
+    }
+
+  }
+
+
+}
+
+.equila-labor-container {
+  overflow-x: auto;
+  max-height: 400px;
+  border: 1px solid #ddd;
+  border-color: #ffffff;
+  
+}
+
+  .equila-labor-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+
+.equila-labor-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+
+.equila-labor-container::-webkit-scrollbar-thumb {
+  background: #00A8A8;
+  border-radius: 10px;
+}
+
+
+.equila-labor-availability-dropdown  {
+  display: flex;
+  width: 118px;
+  height: 33px;
+  padding: 10px 20px;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 5px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  font-family: Inter;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+
+}
+
+.equila-labor-availability-dropdown.available {
+  background-color: #B0F6B0;
+  color: #2DA800;
+}
+
+.equila-labor-availability-dropdown.unavailable {
+  background: #FECDBF;
+  color: #A80000;
+}
+
+.equila-labor-availability-dropdown.undermaintenance {
+  color: #A4742D;
+  background: #FFE3AF;
+}
+
+.equila-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.6);
-  /* Dim the world, babe ✨ */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  /* Front and center */
+
 }
 
-.modal-content {
+.equila-modal-content {
   position: relative;
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
-  max-height: 600px;
+  height: 600px;
   width: 90%;
   max-width: 800px;
   overflow: hidden;
@@ -494,7 +564,7 @@
   flex-direction: column;
 }
 
-.modal-content h1 {
+.equila-modal-content h1 {
   color: #007878;
   font-family: Inter;
   font-size: 36px;
@@ -503,10 +573,10 @@
   line-height: normal;
   margin-bottom: 10px;
   flex-shrink: 0;
-  /* Keep it from shrinking */
+
 }
 
-.proj-equipment-table {
+.equila-proj-equipment {
   flex-grow: 1;
   overflow-y: auto;
   max-height: 400px;
@@ -514,21 +584,21 @@
   border-radius: 8px;
 }
 
-/* Make the table fill the scroll area */
-.proj-equipment-table table {
+.equila-proj-equipment table {
   width: 100%;
   border-collapse: collapse;
   background-color: #fefefe;
 }
 
 
-.proj-equipment-table td {
+.equila-proj-equipment td {
   padding: 10px 15px;
   text-align: left;
   border-bottom: 1px solid #ccc;
+  text-align: center;
 }
 
-.proj-equipment-table th {
+.equila-proj-equipment th {
   background-color: #ffffff;
   color: #404040;
   font-family: Inter;
@@ -545,21 +615,20 @@
 
 
 
-.proj-equipment-table::-webkit-scrollbar {
+.equila-proj-equipment::-webkit-scrollbar {
   width: 8px;
 }
 
-.proj-equipment-table::-webkit-scrollbar-thumb {
+.equila-proj-equipment::-webkit-scrollbar-thumb {
   background: #007878;
   border-radius: 4px;
 }
 
-.proj-equipment-table::-webkit-scrollbar-track {
+.equila-proj-equipment::-webkit-scrollbar-track {
   background: #eee;
 }
 
-/* Close button stays top right */
-.close-button {
+.equila-close-button{
   position: absolute;
   top: 15px;
   right: 20px;
@@ -573,17 +642,17 @@
   transition: color 0.2s ease-in-out;
 }
 
-.close-button:hover {
+.equila-close-button:hover {
   color: #007878;
 }
 
 
-.modalsearch-wrapper {
+.equila-modalsearch-wrapper {
   width: 50%;
   margin-bottom: 15px;
 }
 
-.modalsearch-input-wrapper {
+.equila-modalsearch-input-wrapper {
   position: relative;
   width: 100%;
   max-width: 700px;
@@ -600,9 +669,8 @@
   z-index: 2;
 }
 
-.modalsearch-bar {
+.equila-modalsearch-bar {
   padding: 8px 10px 8px 40px;
-  /* left padding for the icon */
   font-size: 15px;
   font-family: Inter, sans-serif;
   font-weight: 400;
@@ -615,15 +683,22 @@
   box-sizing: border-box;
 }
 
-.modalsearch-bar:focus {
+.equila-modalsearch-bar:focus {
   border-color: #00A8A8;
   outline: none;
   background-color: #fff;
   box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
 }
 
-.modalsearch-bar:hover {
+.equila-modalsearch-bar:hover {
   border-radius: 10px;
   border: 1.5px solid #A4A4A4;
   background: #F5F5F5;
+}
+
+.prodcontainer
+{
+
+align-items: left;
+
 }
