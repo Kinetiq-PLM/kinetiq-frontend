@@ -232,7 +232,8 @@
     padding: 6px 8px;
   }
 
-  .reqplan .table-header .table-cell {
+  .reqplan .table-header,
+  .reqplan .table-cell {
     font-size: 13px;
   }
 

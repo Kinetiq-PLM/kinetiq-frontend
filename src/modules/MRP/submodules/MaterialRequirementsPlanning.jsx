@@ -15,6 +15,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [flag, setFlag] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [showHelpOptions, setShowHelpOptions] = useState(false);
+    const [isOpen3, setIsOpen3] = useState(false);
+    const [isProjectType, setIsProjectType] = useState(null); 
 
     const costOfProducts = 40000.00;
     //const costOfProduction = 15000.00;
@@ -33,6 +35,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
     const [totalLaborCost, setTotalLaborCost] = useState(0);
     const [totalOrderCost, setTotalOrderCost] = useState(0);
+
 
 
     useEffect(() => {
@@ -85,7 +88,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         }
     };
     
-const fetchBomDetails = async (statementId) => {
+    const fetchBomDetails = async (statementId) => {
         try {
             const response = await fetch(`http://127.0.0.1:8000/bills_of_material/productpricing/by-statement/${statementId}/`); // Replace with your API endpoint
             if (!response.ok) {
@@ -110,7 +113,7 @@ const fetchBomDetails = async (statementId) => {
     };
 
 
-const fetchRawMaterials = async (productId) => {
+    const fetchRawMaterials = async (productId) => {
     try {
         const response = await fetch(`http://127.0.0.1:8000/bills_of_material/costofrawmats/by-product/${productId}/`); // Replace with your API endpoint
         if (!response.ok) {
@@ -130,9 +133,9 @@ const fetchRawMaterials = async (productId) => {
     } catch (error) {
         console.error("Error fetching raw materials:", error);
     }
-};
+    };
 
-const fetchCostProduction = async (orderId) => {
+    const fetchCostProduction = async (orderId) => {
     try {
         const response = await fetch(`http://127.0.0.1:8000/bills_of_material/orderproductioncost/${orderId}/`); // Replace with your API endpoint
         if (!response.ok) {
@@ -151,9 +154,9 @@ const fetchCostProduction = async (orderId) => {
     } catch (error) {
         console.error("Error fetching production costs:", error);
     }
-};
+    };
 
-const fetchCostLabor = async (orderId) => {
+    const fetchCostLabor = async (orderId) => {
     try {
         const response = await fetch(`http://127.0.0.1:8000/bills_of_material/employeeorder/${orderId}/`); // Replace with your API endpoint
         if (!response.ok) {
@@ -175,7 +178,7 @@ const fetchCostLabor = async (orderId) => {
     } catch (error) {
         console.error("Error fetching labor costs:", error);
     }
-};
+    };
 
     useEffect(() => {
         const total = (parseFloat(overallTotalCost) + totalCostOfProduction + totalLaborCost).toFixed(2);
@@ -223,8 +226,8 @@ const fetchCostLabor = async (orderId) => {
       
           return matchesFlag && searchMatch;
         });
-      };
-      
+    };
+
     const filteredData = getFilteredData();
     const buttonStyle = (bg, border, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer', });
     const buttonStyle2 = (bg, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, border: '0.5px solid #585757', color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer',});
@@ -271,7 +274,7 @@ const fetchCostLabor = async (orderId) => {
                     <div className="tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 15,flex: '1 1 auto', minWidth: 200,}}>
                         {['All Orders', 'Project Orders', 'Non-Project Orders'].map((label, i) => (
                         <div key={label}
-                            onClick={() => setFlag(i)}
+                            onClick={() => {setFlag(i), setFlagType(i)}}
                             onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")}
                             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                             style={{ minWidth: 120, padding: '10px 16px', background: 'white', boxShadow: flag === i ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', justifyContent: 'center', alignItems: 'center', display: 'flex', cursor: 'pointer'
@@ -281,7 +284,7 @@ const fetchCostLabor = async (orderId) => {
                         ))}
                     </div>
 
-                    <div className="search-container" style={{background: '#F7F9FB', borderRadius: 8, outline: '1px rgba(132,132,132,0.25) solid', padding: 5, display: 'flex', alignItems: 'center', marginTop: 10, paddingRight: 100, alignItems: 'stretch',}}>
+                    <div className="search-container" style={{background: '#F7F9FB', borderRadius: 8, outline: '1px rgba(132,132,132,0.25) solid', padding: 5, display: 'flex', marginTop: 10, paddingRight: 100, alignItems: 'stretch',}}>
                         <input placeholder="Search Order Number..." type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{flex: 1, padding: '8px', border: 'none', outline: 'none', backgroundColor: 'transparent', color: '#969696', fontSize: 16, fontFamily: 'Inter'}}/>
                     </div>
                 </div>
@@ -308,7 +311,7 @@ const fetchCostLabor = async (orderId) => {
                     <div
                     className="table-row"
                     key={index}
-                    onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchCostProduction(item.number); fetchCostLabor(item.number); setIsOpen(true);}}
+                    onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchCostProduction(item.number);fetchCostLabor(item.number); setIsProjectType(item.type === "Project"); setIsOpen(true);}}
                     onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                     style={{display: 'flex', flexWrap: 'wrap', cursor: 'pointer',borderBottom: '1px solid #E8E8E8',}}>
@@ -369,13 +372,82 @@ const fetchCostLabor = async (orderId) => {
                     </button>
 
                     <button
-                        onClick={() => {setIsOpen2(true); setIsOpen(false);}}
+                        onClick={() => {if (isProjectType) {setIsOpen2(true);} else {setIsOpen3(true);}setIsOpen(false);}}
                         style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                         <span>Next</span>
                         <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                     </button>
                     </div>
                 </div>
+                </div>
+            </div>
+            )}
+
+            {isOpen3 && (
+            <div className="bom-print-modal">
+                <div className="fixed inset-0 flex items-center justify-center">
+                    <div style={{width: '90vw', maxWidth: 1360, height: '90vh', maxHeight: 760, background: 'white', borderRadius: 10, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem',}}>
+                        <div style={{fontSize: 'clamp(24px, 3vw, 35px)', fontFamily: 'Inter', fontWeight: 500, textAlign: 'center',color: '#130101',}}>Product Pricing</div>
+                        <div className="reqplan-table-scroll2" style={{flex: 1, overflowY: 'auto', overflowX: 'auto', marginBottom: 30, borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.15)',padding: 0,}}>
+                            <div style={{width: '100%', flex: 1, background: 'white',borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '0.5rem',}}>
+                                <div className="table-header" style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8',}}>
+                                    {['No.', 'Product ID', 'Product', 'Product Description', 'Quantity', 'Cost'].map(
+                                    (label) => (
+                                        <div
+                                        key={label}
+                                        style={{ flex: '1 1 14%', minWidth: 120, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 16 }}>
+                                        {label}
+                                        </div>
+                                    )
+                                    )}
+                                </div>
+
+                                {bomDetails.map((item, index) => (
+                                    <div
+                                    key={index}
+                                    className="table-row"
+                                    style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
+                                    <div style={rowCellStyle}>{item.no}</div>
+                                    <div style={rowCellStyle}>{item.product_id}</div>
+                                    <div style={rowCellStyle}>{item.product_name}</div>
+                                    <div style={rowCellStyle}>{item.product_description}</div>
+                                    <div style={rowCellStyle}>{item.qtyProduct} pcs</div>
+                                    <div style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
+                                    </div>
+                                ))}
+                                </div>
+                            </div>
+
+                            <div style={{width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem',}}>
+                           
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
+                                    <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                                        <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{overallTotalCost}</span>
+                                    </div>
+
+                                    <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10}}>
+                                            <span style={{ fontWeight: 500, color: '#585757' }}><b>Order No.</b></span>
+                                        <div
+                                        style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500}}>{selectedRowData.number}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{width: '100%',  display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto',}}>
+                            <button onClick={() => { setIsOpen3(false); setIsOpen(true); }} style={buttonStyle2('#fff')}>
+                                <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
+                                <span style={{ color: '#969696' }}>Back</span>
+                            </button>
+
+                            <button onClick={() => { setAdditionalCost(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                                <span>Next</span>
+                                <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             )}
@@ -502,8 +574,6 @@ const fetchCostLabor = async (orderId) => {
             </div>
             )}
             
-
-
             {additionalcost && (
             <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center">

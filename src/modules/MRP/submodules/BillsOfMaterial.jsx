@@ -61,32 +61,24 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     return (
         <div className="bom">
             <div style={{width: '100%', height: '100%', padding: '2rem', background: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)', overflow: 'hidden', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', rowGap: 25,}}>
-                <div className="title">BOM LIST</div>
-                {/* Tabs + Search */}
+                <div className="title">BILLS OF MATERIAL LIST</div>
                 <div style={{width: '100%', maxWidth: 1300, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', rowGap: 10,paddingLeft: 80, paddingRight: 80,}}>
-                {/* Tabs */}
-                <div className="tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 15,flex: '1 1 auto', minWidth: 200,}}>
-                    {['All Orders', 'Project Orders', 'Non-Project Orders'].map((label, i) => (
-                    <div key={label}
-                        onClick={() => setFlag(i)}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                        style={{ minWidth: 120, padding: '10px 16px', background: 'white', boxShadow: flag === i ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', justifyContent: 'center', alignItems: 'center', display: 'flex', cursor: 'pointer'
-                        }}>
-                        <div className="text-tab" style={{textAlign: 'center', color: flag === i ? '#00A8A8' : '#585757', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1}}>{label}</div>
+                    <div className="tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 15,flex: '1 1 auto', minWidth: 200,}}>
+                        {['All BOM', 'Project BOM', 'Non-Project BOM'].map((label, i) => (
+                        <div key={label}
+                            onClick={() => {setFlag(i), setFlagType(i)}}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                            style={{ minWidth: 120, padding: '10px 16px', background: 'white', boxShadow: flag === i ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', justifyContent: 'center', alignItems: 'center', display: 'flex', cursor: 'pointer'
+                            }}>
+                            <div className="text-tab" style={{textAlign: 'center', color: flag === i ? '#00A8A8' : '#585757', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: 1}}>{label}</div>
+                        </div>
+                        ))}
                     </div>
-                    ))}
-                </div>
 
-                {/* Search Box */}
-                <div className="search-container" style={{background: '#F7F9FB', borderRadius: 8, outline: '1px rgba(132,132,132,0.25) solid', padding: 5, display: 'flex', alignItems: 'center', marginTop: 10, paddingRight: 100, alignItems: 'stretch',}}>
-                    <input
-                    placeholder="Search Order Number..."
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{flex: 1, padding: '8px', border: 'none', outline: 'none', backgroundColor: 'transparent', color: '#969696', fontSize: 16, fontFamily: 'Inter'}}/>
-                </div>
+                    <div className="search-container" style={{background: '#F7F9FB', borderRadius: 8, outline: '1px rgba(132,132,132,0.25) solid', padding: 5, display: 'flex', marginTop: 10, paddingRight: 100, alignItems: 'stretch',}}>
+                        <input placeholder="Search Order Number..." type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{flex: 1, padding: '8px', border: 'none', outline: 'none', backgroundColor: 'transparent', color: '#969696', fontSize: 16, fontFamily: 'Inter'}}/>
+                    </div>
                 </div>
 
                 {/* Table Container */}
@@ -97,7 +89,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     flexWrap: 'wrap',
                     borderBottom: '1px solid #E8E8E8',
                 }}>
-                    {['Order No.', 'Type', 'Status', 'Date'].map((label, i) => (
+                    {['Bom No.', 'Type', 'Status', 'Created Date'].map((label, i) => (
                         <div
                             className="table-cell2"
                             key={label}
