@@ -22,24 +22,9 @@ const departmentIds = {
 "PRO004": "Production",
 "DIS005": "Distribution",
 };
-const initialDepartmentBudgets = {
-"Marketing": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Operations": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"IT": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Accounting": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Purchasing": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Support and Services": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Management": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"MRP": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Inventory": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Project Management": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Human Resources": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Sales": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Administration": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Financials": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Production": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-"Distribution": { allocatedBudget: 0, totalSpent: 0, remainingBudget: 0 },
-};
+
+const initialDepartmentBudgets = {};
+
 const InfoCard = ({ title, value, color, children, className }) => (
 <div className={`info-card ${className}`}>{children}</div>
 );
@@ -364,7 +349,7 @@ totalSpent: formatNumber(departmentBudgets[dept].totalSpent),
 remainingBudget: formatNumber(departmentBudgets[dept].remainingBudget)
 }));
 
-setValidationTableData(tableData);
+//setValidationTableData(tableData);
 setTotalBudget(totalBudget);
 };
 
@@ -603,22 +588,39 @@ useEffect(() => {
 setIsAllocatedBudgetUpdated(false)
 },[activeTab])
 
+const fetchAllocation = async () => {
+try {
+  const data = await GET("/approvals/budget-allocation/");
+  console.log("Fetched Budget Allocation:", data);
+  setValidationTableData(data.map(item => ({
+    budgetAllocationId: item.budget_allocation_id || "",
+    department: item?.budget_approvals?.validation?.budget_submission.dept.dept_id,
+    allocatedBudget: item?.allocated_budget || 0,
+    totalSpent: item.total_allocated_spent || 0,
+    remainingBudget: item.allocated_remaining || 0,
+  })));
+  } catch (error) {
+    console.error("Error fetching allocation:", error);
+  }
+}
+
 const fetchApprovals = async () => {
 try {
-const data = await GET("/dev/approvals/budget-approvals/");
+const data = await GET("/approvals/budget-submissions/");
 console.log("Fetched Budget Approvals:", data);
 setOriginalData(data.map(sub => ({
-requestId: sub.validation?.budget_submission?.budget_submission_id || "",
-departmentId: sub.validation?.budget_submission?.dept_id || "",
-amount: sub.validation?.amount_requested || "",
-approvedAmount: sub.validation?.final_approved_amount || "",
-submissionDate: sub.validation?.budget_submission?.validation_date || "",
-validatedBy: sub.validation?.validated_by || "",
-validationDate: sub.validation?.validation_date || "",
-approvedBy: sub.approved_by || "",
-approvalDate: sub.approval_date || "",
-remarks: sub.remarks || "",
-validationStatus: sub.validation?.validation_status || ""
+approvalsId: sub.budget_approvals_id || "",
+requestId: sub?.validation?.budget_submission?.budget_submission_id || "",
+departmentId: sub?.validation?.budget_submission?.dept_id || "",
+amount: sub?.validation?.amount_requested || "",
+approvedAmount: sub?.validation?.final_approved_amount || "",
+submissionDate: sub?.validation?.budget_submission?.date_submitted || "",
+validatedBy: sub?.validation?.validated_by || "",
+validationDate: sub?.validation?.validation_date || "",
+approvedBy: sub?.approved_by || "",
+approvalDate: sub?.approval_date || "",
+remarks: sub?.remarks || "",
+validationStatus: sub?.validation?.validation_status || ""
 })));
 } catch (error) {
 console.error("Error fetching returns:", error);
@@ -627,10 +629,11 @@ console.error("Error fetching returns:", error);
 
 const fetchBudgetRequests = async () => {
   try {
-    const data = await GET("/dev/approvals/budget-requests/");
+    const data = await GET("/approvals/budget-requests/");
     console.log("Fetched Budget Requests:", data);
     setOriginalRequestData(data.map(req => ({
-      reqID: req.budget_request_id || "",
+      approvalsId: req.budget_approvals_id || "",
+      reqID: req?.validation?.budget_request_id || "",
       departmentId: req.dept_id || "",
       amount: req.amount_requested || "",
       requestDate: req.date_requested || "",
@@ -647,19 +650,21 @@ const fetchBudgetRequests = async () => {
 };
 
 useEffect(() => {
+fetchAllocation();
 fetchApprovals();
 fetchBudgetRequests();
-//fetchBudgetApprovals();
-//fetchReturns();
 }, []);
+
+
 
 const fetchRejectedApprovals = async () => {
 try {
-const data = await GET("/dev/approvals/rejected-budget-submissions/");
+const data = await GET("/approvals/rejected-budget-submissions/");
 const formattedData = data.map(item => ({
-requestId: item.budget_submission?.budget_submission_id || "",
-amount: item.budget_validation?.amount_requested || "",
-requestDate: item.budget_submission?.date_submitted || "",
+approvalsId: item.budget_approvals_id || "",
+requestId: item?.validation?.budget_submission?.budget_submission_id || "",
+amount: item?.validation?.budget_validation?.amount_requested || "",
+requestDate: item?.validation?.budget_submission?.date_submitted || "",
 approvedBy: item.approved_by || "",
 remarks: item.remarks || "",
 validationStatus: item.approval_status || "",
@@ -682,10 +687,6 @@ const getSelectedRows = () => {
   } 
   return [];
 };
-
-
-  
-
 
 
 return (
