@@ -117,7 +117,7 @@ export default function BlanketAgreementsTab({
           ? new Date(delivery.actual_delivery_date).toLocaleString()
           : null,
         created_at: new Date(delivery.created_at).toLocaleString(),
-        document: ["Pending"].includes(delivery.shipment_status),
+        document: true,
         endpoint: `delivery/${delivery.delivery_note_id}`,
       }));
       setDeliveryList(data);
