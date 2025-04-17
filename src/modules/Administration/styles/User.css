@@ -1,23 +1,457 @@
-/* REMINDER! All of your elements must use your unique namespace '.useraccs' at the start to avoid leaking */
-
-.useraccs {
-  display: flex;
+/* Users.css */
+.users {
   width: 100%;
+  padding: 10px;
   height: 100%;
+  overflow: hidden;
 }
 
-.useraccs .body-content-container {
-    width: 100%;
-    height: 100%;
-    border-radius: 0.5rem;
-    background-color: white;
-    padding: 1rem;
-    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 40rem;
-    min-height: 30rem;
+.users-container {
+  background-color: #fff;
+  width: 100%;
+  height: 100%;
+  max-height: calc(100vh - 140px);
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.page-title {
+  margin-bottom: 0 !important;
+  color: #00A8A8;
+}
+
+.title-divider {
+  margin: 12px 0 16px !important;
+}
+
+.user-tabs {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.ant-tabs-content {
+  height: 100%;
+  overflow: hidden;
+}
+
+.ant-tabs-tabpane {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-container {
+  flex: 1;
+  overflow: auto;
+  padding-bottom: 5px;
+  border: 0.5px solid #90d7d33d;
+  border-radius: 15px;
+  /* box-shadow: 0 1px 10px rgba(150, 194, 187, 0.322); */
+}
+
+.users .ant-tabs-nav {
+  margin-bottom: 0 !important;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+  padding-bottom: 10px;
+}
+
+.table-search-container {
+  padding: 16px 0;
+  background: white;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+}
+
+.table-search-container .ant-input-search {
+  max-width: 300px;
+}
+
+.users .ant-table-wrapper {
+  padding: 1px; /* Add some inner space */
+  border-radius: 8px;
+  background: white; /* Optional: ensures no transparency */
+  width: 100%;
+}
+
+.users .ant-form-item-label {
+  font-weight: 500;
+}
+
+.department-permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.users .ant-tag {
+  margin-right: 0;
+  margin-bottom: 4px;
+}
+
+.users .ant-table-cell .ant-space {
+  display: flex;
+  justify-content: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.custom-modal .ant-modal-content {
+  border-radius: 8px;
+}
+
+.custom-modal .ant-modal-header {
+  border-radius: 8px 8px 0 0;
+}
+
+.form-actions {
+  margin-top: 24px;
+  margin-bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+  .users-container {
+    padding: 12px;
   }
   
+  .ant-tabs-tab {
+    padding: 8px 12px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .users {
+    padding: 8px;
+  }
+  
+  .users-container {
+    padding: 8px;
+    border-radius: 4px;
+  }
+  
+  .department-permissions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .ant-tabs-nav-list {
+    width: 100%;
+  }
+  
+  .ant-tabs-tab {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .action-buttons {
+    margin-top: 8px;
+    width: 100%;
+  }
+  
+  .action-buttons .ant-btn {
+    flex: 1;
+  }
+  
+  .archive-btn {
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 576px) {
+  .users-container {
+    max-height: calc(100vh - 120px);
+  }
+  
+  .ant-tabs-extra-content {
+    width: 100%;
+  }
+  
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .action-buttons .ant-btn {
+    width: 100%;
+  }
+  
+  .table-search-container .ant-input-search {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .department-permissions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ant-table-cell {
+    padding: 8px !important;
+  }
+}
+
+/* Improve the look of tables */
+.users .ant-table-thead > tr > th {
+  background-color: #c5eaeac0;
+  font-weight: 600;
+}
+
+.users .ant-table-tbody > tr:hover > td {
+  background-color: #b9e9e9;
+}
+
+/* Update button colors */
+.users .ant-btn-primary {
+  background-color: #00A8A8;
+  border-color: #00A8A8;
+}
+
+.users .ant-btn-primary:hover, 
+.users .ant-btn-primary:focus {
+  background-color: #008080;
+  border-color: #008080;
+}
+
+
+/* Status color customizations */
+.users .status-active {
+  color: #52c41a;
+}
+
+.users .status-inactive {
+  color: #ff4d4f;
+}
+
+/* Update tab active color */
+.users .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #00A8A8;
+}
+
+.users .ant-tabs-ink-bar {
+  background: #00A8A8;
+}
+
+/* Style for the search and actions container */
+.header-right-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search-container {
+  width: 300px;
+}
+
+.table-meta-info {
+  padding: 8px 0;
+  color: #666;
+  font-weight: 500;
+}
+
+.record-count {
+  font-size: 14px;
+}
+
+/* Make these responsive */
+@media (max-width: 768px) {
+  .header-right-content {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+}
+
+/* Scrollbar styling */
+.users-container::-webkit-scrollbar,
+.table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.users-container::-webkit-scrollbar-track,
+.table-container::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+.users-container::-webkit-scrollbar-thumb,
+.table-container::-webkit-scrollbar-thumb {
+  background: #00A8A8;
+  border-radius: 4px;
+}
+
+.users-container::-webkit-scrollbar-thumb:hover,
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #008080;
+}
+
+/* For Firefox */
+.users-container,
+.table-container {
+  scrollbar-width: thin;
+  scrollbar-color: #00A8A8 #f0f0f0;
+}
+
+/* Make sure modals also have matching scrollbars */
+.custom-modal .ant-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-modal .ant-modal-body::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+.custom-modal .ant-modal-body::-webkit-scrollbar-thumb {
+  background: #00A8A8;
+  border-radius: 4px;
+}
+
+/* Enhanced theme color consistency */
+
+/* Table alternating rows */
+.users .ant-table-tbody > tr:nth-child(odd) > td {
+  background-color: #ffffffe8;
+}
+
+.users .ant-table-tbody > tr:nth-child(even) > td {
+  background-color: #f0fafa;
+}
+
+/* Hover state for all rows */
+.users .ant-table-tbody > tr:hover > td {
+  background-color: #e6f7f7 !important; /* Use !important to override the alternating colors */
+}
+
+/* Selected row */
+.users .ant-table-tbody > tr.ant-table-row-selected > td {
+  background-color: #d9f0f0 !important;
+}
+
+/* All button types in main components and modals */
+.users .ant-btn-primary,
+.custom-modal .ant-btn-primary {
+  background-color: #00A8A8;
+  border-color: #00A8A8;
+}
+
+.users .ant-btn-primary:hover,
+.users .ant-btn-primary:focus,
+.custom-modal .ant-btn-primary:hover,
+.custom-modal .ant-btn-primary:focus {
+  background-color: #55cfcf !important;
+  border-color: #55cfcf !important;
+  color: #fff !important;
+}
+
+/* Secondary buttons hover */
+.users .ant-btn:hover,
+.users .ant-btn:focus,
+.custom-modal .ant-btn:hover,
+.custom-modal .ant-btn:focus {
+  background-color: #55cfcf !important;
+  border-color: #55cfcf !important;
+  color: #fff !important;
+}
+
+/* Pagination and form elements */
+.users .ant-pagination-item-active,
+.custom-modal .ant-pagination-item-active {
+  border-color: #00A8A8;
+}
+
+.users .ant-pagination-item-active a,
+.custom-modal .ant-pagination-item-active a {
+  color: #00A8A8;
+}
+
+.users .ant-pagination-item:hover,
+.custom-modal .ant-pagination-item:hover {
+  border-color: #00A8A8;
+}
+
+.users .ant-pagination-item:hover a,
+.custom-modal .ant-pagination-item:hover a {
+  color: #00A8A8;
+}
+
+/* Form focus states */
+.users .ant-input:hover,
+.users .ant-input:focus,
+.users .ant-input-focused,
+.custom-modal .ant-input:hover,
+.custom-modal .ant-input:focus,
+.custom-modal .ant-input-focused {
+  border-color: #00A8A8;
+}
+
+.users .ant-input-affix-wrapper:hover,
+.users .ant-input-affix-wrapper:focus,
+.users .ant-input-affix-wrapper-focused,
+.custom-modal .ant-input-affix-wrapper:hover,
+.custom-modal .ant-input-affix-wrapper:focus,
+.custom-modal .ant-input-affix-wrapper-focused {
+  border-color: #00A8A8;
+}
+
+.users .ant-select:hover .ant-select-selector,
+.users .ant-select-focused .ant-select-selector,
+.custom-modal .ant-select:hover .ant-select-selector,
+.custom-modal .ant-select-focused .ant-select-selector {
+  border-color: #00A8A8 !important;
+}
+
+/* Checkbox styles */
+.users .ant-checkbox-checked .ant-checkbox-inner,
+.custom-modal .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #00A8A8;
+  border-color: #00A8A8;
+}
+
+.users .ant-checkbox-wrapper:hover .ant-checkbox-inner,
+.custom-modal .ant-checkbox-wrapper:hover .ant-checkbox-inner {
+  border-color: #00A8A8;
+}
+
+/* Tag style updates */
+.users .ant-tag-blue {
+  color: #00A8A8;
+  background: #e6f7f7;
+  border-color: #b3e0e0;
+}
+
+.users .ant-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Add this to your CSS */
+.user-tabs .ant-tabs-nav-wrap {
+  overflow-x: auto;
+}
+
+.user-tabs .ant-tabs-tab {
+  white-space: nowrap;
+}
