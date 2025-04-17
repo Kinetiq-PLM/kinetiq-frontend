@@ -392,6 +392,8 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
           "An error occurred while fetching data." +
           documentQuery.error.message,
       });
+    } else {
+      setIsLoading(true);
     }
   }, [documentQuery.data, documentQuery.status]);
 
@@ -426,664 +428,746 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
         >
           &times;
         </button>
-        {/* BODY */}
-        <div className="px-10 mt-6">
-          {data &&
-            data.statement &&
-            documentToView &&
-            documentToView.includes("quotation") && (
-              <div className="flex flex-col gap-4 text-sm">
-                <Header />
-                <div className="text-center">
-                  <span className="font-light">QUOTATION</span>
-                </div>
-                <CustomerDetails data={data} />
-                <div>
-                  <table className="w-full text-sm font-light table-auto border border-black border-collapse">
-                    <thead className="bg-[#469fc2] border border-black">
+
+        {isLoading ? (
+          <div className="h-full rounded-md flex justify-center items-center">
+            <img src={loading} alt="loading" className="h-[100px]" />
+          </div>
+        ) : (
+          <div className="px-10 mt-6">
+            {data &&
+              data.statement &&
+              documentToView &&
+              documentToView.includes("quotation") && (
+                <div className="flex flex-col gap-4 text-sm">
+                  <Header />
+                  <div className="text-center">
+                    <span className="font-light">QUOTATION</span>
+                  </div>
+                  <CustomerDetails data={data} />
+                  <div>
+                    <table className="w-full text-sm font-light table-auto border border-black border-collapse">
+                      <thead className="bg-[#469fc2] border border-black">
+                        <tr>
+                          <th className="border border-black text-white font-light text-start p-2">
+                            Salesperson
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Date Issued
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Status
+                          </th>
+                        </tr>
+                      </thead>
                       <tr>
-                        <th className="border border-black text-white font-light text-start p-2">
-                          Salesperson
+                        <th className="border border-black text-black font-light text-start p-2">
+                          {`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}
                         </th>
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Date Issued
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {new Date(data.date_issued).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            }
+                          )}
                         </th>
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Status
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.status}
                         </th>
                       </tr>
-                    </thead>
-                    <tr>
-                      <th className="border border-black text-black font-light text-start p-2">
-                        {`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {new Date(data.date_issued).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                          }
-                        )}
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {data.status}
-                      </th>
-                    </tr>
-                  </table>
-                </div>
-                <div>
-                  <OrdersTable data={data} />
-                </div>
-                <div className="flex justify-between text-xs">
-                  <div>Thank you for your business.</div>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td className="flex justify-between gap-10">
-                          <span>Subtotal</span>
-                          <span>
-                            {Number(data.statement.subtotal).toLocaleString(
-                              "en-US",
-                              {
+                    </table>
+                  </div>
+                  <div>
+                    <OrdersTable data={data} />
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <div>Thank you for your business.</div>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Subtotal</span>
+                            <span>
+                              {Number(data.statement.subtotal).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Sales Tax</span>
+                            <span>
+                              {Number(data.statement.total_tax).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Total Discount</span>
+                            <span>
+                              {Number(data.statement.discount).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr className="bg-[#eff8f9]">
+                          <td className="flex justify-between font-bold p-1">
+                            <span className="font-bold text-[#469fc2]">
+                              Total
+                            </span>
+                            <span className="fold-bold text-[#469fc2]">
+                              {Number(
+                                data.statement.total_amount
+                              ).toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
-                      </tr>
+                              })}
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <Terms />
+                </div>
+              )}
+            {data &&
+              data.statement &&
+              documentToView &&
+              documentToView.includes("order") && (
+                <div className="flex flex-col gap-4 text-sm">
+                  <Header />
+                  <div className="text-center">
+                    <span className="font-light">SALES ORDER</span>
+                  </div>
+                  <CustomerDetails data={data} />
+                  <div>
+                    <table className="w-full text-sm font-light table-auto border border-black border-collapse">
+                      <thead className="bg-[#469fc2] border border-black">
+                        <tr>
+                          <th className="border border-black text-white font-light text-start p-2">
+                            Salesperson
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Type
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Status
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Order Date
+                          </th>
+                        </tr>
+                      </thead>
                       <tr>
-                        <td className="flex justify-between gap-10">
-                          <span>Sales Tax</span>
-                          <span>
-                            {Number(data.statement.total_tax).toLocaleString(
-                              "en-US",
-                              {
+                        <th className="border border-black text-black font-light text-start p-2">
+                          {`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.order_type}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.completion_status}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {new Date(data.order_date).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            }
+                          )}
+                        </th>
+                      </tr>
+                    </table>
+                  </div>
+                  <div>
+                    <OrdersTable data={data} />
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <div>Thank you for your business.</div>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Subtotal</span>
+                            <span>
+                              {Number(data.statement.subtotal).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Sales Tax</span>
+                            <span>
+                              {Number(data.statement.total_tax).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Total Discount</span>
+                            <span>
+                              {Number(data.statement.discount).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr className="bg-[#eff8f9]">
+                          <td className="flex justify-between font-bold p-1">
+                            <span className="font-bold text-[#469fc2]">
+                              Total
+                            </span>
+                            <span className="fold-bold text-[#469fc2]">
+                              {Number(
+                                data.statement.total_amount
+                              ).toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
+                              })}
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <Terms />
+                </div>
+              )}
+            {data &&
+              data.statement &&
+              documentToView &&
+              documentToView.includes("delivery") && (
+                <div className="flex flex-col gap-4 text-sm">
+                  <Header />
+                  <div className="text-center">
+                    <span className="font-light">DELIVERY NOTE</span>
+                  </div>
+                  <CustomerDetails data={data} />
+                  <div>
+                    <table className="w-full text-sm font-light table-auto border border-black border-collapse">
+                      <thead className="bg-[#469fc2] border border-black">
+                        <tr>
+                          <th className="border border-black text-white font-light text-start p-2">
+                            Salesperson
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Tracking No.
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Shipping Method
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Payment Terms
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Shipping Date
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Delivery Date
+                          </th>
+                        </tr>
+                      </thead>
+                      <tr>
+                        <th className="border border-black text-black font-light text-start p-2">
+                          {`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.tracking_num || "-"}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          30% Downpayment, 70% After Delivery
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.shipping_method}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {!data.shipping_date
+                            ? "-"
+                            : new Date(data.shipping_date).toLocaleDateString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "long",
+                                  year: "numeric",
+                                }
+                              )}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {!data.actual_delivery_date
+                            ? "-"
+                            : new Date(
+                                data.actual_delivery_date
+                              ).toLocaleDateString("en-GB", {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              })}
+                        </th>
                       </tr>
-                      <tr className="bg-[#eff8f9]">
-                        <td className="flex justify-between font-bold p-1">
-                          <span className="font-bold text-[#469fc2]">
-                            Total
-                          </span>
-                          <span className="fold-bold text-[#469fc2]">
-                            {Number(data.statement.total_amount).toLocaleString(
-                              "en-US",
-                              {
+                    </table>
+                  </div>
+                  <div>
+                    <OrdersTable data={data} />
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <div>Thank you for your business.</div>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Subtotal</span>
+                            <span>
+                              {Number(data.statement.subtotal).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Sales Tax</span>
+                            <span>
+                              {Number(data.statement.total_tax).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Shipping Fee</span>
+                            <span>
+                              {Number(data.shipping_fee).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Total Discount</span>
+                            <span>
+                              {Number(data.statement.discount).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr className="bg-[#eff8f9]">
+                          <td className="flex justify-between font-bold p-1">
+                            <span className="font-bold text-[#469fc2]">
+                              Total
+                            </span>
+                            <span className="fold-bold text-[#469fc2]">
+                              {Number(
+                                data.statement.total_amount
+                              ).toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                              })}
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <Terms />
                 </div>
-                <Terms />
-              </div>
-            )}
-          {data &&
-            data.statement &&
-            documentToView &&
-            documentToView.includes("order") && (
-              <div className="flex flex-col gap-4 text-sm">
-                <Header />
-                <div className="text-center">
-                  <span className="font-light">SALES ORDER</span>
-                </div>
-                <CustomerDetails data={data} />
-                <div>
-                  <table className="w-full text-sm font-light table-auto border border-black border-collapse">
-                    <thead className="bg-[#469fc2] border border-black">
+              )}
+            {data &&
+              data.delivery_note &&
+              documentToView &&
+              documentToView.includes("invoice") && (
+                <div className="flex flex-col gap-4 text-sm">
+                  <Header />
+                  <div className="text-center">
+                    <span className="font-light">SALES INVOICE</span>
+                  </div>
+                  <CustomerDetails data={data} isInvoice={true} />
+                  <div>
+                    <table className="w-full text-sm font-light table-auto border border-black border-collapse">
+                      <thead className="bg-[#469fc2] border border-black">
+                        <tr>
+                          <th className="border border-black text-white font-light text-start p-2">
+                            Invoice Date
+                          </th>
+
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Payment Terms
+                          </th>
+
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Payment Status
+                          </th>
+                        </tr>
+                      </thead>
                       <tr>
-                        <th className="border border-black text-white font-light text-start p-2">
-                          Salesperson
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {new Date(data.invoice_date).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            }
+                          )}
                         </th>
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Type
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          30% Downpayment, 70% After Delivery
                         </th>
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Status
-                        </th>
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Order Date
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.remaining_balance == 0
+                            ? "Fully Paid"
+                            : data.remaining_balance > 0
+                            ? "Partially Paid"
+                            : "Unpaid"}
                         </th>
                       </tr>
-                    </thead>
-                    <tr>
-                      <th className="border border-black text-black font-light text-start p-2">
-                        {`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {data.order_type}
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {data.completion_status}
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {new Date(data.order_date).toLocaleDateString("en-GB", {
+                    </table>
+                  </div>
+                  <div>
+                    <OrdersTable data={data.delivery_note} />
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <div>Thank you for your business.</div>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Subtotal</span>
+                            <span>
+                              {Number(
+                                data.delivery_note.statement.subtotal
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Sales Tax</span>
+                            <span>
+                              {Number(
+                                data.delivery_note.statement.total_tax
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="flex justify-between gap-10">
+                            <span>Shipping Fee</span>
+                            <span>
+                              {Number(
+                                data.delivery_note.shipping_fee
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <tr>
+                            <td className="flex justify-between gap-10">
+                              <span>Total Discount</span>
+                              <span>
+                                {Number(
+                                  data.delivery_note.statement.discount
+                                ).toLocaleString("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}
+                              </span>
+                            </td>
+                          </tr>
+                          <td className="flex justify-between font-bold p-1">
+                            <span className="font-bold">Total</span>
+                            <span className="font-bold">
+                              {Number(
+                                data.delivery_note.statement.total_amount
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr className="bg-[#eff8f9]">
+                          <td className="flex justify-between font-bold p-1">
+                            <span className="text-[#469fc2]">Balance Due</span>
+                            <span className="text-[#469fc2]">
+                              {Number(data.remaining_balance).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <Terms />
+                  <hr />
+                  <Warranty data={data} />
+                </div>
+              )}
+            {data &&
+              data.statement &&
+              documentToView &&
+              documentToView.includes("agreement") && (
+                <div className="flex flex-col gap-4 text-sm">
+                  <div className="text-center">
+                    <span className="font-light text-lg">
+                      BLANKET AGREEMENT
+                    </span>
+                  </div>
+                  <div>
+                    This Agreement is made on{" "}
+                    {new Date(data.signed_date).toLocaleDateString("en-US", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })}{" "}
+                    between:
+                  </div>
+
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-bold">Customer:</span>
+                      <span>{data.statement.customer.name}</span>
+                      <span>{`${data.statement.customer.address_line1} ${data.statement.customer.address_line2}`}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-bold">Seller:</span>
+                      <span>Kinetiq Company</span>
+                      <span>
+                        1975 Street Address of Company, NCR, Philippines
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 mt-2">
+                    <span className="font-bold text-[#469fc2]">1. PURPOSE</span>
+                    <span>
+                      This Agreement sets forth the terms under which the Buyer
+                      may procure goods/services from the Supplier as needed.
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="font-bold text-[#469fc2]">2. TERM</span>
+                    <span>
+                      This Agreement shall be effective from{" "}
+                      <b>
+                        {new Date(data.start_date).toLocaleDateString("en-US", {
                           day: "2-digit",
                           month: "long",
                           year: "numeric",
                         })}
-                      </th>
-                    </tr>
-                  </table>
-                </div>
-                <div>
-                  <OrdersTable data={data} />
-                </div>
-                <div className="flex justify-between text-xs">
-                  <div>Thank you for your business.</div>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td className="flex justify-between gap-10">
-                          <span>Subtotal</span>
-                          <span>
-                            {Number(data.statement.subtotal).toLocaleString(
+                      </b>{" "}
+                      to{" "}
+                      <b>
+                        {new Date(data.end_date).toLocaleDateString("en-US", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </b>
+                      , unless terminated earlier.
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="font-bold text-[#469fc2]">3. PRICING</span>
+                    <span>
+                      The goods/services shall be provided at the following
+                      rates:
+                    </span>
+                    <OrdersTable data={data} />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="font-bold text-[#469fc2]">
+                      4. ORDERING
+                    </span>
+                    <span>
+                      Orders shall be placed by the Buyer via{" "}
+                      <b>{data.agreement_method}</b> method, referencing this
+                      Agreement Number: <b>{data.agreement_id}</b>.
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="font-bold text-[#469fc2]">
+                      5. DELIVERY
+                    </span>
+                    <span>
+                      All deliveries must be made to:{" "}
+                      <b>
+                        {data.statement.customer.address_line1}{" "}
+                        {data.statement.customer.address_line2}
+                      </b>
+                      .
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="font-bold text-[#469fc2]">
+                      6. TERMINATION
+                    </span>
+                    <span>
+                      This Agreement is not subject to termination by either
+                      party for convenience.
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="font-bold text-[#469fc2]">
+                      7. CONFIDENTIALITY
+                    </span>
+                    <span>
+                      Both parties agree to maintain confidentiality of shared
+                      information.
+                    </span>
+                  </div>
+                  <div className="mt-2">
+                    <span>
+                      <i>
+                        IN WITNESS WHEREOF, the parties have executed this
+                        Agreement as of the date first above written.
+                      </i>
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-12">
+                    <div className="flex flex-col flex-1/2">
+                      <span className="font-bold text-[#469fc2]">
+                        Customer Representative
+                      </span>
+                      <div className="flex justify-between">
+                        <span className="font-bold">Signature: </span>
+                        <span className="text-end">______________</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-bold">Name: </span>
+                        <span className="text-end">
+                          <u>{data.statement.customer.contact_person}</u>
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-bold">Date Signed: </span>
+                        <span className="text-end">
+                          <u>
+                            {new Date(data.signed_date).toLocaleDateString(
                               "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="flex justify-between gap-10">
-                          <span>Sales Tax</span>
-                          <span>
-                            {Number(data.statement.total_tax).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr className="bg-[#eff8f9]">
-                        <td className="flex justify-between font-bold p-1">
-                          <span className="font-bold text-[#469fc2]">
-                            Total
-                          </span>
-                          <span className="fold-bold text-[#469fc2]">
-                            {Number(data.statement.total_amount).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <Terms />
-              </div>
-            )}
-          {data &&
-            data.statement &&
-            documentToView &&
-            documentToView.includes("delivery") && (
-              <div className="flex flex-col gap-4 text-sm">
-                <Header />
-                <div className="text-center">
-                  <span className="font-light">DELIVERY NOTE</span>
-                </div>
-                <CustomerDetails data={data} />
-                <div>
-                  <table className="w-full text-sm font-light table-auto border border-black border-collapse">
-                    <thead className="bg-[#469fc2] border border-black">
-                      <tr>
-                        <th className="border border-black text-white font-light text-start p-2">
-                          Salesperson
-                        </th>
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Tracking No.
-                        </th>
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Shipping Method
-                        </th>
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Payment Terms
-                        </th>
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Shipping Date
-                        </th>
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Delivery Date
-                        </th>
-                      </tr>
-                    </thead>
-                    <tr>
-                      <th className="border border-black text-black font-light text-start p-2">
-                        {`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {data.tracking_num || "-"}
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        30% Downpayment, 70% After Delivery
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {data.shipping_method}
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {!data.shipping_date
-                          ? "-"
-                          : new Date(data.shipping_date).toLocaleDateString(
-                              "en-GB",
                               {
                                 day: "2-digit",
                                 month: "long",
                                 year: "numeric",
                               }
                             )}
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {!data.actual_delivery_date
-                          ? "-"
-                          : new Date(
-                              data.actual_delivery_date
-                            ).toLocaleDateString("en-GB", {
-                              day: "2-digit",
-                              month: "long",
-                              year: "numeric",
-                            })}
-                      </th>
-                    </tr>
-                  </table>
-                </div>
-                <div>
-                  <OrdersTable data={data} />
-                </div>
-                <div className="flex justify-between text-xs">
-                  <div>Thank you for your business.</div>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td className="flex justify-between gap-10">
-                          <span>Subtotal</span>
-                          <span>
-                            {Number(data.statement.subtotal).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="flex justify-between gap-10">
-                          <span>Sales Tax</span>
-                          <span>
-                            {Number(data.statement.total_tax).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="flex justify-between gap-10">
-                          <span>Shipping Fee</span>
-                          <span>
-                            {Number(data.statement.total_tax).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr className="bg-[#eff8f9]">
-                        <td className="flex justify-between font-bold p-1">
-                          <span className="font-bold text-[#469fc2]">
-                            Total
-                          </span>
-                          <span className="fold-bold text-[#469fc2]">
-                            {Number(data.statement.total_amount).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <Terms />
-              </div>
-            )}
-          {data &&
-            data.delivery_note &&
-            documentToView &&
-            documentToView.includes("invoice") && (
-              <div className="flex flex-col gap-4 text-sm">
-                <Header />
-                <div className="text-center">
-                  <span className="font-light">SALES INVOICE</span>
-                </div>
-                <CustomerDetails data={data} isInvoice={true} />
-                <div>
-                  <table className="w-full text-sm font-light table-auto border border-black border-collapse">
-                    <thead className="bg-[#469fc2] border border-black">
-                      <tr>
-                        <th className="border border-black text-white font-light text-start p-2">
-                          Invoice Date
-                        </th>
-
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Payment Terms
-                        </th>
-
-                        <th className="border border-black text-white font-light text-start  p-2 text-sm">
-                          Payment Status
-                        </th>
-                      </tr>
-                    </thead>
-                    <tr>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {new Date(data.invoice_date).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                          }
-                        )}
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        30% Downpayment, 70% After Delivery
-                      </th>
-                      <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {data.remaining_balance == 0
-                          ? "Fully Paid"
-                          : data.remaining_balance > 0
-                          ? "Partially Paid"
-                          : "Unpaid"}
-                      </th>
-                    </tr>
-                  </table>
-                </div>
-                <div>
-                  <OrdersTable data={data.delivery_note} />
-                </div>
-                <div className="flex justify-between text-xs">
-                  <div>Thank you for your business.</div>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td className="flex justify-between gap-10">
-                          <span>Subtotal</span>
-                          <span>
-                            {Number(
-                              data.delivery_note.statement.subtotal
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="flex justify-between gap-10">
-                          <span>Sales Tax</span>
-                          <span>
-                            {Number(
-                              data.delivery_note.statement.total_tax
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="flex justify-between font-bold p-1">
-                          <span className="font-bold">Total</span>
-                          <span className="font-bold">
-                            {Number(
-                              data.delivery_note.statement.total_amount
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr className="bg-[#eff8f9]">
-                        <td className="flex justify-between font-bold p-1">
-                          <span className="text-[#469fc2]">Balance Due</span>
-                          <span className="text-[#469fc2]">
-                            {Number(data.remaining_balance).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <Terms />
-                <hr />
-                <Warranty data={data} />
-              </div>
-            )}
-          {data &&
-            data.statement &&
-            documentToView &&
-            documentToView.includes("agreement") && (
-              <div className="flex flex-col gap-4 text-sm">
-                <div className="text-center">
-                  <span className="font-light text-lg">BLANKET AGREEMENT</span>
-                </div>
-                <div>
-                  This Agreement is made on{" "}
-                  {new Date(data.signed_date).toLocaleDateString("en-US", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })}{" "}
-                  between:
-                </div>
-
-                <div className="flex justify-between">
-                  <div className="flex flex-col">
-                    <span className="font-bold">Customer:</span>
-                    <span>{data.statement.customer.name}</span>
-                    <span>{`${data.statement.customer.address_line1} ${data.statement.customer.address_line2}`}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-bold">Seller:</span>
-                    <span>Kinetiq Company</span>
-                    <span>
-                      1975 Street Address of Company, NCR, Philippines
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 mt-2">
-                  <span className="font-bold text-[#469fc2]">1. PURPOSE</span>
-                  <span>
-                    This Agreement sets forth the terms under which the Buyer
-                    may procure goods/services from the Supplier as needed.
-                  </span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <span className="font-bold text-[#469fc2]">2. TERM</span>
-                  <span>
-                    This Agreement shall be effective from{" "}
-                    <b>
-                      {new Date(data.start_date).toLocaleDateString("en-US", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </b>{" "}
-                    to{" "}
-                    <b>
-                      {new Date(data.end_date).toLocaleDateString("en-US", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </b>
-                    , unless terminated earlier.
-                  </span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <span className="font-bold text-[#469fc2]">3. PRICING</span>
-                  <span>
-                    The goods/services shall be provided at the following rates:
-                  </span>
-                  <OrdersTable data={data} />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <span className="font-bold text-[#469fc2]">4. ORDERING</span>
-                  <span>
-                    Orders shall be placed by the Buyer via{" "}
-                    <b>{data.agreement_method}</b> method, referencing this
-                    Agreement Number: <b>{data.agreement_id}</b>.
-                  </span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <span className="font-bold text-[#469fc2]">5. DELIVERY</span>
-                  <span>
-                    All deliveries must be made to:{" "}
-                    <b>
-                      {data.statement.customer.address_line1}{" "}
-                      {data.statement.customer.address_line2}
-                    </b>
-                    .
-                  </span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <span className="font-bold text-[#469fc2]">
-                    6. TERMINATION
-                  </span>
-                  <span>
-                    This Agreement is not subject to termination by either party
-                    for convenience.
-                  </span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <span className="font-bold text-[#469fc2]">
-                    7. CONFIDENTIALITY
-                  </span>
-                  <span>
-                    Both parties agree to maintain confidentiality of shared
-                    information.
-                  </span>
-                </div>
-                <div className="mt-2">
-                  <span>
-                    <i>
-                      IN WITNESS WHEREOF, the parties have executed this
-                      Agreement as of the date first above written.
-                    </i>
-                  </span>
-                </div>
-                <div className="flex justify-between gap-12">
-                  <div className="flex flex-col flex-1/2">
-                    <span className="font-bold text-[#469fc2]">
-                      Customer Representative
-                    </span>
-                    <div className="flex justify-between">
-                      <span className="font-bold">Signature: </span>
-                      <span className="text-end">______________</span>
+                          </u>
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-bold">Name: </span>
-                      <span className="text-end">
-                        <u>{data.statement.customer.contact_person}</u>
+                    <div className="flex flex-col flex-1/2">
+                      <span className="font-bold text-[#469fc2]">
+                        Seller Representative
                       </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-bold">Date Signed: </span>
-                      <span className="text-end">
-                        <u>
-                          {new Date(data.signed_date).toLocaleDateString(
-                            "en-US",
-                            {
-                              day: "2-digit",
-                              month: "long",
-                              year: "numeric",
-                            }
-                          )}
-                        </u>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col flex-1/2">
-                    <span className="font-bold text-[#469fc2]">
-                      Seller Representative
-                    </span>
-                    <div className="flex justify-between">
-                      <span className="font-bold">Signature: </span>
-                      <span className="text-end">______________</span>
-                    </div>
-                    <div className="flex  justify-between">
-                      <span className="font-bold ">Name: </span>
-                      <span className="text-end">
-                        <u>{data.statement.customer.contact_person}</u>
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-bold">Date Signed: </span>
-                      <span className="text-end ">
-                        <u>
-                          {new Date(data.signed_date).toLocaleDateString(
-                            "en-US",
-                            {
-                              day: "2-digit",
-                              month: "long",
-                              year: "numeric",
-                            }
-                          )}
-                        </u>
-                      </span>
+                      <div className="flex justify-between">
+                        <span className="font-bold">Signature: </span>
+                        <span className="text-end">______________</span>
+                      </div>
+                      <div className="flex  justify-between">
+                        <span className="font-bold ">Name: </span>
+                        <span className="text-end">
+                          <u>{data.statement.customer.contact_person}</u>
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-bold">Date Signed: </span>
+                        <span className="text-end ">
+                          <u>
+                            {new Date(data.signed_date).toLocaleDateString(
+                              "en-US",
+                              {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              }
+                            )}
+                          </u>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-          <div className="mt-10 justify-center items-center text-center">
-            <a
-              className="py-1 px-6 font-medium transition-all duration-300 ease-in-out transform bg-[#00A8A8] text-white hover:bg-[#008080] rounded-md hover:shadow-lg"
-              href={`${BASE_API_URL}sales/${documentToView}/document`}
-            >
-              Download
-            </a>
+              )}
+            <div className="mt-10 justify-center items-center text-center">
+              <a
+                className="py-1 px-6 font-medium transition-all duration-300 ease-in-out transform bg-[#00A8A8] text-white hover:bg-[#008080] rounded-md hover:shadow-lg"
+                href={`${BASE_API_URL}sales/${documentToView}/document`}
+              >
+                Download
+              </a>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

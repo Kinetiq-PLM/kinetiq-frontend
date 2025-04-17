@@ -170,6 +170,7 @@ const Support = () => {
                 onClick={() => setIsTicketDetailOpen(true)}
                 type="primary"
                 className={"!max-w-[200px] py-2 flex-1"}
+                disabled={!selectedTicket}
               >
                 View Details
               </Button>
@@ -177,7 +178,7 @@ const Support = () => {
           </div>
 
           {isLoading ? (
-            <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+            <div className="w-full text-center min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
               <img src={loading} alt="loading" className="h-[100px]" />
             </div>
           ) : (
