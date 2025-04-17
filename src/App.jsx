@@ -1,3 +1,4 @@
+
 import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
@@ -381,8 +382,7 @@ function App() {
     },
     Production: {
       "Equipment and Labor": "Equipment&Labor",
-      "Quality Control": "QualityControl",
-      "Cost of Production": "CostOfProduction",
+      "Cost of Production": "CostOfProduction"
     },
     MRP: {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
