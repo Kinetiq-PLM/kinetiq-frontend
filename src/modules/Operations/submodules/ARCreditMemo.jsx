@@ -472,7 +472,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/get-warehouseID/')
+    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
         // Sort A–Z by location
@@ -793,7 +793,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         const updatedDocumentItemData = {
           product_id: item.item_id,
         };
-        const documentItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/product-docu-item/${item.productdocu_id}/`, {
+        const documentItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/product-docu-item/${item.productdocu_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -828,7 +828,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         } else if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
           updateDocomentItems.productdocu_id = item.productdocu_id;
         }
-        const productDocuItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/document-item/${item.content_id}/`, {
+        const productDocuItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -868,7 +868,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         freight: parseFloat(documentDetails.freight) || 0,
         transaction_cost: parseFloat(documentDetails.total).toFixed(2) || 0,
       };
-      const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/goods-tracking/${selectedData.document_id}/`, {
+      const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -918,7 +918,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/purchase_order/");
+      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
       if (!response.ok) throw new Error("Failed to fetch purchase orders");
      
       const data = await response.json();
@@ -942,7 +942,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
     try {
       // Fetch the selected purchase order details
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/purchase_order/${poId}/`);
+      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
       const selectedPO = await response.json();
