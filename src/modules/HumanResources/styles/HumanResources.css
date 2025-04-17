@@ -9,7 +9,7 @@
 /* Main content container */
 .hr .hr-body-content-container {
   width: 100%;
-  height: 100%; /* Fixed height */
+  height: 85%; /* Fixed height */
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
@@ -29,20 +29,18 @@
 }
 
 .hr-dashboard h2 {
-  position: sticky;
   top: 0;
-  background-color: white;
   padding: 1rem 0;
   margin: 0;
   margin-bottom: 1.5rem;
   font-size: 1.75rem;
 }
 
-/* Layout */
+/* Layout - Keep the flex layout but align items at the top */
 .hr-layout {
   display: flex;
   gap: 2rem;
-  align-items: stretch; /* Ensures both columns align vertically */
+  align-items: flex-start;
   margin-bottom: 2rem;
 }
 
@@ -53,12 +51,49 @@
   gap: 2rem;
 }
 
-.hr-interview-calendar {
-  flex: 1;
+/* Replace the hr-calendar-container with a direct styling for the Calendar */
+.hr-layout > .hr-calendar {
+  width: 550px;
+  max-height: 550px; /* Set a reasonable max-height */
+  border: 1px solid #cdcdcd;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  border: 1px solid #cdcdcd;
+}
+
+/* Add these styles to better size the internal calendar components */
+.hr-calendar-grid {
+  flex: 1;
+  min-height: 0; /* Allows the grid to shrink if needed */
+}
+
+/* Adjust holidays list to take less vertical space */
+.hr-calendar-holidays {
+  padding: 0 1rem;
+  margin-top: 0.5rem;
+}
+
+.hr-calendar-holidays h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.hr-calendar-holidays ul {
+  max-height: 120px; /* Reduce from 160px */
+}
+
+.hr-calendar-holidays li {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* Style for the Calendar heading that was inside the container */
+.hr-layout > h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
 }
 
 /* Summary container */
@@ -130,47 +165,6 @@
   border-bottom: 1px solid #eee;
   white-space: nowrap;
   text-align: left;
-}
-
-/* Interview section */
-.hr-interview-calendar {
-  background: #fff;
-  padding: 1.25rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.hr-calendar-box {
-  height: 250px;
-  background-color: #f3f3f3;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-style: italic;
-  color: #777;
-}
-
-.hr-interview-item {
-  display: flex;
-  justify-content: space-between;
-  background-color: #eefbfd;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  align-items: center;
-}
-
-.hr-tag {
-  background-color: #c0f0f2;
-  color: #007b80;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  margin-right: 0.5rem;
 }
 
 /* Leave requests section */
