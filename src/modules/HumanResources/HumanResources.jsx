@@ -189,10 +189,7 @@ const HRDashboard = () => {
                 </div>
               </div>
 
-              <div className="hr-interview-calendar">
-                <h3><strong>Calendar</strong></h3>
-                <Calendar />
-              </div>
+              <Calendar />
             </div>
 
             <div className="hr-leave-requests-section">
