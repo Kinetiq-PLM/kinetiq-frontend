@@ -188,7 +188,7 @@ const OrdersTable = ({ data }) => {
 
 const Terms = () => {
   return (
-    <div className="flex flex-col text-xs gap-1">
+    <div className="flex flex-col text-xs gap-1 text-gray-500">
       <span className="text-sm">Terms & Conditions</span>
       <span>
         Full payment is due upon receipt of this invoice. Late payments may
@@ -217,7 +217,9 @@ const Warranty = ({ data }) => {
         <tbody>
           <tr>
             <td className="border border-black text-black font-bold text-center p-2">
-              {`
+              <div className="flex flex-col">
+                <span>
+                  {`
                 ${new Date(data.invoice_date).toLocaleDateString("en-GB", {
                   day: "2-digit",
                   month: "long",
@@ -232,6 +234,11 @@ const Warranty = ({ data }) => {
                 }
               )}
               `}
+                </span>
+                <span className="font-normal text-xs">
+                  Please retain this invoice as proof of warranty coverage.
+                </span>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -401,7 +408,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
     >
       <div
         ref={modalRef}
-        className="bg-white pb-6 overflow-y-auto rounded-lg shadow-lg max-w-2xl w-2xl max-h-[90%] h-[90%] relative animate-in fade-in zoom-in duration-200"
+        className="bg-white pb-10 overflow-y-auto rounded-lg shadow-lg max-w-2xl w-2xl max-h-[90%] h-[90%] relative animate-in fade-in zoom-in duration-200"
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
         {/* HEADER */}
@@ -420,7 +427,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
           &times;
         </button>
         {/* BODY */}
-        <div className="px-10 mt-4 h-full">
+        <div className="px-10 mt-6">
           {data &&
             data.statement &&
             documentToView &&
@@ -856,18 +863,30 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                           </span>
                         </td>
                       </tr>
-                      <tr className="bg-[#eff8f9]">
+                      <tr>
                         <td className="flex justify-between font-bold p-1">
-                          <span className="font-bold text-[#469fc2]">
-                            Total
-                          </span>
-                          <span className="fold-bold text-[#469fc2]">
+                          <span className="font-bold">Total</span>
+                          <span className="font-bold">
                             {Number(
                               data.delivery_note.statement.total_amount
                             ).toLocaleString("en-US", {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
                             })}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr className="bg-[#eff8f9]">
+                        <td className="flex justify-between font-bold p-1">
+                          <span className="text-[#469fc2]">Balance Due</span>
+                          <span className="text-[#469fc2]">
+                            {Number(data.remaining_balance).toLocaleString(
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
                           </span>
                         </td>
                       </tr>
@@ -879,11 +898,184 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                 <Warranty data={data} />
               </div>
             )}
-          {documentToView && documentToView.includes("agreement") && (
-            <div>Agreement</div>
-          )}
+          {data &&
+            data.statement &&
+            documentToView &&
+            documentToView.includes("agreement") && (
+              <div className="flex flex-col gap-4 text-sm">
+                <div className="text-center">
+                  <span className="font-light text-lg">BLANKET AGREEMENT</span>
+                </div>
+                <div>
+                  This Agreement is made on{" "}
+                  {new Date(data.signed_date).toLocaleDateString("en-US", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  })}{" "}
+                  between:
+                </div>
 
-          <div className="mt-6 items-end">
+                <div className="flex justify-between">
+                  <div className="flex flex-col">
+                    <span className="font-bold">Customer:</span>
+                    <span>{data.statement.customer.name}</span>
+                    <span>{`${data.statement.customer.address_line1} ${data.statement.customer.address_line2}`}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold">Seller:</span>
+                    <span>Kinetiq Company</span>
+                    <span>
+                      1975 Street Address of Company, NCR, Philippines
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 mt-2">
+                  <span className="font-bold text-[#469fc2]">1. PURPOSE</span>
+                  <span>
+                    This Agreement sets forth the terms under which the Buyer
+                    may procure goods/services from the Supplier as needed.
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="font-bold text-[#469fc2]">2. TERM</span>
+                  <span>
+                    This Agreement shall be effective from{" "}
+                    <b>
+                      {new Date(data.start_date).toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </b>{" "}
+                    to{" "}
+                    <b>
+                      {new Date(data.end_date).toLocaleDateString("en-US", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </b>
+                    , unless terminated earlier.
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="font-bold text-[#469fc2]">3. PRICING</span>
+                  <span>
+                    The goods/services shall be provided at the following rates:
+                  </span>
+                  <OrdersTable data={data} />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="font-bold text-[#469fc2]">4. ORDERING</span>
+                  <span>
+                    Orders shall be placed by the Buyer via{" "}
+                    <b>{data.agreement_method}</b> method, referencing this
+                    Agreement Number: <b>{data.agreement_id}</b>.
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="font-bold text-[#469fc2]">5. DELIVERY</span>
+                  <span>
+                    All deliveries must be made to:{" "}
+                    <b>
+                      {data.statement.customer.address_line1}{" "}
+                      {data.statement.customer.address_line2}
+                    </b>
+                    .
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="font-bold text-[#469fc2]">
+                    6. TERMINATION
+                  </span>
+                  <span>
+                    This Agreement is not subject to termination by either party
+                    for convenience.
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="font-bold text-[#469fc2]">
+                    7. CONFIDENTIALITY
+                  </span>
+                  <span>
+                    Both parties agree to maintain confidentiality of shared
+                    information.
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <span>
+                    <i>
+                      IN WITNESS WHEREOF, the parties have executed this
+                      Agreement as of the date first above written.
+                    </i>
+                  </span>
+                </div>
+                <div className="flex justify-between gap-12">
+                  <div className="flex flex-col flex-1/2">
+                    <span className="font-bold text-[#469fc2]">
+                      Customer Representative
+                    </span>
+                    <div className="flex justify-between">
+                      <span className="font-bold">Signature: </span>
+                      <span className="text-end">______________</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-bold">Name: </span>
+                      <span className="text-end">
+                        <u>{data.statement.customer.contact_person}</u>
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-bold">Date Signed: </span>
+                      <span className="text-end">
+                        <u>
+                          {new Date(data.signed_date).toLocaleDateString(
+                            "en-US",
+                            {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            }
+                          )}
+                        </u>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col flex-1/2">
+                    <span className="font-bold text-[#469fc2]">
+                      Seller Representative
+                    </span>
+                    <div className="flex justify-between">
+                      <span className="font-bold">Signature: </span>
+                      <span className="text-end">______________</span>
+                    </div>
+                    <div className="flex  justify-between">
+                      <span className="font-bold ">Name: </span>
+                      <span className="text-end">
+                        <u>{data.statement.customer.contact_person}</u>
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-bold">Date Signed: </span>
+                      <span className="text-end ">
+                        <u>
+                          {new Date(data.signed_date).toLocaleDateString(
+                            "en-US",
+                            {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            }
+                          )}
+                        </u>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          <div className="mt-10 justify-center items-center text-center">
             <a
               className="py-1 px-6 font-medium transition-all duration-300 ease-in-out transform bg-[#00A8A8] text-white hover:bg-[#008080] rounded-md hover:shadow-lg"
               href={`${BASE_API_URL}sales/${documentToView}/document`}
