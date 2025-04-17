@@ -649,6 +649,29 @@
   to { opacity: 0; }
 }
 
+/* Loading & Error States */
+.recruitment-loading,
+.recruitment-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 2rem;
+}
+
+.recruitment-error {
+  color: #842029;
+}
+
+.recruitment-no-results {
+  text-align: center;
+  font-style: italic;
+  padding: 2rem;
+  color: #888;
+}
+
 .recruitment-modal-overlay {
   position: fixed;
   top: 0;
