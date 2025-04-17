@@ -1010,7 +1010,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const invoiceAmount = parseFloat(documentDetails.invoice_balance) || 0;
     const taxAmount = (parseFloat(documentDetails.tax_rate) / 100) * initialAmount;
     const initial_amount = parseFloat(initialAmount)
-    const total = parseFloat(taxAmount + invoiceAmount + initial_amount).toFixed(2);
+    const total = parseFloat(taxAmount + initial_amount).toFixed(2);
     setDocumentDetails(prev => ({
       ...prev,
       tax_amount: taxAmount,
