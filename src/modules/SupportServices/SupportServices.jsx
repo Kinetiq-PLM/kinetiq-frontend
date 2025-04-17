@@ -27,17 +27,17 @@ const SupportServices = ({ loadSubModule, setActiveSubModule, user_id, employee_
     reports: { total: 0, draft: 0, submitted: 0, reviewed: 0 },
   })
 
-  const fetchDataAndUpdateMetrics = async (endpoint, statusField, metricType, statusValues = []) => {
+  const fetchDataAndUpdateMetrics = async (endpoint, statusField, metricType, statusMap = {}) => {
     try {
       const data = await GET(endpoint);
-      
-      // Initialize an object to count the different statuses
-      const statusCounts = statusValues.reduce((acc, status) => {
-        acc[status] = data.filter(item => item[statusField].toLowerCase() === status).length;
+  
+      const statusCounts = Object.entries(statusMap).reduce((acc, [rawStatus, key]) => {
+        acc[key] = data.filter(item =>
+          item[statusField]?.toLowerCase().trim() === rawStatus
+        ).length;
         return acc;
       }, {});
   
-      // Update service metrics
       setServiceMetrics(prev => ({
         ...prev,
         [metricType]: {
@@ -50,7 +50,6 @@ const SupportServices = ({ loadSubModule, setActiveSubModule, user_id, employee_
       console.error(`Error fetching ${metricType}:`, error);
     }
   };
-  
   const fetchServiceRenewals = async () => {
     try {
       const data = await GET("renewal/");
@@ -76,6 +75,45 @@ const SupportServices = ({ loadSubModule, setActiveSubModule, user_id, employee_
     fetchDataAndUpdateMetrics("billing/", "billing_status", "billings", ["paid", "unpaid"]);
     fetchDataAndUpdateMetrics("report/", "report_status", "reports", ["draft", "submitted", "reviewed"]);
     fetchDataAndUpdateMetrics("contract/", "contract_status", "contracts", ["active", "expired", "terminated"]);
+    fetchServiceRenewals();
+  }, []);
+
+  useEffect(() => {
+    fetchDataAndUpdateMetrics("ticket/", "status", "tickets", {
+      "open": "open",
+      "in progress": "inProgress",
+      "closed": "closed"
+    });
+    fetchDataAndUpdateMetrics("call/", "call_status", "calls", {
+      "open": "open",
+      "in progress": "inProgress",
+      "closed": "closed"
+    });
+    fetchDataAndUpdateMetrics("request/", "request_status", "requests", {
+      "approved": "approved",
+      "in progress": "inProgress",
+      "pending": "pending",
+      "rejected": "rejected"
+    });
+    fetchDataAndUpdateMetrics("analysis/", "analysis_status", "analyses", {
+      "scheduled": "scheduled",
+      "done": "done"
+    });
+    fetchDataAndUpdateMetrics("billing/", "billing_status", "billings", {
+      "paid": "paid",
+      "unpaid": "unpaid"
+    });
+    fetchDataAndUpdateMetrics("report/", "report_status", "reports", {
+      "draft": "draft",
+      "submitted": "submitted",
+      "reviewed": "reviewed"
+    });
+    fetchDataAndUpdateMetrics("contract/", "contract_status", "contracts", {
+      "active": "active",
+      "expired": "expired",
+      "terminated": "terminated"
+    });
+  
     fetchServiceRenewals();
   }, []);
 
