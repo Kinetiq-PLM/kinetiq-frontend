@@ -20,11 +20,6 @@
   position: relative;
 }
 
-.servdash .body-content-container.fixed {
-  min-width: 40rem;
-  max-height: 47rem;
-}
-
 /* Header styling */
 .servdash .header {
   display: flex;
@@ -76,12 +71,19 @@
   margin: 0.5rem 0 1.5rem 0;
 }
 
-/* Dashboard grid layout */
 .servdash .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem; /* Slightly reduced from 1.5rem */
-  overflow: visible; /* Changed from auto to visible to prevent scrolling */
+  gap: 1.25rem;
+  
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  border-radius: 8px;
+  box-shadow: 0 0 0.5rem 0.1rem rgba(162, 162, 162, 0.2);
+  padding: 1.5rem;
+  border: 1px solid #e0e0e0;
+  margin-top: 2rem;
 }
 
 /* Dashboard card styling */
@@ -92,7 +94,6 @@
   flex-direction: column;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
   height: 100%;
-  min-height: 8.25rem; /* Increased from 7.5rem to 8.25rem */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -308,6 +309,8 @@
   }
 }
 
+/* ============ SERV ================ */
+
 .serv  {
   display: flex;
   width: 100%;
@@ -442,8 +445,9 @@
   font-size: 0.875rem;
   font-family: "Poppins", sans-serif;
   background-color: #f5f5f5;
-  width: auto;
+  width: 100%;
   min-width: 350px;
+  margin-bottom: 0px;
 }
 
 .serv .search-input:focus {
@@ -588,7 +592,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 5;
 }
 
 /* Modal header */
@@ -728,7 +732,7 @@
   max-height: 150px;
   overflow-y: auto;
   border-radius: 7px;
-  z-index: 9999; 
+  z-index: 5;
   display: block !important; 
 }
 .serv .dropdown-list li {
@@ -844,7 +848,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 6;
 }
 
 .serv .alert-modal-content {
@@ -904,3 +908,29 @@
   align-items: center;
   justify-content: center;
 }
+
+@media (max-width: 992px) {
+  .serv .update-button {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    padding-top: 0%;
+    padding-bottom: 0%;
+  }
+}
+
+@media (max-width: 847px) {
+  .serv .search-input {
+    min-width: 100%;
+  }
+
+  .serv .search-filter-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .serv .filter-options {
+    left: 0
+  }
+}
+

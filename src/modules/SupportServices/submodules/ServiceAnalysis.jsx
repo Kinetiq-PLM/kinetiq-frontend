@@ -17,7 +17,7 @@ import { GET } from "../api/api"
 import { POST } from "../api/api"
 import { PATCH } from "../api/api"
 
-const ServiceAnalysis = () => {
+const ServiceAnalysis = ({employee_id}) => {
   // State for analyses
   const [analyses, setAnalyses] = useState([])
   const [showUpdateModal, setShowUpdateModal] = useState(false)
@@ -82,7 +82,12 @@ const ServiceAnalysis = () => {
 
   const fetchAnalyses = async () => {
     try {
-      const data = await GET("service-analyses/");
+      // this filters out analyses so that only the service analyses assigned to the one currently logged in will show:
+      //const data = await GET(`analysis/analyses/technician/HR-EMP-2025-8d9f9b/`);
+      const data = await GET(`analysis/analyses/technician/${employee_id}/`);
+
+      // all analyses version:
+      // const data = await GET("analysis/");
       setAnalyses(data);
     } catch (error) {
       console.error("Error fetching analyses:", error)
@@ -122,7 +127,7 @@ const ServiceAnalysis = () => {
 
   const handleRowClick = async (analysis) => {
     try {
-      const data = await GET(`service-analyses/${analysis.analysis_id}`); 
+      const data = await GET(`analysis/${analysis.analysis_id}`); 
       console.log("Fetched data:", data);
 
       setSelectedAnalysis(data);
@@ -163,9 +168,12 @@ const ServiceAnalysis = () => {
 
   const fetchOrder = async (analysisId) => {
     try {
-      const data = await GET(`orders/${analysisId}/`);
+      const fetchedData = await GET(`order/orders/${analysisId}/`);
+      const data = fetchedData[0] || {};
+
       const rawDate = data?.order_date;
-  
+      
+      
       let formattedDate = "";
       if (rawDate) {
         const date = new Date(rawDate);
@@ -178,7 +186,7 @@ const ServiceAnalysis = () => {
   
         formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
       }
-  
+
       setServiceOrderInfo({
         serviceOrderId: data?.service_order_id || "",
         orderDate: formattedDate,
@@ -199,12 +207,21 @@ const ServiceAnalysis = () => {
         orderDate: "",
         orderTotalPrice: ""
       });
+      if (serviceOrderItems){ setServiceOrderItems([]) }
+      if (deliveryOrderInfo){ 
+        setDeliveryOrderInfo({
+          serviceOrderId: "",
+          deliveryOrderId: "",
+          deliveryDate: "",
+          deliveryStatus: "",
+      }) }
+      
     }
   };
 
   const fetchServiceOrderItems = async (serviceOrderId) => {
     try {
-      const data = await GET(`order-items/${serviceOrderId}/`);
+      const data = await GET(`order/order-items/${serviceOrderId}/`);
       setServiceOrderItems(data)
     } catch (error) {
       console.error("Error fetching order items:", error);
@@ -213,7 +230,7 @@ const ServiceAnalysis = () => {
 
   const fetchDeliveryOrder = async (serviceOrderId) => {
     try {
-      const data = await GET(`delivery-orders/${serviceOrderId}/`);
+      const data = await GET(`delivery/order/${serviceOrderId}/`);
       setDeliveryOrderInfo((prevState) => ({
         ...prevState,  
         deliveryOrderId: data?.delivery_order_id || prevState.deliveryOrderId,
@@ -233,7 +250,7 @@ const ServiceAnalysis = () => {
 
   const fetchAfterAnalysis = async (analysisId) => {
     try {
-      const data = await GET(`analysis-sched/${analysisId}/`);
+      const data = await GET(`after-analysis/analysis/${analysisId}/`);
 
       setAfterAnalysisInfo({
         afterAnalysisId: data?.analysis_sched_id || "",
@@ -339,7 +356,7 @@ const ServiceAnalysis = () => {
     }
     console.log("Updating analysis:", analysisData)
     try {
-      await PATCH(`service-analyses/${analysisId}/update/`, analysisData);
+      await PATCH(`analysis/${analysisId}/`, analysisData);
       setShowUpdateModal(false);
       fetchAnalyses();
     } catch (error) {
@@ -366,7 +383,7 @@ const ServiceAnalysis = () => {
   const handleCreateAnalysis = async (analysisData) => {
       console.log("Creating analysis:", analysisData)
       try {
-        const data = await POST("/service-analyses/", analysisData);
+        const data = await POST("analysis/", analysisData);
         console.log("Analysis created successfully:", data);
         setShowAddModal(false);
         fetchAnalyses();
@@ -398,7 +415,7 @@ const ServiceAnalysis = () => {
 
     console.log("Creating service order:", orderData)
       try {
-        const data = await POST("/service-order/", orderData);
+        const data = await POST("order/", orderData);
         console.log("Service order created successfully:", data);
         fetchOrder(selectedAnalysis.analysis_id);
         setSuccessModalMessage("Service order created successfully!"); 
@@ -433,21 +450,21 @@ const ServiceAnalysis = () => {
   const handleCreateOrderItem = async (orderItemData) => {
     console.log("Creating order item:", orderItemData)
     try {
-      const data = await POST("service-order-item/", orderItemData);
+      const data = await POST("order/item/", orderItemData);
       console.log("Order item created successfully:", data);
       setShowAddItemModal(false);
       fetchServiceOrderItems(serviceOrderInfo.serviceOrderId);
       
       try {
-        const data = await GET(`orders/${selectedAnalysis.analysis_id}/`);
-    
+        const fetchedData = await GET(`order/orders/${selectedAnalysis.analysis_id}/`);
+        const data = fetchedData[0] || {};
         setServiceOrderInfo({
           ...serviceOrderInfo,
           orderTotalPrice: data?.order_total_price || "",
         });
 
       } catch (error) {
-        console.error("Error fetching order:", error);
+        console.error("Error creating order item:", error);
         setServiceOrderInfo({
           ...serviceOrderInfo,
           orderTotalPrice: ""
@@ -483,21 +500,21 @@ const ServiceAnalysis = () => {
     console.log("Updating service order item:", orderItemData)
 
     try {
-      const data = await PATCH (`order-item/${orderItemId}/update/`, orderItemData);
+      const data = await PATCH (`order/item/${orderItemId}/`, orderItemData);
       console.log("Order item updated successfully:", data);
       setShowEditItemModal(false);
       fetchServiceOrderItems(serviceOrderInfo.serviceOrderId);
-      
+
       try {
-        const data = await GET(`orders/${selectedAnalysis.analysis_id}/`);
-    
+        const fetchedData = await GET(`order/orders/${selectedAnalysis.analysis_id}/`);
+        const data = fetchedData[0] || {};
         setServiceOrderInfo({
           ...serviceOrderInfo,
           orderTotalPrice: data?.order_total_price || "",
         });
 
       } catch (error) {
-        console.error("Error fetching order:", error);
+        console.error("Error fetching order item:", error);
         setServiceOrderInfo({
           ...serviceOrderInfo,
           orderTotalPrice: ""
@@ -549,7 +566,7 @@ const ServiceAnalysis = () => {
       }
       console.log("Creating delivery order:", newDeliveryOrderInfo )
       try {
-        const data = await POST("/delivery-order/", newDeliveryOrderInfo );
+        const data = await POST("delivery/", newDeliveryOrderInfo );
         console.log("Delivery order created successfully:", data);
         fetchDeliveryOrder(serviceOrderInfo.serviceOrderId);
         setSuccessModalMessage("Service delivery order created successfully!"); 
@@ -582,9 +599,10 @@ const ServiceAnalysis = () => {
         delivery_date: deliveryOrderInfo.deliveryDate,
       }
       const id = deliveryOrderInfo.deliveryOrderId
-      console.log("Updating delivery order:", id )
+      console.log("Updating delivery order:", id, " with: \n", newDeliveryOrderInfo )
+
       try {
-        const data = await PATCH(`delivery-order/${id}/update/`, newDeliveryOrderInfo );
+        const data = await PATCH(`delivery/${id}/`, newDeliveryOrderInfo );
         console.log("Delivery order updated successfully:", data);
         fetchDeliveryOrder(serviceOrderInfo.serviceOrderId);
         setSuccessModalMessage("Delivery order updated successfully!"); 
@@ -625,7 +643,7 @@ const ServiceAnalysis = () => {
 
     console.log("Updating after analysis sched:", afterAnalysisData)
     try {
-        const data = await PATCH (`analysis-sched/${afterAnalysisId}/update/`, afterAnalysisData);
+        const data = await PATCH (`after-analysis/${afterAnalysisId}/`, afterAnalysisData);
         console.log("After analysis sched update successfully:", data);
         fetchAfterAnalysis(selectedAnalysis.analysis_id);
         setSuccessModalMessage("After analysis schedule updated successfully!"); 
@@ -657,7 +675,7 @@ const ServiceAnalysis = () => {
 
     console.log("Creating after analysis sched:", afterAnalysisData)
       try {
-        const data = await POST("/after-analysis/", afterAnalysisData);
+        const data = await POST("after-analysis/", afterAnalysisData);
         console.log("After analysis sched created successfully:", data);
         fetchAfterAnalysis(selectedAnalysis.analysis_id);
         setSuccessModalMessage("After analysis scheduled successfully!"); 
@@ -932,8 +950,8 @@ const ServiceAnalysis = () => {
                             style={{ cursor: "pointer" }}
                             className={selectedItem === item ? "selected-row" : ""}
                           >
-                            <td>{item.item?.item_id || ""}</td>
-                            <td>{item.item?.item_name || ""}</td>
+                            <td>{item.item?.inventory_item_id || ""}</td>
+                            <td>{item.item_name || ""}</td>
                             <td>{item.item_quantity}</td>
                             <td>{item.item_price}</td>
                             <td>{item.total_price}</td>
@@ -1037,6 +1055,7 @@ const ServiceAnalysis = () => {
                     type="text"
                     id="serviceOrderId"
                     value={deliveryOrderInfo.serviceOrderId}
+                    readOnly
                     onChange={(e) => setDeliveryOrderInfo({ ...deliveryOrderInfo, serviceOrderId: e.target.value })}
                     placeholder="Enter service order ID"
                   />
@@ -1312,6 +1331,7 @@ const ServiceAnalysis = () => {
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
           onAdd={handleCreateAnalysis}
+          technician={employee_id}
         />
       )}
 
