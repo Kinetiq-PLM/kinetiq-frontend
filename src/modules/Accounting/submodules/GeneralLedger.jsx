@@ -4,7 +4,7 @@ import Button from "../components/Button";
 import Dropdown from "../components/Dropdown";
 import Table from "../components/Table";
 import Search from "../components/Search";
-import ReportModalInput from "../components/modalGL/ReportModalInput";
+import ReportModalInput from "../components/ReportModalInput";
 
 const BodyContent = () => {
     // Use state

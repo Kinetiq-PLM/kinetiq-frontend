@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./styles/accounting-styling.css";
+import Button from "../Accounting/components/Button";
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
     PieChart, Pie, Cell
@@ -107,12 +108,15 @@ const BodyContent = () => {
             .catch((error) => console.error("Error fetching COA data:", error));
     }, []);
 
+
+
     return (
         <div className="accounting">
             <div className="body-content-container">
                 <div className="title-subtitle-container">
                     <h1 className="subModule-title">Accounting Dashboard</h1>
                 </div>
+
 
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

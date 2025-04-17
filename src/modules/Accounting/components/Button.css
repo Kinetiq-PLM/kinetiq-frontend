@@ -1,4 +1,4 @@
-.btn {
+.accounting-btn .btn {
     font-size: 14px;
     border-radius: 10px;
     padding: 10px 20px;
@@ -8,53 +8,55 @@
 
 
 /* Standard Button 1 Styles */
-.btn-standard1 {
+.accounting-btn .btn-standard1 {
     border: 1.5px solid #00A8A8;
     background-color: white;
     color: #00A8A8;
 }
 
-.btn-standard1:hover {
+.accounting-btn .btn-standard1:hover {
     border: 1.5px solid #00A8A8;
     background-color: #E4FDFB;
 }
 
-.btn-standard1:active {
+.accounting-btn .btn-standard1:active {
     border: 1.5px solid #00A8A8;
     background-color: #C9E7E5;
 }
 
-.btn-standard1:disabled {
+.accounting-btn .btn-standard1:disabled {
     border: 1.5px solid #D2EFED;
     background-color: #ECF6F7;
     color: #B1DCDC;
 }
+
 /* Standard Button 1 Styles */
 
 
 
 /* Standard Button 2 Styles */
-.btn-standard2 {
+.accounting-btn .btn-standard2 {
     border: 1.5px solid #00A8A8;
     background-color: #00A8A8;
     color: white;
 }
 
-.btn-standard2:hover {
+.accounting-btn .btn-standard2:hover {
     border: 1.5px solid #00A8A8;
     background-color: #098F8F;
 }
 
-.btn-standard2:active {
+.accounting-btn .btn-standard2:active {
     border: 1.5px solid #00A8A8;
     background-color: #087D7D;
 }
 
-.btn-standard2:disabled {
+.accounting-btn .btn-standard2:disabled {
     border: 1.5px solid #D2EFED;
     background-color: #D9EDEF;
     color: #B1DCDC;
 }
+
 /* Standard Button 2 Styles */
 
 
@@ -68,7 +70,7 @@
 
 /* Small Desktop */
 @media (min-width: 1025px) and (max-width: 1280px) {
-    .btn {
+    .accounting-btn .btn {
         font-size: 12px;
         border-radius: 10px;
         padding: 8px 18px;
@@ -78,21 +80,21 @@
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
-    .btn {
+    .accounting-btn .btn {
         font-size: 10px;
         padding: 8px 15px;
     }
 }
 
 @media (max-width: 768px) {
-    .btn {
+    .accounting-btn .btn {
         font-size: 10px;
         padding: 6px 14px;
     }
 }
 
 @media (max-width: 480px) {
-    .btn {
+    .accounting-btn .btn {
         font-size: 10px;
         padding: 6px 14px;
     }

@@ -5,10 +5,9 @@ import Button from "../components/Button";
 import Forms from "../components/Forms";
 import NotifModal from "../components/modalNotif/NotifModal";
 import Dropdown from "../components/Dropdown";
-import AddAccountModal from "../components/modalJournalEntry/AddAccountModal";
+import AddAccountModal from "../components/AddAccountModal";
 
 const JournalEntry = () => {
-  // Use states
   const [totalDebit, setTotalDebit] = useState(0);
   const [totalCredit, setTotalCredit] = useState(0);
   const [journalOptions, setJournalOptions] = useState([]);
@@ -26,10 +25,8 @@ const JournalEntry = () => {
     message: "",
   });
 
-
-  // Handle input changes for amount fields
   const handleInputChange = (index, field, value) => {
-    const sanitizedValue = value.replace(/,/g, "");
+    const sanitizedValue = value.replace(/[^0-9.]/g, "");
     setJournalForm((prevState) => {
       const updatedTransactions = prevState.transactions.map((entry, i) =>
         i === index ? { ...entry, [field]: sanitizedValue } : entry
@@ -39,8 +36,6 @@ const JournalEntry = () => {
     });
   };
 
-
-  // Add a new transaction entry
   const addEntry = (type) => {
     setJournalForm((prevState) => {
       const updatedTransactions = [
@@ -52,8 +47,6 @@ const JournalEntry = () => {
     });
   };
 
-
-  // Remove a transaction entry
   const removeEntry = (index) => {
     setJournalForm((prevState) => {
       const updatedTransactions = prevState.transactions.filter((_, i) => i !== index);
@@ -62,8 +55,6 @@ const JournalEntry = () => {
     });
   };
 
-
-  // Calculate totals for debit and credit
   const updateTotals = (transactions) => {
     const debitSum = transactions
       .filter((t) => t.type === "debit")
@@ -75,23 +66,51 @@ const JournalEntry = () => {
     setTotalCredit(creditSum);
   };
 
-
-  // Handle adding selected account from modal
   const handleAddAccount = (accountData) => {
     setJournalForm((prevState) => {
       const updatedTransactions = prevState.transactions.map((entry, i) =>
         i === selectedIndex
-          ? { ...entry, glAccountId: accountData.glAccountId, accountName: accountData.accountName }
+          ? {
+              ...entry,
+              glAccountId: accountData.glAccountId,
+              accountName: accountData.accountName,
+            }
           : entry
       );
+
+      const isTargetDebit =
+        accountData.glAccountId === "ACC-GLA-2025-ae6010" && // Update to valid gl_account_id
+        prevState.transactions[selectedIndex].type === "debit";
+
+      if (isTargetDebit) {
+        const creditEntries = [
+          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "SSS Contribution" },
+          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Philhealth Contribution" },
+          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Pagibig Contribution" },
+          { glAccountId: "ACC-GLA-2025-cl2030", accountName: "Tax" },
+          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Late Deduction" },
+          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Absent Deduction" },
+          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Undertime Deduction" },
+          { glAccountId: "", accountName: "" },
+        ];
+
+        creditEntries.forEach((credit) => {
+          updatedTransactions.push({
+            type: "credit",
+            glAccountId: credit.glAccountId,
+            amount: "",
+            accountName: credit.accountName,
+          });
+        });
+      }
+
       return { ...prevState, transactions: updatedTransactions };
     });
+
     setIsAccountModalOpen(false);
     setSelectedIndex(null);
   };
 
-  
-  // Submit journal entry to backend without entry_line_id w/ user validations
   const handleSubmit = async () => {
     if (!journalForm.journalId || !journalForm.description) {
       setValidation({
@@ -133,13 +152,15 @@ const JournalEntry = () => {
       return;
     }
 
+    const currentYear = new Date().getFullYear();
+    const baseIdentifier = "YZ2020";
 
-    // Payloads
     const payload = {
       total_debit: totalDebit.toFixed(2),
       total_credit: totalCredit.toFixed(2),
       description: journalForm.description,
-      transactions: journalForm.transactions.map((t) => ({
+      transactions: journalForm.transactions.map((t, index) => ({
+        entry_line_id: `ACC-JEL-${currentYear}-${baseIdentifier}-${index}`,
         gl_account_id: t.glAccountId,
         debit_amount: t.type === "debit" ? parseFloat(t.amount).toFixed(2) : "0.00",
         credit_amount: t.type === "credit" ? parseFloat(t.amount).toFixed(2) : "0.00",
@@ -183,8 +204,6 @@ const JournalEntry = () => {
     }
   };
 
-
-  // Fetch journal IDs for dropdown
   useEffect(() => {
     const fetchJournalIDs = async () => {
       try {
@@ -201,7 +220,6 @@ const JournalEntry = () => {
     fetchJournalIDs();
   }, []);
 
-  
   return (
     <div className="JournalEntry">
       <div className="body-content-container">
@@ -211,7 +229,7 @@ const JournalEntry = () => {
 
         <div className="parent-component-container">
           <div className="flex justify-between gap-x-5">
-            <div className="flex gap-x-5 w-auto">
+            <div className="flex items-end gap-x-5 w-auto">
               <div className="flex flex-col">
                 <label htmlFor="journalId">Journal ID*</label>
                 <Dropdown
@@ -253,7 +271,6 @@ const JournalEntry = () => {
           </div>
         </div>
 
-        {/* Debit and Credit table */}
         <div className="journal-table">
           <div className="table-header">
             <div className="column account-column">Accounts Affected</div>
@@ -277,7 +294,8 @@ const JournalEntry = () => {
               <div className="column debit-column">
                 {entry.type === "debit" && (
                   <Forms
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     placeholder="Enter Debit"
                     value={entry.amount}
                     onChange={(e) => handleInputChange(index, "amount", e.target.value)}
@@ -289,7 +307,8 @@ const JournalEntry = () => {
               <div className="column credit-column">
                 {entry.type === "credit" && (
                   <Forms
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     placeholder="Enter Credit"
                     value={entry.amount}
                     onChange={(e) => handleInputChange(index, "amount", e.target.value)}

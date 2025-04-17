@@ -3,43 +3,38 @@ import "../styles/accounting-styling.css";
 import Table from "../components/Table";
 import Search from "../components/Search";
 import Button from "../components/Button";
-import CreateReceiptModal from "../components/modalOfficialReceipt/CreateReceiptModal";
+import CreateReceiptModal from "../components/CreateReceiptModal";
 import NotifModal from "../components/modalNotif/NotifModal";
 
 const OfficialReceipts = () => {
-  // Use states
   const columns = ["OR ID", "Invoice ID", "Customer ID", "OR Date", "Settled Amount", "Remaining Amount", "Payment Method", "Reference #", "Created By"];
   const [data, setData] = useState([]);
   const [searching, setSearching] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
 
-
-  // Open modal function
   const openModal = () => setModalOpen(true);
 
-
-  // Close modal function
   const closeModal = () => {
     setModalOpen(false);
     setReportForm({
       startDate: "",
       salesInvoiceId: "",
       amountPaid: "",
+      paymentMethod: "",
+      bankAccount: "", // Include bankAccount for Bank Transfer
       createdBy: "",
     });
   };
 
-
-  // State to store form data
   const [reportForm, setReportForm] = useState({
     startDate: "",
     salesInvoiceId: "",
     amountPaid: "",
-    createdBy: ""
+    paymentMethod: "",
+    bankAccount: "", // Include bankAccount for Bank Transfer
+    createdBy: "",
   });
 
-
-  // State for validation and notifications
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
@@ -47,22 +42,20 @@ const OfficialReceipts = () => {
     message: "",
   });
 
-  
-  // Fetch data from the backend
   const fetchData = () => {
     fetch('http://127.0.0.1:8000/api/official-receipts/')
       .then(response => response.json())
       .then(result => {
         setData(result.map(entry => [
-          entry.or_id || "-", 
-          entry.invoice_id || "-", 
-          entry.customer_id || "-", 
-          entry.or_date ? new Date(entry.or_date).toLocaleString() : "-", 
-          entry.settled_amount || "-", 
-          entry.remaining_amount || "-", 
-          entry.payment_method || "-", 
-          entry.reference_number || "-", 
-          entry.created_by || "-"
+          entry.or_id || "-",
+          entry.invoice_id || "-",
+          entry.customer_id || "-",
+          entry.or_date ? new Date(entry.or_date).toLocaleString() : "-",
+          entry.settled_amount || "-",
+          entry.remaining_amount || "-",
+          entry.payment_method || "-",
+          entry.reference_number || "-",
+          entry.created_by || "-",
         ]));
       })
       .catch(error => console.error('Error fetching data:', error));
@@ -72,81 +65,80 @@ const OfficialReceipts = () => {
     fetchData();
   }, []);
 
-
-  // Fetch the latest reference number and increment it
   const fetchLatestReferenceNumber = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/official-receipts/');
       const receipts = await response.json();
       if (receipts.length > 0) {
-        const lastReceipt = receipts[receipts.length - 1]; // Get the last receipt
-        const lastRef = lastReceipt.reference_number; // e.g., "REF-1021"
+        const lastReceipt = receipts[receipts.length - 1];
+        const lastRef = lastReceipt.reference_number;
 
-        // Validate the reference number format
         if (lastRef && lastRef.includes('-')) {
           const parts = lastRef.split('-');
-          const numericPart = parseInt(parts[1], 10); // Parse the numeric part
+          const numericPart = parseInt(parts[1], 10);
           if (!isNaN(numericPart)) {
-            const newRefNumber = numericPart + 1; // Increment by 1
+            const newRefNumber = numericPart + 1;
             return `REF-${newRefNumber}`;
           }
         }
       }
-      return "REF-0001"; // Default if no valid reference number exists
+      return "REF-0001";
     } catch (error) {
       console.error("Error fetching latest reference number:", error);
-      return "REF-0001"; // Fallback value
+      return "REF-0001";
     }
   };
 
-
-  // Generate custom OR ID
   const generateCustomORID = () => {
-    const prefix = "ACC-OFR"; // Static prefix
-    const year = new Date().getFullYear(); // Current year
-    const randomString = Math.random().toString(36).substring(2, 7).toUpperCase(); // Random 5-character string
+    const prefix = "ACC-OFR";
+    const year = new Date().getFullYear();
+    const randomString = Math.random().toString(36).substring(2, 7).toUpperCase();
     return `${prefix}-${year}-${randomString}`;
   };
 
-
-  // Handle input changes in the modal
   const handleInputChange = (field, value) => {
+    console.log(`Updating ${field} to ${value}`); // Debug log
     setReportForm((prevForm) => ({
       ...prevForm,
-      [field]: value
+      [field]: value,
     }));
   };
 
-
-  // Handle form submission
   const handleSubmit = async () => {
-    if (!reportForm.startDate || !reportForm.salesInvoiceId || !reportForm.amountPaid || !reportForm.createdBy) {
+    console.log("Form data on submit:", reportForm); // Debug log
+    if (
+      !reportForm.startDate ||
+      !reportForm.salesInvoiceId ||
+      !reportForm.amountPaid ||
+      !reportForm.paymentMethod ||
+      !reportForm.createdBy ||
+      (reportForm.paymentMethod === "Bank Transfer" && !reportForm.bankAccount)
+    ) {
       setValidation({
         isOpen: true,
         type: "warning",
         title: "All Fields Required",
-        message: "Please fill in all the fields before submitting.",
+        message: "Please fill in all fields, including payment method and bank account (if applicable).",
       });
       return;
     }
 
-
-    const referenceNumber = await fetchLatestReferenceNumber(); // Fetch and increment reference number
-
+    const referenceNumber = await fetchLatestReferenceNumber();
 
     const newReceipt = {
-      or_id: generateCustomORID(), // Use the custom OR ID generator
+      or_id: generateCustomORID(),
       invoice_id: reportForm.salesInvoiceId,
-      customer_id: "SALES-CUST-2025", // Default customer ID
+      customer_id: "SALES-CUST-2025",
       or_date: reportForm.startDate,
       settled_amount: reportForm.amountPaid,
-      remaining_amount: "0.00", // Default remaining amount
-      payment_method: "Cash", // Default payment method
-      reference_number: referenceNumber, // Use the incremented reference number
+      remaining_amount: "0.00",
+      payment_method: reportForm.paymentMethod,
+      reference_number: referenceNumber,
       created_by: reportForm.createdBy,
+      bank_account: reportForm.paymentMethod === "Bank Transfer" ? reportForm.bankAccount : null, // Include bank account if Bank Transfer
     };
 
-    console.log("Submitting receipt:", newReceipt); // Log the data being sent
+    console.log("Submitting receipt:", newReceipt);
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/official-receipts/', {
@@ -155,13 +147,13 @@ const OfficialReceipts = () => {
         body: JSON.stringify(newReceipt),
       });
 
-      console.log("Response status:", response.status); // Log the response status
+      console.log("Response status:", response.status);
 
       if (response.ok) {
         const createdReceipt = await response.json();
-        console.log("Created receipt:", createdReceipt); // Log the created receipt
-        fetchData(); // Refresh the table data
-        closeModal(); // Close the modal
+        console.log("Created receipt:", createdReceipt);
+        fetchData();
+        closeModal();
         setValidation({
           isOpen: true,
           type: "success",
@@ -170,7 +162,7 @@ const OfficialReceipts = () => {
         });
       } else {
         const errorData = await response.json();
-        console.error("Error response from server:", errorData); // Log the error response
+        console.error("Error response from server:", errorData);
         setValidation({
           isOpen: true,
           type: "error",
@@ -189,8 +181,6 @@ const OfficialReceipts = () => {
     }
   };
 
-
-  // Filter the data based on the search input
   const filteredData = data.filter(row =>
     [row[0], row[1], row[2], row[6], row[7], row[8]]
       .filter(Boolean)
@@ -199,7 +189,6 @@ const OfficialReceipts = () => {
       .includes(searching.toLowerCase())
   );
 
-  
   return (
     <div className="officialReceipts">
       <div className="body-content-container">

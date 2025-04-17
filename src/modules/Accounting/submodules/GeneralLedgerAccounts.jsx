@@ -4,7 +4,7 @@ import Table from '../components/Table';
 import Search from '../components/Search';
 import Dropdown from '../components/Dropdown';
 import Button from '../components/Button';
-import CreateGLAccountModal from '../components/modalGLA/CreateGLAccountModal';
+import CreateGLAccountModal from '../components/CreateGLAccountModal';
 import NotifModal from '../components/modalNotif/NotifModal';
 
 const GeneralLedgerAccounts = () => {

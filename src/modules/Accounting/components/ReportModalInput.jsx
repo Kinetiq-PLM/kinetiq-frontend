@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "./../ModalInput.css";
-import Button from "../Button";
-import Dropdown from "../Dropdown";
-import { accounts, subAccounts } from "../../submodules/ListOfAccounts";
-import Forms from "../Forms";
+import "./ModalInput.css";
+import Button from "../components/Button";
+import Dropdown from "../components/Dropdown";
+import { accounts, subAccounts } from "../submodules/ListOfAccounts";
+import Forms from "./Forms";
 
 const ReportModalInput = ({ isModalOpen, closeModal, reportForm, handleInputChange, handleSubmit, }) => {
   // Use state
@@ -33,7 +33,7 @@ const ReportModalInput = ({ isModalOpen, closeModal, reportForm, handleInputChan
       .replace(/^(.)/, (match, group1) => group1.toLowerCase()); // Lowercase first
 
   return (
-    <div>
+    <div className="accounting-modal">
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-container">
@@ -127,7 +127,7 @@ const ReportModalInput = ({ isModalOpen, closeModal, reportForm, handleInputChan
             </div>
           </div>
         </div>
-      )};
+      )}
     </div>
   );
 };
