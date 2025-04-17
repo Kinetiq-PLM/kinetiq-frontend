@@ -336,14 +336,15 @@ const BodyContent = () => {
 
   const fetchReturns = async () => {
     try {
-      const data = await GET("/dev/validation/budget-returns/");
+      const data = await GET("/validation/budget-returns/");
       setOriginalReturnsData(data.map(sub=> ({
-        returnsId: sub.budget_return?.budget_return_id,
-        departmentId: sub.budget_return?.dept_id || "",
-        returnDate: sub.budget_return?.return_date || "",
+        validationId: sub.validation_id,
+        returnsId: sub?.budget_return?.budget_return_id || "",
+        departmentId: sub?.budget_return?.dept_id || "",
+        returnDate: sub?.budget_return?.return_date || "",
         originTotalBudget: sub.final_approved_amount || "",
-        returnedAmount: sub.budget_return?.returned_amount || "",
-        attachedFile: sub.budget_return?.expense_history_breakdown || "",
+        returnedAmount: sub?.budget_return?.returned_amount || "",
+        attachedFile: sub?.budget_return?.expense_history_breakdown || "",
         remarks: sub.remarks || "",
         comments: sub.comments || "",
         validationStatus: sub.validation_status || "",
@@ -356,13 +357,14 @@ const BodyContent = () => {
 
   const fetchRequests = async () => {
     try {
-      const data = await GET("/dev/validation/budget-requests/");
+      const data = await GET("/validation/budget-requests/");
       setOriginalRequestData(data.map(sub=> ({
-        reqID: sub.budget_request?.budget_request_id,
-        departmentId: sub.budget_request?.dept_id || "",
-        amount: sub.budget_request?.amount_requested || "",
-        requestDate: sub.budget_request?.requested_date || "",
-        validatedBy: sub.validated_by || "",
+        validationId: sub.validation_id,
+        reqID: sub?.budget_request?.budget_request_id || "",
+        departmentId: sub?.budget_request?.dept_id || "",
+        amount: sub?.budget_request?.amount_requested || "",
+        requestDate: sub?.budget_request?.requested_date || "",
+        validatedBy: sub?.validated_by || "",
         remarks: sub.remarks || "",
         approvedAmount: sub.final_approved_amount || "",
         validationStatus: sub.validation_status || "",
@@ -375,12 +377,13 @@ const BodyContent = () => {
 
 const fetch = async () => {
   try {
-    const data = await GET("/dev/validation/budget-submissions/");
+    const data = await GET("/validation/budget-submissions/");
     setOriginalData(data.map(sub=> ({
-      requestId: sub.budget_submission,
-      departmentId: sub.budget_submission?.dept_id || "",
+      validationId: sub.validation_id,
+      requestId: sub?.budget_submission?.budget_submission_id || "",
+      departmentId: sub?.budget_submission?.dept_id || "",
       amount: sub.amount_requested || "",
-      submissionDate: sub.budget_submission?.date_submitted || "",
+      submissionDate: sub?.budget_submission?.date_submitted || "",
       validatedBy: sub.validated_by || "",
       remarks: sub.remarks || "",
       approvedAmount: sub.final_approved_amount || "",
@@ -404,36 +407,44 @@ const patchEditedRows = async () => {
       const requestId = row.requestId || row.reqID || row.returnsId;
       if (!requestId) {
         console.error("Error: ID is undefined for row:", row);
-        continue; // Skip this row and move to the next
+        continue; 
       }
 
       let endpoint = "";
       let payload = {};
+      let dateValidated = new Date().toISOString().split('T')[0];
+      console.log ("Date Validated:", dateValidated);
 
       if (activeTab === "Budget Submission List" && row.requestId) {
-        // Add the ID to the endpoint URL
-        endpoint = `/dev/validation/budget-submissions/${row.requestId}/`;
+        endpoint = `/validation/budget-submissions/${row.validationId}/`;
         payload = {
-          validated_by: row.validatedBy || "",
-          final_approved_amount: row.approvedAmount || "",
+          validated_by: editedData[row.requestId].validatedBy || "",
+          final_approved_amount: editedData[row.requestId].approvedAmount || "",
+          validation_date: dateValidated || "",
+          remarks: 'Approved' || "",
+          validation_status: 'Validated' || "",
         };
       } else if (activeTab === "Budget Request List" && row.reqID) {
-        endpoint = `/dev/validation/budget-requests/${row.reqID}/`;
+        endpoint = `/validation/budget-requests/${row.validationId}/`;
         payload = {
-          validated_by: row.validatedBy || "",
-          final_approved_amount: row.approvedAmount || "",
+          validated_by: editedData[row.reqID].validatedBy || "",
+          final_approved_amount: editedData[row.reqID].approvedAmount || "",
+          validation_date: dateValidated || "",
+          remarks: 'Approved' || "",
+          validation_status: 'Validated' || "",
         };
       } else if (activeTab === "Returns List" && row.returnsId) {
-        endpoint = `/dev/validation/budget-returns/${row.returnsId}/`;
+        endpoint = `/validation/budget-returns/${row.validationId}/`;
         payload = {
-          validated_by: row.validatedBy || "",
+          validated_by: editedData[row.returnsId].validatedBy || "",
           remarks: row.remarks || "",
+          validation_date: dateValidated || "",
           comments: row.comments || "N/A",
           expense_history_breakdown: row.attachedFile || "",
         };
       } else {
         console.error("Unsupported tab or missing ID:", row);
-        continue; // Skip this row and move to the next
+        continue;
       }
 
       console.log("Updating row with endpoint:", endpoint, "and payload:", payload);
@@ -443,12 +454,9 @@ const patchEditedRows = async () => {
         console.log("Row updated successfully:", response);
       } catch (error) {
         console.error("Error updating row:", error);
-        // Optionally, you can decide whether to stop or continue on error
-        // For now, we continue to the next row
       }
     }
 
-    // Close the modal and refresh data
     setIsConfirmationVisible(false);
     fetch();
     fetchRequests();
@@ -458,7 +466,6 @@ const patchEditedRows = async () => {
     alert("An error occurred while updating rows. Please try again.");
   }
 };
-
 
   return (
     <div className="valid">
