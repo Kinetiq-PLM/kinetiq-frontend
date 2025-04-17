@@ -30,7 +30,6 @@ const PurchaseCredMemoBody = () => {
   ];
 
   const handleNewForm = () => setShowForm(true);
-  const handleCompare = () => alert("Compare feature not implemented yet.");
   const handleSendTo = () => alert("Send To feature not implemented yet.");
 
   // Add back button handler to toggle dashboard
@@ -175,7 +174,7 @@ const PurchaseCredMemoBody = () => {
             <div className="credmemo-table-header">
               <div className="credmemo-checkbox"><input type="checkbox" /></div>
               <div>Credit Memo</div>
-              <div>Ref: Purchase Order</div>
+              <div>Ref: A/P Invoice</div>
               <div>Status</div>
               <div>Document Date</div>
               <div>Due Date</div>
@@ -203,7 +202,6 @@ const PurchaseCredMemoBody = () => {
           <div className="credmemo-footer">
             <button className="credmemo-new-form" onClick={handleNewForm}>New Form</button>
             <div className="credmemo-footer-right">
-              <button className="credmemo-compare" onClick={handleCompare}>Compare</button>
               <button className="credmemo-send-to" onClick={handleSendTo}>Send to</button>
             </div>
           </div>

@@ -125,23 +125,9 @@ const VendorAppForm = () => {
                     <div className="vendorappform-header">
                         <button className="vendorappform-back">Back</button>
                         <h2 className="vendorappform-title">Vendor Application Form</h2>
-                        <button className="vendorappform-copy">Copy To</button>
                     </div>
 
                     <div className="vendorappform-content">
-                        {/* Company Info */}
-                        <div className="vendorappform-company-info">
-                            <div className="vendorappform-company-details">
-                                <h3 className="vendorappform-company-name">COMPANY NAME</h3>
-                                <div className="vendorappform-address">
-                                    <div>Address</div>
-                                    <div>Address</div>
-                                </div>
-                            </div>
-                            <div className="vendorappform-logo">
-                                <img src="../images/kinetiq.png" alt="Kinetiq Logo" />
-                            </div>
-                        </div>
 
                         {/* Vendor Info */}
                         <div className="vendorappform-vendor-info">
