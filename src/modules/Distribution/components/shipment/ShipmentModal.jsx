@@ -663,17 +663,16 @@ const ShipmentModal = ({
                   Manage Delivery Receipt
                 </button>
               )}
-              
+
               {canBeFailed && (
                 <button
                   type="button"
-                  className={`status-update-button failure ${!formData.carrier_id ? 'disabled' : ''}`}
+                  className="status-update-button failure"
                   onClick={() => onReportFailure(shipment)}
                   style={{ 
                     marginTop: (canBeShipped || hasDeliveryReceipt) ? '0.5rem' : '0',
-                    cursor: !formData.carrier_id ? 'not-allowed' : 'pointer'
+                    cursor: 'pointer'
                   }}
-                  disabled={!formData.carrier_id}
                 >
                   Report Failure
                 </button>
