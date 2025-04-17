@@ -34,6 +34,8 @@ const ServiceCall = ({user_id, employee_id}) => {
   // Fetch service calls from API (mock function)
   const fetchServiceCalls = async () => {
     try {
+      // this filters out service calls so that only the service calls assigned to the one currently logged in will show:
+      // const data = await GET(`call/calls/technician/HR-EMP-2025-a66f9c/`);
       const data = await GET(`call/calls/technician/${employee_id}/`);
 
       // all calls version:

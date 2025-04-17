@@ -44,7 +44,11 @@ const ServiceReport = ({employee_id}) => {
 
   const fetchReports = async () => {
     try {
+      // this filters out reports so that only the service reports assigned to the one currently logged in will show:
+      // const data = await GET(`report/reports/technician/HR-EMP-2025-8d9f9b/`);
       const data = await GET(`report/reports/technician/${employee_id}/`);
+
+      // all reports:
       //const data = await GET("report/");
       setReports(data);
     } catch (error) {

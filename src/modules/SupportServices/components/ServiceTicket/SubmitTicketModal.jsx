@@ -56,7 +56,7 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit, user_id, employee_id }) 
 // fetches a list of techs
 const fetchTechnicians = async () => {
   try {
-    const response = await GET("call/calls/technicians/");
+    const response = await GET("call/calls/help-desks/"); // filter out only help desk technicians
     console.log("techs", response)
     setTechnicians(response);
   } catch (error) {
@@ -103,7 +103,7 @@ const handleSelectType = (selectedType) => {
   const prioRef = useRef(null);
 
   useEffect(() => {
-    setTechnicianId(employee_id); // set the technician id to the one currently logged in
+    // setTechnicianId(employee_id); // set the technician id to the one currently logged in
 
     const handleClickOutside = (event) => {
       if (customerRef.current && !customerRef.current.contains(event.target)) {
@@ -248,16 +248,16 @@ const handleSelectType = (selectedType) => {
                   <input
                     type="text"
                     id="technicianId"
-                    readOnly
+                    // readOnly
                     value={technicianId}
-                    // onChange={(e) => {
-                    //   setTechnicianId(e.target.value);
-                    //   setDropdownOpenT(true);
-                    // }}
-                    // onClick = {handleToggleDropdownTech}
+                    onChange={(e) => {
+                      setTechnicianId(e.target.value);
+                      setDropdownOpenT(true);
+                    }}
+                    onClick = {handleToggleDropdownTech}
                     placeholder="Select technician ID"
                   />
-                  {/* <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
+                  <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
                     {isDropdownOpenT && (
                         <ul className="dropdown-list">
                           {technicians.length > 0 ? (
@@ -274,11 +274,7 @@ const handleSelectType = (selectedType) => {
                             <li>No technicians ID found</li>
                           )}
                         </ul>
-                      )} 
-                      
-                      DISABLED DROPDOWN OF TECHNICIAN, AUTO FILL OF TECHNICIAN CURRENTLY LOGGED IN
-                      */}
-                      
+                      )}  
                 </div>
               </div>
             </div>

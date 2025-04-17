@@ -32,6 +32,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
     description: "",
     reportStatus: "",
     technicianId: technician,
+    // technicianId: 'HR-EMP-2025-8d9f9b'
   })
 
   const fetchTickets = async () => {

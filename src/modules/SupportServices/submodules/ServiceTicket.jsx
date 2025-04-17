@@ -38,8 +38,10 @@ const ServiceTicket = ({ user_id, employee_id }) => {
 
   const fetchTickets = async () => {
     try {
-      const data = await GET(`ticket/tickets/salesrep/${employee_id}/`);
-
+      // this filters out tickets so that only the tickets assigned to the one currently logged in will show:
+      const data = await GET(`ticket/tickets/salesrep/HR-EMP-2025-de92df/`);
+      // const data = await GET(`ticket/tickets/salesrep/${employee_id}/`);
+      
       // all tix version:
       // const data = await GET("ticket/");
       setTickets(data);

@@ -138,6 +138,7 @@ const [isRenewalDropdown, setOpenRenewal] = useState(false);
 const fetchRenewals = async () => {
   try {
     const response = await GET(`renewal/renewals/technician/${technician}/`);
+    // const response = await GET(`renewal/renewals/technician/HR-EMP-2025-a66f9c/`);
     //const response = await GET(`renewal/`); 
     console.log("renewals", response)
     setRenewals(response);
@@ -177,6 +178,7 @@ const [isRequestDropdown, setRequestDropdown] = useState(false);
 const fetchRequests = async () => {
   try {
     const response = await GET(`request/requests/technician/${technician}/`);
+    // const response = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
     //const response = await GET(`request/`); 
     console.log("requests", response)
     setRequests(response);

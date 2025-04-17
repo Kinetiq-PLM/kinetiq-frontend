@@ -25,6 +25,8 @@ const WarrantyRenewal = ({employee_id}) => {
   // Fetch service calls from API (mock function)
   const fetchServiceRenewals = async () => {
    try {
+      // this filters out renewals so that only the warranty renewals assigned to the one currently logged in will show:
+      // const data = await GET(`renewal/renewals/technician/HR-EMP-2025-a66f9c/`);
       const data = await GET(`renewal/renewals/technician/${employee_id}/`);
 
       // all renewals version:

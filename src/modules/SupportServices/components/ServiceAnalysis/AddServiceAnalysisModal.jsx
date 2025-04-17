@@ -9,7 +9,8 @@ import { GET } from "../../api/api"
 
 const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
   const [requestId, setRequestId] = useState("")
-  const [technicianId, setTechnicianId] = useState(technician)
+  // const [technicianId, setTechnicianId] = useState(technician)
+  const [technicianId, setTechnicianId] = useState('HR-EMP-2025-8d9f9b')
   const [analysisDate, setAnalysisDate] = useState("")
   const [analysisStatus, setAnalysisStatus] = useState("")
   const [customerId, setCustomerId] = useState("")
@@ -31,6 +32,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
   const fetchRequests = async () => {
     try {
       const data = await GET(`request/requests/technician/${technician}/`);
+      // const data = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
 
       //const data = await GET("request/");
       setRequests(data);

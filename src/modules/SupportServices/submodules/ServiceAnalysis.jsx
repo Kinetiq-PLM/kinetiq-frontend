@@ -82,11 +82,13 @@ const ServiceAnalysis = ({employee_id}) => {
 
   const fetchAnalyses = async () => {
     try {
+      // this filters out analyses so that only the service analyses assigned to the one currently logged in will show:
+      //const data = await GET(`analysis/analyses/technician/HR-EMP-2025-8d9f9b/`);
       const data = await GET(`analysis/analyses/technician/${employee_id}/`);
-      setAnalyses(data);
 
       // all analyses version:
       // const data = await GET("analysis/");
+      setAnalyses(data);
     } catch (error) {
       console.error("Error fetching analyses:", error)
     }
@@ -597,7 +599,8 @@ const ServiceAnalysis = ({employee_id}) => {
         delivery_date: deliveryOrderInfo.deliveryDate,
       }
       const id = deliveryOrderInfo.deliveryOrderId
-      console.log("Updating delivery order:", id )
+      console.log("Updating delivery order:", id, " with: \n", newDeliveryOrderInfo )
+
       try {
         const data = await PATCH(`delivery/${id}/`, newDeliveryOrderInfo );
         console.log("Delivery order updated successfully:", data);
