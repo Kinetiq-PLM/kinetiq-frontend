@@ -53,7 +53,7 @@ export default function StandaloneLogin() {
         return;
       }
 
-      const response = await axios.post("http://127.0.0.1:8001/login/", {
+      const response = await axios.post("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/login/", {
         email: credentials.email,
         password: credentials.password,
       });
