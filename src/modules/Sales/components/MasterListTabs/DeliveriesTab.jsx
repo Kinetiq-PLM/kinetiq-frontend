@@ -6,17 +6,24 @@ import DELIVERY_LIST_DATA from "../../temp_data/deliveries_list_data";
 import { useQuery } from "@tanstack/react-query";
 import { GET, BASE_API_URL } from "../../api/api";
 import { useAlert } from "../Context/AlertContext";
+
+import loading from "../Assets/kinetiq-loading.gif";
+
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
+  setIsDocumentModalOpen,
+  setDocument,
 }) {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [deliveryList, setDeliveryList] = useState([]);
   const columns = [
-    { key: "delivery_note_id", label: "Delivery ID" },
+    { key: "id", label: "Delivery ID" },
     { key: "order_id", label: "Order ID" },
     { key: "type", label: "Type" },
     { key: "customer_id", label: "Customer ID" },
@@ -24,7 +31,7 @@ export default function BlanketAgreementsTab({
     { key: "address", label: "Address" },
     { key: "tracking_num", label: "Tracking Number" },
     { key: "shipping_method", label: "Shipping Method" },
-    { key: "shipment_status", label: "Status" },
+    { key: "status", label: "Status" },
     { key: "preferred_delivery_date", label: "Preferred Delivery Date" },
     { key: "shipping_date", label: "Shipping Date" },
     { key: "estimated_delivery", label: "Estimated Delivery Date" },
@@ -81,16 +88,16 @@ export default function BlanketAgreementsTab({
   useEffect(() => {
     if (deliveryQuery.status === "success") {
       const data = deliveryQuery.data.map((delivery) => ({
-        delivery_note_id: delivery.delivery_note_id,
-        customer_id: delivery.statement.customer.customer_id,
-        order_id: delivery.order ? delivery.order.order_id : null,
+        id: delivery.delivery_note_id,
+        customer_id: delivery.statement?.customer?.customer_id,
+        order_id: delivery.order ? delivery.order?.order_id : null,
         tracking_num: delivery.tracking_num,
         shipping_method: delivery.shipping_method,
-        customer_name: delivery.statement.customer.name,
-        shipment_status: delivery.shipment_status,
-        address: `${delivery.statement.customer.address_line1} ${delivery.statement.customer.address_line2}`,
-        type: delivery.order.order_type,
-        total_price: Number(delivery.statement.total_amount).toLocaleString(
+        customer_name: delivery.statement?.customer?.name,
+        status: delivery.shipment_status,
+        address: `${delivery.statement?.customer?.address_line1} ${delivery.statement?.customer?.address_line2}`,
+        type: delivery.order?.order_type,
+        total_price: Number(delivery.statement?.total_amount).toLocaleString(
           "en-US",
           {
             minimumFractionDigits: 2,
@@ -110,9 +117,11 @@ export default function BlanketAgreementsTab({
           ? new Date(delivery.actual_delivery_date).toLocaleString()
           : null,
         created_at: new Date(delivery.created_at).toLocaleString(),
-        document: `${BASE_API_URL}sales/delivery/${delivery.delivery_note_id}/document`,
+        document: ["Pending"].includes(delivery.shipment_status),
+        endpoint: `delivery/${delivery.delivery_note_id}`,
       }));
       setDeliveryList(data);
+      setIsLoading(false);
     } else if (deliveryQuery.status === "error") {
       showAlert({ type: "error", title: "Failed to fetch Deliveries." });
     }
@@ -121,54 +130,71 @@ export default function BlanketAgreementsTab({
   return (
     <section className="h-full">
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+      <div className="mb-4">
         {/* Filters */}
-        <div className="flex flex-1/2 items-center space-x-2 gap-2 w-fit flex-wrap">
-          {/* Date Filter Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={dateFilters}
-              onChange={setDateFilter}
-              value={dateFilter}
-            />
+        <div className="flex justify-between gap-2 w-full flex-wrap">
+          <div className="h-fit items-center flex flex-row flex-1 space-x-4">
+            {/* Date Filter Dropdown */}
+            <div className="w-full max-w-[200px]">
+              <Dropdown
+                options={dateFilters}
+                onChange={setDateFilter}
+                value={dateFilter}
+              />
+            </div>
+
+            {/* Search By Dropdown */}
+            <div className="w-full max-w-[200px]">
+              <Dropdown
+                options={searchFields.map((field) => field.label)}
+                onChange={(selected) => {
+                  const field = searchFields.find((f) => f.label === selected);
+                  if (field) setSearchBy(field.key);
+                }}
+                value={searchFields.find((f) => f.key === searchBy)?.label}
+              />
+            </div>
+
+            {/* Search Input */}
+            <div className="flex items-center w-full max-w-[600px]">
+              <div className="h-[40px] w-full">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Search By Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={searchFields.map((field) => field.label)}
-              onChange={(selected) => {
-                const field = searchFields.find((f) => f.label === selected);
-                if (field) setSearchBy(field.key);
-              }}
-              value={searchFields.find((f) => f.key === searchBy)?.label}
-            />
-          </div>
-
-          {/* Search Input */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          {/* New Quotation Button (No onClick) */}
+          <Button
+            onClick={handleRedirect}
+            type="primary"
+            className={"!max-w-[200px] py-2 flex-1"}
+          >
+            New Delivery
+          </Button>
         </div>
-
-        {/* New Quotation Button (No onClick) */}
-        <Button
-          onClick={handleRedirect}
-          type="primary"
-          className={"w-[200px] py-2"}
-        >
-          New Delivery
-        </Button>
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
-      </div>
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table
+            data={filteredQuotations}
+            columns={columns}
+            setIsDocumentModalOpen={setIsDocumentModalOpen}
+            setDocument={setDocument}
+          />
+        </div>
+      )}
     </section>
   );
 }

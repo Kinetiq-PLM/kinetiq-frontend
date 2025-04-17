@@ -43,7 +43,10 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
       queryClient.refetchQueries(["customers", "customerPartners"]);
     },
     onError: (error) => {
-      alert(error.message);
+      showAlert({
+        type: "error",
+        title: "Failed to add Customer: " + error.message,
+      });
     },
   });
 

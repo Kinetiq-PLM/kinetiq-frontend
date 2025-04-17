@@ -6,7 +6,12 @@ import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
 import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "../../../Sales/components/Context/AlertContext";
+
+import loading from "../../../Sales/components/Assets/kinetiq-loading.gif";
+
 export default function SupplierTab() {
+  const [isLoading, setIsLoading] = useState(true);
+
   const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
@@ -57,10 +62,6 @@ export default function SupplierTab() {
     return true;
   });
 
-  const handleClick = () => {
-    console.log("CLICKED");
-  };
-
   useEffect(() => {
     if (customersQuery.status === "success") {
       const data = customersQuery.data.map((customer) => ({
@@ -70,53 +71,66 @@ export default function SupplierTab() {
         contact_info: customer.contact_info,
       }));
       setCustomers(data);
+      setIsLoading(false);
     } else if (customersQuery.status === "error") {
-      showAlert({ type: "error", title: "Failed to fetch Customers." });
+      showAlert({ type: "error", title: "Failed to fetch Suppliers." });
     }
   }, [customersQuery.data, customersQuery.status]);
 
   return (
     <section className="h-full">
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+      <div className="mb-4">
         {/* Filters */}
-        <div className="flex flex-1/2 items-center space-x-2 gap-2 w-fit flex-wrap">
-          {/* Date Filter Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={dateFilters}
-              onChange={setDateFilter}
-              value={dateFilter}
-            />
-          </div>
+        <div className="flex justify-between gap-2 w-full flex-wrap">
+          <div className="h-fit items-center flex flex-row flex-1 space-x-4">
+            {/* Date Filter Dropdown */}
+            <div className="w-full max-w-[200px]">
+              <Dropdown
+                options={dateFilters}
+                onChange={setDateFilter}
+                value={dateFilter}
+              />
+            </div>
 
-          {/* Search By Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={searchFields.map((field) => field.label)}
-              onChange={(selected) => {
-                const field = searchFields.find((f) => f.label === selected);
-                if (field) setSearchBy(field.key);
-              }}
-              value={searchFields.find((f) => f.key === searchBy)?.label}
-            />
-          </div>
+            {/* Search By Dropdown */}
+            <div className="w-full max-w-[200px]">
+              <Dropdown
+                options={searchFields.map((field) => field.label)}
+                onChange={(selected) => {
+                  const field = searchFields.find((f) => f.label === selected);
+                  if (field) setSearchBy(field.key);
+                }}
+                value={searchFields.find((f) => f.key === searchBy)?.label}
+              />
+            </div>
 
-          {/* Search Input */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+            {/* Search Input */}
+            <div className="flex items-center w-full max-w-[600px]">
+              <div className="h-[40px] w-full">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
-      </div>
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table data={filteredQuotations} columns={columns} />
+        </div>
+      )}
     </section>
   );
 }

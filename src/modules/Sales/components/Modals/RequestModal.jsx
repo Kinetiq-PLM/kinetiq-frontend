@@ -2,18 +2,53 @@
 
 import { useState, useEffect, useRef } from "react";
 
-import { useAlert } from "../../Sales/components/Context/AlertContext.jsx";
+import Button from "../Button";
+import Dropdown from "../Dropdown.jsx";
 
-import Button from "../../Sales/components/Button.jsx";
-import InputField from "../../Sales/components/InputField.jsx";
-import TextField from "./TextField.jsx";
-import DateInputField from "../../Sales/components/DateInputField.jsx";
-
-const TicketDetail = ({ isOpen, onClose, ticket, setIsTicketResolveOpen }) => {
+const RequestModal = ({ isOpen, onClose, setAction }) => {
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
+  const [requestType, setRequestType] = useState("");
+  const [isValidationVisible, setIsValidationVisible] = useState(false);
+
+  const requestTypes = [
+    "Project Request",
+    "Purchase Request",
+    "Workforce Request",
+    "Job Posting Request",
+  ];
+
+  const validateRequestType = () => {
+    if (!requestType) {
+      return "Please select a request type.";
+    }
+    return null;
+  };
+
+  const handleConfirm = () => {
+    setIsValidationVisible(true);
+
+    const validators = [validateRequestType];
+
+    const errorCount = validators.reduce(
+      (count, validate) => count + (validate() ? 1 : 0),
+      0
+    );
+
+    console.log(errorCount === 0 ? "NO ERRORS" : errorCount);
+
+    if (errorCount === 0) {
+      // Reset form fields
+      setAction(requestType);
+
+      setRequestType("");
+      onClose();
+    }
+  };
+
   useEffect(() => {
+    setIsValidationVisible(false);
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
         onClose();
@@ -57,7 +92,7 @@ const TicketDetail = ({ isOpen, onClose, ticket, setIsTicketResolveOpen }) => {
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            Ticket Details
+            Choose Request
           </h2>
         </div>
 
@@ -73,51 +108,26 @@ const TicketDetail = ({ isOpen, onClose, ticket, setIsTicketResolveOpen }) => {
 
         {/* BODY */}
         <div className="px-6 mt-4">
-          <form action="" className="space-y-4 mb-6">
-            <div className="flex gap-2">
-              <InputField
-                label={"Ticket ID"}
-                value={ticket.ticket_id}
-                isDisabled={true}
-              />
-              <InputField
-                label={"Status"}
-                value={ticket.status}
-                isDisabled={true}
-              />
-            </div>
-            <DateInputField
-              label={"Date Issued"}
-              value={new Date(ticket.created_at).toISOString().split("T")[0]}
-              isDisabled={true}
-            />
-            <InputField
-              label={"Customer Name"}
-              value={ticket.customer_name}
-              isDisabled={true}
-            />
-            <InputField
-              label={"Subject"}
-              value={ticket.subject}
-              isDisabled={true}
-            />
-            <TextField
-              label={"Message"}
-              value={ticket.description}
-              isDisabled={true}
+          <form action="" className="space-y-4 mb-16">
+            <Dropdown
+              label="Request Type"
+              options={requestTypes}
+              onChange={setRequestType}
+              value={requestType}
+              validation={validateRequestType}
+              isValidationVisible={isValidationVisible}
             />
           </form>
 
-          <div className="mt-4 flex justify-between">
+          <div className="flex justify-between">
             <div>
               <Button
                 type="primary"
                 className={"mr-2"}
+                onClick={handleConfirm}
                 submit={true}
-                onClick={() => setIsTicketResolveOpen(true)}
-                disabled={ticket.status === "Closed"}
               >
-                Resolve
+                Continue
               </Button>
             </div>
             <div>
@@ -132,4 +142,4 @@ const TicketDetail = ({ isOpen, onClose, ticket, setIsTicketResolveOpen }) => {
   );
 };
 
-export default TicketDetail;
+export default RequestModal;

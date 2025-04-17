@@ -7,8 +7,16 @@ import { useQuery } from "@tanstack/react-query";
 import { BASE_API_URL, GET } from "../../api/api";
 import { useAlert } from "../Context/AlertContext";
 
-export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
+import loading from "../Assets/kinetiq-loading.gif";
+export default function OrdersTab({
+  loadSubModule,
+  setActiveSubModule,
+  setIsDocumentModalOpen,
+  setDocument,
+}) {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -19,13 +27,12 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
     retry: 2,
   });
   const columns = [
-    { key: "order_id", label: "Order ID" },
+    { key: "id", label: "Order ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "address", label: "Address" },
     { key: "order_type", label: "Type" },
-    { key: "ext_project_request", label: "Project Request ID" },
-    { key: "order_status", label: "Status" },
+    { key: "status", label: "Status" },
     { key: "total_price", label: "Total Price" },
     { key: "salesrep", label: "Sales Representative" }, // name of salesrep if available
     { key: "order_date", label: "Date Issued" },
@@ -73,22 +80,28 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
   useEffect(() => {
     if (orderQuery.status === "success") {
       const data = orderQuery.data.map((order) => ({
-        order_id: order.order_id,
-        customer_id: order.statement.customer.customer_id,
-        customer_name: order.statement.customer.name,
-        address: `${order.statement.customer.address_line1} ${order.statement.customer.address_line2}`,
+        id: order.order_id,
+        customer_id: order.statement?.customer?.customer_id,
+        customer_name: order.statement?.customer?.name,
+        address: `${order.statement?.customer?.address_line1} ${order.statement?.customer?.address_line2}`,
         order_type: order.order_type,
-        order_status: order.completion_status,
+        status: order.completion_status,
         ext_project_request: order.ext_project_request,
-        salesrep: `${order.statement.salesrep.first_name} ${order.statement.salesrep.last_name}`,
-        total_price: Number(order.statement.total_amount).toLocaleString(
+        salesrep: `${order.statement?.salesrep?.first_name} ${order.statement?.salesrep?.last_name}`,
+        total_price: Number(order.statement?.total_amount).toLocaleString(
           "en-US",
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),
         order_date: new Date(order.order_date).toLocaleString(),
-        document: `${BASE_API_URL}sales/order/${order.order_id}/document`,
+        document: [
+          "Open for Delivery",
+          "Partially Delivered",
+          "Completed",
+        ].includes(order.completion_status),
+        endpoint: `order/${order.order_id}`,
       }));
       setOrderList(data);
+      setIsLoading(false);
     } else if (orderQuery.status === "error") {
       showAlert({ type: "error", title: "Failed to fetch Orders" });
     }
@@ -97,54 +110,71 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
   return (
     <section className="h-full">
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+      <div className="mb-4">
         {/* Filters */}
-        <div className="flex flex-1/2 items-center space-x-2 gap-2 w-fit flex-wrap">
-          {/* Date Filter Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={dateFilters}
-              onChange={setDateFilter}
-              value={dateFilter}
-            />
+        <div className="flex justify-between gap-2 w-full flex-wrap">
+          <div className="h-fit items-center flex flex-row flex-1 space-x-4">
+            {/* Date Filter Dropdown */}
+            <div className="w-full max-w-[200px]">
+              <Dropdown
+                options={dateFilters}
+                onChange={setDateFilter}
+                value={dateFilter}
+              />
+            </div>
+
+            {/* Search By Dropdown */}
+            <div className="w-full max-w-[200px]">
+              <Dropdown
+                options={searchFields.map((field) => field.label)}
+                onChange={(selected) => {
+                  const field = searchFields.find((f) => f.label === selected);
+                  if (field) setSearchBy(field.key);
+                }}
+                value={searchFields.find((f) => f.key === searchBy)?.label}
+              />
+            </div>
+
+            {/* Search Input */}
+            <div className="flex items-center w-full max-w-[600px]">
+              <div className="h-[40px] w-full">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Search By Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={searchFields.map((field) => field.label)}
-              onChange={(selected) => {
-                const field = searchFields.find((f) => f.label === selected);
-                if (field) setSearchBy(field.key);
-              }}
-              value={searchFields.find((f) => f.key === searchBy)?.label}
-            />
-          </div>
-
-          {/* Search Input */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          {/* New Quotation Button (No onClick) */}
+          <Button
+            onClick={handleRedirect}
+            type="primary"
+            className={"!max-w-[200px] py-2 flex-1"}
+          >
+            New Orders
+          </Button>
         </div>
-
-        {/* New Quotation Button (No onClick) */}
-        <Button
-          onClick={handleRedirect}
-          type="primary"
-          className={"w-[200px] py-2"}
-        >
-          New Order
-        </Button>
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
-      </div>
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table
+            data={filteredQuotations}
+            columns={columns}
+            setIsDocumentModalOpen={setIsDocumentModalOpen}
+            setDocument={setDocument}
+          />
+        </div>
+      )}
     </section>
   );
 }
