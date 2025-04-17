@@ -84,6 +84,7 @@
   padding: 6px;
   margin-top: 4px;
   box-sizing: border-box;
+  resize: none;
 }
 .po-edit-modal {
   position: fixed;
@@ -553,4 +554,10 @@
   font-weight: 600;
   margin-bottom: 1rem;
   color: #333;
+}
+
+.po-edit-form-group textarea{
+  resize: none;
+  width: 100%;
+  border: 1px solid #ddd;
 }

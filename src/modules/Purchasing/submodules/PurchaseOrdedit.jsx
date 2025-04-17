@@ -161,7 +161,7 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
         )}
         <form onSubmit={handleSubmit}>
           <div className="po-edit-form-group">
-            <label>Status *</label>
+            <label>Status</label>
             <select
               name="status"
               value={formData.status}

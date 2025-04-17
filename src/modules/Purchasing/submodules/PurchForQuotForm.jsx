@@ -458,7 +458,7 @@ const handleSendTo = async () => {
                 </select>
               </div>
               <div className="form-group">
-                <label>Document Number*</label>
+                <label>Document Number</label>
                 <input 
                   type="text" 
                   name="documentNumber"

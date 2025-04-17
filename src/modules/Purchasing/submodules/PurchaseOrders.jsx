@@ -629,7 +629,7 @@ const PurchaseOrderUI = ({
               <form onSubmit={handleQCSubmit}>
                 <div className="purchord-qc-form">
                   <div className="form-group">
-                    <label>Inspection Date *</label>
+                    <label>Inspection Date</label>
                     <input
                       type="date"
                       value={qcForm.inspection_date}
@@ -639,7 +639,7 @@ const PurchaseOrderUI = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Shipment ID *</label>
+                    <label>Shipment ID</label>
                     {shipments.length > 0 ? (
                       <select
                         value={qcForm.shipment_id}
@@ -666,7 +666,7 @@ const PurchaseOrderUI = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Inspector *</label>
+                    <label>Inspector</label>
                     <select
                       value={qcForm.employee_id}
                       onChange={(e) => setQcForm({...qcForm, employee_id: e.target.value})}
@@ -682,7 +682,7 @@ const PurchaseOrderUI = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Inspection Result *</label>
+                    <label>Inspection Result</label>
                     <select
                       value={qcForm.inspection_result}
                       onChange={(e) => setQcForm({...qcForm, inspection_result: e.target.value})}

@@ -282,7 +282,7 @@ const PurchaseReqForm = ({ onClose }) => {
                 <div className="form-content">
                     <div className="form-left">
                         <div className="form-group">
-                            <label>Name<span className="required">*</span></label>
+                            <label>Name<span className="required"></span></label>
                             <select name="employeeId" value={formData.employeeId} onChange={handleEmployeeChange}>
                                 <option value="">Select employee</option>
                                 {employees.map(emp => (
@@ -304,7 +304,7 @@ const PurchaseReqForm = ({ onClose }) => {
                         </div>
 
                         <div className="form-group">
-                            <label>Department<span className="required">*</span></label>
+                            <label>Department<span className="required"></span></label>
                             <input type="text" name="department" value={formData.department} readOnly />
                         </div>
 
