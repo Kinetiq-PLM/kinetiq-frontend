@@ -177,8 +177,11 @@
   height: auto;
   justify-content: space-between;
   border-radius: 15px;
+<<<<<<< HEAD
   padding-top: 5px;
   padding-bottom: 10px;
+=======
+>>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 }
 
 .repgen .text-input {
@@ -189,14 +192,20 @@
   margin-left: 10px;
   outline: none;
   height: auto;
+<<<<<<< HEAD
   min-height: 40px; /* Fixed minimum height */
   max-height: 120px; /* Maximum expanded height */
+=======
+  min-height: 40px;
+  max-height: 300px;
+>>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
   resize: none;
   overflow-y: auto;
   word-wrap: break-word;
   padding-top: 10px;
   font-size: 16px;
   font-family: inter;
+<<<<<<< HEAD
   transition: min-height 0.2s ease; /* Smooth height transition */
   line-height: 1.5; /* Ensure consistent line height */
 }
@@ -204,6 +213,9 @@
 /* Add this new class for expanded state */
 .repgen .text-input.expanded {
   height: 120px;
+=======
+  padding-top: 15px;
+>>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 }
 
 .repgen .text-input::placeholder {
@@ -235,7 +247,10 @@
   padding: 15px;
   max-height: 400px;
   overflow-y: auto;
+<<<<<<< HEAD
   box-sizing: border-box;
+=======
+>>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 }
 
 .repgen .chat-history::-webkit-scrollbar {
@@ -253,20 +268,29 @@
   align-self: flex-end;
   background-color: #F7F9FB;
   text-align: right;
+<<<<<<< HEAD
   margin-left: auto;
   margin-right: 10px;
+=======
+>>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 }
 
 .repgen .chat-message.bot {
   align-self: flex-start;
+<<<<<<< HEAD
   margin-left: 10px;
   margin-right: auto;
+=======
+>>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 }
 
 .repgen .chat-table-response {
   border-radius: 8px;
   margin-top: 10px;
+<<<<<<< HEAD
   width: 100%; 
+=======
+>>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 }
 
 .repgen .res-head {
@@ -492,7 +516,11 @@
     flex: 1;
     overflow-y: scroll;
     padding: 10px;
+<<<<<<< HEAD
     max-height: 500px;
+=======
+    max-height: 430px;
+>>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 }
 
 .repgen .history-section {
