@@ -13,6 +13,8 @@ export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
   setIsQuotationListOpen,
+  setIsDocumentModalOpen,
+  setDocument,
 }) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +30,7 @@ export default function BlanketAgreementsTab({
     retry: 2,
   });
   const columns = [
-    { key: "agreement_id", label: "Agreement ID" },
+    { key: "id", label: "Agreement ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "address", label: "Address" },
@@ -81,7 +83,7 @@ export default function BlanketAgreementsTab({
   useEffect(() => {
     if (agreementQuery.status === "success") {
       const data = agreementQuery.data.map((agreement) => ({
-        agreement_id: agreement.agreement_id,
+        id: agreement.agreement_id,
         customer_id: agreement.statement?.customer?.customer_id,
         customer_name: agreement.statement?.customer?.name,
         address: `${agreement.statement?.customer?.address_line1} ${agreement.statement?.customer?.address_line2}`,
@@ -96,7 +98,8 @@ export default function BlanketAgreementsTab({
         start_date: new Date(agreement.start_date).toLocaleDateString(),
         end_date: new Date(agreement.end_date).toLocaleDateString(),
         status: agreement.status,
-        document: `${BASE_API_URL}sales/agreement/${agreement.agreement_id}/document`,
+        document: true,
+        endpoint: `agreement/${agreement.agreement_id}`,
       }));
       setAgreementList(data);
       setIsLoading(false);
@@ -167,7 +170,12 @@ export default function BlanketAgreementsTab({
         </div>
       ) : (
         <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-          <Table data={filteredQuotations} columns={columns} />
+          <Table
+            data={filteredQuotations}
+            columns={columns}
+            setIsDocumentModalOpen={setIsDocumentModalOpen}
+            setDocument={setDocument}
+          />
         </div>
       )}
     </section>

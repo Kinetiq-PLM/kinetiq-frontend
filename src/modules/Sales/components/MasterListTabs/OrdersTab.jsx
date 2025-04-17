@@ -8,7 +8,12 @@ import { BASE_API_URL, GET } from "../../api/api";
 import { useAlert } from "../Context/AlertContext";
 
 import loading from "../Assets/kinetiq-loading.gif";
-export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
+export default function OrdersTab({
+  loadSubModule,
+  setActiveSubModule,
+  setIsDocumentModalOpen,
+  setDocument,
+}) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -22,7 +27,7 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
     retry: 2,
   });
   const columns = [
-    { key: "order_id", label: "Order ID" },
+    { key: "id", label: "Order ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "address", label: "Address" },
@@ -75,7 +80,7 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
   useEffect(() => {
     if (orderQuery.status === "success") {
       const data = orderQuery.data.map((order) => ({
-        order_id: order.order_id,
+        id: order.order_id,
         customer_id: order.statement?.customer?.customer_id,
         customer_name: order.statement?.customer?.name,
         address: `${order.statement?.customer?.address_line1} ${order.statement?.customer?.address_line2}`,
@@ -88,7 +93,12 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),
         order_date: new Date(order.order_date).toLocaleString(),
-        document: `${BASE_API_URL}sales/order/${order.order_id}/document`,
+        document: [
+          "Open for Delivery",
+          "Partially Delivered",
+          "Completed",
+        ].includes(order.completion_status),
+        endpoint: `order/${order.order_id}`,
       }));
       setOrderList(data);
       setIsLoading(false);
@@ -157,7 +167,12 @@ export default function OrdersTab({ loadSubModule, setActiveSubModule }) {
         </div>
       ) : (
         <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-          <Table data={filteredQuotations} columns={columns} />
+          <Table
+            data={filteredQuotations}
+            columns={columns}
+            setIsDocumentModalOpen={setIsDocumentModalOpen}
+            setDocument={setDocument}
+          />
         </div>
       )}
     </section>

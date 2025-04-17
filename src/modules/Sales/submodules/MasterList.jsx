@@ -12,6 +12,7 @@ import BlanketAgreementsTab from "./../components/MasterListTabs/BlanketAgreemen
 import { AlertProvider } from "../components/Context/AlertContext";
 import BlanketAgreementDetailsModal from "../components/Modals/BlanketAgreementDetails";
 import QuotationListModal from "../components/Modals/Lists/QuotationList";
+import ViewDocumentModal from "../components/Modals/ViewDocumentModal";
 
 const BodyContent = ({
   setActiveModule,
@@ -25,6 +26,8 @@ const BodyContent = ({
     useState(false);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
   const [isQuotationListOpen, setIsQuotationListOpen] = useState(false);
+  const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+  const [documentToView, setDocument] = useState(null);
 
   const tabs = [
     {
@@ -33,6 +36,8 @@ const BodyContent = ({
         <QuotationsTab
           loadSubModule={loadSubModule}
           setActiveSubModule={setActiveSubModule}
+          setIsDocumentModalOpen={setIsDocumentModalOpen}
+          setDocument={setDocument}
         />
       ),
     },
@@ -42,6 +47,8 @@ const BodyContent = ({
         <OrdersTab
           loadSubModule={loadSubModule}
           setActiveSubModule={setActiveSubModule}
+          setIsDocumentModalOpen={setIsDocumentModalOpen}
+          setDocument={setDocument}
         />
       ),
     },
@@ -51,6 +58,8 @@ const BodyContent = ({
         <DeliveriesTab
           loadSubModule={loadSubModule}
           setActiveSubModule={setActiveSubModule}
+          setIsDocumentModalOpen={setIsDocumentModalOpen}
+          setDocument={setDocument}
         />
       ),
     },
@@ -60,6 +69,8 @@ const BodyContent = ({
         <InvoicesTab
           loadSubModule={loadSubModule}
           setActiveSubModule={setActiveSubModule}
+          setIsDocumentModalOpen={setIsDocumentModalOpen}
+          setDocument={setDocument}
         />
       ),
     },
@@ -70,6 +81,8 @@ const BodyContent = ({
           loadSubModule={loadSubModule}
           setActiveSubModule={setActiveSubModule}
           setIsQuotationListOpen={setIsQuotationListOpen}
+          setIsDocumentModalOpen={setIsDocumentModalOpen}
+          setDocument={setDocument}
         />
       ),
     },
@@ -122,6 +135,11 @@ const BodyContent = ({
               query={"get_null=True"}
             ></QuotationListModal>
 
+            <ViewDocumentModal
+              isOpen={isDocumentModalOpen}
+              onClose={() => setIsDocumentModalOpen(false)}
+              documentToView={documentToView}
+            ></ViewDocumentModal>
             <div className="hidden lg:flex mt-4 border-b border-[#E8E8E8] w-fit gap-2">
               {tabs.map((tab) => (
                 <Button

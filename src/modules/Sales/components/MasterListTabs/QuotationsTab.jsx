@@ -10,7 +10,12 @@ import { useAlert } from "../Context/AlertContext";
 
 import loading from "../Assets/kinetiq-loading.gif";
 
-export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
+export default function QuotationsTab({
+  loadSubModule,
+  setActiveSubModule,
+  setIsDocumentModalOpen,
+  setDocument,
+}) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -18,6 +23,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [quotationList, setQuotationList] = useState([]);
+
   // const [filteredQuotations, setFilteredQuotations] = useState([]);
 
   const quotationQuery = useQuery({
@@ -27,7 +33,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
   });
 
   const columns = [
-    { key: "quotation_id", label: "Quotation ID" },
+    { key: "id", label: "Quotation ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "address", label: "Address" },
@@ -59,7 +65,7 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
   useEffect(() => {
     if (quotationQuery.status === "success") {
       const data = quotationQuery.data.map((quote) => ({
-        quotation_id: quote.quotation_id,
+        id: quote.quotation_id,
         customer_id: quote.statement?.customer?.customer_id,
         customer_name: quote.statement?.customer?.name,
         address: `${quote.statement?.customer?.address_line1} ${quote.statement?.customer?.address_line2}`,
@@ -71,7 +77,8 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),
         date_issued: new Date(quote.date_issued).toLocaleString(),
-        document: `${BASE_API_URL}sales/quotation/${quote.quotation_id}/document`,
+        document: ["Approved", "Ready"].includes(quote.status),
+        endpoint: `quotation/${quote.quotation_id}`,
       }));
       setQuotationList(data);
       setIsLoading(false);
@@ -161,7 +168,12 @@ export default function QuotationsTab({ loadSubModule, setActiveSubModule }) {
         </div>
       ) : (
         <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-          <Table data={filteredQuotations} columns={columns} />
+          <Table
+            data={filteredQuotations}
+            columns={columns}
+            setIsDocumentModalOpen={setIsDocumentModalOpen}
+            setDocument={setDocument}
+          />
         </div>
       )}
     </section>

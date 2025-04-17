@@ -12,6 +12,8 @@ import loading from "../Assets/kinetiq-loading.gif";
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
+  setIsDocumentModalOpen,
+  setDocument,
 }) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function BlanketAgreementsTab({
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [deliveryList, setDeliveryList] = useState([]);
   const columns = [
-    { key: "delivery_note_id", label: "Delivery ID" },
+    { key: "id", label: "Delivery ID" },
     { key: "order_id", label: "Order ID" },
     { key: "type", label: "Type" },
     { key: "customer_id", label: "Customer ID" },
@@ -86,7 +88,7 @@ export default function BlanketAgreementsTab({
   useEffect(() => {
     if (deliveryQuery.status === "success") {
       const data = deliveryQuery.data.map((delivery) => ({
-        delivery_note_id: delivery.delivery_note_id,
+        id: delivery.delivery_note_id,
         customer_id: delivery.statement?.customer?.customer_id,
         order_id: delivery.order ? delivery.order?.order_id : null,
         tracking_num: delivery.tracking_num,
@@ -115,7 +117,8 @@ export default function BlanketAgreementsTab({
           ? new Date(delivery.actual_delivery_date).toLocaleString()
           : null,
         created_at: new Date(delivery.created_at).toLocaleString(),
-        document: `${BASE_API_URL}sales/delivery/${delivery.delivery_note_id}/document`,
+        document: ["Pending"].includes(delivery.shipment_status),
+        endpoint: `delivery/${delivery.delivery_note_id}`,
       }));
       setDeliveryList(data);
       setIsLoading(false);
@@ -184,7 +187,12 @@ export default function BlanketAgreementsTab({
         </div>
       ) : (
         <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-          <Table data={filteredQuotations} columns={columns} />
+          <Table
+            data={filteredQuotations}
+            columns={columns}
+            setIsDocumentModalOpen={setIsDocumentModalOpen}
+            setDocument={setDocument}
+          />
         </div>
       )}
     </section>

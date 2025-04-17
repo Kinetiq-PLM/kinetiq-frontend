@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Table from "../Table";
 import Dropdown from "../Dropdown";
 import Button from "../Button";
@@ -10,16 +10,20 @@ import { useAlert } from "../Context/AlertContext";
 
 import loading from "../Assets/kinetiq-loading.gif";
 
-export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
+export default function InvoicesTab({
+  loadSubModule,
+  setActiveSubModule,
+  setIsDocumentModalOpen,
+  setDocument,
+}) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
-
   const columns = [
-    { key: "invoice_id", label: "Invoice ID" },
+    { key: "id", label: "Invoice ID" },
     { key: "delivery_note_id", label: "Delivery ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
@@ -75,7 +79,7 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
   useEffect(() => {
     if (invoiceQuery.status === "success") {
       const data = invoiceQuery.data.map((invoice) => ({
-        invoice_id: invoice.invoice_id,
+        id: invoice.invoice_id,
         delivery_note_id: invoice.delivery_note?.delivery_note_id,
         customer_id: invoice.delivery_note?.statement?.customer?.customer_id,
         customer_name: invoice.delivery_note?.statement?.customer?.name,
@@ -100,7 +104,8 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
           }
         ),
         payment_status: invoice.payment_status,
-        document: `${BASE_API_URL}sales/invoice/${invoice.invoice_id}/document`,
+        document: true,
+        endpoint: `invoice/${invoice.invoice_id}`,
       }));
       setInvoiceList(data);
       setIsLoading(false);
@@ -162,7 +167,12 @@ export default function InvoicesTab({ loadSubModule, setActiveSubModule }) {
         </div>
       ) : (
         <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-          <Table data={filteredQuotations} columns={columns} />
+          <Table
+            data={filteredQuotations}
+            columns={columns}
+            setIsDocumentModalOpen={setIsDocumentModalOpen}
+            setDocument={setDocument}
+          />
         </div>
       )}
     </section>
