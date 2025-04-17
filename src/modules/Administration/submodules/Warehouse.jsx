@@ -103,7 +103,7 @@ const Warehouse = () => {
                         <div className="flex justify-end gap-2 mt-6">
                             <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
                             <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">Edit</button>
-                            <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Delete</button>
+                            <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Archive</button>
                         </div>
                     </div>
                 </div>
@@ -139,7 +139,7 @@ const Warehouse = () => {
                         <div className="flex justify-end gap-2 mt-6">
                             <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
                             <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">Edit</button>
-                            <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Delete</button>
+                            <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Archive</button>
                         </div>
                     </div>
                 </div>

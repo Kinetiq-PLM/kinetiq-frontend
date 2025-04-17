@@ -89,11 +89,92 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
 
             {/* RIGHT PANEL */}
             <div className="w-full md:w-1/2 space-y-6 overflow-y-auto pr-2 max-h-[calc(100vh-100px)] custom-scroll">
+
+                {/* ITEM MASTERLIST SECTION */}
+                <div>
+                    <h2 className="text-lg font-semibold text-gray-700 mb-2">Item Masterlist</h2>
+                    <hr className="mb-4 border-gray-300" />
+                    <div className="grid grid-cols-2 gap-4">
+                        {[
+                            { title: "Item Masterlist", module: "Item Masterlist", count: 57, icon: "/icons/inventory.png" },
+                            { title: "Assets", module: "Item Masterlist", tab: "Assets", count: 32, icon: "/icons/asset.png" },
+                            { title: "Products", module: "Item Masterlist", tab: "Product", count: 19, icon: "/icons/product.png" },
+                            { title: "Raw Materials", module: "Item Masterlist", tab: "Raw Materials", count: 44, icon: "/icons/raw.png" }
+                        ].map(({ title, module, tab, count, icon }) => (
+                            <div
+                                key={title}
+                                className="bg-white shadow-md rounded-lg p-6 flex items-center gap-4 cursor-pointer hover:opacity-90 transition"
+                                onClick={() => {
+                                    setActiveSubModule(module);
+                                    loadSubModule(module);
+                                    if (tab) {
+                                        setTimeout(() => {
+                                            const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
+                                            if (tabBtn) tabBtn.click();
+                                        }, 100);
+                                    }
+                                }}
+                            >
+                                <img src={icon} alt={`${title} Icon`} className="w-10 h-10 object-contain" />
+                                <div>
+                                    <p className="text-sm text-gray-500">{title}</p>
+                                    <p className="text-xl font-bold text-black">{count}</p>
+                                    <p className="text-xs text-gray-400">Records</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* BUSINESS PARTNER MASTERLIST SECTION */}
+                <div>
+                    <h2 className="text-lg font-semibold text-gray-700 mb-2">Business Partner</h2>
+                    <hr className="mb-4 border-gray-300" />
+                    <div className="grid grid-cols-2 gap-4">
+                        {[
+                            {
+                                title: "Business Partner Masterlist",
+                                module: "Business Partner Masterlist",
+                                count: 23,
+                                icon: "/icons/business-partner.png"
+                            },
+                            {
+                                title: "Vendors",
+                                module: "Business Partner Masterlist",
+                                tab: "Vendor",
+                                count: 18,
+                                icon: "/icons/vendor.png"
+                            }
+                        ].map(({ title, module, tab, count, icon }) => (
+                            <div
+                                key={title}
+                                className="bg-white shadow-md rounded-lg p-6 flex items-center gap-4 cursor-pointer hover:opacity-90 transition"
+                                onClick={() => {
+                                    setActiveSubModule(module);
+                                    loadSubModule(module);
+                                    if (tab) {
+                                        setTimeout(() => {
+                                            const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
+                                            if (tabBtn) tabBtn.click();
+                                        }, 100);
+                                    }
+                                }}
+                            >
+                                <img src={icon} alt={`${title} Icon`} className="w-10 h-10 object-contain" />
+                                <div>
+                                    <p className="text-sm text-gray-500">{title}</p>
+                                    <p className="text-xl font-bold text-black">{count}</p>
+                                    <p className="text-xs text-gray-400">Records</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* TABLE SECTIONS */}
                 {[
-                    { title: "Item Masterlist", module: "Item Masterlist" },
-                    { title: "Business Partner Masterlist", module: "Business Partner Masterlist" },
-                    { title: "Audit logs", module: "Audit Logs" },
-                    { title: "Warehouse", module: "Warehouse" },
+                    { title: "Audit Logs", module: "Audit Logs" },
+                    { title: "Warehouse", module: "Warehouse" }
                 ].map(({ title, module }) => (
                     <Card
                         key={title}
@@ -107,8 +188,7 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
                             headers={["User id", "Employee ID", "First name", "Last name"]}
                             data={[
                                 ["User_02", "User02@Gmail.Com", "2024-12-16", "Employee Benefits"],
-                                ["User_02", "User02@Gmail.Com", "2024-12-16", "Employee Benefits"],
-                                ["User_02", "User02@Gmail.Com", "2024-12-16", "Employee Benefits"],
+                                ["User_02", "User02@Gmail.Com", "2024-12-16", "Employee Benefits"]
                             ]}
                             withCheckbox
                             badge
