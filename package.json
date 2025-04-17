@@ -10,11 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-infinite-scroll-component": "^6.1.0"
-=======
     "@emailjs/browser": "^4.4.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -38,7 +33,6 @@
     "rechart": "^0.0.1",
     "recharts": "^2.15.2",
     "styled-components": "^6.1.16"
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

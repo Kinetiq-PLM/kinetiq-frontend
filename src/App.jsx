@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-import { useState, useRef, Suspense, lazy, act } from 'react'
-import './App.css'
-import './MediaQueries.css'
-import SearchBar from "./shared/components/SearchBar";
-=======
 import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
@@ -13,7 +7,6 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { User } from "lucide-react";
 import LandingPage from "./pages/LandingPage";
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -226,18 +219,12 @@ function App() {
   };
 
   const loadMainModule = (moduleId) => {
-<<<<<<< HEAD
-    if (moduleFileNames[moduleId] && !(activeModule == moduleId && !activeSubModule)) {
-
-      const LazyComponent = lazy(() => import(/* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`));
-=======
     if (moduleFileNames[moduleId] && !activeSubModule) {
       const LazyComponent = lazy(() =>
         import(
           /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
         )
       );
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 
       const WrappedComponent = () => (
         <LazyComponent
@@ -253,13 +240,6 @@ function App() {
     }
   };
 
-<<<<<<< HEAD
-  // load jsx files for submodules
-  const loadSubModule = (submoduleId) => {
-    if (moduleSubmoduleFileNames[activeModule][submoduleId] && !(activeSubModule == submoduleId)) {
-
-      const LazyComponent = lazy(() => import(/* @vite-ignore */ `./modules/${moduleFileNames[activeModule]}/submodules/${moduleSubmoduleFileNames[activeModule][submoduleId]}.jsx`));
-=======
   const loadSubModule = (submoduleId, mainModule = activeModule) => {
     if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
       const LazyComponent = lazy(() =>
@@ -267,7 +247,6 @@ function App() {
           /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
         )
       );
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 
       const WrappedComponent = () => (
         <LazyComponent
@@ -295,11 +274,7 @@ function App() {
     "CRM": "CRM",
     "Support & Services": "SupportServices",
     "Inventory": "Inventory",
-<<<<<<< HEAD
-    "Distribution": "Distribution", 
-=======
     "Distribution": "Distribution",
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
     "Production": "Production",
     "MRP": "MRP",
     "Project Management": "ProjectManagement",
@@ -313,8 +288,6 @@ function App() {
 
   const moduleSubmoduleFileNames = {
     "Management": {
-<<<<<<< HEAD
-=======
       "Dashboard": "ManagementDashboard",
       "Policy Compliance Oversight": "ManagementPolicyComplianceOversight",
       "Salary Release Approval": "ManagementSalaryReleaseApproval",
@@ -324,18 +297,10 @@ function App() {
       "Project Monitoring": "ManagementProjectMonitoring",
       "RecruitmentCandidates": "ManagementRecruitmentCandidates",
       "AssetRemoval": "ManagementAssetRemoval",
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
       "User Roles": "UserRoles",
       "Access Control": "AccessControl",
       "Settings": "Settings",
     },
-<<<<<<< HEAD
-    "Administration": {
-      "Company Policies": "CompanyPolicies",
-      "User Accounts": "UserAccounts",
-    },
-    "Accounting": {
-=======
     Administration: {
       "User": "User",
       "Item Masterlist": "ItemMasterlist",
@@ -349,7 +314,6 @@ function App() {
       "Chart of Accounts": "ChartOfAccounts",
       "Journal": "Journal",
       "Journal Entry": "JournalEntry",
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
       "General Ledger": "GeneralLedger",
       "General Ledger Accounts": "GeneralLedgerAccounts",
       "Accounts Receivable": "AccountsReceivable",
@@ -365,21 +329,6 @@ function App() {
       "Supplier Management": "SupplierManagement",
       "Purchase Orders": "PurchaseOrders",
     },
-<<<<<<< HEAD
-    "Operations": {
-      "Workflow Automation": "WorkflowAutomation",
-      "Operational Analytics": "OperationalAnalytics",
-    },
-    "Sales": {
-      "Lead Management": "LeadManagement",
-      "Invoices": "Invoices",
-      "Quotations": "Quotations",
-    },
-    "CRM": {
-      "Contact Management": "ContactManagement",
-      "Marketing": "Marketing",
-      "Customer Support": "CustomerSupport",
-=======
     Operations: {
       "Goods Tracking": "GoodsTracking",
       "Internal Transfer": "InternalTransfer",
@@ -403,7 +352,6 @@ function App() {
       "Partner Master Data": "PartnerMasterData",
       Opportunity: "Opportunity",
       Support: "Support",
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
     },
     "Support & Services": {
       "Service Ticket": "ServiceTicket",
@@ -421,13 +369,6 @@ function App() {
       "Stock Flow": "StockFlow",
     },
     "Distribution": {
-<<<<<<< HEAD
-      "Shipping": "Shipping",
-      "Order Fulfillment": "OrderFulfillment",
-    },
-    "Production": {
-      "Manufacturing Process": "ManufacturingProcess",
-=======
       "External Delivery": "ExternalDelivery",
       "Internal Delivery": "InternalDelivery",
       "Picking": "Picking",
@@ -437,7 +378,6 @@ function App() {
     },
     "Production": {
       "Equipment and Labor": "Equipment&Labor",
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
       "Quality Control": "QualityControl",
       "Cost of Production": "CostOfProduction"
     },
@@ -450,11 +390,6 @@ function App() {
       "Gantt Charts": "GanttCharts",
     },
     "Human Resources": {
-<<<<<<< HEAD
-      "Employee Records": "EmployeeRecords",
-      "Payroll": "Payroll",
-      "Recruitment": "Recruitment",
-=======
       "Employees": "Employees",
       "Recruitment": "Recruitment",
       "Attendance Tracking": "AttendanceTracking",
@@ -464,7 +399,6 @@ function App() {
       "Leave Requests": "LeaveRequests",
       "Employee Performance": "EmployeePerformance",
       "Employee Salary": "EmployeeSalary"
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
     },
     "Report Generator": {
     },
@@ -559,12 +493,8 @@ function App() {
 
 
                 <div
-<<<<<<< HEAD
-                  className={`sidebar-submodule-empty-container ${(isSidebarOpen && activeModule === module.id) ? "opened" : ""}`}
-=======
                   className={`sidebar-submodule-empty-container ${isMainModuleCollapsed && isSidebarOpen && activeModule === module.id ? "opened" : ""
                     }`}
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
                 >
                   {/* submodules - only show if this module is active */}
                   {moduleSubmoduleFileNames[module.id] &&
@@ -637,12 +567,8 @@ function App() {
                 </div>
 
                 <div
-<<<<<<< HEAD
-                  className={`sidebar-submodule-empty-container ${(isSidebarOpen && activeModule === module.id) ? "opened" : ""}`}
-=======
                   className={`sidebar-submodule-empty-container ${isMainModuleCollapsed && isSidebarOpen && activeModule === module.id ? "opened" : ""
                     }`}
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
                 >
 
                   {/* Submodules - only show if the main module is active */}
@@ -653,16 +579,6 @@ function App() {
                         className={`sidebar-submodule-item
                             ${activeSubModule === sub ? "active" : ""} 
                             ${hoveredSubModule === sub ? "hovered" : ""}`}
-<<<<<<< HEAD
-                        onClick={() => { setActiveSubModule(sub); loadSubModule(sub); }}
-                        onMouseEnter={() => setHoveredSubModule(sub)}
-                        onMouseLeave={() => setHoveredSubModule(null)}
-                      >
-                        <p>{sub}</p>
-                      </div>
-                    ))}
-
-=======
                           onClick={() => {
                             setActiveSubModule(sub);
                             //loadSubModule(sub);
@@ -674,7 +590,6 @@ function App() {
                         </div>
                       )
                     )}
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
                 </div>
               </div>
             ))}
@@ -688,31 +603,6 @@ function App() {
         </div>
 
         {/* adjustable right content */}
-<<<<<<< HEAD
-        <div className='header-body-container'>
-          <div className='header-navi'>
-            <div className={`header-tabs-container ${activeModule ? "visible" : "hidden"}`}>
-              <img src={`/icons/header-module-icons/${moduleFileNames[activeModule]}.png`} alt={activeModule} />
-              <p className={`header-module-name ${!activeSubModule ? "active" : ""}`} onClick={() => {
-                setActiveModule(activeModule);
-                setActiveSubModule(null);
-              }}>
-                {activeModule}
-              </p>
-
-              <p>{activeSubModule ? ` > ` : ""}</p>
-              <p id="header-submodule-name">{activeSubModule ? activeSubModule : ""}</p>
-            </div>
-
-
-            <div className='header-right-container'>
-              <SearchBar />
-              <img src={`/icons/Notification-${hasNotification ? "active-" : ""}logo.png`}
-                alt='Notificaton-Logo' onClick={() => setHasNotification(!hasNotification)}></img>
-              <div className='header-profile-container'>
-                <div className='header-profile-icon'> <p>C</p></div>
-                <p className='header-profile-name'>Crusch K.</p>
-=======
         <div className="header-body-container">
 
           <div className={`header-navi ${isSidebarOpen ? "squished" : ""}`}>
@@ -825,22 +715,11 @@ function App() {
                   </div>
                   <p className="header-profile-name">{displayName}</p>
                 </div>
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
               </div>
             </div>
 
 
           </div>
-<<<<<<< HEAD
-          <div className='body-container'>
-            {ModuleComponent && (
-              <Suspense>
-                <ModuleComponent />
-              </Suspense>
-            )}
-
-          </div>
-=======
           <QueryClientProvider client={queryClient}>
             <div className="body-container">
               {showLanding && <LandingPage />}
@@ -864,17 +743,11 @@ function App() {
               )}
             </div>
           </QueryClientProvider>
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
         </div>
 
       </div>
-<<<<<<< HEAD
-    </div>
-  )
-=======
     </div >
   );
->>>>>>> 45923f7eb8335c67c90b54d0e64d21aadf1cccd7
 }
 
 export default App;
