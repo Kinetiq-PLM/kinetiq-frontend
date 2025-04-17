@@ -54,18 +54,18 @@ function App() {
       console.log("User data loaded from localStorage:");
       console.log(localStorage.getItem("user"));
 
-      const storedModule = localStorage.getItem("activeModule");
-      const storedSubModule = localStorage.getItem("activeSubModule");
-      const storedShowUserProfile = localStorage.getItem("showUserProfile");
+      // const storedModule = localStorage.getItem("activeModule");
+      // const storedSubModule = localStorage.getItem("activeSubModule");
+      // const storedShowUserProfile = localStorage.getItem("showUserProfile");
 
-      if (storedShowUserProfile === "true") {
-        setShowUserProfile(true);
-        setActiveModule(null);
-        setActiveSubModule(null);
-      } else if (storedModule) {
-        setActiveModule(storedModule);
-        if (storedSubModule && storedSubModule !== "null") setActiveSubModule(storedSubModule);
-      }
+      // if (storedShowUserProfile === "true") {
+      //   setShowUserProfile(true);
+      //   setActiveModule(null);
+      //   setActiveSubModule(null);
+      // } else if (storedModule) {
+      //   setActiveModule(storedModule);
+      //   if (storedSubModule && storedSubModule !== "null") setActiveSubModule(storedSubModule);
+      // }
     } else {
       setUser(null);
       navigate("/login", { replace: true }); // redirect to login if no user found
