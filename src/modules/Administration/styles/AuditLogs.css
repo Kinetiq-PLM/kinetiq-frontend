@@ -1,0 +1,132 @@
+.auditlogs-container {
+    padding: 24px;
+    font-family: 'Inter', sans-serif;
+}
+
+.auditlogs-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #1f2937;
+}
+
+.auditlogs-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.auditlogs-search {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 220px;
+}
+
+.auditlogs-filter-btn {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.auditlogs-filter-dropdown {
+    position: relative;
+}
+
+.auditlogs-dropdown-menu {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    z-index: 10;
+    width: 180px;
+}
+
+.auditlogs-dropdown-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.auditlogs-dropdown-item:hover {
+    background-color: #f0fdfa;
+    color: #0f766e;
+}
+
+.auditlogs-submenu {
+    position: absolute;
+    top: 110%;
+    right: -200px;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 20;
+    width: 220px;
+}
+
+.auditlogs-submenu-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.ok-btn {
+    background-color: #14b8a6;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+}
+
+.cancel-btn {
+    border: 1px solid #d1d5db;
+    background-color: white;
+    color: #6b7280;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+.auditlogs-table-wrapper {
+    overflow-x: auto;
+}
+
+.auditlogs-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.auditlogs-table th,
+.auditlogs-table td {
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+    font-size: 14px;
+}
+
+.auditlogs-table th {
+    background-color: #f3f4f6;
+    font-weight: 600;
+    color: #374151;
+}
+
+.auditlogs-placeholder {
+    color: #6b7280;
+    font-size: 13px;
+    font-style: italic;
+}

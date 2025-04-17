@@ -1,0 +1,139 @@
+/* Container */
+.policy-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem;
+    background-color: #f2f7fa;
+    min-height: 100vh;
+}
+
+
+/* Header */
+.policy-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #ccc;
+}
+
+
+/* Grid Section */
+.policy-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+
+.policy-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: transform 0.3s;
+}
+
+
+.policy-card:hover {
+    transform: translateY(-5px);
+}
+
+
+.policy-card h3 {
+    font-size: 1.2rem;
+    color: #444;
+    margin-bottom: 0.5rem;
+}
+
+
+.policy-card p {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+
+/* Textarea */
+.policy-textarea {
+    width: 100%;
+    height: 150px;
+    padding: 1rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none;
+    margin-top: 1rem;
+}
+
+
+/* Table Section */
+.table-container {
+    width: 100%;
+    margin-top: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+.table-container th, .table-container td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+
+.table-container th {
+    background: #f0f0f0;
+    font-weight: bold;
+    color: #333;
+}
+
+
+/* Buttons */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+
+.btn-save, .btn-cancel {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+
+.btn-save {
+    background: #00bfa5;
+    color: white;
+}
+
+
+.btn-save:hover {
+    background: #00897b;
+}
+
+
+.btn-cancel {
+    background: #f44336;
+    color: white;
+}
+
+
+.btn-cancel:hover {
+    background: #d32f2f;
+}

@@ -1,0 +1,55 @@
+/* Mimics the style/logic from Employees.css */
+
+.hr-attendance {
+  composes: hr-employee-performance;
+}
+
+.hr-attendance-body-content-container {
+  composes: hr-employee-performance-body-content-container;
+}
+
+.hr-attendance-scrollable {
+  composes: hr-employee-performance-scrollable;
+}
+
+.hr-attendance-heading {
+  composes: hr-department-heading;
+}
+
+.hr-attendance-right-controls {
+  composes: hr-department-right-controls;
+}
+
+.hr-attendance-search-wrapper {
+  composes: hr-department-search-wrapper;
+}
+
+.hr-attendance-search {
+  composes: hr-department-search;
+}
+
+.hr-attendance-filter {
+  composes: hr-department-filter;
+}
+
+.hr-attendance-table-container {
+  composes: hr-department-table-container;
+}
+
+.hr-attendance-table-scrollable {
+  composes: hr-department-table-scrollable;
+}
+
+.hr-attendance-table {
+  composes: hr-department-table;
+}
+
+.hr-attendance-table thead {
+  composes: hr-department-table thead;
+}
+
+.hr-attendance-table th,
+.hr-attendance-table td {
+  composes: hr-department-table th, hr-department-table td;
+}
+

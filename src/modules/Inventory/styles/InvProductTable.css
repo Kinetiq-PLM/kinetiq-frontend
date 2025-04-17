@@ -1,0 +1,18 @@
+/* White Scrollbar Styling */
+.inv .scroll-container::-webkit-scrollbar {
+  width: 12px; /* Scrollbar width */
+  background: rgb(239, 239, 239);
+}
+
+.inv .scroll-container::-webkit-scrollbar-track {
+  background: #aba9a9; /* Dark background (optional) */
+}
+
+.inv ::-webkit-scrollbar-thumb {
+  background: rgb(168, 168, 168); /* Scrollbar color */
+  border-radius: 6px; /* Rounded edges */
+}
+
+.inv ::-webkit-scrollbar-thumb:hover {
+  background: #e5e7eb; /* Light gray on hover */
+}

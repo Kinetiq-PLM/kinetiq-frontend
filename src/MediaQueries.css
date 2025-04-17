@@ -1,12 +1,53 @@
-@media (max-width: 1000px) { 
-    .header-profile-name {
-      display: none;
-    }
+@keyframes fadeInModule {
+  from {
+    opacity: 0;
+    transform: translateX(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInModule 0.4s ease-in-out;
+}
+
+@media (max-width: 55rem){
+  .header-navi.squished .header-module-name.inactive{
+    display: none;
+  }
+}
+
+@media (max-width: 50rem){
+  .header-navi.squished .header-module-names {
+    display: none;
+  }
+}
+
+@media (max-width: 46rem) {
+  .header-module-name.inactive {
+    display: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .notif-menu {
+    width: 20rem;
+    height: fit-content;
+    max-height: 90vh;
+    top: 3.5rem;
+    right: 0.4rem;
   }
 
-  @media (max-width: 850px) {
-    .header-module-name {
-      display: none;
-    }
+  .header-profile-name {
+    display: none;
   }
-  
+
+  #header-submodule-name {
+    width: 12rem;
+    overflow: hidden;         
+    white-space: nowrap;       
+    text-overflow: ellipsis;
+  }
+}

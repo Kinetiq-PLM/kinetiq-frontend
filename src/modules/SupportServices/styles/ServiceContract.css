@@ -1,0 +1,402 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.servcont .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+/* Hide scrollbar arrows unless hovered */
+.servcont .content-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-right: -0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  border-radius: 8px;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  max-height: calc(100% - 7rem);
+  margin-top: 2rem;
+}
+
+.servcont .filter-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 150px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 0.25rem;
+}
+
+.servcont .contracts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inter", sans-serif;
+}
+
+.servcont .contracts-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 3;
+}
+
+.servcont thead {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.servcont th {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.servcont td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+}
+
+.servcont tbody tr {
+  background-color: #eff8f9;
+  transition: background-color 0.3s ease;
+}
+
+.servcont tbody tr:hover {
+  background-color: #d6f5f5;
+}
+
+.servcont .contracts-table .selected-row {
+  background-color: #d6f5f5;
+}
+
+.servcont tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.servcont .empty-row td {
+  height: 2.5rem;
+}
+
+/* Buttons container */
+.servcont .buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.servcont .update-button,
+.servcont .add-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  min-width: 7rem;
+}
+
+.servcont .update-button:hover,
+.servcont .add-button:hover {
+  background-color: #098f8f;
+}
+
+.servcont .update-button:active,
+.servcont .add-button:active {
+  background-color: #087d7d;
+}
+
+.servcont .modal-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 850px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.servcont .modal-content {
+  padding: 1.8rem;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.servcont .modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.servcont .form-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.servcont .form-row .form-group {
+  flex: 1;
+}
+
+.servcont .form-group input:focus,
+.servcont .form-group textarea:focus,
+.servcont .form-group select:focus {
+  outline: none;
+  border: 2px solid #00a8a8; /* Thicker border when focused */
+}
+
+.servcont .form-group textarea {
+  height: 10rem;
+  resize: none;
+}
+
+.servcont .form-divider {
+  height: 2px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+.servcont .additional-services-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  margin: 0.5rem 0 1rem 0; /* Adjusted spacing */
+}
+
+.servcont .additional-services-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Poppins", sans-serif;
+}
+
+.servcont .additional-services-table thead {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.servcont .additional-services-table th {
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.servcont .additional-services-table td {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  color: #333;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.servcont .additional-services-table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.servcont .additional-services-table tbody tr:nth-child(even) {
+  background-color: #eff8f9;
+}
+
+.servcont .renewal-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.servcont .renewal-container input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.5rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #eff8f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+}
+
+.servcont .renewal-container input[type="checkbox"]:checked {
+  background-color: #00a8a8;
+  border-color: #00a8a8;
+}
+
+.servcont .renewal-container input[type="checkbox"]:checked::after {
+  content: "✓";
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+}
+
+.servcont .renewal-container label {
+  font-size: 0.75rem;
+  color: #00a8a8;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+}
+
+/* not renewal styling */
+.servcont  input:disabled {
+  background-color: #f0f0f0; 
+  cursor: not-allowed; 
+  opacity: 0.6; 
+}
+
+.servcont  .select-wrapper input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.servcont .select-arrow input:disabled  {
+  color: #ccc; 
+  cursor: not-allowed;
+}
+
+.servcont .select-wrapper input:disabled + .select-arrow {
+  pointer-events: none;
+}
+
+.servcont .date-input-wrapper input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.servcont .status-dropdown-list {
+  top: auto !important;
+  bottom: 100% !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .servcont .body-content-container {
+    min-width: auto;
+    max-height: none;
+    padding: 1.25rem;
+  }
+
+  .servcont .modal-container {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .servcont .search-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .servcont .search-input-wrapper {
+    margin-right: 0;
+  }
+
+  .servcont .filter-dropdown {
+    width: 100%;
+  }
+
+  .servcont .filter-button {
+    width: 100%;
+  }
+
+  .servcont .table-container {
+    overflow-x: auto;
+  }
+
+  .servcont .contracts-table {
+    min-width: 600px;
+  }
+
+  .servcont .form-row {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .servcont .body-content-container {
+    padding: 1rem;
+  }
+
+  .servcont .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .servcont .title-container {
+    width: 100%;
+  }
+
+  .servcont .modal-header,
+  .servcont .modal-content,
+  .servcont .modal-footer {
+    padding: 1rem;
+  }
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Adjust the additional services table column widths */
+.servcont .additional-services-table th:nth-child(1) {
+  width: 18%;
+}
+
+.servcont .additional-services-table th:nth-child(2) {
+  width: 22%;
+}
+
+.servcont .additional-services-table th:nth-child(3) {
+  width: 20%;
+}
+
+.servcont .additional-services-table th:nth-child(4) {
+  width: 20%;
+}
+
+.servcont .additional-services-table th:nth-child(5) {
+  width: 20%;
+}
+
