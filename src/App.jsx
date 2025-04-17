@@ -386,8 +386,12 @@ function App() {
       "Bills Of Material": "BillsOfMaterial",
     },
     "Project Management": {
-      "Task Assignments": "TaskAssignments",
-      "Gantt Charts": "GanttCharts",
+      "DashBoard": "DashBoard",
+      "Project List": "Project List",
+      "Project Planning": "ProjectPlanning",
+      "Tasks": "TaskMonitoring",
+      "Report Monitoring": "Reports",
+      "Warranty Monitoring":"Warranties",
     },
     "Human Resources": {
       "Employees": "Employees",

@@ -1,0 +1,475 @@
+/* REMINDER! All of your elements must use your unique namespace '.taskass' at the start to avoid leaking */
+
+.overview {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+ .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+.overview {
+  color: #000000;
+  font-size: 20px;
+  font-family: 'Inter'; 
+  line-height: auto;
+  outline: none;
+}
+
+.rectangle{
+  background-color: white;
+  height: 170px;
+  width:1000px;
+  filter:drop-shadow(0px 5px 5px rgba(0,0,0,0.25));
+  border-radius:10px;
+  position: absolute;
+  bottom: 50px; 
+}
+.rectangle2{
+background-color: #ffffffff;
+height: 170px;
+width:480px;
+filter:drop-shadow(0px 5px 5px rgba(0,0,0,0.25));
+border-radius:10px;
+position: absolute;
+top: 200px;
+left: 310px;
+}
+
+.rectangle3{
+  background-color: #ffffffff;
+  height: 170px;
+  width:480px;
+  filter:drop-shadow(0px 5px 5px rgba(0,0,0,0.25));
+  border-radius:10px;
+  position: absolute;
+  top: 200px;
+  right: 55px;
+  }
+  .overdue1{
+  display: flex;
+  color: #000000;
+  font-size: 20px;
+  font-family: 'Inter'; 
+  line-height: auto;
+  outline: none;
+  position: absolute;
+  top: 160px;
+  left: 310px;
+
+   }
+  .add{
+    color: #444444;
+    border: none;
+    font-size: 12px;
+    font-family: 'Inter';
+    position: absolute;
+    top: 180px;
+    right: 60px;
+  }
+  .tft{
+  display: flex;
+  color: #000000;
+  font-size: 16px;
+  font-family: 'Inter'; 
+  line-height: auto;
+  outline: none;
+  position: absolute;
+  top: 160px;
+  right: 410px;
+  }
+  .projsum{
+  display: flex;
+  color: #000000;
+  font-size: 16px;
+  font-family: 'Inter'; 
+  line-height: auto;
+  outline: none;
+  position: absolute;
+  bottom: 230px;
+  left: 310px;
+  }
+  .top-nav-container {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+    position: absolute;
+    bottom: 225px;
+    right: 100px;
+    
+  }
+  .top-nav2 {
+    display: flex;
+    color: #585757;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif; 
+    gap: 15px; 
+    align-items: center; 
+    margin: 0; 
+    padding: 0; 
+    position: absolute;
+    bottom: 230px; 
+    right: 100px;
+  }
+  
+  .nav-button {
+    color: #000000;
+    font-size: 12px;
+    font-family: 'Inter';
+    border: none;
+    background-color: transparent; 
+    cursor: pointer;
+    margin-right: 10px; 
+    position: relative; 
+  }
+  .nav-button:hover {
+    background-color: #e0e0e0;
+  }
+  .selected2 {
+    color: white;
+    background-color: #087D7D;
+    width: 110px;
+    height: 20px;
+    border-radius: 10px;
+  }
+  
+  .selected2 {
+    border-bottom: 3px solid #00A8A8; 
+  }
+
+  .tb {
+    width: 100%; 
+    border-collapse: collapse;
+  }
+  
+  .scroll {
+    width: 450px;
+    height: 150px; 
+    position: absolute;
+    top: 205px;
+    left: 320px;
+    overflow-x: auto;
+    overflow-y: auto; 
+  }
+  
+  .tb{
+    padding: 5px;
+    text-align: center;
+    font-size: 12px;
+    font-family: 'Inter';
+    white-space: nowrap; 
+    
+  }
+  
+  .tb {
+    background-color: white;
+    font-size: 12px;
+    font-family: 'Inter';
+    
+  }
+  .tb td{
+    border: none;
+  }
+  .scroll::-webkit-scrollbar-thumb{
+    background-color: #00A8A8;
+    border-radius: 5px;
+  }
+  .scroll::-webkit-scrollbar-track{
+    background-color: lightgray;
+    border-radius: 10px;
+  }
+  .scroll::-webkit-scrollbar{
+    background-color: #00A8A8;
+    width: 5px;
+    border-radius: 10px;
+  }
+
+  .due{
+    color: maroon;
+  }
+  
+  .tb2 {
+    width: 100%; 
+    border-collapse: collapse;
+  }
+  
+  .scroll2 {
+    width: 460px;
+    height: 150px; 
+    position: absolute;
+    top: 210px;
+    right:60px;
+    overflow-x: auto;
+    overflow-y: auto; 
+    
+  }
+  
+  th,td {
+    padding: 4px;
+    text-align: center;
+    font-size: 12px;
+    font-family: 'Inter';
+    white-space: nowrap; 
+    
+  }
+  
+  th {
+    background-color: white;
+    border-bottom: 1px solid black;
+    font-size: 12px;
+    font-family: 'Inter';
+    
+  }
+  .scroll2::-webkit-scrollbar-thumb{
+    background-color: #00A8A8;
+    border-radius: 5px;
+  }
+  .scroll2::-webkit-scrollbar-track{
+    background-color: lightgray;
+    border-radius: 10px;
+  }
+  .scroll2::-webkit-scrollbar{
+    background-color: #00A8A8;
+    width: 5px;
+    border-radius: 10px;
+  }
+
+  .nav-button2{
+    color: #000000;
+  }
+  .selected3{
+    border-bottom: 3px solid #00A8A8;
+  }
+  
+
+#line3{
+  width: 1050px;
+  height: 1px;
+  background-color:darkgray;
+  position: absolute;
+  bottom:265px;
+  right: -70px;
+}
+.tasklist{
+  position: absolute;
+  top: 40px;
+  text-align: left;
+  font-size: 12px;
+  font-family: 'Inter';
+  color: #000000;
+  height:150px;
+}
+.tasklist2{
+  color: #000000;
+  text-align: left;
+  font-size: 12px;
+  font-family: 'Inter';
+  height: 150px;
+  position: absolute;
+  top: 40px;
+  left: 0px;
+}
+.tasklist3{
+  color: #000000;
+  text-align: left;
+  font-size: 12px;
+  font-family: 'Inter';
+  height: 150px;
+  width: 100px;
+  position: absolute;
+  top: 40px;
+  left: 0px;
+}
+.dashtable3{
+  color: #000000;
+  font-size: 12px;
+  font-family: 'Inter',sans-serif;
+  width: 990px;
+  height: 200px;
+  position: absolute;
+  bottom: 70px;
+  left: 320px;
+  max-height: 150px;
+  overflow-y: auto; 
+  overflow-x: auto;
+  display: block;
+  text-align: center;
+  padding: 10px;
+  border: none;
+
+}
+.dashtable3 table {
+  width: 100%;
+  table-layout: fixed;
+  white-space: nowrap;
+
+}
+.dashtable3 td{
+  padding: 2px;
+  border: none;
+ 
+} 
+.dashtable3 th{
+  background-color: white;
+  font-size: 12px;
+  
+}
+
+.dashtable3 th:nth-child(1),
+.dashtable3 td:nth-child(1) {
+  width: 200px;
+}
+
+.dashtable3 th:nth-child(2),
+.dashtable3 td:nth-child(2) {
+  width: 200px;
+  height: 50px;
+}
+
+.dashtable3 th:nth-child(3),
+.dashtable3 td:nth-child(3) {
+  width:500px;
+}
+
+.dashtable3 th:nth-child(4),
+.dashtable3 td:nth-child(4) {
+  width: 200px;
+}
+
+.dashtable3 th:nth-child(5),
+.dashtable3 td:nth-child(5) {
+  width: 170px;
+}
+.dashtable3 th:nth-child(6),
+.dashtable3 td:nth-child(6) {
+  width: 170px;
+}
+.dashtable3 th:nth-child(7),
+.dashtable3 td:nth-child(7) {
+  width: 500px;
+}
+.dashtable3::-webkit-scrollbar{
+  background-color: #00A8A8;
+  width: 4px;
+  height: 2px;
+  border-radius: 5px;
+}
+.dashtable3::-webkit-scrollbar-thumb{
+  background-color: #00A8A8;
+  border-radius: 5px;
+}
+.dashtable3::-webkit-scrollbar-track{
+  background-color: darkgray;
+  border-radius: 5px;
+  
+}
+.dashtable5{
+  color: black;
+  font-size: 12px;
+  font-family: 'Inter',sans-serif;
+  width: 990px;
+  height: 400px;
+  position: absolute;
+  bottom: 70px;
+  left: 316px;
+  overflow-y: auto;
+  max-height: 150px;
+  display: block;
+  text-align: center;
+  padding: 10px;
+
+}
+.dashtable5 table {
+  width: 100%;
+  height: 100%;
+  table-layout: fixed;
+  white-space: nowrap;
+
+}
+
+.dashtable5 td{
+  padding: 20px;
+  border: none;
+ 
+} 
+.dashtable5 th{
+  font-size: 12px;
+}
+
+.dashtable5 th:nth-child(1),
+.dashtable5 td:nth-child(1) {
+  width: 300px;
+}
+
+.dashtable5 th:nth-child(2),
+.dashtable5 td:nth-child(2) {
+  width: 300px;
+}
+
+.dashtable5 th:nth-child(3),
+.dashtable5 td:nth-child(3) {
+  width:300px;
+}
+
+.dashtable4 th:nth-child(4),
+.dashtable4 td:nth-child(4) {
+  width: 300px;
+}
+
+.dashtable5 th:nth-child(5),
+.dashtable5 td:nth-child(5) {
+  width: 300px;
+}
+.dashtable5::-webkit-scrollbar{
+  background-color: #00A8A8;
+  width: 4px;
+  height: 1px;
+  border-radius: 5px;
+}
+.dashtable5::-webkit-scrollbar-thumb{
+  background-color: #00A8A8;
+  border-radius: 5px;
+  
+}
+.dashtable5::-webkit-scrollbar-track{
+  background-color: darkgray;
+  border-radius: 5px;
+  
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  margin: 0 5px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+
