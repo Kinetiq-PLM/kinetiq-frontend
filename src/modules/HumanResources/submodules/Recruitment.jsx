@@ -155,81 +155,83 @@ const Recruitment = () => {
     if (!paginated.length) return <div className="recruitment-no-results">No job postings found.</div>;
 
     return (
-      <div className="recruitment-table-wrapper">
-        <div className="recruitment-table-scrollable">
-          <table className="recruitment-table">
-            <thead>
-              <tr>
-                {isArchived && <th>Select</th>}
-                <th>Job ID</th>
-                <th>Department</th>
-                <th>Position</th>
-                <th>Description</th>
-                <th>Requirements</th>
-                <th>Employment Type</th>
-                <th>Base Salary</th>
-                <th>Daily Rate</th>
-                <th>Duration (Days)</th>
-                <th>Finance Approval</th>
-                <th>Posting Status</th>
-                <th>Created At</th>
-                <th>Updated At</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-                      {paginated.map((posting, index) => (
-                    <tr key={posting.job_id} className={isArchived ? "recruitment-archived-row" : ""}>
-                      {isArchived && (
-                        <td>
-                          <input type="checkbox" />
-                        </td>
-                      )}
-                      <td>{posting.job_id}</td>
-                      <td>{posting.dept_id}</td>
-                      <td>{posting.position_title}</td>
-                      <td>{posting.description}</td>
-                      <td>{posting.requirements}</td>
-                      <td>{posting.employment_type}</td>
-                      <td>{posting.base_salary}</td>
-                      <td>{posting.daily_rate}</td>
-                      <td>{posting.duration_days}</td>
-                      <td>{posting.finance_approval_status}</td>
+      <>
+        <div className="recruitment-table-wrapper">
+          <div className="recruitment-table-scrollable">
+            <table className="recruitment-table">
+              <thead>
+                <tr>
+                  {isArchived && <th>Select</th>}
+                  <th>Job ID</th>
+                  <th>Department</th>
+                  <th>Position</th>
+                  <th>Description</th>
+                  <th>Requirements</th>
+                  <th>Employment Type</th>
+                  <th>Base Salary</th>
+                  <th>Daily Rate</th>
+                  <th>Duration (Days)</th>
+                  <th>Finance Approval</th>
+                  <th>Posting Status</th>
+                  <th>Created At</th>
+                  <th>Updated At</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.map((posting, index) => (
+                  <tr key={posting.job_id} className={isArchived ? "recruitment-archived-row" : ""}>
+                    {isArchived && (
                       <td>
-                        <span className={`recruitment-tag ${posting.status ? posting.status.toLowerCase() : 'unknown'}`}>
-                          {posting.status || 'Unknown'}
-                        </span>
+                        <input type="checkbox" />
                       </td>
-                      <td>{posting.created_at}</td>
-                      <td>{posting.updated_at}</td>
-                      <td className="recruitment-actions">
-                        <div
-                          className="recruitment-dots"
-                          onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                        >
-                          ⋮
-                          {dotsMenuOpen === index && (
-                            <div className="recruitment-dropdown">
-                              <div 
-                                className="recruitment-dropdown-item"
-                                onClick={() => handleEditJobPosting(posting)}
-                              >
-                                Edit
-                              </div>
-                              <div className="recruitment-dropdown-item">
-                                {isArchived ? "Restore" : "Archive"}
-                              </div>
+                    )}
+                    <td>{posting.job_id}</td>
+                    <td>{posting.dept_id}</td>
+                    <td>{posting.position_title}</td>
+                    <td>{posting.description}</td>
+                    <td>{posting.requirements}</td>
+                    <td>{posting.employment_type}</td>
+                    <td>{posting.base_salary}</td>
+                    <td>{posting.daily_rate}</td>
+                    <td>{posting.duration_days}</td>
+                    <td>{posting.finance_approval_status}</td>
+                    <td>
+                      <span className={`recruitment-tag ${posting.status ? posting.status.toLowerCase() : 'unknown'}`}>
+                        {posting.status || 'Unknown'}
+                      </span>
+                    </td>
+                    <td>{posting.created_at}</td>
+                    <td>{posting.updated_at}</td>
+                    <td className="recruitment-actions">
+                      <div
+                        className="recruitment-dots"
+                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="recruitment-dropdown">
+                            <div 
+                              className="recruitment-dropdown-item"
+                              onClick={() => handleEditJobPosting(posting)}
+                            >
+                              Edit
                             </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-            </tbody>
-          </table>
+                            <div className="recruitment-dropdown-item">
+                              {isArchived ? "Restore" : "Archive"}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {renderPagination(totalPages)}
-      </div>
+      </>
     );
   };
 
@@ -238,64 +240,66 @@ const Recruitment = () => {
     if (loading) return <div className="recruitment-no-results">Loading candidates...</div>;
     if (!paginated.length) return <div className="recruitment-no-results">No candidates found.</div>;
     return (
-      <div className="recruitment-table-wrapper">
-        <div className="recruitment-table-scrollable">
-          <table className="recruitment-table">
-            <thead>
-              <tr>
-                {isArchived && <th>Select</th>}
-                <th>ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Status</th>
-                <th>Applied Position</th>
-                <th>Applied Date</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.map((candidate, index) => (
-                <tr key={candidate.id} className={isArchived ? "recruitment-archived-row" : ""}>
-                  {isArchived && (
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                  )}
-                  <td>{candidate.id}</td>
-                  <td>{candidate.first_name}</td>
-                  <td>{candidate.last_name}</td>
-                  <td>{candidate.email}</td>
-                  <td>{candidate.phone}</td>
-                  <td>
-                    <span className={`recruitment-tag ${candidate.status ? candidate.status.toLowerCase() : 'unknown'}`}>
-                      {candidate.status || 'Unknown'}
-                    </span>
-                  </td>
-                  <td>{candidate.applied_position}</td>
-                  <td>{candidate.applied_date}</td>
-                  <td className="recruitment-actions">
-                    <div
-                      className="recruitment-dots"
-                      onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                    >
-                      ⋮
-                      {dotsMenuOpen === index && (
-                        <div className="recruitment-dropdown">
-                          <div className="recruitment-dropdown-item">Edit</div>
-                          <div className="recruitment-dropdown-item">Archive</div>
-                        </div>
-                      )}
-                    </div>
-                  </td>
+      <>
+        <div className="recruitment-table-wrapper">
+          <div className="recruitment-table-scrollable">
+            <table className="recruitment-table">
+              <thead>
+                <tr>
+                  {isArchived && <th>Select</th>}
+                  <th>ID</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Status</th>
+                  <th>Applied Position</th>
+                  <th>Applied Date</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {paginated.map((candidate, index) => (
+                  <tr key={candidate.id} className={isArchived ? "recruitment-archived-row" : ""}>
+                    {isArchived && (
+                      <td>
+                        <input type="checkbox" />
+                      </td>
+                    )}
+                    <td>{candidate.id}</td>
+                    <td>{candidate.first_name}</td>
+                    <td>{candidate.last_name}</td>
+                    <td>{candidate.email}</td>
+                    <td>{candidate.phone}</td>
+                    <td>
+                      <span className={`recruitment-tag ${candidate.status ? candidate.status.toLowerCase() : 'unknown'}`}>
+                        {candidate.status || 'Unknown'}
+                      </span>
+                    </td>
+                    <td>{candidate.applied_position}</td>
+                    <td>{candidate.applied_date}</td>
+                    <td className="recruitment-actions">
+                      <div
+                        className="recruitment-dots"
+                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="recruitment-dropdown">
+                            <div className="recruitment-dropdown-item">Edit</div>
+                            <div className="recruitment-dropdown-item">Archive</div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {renderPagination(totalPages)}
-      </div>
+      </>
     );
   };
 
@@ -304,60 +308,62 @@ const Recruitment = () => {
     if (loading) return <div className="recruitment-no-results">Loading resignations...</div>;
     if (!paginated.length) return <div className="recruitment-no-results">No resignations found.</div>;
     return (
-      <div className="recruitment-table-wrapper">
-        <div className="recruitment-table-scrollable">
-          <table className="recruitment-table">
-            <thead>
-              <tr>
-                <th>Resignation ID</th>
-                <th>Employee ID</th>
-                <th>Submission Date</th>
-                <th>Notice Period (Days)</th>
-                <th>HR Approver</th>
-                <th>Approval Status</th>
-                <th>Clearance Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.map((resignation, index) => (
-                <tr key={resignation.resignation_id}>
-                  <td>{resignation.resignation_id}</td>
-                  <td>{resignation.employee_id}</td>
-                  <td>{resignation.submission_date ? new Date(resignation.submission_date).toLocaleDateString() : 'N/A'}</td>
-                  <td>{resignation.notice_period_days || 'N/A'}</td>
-                  <td>{resignation.hr_approver_id || 'Pending'}</td>
-                  <td>
-                    <span className={`recruitment-tag ${resignation.approval_status ? resignation.approval_status.toLowerCase() : 'unknown'}`}>
-                      {resignation.approval_status || 'Unknown'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`recruitment-tag ${resignation.clearance_status ? resignation.clearance_status.toLowerCase() : 'unknown'}`}>
-                      {resignation.clearance_status || 'Unknown'}
-                    </span>
-                  </td>
-                  <td className="recruitment-actions">
-                    <div
-                      className="recruitment-dots"
-                      onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                    >
-                      ⋮
-                      {dotsMenuOpen === index && (
-                        <div className="recruitment-dropdown">
-                          <div className="recruitment-dropdown-item">View</div>
-                          <div className="recruitment-dropdown-item">Archive</div>
-                        </div>
-                      )}
-                    </div>
-                  </td>
+      <>
+        <div className="recruitment-table-wrapper">
+          <div className="recruitment-table-scrollable">
+            <table className="recruitment-table">
+              <thead>
+                <tr>
+                  <th>Resignation ID</th>
+                  <th>Employee ID</th>
+                  <th>Submission Date</th>
+                  <th>Notice Period (Days)</th>
+                  <th>HR Approver</th>
+                  <th>Approval Status</th>
+                  <th>Clearance Status</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {paginated.map((resignation, index) => (
+                  <tr key={resignation.resignation_id}>
+                    <td>{resignation.resignation_id}</td>
+                    <td>{resignation.employee_id}</td>
+                    <td>{resignation.submission_date ? new Date(resignation.submission_date).toLocaleDateString() : 'N/A'}</td>
+                    <td>{resignation.notice_period_days || 'N/A'}</td>
+                    <td>{resignation.hr_approver_id || 'Pending'}</td>
+                    <td>
+                      <span className={`recruitment-tag ${resignation.approval_status ? resignation.approval_status.toLowerCase() : 'unknown'}`}>
+                        {resignation.approval_status || 'Unknown'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`recruitment-tag ${resignation.clearance_status ? resignation.clearance_status.toLowerCase() : 'unknown'}`}>
+                        {resignation.clearance_status || 'Unknown'}
+                      </span>
+                    </td>
+                    <td className="recruitment-actions">
+                      <div
+                        className="recruitment-dots"
+                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="recruitment-dropdown">
+                            <div className="recruitment-dropdown-item">View</div>
+                            <div className="recruitment-dropdown-item">Archive</div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {renderPagination(totalPages)}
-      </div>
+      </>
     );
   };
 

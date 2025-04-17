@@ -308,6 +308,20 @@ const LeaveRequests = () => {
     }
   };
 
+  // Add this function near your other handler functions
+  const handleArchiveLeaveRequest = async (leaveId) => {
+    if (!window.confirm("Are you sure you want to archive this leave request?")) return;
+    
+    try {
+      await axios.post(`http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/archived/`);
+      showToast("Leave request archived successfully");
+      fetchData(); // Refresh data after archiving
+    } catch (err) {
+      console.error("Archive leave request error:", err);
+      showToast("Failed to archive leave request", false);
+    }
+  };
+
   // Display leave balance information in the form
   const renderLeaveBalanceInfo = () => {
     if (!currentEmployeeBalance) return null;
@@ -513,6 +527,14 @@ const LeaveRequests = () => {
                           >
                             Edit
                           </div>
+                          {!isArchived && (
+                            <div
+                              className="leave-requests-dropdown-item"
+                              onClick={() => handleArchiveLeaveRequest(request.leave_id)}
+                            >
+                              Archive
+                            </div>
+                          )}
                         </div>
                       )}
                     </td>
