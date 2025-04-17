@@ -336,7 +336,7 @@ const BodyContent = () => {
 
   const fetchReturns = async () => {
     try {
-      const data = await GET("/validation/budget-validations/");
+      const data = await GET("/dev/validation/budget-returns/");
       setOriginalReturnsData(data.map(sub=> ({
         returnsId: sub.budget_return?.budget_return_id,
         departmentId: sub.budget_return?.dept_id || "",
@@ -356,7 +356,7 @@ const BodyContent = () => {
 
   const fetchRequests = async () => {
     try {
-      const data = await GET("/validation/budget-validations/");
+      const data = await GET("/dev/validation/budget-requests/");
       setOriginalRequestData(data.map(sub=> ({
         reqID: sub.budget_request?.budget_request_id,
         departmentId: sub.budget_request?.dept_id || "",
@@ -375,11 +375,11 @@ const BodyContent = () => {
 
 const fetch = async () => {
   try {
-    const data = await GET("/validation/budget-validations/");
+    const data = await GET("/dev/validation/budget-submissions/");
     setOriginalData(data.map(sub=> ({
-      requestId: sub.budget_submission?.budget_submission_id,
+      requestId: sub.budget_submission,
       departmentId: sub.budget_submission?.dept_id || "",
-      amount: sub.budget_submission?.proposed_total_budget || "",
+      amount: sub.amount_requested || "",
       submissionDate: sub.budget_submission?.date_submitted || "",
       validatedBy: sub.validated_by || "",
       remarks: sub.remarks || "",
@@ -400,11 +400,11 @@ useEffect(() => {
 
 const patchEditedRows = async () => {
   try {
-    const patchPromises = editedDataForConfirmation.map(async (row) => {
+    for (const row of editedDataForConfirmation) {
       const requestId = row.requestId || row.reqID || row.returnsId;
       if (!requestId) {
         console.error("Error: ID is undefined for row:", row);
-        return null;
+        continue; // Skip this row and move to the next
       }
 
       let endpoint = "";
@@ -412,19 +412,19 @@ const patchEditedRows = async () => {
 
       if (activeTab === "Budget Submission List" && row.requestId) {
         // Add the ID to the endpoint URL
-        endpoint = `/validation/budget-submissions/${row.requestId}/`;
+        endpoint = `/dev/validation/budget-submissions/${row.requestId}/`;
         payload = {
           validated_by: row.validatedBy || "",
           final_approved_amount: row.approvedAmount || "",
         };
       } else if (activeTab === "Budget Request List" && row.reqID) {
-        endpoint = `/validation/budget-requests/${row.reqID}/`;
+        endpoint = `/dev/validation/budget-requests/${row.reqID}/`;
         payload = {
           validated_by: row.validatedBy || "",
           final_approved_amount: row.approvedAmount || "",
         };
       } else if (activeTab === "Returns List" && row.returnsId) {
-        endpoint = `/validation/budget-returns/${row.returnsId}/`;
+        endpoint = `/dev/validation/budget-returns/${row.returnsId}/`;
         payload = {
           validated_by: row.validatedBy || "",
           remarks: row.remarks || "",
@@ -433,22 +433,20 @@ const patchEditedRows = async () => {
         };
       } else {
         console.error("Unsupported tab or missing ID:", row);
-        return null;
+        continue; // Skip this row and move to the next
       }
 
       console.log("Updating row with endpoint:", endpoint, "and payload:", payload);
 
       try {
         const response = await PATCH(endpoint, payload);
-        return response;
+        console.log("Row updated successfully:", response);
       } catch (error) {
         console.error("Error updating row:", error);
-        throw error;
+        // Optionally, you can decide whether to stop or continue on error
+        // For now, we continue to the next row
       }
-    });
-
-    const results = await Promise.allSettled(patchPromises);
-    console.log("Patch results:", results);
+    }
 
     // Close the modal and refresh data
     setIsConfirmationVisible(false);
