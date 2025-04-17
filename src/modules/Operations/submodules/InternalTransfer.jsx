@@ -76,7 +76,7 @@ const ApprovalTable = ({employee_id}) => {
  
           const data = await response.json();
           const reworkorderData = await reworkResponse.json();
-         
+          console.log(data)
           if (!Array.isArray(data) || !Array.isArray(reworkorderData)) {
             throw new Error("Invalid data format");
           }
@@ -250,6 +250,7 @@ const ApprovalTable = ({employee_id}) => {
                 <th>ID</th> {/* ID column next */}
                 {activePrimaryTab === "Delivery Request" ? (
                   <>
+                    <th>Item Name</th>
                     <th>Date</th>
                     <th>Delivery Type</th>
                     <th>Warehouse Location</th>
@@ -257,6 +258,7 @@ const ApprovalTable = ({employee_id}) => {
                   </>
                 ) : (
                   <>
+                    <th>Product Name</th>
                     <th>Reason for Rework</th>
                     <th>Actual Quantity</th>
                     <th>Rework Quantity</th>
@@ -282,6 +284,7 @@ const ApprovalTable = ({employee_id}) => {
                   {activePrimaryTab === "Delivery Request" ? (
                     <>
                       <td>{row.delivery_id}</td>
+                      <td>{row.item_name}</td>
                       <td>{row.request_date}</td>
                       <td>{row.delivery_type}</td>
                       <td>{warehouseList.find(w => w.warehouse_id === row.warehouse_id)?.warehouse_location || "N/A"}</td>
@@ -290,6 +293,7 @@ const ApprovalTable = ({employee_id}) => {
                   ) : (
                     <>
                       <td>{row.production_order_detail_id}</td>
+                      <td>{row.product_name}</td>
                       <td>{row.external_module?.reason_rework || ""}</td>
                       <td>{row.production_order?.actual_quantity || ""}</td>
                       <td>{row.external_module?.rework_quantity || ""}</td>
