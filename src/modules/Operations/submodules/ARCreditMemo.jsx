@@ -6,9 +6,13 @@ import { Slide } from 'react-toastify';
 
 
 
-const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
+
+
+
+const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
+
 
   const [selectedStatus, setSelectedStatus] = useState("Draft");
   const [activeTab, setActiveTab] = useState("document");
@@ -20,22 +24,22 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
 
+
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
 
+
   const [selectedVendor, setSelectedVendor] = useState("");
-  const [selectedOwner, setSelectedOwner] = useState("");
+  const [selectedOwner, setSelectedOwner] = useState(
+      isCreateMode ? employee_id : selectedData.employee_name || employee_id
+  );
   const [contactPerson, setContactPerson] = useState("");
   const [vendorID, setVendorID] = useState("");
   const [vendorList, setVendorList] = useState([]);
   const [employeeList, setEmployeeList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (selectedData?.status) {
-      setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
-    }
-  }, [selectedData]);
+  const [invoices, setInvoices] = useState([]);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
 
 
   const fetchVendors = async () => {
@@ -51,16 +55,67 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
       const data = await response.json();
       if (!Array.isArray(data)) throw new Error("Invalid customer format");
       setVendorList(data);
+      setLoadingInvoices(true);
+      const responseSalesInvoice = await fetch("http://127.0.0.1:8000/operation/sales-invoice/");
+      if (!responseSalesInvoice.ok) throw new Error("Failed to fetch invoices");
+      const dataInvoice = await responseSalesInvoice.json();
+      setInvoices(dataInvoice);
     } catch (error) {
       setError(error.message);
     } finally {
       setLoading(false);
+      setLoadingInvoices(false);
     }
   };
   useEffect(() => {
     fetchVendors();
    
   }, []);
+
+
+  const handleInvoiceSelect = (invoiceId) => {
+    if (!invoiceId) {
+      setDocumentDetails(prev => ({
+        ...prev,
+        invoice_id: "",
+        invoice_balance: 0,
+        invoice_date: date_today,
+      }));
+      return;
+    }
+ 
+    const selectedInvoice = invoices.find(inv => inv.invoice_id === invoiceId);
+    if (!selectedInvoice) return;
+ 
+    // Format the date by removing the time portion
+    const formattedDate = selectedInvoice.invoice_date.split('T')[0];
+ 
+    setDocumentDetails(prev => ({
+      ...prev,
+      invoice_id: selectedInvoice.invoice_id,
+      invoice_balance: parseFloat(selectedInvoice.total_amount) || 0,
+      invoice_date: formattedDate || date_today,
+    }));
+  };
+  useEffect(() => {
+    if (selectedData?.status) {
+      setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
+    }
+    if (selectedData?.invoice_id) {
+      // Directly update the state instead of calling handleInvoiceSelect
+      const selectedInvoice = invoices.find(inv => inv.invoice_id === selectedData.invoice_id);
+      if (selectedInvoice) {
+        const formattedDate = selectedInvoice.invoice_date?.split('T')[0] || date_today;
+       
+        setDocumentDetails(prev => ({
+          ...prev,
+          invoice_id: selectedInvoice.invoice_id,
+          invoice_balance: parseFloat(selectedInvoice.total_amount) || 0,
+          invoice_date: formattedDate,
+        }));
+      }
+    }
+  }, [selectedData, invoices, date_today]);
 
 
   const handleVendorChange = (e) => {
@@ -70,6 +125,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
     setVendorID(selectedVendorData ? selectedVendorData.customer_id : null);
     setContactPerson(selectedVendorData ? selectedVendorData.contact_person : "");
   };
+
+
 
 
   useEffect(() => {
@@ -88,9 +145,14 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
   }, [vendorList, selectedData.buyer, employeeList, selectedData.employee_id]);
 
 
+ 
   const [documentItems, setDocumentItems] = useState(
     isCreateMode ? [{}] : [...selectedData.document_items, {}]
   );
+
+
+
+
 
 
 
@@ -103,7 +165,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
     vendor_name: isCreateMode ? "" : selectedVendor,
     contact_person: isCreateMode ? "" : contactPerson,
     buyer: isCreateMode ? "" : selectedData.buyer || "",
-    owner: isCreateMode ? "" : selectedOwner,
+    owner: isCreateMode ? employee_id : selectedOwner,
     transaction_id: isCreateMode ? "" : selectedData.transaction_id || "",
     ar_credit_memo: isCreateMode ? "" : selectedData.ar_credit_memo || "",
     delivery_date: isCreateMode ? today : selectedData.delivery_date || "",
@@ -120,6 +182,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
     freight: isCreateMode ? 0 : selectedData.freight || 0,
     transaction_cost: isCreateMode ? 0 : selectedData.transaction_cost || 0,
   });
+
+
+
+
 
 
 
@@ -155,9 +221,15 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
   const handleInputChange = async (e, index, field) => {
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
+
+
 
 
     // Handle date fields
@@ -173,6 +245,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
       updatedItems[index][field] = e.target.value;
     }
     setDocumentItems(updatedItems);
+
+
+
+
 
 
 
@@ -304,9 +380,17 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
         if (!newItem) {
           throw new Error('Newly created item not found in reloaded data');
         }
+
+
+
+
 
 
 
@@ -332,9 +416,13 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
 
 
+
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
+
+
 
 
         const updatedDoc = await response.json();  
@@ -346,6 +434,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
           cost: '',
           warehouse_id: ''
         });
+
+
 
 
         setDocumentItems(updatedDoc.document_items);  
@@ -362,17 +452,21 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
  
   const isRowFilled = (row) => {
     return (
-      row.item_id &&
-      row.item_name &&
-      row.unit_of_measure &&
-      row.quantity &&
-      row.cost &&
-      row.warehouse_id
+      row.item_id,
+      row.item_name,
+      row.quantity,
+      row.cost
     );
   };
 
 
+
+
   const [warehouseOptions, setWarehouseOptions] = useState([]);
+
+
+
+
 
 
 
@@ -393,11 +487,19 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
   useEffect(() => {
     fetch('http://127.0.0.1:8000/operation/item-data/')
       .then(res => res.json())
       .then(data => {
         const options = [];
+
+
+
+
 
 
 
@@ -415,6 +517,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
         data.material.forEach(mat => {
           options.push({
             id: mat.material_id,
@@ -424,6 +530,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
             type: 'material',
           });
         });
+
+
+
+
 
 
 
@@ -441,9 +551,17 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
         setItemOptions(options);
       });
   }, []);
+
+
+
+
 
 
 
@@ -471,6 +589,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
  
 
 
+
+
           await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
@@ -481,6 +601,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
             }),
           });
          
+
+
 
 
         } catch (error) {
@@ -528,9 +650,14 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
   useEffect(() => {
     const invoiceAmount = parseFloat(documentDetails.invoice_amount) || 0;
     const taxRate = parseFloat(documentDetails.tax_rate) || 0;
+
 
     const tax_amount = (taxRate / 100) * invoiceAmount;
     const total = parseFloat(invoiceAmount + invoiceAmount +tax_amount).toFixed(2);
@@ -569,11 +696,11 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         status: selectedStatus,
         vendor_code: null,
         buyer: vendorID,
-        employee_id: employeeList.find(emp => emp.employee_name === selectedOwner)?.employee_id,
+        employee_id: employee_id,
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
-        document_no: documentDetails?.document_no || null, 
+        document_no: documentDetails?.document_no || null,
         transaction_id: documentDetails.transaction_id,
         ar_credit_memo: documentDetails.ar_credit_memo,
         initial_amount: documentDetails.initialAmount,
@@ -607,10 +734,18 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Create failed: ${JSON.stringify(errorData)}`);
       }
+
+
+
+
 
 
 
@@ -633,10 +768,21 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
+
+
+
+
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
-
+    if (!vendorID){
+      toast.error("Customer Required")
+      return
+    }
     try {
       if (isCreateMode) {
         await handleCreateDocument();
@@ -736,13 +882,13 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
       }
  
       const goodsTrackingResult = await goodsTrackingResponse.json();
-      console.log('GoodsTrackingData update successful:', goodsTrackingResult);
+      toast.loading("Updating...");
       }
       if (onSuccess) {
         await onSuccess();  // Refresh the data in GoodsTracking
       }
  
-      // ✅ Then call onBack to close GoodsReceiptPO and go back
+      
       if (onBack) {
         onBack();  // Navigate back to GoodsTracking
       }
@@ -755,8 +901,16 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedPO, setSelectedPO] = useState("");
+
+
+
+
 
 
 
@@ -774,6 +928,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
       setError(error.message);
     }
   };
+
+
+
+
 
 
 
@@ -838,6 +996,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
   useEffect(() => {
     if (isCreateMode) {
       fetchPurchaseOrders();
@@ -845,7 +1007,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
   }, [isCreateMode]);
  
   useEffect(() => {
-    const invoiceAmount = parseFloat(documentDetails.invoice_amount) || 0;
+    const invoiceAmount = parseFloat(documentDetails.invoice_balance) || 0;
     const taxAmount = (parseFloat(documentDetails.tax_rate) / 100) * initialAmount;
     const initial_amount = parseFloat(initialAmount)
     const total = parseFloat(taxAmount + invoiceAmount + initial_amount).toFixed(2);
@@ -854,7 +1016,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
       tax_amount: taxAmount,
       transaction_cost: total,
     }));
-  }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, documentDetails.invoice_amount, initialAmount]);
+  }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, documentDetails.invoice_balance, initialAmount]);
+
+
 
 
   useEffect(() => {
@@ -864,12 +1028,13 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
         return sum + (parseFloat(item.quantity || 0) * parseFloat(item.cost || 0));
       }, 0)
       .toFixed(2);
-    
+   
     setInitialAmount(newInitialAmount);
   }, [documentItems]);
 
+
   return (
-    <div className="gr">
+    <div className="ar-cred">
       <div className="body-content-container">
         <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
         <div className="content-wrapper">
@@ -878,7 +1043,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
             <div className="details-section">
               <div className="detail-row">
                 <label>Customer ID</label>
-                <input type="text" value={vendorID} />
+                <input type="text" value={vendorID} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
               <div className="detail-row dropdown-scrollbar">
                 <label>Customer Name</label>
@@ -895,36 +1060,42 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                   )}
                 </select>
 
+
               </div>
               <div className="detail-row">
                 <label>Contact Person</label>
-                <input type="text" value={contactPerson} />
+                <input type="text" value={contactPerson} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
               <div className="detail-row">
                 <label>Owner</label>
-                <select value={selectedOwner} onChange={(e) => setSelectedOwner(e.target.value)}>
-                  <option value="">Select Owner</option>
-                  {loading ? (
-                    <option value="">Loading employees...</option>
-                  ) : (
-                    employeeList.map((employee) => (
-                      <option key={employee.employee_id} value={employee.employee_name}>
-                        {employee.employee_name}
-                      </option>
-                    ))
-                  )}
-                </select>
+                <input
+                  type="text"
+                  readOnly
+                  value={
+                    selectedData?.employee_id
+                      ? employeeList.find(e => e.employee_id === selectedData.employee_id)?.employee_name || selectedData.employee_id
+                      : employeeList.find(e => e.employee_id === employee_id)?.employee_name || employee_id
+                  }
+                  style={{
+                    cursor: 'not-allowed',
+                    backgroundColor: '#f8f8f8'
+                  }}
+                />
               </div>
               <div className="detail-row">
                 <label>Credit Memo ID</label>
-                <input 
-                  type="text" 
-                  value={documentDetails.ar_credit_memo || selectedData?.ar_credit_memo || ""} 
-                  readOnly 
+                <input
+                  type="text"
+                  value={documentDetails.ar_credit_memo || selectedData?.ar_credit_memo || ""}
+                  readOnly
                   style={{ cursor: 'not-allowed' }}
                 />              
               </div>
             </div>
+
+
+
+
 
 
 
@@ -950,20 +1121,34 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                   <div className="left-column">
                     <div className="detail-row">
                       <label>Transaction ID</label>
-                      <input 
-                        type="text" 
-                        value={documentDetails.transaction_id} 
+                      <input
+                        type="text"
+                        value={documentDetails.transaction_id}
                         readOnly
-                        style={{ cursor: 'not-allowed' }} 
+                        style={{ cursor: 'not-allowed' }}
                       />
                     </div>
-                    <div className="detail-row">
+                    <div className="detail-row dropdown-scrollbar">
                       <label>Invoice ID</label>
-                      <input 
-                        type="text" 
-                        value={selectedData.invoice_id} 
-                        onChange={(e) => handleDocumentDetailChange(e, "invoice_id")}
-                      />
+                      <select
+                        value={documentDetails.invoice_id || ""}
+                        onChange={(e) => {
+                          handleDocumentDetailChange(e, "invoice_id");
+                          handleInvoiceSelect(e.target.value);
+                        }}
+                        disabled={loadingInvoices}
+                      >
+                        <option value="">Select Invoice</option>
+                        {loadingInvoices ? (
+                          <option value="">Loading invoices...</option>
+                        ) : (
+                          invoices.map((invoice) => (
+                            <option key={invoice.invoice_id} value={invoice.invoice_id}>
+                              {invoice.invoice_id})
+                            </option>
+                          ))
+                        )}
+                      </select>
                     </div>
                     <div className="detail-row">
                       <label>Status</label>
@@ -984,9 +1169,12 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                     <div className="detail-row">
                       <label>Invoice Date</label>
                       <div className="date-input clickable">
-                        <input type="date" 
-                          value={selectedData?.invoice_date || date_today} 
-                          onChange={(e) => setSelectedStatus(e, "invoice_date")}
+                        <input
+                          type="date"
+                          value={documentDetails.invoice_date || date_today}
+                          onChange={(e) => handleDocumentDetailChange(e, "invoice_date")}
+                          readOnly
+                          style={{ cursor: 'not-allowed' }}
                         />
                         <span className="calendar-icon">📅</span>
                       </div>
@@ -1002,6 +1190,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
+
 
                     </div>
                     <div className="detail-row">
@@ -1022,20 +1211,22 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                 <div className="tab-content credit-details">
                   <div className="detail-row">
                     <label>Initial Amount</label>
-                    <input 
-                      type="text" 
-                      value={initialAmount} 
+                    <input
+                      type="text"
+                      value={initialAmount}
                       readOnly
                       style={{ cursor: 'not-allowed' }}
                     />
                   </div>
                   <div className="detail-row">
                     <label>Invoice Balance</label>
-                    <input 
-                      type="text" 
-                      value={selectedData?.invoice_amount || 0.00} 
+                    <input
+                      type="text"
+                      value={documentDetails.invoice_balance ? parseFloat(documentDetails.invoice_balance).toFixed(2) : "0.00"}
+                      onChange={(e) => handleDocumentDetailChange(e, "invoice_balance")}
                       readOnly
-                      style={{ cursor: 'not-allowed' }}/>
+                      style={{ cursor: 'not-allowed' }}
+                    />
                   </div>
                   <div className="detail-row">
                     <label>Sales Tax</label>
@@ -1049,15 +1240,15 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                   <div className="detail-row">
                     <label>Total</label>
                     <input type="text" value={
-                      (documentDetails.transaction_cost).toFixed(2)
+                      documentDetails.transaction_cost
                     }  />
                   </div>
                   </div>
                   <div className="detail-row">
                     <label>Tax Amount</label>
-                    <input 
-                      type="text" 
-                      value={documentDetails.tax_amount.toFixed(2)} 
+                    <input
+                      type="text"
+                      value={documentDetails.tax_amount.toFixed(2)}
                       readOnly
                       style={{ cursor: 'not-allowed' }}
                     />
@@ -1066,6 +1257,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
               )}
             </div>
           </div>
+
+
+
+
 
 
 
@@ -1102,7 +1297,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
                         onChange={(e) => handleItemSelection(index, e.target.value)}
                       >
                         <option value="">-- Select Item --</option>
-                        {itemOptions.map((opt, i) => (
+                        {itemOptions.filter(opt => opt.type === 'product').map((opt, i) => (
                           <option key={i} value={opt.name}>
                             {opt.name} ({opt.type})
                           </option>
@@ -1135,13 +1330,18 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
           <div className="button-section">
-          <button 
-            className="copy-from-button" 
+          <button
+            className="copy-from-button"
             style={{ backgroundColor: '#098F8F', color: 'white', cursor: 'not-allowed' }}
             >
             Copy From
           </button>
+
 
           <div className="right-buttons">
               <button className="cancel-button" onClick={onBack}>Cancel</button>
@@ -1156,6 +1356,15 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton }) => {
 
 
 
+
+
+
+
 export default ARCreditMemo;
+
+
+
+
+
 
 

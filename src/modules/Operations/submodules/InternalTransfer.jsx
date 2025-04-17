@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
 
-const ApprovalTable = () => {
+const ApprovalTable = ({employee_id}) => {
   const [activePrimaryTab, setActivePrimaryTab] = useState("Delivery Request");
 
 
@@ -76,7 +76,7 @@ const ApprovalTable = () => {
  
           const data = await response.json();
           const reworkorderData = await reworkResponse.json();
-         
+          console.log(data)
           if (!Array.isArray(data) || !Array.isArray(reworkorderData)) {
             throw new Error("Invalid data format");
           }
@@ -250,6 +250,7 @@ const ApprovalTable = () => {
                 <th>ID</th> {/* ID column next */}
                 {activePrimaryTab === "Delivery Request" ? (
                   <>
+                    <th>Item Name</th>
                     <th>Date</th>
                     <th>Delivery Type</th>
                     <th>Warehouse Location</th>
@@ -257,6 +258,7 @@ const ApprovalTable = () => {
                   </>
                 ) : (
                   <>
+                    <th>Product Name</th>
                     <th>Reason for Rework</th>
                     <th>Actual Quantity</th>
                     <th>Rework Quantity</th>
@@ -282,14 +284,16 @@ const ApprovalTable = () => {
                   {activePrimaryTab === "Delivery Request" ? (
                     <>
                       <td>{row.delivery_id}</td>
+                      <td>{row.item_name}</td>
                       <td>{row.request_date}</td>
                       <td>{row.delivery_type}</td>
-                      {warehouseList.find(w => w.warehouse_id === row.warehouse_id)?.warehouse_location || "N/A"}
+                      <td>{warehouseList.find(w => w.warehouse_id === row.warehouse_id)?.warehouse_location || "N/A"}</td>
                       <td>{row.module_name}</td>
                     </>
                   ) : (
                     <>
                       <td>{row.production_order_detail_id}</td>
+                      <td>{row.product_name}</td>
                       <td>{row.external_module?.reason_rework || ""}</td>
                       <td>{row.production_order?.actual_quantity || ""}</td>
                       <td>{row.external_module?.rework_quantity || ""}</td>
@@ -407,7 +411,13 @@ const ApprovalTable = () => {
               </div>
               <div className="input-group">
                 <label>Actual Quantity</label>
-                <input type="text" className="short-input" value={selectedData?.production_order?.actual_quantity || ''} readOnly/>
+                <input 
+                  type="text" 
+                  className="short-input" 
+                  value={selectedData?.production_order?.actual_quantity || ''} 
+                  style={{ cursor: 'not-allowed' }}
+                  readOnly
+                />
               </div>
               <div className="input-group">
                 <label>Rework Quantity</label>

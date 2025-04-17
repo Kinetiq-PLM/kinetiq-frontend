@@ -16,9 +16,18 @@
     flex-direction: column;
     min-width: 40rem;
     min-height: 30rem;
-    overflow: hidden; /* Hide overflow for the main container */
+    overflow: visible; /* Hide overflow for the main container */
 }
-
+.delivery-receipt-wrapper .table-wrapper tbody{
+    max-height: 420px; /* Or whatever height you prefer */
+    overflow-y: auto;
+}
+.delivery-receipt-wrapper .table-wrapper thead {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+}
 /* Tabs */
 .delivery-receipt-wrapper .tab-container {
     width: 100%;

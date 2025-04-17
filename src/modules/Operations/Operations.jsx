@@ -68,6 +68,3 @@ const BodyContent = ({ setActiveModule, setActiveSubModule, loadSubModule }) => 
 
 
 export default BodyContent;
-
-
-

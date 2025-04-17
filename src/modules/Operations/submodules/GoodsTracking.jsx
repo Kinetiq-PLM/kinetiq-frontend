@@ -6,7 +6,7 @@ import GoodsIssue from "./GoodsIssue";
 import ARCreditMemo from "./ARCreditMemo";
 
 
-const GoodsTracking = () => {
+const GoodsTracking = ({employee_id}) => {
   const [activeTab, setActiveTab] = useState("all");
   const [selectedGoods, setSelectedGoods] = useState("Goods Receipt PO");
   const [showGoodsReceiptPO, setShowGoodsReceiptPO] = useState(false);
@@ -79,7 +79,6 @@ const GoodsTracking = () => {
       try {
           setLoading(true);
           setError(null); // Reset error state
- 
           const response = await fetch("http://127.0.0.1:8000/operation/goods-tracking/");
           if (!response.ok) throw new Error("Connection to database failed");
  
@@ -131,6 +130,7 @@ const GoodsTracking = () => {
       onSuccess={refreshData}
       selectedData={emptyGoodsReceiptPO} // Pass the selected row data
       selectedButton={selectedButton}
+      employee_id={employee_id}
       />
     } else {
       return <GoodsReceiptPO
@@ -138,6 +138,7 @@ const GoodsTracking = () => {
       onSuccess={refreshData}
       selectedData={selectedData} // Pass the selected row data
       selectedButton={selectedButton}
+      employee_id={employee_id}
       />
     }
   }
@@ -148,6 +149,7 @@ const GoodsTracking = () => {
       onSuccess={refreshData}
       selectedData={emptyGoodsReceiptPO} // Pass the selected row data
       selectedButton={selectedButton}
+      employee_id={employee_id}
       />
     } else {
       return <GoodsReceipt
@@ -155,6 +157,7 @@ const GoodsTracking = () => {
       onSuccess={refreshData}
       selectedData={selectedData} // Pass the selected row data
       selectedButton={selectedButton}
+      employee_id={employee_id}
       />
     }
   }
@@ -166,6 +169,7 @@ const GoodsTracking = () => {
       onSuccess={refreshData}
       selectedData={emptyGoodsReceiptPO} // Pass the selected row data
       selectedButton={selectedButton}
+      employee_id={employee_id}
       />
     } else {
       return <GoodsIssue
@@ -173,6 +177,7 @@ const GoodsTracking = () => {
       onSuccess={refreshData}
       selectedData={selectedData} // Pass the selected row data
       selectedButton={selectedButton}
+      employee_id={employee_id}
       />
     }
   }
@@ -183,6 +188,7 @@ const GoodsTracking = () => {
       onSuccess={refreshData}
       selectedData={emptyGoodsReceiptPO} // Pass the selected row data
       selectedButton={selectedButton}
+      employee_id={employee_id}
       />
     } else {
       return <ARCreditMemo
@@ -190,6 +196,7 @@ const GoodsTracking = () => {
       onSuccess={refreshData}
       selectedData={selectedData} // Pass the selected row data
       selectedButton={selectedButton}
+      employee_id={employee_id}
       />
     }
   }

@@ -1,0 +1,221 @@
+/* REMINDER! All of your elements must use your unique namespace '.usrprofile' at the start to avoid leaking */
+.usrprofile {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 40rem;
+  min-height: 30rem;
+  overflow: auto;
+}
+
+.usrprofile .user-details-container, .usrprofile .password-kinetiq-container{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2rem;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 2rem;
+}
+
+.usrprofile .user-details-container{
+  border-bottom: 0.05rem solid rgb(207, 207, 207);
+}
+
+.usrprofile .user-details-container img{
+  height: 10rem;
+  width: auto;
+}
+.usrprofile .user-image{
+  aspect-ratio: 1 / 1;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 500rem;
+  background-color: rgb(178, 238, 242);
+  color: rgb(0, 125, 141);
+  font-size: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.usrprofile .user-details{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  width: fit-content;
+  font-size: 0.8rem;
+  color: #7d7d7d;
+  gap: 1rem;
+  margin-left: 2rem ;
+}
+
+.usrprofile .user-details strong, .usrprofile .role-details strong{
+  font-weight: 700;
+  color: #4eb5b5;
+}
+
+.usrprofile .user-name{
+  font-size: 2rem;
+  color: #008b8b;
+  margin-bottom: 0rem;
+  line-height: 2rem;
+}
+
+.usrprofile .user-email{
+  color: rgb(155, 160, 162);
+  font-size: 0.85rem;
+}
+
+.usrprofile .user-position{
+  border-left:  0.15rem solid #b4c0c0; 
+  padding-left: 0.95rem;
+  font-style: italic;
+  font-size: 1.35rem;
+  color: #7ca2a2;
+}
+
+.usrprofile .role-details{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  font-size: 0.8rem;
+  color: #7d7d7d;
+  margin-left: 2rem;
+  font-size: 0.85rem;
+  padding: 0rem 3rem;
+}
+
+.usrprofile .role-details h3{
+  font-size: 0.85rem;
+  color: #a2a2a2;
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.25rem;
+  border-bottom: 1px solid #b4c0c0;
+  padding-bottom: 0.3rem;
+}
+
+.usrprofile .password-section{
+  display: flex;
+  flex-direction: column;
+  width: 30rem;
+  height: 17rem;
+  margin-left: 4rem;
+  align-items: center;
+}
+.usrprofile .password-section h3{
+  color: rgb(24, 172, 172);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.usrprofile .change-password-btn {
+  background-color: #00a7a7;
+  width: 100%;
+  color: white;
+  border: none;
+  padding: 0.25rem 1rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  font-weight: 500;
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+}
+
+.password-input-wrapper-item{
+  width: 100%;
+}
+
+.usrprofile .password-input-wrapper{
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.usrprofile input[type="password"], 
+.usrprofile input[type="text"]{
+  color: #7d7d7d;
+  font-size: 0.85rem;
+  width: 100%;
+  padding: 0.2rem 2.5rem 0.2rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.3rem;
+}
+
+.usrprofile input[type="text"]:focus,
+.usrprofile input[type="password"]:focus {
+  border: none;
+  box-shadow: 0 0 0.1rem 0.1rem rgba(0, 128, 128, 0.25); 
+  outline: none;
+}
+
+.usrprofile input:-webkit-autofill {
+  background-color: white !important; 
+  color: #7d7d7d !important;          
+  -webkit-text-fill-color: #7d7d7d !important; 
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+
+.usrprofile .eye-icon {
+  position: absolute;
+  right: 0.65rem;
+  cursor: pointer;
+  color: #888;
+}
+
+.password-input-error-container {
+  margin-top: 0.75rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.75rem;
+}
+
+.usrprofile .login-error{
+  color: rgb(255, 128, 0);  
+  font-size: 0.7rem;
+  font-style: italic;
+  width: 100%;
+  min-height: 0.7rem;
+}
+
+.usrprofile .user-info{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+@media (max-width: 69rem) {
+  .usrprofile .user-details-container {
+    flex-direction: row-reverse;
+  }
+
+  .usrprofile .user-info{
+    position: relative;
+    right: 25%;
+  }
+
+  .usrprofile .user-details-container img{
+    position: absolute;
+    opacity: 70%;
+  }
+}

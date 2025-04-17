@@ -4,14 +4,16 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
 
-const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => {
+
+const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
-
+ 
   const [selectedStatus, setSelectedStatus] = useState("Open");
   const [activeTab, setActiveTab] = useState("document");
   const [showSerialModal, setShowSerialModal] = useState(false);
   const [selectedSerialNumbers, setSelectedSerialNumbers] = useState([]);
+
 
   const calculateInitialAmount = () => {
     if (isCreateMode) return 0;
@@ -21,10 +23,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
 
+
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
 
+
   const [selectedVendor, setSelectedVendor] = useState("");
-  const [selectedOwner, setSelectedOwner] = useState("");
+  const [selectedOwner, setSelectedOwner] = useState(
+      isCreateMode ? employee_id : selectedData.employee_name || employee_id
+  );
   const [contactPerson, setContactPerson] = useState("");
   const [vendorID, setVendorID] = useState("");
   const [vendorList, setVendorList] = useState([]);
@@ -32,11 +38,13 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+
   useEffect(() => {
     if (selectedData?.status) {
       setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
     }
   }, [selectedData]);
+
 
   const fetchVendors = async () => {
     try {
@@ -45,13 +53,19 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
       if (!response.ok) throw new Error("Connection to database failed");
 
 
+
+
       const data = await response.json();
+
+
 
 
       if (!Array.isArray(data.vendors)) throw new Error("Invalid goods data format");
       setVendorList(data.vendors);
       if (!Array.isArray(data.employees)) throw new Error("Invalid goods data format");
       setEmployeeList(data.employees)
+
+
 
 
     } catch (error) {
@@ -65,6 +79,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
    
   }, []);
 
+
   const handleVendorChange = (e) => {
     const vendorName = e.target.value;
     setSelectedVendor(vendorName);
@@ -72,6 +87,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
     setVendorID(selectedVendorData ? selectedVendorData.vendor_code : null);
     setContactPerson(selectedVendorData ? selectedVendorData.contact_person : "");
   };
+
 
   useEffect(() => {
     if (vendorList.length > 0) {
@@ -88,9 +104,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
     }
   }, [vendorList, selectedData.vendor_code, employeeList, selectedData.employee_id]);
 
+
   const [documentItems, setDocumentItems] = useState(
     isCreateMode ? [{}] : [...selectedData.document_items, {}]
   );
+
+
 
 
  
@@ -101,7 +120,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
     vendor_name: isCreateMode ? "" : selectedVendor,
     contact_person: isCreateMode ? "" : contactPerson,
     buyer: isCreateMode ? "" : selectedData.buyer || "",
-    owner: isCreateMode ? "" : selectedOwner,
+    owner: isCreateMode ? employee_id : selectedOwner,
     transaction_id: isCreateMode ? "" : selectedData.transaction_id || "",
     delivery_date: isCreateMode ? today : selectedData.delivery_date || "",
     status: isCreateMode ? "Draft" : selectedStatus,
@@ -116,6 +135,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
     freight: isCreateMode ? 0 : selectedData.freight || 0,
     transaction_cost: isCreateMode ? 0 : selectedData.transaction_cost || 0,
   });
+
+
 
 
   useEffect(() => {
@@ -144,9 +165,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
   }, [isCreateMode]);
 
 
+
+
   const handleInputChange = async (e, index, field) => {
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
+
 
     // Handle date fields
     if (field === 'manuf_date' || field === 'expiry_date') {
@@ -161,6 +185,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
       updatedItems[index][field] = e.target.value;
     }
     setDocumentItems(updatedItems);
+
+
 
 
     // Check if the row is NOT the last row and the item_name was cleared
@@ -288,9 +314,13 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
         );
 
 
+
+
         if (!newItem) {
           throw new Error('Newly created item not found in reloaded data');
         }
+
+
 
 
         // Update state with the fresh data
@@ -313,9 +343,11 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
         setDocumentItems(updatedItems);
         const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
 
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
+
 
         const updatedDoc = await response.json();  
         updatedDoc.document_items.push({          
@@ -326,6 +358,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
           cost: '',
           warehouse_id: ''
         });
+
 
         setDocumentItems(updatedDoc.document_items);  
       }
@@ -344,13 +377,18 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
       row.item_id &&
       row.item_name &&
       row.unit_of_measure &&
+      (row.product_details.manuf_date || !row.item_id.startsWith('ADMIN-PROD')) &&
+      (row.product_details.expiry_date || !row.item_id.startsWith('ADMIN-PROD')) &&
       row.quantity &&
       row.cost &&
       row.warehouse_id
     );
   };
 
+
   const [warehouseOptions, setWarehouseOptions] = useState([]);
+
+
 
 
   useEffect(() => {
@@ -367,11 +405,15 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
   const [itemOptions, setItemOptions] = useState([]);
 
 
+
+
   useEffect(() => {
     fetch('http://127.0.0.1:8000/operation/item-data/')
       .then(res => res.json())
       .then(data => {
         const options = [];
+
+
 
 
         data.products.forEach(prod => {
@@ -385,6 +427,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
         });
 
 
+
+
         data.material.forEach(mat => {
           options.push({
             id: mat.material_id,
@@ -394,6 +438,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
             type: 'material',
           });
         });
+
+
 
 
         data.asset?.forEach(asset => {
@@ -407,9 +453,13 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
         });
 
 
+
+
         setItemOptions(options);
       });
   }, []);
+
+
 
 
   const handleItemSelection = async (index, selectedName) => {
@@ -434,6 +484,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
           }
  
 
+
           await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
@@ -443,7 +494,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
               document_id: "",  // or null, depending on the backend expectations
             }),
           });
-          
+         
+
 
         } catch (error) {
           toast.error('Error deleting row from database:', error);
@@ -488,6 +540,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
   };
 
 
+
+
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
@@ -508,6 +562,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
       [field]: e.target.value
     }));
   };
+
+
 
 
  
@@ -533,7 +589,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
         status: selectedStatus,
         vendor_code: vendorID || null,
         buyer: documentDetails.buyer,
-        employee_id: employeeList.find(emp => emp.employee_name === selectedOwner)?.employee_id,
+        employee_id: employee_id,
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
@@ -568,10 +624,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
       });
 
 
+
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Create failed: ${JSON.stringify(errorData)}`);
       }
+
+
 
 
       const result = await response.json();
@@ -584,6 +644,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
       toast.error(`Failed to create document: ${error.message}`);
     }
   };
+
+
+
+
 
 
 
@@ -661,7 +725,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
         status: selectedStatus,
         vendor_code: vendorID,
         buyer: documentDetails.buyer,
-        employee_id: employeeList.find(emp => emp.employee_name === selectedOwner)?.employee_id,
+        employee_id: isCreateMode ? employee_id : selectedData?.employee_id || employee_id,
         transaction_id: documentDetails.transaction_id,
         document_no: documentDetails.document_no,
         delivery_date: documentDetails.delivery_date,
@@ -689,13 +753,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
       }
  
       const goodsTrackingResult = await goodsTrackingResponse.json();
-      console.log('GoodsTrackingData update successful:', goodsTrackingResult);
+      toast.loading("Updating...");
       }
       if (onSuccess) {
         await onSuccess();  // Refresh the data in GoodsTracking
       }
-  
-      // ✅ Then call onBack to close GoodsReceiptPO and go back
+ 
       if (onBack) {
         onBack();  // Navigate back to GoodsTracking
       }
@@ -706,8 +769,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
  
 
 
+
+
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedPO, setSelectedPO] = useState("");
+
+
 
 
   // Fetch purchase orders
@@ -723,6 +790,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
       setError(error.message);
     }
   };
+
+
 
 
   const handlePOSelect = async (poId) => {
@@ -783,6 +852,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
  
 
 
+
+
   useEffect(() => {
     if (isCreateMode) {
       fetchPurchaseOrders();
@@ -792,8 +863,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0).toFixed(2);
- 
+    const total = (
+      parseFloat(initialAmount) +
+      parseFloat(tax_amount) -
+      parseFloat(discount_amount) +
+      parseFloat(documentDetails.freight || 0)
+    ).toFixed(2);
     setDocumentDetails(prev => ({
       ...prev,
       tax_amount: tax_amount,
@@ -808,12 +883,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
           return sum + (parseFloat(item.quantity || 0) * parseFloat(item.cost || 0));
         }, 0)
         .toFixed(2);
-      
+     
       setInitialAmount(newInitialAmount);
     }, [documentItems]);
-    
+   
   return (
-    <div className="grpo">
+    <div className="goods-r-po">
       <div className="body-content-container">
         <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
         <div className="content-wrapper">
@@ -825,6 +900,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
                 <label>Vendor Code</label>
                 <input type="text" value={vendorID} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
+
+
 
 
               {/* Vendor Name Dropdown */}
@@ -850,6 +927,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
               </div>
 
 
+
+
               <div className="detail-row">
                 <label>Buyer</label>
                 <input
@@ -860,20 +939,23 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
               </div>
 
 
+
+
               <div className="detail-row">
                 <label>Owner</label>
-                <select value={selectedOwner} onChange={(e) => setSelectedOwner(e.target.value)}>
-                  <option value="">Select Owner</option>
-                  {loading ? (
-                    <option value="">Loading employees...</option>
-                  ) : (
-                    employeeList.map((employee) => (
-                      <option key={employee.employee_id} value={employee.employee_name}>
-                        {employee.employee_name}
-                      </option>
-                    ))
-                  )}
-                </select>
+                <input
+                  type="text"
+                  readOnly
+                  value={
+                    selectedData?.employee_id
+                      ? employeeList.find(e => e.employee_id === selectedData.employee_id)?.employee_name || selectedData.employee_id
+                      : employeeList.find(e => e.employee_id === employee_id)?.employee_name || employee_id
+                  }
+                  style={{
+                    cursor: 'not-allowed',
+                    backgroundColor: '#f8f8f8'
+                  }}
+                />
               </div>
             </div>
             {/* Details Document */}
@@ -999,7 +1081,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
                   <div className="detail-row">
                     <label>Total</label>
                     <input type="text" value={
-                      documentDetails.total.toFixed(2)
+                      documentDetails.transaction_cost
                     }  
                     style={{ cursor: 'not-allowed' }}
                     readOnly
@@ -1019,7 +1101,16 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
           </div>
 
 
+
+
           {/* Item Document */}
+
+
+
+
+
+
+
 
 
 
@@ -1065,7 +1156,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
                         onChange={(e) => handleItemSelection(index, e.target.value)}
                       >
                         <option value="">-- Select Item --</option>
-                        {itemOptions.filter(opt => opt.type === 'product' || opt.type === 'asset').map((opt, i) => (
+                        {itemOptions.filter(opt => opt.type === 'material' || opt.type === 'asset').map((opt, i) => (
                           <option key={i} value={opt.name}>
                             {opt.name} ({opt.type})
                           </option>
@@ -1099,14 +1190,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
                       <td>{(item.quantity * item.cost || 0).toFixed(2)}</td>
                       <td>
                       {!item.item_id?.startsWith('ADMIN-PROD') ? (
-                        <input 
-                          type="text" 
-                          value="N/A" 
-                          readOnly 
+                        <input
+                          type="text"
+                          value="N/A"
+                          readOnly
                           style={{ cursor: 'not-allowed' }}
                         />
                       ) : (
-                        <input 
+                        <input
                           type="date"
                           value={item.product_details?.manuf_date || ''}
                           onChange={(e) => {
@@ -1118,14 +1209,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
                     </td>
                     <td>
                       {!item.item_id?.startsWith('ADMIN-PROD') ? (
-                        <input 
-                          type="text" 
-                          value="N/A" 
-                          readOnly 
+                        <input
+                          type="text"
+                          value="N/A"
+                          readOnly
                           style={{ cursor: 'not-allowed' }}
                         />
                       ) : (
-                        <input 
+                        <input
                           type="date"
                           value={item.product_details?.expiry_date || ''}
                           onChange={(e) => handleInputChange(e, index, 'expiry_date')}
@@ -1161,6 +1252,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
 
 
 
+
+
+
+
+
+
+
+
           <div className="button-section">
             <div className="copy-from-button">
             <select
@@ -1184,6 +1283,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
       </div>
 
 
+
+
     </div>
   );
 };
@@ -1195,7 +1296,20 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton }) => 
 
 
 
+
+
+
+
+
+
+
+
 export default GoodsReceiptPO;
  
+
+
+
+
+
 
 

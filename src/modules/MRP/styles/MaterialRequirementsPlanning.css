@@ -1,5 +1,4 @@
-/* REMINDER! All of your elements must use your unique namespace '.reqplan' at the start to avoid leaking */
-
+/* REMINDER! All of your elements must use your unique namespace '.mrp' at the start to avoid leaking */
 .reqplan {
   display: flex;
   width: 100%;
@@ -19,5 +18,105 @@
     justify-content: center;
     min-width: 40rem;
     min-height: 30rem;
-  }
-  
+}
+
+.reqplan .sub-body-content-container{
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+}
+
+.reqplan .MRPSearch{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPsearch.png);
+  width: 20;
+  height: 20;
+}
+
+.reqplan .MRPIcon1{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon1.png);
+  width: 20;
+  height: 20;
+}
+
+.reqplan .MRPIcon2{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon2.png);
+  width: 20;
+  height: 20;
+}
+
+.reqplan .MRPIcon3{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon3.png);
+  width: 30;
+  height: 30;
+  background-repeat: no-repeat;
+}
+
+.reqplan .MRPIcon4{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon5.png);
+  width: 20;
+  height: 20;
+  background-repeat: no-repeat;
+}
+
+.reqplan .MRPIcon5{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon5.png);
+  width: 20;
+  height: 20;
+  background-repeat: no-repeat;
+}
+
+.reqplan .MRPclose{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPclose.png);
+  width: 26;
+  height: 26;
+  background-repeat: no-repeat;
+}
+
+.bom-print-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.3); /* translucent dark gray */
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* keep scrollable from top */
+  padding: 2rem;
+}
+
+.bom-print-modal2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0); /* translucent dark gray */
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* keep scrollable from top */
+  padding: 2rem;
+}
+
+
+.bom-print-content {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
+  max-width: 1128px;
+  width: 100%;
+}
