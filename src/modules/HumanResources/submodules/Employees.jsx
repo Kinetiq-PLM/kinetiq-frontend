@@ -10,6 +10,7 @@ const Employees = () => {
   const [employees, setEmployees] = useState([]);
   const [archivedEmployees, setArchivedEmployees] = useState([]);
   const [selectedArchivedEmployees, setSelectedArchivedEmployees] = useState([]);
+  const [departmentSuperiors, setDepartmentSuperiors] = useState([]);
 
   // Add/Edit modals for Employees
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
@@ -194,10 +195,22 @@ const Employees = () => {
       setEmployees(activeRes.data);
       setArchivedEmployees(archivedRes.data);
     } catch (err) {
-      console.error("Fetch employees error", err);
-      showToast("Failed to fetch employees", false);
+      console.error("Full error response:", err.response);
+      const errorDetail = err.response?.data?.detail || 
+                         JSON.stringify(err.response?.data || {});
+      showToast(`Error: ${errorDetail}`, false);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDepartmentSuperiors = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/department_superiors/department-superiors/");
+      setDepartmentSuperiors(response.data.filter(sup => !sup.is_archived && sup.status === "Active"));
+    } catch (err) {
+      console.error("Fetch department superiors error:", err);
+      showToast("Failed to fetch department superiors", false);
     }
   };
 
@@ -253,7 +266,8 @@ const Employees = () => {
   useEffect(() => {
     fetchEmployees();
     fetchPositions();
-    fetchDepartments(); // Fetch departments on component load
+    fetchDepartments();
+    fetchDepartmentSuperiors(); 
   }, []);
 
   /***************************************************************************
@@ -342,6 +356,27 @@ const Employees = () => {
 
   const handleEmployeeChange = (e) => {
     const { name, value } = e.target;
+    
+    // Special handling for phone field
+    if (name === "phone") {
+      // Only allow digits
+      const digitsOnly = value.replace(/\D/g, '');
+      
+      // Ensure first digit is 0
+      let formattedPhone = digitsOnly;
+      if (formattedPhone.length > 0 && formattedPhone[0] !== '0') {
+        formattedPhone = '0' + formattedPhone.substring(0, 10);
+      } else {
+        formattedPhone = formattedPhone.substring(0, 11);
+      }
+      
+      setNewEmployee(prev => ({
+        ...prev,
+        [name]: formattedPhone
+      }));
+      return;
+    }
+    
     setNewEmployee((prev) => ({
       ...prev,
       [name]: value,
@@ -350,38 +385,49 @@ const Employees = () => {
 
   const submitEmployeeModal = async (e) => {
     e.preventDefault();
-
+  
     // Basic validation
     if (!newEmployee.first_name.trim() || !newEmployee.last_name.trim()) {
       showToast("First name and last name are required", false);
       return;
     }
-
+  
     if (!newEmployee.dept_id || !newEmployee.position_id) {
       showToast("Department and Position are required", false);
       return;
     }
-
+  
     try {
       const employeeData = {
+        // user_id: newEmployee.user_id || `TEMP-USER-${Date.now().toString(36)}`,
+        user_id: newEmployee.user_id || "",
         dept_id: newEmployee.dept_id,
+        dept_name: newEmployee.dept_name || "",
         position_id: newEmployee.position_id,
+        position_name: newEmployee.position_title || "",
         first_name: newEmployee.first_name.trim(),
         last_name: newEmployee.last_name.trim(),
         phone: newEmployee.phone.trim(),
         employment_type: newEmployee.employment_type,
         status: newEmployee.status,
-        reports_to: newEmployee.reports_to.trim() || null,
+        // Important: Make sure reports_to is null, not an empty string
+        reports_to: newEmployee.reports_to || null, // Don't trim the ID, just use it as is
         is_supervisor: newEmployee.is_supervisor
       };
-
+  
+      // Add logging to debug
+      console.log("Sending employee data:", JSON.stringify(employeeData));
+  
       const response = await axios.post("http://127.0.0.1:8000/api/employees/employees/", employeeData);
       setShowEmployeeModal(false);
       showToast("Employee added successfully");
       fetchEmployees();
     } catch (err) {
       console.error("Add employee error:", err);
-      showToast(err.response?.data?.detail || "Failed to add employee", false);
+      // Improve error handling to show more details
+      const errorMsg = err.response?.data?.detail || 
+                      (err.response?.data ? JSON.stringify(err.response.data) : "Failed to add employee");
+      showToast(errorMsg, false);
     }
   };
 
@@ -407,6 +453,27 @@ const Employees = () => {
 
   const handleEditEmployeeChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    // Special handling for phone field
+    if (name === "phone") {
+      // Only allow digits
+      const digitsOnly = value.replace(/\D/g, '');
+      
+      // Ensure first digit is 0
+      let formattedPhone = digitsOnly;
+      if (formattedPhone.length > 0 && formattedPhone[0] !== '0') {
+        formattedPhone = '0' + formattedPhone.substring(0, 10);
+      } else {
+        formattedPhone = formattedPhone.substring(0, 11);
+      }
+      
+      setEditingEmployee(prev => ({
+        ...prev,
+        [name]: formattedPhone
+      }));
+      return;
+    }
+    
     setEditingEmployee((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value
@@ -1330,8 +1397,10 @@ const Employees = () => {
                   name="phone"
                   value={newEmployee.phone}
                   onChange={handleEmployeeChange}
-                  pattern="[0-9]*"
+                  placeholder="0XXXXXXXXXX (11 digits)"
+                  maxLength="11"
                 />
+                <small>Must be 11 digits starting with 0</small>
               </div>
 
               {/* Employment Details */}
@@ -1364,13 +1433,18 @@ const Employees = () => {
 
               <div className="form-group">
                 <label>Reports To</label>
-                <input
-                  type="text"
+                <select
                   name="reports_to"
                   value={newEmployee.reports_to}
                   onChange={handleEmployeeChange}
-                  placeholder="Employee ID of supervisor"
-                />
+                >
+                  <option value="">-- Select Supervisor --</option>
+                  {departmentSuperiors.map(superior => (
+                    <option key={superior.dept_superior_id} value={superior.employee_id}>
+                      {superior.superior_name} - {superior.dept_name} ({superior.position_title})
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="form-group">
@@ -1494,12 +1568,18 @@ const Employees = () => {
               </div>
               <div className="form-group">
                 <label>Reports To</label>
-                <input
-                  type="text"
+                <select
                   name="reports_to"
-                  value={editingEmployee.reports_to}
+                  value={editingEmployee.reports_to || ""}
                   onChange={handleEditEmployeeChange}
-                />
+                >
+                  <option value="">-- No Supervisor --</option>
+                  {departmentSuperiors.map(superior => (
+                    <option key={superior.dept_superior_id} value={superior.employee_id}>
+                      {superior.superior_name} - {superior.dept_name} ({superior.position_title})
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="form-group">
                 <label>Is Supervisor?</label>
