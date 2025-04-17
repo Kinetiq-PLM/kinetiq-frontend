@@ -1,0 +1,256 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.hr-app-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.hr-sidebar {
+  width: 240px;
+  background-color: #1a1a1a;
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  padding: 1rem;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.hr-main-content {
+  margin-left: 240px;
+  width: calc(100% - 240px);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.hr-navbar {
+  height: 60px;
+  background: white;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.hr-dashboard-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f7fbfc;
+  padding: 1.5rem;
+}
+
+.hr-dashboard-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+.hr-dashboard-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+/* Calendar Component Styles */
+.hr-calendar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  padding-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+}
+
+/* Calendar Header */
+.hr-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #00a9ac;
+  border-bottom: 1px solid #eee;
+}
+
+.hr-calendar-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: white;
+  font-weight: 600;
+}
+
+.hr-calendar-nav {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.hr-calendar-nav:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Calendar Grid */
+.hr-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  background-color: #eee;
+  border: 1px solid #eee;
+  margin: 0 2px;
+}
+
+.hr-calendar-day-name {
+  background: #f3f9fa;
+  text-align: center;
+  padding: 12px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.hr-calendar-day {
+  height: 55px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: 1rem;
+  cursor: default;
+  transition: transform 0.1s ease;
+}
+
+.hr-calendar-day:hover {
+  transform: scale(1.02);
+  z-index: 1;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.hr-calendar-outside-month {
+  background: #f9f9f9;
+  color: #ccc;
+}
+
+.hr-calendar-holiday {
+  background: #ffe6e6;
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.hr-calendar-special {
+  background: #fff2d6;
+  color: #e67700;
+  font-weight: 600;
+}
+
+.hr-calendar-workday {
+  background: #f5fffa;
+  color: #222;
+}
+
+.hr-calendar-non-workday {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.hr-calendar-indicator {
+  font-size: 1rem;
+  margin-top: 4px;
+}
+
+/* Holidays Section */
+.hr-calendar-holidays {
+  margin-top: 16px;
+  padding: 0 20px;
+}
+
+.hr-calendar-holidays h4 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  color: #00a9ac;
+}
+
+.hr-calendar-no-holidays {
+  font-style: italic;
+  color: #777;
+  font-size: 0.95rem;
+  margin: 8px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.hr-calendar-holiday-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.hr-calendar-holiday-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.hr-calendar-holiday-item:hover {
+  background-color: #f5f5f5;
+}
+
+.hr-calendar-holiday-item:last-child {
+  border-bottom: none;
+}
+
+.hr-calendar-holiday-date {
+  font-weight: 600;
+  color: #d32f2f;
+  min-width: 120px;
+}
+
+.hr-calendar-holiday-name {
+  margin-left: 8px;
+  color: #444;
+}
+
+/* Status */
+.hr-calendar-loading,
+.hr-calendar-error {
+  padding: 30px;
+  text-align: center;
+  color: #777;
+  font-style: italic;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin: 10px;
+}
+
+.hr-calendar-error {
+  color: #d32f2f;
+  background: #fff0f0;
+}
