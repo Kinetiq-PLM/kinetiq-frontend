@@ -3,13 +3,16 @@ import { approvalService } from '../components/Approvals/API.jsx';
 import "../styles/ManagementDashboard.css";
 
 function ManagementDashboard() {
-  // ...existing state declarations
+  const [approvals, setApprovals] = useState([]);
+  const [stats, setStats] = useState({ approved: 0, pending: 0, rejected: 0 });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchApprovals = async () => {
     try {
       setLoading(true);
       const data = await approvalService.fetchAll();
-      
+
       // Map backend data to frontend structure
       const mappedData = data.map(item => ({
         approvalId: item.approval_id,
@@ -22,16 +25,16 @@ function ManagementDashboard() {
         dueDate: item.due_date,
         remarks: item.remarks
       }));
-      
+
       setApprovals(mappedData);
-      
+
       // Calculate stats
       const newStats = data.reduce((acc, curr) => {
         const status = curr.status.toLowerCase();
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       }, { approved: 0, pending: 0, rejected: 0 });
-      
+
       setStats(newStats);
     } catch (error) {
       setError(error.message);
@@ -44,11 +47,14 @@ function ManagementDashboard() {
     try {
       const data = await approvalService.getById(approvalId);
       console.log('Approval details:', data);
-      // Handle the approval details
     } catch (error) {
       setError(error.message);
     }
   };
+
+  useEffect(() => {
+    fetchApprovals();
+  }, []);
 
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error-message">{error}</div>;
@@ -91,8 +97,8 @@ function ManagementDashboard() {
               {approvals.map((approval) => (
                 <tr key={approval.approvalId}>
                   <td>
-                    <button 
-                      className="approval-button" 
+                    <button
+                      className="approval-button"
                       onClick={() => handleApprovalClick(approval.approvalId)}
                     >
                       {approval.approvalId}

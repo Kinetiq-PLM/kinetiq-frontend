@@ -1,83 +1,267 @@
-import React, { useState, useEffect } from 'react';
-import { approvalService } from '../components/Approvals/API.jsx';
+import React, { useState } from 'react';
 import "../styles/ManagementApprovals.css";
 
+
 function Approvals() {
+  const [approvalStatus, setApprovalStatus] = useState('');
   const [formData, setFormData] = useState({
     approvalId: '',
     requestId: '',
     decisionDate: '',
-    externalId: '',
+    externalModuleId: '',
     issueDate: '',
     checkedBy: '',
     dueDate: '',
     checkedDate: '',
     remarks: '',
-    status: ''
   });
+  const [searchId, setSearchId] = useState('');
+  const [dateRange, setDateRange] = useState('Last 30 Days');
+  const [filterBy, setFilterBy] = useState('Filter By...');
+  const [approvalList, setApprovalList] = useState([
+    {
+      approvalId: '123',
+      requestId: 'REQ456',
+      decisionDate: '2023-11-15',
+      externalModuleId: 'MOD789',
+      issueDate: '2023-11-10',
+      checkedBy: 'John Doe',
+      dueDate: '2023-11-30',
+      checkedDate: '2023-11-12',
+      remarks: 'Approved',
+      status: 'approved',
+    },
+    {
+      approvalId: '456',
+      requestId: 'REQ789',
+      decisionDate: '2023-11-16',
+      externalModuleId: 'MOD101',
+      issueDate: '2023-11-11',
+      checkedBy: 'Jane Smith',
+      dueDate: '2023-12-01',
+      checkedDate: '2023-11-13',
+      remarks: 'Rejected',
+      status: 'rejected',
+    },
+  ]);
 
-  const handleSave = async () => {
-    try {
-      // Map frontend data to backend structure
-      const backendData = {
-        approval_id: formData.approvalId,
-        request_id_all: formData.requestId,
-        external_id: formData.externalId,
-        decision_date: formData.decisionDate,
-        issue_date: formData.issueDate,
-        checked_by: formData.checkedBy,
-        checked_date: formData.checkedDate,
-        due_date: formData.dueDate,
-        remarks: formData.remarks,
-        status: formData.status
-      };
 
-      if (formData.approvalId) {
-        await approvalService.update(formData.approvalId, backendData);
-      } else {
-        await approvalService.create(backendData);
-      }
-
-      // Reset form
-      setFormData({
-        approvalId: '',
-        requestId: '',
-        decisionDate: '',
-        externalId: '',
-        issueDate: '',
-        checkedBy: '',
-        dueDate: '',
-        checkedDate: '',
-        remarks: '',
-        status: ''
-      });
-    } catch (error) {
-      console.error('Error saving approval:', error);
-    }
+  const handleStatusChange = (event) => {
+    setApprovalStatus(event.target.value);
   };
 
-  const handleSearchIdChange = async (event) => {
-    const value = event.target.value;
-    try {
-      const data = await approvalService.fetchAll();
-      const filteredData = data.filter(item => 
-        item.approval_id.toLowerCase().includes(value.toLowerCase())
-      );
-      setApprovalList(filteredData.map(item => ({
-        approvalId: item.approval_id,
-        requestId: item.request_id_all,
-        externalId: item.external_id,
-        issueDate: item.issue_date,
-        checkedBy: item.checked_by,
-        checkedDate: item.checked_date,
-        status: item.status,
-        dueDate: item.due_date,
-        remarks: item.remarks
-      })));
-    } catch (error) {
-      console.error('Error searching approvals:', error);
-    }
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  // ...rest of your component remains the same
+
+  const handleSave = () => {
+    console.log('Form Data:', formData);
+    console.log('Approval Status:', approvalStatus);
+  };
+
+
+  const handleBack = () => {
+    console.log("Back button clicked");
+  };
+
+
+  const handleSearchIdChange = (event) => {
+    setSearchId(event.target.value);
+  };
+
+
+  const handleDateRangeChange = (event) => {
+    setDateRange(event.target.value);
+  };
+
+
+  const handleFilterByChange = (event) => {
+    setFilterBy(event.target.value);
+  };
+
+
+  return (
+    <div className="approvals-container">
+      <div className="header">
+        <div className="search-bar"></div>
+        <div className="notification"></div>
+        <div className="user-profile"></div>
+      </div>
+
+
+      <div className="content">
+        <h1>Approvals</h1>
+
+
+        <div className="search-id">
+          <input
+            type="text"
+            placeholder="Search ID..."
+            value={searchId}
+            onChange={handleSearchIdChange}
+          />
+        </div>
+
+
+        <div className="filter-options">
+          <select value={dateRange} onChange={handleDateRangeChange}>
+            <option>Last 30 Days</option>
+            {/* Add other date range options */}
+          </select>
+          <select value={filterBy} onChange={handleFilterByChange}>
+            <option>Filter By...</option>
+            {/* Add other filter options */}
+          </select>
+        </div>
+
+
+        <div className="form-grid">
+          <div className="form-group">
+            <label>Approval ID</label>
+            <input
+              type="text"
+              name="approvalId"
+              value={formData.approvalId}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>Request ID</label>
+            <input
+              type="text"
+              name="requestId"
+              value={formData.requestId}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>Decision Date</label>
+            <input
+              type="date"
+              name="decisionDate"
+              value={formData.decisionDate}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>External Module ID</label>
+            <input
+              type="text"
+              name="externalModuleId"
+              value={formData.externalModuleId}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>Issue Date</label>
+            <input
+              type="date"
+              name="issueDate"
+              value={formData.issueDate}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>Checked By</label>
+            <input
+              type="text"
+              name="checkedBy"
+              value={formData.checkedBy}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>Due Date</label>
+            <input
+              type="date"
+              name="dueDate"
+              value={formData.dueDate}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>Checked Date</label>
+            <input
+              type="date"
+              name="checkedDate"
+              value={formData.checkedDate}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group status-group">
+            <label>Status</label>
+            <div className="status-select-container">
+              <select value={approvalStatus} onChange={handleStatusChange}>
+                <option value="">Select Status</option>
+                <option value="approved">Approved</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-group remarks">
+            <label>Remarks</label>
+            <textarea
+              name="remarks"
+              value={formData.remarks}
+              onChange={handleInputChange}
+            ></textarea>
+          </div>
+        </div>
+
+
+        <div className="form-actions">
+          <button className="back-button" onClick={handleBack}>
+            Back
+          </button>
+          <button className="save-button" onClick={handleSave}>
+            Save
+          </button>
+        </div>
+
+
+        <div className="Full-list">
+          <h2>Full List</h2>
+          <table className="requests-table-container">
+            <thead>
+              <tr>
+                <th>Approval ID</th>
+                <th>Request ID</th>
+                <th>Decision Date</th>
+                <th>External Module ID</th>
+                <th>Issue Date</th>
+                <th>Checked By</th>
+                <th>Due Date</th>
+                <th>Checked Date</th>
+                <th>Remarks</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody className="table-body-scroll">
+              {approvalList.map((approval) => (
+                <tr key={approval.approvalId}>
+                  <td>{approval.approvalId}</td>
+                  <td>{approval.requestId}</td>
+                  <td>{approval.decisionDate}</td>
+                  <td>{approval.externalModuleId}</td>
+                  <td>{approval.issueDate}</td>
+                  <td>{approval.checkedBy}</td>
+                  <td>{approval.dueDate}</td>
+                  <td>{approval.checkedDate}</td>
+                  <td>{approval.remarks}</td>
+                  <td>{approval.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
 }
+
+
+export default Approvals;

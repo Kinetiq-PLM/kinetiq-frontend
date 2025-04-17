@@ -2,7 +2,7 @@
 
 .approvals-container {
   padding: 20px;
-background-color: white;
+  background-color: white;
 }
 
 .header {
@@ -16,16 +16,19 @@ background-color: white;
 .user-profile {
   margin-left: 10px;
 }
- .content {
+
+.content {
+  margin-top: 20px;
 }
 
 .search-id input {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  width: 100%; /* Ensure it spans the full width of the container */
 }
 
- .filter-options select {
+.filter-options select {
   padding: 8px;
   margin-right: 10px;
   border: 1px solid #ccc;
@@ -58,11 +61,12 @@ background-color: white;
 
 .remarks textarea {
   min-height: 100px;
+  width: 100%; /* Ensure it spans the full width of the container */
 }
 
 .form-actions {
   display: flex;
- justify-content: flex-end;
+  justify-content: flex-end;
 }
 
 .form-actions button {
@@ -137,6 +141,7 @@ background-color: white;
   background-color: #00A8A8; /* Color of the scrollbar thumb */
   border-radius: 4px; /* Rounded corners for the scrollbar thumb */
 }
+
 .error-message {
   color: red;
   padding: 10px;
