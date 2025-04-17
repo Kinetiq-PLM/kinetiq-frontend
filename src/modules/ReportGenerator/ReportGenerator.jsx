@@ -15,7 +15,7 @@ const BodyContent = (user_id) => {
     const [isBotResponding, setIsBotResponding] = useState(false);
     const authToken = "dummy-token";
     const textareaRef = useRef(null);
-    const currentUserId = "muge";
+    const currentUserId = user_id;
 
     // API base URL - would typically come from environment variables
     const API_BASE_URL = "http://127.0.0.1:8000/";
