@@ -147,18 +147,7 @@ function Approvals() {
                 <option value="">Select Status</option>
                 <option value="approved">Approved</option>
                 <option value="pending">Pending</option>
-                <option value="rejected">Rejected</option>
-                {/* Add more option for scroll test */}
-                <option value="extra1">Extra Option 1</option>
-                <option value="extra2">Extra Option 2</option>
-                <option value="extra3">Extra Option 3</option>
-                <option value="extra4">Extra Option 4</option>
-                <option value="extra5">Extra Option 5</option>
-                <option value="extra6">Extra Option 6</option>
-                <option value="extra7">Extra Option 7</option>
-                <option value="extra8">Extra Option 8</option>
-                <option value="extra9">Extra Option 9</option>
-                <option value="extra10">Extra Option 10</option>
+                 <option value="rejected">Rejected</option>
               </select>
             </div>
           </div>
