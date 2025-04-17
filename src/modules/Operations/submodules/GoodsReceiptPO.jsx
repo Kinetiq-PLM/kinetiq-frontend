@@ -2,20 +2,16 @@ import React, { useState } from "react";
 import "../styles/GoodsReceiptPO.css";
 
 
-
-
 const GoodsReceiptPO = ({ onBack }) => {
   const [selectedOwner, setSelectedOwner] = useState("Bob Smith");
   const [selectedStatus, setSelectedStatus] = useState("Open");
   const [activeTab, setActiveTab] = useState("document");
-
-
+  const [showSerialModal, setShowSerialModal] = useState(false);
+  const [selectedSerialNumbers, setSelectedSerialNumbers] = useState([]);
 
 
   const ownerOptions = ["Bob Smith", "John Smith", "Sarah Johnson"];
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
-
-
 
 
   const tableData = [
@@ -61,6 +57,17 @@ const GoodsReceiptPO = ({ onBack }) => {
   ];
 
 
+  const serialNumbers = [
+    { no: 1, itemId: "RM120", itemName: "Stainless Steel", serialNo: "J1N-TYY4JC" },
+    { no: 2, itemId: "RM120", itemName: "Stainless Steel", serialNo: "FO5-R5Y811" },
+    { no: 3, itemId: "RM120", itemName: "Stainless Steel", serialNo: "K48-H9X62V" },
+    { no: 4, itemId: "RM120", itemName: "Stainless Steel", serialNo: "7L3-W8JV2X" },
+    { no: 5, itemId: "RM120", itemName: "Stainless Steel", serialNo: "GV9-CF5GDX" },
+    { no: 6, itemId: "RM120", itemName: "Stainless Steel", serialNo: "QWE-R5T6U1" },
+    { no: 7, itemId: "RM120", itemName: "Stainless Steel", serialNo: "ZXC-V7B8NM" },
+    { no: 8, itemId: "RM120", itemName: "Stainless Steel", serialNo: "XWY-13BDUS" },
+    { no: 9, itemId: "RM120", itemName: "Stainless Steel", serialNo: "11D-DSHW34" }
+  ];
 
 
   return (
@@ -101,8 +108,6 @@ const GoodsReceiptPO = ({ onBack }) => {
                 </select>
               </div>
             </div>
-
-
 
 
             <div className="details-section tabbed-section">
@@ -203,10 +208,8 @@ const GoodsReceiptPO = ({ onBack }) => {
           </div>
 
 
-
-
-          <div className="table-section">
-            <div className="table-header">
+          <div className="operation_table_container">
+            <div className="grpo-table">
               <table className="materials-table">
                 <thead>
                   <tr>
@@ -221,13 +224,10 @@ const GoodsReceiptPO = ({ onBack }) => {
                     <th>Manufacturing Date</th>
                     <th>Expiry Date</th>
                     <th>Warehouse Location</th>
+                    <th>Batch No.</th>
                     <th>Serial No.</th>
                   </tr>
                 </thead>
-              </table>
-            </div>
-            <div className="table-body">
-              <table className="materials-table">
                 <tbody>
                   {tableData.map((row, index) => (
                     <tr key={row.id}>
@@ -242,15 +242,21 @@ const GoodsReceiptPO = ({ onBack }) => {
                       <td>{row.manufacturingDate}</td>
                       <td>{row.expiryDate}</td>
                       <td>{row.warehouseLocation}</td>
-                      <td>{row.serialNo || '-'}</td>
+                      <td>{row.batchNo}</td>
+                      <td>
+                        <button
+                          className="serial-dots-button"
+                          onClick={() => setShowSerialModal(true)}
+                        >
+                          ...
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-
-
 
 
           <div className="button-section">
@@ -262,20 +268,47 @@ const GoodsReceiptPO = ({ onBack }) => {
           </div>
         </div>
       </div>
+
+
+      {showSerialModal && (
+        <div className="modal-overlay">
+          <div className="serial-modal">
+            <div className="modal-header">
+              <h3>Serial Numbers</h3>
+              <button className="close-button" onClick={() => setShowSerialModal(false)}>
+                Close
+              </button>
+            </div>
+            <div className="modal-content">
+              <div className="serial-table-container">
+                <table className="serial-table">
+                  <thead>
+                    <tr>
+                      <th>No.</th>
+                      <th>Item ID</th>
+                      <th>Item Name</th>
+                      <th>Serial No.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {serialNumbers.map((item) => (
+                      <tr key={item.no}>
+                        <td>{item.no}</td>
+                        <td>{item.itemId}</td>
+                        <td>{item.itemName}</td>
+                        <td>{item.serialNo}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 
-
-
 export default GoodsReceiptPO;
-
-
-
-
-
-
-
-
-

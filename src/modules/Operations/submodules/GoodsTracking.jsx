@@ -1,18 +1,21 @@
-import React, { useState } from "react";
-import "../styles/GoodsTracking.css";
+import React, { useState, useEffect } from "react";
+import "../styles/GoodsTracking.css";    
 import GoodsReceiptPO from "./GoodsReceiptPO";
-
+import GoodsReceipt from "./GoodsReceipt";
+import GoodsIssue from "./GoodsIssue"; 
+import ARCreditMemo from "./ARCreditMemo";
 
 const GoodsTracking = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [selectedGoods, setSelectedGoods] = useState("Goods Receipt PO");
   const [showGoodsReceiptPO, setShowGoodsReceiptPO] = useState(false);
+  const [showGoodsReceipt, setShowGoodsReceipt] = useState(false);
+  const [showGoodsIssue, setShowGoodsIssue] = useState(false);
+  const [showARCreditMemo, setShowARCreditMemo] = useState(false);
 
+  const goodsOptions = ["Goods Receipt PO", "Goods Receipt", "Goods Issue", "A/R Credit Memo"];
 
-  const goodsOptions = ["Goods Receipt PO", "Goods Receipt", "Goods Issue"];
-
-
-  const tableData = [
+  const tableData = [ 
     { id: 1, transactionId: "0031", documentNo: "0042", status: "closed", postingDate: "12/23/24", cost: "12/24/24" },
     { id: 2, transactionId: "0035", documentNo: "0043", status: "open", postingDate: "01/31/25", cost: "01/31/25" },
     { id: 3, transactionId: "0036", documentNo: "0044", status: "cancelled", postingDate: "02/01/25", cost: "02/01/25" },
@@ -25,21 +28,39 @@ const GoodsTracking = () => {
     { id: 10, transactionId: "0044", documentNo: "0054", status: "closed", postingDate: "02/10/25", cost: "02/10/25" },
   ];
 
-
   const filteredData = activeTab === "all" ? tableData : tableData.filter(row => row.status === activeTab);
-
 
   const handleCreate = () => {
     if (selectedGoods === "Goods Receipt PO") {
       setShowGoodsReceiptPO(true);
+    } else if (selectedGoods === "Goods Receipt") {
+      setShowGoodsReceipt(true);
+    } else if (selectedGoods === "Goods Issue") {
+      setShowGoodsIssue(true);
+    } else if (selectedGoods === "A/R Credit Memo") {
+      setShowARCreditMemo(true);
     }
   };
 
+  useEffect(() => {
+    localStorage.setItem('operationsActiveTab', activeTab);
+  }, [activeTab]);
 
   if (showGoodsReceiptPO) {
     return <GoodsReceiptPO onBack={() => setShowGoodsReceiptPO(false)} />;
   }
 
+  if (showGoodsReceipt) {
+    return <GoodsReceipt onBack={() => setShowGoodsReceipt(false)} />;
+  }
+
+  if (showGoodsIssue) {
+    return <GoodsIssue onBack={() => setShowGoodsIssue(false)} />;
+  }
+
+  if (showARCreditMemo) {
+    return <ARCreditMemo onBack={() => setShowARCreditMemo(false)} />;
+  }
 
   return (
     <div className="gr">
@@ -47,7 +68,7 @@ const GoodsTracking = () => {
         <div className="header-container">
           <h2>Goods Tracking</h2>
           <div className="goods-dropdown-container">
-            <select
+            <select 
               className="goods-dropdown"
               value={selectedGoods}
               onChange={(e) => setSelectedGoods(e.target.value)}
@@ -61,7 +82,6 @@ const GoodsTracking = () => {
           </div>
         </div>
 
-
         <div className="operations-gt-filters">
           {["all", "open", "closed", "cancelled", "draft"].map((status) => (
             <button
@@ -73,7 +93,6 @@ const GoodsTracking = () => {
             </button>
           ))}
         </div>
-
 
         <div className="operation_table_container">
           <div className="operations-gt-table">
@@ -112,7 +131,6 @@ const GoodsTracking = () => {
           </div>
         </div>
 
-
         <div className="action-buttons">
           <button className="view-btn">Edit</button>
           <button className="create-btn" onClick={handleCreate}>Create</button>
@@ -121,6 +139,5 @@ const GoodsTracking = () => {
     </div>
   );
 };
-
 
 export default GoodsTracking;
