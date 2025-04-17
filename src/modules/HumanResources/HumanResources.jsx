@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./styles/HumanResources.css";
+import Calendar from "./components/Calendar"; // Add this line
 
 const HRDashboard = () => {
   // State for fetched data
@@ -94,11 +95,6 @@ const HRDashboard = () => {
     
     fetchData();
   }, []);
-
-  const interviewsToday = [
-    { name: "Miranda Kerr", time: "10:30–11:30 AM" },
-    { name: "Jack Acosta", time: "12:00–01:00 PM" },
-  ];
 
   return (
     <div className="hr">
@@ -194,20 +190,8 @@ const HRDashboard = () => {
               </div>
 
               <div className="hr-interview-calendar">
-                <h3><strong>Interviews</strong></h3>
-                <div className="hr-calendar-box">
-                  <p>[Calendar Component Here]</p>
-                </div>
-                <div className="hr-interviews-today">
-                  <h4>Today</h4>
-                  {interviewsToday.map((int, idx) => (
-                    <div key={idx} className="hr-interview-item">
-                      <span className="hr-tag">Job Interview</span>
-                      <span>{int.name}</span>
-                      <span>{int.time}</span>
-                    </div>
-                  ))}
-                </div>
+                <h3><strong>Calendar</strong></h3>
+                <Calendar />
               </div>
             </div>
 

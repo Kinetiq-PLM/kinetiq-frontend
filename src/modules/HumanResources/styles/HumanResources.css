@@ -35,7 +35,6 @@
   padding: 1rem 0;
   margin: 0;
   margin-bottom: 1.5rem;
-  z-index: 10;
   font-size: 1.75rem;
 }
 
@@ -184,13 +183,24 @@
 }
 
 .hr-leave-requests-table {
-  max-height: 250px;
-  overflow-y: auto;
+  height: 200px; /* Match the performance table height */
+  overflow-y: auto; /* Keep scrolling at container level */
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-top: 0.5rem;
 }
 
 .hr-leave-requests-table table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
+}
+
+.hr-leave-requests-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #f3f9fa;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
 }
 
 .hr-leave-requests-table th,
@@ -200,11 +210,34 @@
   text-align: left;
 }
 
-.hr-leave-requests-table select {
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background-color: white;
+/* Update scrollbar styling to match performance table */
+.hr-leave-requests-table::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-leave-requests-table::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-leave-requests-table::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Add these scrollbar styles for the leave requests table */
+.hr-leave-requests-table::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-leave-requests-table::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-leave-requests-table::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* Scrollable dashboard content */
@@ -228,7 +261,6 @@
   background-color: #f3f9fa;
   position: sticky;
   top: 0;
-  /* z-index: 1; */
 }
 /* Leave type tags */
 .hr-tag.sick {
@@ -306,7 +338,6 @@
 .hr-performance-table-container thead {
   position: sticky;
   top: 0;
-  z-index: 2;
   background-color: #f3f9fa;
   box-shadow: 0 1px 0 rgba(0,0,0,0.1);
 }
