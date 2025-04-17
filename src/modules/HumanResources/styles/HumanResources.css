@@ -115,10 +115,9 @@
   padding: 1.25rem;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  height: 250px;
-  overflow-y: auto;
+  height: auto; /* Changed from fixed height */
+  overflow-y: visible; /* Changed from auto to remove scrollbar */
   border: 1px solid #cdcdcd;
-
 }
 
 .hr-candidates-section table {
@@ -291,17 +290,17 @@
 
 /* Performance table scrollable styling */
 .hr-performance-table-container {
-  display: flex;
-  flex-direction: column;
   height: 200px; /* Keep fixed height for the container */
-  overflow: hidden; /* Prevent outer scrollbar */
+  overflow-y: auto; /* Keep scrolling at container level */
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-top: 0.5rem;
 }
 
 .hr-performance-table-container table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  table-layout: fixed;
+  border-collapse: collapse;
+  table-layout: auto;
 }
 
 .hr-performance-table-container thead {
@@ -309,27 +308,21 @@
   top: 0;
   z-index: 2;
   background-color: #f3f9fa;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
 }
 
-.hr-performance-tbody {
-  display: block;
-  overflow-y: auto;
-  height: 100%; /* Fill available height instead of max-height */
-  width: 100%;
-}
-
-/* Scrollbar styling for performance table */
-.hr-performance-tbody::-webkit-scrollbar {
+/* Keep scrollbar styling only on the container */
+.hr-performance-table-container::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-.hr-performance-tbody::-webkit-scrollbar-thumb {
+.hr-performance-table-container::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.15);
   border-radius: 4px;
 }
 
-.hr-performance-tbody::-webkit-scrollbar-track {
+.hr-performance-table-container::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
