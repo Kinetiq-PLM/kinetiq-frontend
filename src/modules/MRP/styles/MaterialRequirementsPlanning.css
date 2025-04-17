@@ -295,6 +295,11 @@
     padding: 0rem;
   }
 
+  .reqplan .search-container{
+    align-items: stretch ;
+    width: 100%;
+  }
+
 }
 
 @media (max-width: 645px) {
@@ -413,5 +418,130 @@
   .reqplan .modal-inner div[style="position: 'absolute'"] {
     font-size: 14px !important;
     padding: 4px 6px !important;
+  }
+}
+
+
+.reqplan-table-scroll2::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+
+.reqplan-table-scroll2::-webkit-scrollbar-thumb:hover {
+  background-color: #008080;
+}
+
+.reqplan-table-scroll2::-webkit-scrollbar-track {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+
+.reqplan .reqplan-table-scroll::-webkit-scrollbar,
+.reqplan .reqplan-table-scroll2::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.reqplan .reqplan-table-scroll::-webkit-scrollbar-thumb,
+.reqplan .reqplan-table-scroll2::-webkit-scrollbar-thumb {
+  background-color: #00A8A8;
+  border-radius: 4px;
+}
+
+.reqplan .reqplan-table-scroll::-webkit-scrollbar-thumb:hover,
+.reqplan .reqplan-table-scroll2::-webkit-scrollbar-thumb:hover {
+  background-color: #008080;
+}
+
+.reqplan .reqplan-table-scroll::-webkit-scrollbar-track,
+.reqplan .reqplan-table-scroll2::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.reqplan-help-wrapper {
+  position: fixed;
+  bottom: 2.5rem; 
+  right: 2.5rem;  
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.reqplan-help-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #00A8A8;
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.reqplan-help-button:hover {
+  background-color: #008080;
+}
+
+.reqplan-help-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.reqplan-help-option {
+  background: white;
+  color: #00A8A8;
+  border: 1px solid #00A8A8;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-family: 'Inter';
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.reqplan-help-option:hover {
+  background: #00A8A8;
+  color: white;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .reqplan-help-wrapper {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .reqplan-help-button {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .reqplan-help-option {
+    font-size: 13px;
+    padding: 0.4rem 0.8rem;
   }
 }
