@@ -422,26 +422,27 @@ const handleSendTo = async () => {
 
   return (
     <div className="purchquoteform">
-    <div className="body-content-container">
-      <div className="purchquoteform-header">
-        <button className="purchquoteform-back" onClick={onClose}>← Back</button>
-        <h2 className="purchquoteform-title">Request For Quotation Form</h2>
-        {formData.status === "Pending" || formData.status === "Rejected" ? (
-        <button
-          className="purchquoteform-send"
-          onClick={handleAddToList}
-        >
-          Add to List
-        </button>
-      ) : (
-        <button
-        className="purchquoteform-send"
-          onClick={() => setIsPopupVisible(true)} // Just show popup first
->
-          Send To
-        </button>
-      )}
-      </div>
+      <div className="purchquoteform-scrollable-wrapper">
+        <div className="body-content-container">
+          <div className="purchquoteform-header">
+            <button className="purchquoteform-back" onClick={onClose}>← Back</button>
+            <h2 className="purchquoteform-title">Request For Quotation Form</h2>
+            {formData.status === "Pending" || formData.status === "Rejected" ? (
+              <button
+                className="purchquoteform-send"
+                onClick={handleAddToList}
+              >
+                Add to List
+              </button>
+            ) : (
+              <button
+                className="purchquoteform-send"
+                onClick={() => setIsPopupVisible(true)}
+              >
+                Send To
+              </button>
+            )}
+          </div>
 
           <div className="purchquoteform-content">
             <div className="purchquoteform-grid">
@@ -758,7 +759,8 @@ const handleSendTo = async () => {
           </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
   export default PurchForQuotForm;

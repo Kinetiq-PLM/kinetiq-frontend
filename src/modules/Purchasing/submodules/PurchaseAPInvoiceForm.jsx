@@ -144,170 +144,172 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
 
     return (
         <div className="purchase-ap-invoice-form">
-            <div className="purchase-ap-invoice-form-body-content-container">
-                {/* Header Section */}
-                <div className="purchase-ap-invoice-header">
-                    <button className="purchase-ap-invoice-back-btn" onClick={handleBack}>← Back</button>
-                    <h1>Purchase Invoice</h1>
-                </div>
+            <div className="purchase-ap-invoice-scrollable-wrapper">
+                <div className="purchase-ap-invoice-form-body-content-container">
+                    {/* Header Section */}
+                    <div className="purchase-ap-invoice-header">
+                        <button className="purchase-ap-invoice-back-btn" onClick={handleBack}>← Back</button>
+                        <h1>Purchase Invoice</h1>
+                    </div>
 
-                {/* Main Content */}
-                <div className="purchase-ap-invoice-content">
-                    {loading ? (
-                        <p>Loading...</p>
-                    ) : error ? (
-                        <p className="error-message">{error}</p>
-                    ) : fetchedData ? (
-                        <>
-                            {/* Company Logo and Details Section */}
-                            <div className="purchase-ap-invoice-company-section">
-                                <div className="purchase-ap-invoice-logo">
-                                    <img src="../images/kinetiq.png" alt="Kinetiq Logo" />
+                    {/* Main Content */}
+                    <div className="purchase-ap-invoice-content">
+                        {loading ? (
+                            <p>Loading...</p>
+                        ) : error ? (
+                            <p className="error-message">{error}</p>
+                        ) : fetchedData ? (
+                            <>
+                                {/* Company Logo and Details Section */}
+                                <div className="purchase-ap-invoice-company-section">
+                                    <div className="purchase-ap-invoice-logo">
+                                        <img src="../images/kinetiq.png" alt="Kinetiq Logo" />
+                                    </div>
+                                    <div className="purchase-ap-invoice-details">
+                                        <div className="purchase-ap-invoice-info">
+                                            <label>Status</label>
+                                            <span>{fetchedData.status || "N/A"}</span>
+                                        </div>
+                                        <div className="purchase-ap-invoice-info">
+                                            <label>Invoice No.</label>
+                                            <span>{fetchedData.document_no || "N/A"}</span>
+                                        </div>
+                                        <div className="purchase-ap-invoice-info">
+                                            <label>Invoice Date</label>
+                                            <span>{fetchedData.document_date || "N/A"}</span>
+                                        </div>
+                                        <div className="purchase-ap-invoice-info">
+                                            <label>Due</label>
+                                            <span>{fetchedData.due_date || "N/A"}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="purchase-ap-invoice-details">
-                                    <div className="purchase-ap-invoice-info">
-                                        <label>Status</label>
-                                        <span>{fetchedData.status || "N/A"}</span>
-                                    </div>
-                                    <div className="purchase-ap-invoice-info">
-                                        <label>Invoice No.</label>
-                                        <span>{fetchedData.document_no || "N/A"}</span>
-                                    </div>
-                                    <div className="purchase-ap-invoice-info">
-                                        <label>Invoice Date</label>
-                                        <span>{fetchedData.document_date || "N/A"}</span>
-                                    </div>
-                                    <div className="purchase-ap-invoice-info">
-                                        <label>Due</label>
-                                        <span>{fetchedData.due_date || "N/A"}</span>
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* From and To Section */}
-                            <div className="purchase-ap-invoice-addresses">
-                                <div className="purchase-ap-invoice-from">
-                                    <h3>From</h3>
-                                    <h2>{purchaseQuotationData?.vendor_code || "N/A"}</h2>
-                                    <p>SoftwareTech.com</p>
-                                    <p>8970678878898</p>
-                                    <p>LA, U.S</p>
-                                </div>
-                                <div className="purchase-ap-invoice-to">
-                                    <div>
-                                        <h3>Bill To</h3>
-                                        <h2></h2>
-                                        <p>{purchaseQuotationData?.[0]?.delivery_loc || fetchedData.delivery_loc || "N/A"}</p>
+                                {/* From and To Section */}
+                                <div className="purchase-ap-invoice-addresses">
+                                    <div className="purchase-ap-invoice-from">
+                                        <h3>From</h3>
+                                        <h2>{purchaseQuotationData?.vendor_code || "N/A"}</h2>
                                         <p>SoftwareTech.com</p>
                                         <p>8970678878898</p>
                                         <p>LA, U.S</p>
-                                        <p>Track #: RO123456789</p>
                                     </div>
-                                    <div>
-                                        <h3>Ship To</h3>
-                                        <p>{purchaseQuotationData?.[0]?.delivery_loc || fetchedData.delivery_loc || "N/A"}</p>
-                                        <p>Track #: RO123456789</p>
+                                    <div className="purchase-ap-invoice-to">
+                                        <div>
+                                            <h3>Bill To</h3>
+                                            <h2></h2>
+                                            <p>{purchaseQuotationData?.[0]?.delivery_loc || fetchedData.delivery_loc || "N/A"}</p>
+                                            <p>SoftwareTech.com</p>
+                                            <p>8970678878898</p>
+                                            <p>LA, U.S</p>
+                                            <p>Track #: RO123456789</p>
+                                        </div>
+                                        <div>
+                                            <h3>Ship To</h3>
+                                            <p>{purchaseQuotationData?.[0]?.delivery_loc || fetchedData.delivery_loc || "N/A"}</p>
+                                            <p>Track #: RO123456789</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Items Table */}
-                            <div className="purchase-ap-invoice-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Item No.</th>
-                                            <th>Material/Asset ID</th>
-                                            <th>Material/Asset Name</th>
-                                            <th>Unit Price</th>
-                                            <th>Purchase Quantity</th>
-                                            
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {fetchedData?.items?.length > 0 ? (
-                                            fetchedData.items.map((item, index) => (
-                                                <tr key={index}>
-                                                    <td>{index + 1}</td>
-                                                    <td>{item.material_id || item.asset_id || "N/A"}</td>
-                                                    <td>{item.material_name || item.asset_name || "N/A"}</td>
-                                                    <td>{item.unit_price || "N/A"}</td>
-                                                    <td>{item.purchase_quantity || "N/A"}</td>
-                                                    
-                                                </tr>
-                                            ))
-                                        ) : (
+                                {/* Items Table */}
+                                <div className="purchase-ap-invoice-table">
+                                    <table>
+                                        <thead>
                                             <tr>
-                                                <td colSpan="6">No items found</td>
+                                                <th>Item No.</th>
+                                                <th>Material/Asset ID</th>
+                                                <th>Material/Asset Name</th>
+                                                <th>Unit Price</th>
+                                                <th>Purchase Quantity</th>
+                                                
                                             </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            {fetchedData?.items?.length > 0 ? (
+                                                fetchedData.items.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{item.material_id || item.asset_id || "N/A"}</td>
+                                                        <td>{item.material_name || item.asset_name || "N/A"}</td>
+                                                        <td>{item.unit_price || "N/A"}</td>
+                                                        <td>{item.purchase_quantity || "N/A"}</td>
+                                                        
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="6">No items found</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                            {/* Payment and Total Section */}
-                            <div className="purchase-ap-invoice-summary">
-                                <div className="purchase-ap-invoice-payment">
-                                    <h3>Payment Instruction</h3>
-                                    <div className="payment-details">
-                                        <p>Kinetiq</p>
-                                        <p>Bank name: Kinetiq Bank</p>
-                                        <p>Account Number: 1234567</p>
-                                        <p>Ref. Number: {fetchedData.content_id || "N/A"}</p>
-                                        <p>Routing: 1234567</p>
-                                        <p>Tax Code: 1234567</p>
+                                {/* Payment and Total Section */}
+                                <div className="purchase-ap-invoice-summary">
+                                    <div className="purchase-ap-invoice-payment">
+                                        <h3>Payment Instruction</h3>
+                                        <div className="payment-details">
+                                            <p>Kinetiq</p>
+                                            <p>Bank name: Kinetiq Bank</p>
+                                            <p>Account Number: 1234567</p>
+                                            <p>Ref. Number: {fetchedData.content_id || "N/A"}</p>
+                                            <p>Routing: 1234567</p>
+                                            <p>Tax Code: 1234567</p>
+                                        </div>
+                                    </div>
+                                    <div className="purchase-ap-invoice-totals">
+                                        <div className="total-row">
+                                            <span>Subtotal:</span>
+                                            <span>{purchaseQuotationData?.[0]?.total_before_discount || fetchedData.total_before_discount || "N/A"}</span>
+                                        </div>
+                                        <div className="total-row">
+                                            <span>Discount (20%):</span>
+                                            <span>{purchaseQuotationData?.[0]?.discount_percent || fetchedData.discount_percent || "N/A"}</span>
+                                        </div>
+                                        <div className="total-row">
+                                            <span>Downpayment Rate:</span>
+                                            <span>{fetchedData.dpm_rate || "N/A"}</span>
+                                        </div>
+                                        <div className="total-row">
+                                            <span>Total Downpayment:</span>
+                                            <span>{purchaseQuotationData?.[0]?.downpayment_request || fetchedData.downpayment_request || "N/A"}</span>
+                                        </div>
+                                        <div className="total-row">
+                                            <span>Shipping Cost:</span>
+                                            <span>{purchaseQuotationData?.[0]?.freight || fetchedData.freight || "N/A"}</span>
+                                        </div>
+                                        <div className="total-row">
+                                            <span>Tax Amount:</span>
+                                            <span>{purchaseQuotationData?.[0]?.tax || fetchedData.tax || "N/A"}</span>
+                                        </div>
+                                        <div className="total-row">
+                                            <span>Total:</span>
+                                            <span>{purchaseQuotationData?.[0]?.total_payment || fetchedData.total_payment || "N/A"}</span>
+                                        </div>
+                                        <div className="total-row">
+                                            <span>Amount Paid:</span>
+                                            <span>{fetchedData.applied_amount}</span>
+                                        </div>
+                                        <div className="total-row">
+                                            <span>Credit Balance:</span>
+                                            <span>{fetchedData.credit_balance || "N/A"}</span>
+                                        </div>
+                                        <div className="total-row balance-due">
+                                            <span>Balance Due:</span>
+                                            <span>{balanceDue >= 0 ? balanceDue : "Invalid Amount"}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="purchase-ap-invoice-totals">
-                                    <div className="total-row">
-                                        <span>Subtotal:</span>
-                                        <span>{purchaseQuotationData?.[0]?.total_before_discount || fetchedData.total_before_discount || "N/A"}</span>
-                                    </div>
-                                    <div className="total-row">
-                                        <span>Discount (20%):</span>
-                                        <span>{purchaseQuotationData?.[0]?.discount_percent || fetchedData.discount_percent || "N/A"}</span>
-                                    </div>
-                                    <div className="total-row">
-                                        <span>Downpayment Rate:</span>
-                                        <span>{fetchedData.dpm_rate || "N/A"}</span>
-                                    </div>
-                                    <div className="total-row">
-                                        <span>Total Downpayment:</span>
-                                        <span>{purchaseQuotationData?.[0]?.downpayment_request || fetchedData.downpayment_request || "N/A"}</span>
-                                    </div>
-                                    <div className="total-row">
-                                        <span>Shipping Cost:</span>
-                                        <span>{purchaseQuotationData?.[0]?.freight || fetchedData.freight || "N/A"}</span>
-                                    </div>
-                                    <div className="total-row">
-                                        <span>Tax Amount:</span>
-                                        <span>{purchaseQuotationData?.[0]?.tax || fetchedData.tax || "N/A"}</span>
-                                    </div>
-                                    <div className="total-row">
-                                        <span>Total:</span>
-                                        <span>{purchaseQuotationData?.[0]?.total_payment || fetchedData.total_payment || "N/A"}</span>
-                                    </div>
-                                    <div className="total-row">
-                                        <span>Amount Paid:</span>
-                                        <span>{fetchedData.applied_amount}</span>
-                                    </div>
-                                    <div className="total-row">
-                                        <span>Credit Balance:</span>
-                                        <span>{fetchedData.credit_balance || "N/A"}</span>
-                                    </div>
-                                    <div className="total-row balance-due">
-                                        <span>Balance Due:</span>
-                                        <span>{balanceDue >= 0 ? balanceDue : "Invalid Amount"}</span>
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* Done Button */}
-                            <button className="purchase-ap-invoice-done-btn" onClick={handleDone}>Done</button>
-                        </>
-                    ) : (
-                        <p>No data available</p>
-                    )}
+                                {/* Done Button */}
+                                <button className="purchase-ap-invoice-done-btn" onClick={handleDone}>Done</button>
+                            </>
+                        ) : (
+                            <p>No data available</p>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,10 +1,9 @@
 .purchreq { 
   display: flex;
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 
-/* Body container that holds all the content */
 .purchreq-body-content-container {
   width: 100%;
     height: 100%;
@@ -20,22 +19,28 @@
     min-height: 30rem;
 }
 
-/* Header section containing the back button & search bar */
 .purchreq-header {
   display: flex;
   justify-content: space-between;
-  width: 100%;
   align-items: center;
   margin-bottom: 1rem;
+  gap: 1rem;
+  width: 100%;
 }
 
-/* Back button styling */
+.purchreq-header-left {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .purchreq-back-btn {
+  padding: 0.5rem 1rem;
   border: none;
   background: none;
-  color: #666;
-  font-size: 0.9rem;
   cursor: pointer;
+  font-size: 0.9rem;
+  color: #666;
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -46,158 +51,110 @@
   color: #00A8A8;
 }
 
-/* Search input field */
 .purchreq-search {
-  border: 1px solid #ddd;
-  border-radius: 1rem;
   padding: 0.5rem 1rem;
-  width: 20rem;
-  outline: none;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  width: 300px;
 }
 
-/* Table container */
 .purchreq-table-container {
-  width: 100%;
+  flex: 1;
   background: white;
+  border: 1px solid #D2D2D2;
   border-radius: 0.5rem;
   padding: 1rem;
-  border: 1px solid #D2D2D2;
-  
-  /* Ensuring table maintains consistent layout */
-  min-height: 35rem;
-  max-height: 20rem;
-  overflow-y: auto; /* Enables scrolling */
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-/* Table styles */
+.purchreq-table-scrollable {
+  width: 100%;
+  max-height: 50vh;
+  overflow-x: auto;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd #f5f5f5;
+}
+
 .purchreq-table {
+  flex: 1;
+  border-radius: 0.25rem;
+  overflow: hidden;
   width: 100%;
   border-collapse: collapse;
+  background: white;
 }
 
-.purchreq-table th, 
-.purchreq-table td {
-  border-bottom: 1px solid #ddd;
-  padding: 10px;
+.purchreq-table-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  font-weight: 500;
+  color: #666;
+}
+
+.purchreq-table-header > div {
   text-align: center;
 }
 
-/* Table header */
-.purchreq-table th {
-  background-color: #f8f8f8;
-  font-weight: bold;
+.purchreq-table-rows {
+  display: flex;
+  flex-direction: column;
 }
 
-/* No results found message */
+.purchreq-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.purchreq-row:hover {
+  background: #f5fcfc;
+}
+
+.purchreq-checkbox {
+  display: flex;
+  justify-content: center;
+}
+
 .purchreq-no-results {
   text-align: center;
   font-size: 1rem;
   font-weight: bold;
   padding: 10px;
-  color: #00A8A8;
+  grid-column: 1 / -1;
 }
 
-/* Custom checkbox styling */
-.purchreq-table input[type="checkbox"] {
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #00A8A8;
-  border-radius: 4px;
-  cursor: pointer;
-  position: relative;
-}
-
-/* Checked checkbox styling */
-.purchreq-table input[type="checkbox"]:checked {
-  background-color: #00A8A8;
-  border-color: #00A8A8;
-}
-
-/* Checkmark icon when checked */
-.purchreq-table input[type="checkbox"]:checked::after {
-  content: "✔";
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.purchreq-new-btn {
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 0.25rem;
-  background-color: #00bcd4;
-  color: white;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.purchreq-new-btn:hover {
-  background-color: #00A8A8;
-}
-
-/* Button container at the bottom */
-.purchreq-button-container {
+.purchreq-footer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   margin-top: 1rem;
 }
 
-/* Common button styles */
-.purchreq-new-form,
-.purchreq-load-more,
-.purchreq-send-to {
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-/* New Form button */
 .purchreq-new-form {
-  background-color: #00A8A8;
-  color: white;
+  padding: 0.5rem 1.2rem;
+  background: #00A8A8;
+  color: #fff;
   border: none;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
 .purchreq-new-form:hover {
-  background-color: #008080;
-}
-
-/* Send to button */
-.purchreq-send-to {
-  background-color: #00A8A8;
-  color: white;
-  border: none;
-}
-
-.purchreq-send-to:hover {
-  background-color: #4d4d4d;
-}
-
-/* Load more button */
-.purchreq-load-more {
-  background-color: white;
-  color: #00A8A8;
-  border: 1px solid #00A8A8;
-}
-
-.purchreq-load-more:hover {
-  background-color: #f0f0f0;
-}
-
-.purchreq-item {
-  transition: background-color 0.2s ease;
-}
-
-.purchreq-item:hover {
-  background-color: rgba(0, 168, 168, 0.05);
-  cursor: pointer;
+  background: #008080;
 }

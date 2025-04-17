@@ -21,18 +21,23 @@ const PurchaseCredMemoBody = () => {
     "Last 3 days",
     "Last 1 day"
   ];
-
   const statusOptions = [
     "All",
     "Approved",
     "Pending",
-    "Rejected",
-    "Paid"
+    "Completed",
+    "Rejected"
   ];
 
   const handleNewForm = () => setShowForm(true);
   const handleCompare = () => alert("Compare feature not implemented yet.");
   const handleSendTo = () => alert("Send To feature not implemented yet.");
+
+  // Add back button handler to toggle dashboard
+  const handleBackToDashboard = () => {
+    const event = new CustomEvent('purchasing-back-to-dashboard');
+    window.dispatchEvent(event);
+  };
 
   useEffect(() => {
     const fetchCreditMemos = async () => {
@@ -65,7 +70,13 @@ const PurchaseCredMemoBody = () => {
 
     // Status filter
     if (selectedStatus !== "All") {
-      result = result.filter(memo => memo.status === selectedStatus);
+      result = result.filter(memo => {
+        if (selectedStatus === "Completed") {
+          // Completed: status is 'Completed'
+          return memo.status === "Completed";
+        }
+        return memo.status === selectedStatus;
+      });
     }
 
     // Search filter
@@ -105,7 +116,7 @@ const PurchaseCredMemoBody = () => {
       ) : (
         <div className="credmemo-body-content-container">
           <div className="credmemo-header">
-            <button className="credmemo-back">← Back</button>
+            <button className="credmemo-back" onClick={handleBackToDashboard}>← Back</button>
             <div className="credmemo-filters" style={{ marginLeft: 'auto' }}>
               <div className="credmemo-date-filter">
                 <div 
@@ -161,16 +172,15 @@ const PurchaseCredMemoBody = () => {
           </div>
 
           <div className="credmemo-content">
-            <div className="credmemo-table">
-              <div className="credmemo-table-header">
-                <div className="credmemo-checkbox"><input type="checkbox" /></div>
-                <div>Credit Memo</div>
-                <div>Ref: Purchase Order</div>
-                <div>Status</div>
-                <div>Document Date</div>
-                <div>Due Date</div>
-              </div>
-
+            <div className="credmemo-table-header">
+              <div className="credmemo-checkbox"><input type="checkbox" /></div>
+              <div>Credit Memo</div>
+              <div>Ref: Purchase Order</div>
+              <div>Status</div>
+              <div>Document Date</div>
+              <div>Due Date</div>
+            </div>
+            <div className="credmemo-table-scrollable">
               <div className="credmemo-table-rows">
                 {filteredMemos.length > 0 ? filteredMemos.map((memo) => (
                   <div key={memo.id} className="credmemo-row" onClick={() => setSelectedMemo(memo)}>

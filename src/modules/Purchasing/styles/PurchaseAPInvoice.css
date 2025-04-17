@@ -1,7 +1,72 @@
 .apinvoice {
     display: flex;
     width: 100%;
-    height: auto;
+    height: 100%;
+}
+
+.apinvoice .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+}
+
+.apinvoice-table-scrollable {
+    width: 100%;
+  max-height: 50vh;
+  overflow-x: auto;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd #f5f5f5;
+}
+
+.apinvoice-table-header {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-weight: 400;
+    color: #666;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    align-items: center;
+}
+
+.apinvoice-table-header > div {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.apinvoice-table-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.apinvoice-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.apinvoice-row > div {
+    text-align: center;
 }
 
 .apinvoice-table-header > div:last-child,
@@ -27,21 +92,6 @@
 
 .apinvoice-edit-button:hover {
   background-color: #e0e0e0;
-}
-  
-.apinvoice .body-content-container {
-    width: 100%;
-    height: 100%;
-    border-radius: 0.5rem;
-    background-color: white;
-    padding: 1rem;
-    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 40rem;
-    min-height: 30rem;
 }
 
 .apinvoice-header {
@@ -127,17 +177,20 @@
 }
 
 .apinvoice-filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.5rem 1rem;
-    border: 1px solid #00bcd4;
+    border: 1px solid #ddd;
     border-radius: 0.25rem;
-    color: #00bcd4;
+    color: black;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
+    min-width: 210px;
 }
 
 .apinvoice-filter-btn:hover {
-    border-color: #00A8A8;
-    color: #00A8A8;
     background-color: rgba(0, 168, 168, 0.05);
 }
 
@@ -150,52 +203,20 @@
 
 .apinvoice-content {
     flex: 1;
-    background: white;
-    border: 1px solid #D2D2D2;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    margin: 1rem 0;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+  background: white;
+  border: 1px solid #D2D2D2;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .apinvoice-table {
     flex: 1;
     border-radius: 0.25rem;
     overflow: hidden;
-}
-
-.apinvoice-table-header {
-    display: grid;
-    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: white;
-    border-bottom: 1px solid white;
-    font-weight: 500;
-}
-
-.apinvoice-table-header > div {
-    text-align: center;
-}
-
-.apinvoice-table-rows {
-    display: flex;
-    flex-direction: column;
-}
-
-.apinvoice-row {
-    display: grid;
-    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
-    gap: 1rem;
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-    align-items: center;
-}
-
-.apinvoice-row > div {
-    text-align: center;
 }
 
 .apinvoice-row:hover {
@@ -206,7 +227,8 @@
 .status-closed,
 .status-open,
 .status-cancelled,
-.status-draft {
+.status-draft,
+.status-complete {
     padding: 0.25rem 0.75rem;
     border-radius: 1rem;
     font-size: 0.9rem;
@@ -231,6 +253,84 @@
 .status-draft {
     background-color: #fff3e0;
     color: #f57c00;
+}
+
+.status-complete {
+    background-color: #c8e6c9;
+    color: #388e3c;
+}
+
+.status-approved,
+.status-pending,
+.status-rejected,
+.status-completed {
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 0.85em;
+  font-weight: normal;
+  display: inline-block;
+}
+
+.status-approved {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.status-pending {
+  color: #856404;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+}
+
+.status-rejected {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.status-completed {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+}
+
+.apinvoice-status-filter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.status-options-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 210px;
+}
+
+.status-option {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.status-option:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    color: #00A8A8;
+}
+
+.status-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
 }
 
 .apinvoice .apinvoice-footer {

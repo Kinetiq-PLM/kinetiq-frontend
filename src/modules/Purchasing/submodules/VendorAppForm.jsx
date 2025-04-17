@@ -120,221 +120,223 @@ const VendorAppForm = () => {
 
     return (
         <div className="vendorappform">
-            <div className="body-content-container">
-                <div className="vendorappform-header">
-                    <button className="vendorappform-back">Back</button>
-                    <h2 className="vendorappform-title">Vendor Application Form</h2>
-                    <button className="vendorappform-copy">Copy To</button>
-                </div>
-
-                <div className="vendorappform-content">
-                    {/* Company Info */}
-                    <div className="vendorappform-company-info">
-                        <div className="vendorappform-company-details">
-                            <h3 className="vendorappform-company-name">COMPANY NAME</h3>
-                            <div className="vendorappform-address">
-                                <div>Address</div>
-                                <div>Address</div>
-                            </div>
-                        </div>
-                        <div className="vendorappform-logo">
-                            <img src="../images/kinetiq.png" alt="Kinetiq Logo" />
-                        </div>
+            <div className="vendorappform-scrollable-wrapper">
+                <div className="body-content-container">
+                    <div className="vendorappform-header">
+                        <button className="vendorappform-back">Back</button>
+                        <h2 className="vendorappform-title">Vendor Application Form</h2>
+                        <button className="vendorappform-copy">Copy To</button>
                     </div>
 
-                    {/* Vendor Info */}
-                    <div className="vendorappform-vendor-info">
-                        <h3 className="vendorappform-section-title">VENDOR INFORMATION</h3>
-                        <div className="vendorappform-grid">
-                            {[ 
-                                { label: "Company Name", name: "company_name" },
-                                { label: "Vendor Name", name: "vendor_name" },
-                                { label: "Tax No.", name: "tax_number" },
-                                { label: "Vendor Address", name: "vendor_address" },
-                                { label: "Contact Person", name: "contact_person" },
-                                { label: "Fax", name: "fax" },
-                                { label: "Title", name: "title" },
-                                { label: "Vendor Email", name: "vendor_email", type: "email" },
-                                { label: "Phone", name: "phone", type: "tel" },
-                                { label: "Vendor Website", name: "vendor_website", type: "url" },
-                            ].map(({ label, name, type = "text" }) => (
-                                <div className="form-group" key={name}>
-                                    <label>{label}</label>
-                                    <input
-                                        type={type}
-                                        name={name}
-                                        value={formData[name] || ""}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                            ))}
-                            <div className="form-group">
-                                <label>Tax Exempt</label>
-                                <input
-                                    type="checkbox"
-                                    name="tax_exempt"
-                                    checked={formData.tax_exempt}
-                                    onChange={handleInputChange}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Org Type */}
-                    <div className="vendorappform-org-type">
-                        <h3 className="vendorappform-section-title">ORGANIZATION TYPE</h3>
-                        <div className="org-type-dropdown">
-                            <button
-                                type="button"
-                                className="org-type-toggle"
-                                onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
-                            >
-                                {formData.organization_type
-                                    ? formData.organization_type.charAt(0).toUpperCase() +
-                                      formData.organization_type.slice(1).replace("_", " ")
-                                    : "Select organization type"}
-                                <span className="dropdown-arrow">{orgDropdownOpen ? "▲" : "▼"}</span>
-                            </button>
-                            {orgDropdownOpen && (
-                                <div className="org-type-options">
-                                    {["Corporation", "LLC", "Partnership", "Nonprofit"].map((type) => (
-                                        <div
-                                            key={type}
-                                            className={`org-type-option ${formData.organization_type === type ? "selected" : ""}`}
-                                            onClick={() => {
-                                                handleOrgTypeChange(type);
-                                                setOrgDropdownOpen(false);
-                                            }}
-                                        >
-                                            {type.charAt(0).toUpperCase() + type.slice(1)}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Checks and Card */}
-                    <div className="vendorappform-bottom">
-                        <div className="vendorappform-checks">
-                            <div className="check-group">
-                                <h4>Separate Checks?</h4>
-                                <div className="radio-group">
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="separate_checks"
-                                            checked={formData.separate_checks}
-                                            onChange={() =>
-                                                setFormData((prev) => ({
-                                                    ...prev,
-                                                    separate_checks: true,
-                                                }))
-                                            }
-                                        />
-                                        Yes
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="separate_checks"
-                                            checked={!formData.separate_checks}
-                                            onChange={() =>
-                                                setFormData((prev) => ({
-                                                    ...prev,
-                                                    separate_checks: false,
-                                                }))
-                                            }
-                                        />
-                                        No
-                                    </label>
+                    <div className="vendorappform-content">
+                        {/* Company Info */}
+                        <div className="vendorappform-company-info">
+                            <div className="vendorappform-company-details">
+                                <h3 className="vendorappform-company-name">COMPANY NAME</h3>
+                                <div className="vendorappform-address">
+                                    <div>Address</div>
+                                    <div>Address</div>
                                 </div>
                             </div>
-
-                            <div className="check-group">
-                                <h4>Accept Purchasing Card?</h4>
-                                <div className="radio-group">
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="purchasing_card"
-                                            checked={formData.purchasing_card}
-                                            onChange={() =>
-                                                setFormData((prev) => ({
-                                                    ...prev,
-                                                    purchasing_card: true,
-                                                }))
-                                            }
-                                        />
-                                        Yes
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="purchasing_card"
-                                            checked={!formData.purchasing_card}
-                                            onChange={() =>
-                                                setFormData((prev) => ({
-                                                    ...prev,
-                                                    purchasing_card: false,
-                                                }))
-                                            }
-                                        />
-                                        No
-                                    </label>
-                                </div>
+                            <div className="vendorappform-logo">
+                                <img src="../images/kinetiq.png" alt="Kinetiq Logo" />
                             </div>
                         </div>
 
-                        {/* Banking Info */}
-                        <div className="vendorappform-banking">
-                            <h4>BANKING INFORMATION:</h4>
-                            <div className="banking-inputs">
-                                {["account_no", "routing_no"].map((name) => (
+                        {/* Vendor Info */}
+                        <div className="vendorappform-vendor-info">
+                            <h3 className="vendorappform-section-title">VENDOR INFORMATION</h3>
+                            <div className="vendorappform-grid">
+                                {[ 
+                                    { label: "Company Name", name: "company_name" },
+                                    { label: "Vendor Name", name: "vendor_name" },
+                                    { label: "Tax No.", name: "tax_number" },
+                                    { label: "Vendor Address", name: "vendor_address" },
+                                    { label: "Contact Person", name: "contact_person" },
+                                    { label: "Fax", name: "fax" },
+                                    { label: "Title", name: "title" },
+                                    { label: "Vendor Email", name: "vendor_email", type: "email" },
+                                    { label: "Phone", name: "phone", type: "tel" },
+                                    { label: "Vendor Website", name: "vendor_website", type: "url" },
+                                ].map(({ label, name, type = "text" }) => (
                                     <div className="form-group" key={name}>
-                                        <label>{name === "account_no" ? "Account No." : "Routing No."}</label>
+                                        <label>{label}</label>
                                         <input
-                                            type="text"
+                                            type={type}
                                             name={name}
-                                            value={formData[name]}
+                                            value={formData[name] || ""}
                                             onChange={handleInputChange}
                                         />
                                     </div>
                                 ))}
+                                <div className="form-group">
+                                    <label>Tax Exempt</label>
+                                    <input
+                                        type="checkbox"
+                                        name="tax_exempt"
+                                        checked={formData.tax_exempt}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        {/* Requestor Info */}
-                        <div className="vendorappform-requester">
-                            <div className="form-group">
-                                <label>Requestor</label>
-                                <input
-                                    type="text"
-                                    name="requestor"
-                                    value={formData.requestor}
-                                    onChange={handleInputChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Date Requested</label>
-                                <input
-                                    type="date"
-                                    name="date_requested"
-                                    value={formData.date_requested}
-                                    onChange={handleInputChange}
-                                />
+                        {/* Org Type */}
+                        <div className="vendorappform-org-type">
+                            <h3 className="vendorappform-section-title">ORGANIZATION TYPE</h3>
+                            <div className="org-type-dropdown">
+                                <button
+                                    type="button"
+                                    className="org-type-toggle"
+                                    onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
+                                >
+                                    {formData.organization_type
+                                        ? formData.organization_type.charAt(0).toUpperCase() +
+                                          formData.organization_type.slice(1).replace("_", " ")
+                                        : "Select organization type"}
+                                    <span className="dropdown-arrow">{orgDropdownOpen ? "▲" : "▼"}</span>
+                                </button>
+                                {orgDropdownOpen && (
+                                    <div className="org-type-options">
+                                        {["Corporation", "LLC", "Partnership", "Nonprofit"].map((type) => (
+                                            <div
+                                                key={type}
+                                                className={`org-type-option ${formData.organization_type === type ? "selected" : ""}`}
+                                                onClick={() => {
+                                                    handleOrgTypeChange(type);
+                                                    setOrgDropdownOpen(false);
+                                                }}
+                                            >
+                                                {type.charAt(0).toUpperCase() + type.slice(1)}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    </div>
 
-                    {/* Buttons */}
-                    <div className="button-container">
-                        <button className="cancel-btn" onClick={handleCancel}>
-                            Cancel
-                        </button>
-                        <button className="submit-btn" onClick={handleSubmit}>
-                            Submit
-                        </button>
+                        {/* Checks and Card */}
+                        <div className="vendorappform-bottom">
+                            <div className="vendorappform-checks">
+                                <div className="check-group">
+                                    <h4>Separate Checks?</h4>
+                                    <div className="radio-group">
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                name="separate_checks"
+                                                checked={formData.separate_checks}
+                                                onChange={() =>
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        separate_checks: true,
+                                                    }))
+                                                }
+                                            />
+                                            Yes
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                name="separate_checks"
+                                                checked={!formData.separate_checks}
+                                                onChange={() =>
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        separate_checks: false,
+                                                    }))
+                                                }
+                                            />
+                                            No
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="check-group">
+                                    <h4>Accept Purchasing Card?</h4>
+                                    <div className="radio-group">
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                name="purchasing_card"
+                                                checked={formData.purchasing_card}
+                                                onChange={() =>
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        purchasing_card: true,
+                                                    }))
+                                                }
+                                            />
+                                            Yes
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                name="purchasing_card"
+                                                checked={!formData.purchasing_card}
+                                                onChange={() =>
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        purchasing_card: false,
+                                                    }))
+                                                }
+                                            />
+                                            No
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Banking Info */}
+                            <div className="vendorappform-banking">
+                                <h4>BANKING INFORMATION:</h4>
+                                <div className="banking-inputs">
+                                    {["account_no", "routing_no"].map((name) => (
+                                        <div className="form-group" key={name}>
+                                            <label>{name === "account_no" ? "Account No." : "Routing No."}</label>
+                                            <input
+                                                type="text"
+                                                name={name}
+                                                value={formData[name]}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Requestor Info */}
+                            <div className="vendorappform-requester">
+                                <div className="form-group">
+                                    <label>Requestor</label>
+                                    <input
+                                        type="text"
+                                        name="requestor"
+                                        value={formData.requestor}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Date Requested</label>
+                                    <input
+                                        type="date"
+                                        name="date_requested"
+                                        value={formData.date_requested}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="button-container">
+                            <button className="cancel-btn" onClick={handleCancel}>
+                                Cancel
+                            </button>
+                            <button className="submit-btn" onClick={handleSubmit}>
+                                Submit
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

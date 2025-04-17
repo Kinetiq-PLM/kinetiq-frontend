@@ -3,7 +3,7 @@ import "../styles/PurchaseQuot.css";
 import PurchForQuotForm from "./PurchForQuotForm";
 import PurchaseOrdStat from "./PurchaseOrdStat"; // Import the PurchaseOrdStat component
 
-const PurchaseQuotBody = () => {
+const PurchaseQuotBody = ({ onBackToDashboard }) => {
     const [showDateDropdown, setShowDateDropdown] = useState(false);
     const [selectedDate, setSelectedDate] = useState("Last 30 days");
     const [searchTerm, setSearchTerm] = useState("");
@@ -70,7 +70,7 @@ const PurchaseQuotBody = () => {
             {view === "list" ? (
                 <div className="body-content-container">
                     <div className="purchquote-header">
-                        <button className="purchquote-back">← Back</button>
+                        <button className="purchquote-back" onClick={onBackToDashboard}>← Back</button>
                         <div className="purchquote-filters">
                             <div className="purchquote-date-filter">
                                 <div
@@ -106,32 +106,29 @@ const PurchaseQuotBody = () => {
                     </div>
 
                     <div className="purchquote-content">
-                        <div className="purchquote-table">
-                            <div className="purchquote-table-header">
-                                <div className="purchquote-column">Document No</div>
-                                <div className="purchquote-column">Quotation ID</div>
-                                <div className="purchquote-column">Status</div>
-                                <div className="purchquote-column">Document Date</div>
-                            </div>
-
+                        <div className="purchquote-table-header">
+                            <div className="purchquote-checkbox"><input type="checkbox" /></div>
+                            <div>Document No</div>
+                            <div>Quotation ID</div>
+                            <div>Status</div>
+                            <div>Document Date</div>
+                        </div>
+                        <div className="purchquote-table-scrollable">
                             <div className="purchquote-table-rows">
                                 {filteredQuotations.length > 0 ? (
                                     filteredQuotations.map((q) => (
                                         <div
-                                            className="purchquote-row"
                                             key={q.quotation_id}
-                                            onClick={() => handleRowClick(q)} // Handle row click
+                                            className="purchquote-row"
+                                            onClick={() => handleRowClick(q)}
                                         >
-                                            <div className="purchquote-column">{q.document_no}</div>
-                                            <div className="purchquote-column">{q.quotation_id}</div>
-                                            <div className="purchquote-column">
-                                                <span className={`status-${q.status.toLowerCase()}`}>
-                                                    {q.status}
-                                                </span>
+                                            <div className="purchquote-checkbox"><input type="checkbox" /></div>
+                                            <div>{q.document_no}</div>
+                                            <div>{q.quotation_id}</div>
+                                            <div>
+                                                <span className={`status-${q.status?.toLowerCase()}`}>{q.status}</span>
                                             </div>
-                                            <div className="purchquote-column">
-                                                {new Date(q.document_date).toLocaleDateString()}
-                                            </div>
+                                            <div>{q.document_date ? new Date(q.document_date).toLocaleDateString() : ''}</div>
                                         </div>
                                     ))
                                 ) : (

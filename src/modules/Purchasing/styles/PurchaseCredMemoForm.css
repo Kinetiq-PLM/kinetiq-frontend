@@ -1,7 +1,7 @@
 .purchase-cred-memo-form {
     display: flex;
     width: 100%;
-    height: auto;
+    height: 100%;
 }
   
 .purchase-cred-memo-form .purchase-cred-memo-form-body-content-container {

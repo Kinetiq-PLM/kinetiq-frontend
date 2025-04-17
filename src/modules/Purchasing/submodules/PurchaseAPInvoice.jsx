@@ -22,9 +22,10 @@ const PurchaseAPInvoiceBody = () => {
 
     const statusOptions = [
         "All",
-        "Pending",
         "Rejected",
-        "Paid",
+        "Completed",
+        "Approved",
+        "Pending"
     ];
 
     useEffect(() => {
@@ -94,6 +95,12 @@ const PurchaseAPInvoiceBody = () => {
         setSelectedInvoice(invoice); // Set the selected invoice
     };
 
+    // Add back button handler to toggle dashboard
+    const handleBackToDashboard = () => {
+        const event = new CustomEvent('purchasing-back-to-dashboard');
+        window.dispatchEvent(event);
+    };
+
     return (
         <div className="apinvoice">
             {selectedInvoice ? (
@@ -104,7 +111,7 @@ const PurchaseAPInvoiceBody = () => {
             ) : (
                 <div className="body-content-container">
                     <div className="apinvoice-header">
-                        <button className="apinvoice-back">← Back</button>
+                        <button className="apinvoice-back" onClick={handleBackToDashboard}>← Back</button>
                         <div className="apinvoice-filters">
                             <div className="apinvoice-date-filter">
                                 <div 
@@ -157,23 +164,22 @@ const PurchaseAPInvoiceBody = () => {
                     </div>
 
                     <div className="apinvoice-content">
-                        <div className="apinvoice-table">
-                            <div className="apinvoice-table-header">
-                                <div className="apinvoice-checkbox"><input type="checkbox" /></div>
-                                <div>Invoice ID</div>
-                                <div>Purchase Order</div>
-                                <div>Status</div>
-                                <div>Due Date</div>
-                                <div>Document Date</div>
-                            </div>
-
+                        <div className="apinvoice-table-header">
+                            <div className="apinvoice-checkbox"><input type="checkbox" /></div>
+                            <div>Invoice ID</div>
+                            <div>Purchase Order</div>
+                            <div>Status</div>
+                            <div>Document Date</div>
+                            <div>Due Date</div>
+                        </div>
+                        <div className="apinvoice-table-scrollable">
                             <div className="apinvoice-table-rows">
                                 {filteredInvoices.length > 0 ? (
                                     filteredInvoices.map((invoice) => (
                                         <div 
                                             key={invoice.id} 
                                             className="apinvoice-row"
-                                            onClick={() => handleInvoiceClick(invoice)} // Handle row click
+                                            onClick={() => handleInvoiceClick(invoice)}
                                         >
                                             <div className="apinvoice-checkbox">
                                                 <input type="checkbox" />
@@ -181,12 +187,10 @@ const PurchaseAPInvoiceBody = () => {
                                             <div>{invoice.invoice_id}</div>
                                             <div>{invoice.purchase_order}</div>
                                             <div>
-                                                <span className={`status-${invoice.status.toLowerCase()}`}>
-                                                    {invoice.status}
-                                                </span>
+                                                <span className={`status-${invoice.status?.toLowerCase()}`}>{invoice.status}</span>
                                             </div>
-                                            <div>{invoice.due_date}</div>
                                             <div>{invoice.document_date}</div>
+                                            <div>{invoice.due_date}</div>
                                         </div>
                                     ))
                                 ) : (
@@ -194,6 +198,9 @@ const PurchaseAPInvoiceBody = () => {
                                 )}
                             </div>
                         </div>
+                    </div>
+                    <div className="apinvoice-footer">
+                        {/* Removed New Form, Compare, and Send To buttons as requested */}
                     </div>
                 </div>
             )}

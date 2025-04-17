@@ -553,20 +553,18 @@ const PurchaseOrderUI = ({
 
   return (
     <div className="purchord">
+      <div className="purchord-scrollable-wrapper">
       <div className="body-content-container">
-        <button className="purchord-back-button" onClick={onClose}>← Back</button>
-        <h2 className="purchord-title">Purchase Order</h2>
-        
-        {error && <div className="error-message">{error}</div>}
-        
-       
-          <button 
-            className="purchord-qc-button" 
-            onClick={() => setShowQCModal(true)}
-            
-          >
-            {loading ? "Loading..." : "Quality Check"}
-          </button>
+  <div className="purchord-header">
+    <button className="purchord-back-button" onClick={onClose}>← Back</button>
+    <h2 className="purchord-title">Purchase Order</h2>
+    <button 
+      className="purchord-qc-button" 
+      onClick={() => setShowQCModal(true)}
+    >
+      {loading ? "Loading..." : "Quality Check"}
+    </button>
+  </div>
         
 
         <div className="purchord-main-container">
@@ -707,26 +705,27 @@ const PurchaseOrderUI = ({
                   </div>
 
                   <div className="form-buttons">
-                    <button 
-                      type="button"
-                      className="cancel-button" 
-                      onClick={() => setShowQCModal(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit"
-                      className="submit-button"
-                      disabled={!qcForm.shipment_id || !qcForm.inspection_result || !qcForm.employee_id}
-                    >
-                      Submit Quality Check
-                    </button>
+                  <button 
+  type="button"
+  className="cancel-btn"
+  onClick={() => setShowQCModal(false)}
+>
+  Cancel
+</button>
+<button 
+  type="submit"
+  className="submit-btn"
+  disabled={!qcForm.shipment_id || !qcForm.inspection_result || !qcForm.employee_id}
+>
+  Submit Quality Check
+</button>
                   </div>
                 </div>
               </form>
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

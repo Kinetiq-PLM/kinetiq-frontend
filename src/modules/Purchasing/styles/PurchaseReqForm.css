@@ -1,8 +1,10 @@
 .purchase-req-form {
     display: flex;
     width: 100%;
-    height: auto;
+    height: 100%;
 }
+
+
 .popup-overlay {
     position: fixed;
     top: 0;
@@ -25,26 +27,13 @@
 .popup-actions {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 10px;
     margin-top: 20px;
 }
 
 .popup-buttons button {
     margin: 10px;
-}
-.purchase-req-form .form-container {
-  width: 100%;
-  height: 100%;
-  border-radius: 0.5rem;
-  background-color: white;
-  padding: 1rem;
-  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 40rem;
-  min-height: 30rem;
 }
 
 /* Header styles */
@@ -236,31 +225,45 @@ button.add-item-btn:disabled {
 }
 
 /* Cancel and Submit buttons */
+.cancel-btn, .submit-btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.95rem;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
 .cancel-btn {
     padding: 0.5rem 1.5rem;
-    border: 1px solid #00bcd4;
+    border: 2px solid #00bcd4;
     border-radius: 0.25rem;
-    background: none;
+    background: #fff;
     color: #00bcd4;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    transition: background 0.18s, color 0.18s, border 0.18s;
 }
 
 .cancel-btn:hover {
-    border-color: #00A8A8;
-    color: #00A8A8;
-    background-color: rgba(0, 168, 168, 0.05);
+    background: #00bcd4;
+    color: #fff;
+    border-color: #00bcd4;
 }
 
 .submit-btn {
-    padding: 0.5rem 1.5rem;
     border: none;
-    border-radius: 0.25rem;
     background-color: #00bcd4;
     color: white;
-    font-size: 0.85rem;
-    cursor: pointer;
+    font-weight: 500;
     transition: background-color 0.2s ease;
 }
 
@@ -292,4 +295,39 @@ button.add-item-btn:disabled {
     font-size: 0.9rem;
     color: #060606;
     pointer-events: none;
+}
+
+/* Add flex row for purchase popup fields */
+.popup-fields-row {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    justify-content: center;
+    margin-bottom: 16px;
+    margin-top: 32px;
+}
+.popup-label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+    margin: 0 8px;
+    min-width: 180px;
+    align-items: flex-start;
+}
+.popup-label input,
+.popup-label select {
+    margin-top: 4px;
+    width: 100%;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+.centered-error-message {
+    text-align: center;
+    color: #e53935;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
 }

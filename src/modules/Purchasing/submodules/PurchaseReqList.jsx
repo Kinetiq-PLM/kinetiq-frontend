@@ -4,7 +4,7 @@ import "../styles/PurchaseReqList.css";
 import PurchaseReqForm from "./PurchaseReqForm";
 import PurchForQuotForm from "./PurchForQuotForm";
 
-const PurchaseReqListBody = () => {
+const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showNewForm, setShowNewForm] = useState(false);
   const [showPurchQuot, setShowPurchQuot] = useState(false);
@@ -12,7 +12,6 @@ const PurchaseReqListBody = () => {
   const [employeeMap, setEmployeeMap] = useState({}); // Map of employee_id to employee_name
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showAll, setShowAll] = useState(false); // Toggle for Load More
   const [selectedRequest, setSelectedRequest] = useState(null); // Store selected request
 
   // Fetch purchase requests and employee data from the API
@@ -55,10 +54,27 @@ const PurchaseReqListBody = () => {
     fetchEmployees();
   }, []);
 
+  // Safety net: never allow both forms to show at once
+  useEffect(() => {
+    if (showNewForm && showPurchQuot) {
+      setShowNewForm(false); // Always prioritize PurchForQuotForm
+    }
+  }, [showNewForm, showPurchQuot]);
+
   const handleBack = () => {
-    console.log("Back button clicked");
-    setSelectedRequest(null);
-    setShowPurchQuot(false);
+    // If we're in a detail or form view, reset local state; otherwise, go back to dashboard and toggle sidebar
+    if (showNewForm || showPurchQuot || selectedRequest) {
+      setShowNewForm(false);
+      setShowPurchQuot(false);
+      setSelectedRequest(null);
+    } else {
+      if (onBackToDashboard) {
+        onBackToDashboard();
+      }
+      if (toggleDashboardSidebar) {
+        toggleDashboardSidebar();
+      }
+    }
   };
 
   const handleSearch = (e) => {
@@ -75,17 +91,14 @@ const PurchaseReqListBody = () => {
     const employeeName = employeeMap[request.employee_id] || "Unknown"; // Get employee_name from the map
     setSelectedRequest({...request, employee_name: employeeName}); // Set the clicked request
     setShowPurchQuot(true); // Show the quotation form
+    setShowNewForm(false); // Hide the PurchaseReqForm if it was open
   };
 
   const handleCheckboxClick = (event) => {
     event.stopPropagation();
   };
 
-  const handleLoadMore = () => {
-    setShowAll(!showAll);
-  };
-
-  // Filter and limit requests
+  // Filter requests
   const filteredRequests = purchaseRequests.filter((request) => {
     const searchLower = searchTerm.toLowerCase();
     const employeeName = employeeMap[request.employee_id] || ""; // Get employee_name from the map
@@ -98,21 +111,16 @@ const PurchaseReqListBody = () => {
     );
   });
 
-  const displayedRequests = showAll ? filteredRequests : filteredRequests.slice(0, 11);
-
   return (
     <div className="purchreq">
-      {showNewForm ? (
-        <PurchaseReqForm onClose={() => setShowNewForm(false)} />
-      ) : showPurchQuot && selectedRequest ? (
-        <PurchForQuotForm
-          request={selectedRequest} // Pass the selected request object
-          onClose={handleBack} // Pass the handleBack function to reset
-        />
-      ) : (
-        <div className="purchreq-body-content-container">
-          <div className="purchreq-header">
-            <button className="purchreq-back-btn" onClick={handleBack}>← Back</button>
+      <div className="purchreq-body-content-container">
+        <div className="purchreq-header">
+          <div className="purchreq-header-left">
+            {!showNewForm && !showPurchQuot && (
+              <button className="purchreq-back-btn" onClick={handleBack}>← Back</button>
+            )}
+          </div>
+          {!showNewForm && !showPurchQuot && (
             <input
               type="text"
               className="purchreq-search"
@@ -120,59 +128,59 @@ const PurchaseReqListBody = () => {
               value={searchTerm}
               onChange={handleSearch}
             />
-          </div>
-
-          {loading ? (
-            <p>Loading...</p>
-          ) : error ? (
-            <p className="error">{error}</p>
-          ) : (
-            <div className="purchreq-table-container">
-              <table className="purchreq-table">
-                <thead>
-                  <tr>
-                    <th><input type="checkbox" onClick={handleCheckboxClick} /></th>
-                    <th>PR No.</th>
-                    <th>Employee Name</th>
-                    <th>Department</th>
-                    <th>Document Date</th>
-                    <th>Valid Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {displayedRequests.length > 0 ? (
-                    displayedRequests.map((request, index) => (
-                      <tr key={index} onClick={() => handleRequestClick(request)}>
-                        <td><input type="checkbox" onClick={handleCheckboxClick} /></td>
-                        <td>{request.request_id}</td>
-                        <td>{employeeMap[request.employee_id] || " "}</td> {/* Display employee_name */}
-                        <td>{request.department}</td>
-                        <td>{request.document_date}</td>
-                        <td>{request.valid_date}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="6" className="purchreq-no-results">No results found</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
           )}
-
-          {/* Buttons */}
-          <div className="purchreq-button-container">
-            <button className="purchreq-new-form" onClick={handleNewRequest}>New Form</button>
-            {filteredRequests.length > 10 && (
-              <button className="purchreq-load-more" onClick={handleLoadMore}>
-                {showAll ? "Show Less" : "Load More"}
-              </button>
-            )}
-            <button className="purchreq-send-to">Send to</button>
-          </div>
         </div>
-      )}
+        {showNewForm && !showPurchQuot && (
+          <PurchaseReqForm onClose={() => {
+            setShowNewForm(false);
+            setShowPurchQuot(false);
+            setSelectedRequest(null);
+          }} />
+        )}
+        {showPurchQuot && selectedRequest && !showNewForm && (
+          <PurchForQuotForm
+            request={selectedRequest} // Pass the selected request object
+            onClose={() => {
+              setShowPurchQuot(false);
+              setShowNewForm(false);
+              setSelectedRequest(null);
+            }}
+          />
+        )}
+        {!showNewForm && !showPurchQuot && (
+          <div className="purchreq-table-container">
+            <div className="purchreq-table-header">
+              <div className="purchreq-checkbox"><input type="checkbox" onClick={handleCheckboxClick} /></div>
+              <div>PR No.</div>
+              <div>Employee Name</div>
+              <div>Department</div>
+              <div>Document Date</div>
+              <div>Valid Date</div>
+            </div>
+            <div className="purchreq-table-scrollable">
+              <div className="purchreq-table-rows">
+                {filteredRequests.length > 0 ? filteredRequests.map((request, index) => (
+                  <div key={index} className="purchreq-row" onClick={() => handleRequestClick(request)}>
+                    <div className="purchreq-checkbox"><input type="checkbox" onClick={handleCheckboxClick} /></div>
+                    <div>{request.request_id}</div>
+                    <div>{employeeMap[request.employee_id] || " "}</div>
+                    <div>{request.department}</div>
+                    <div>{request.document_date}</div>
+                    <div>{request.valid_date}</div>
+                  </div>
+                )) : (
+                  <div className="purchreq-no-results">No results found</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        {!showNewForm && !showPurchQuot && (
+          <div className="purchreq-footer">
+            <button className="purchreq-new-form" onClick={handleNewRequest}>New Form</button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

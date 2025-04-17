@@ -262,11 +262,20 @@ const PurchaseReqForm = ({ onClose }) => {
         });
     };
 
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        return () => {
+            setIsMounted(false);
+        };
+    }, []);
+
     return (
         <div className="purchase-req-form">
             <div className="form-container">
                 <div className="form-header">
-                    <button className="back-btn" onClick={handleBack}><span>←</span> Back</button>
+                    <button className="back-btn" onClick={handleBack}>← Back</button>
                     <h1>PURCHASE REQUEST FORM</h1>
                 </div>
 
@@ -338,6 +347,7 @@ const PurchaseReqForm = ({ onClose }) => {
 
                 <div className="form-group">
                     <button className="save-item" onClick={handleSave}>Next</button>
+                    <div className="centered-error-message">{error === "Fill up the form first" && error}</div>
                 </div>
 
                 <div className="table-container">
@@ -392,112 +402,113 @@ const PurchaseReqForm = ({ onClose }) => {
                     <button className="submit-btn" onClick={() => setIsPurchasePopupOpen(true)}>Purchase</button>
                 </div>
 
-                {error && <div className="error-message">{error}</div>}
                 {successMessage && <div className="success-message">{successMessage}</div>} {/* Success message */}
 
                 
             </div>
-            {isPurchasePopupOpen && (
-    <div className="popup-overlay">
-        <div className="popup-content">
-            <h3>Confirm Purchase</h3>
-            <p>Are you sure you want to make a purchase without filing a quotation?</p>
-            <label>
-                Document Number:
-                <input
-                    type="text"
-                    value={purchaseForm.documentNumber}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, documentNumber: e.target.value })}
-                />
-            </label>
-            <label>
-                Delivery Date:
-                <input
-                    type="date"
-                    value={purchaseForm.deliveryDate}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, deliveryDate: e.target.value })}
-                />
-            </label>
-            <label>
-                Status:
-                <select
-                    value={purchaseForm.popupStatus}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, popupStatus: e.target.value })}
-                >
-                    <option value="Pending">Pending</option>
-                    <option value="Ordered">Ordered</option>
-                    <option value="Delivered">Delivered</option>
-                </select>
-            </label>
-            <div className="popup-actions">
-                <button onClick={() => setIsPurchasePopupOpen(false)}>Cancel</button>
-                <button
-  className="popup-submit-button"
-  onClick={async () => {
-    try {
-      // Step 1: Create quotation first
-      const quotationPayload = {
-        document_date: new Date().toISOString().split("T")[0],
-        valid_date: purchaseForm.deliveryDate || null,
-        request_id: formData.requestId, // make sure this is set from the parent PR
-        status: "Pending",
-      };
+            {isMounted && isPurchasePopupOpen && (
+                <div className="popup-overlay">
+                    <div className="popup-content">
+                        <h3>Confirm Purchase</h3>
+                        <p>Are you sure you want to make a purchase without filing a quotation?</p>
+                        <div className="popup-fields-row">
+                            <label className="popup-label">
+                                Document Number:
+                                <input
+                                    type="text"
+                                    value={purchaseForm.documentNumber}
+                                    onChange={(e) => setPurchaseForm({ ...purchaseForm, documentNumber: e.target.value })}
+                                />
+                            </label>
+                            <label className="popup-label">
+                                Delivery Date:
+                                <input
+                                    type="date"
+                                    value={purchaseForm.deliveryDate}
+                                    onChange={(e) => setPurchaseForm({ ...purchaseForm, deliveryDate: e.target.value })}
+                                />
+                            </label>
+                            <label className="popup-label">
+                                Status:
+                                <select
+                                    value={purchaseForm.popupStatus}
+                                    onChange={(e) => setPurchaseForm({ ...purchaseForm, popupStatus: e.target.value })}
+                                >
+                                    <option value="Pending">Pending</option>
+                                    <option value="Ordered">Ordered</option>
+                                    <option value="Delivered">Delivered</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div className="popup-actions">
+                            <button onClick={() => setIsPurchasePopupOpen(false)}>Cancel</button>
+                            <button
+                                className="popup-submit-button"
+                                onClick={async () => {
+                                    try {
+                                        // Step 1: Create quotation first
+                                        const quotationPayload = {
+                                            document_date: new Date().toISOString().split("T")[0],
+                                            valid_date: purchaseForm.deliveryDate || null,
+                                            request_id: formData.requestId, // make sure this is set from the parent PR
+                                            status: "Pending",
+                                        };
 
-      const quotationRes = await fetch("http://127.0.0.1:8000/api/purchase_quotation/create/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(quotationPayload),
-      });
+                                        const quotationRes = await fetch("http://127.0.0.1:8000/api/purchase_quotation/create/", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify(quotationPayload),
+                                        });
 
-      if (!quotationRes.ok) {
-        const errorDetail = await quotationRes.text(); // Get backend response text
-        console.error("❌ Backend response:", errorDetail); // Log for debugging
-        throw new Error("Failed to create quotation");
-        
-      }
+                                        if (!quotationRes.ok) {
+                                            const errorDetail = await quotationRes.text(); // Get backend response text
+                                            console.error("❌ Backend response:", errorDetail); // Log for debugging
+                                            throw new Error("Failed to create quotation");
+                                            
+                                        }
 
-      const quotationData = await quotationRes.json();
-      const quotationId = quotationData.quotation_id;
+                                        const quotationData = await quotationRes.json();
+                                        const quotationId = quotationData.quotation_id;
 
-      console.log("🧾 Created Quotation:", quotationId);
+                                        console.log("🧾 Created Quotation:", quotationId);
 
-      // Step 2: Create purchase order using the generated quotation_id
-      const orderPayload = {
-        purchase_id: "",
-        quotation_id: quotationId,
-        order_date: new Date().toISOString().split("T")[0],
-        delivery_date: purchaseForm.deliveryDate || null,
-        document_date: new Date().toISOString().split("T")[0],
-        status: purchaseForm.popupStatus || "Pending",
-      };
+                                        // Step 2: Create purchase order using the generated quotation_id
+                                        const orderPayload = {
+                                            purchase_id: "",
+                                            quotation_id: quotationId,
+                                            order_date: new Date().toISOString().split("T")[0],
+                                            delivery_date: purchaseForm.deliveryDate || null,
+                                            document_date: new Date().toISOString().split("T")[0],
+                                            status: purchaseForm.popupStatus || "Pending",
+                                        };
 
-      const orderRes = await fetch("http://127.0.0.1:8000/api/purchase-orders/list/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderPayload),
-      });
+                                        const orderRes = await fetch("http://127.0.0.1:8000/api/purchase-orders/list/", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify(orderPayload),
+                                        });
 
-      if (!orderRes.ok) {
-        throw new Error("Failed to create purchase order");
-      }
+                                        if (!orderRes.ok) {
+                                            throw new Error("Failed to create purchase order");
+                                        }
 
-      const orderData = await orderRes.json();
-      console.log("✅ Purchase Order Created:", orderData);
+                                        const orderData = await orderRes.json();
+                                        console.log("✅ Purchase Order Created:", orderData);
 
-      alert("Purchase order created successfully!");
-      setIsPurchasePopupOpen(false);
-    } catch (error) {
-      console.error("❌ Error during purchase creation:", error);
-      alert("Failed to complete purchase. Check the console for details.");
-    }
-  }}
->
-  Submit
-</button>
-            </div>
-        </div>
-    </div>
-)}
+                                        alert("Purchase order created successfully!");
+                                        setIsPurchasePopupOpen(false);
+                                    } catch (error) {
+                                        console.error("❌ Error during purchase creation:", error);
+                                        alert("Failed to complete purchase. Check the console for details.");
+                                    }
+                                }}
+                            >
+                                Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
