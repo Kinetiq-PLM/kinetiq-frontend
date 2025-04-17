@@ -28,17 +28,35 @@ const BodyContent = ({ employee_id }) => {
   const [popupContent, setPopupContent] = useState('Are you sure you want to change your password?');
   const [isPassChanged, setIsPassChanged] = useState(false);
 
-  const arePassFieldsValid = () => {
-    if (!newPassword) {
-      setNewPassErr("* Password cannot be empty. *");
+  const arePassFieldsValid = async () => {
+    if (!newPassword || !conPassword || !currPassword) {
+      if (!currPassword) {
+        setCurrPassErr("* This field cannot be empty. *");
+      }
+      if (!newPassword) {
+        setNewPassErr("* This field cannot be empty. *");
+      }
+      if (!conPassword) {
+        setConPassErr("* This field cannot be empty. *");
+      }
       return false;
     }
     if (newPassword.length < 8) {
       setNewPassErr("* Password must be at least 8 characters long. *");
       return false;
     }
+    if (currPassword === newPassword) {
+      setNewPassErr("* New password cannot be the same as the current password. *");
+      return false;
+    }
     if (newPassword !== conPassword) {
       setConPassErr("* Passwords do not match. *");
+      return false;
+    }
+    const pass_valid = await checkPassword()
+    console.log(pass_valid)
+    if (!pass_valid) {
+      setCurrPassErr("* Incorrect password. *")
       return false;
     }
 
@@ -49,14 +67,13 @@ const BodyContent = ({ employee_id }) => {
   const handleChangePassword = async () => {
     if (!isPassChanged) {
       try {
-        const res = await fetch("http://127.0.0.1:8000/reset-password/", {
+        console.log('new pass ' + newPassword)
+        const res = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/reset-password/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: email,
             newPassword: newPassword,
-            oldPassword: currPassword,
-            passreq: true,
           }),
         });
 
@@ -73,6 +90,25 @@ const BodyContent = ({ employee_id }) => {
     }
   };
 
+  const checkPassword = async () => {
+    console.log("checking password")
+    const res = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/check-password/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email,
+        password: currPassword,
+      }),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      return true
+    } else {
+      return false
+    }
+  }
+
   return (
     <div className="usrprofile">
       <div className="user-details-container">
@@ -81,10 +117,12 @@ const BodyContent = ({ employee_id }) => {
           <div className="user-image">{first_name?.charAt(0)}</div>
           <div className="user-details">
             <div className="user-name-pos">
-              <div className="user-name">{first_name} {last_name}</div>
+              <div className="user-name-email-container">
+                <div className="user-name">{first_name} {last_name}</div>
+                <div className="user-email">{email}</div>
+              </div>
               <div className="user-position">{role_name}</div>
             </div>
-            <div className="user-email">{email}</div>
           </div>
         </div>
       </div>
@@ -172,7 +210,7 @@ const BodyContent = ({ employee_id }) => {
 
       <Popup open={openPopup} closeOnDocumentClick onClose={() => setOpenPopup(false)} modal>
         {(close) => (
-          <div className="modal">
+          <div className="usrprofile-modal">
             <div className="header">Change Password Confirmation</div>
             <div className="content">
               {popupContent}
@@ -181,7 +219,7 @@ const BodyContent = ({ employee_id }) => {
               {popupContent === "Are you sure you want to change your password?" ? (
                 <>
                   <button className="confirm-btn" onClick={() => { handleChangePassword(); }}>
-                    "Yes, Change Password"
+                    Yes, Change Password
                   </button>
                   <button className="cancel-btn" onClick={() => close()}>Cancel</button>
                 </>
