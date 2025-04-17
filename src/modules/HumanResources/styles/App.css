@@ -47,7 +47,6 @@ html, body {
 .hr-dashboard-scrollable {
   flex: 1;
   overflow-y: auto;
-  background-color: #f7fbfc;
   padding: 1.5rem;
 }
 
