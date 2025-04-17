@@ -28,28 +28,52 @@ const Header = () => {
   );
 };
 
-const CustomerDetails = ({ data }) => {
+const CustomerDetails = ({ data, isInvoice = false }) => {
   return (
     <div className="flex gap-4">
       <div className="flex-1/5">
         <div className="flex flex-col text-sm gap-0.5">
           <span className="text-[#469fc2] font-bold text-md">Bill To</span>
           <span className="text-md font-bold">
-            {data.statement.customer.name}
+            {isInvoice
+              ? data.delivery_note.statement.customer.name
+              : data.statement.customer.name}
           </span>
-          <span>{data.statement.customer.address_line1}</span>
-          <span>{data.statement.customer.address_line2}</span>
-          <span>{data.statement.customer.country}</span>
-          <span>{data.statement.customer.phone_number}</span>
+          {isInvoice ? (
+            <>
+              <span>{data.delivery_note.statement.customer.address_line1}</span>
+              <span>{data.delivery_note.statement.customer.address_line2}</span>
+              <span>{data.delivery_note.statement.customer.country}</span>
+              <span>{data.delivery_note.statement.customer.phone_number}</span>
+            </>
+          ) : (
+            <>
+              <span>{data.statement.customer.address_line1}</span>
+              <span>{data.statement.customer.address_line2}</span>
+              <span>{data.statement.customer.country}</span>
+              <span>{data.statement.customer.phone_number}</span>
+            </>
+          )}
         </div>
       </div>
       <div className="flex-1/5">
         <div className="flex flex-col text-sm gap-0.5">
           <span className="text-[#469fc2] font-bold text-md">Ship To</span>
-          <span>{data.statement.customer.address_line1}</span>
-          <span>{data.statement.customer.address_line2}</span>
-          <span>{data.statement.customer.country}</span>
-          <span>{data.statement.customer.phone_number}</span>
+          {isInvoice ? (
+            <>
+              <span>{data.delivery_note.statement.customer.address_line1}</span>
+              <span>{data.delivery_note.statement.customer.address_line2}</span>
+              <span>{data.delivery_note.statement.customer.country}</span>
+              <span>{data.delivery_note.statement.customer.phone_number}</span>
+            </>
+          ) : (
+            <>
+              <span>{data.statement.customer.address_line1}</span>
+              <span>{data.statement.customer.address_line2}</span>
+              <span>{data.statement.customer.country}</span>
+              <span>{data.statement.customer.phone_number}</span>
+            </>
+          )}
         </div>
       </div>
       <div className="flex-1/5">
@@ -170,6 +194,142 @@ const Terms = () => {
         Full payment is due upon receipt of this invoice. Late payments may
         incur additional charges or interest as per the applicable laws.
       </span>
+    </div>
+  );
+};
+
+const Warranty = ({ data }) => {
+  const addOneYear = (date) => {
+    date.setFullYear(date.getFullYear() + 1);
+    return date;
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <table className="w-full text-sm font-light table-auto border border-black border-collapse">
+        <thead className="bg-[#469fc2] border border-black">
+          <tr>
+            <th className="border border-black text-white font-light text-center p-2">
+              Warranty
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td className="border border-black text-black font-bold text-center p-2">
+              {`
+                ${new Date(data.invoice_date).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
+              - ${addOneYear(new Date(data.invoice_date)).toLocaleDateString(
+                "en-GB",
+                {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                }
+              )}
+              `}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div className="flex flex-col gap-2">
+        <span className="font-bold">Warranty Policy</span>
+        <span className="text-xs">
+          Kinetiq offers a one-year warranty to the original purchaser against
+          defects in materials and workmanship. If found defective within this
+          period, Kinetiq will repair or replace the part with a new or
+          remanufactured one at no cost, subject to the terms and conditions
+          herein:
+        </span>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="font-bold">Terms and Conditions</span>
+        <span className="text-xs">
+          To receive warranty service, you must provide a proof of purchase and
+          warranty certificate (or copies) as proof the product is within the
+          warranty period. Without either document, labor and replacement part
+          fees will apply.
+        </span>
+      </div>
+      <div className="ml-4 flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <span className="font-bold">Parts and Labor</span>
+          <span className="text-xs">
+            During the warranty period, parts and labor are free of charge.
+            Replacements, at Kinetiq’s sole discretion, may be new or
+            recertified and are covered for the remainder of the original
+            warranty. Kinetiq’s decisions on defect-related complaints are final
+            and binding. Replaced parts or units become Kinetiq’s property.
+            After the warranty expires, labor and part replacement will incur
+            charges.
+          </span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="font-bold">Types of Service</span>
+          <span className="text-xs">
+            To obtain warranty service, defective products must be sent to a
+            Kinetiq service center. Customers are responsible for both shipping
+            to and from the center. Returns must use the original packaging or
+            equivalent protective materials.
+          </span>
+          <span className="text-xs mt-2">
+            For home service, a transportation fee will apply based on location.
+            Kinetiq personnel may refuse service if equipment is in inaccessible
+            or hazardous locations.
+          </span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="font-bold">Limitations and Exclusions</span>
+          <span className="text-xs">
+            Kinetiq's one-year limited warranty only covers defects in materials
+            and workmanship; however, this warranty does not cover the
+            following:
+          </span>
+          <ol className="ml-6 text-xs list-decimal">
+            <li>
+              Damage from accidents, misuse, abuse, transportation, tampering,
+              negligence, or poor maintenance.
+            </li>
+            <li>
+              Issues caused by spills, improper electrical use, voltage
+              fluctuations, or exposure to moisture.
+            </li>
+            <li>Damage from fire, flood, or other Acts of God.</li>
+            <li>Normal wear-and-tear, rust, stains, or corrosion.</li>
+            <li>
+              Problems due to improper testing, use of wrong components, or
+              unauthorized modifications.
+            </li>
+            <li>Scratches or surface damage from regular use.</li>
+            <li>Routine maintenance or servicing.</li>
+            <li>
+              Claims for missing/damaged parts made after 7 days from purchase.
+            </li>
+            <li>
+              If any part/s of the unit are replaced with a part or parts not
+              supplied or approved by us or the unit has been dismantled or
+              repaired by any person other than a Kinetiq authorized technician.
+            </li>
+            <li>
+              Products with missing, tampered, or illegible serial numbers.
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 text-gray-500">
+        <span className="text-sm">Legal Disclaimers</span>
+        <span className="text-xs">
+          This warranty is governed by the laws of the Republic of the
+          Philippines and complies with all regulations under Consumer Act of
+          the Philippines (RA 7394). The remedies outlined in this policy are
+          the sole recourse available under this warranty.
+        </span>
+      </div>
     </div>
   );
 };
@@ -613,7 +773,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               </div>
             )}
           {data &&
-            data.statement &&
+            data.delivery_note &&
             documentToView &&
             documentToView.includes("invoice") && (
               <div className="flex flex-col gap-4 text-sm">
@@ -621,7 +781,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                 <div className="text-center">
                   <span className="font-light">SALES INVOICE</span>
                 </div>
-                <CustomerDetails data={data} />
+                <CustomerDetails data={data} isInvoice={true} />
                 <div>
                   <table className="w-full text-sm font-light table-auto border border-black border-collapse">
                     <thead className="bg-[#469fc2] border border-black">
@@ -654,13 +814,17 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                         30% Downpayment, 70% After Delivery
                       </th>
                       <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                        {data.payment_status}
+                        {data.remaining_balance == 0
+                          ? "Fully Paid"
+                          : data.remaining_balance > 0
+                          ? "Partially Paid"
+                          : "Unpaid"}
                       </th>
                     </tr>
                   </table>
                 </div>
                 <div>
-                  <OrdersTable data={data} />
+                  <OrdersTable data={data.delivery_note} />
                 </div>
                 <div className="flex justify-between text-xs">
                   <div>Thank you for your business.</div>
@@ -670,13 +834,12 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                         <td className="flex justify-between gap-10">
                           <span>Subtotal</span>
                           <span>
-                            {Number(data.statement.subtotal).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
+                            {Number(
+                              data.delivery_note.statement.subtotal
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </span>
                         </td>
                       </tr>
@@ -684,13 +847,12 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                         <td className="flex justify-between gap-10">
                           <span>Sales Tax</span>
                           <span>
-                            {Number(data.statement.total_tax).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
+                            {Number(
+                              data.delivery_note.statement.total_tax
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </span>
                         </td>
                       </tr>
@@ -700,13 +862,12 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                             Total
                           </span>
                           <span className="fold-bold text-[#469fc2]">
-                            {Number(data.statement.total_amount).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )}
+                            {Number(
+                              data.delivery_note.statement.total_amount
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </span>
                         </td>
                       </tr>
@@ -714,6 +875,8 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                   </table>
                 </div>
                 <Terms />
+                <hr />
+                <Warranty data={data} />
               </div>
             )}
           {documentToView && documentToView.includes("agreement") && (
