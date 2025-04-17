@@ -85,6 +85,7 @@ const TabSystem = () => {
                     {/* Billing Receipt */}
                     {activeTab === "Billing Receipt" && (
                         <div className="table-container" activeTab="Billing Receipt">
+                            <div className="table-wrapper">
                             <table className="billing-table">
                                 <thead>
                                     <tr>
@@ -119,6 +120,7 @@ const TabSystem = () => {
                                         )}
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     )}
 
@@ -132,6 +134,7 @@ const TabSystem = () => {
                     {/* Delivery Receipt */}
                     {activeTab === "Delivery Receipt" && (
                         <div className="table-container" activeTab="Delivery Receipt">
+                            <div className="table-wrapper">
                             <table className="billing-table">
                                 <thead>
                                     <tr>
@@ -160,6 +163,7 @@ const TabSystem = () => {
                                     )}
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     )}
 
@@ -173,6 +177,7 @@ const TabSystem = () => {
                     {/* Rework Order */}
                     {activeTab === "Rework Order" && (
                         <div className="table-container" activeTab="Rework Order">
+                            <div className="table-wrapper">
                             <table className="billing-table">
                                 <thead>
                                     <tr>
@@ -203,6 +208,7 @@ const TabSystem = () => {
                                     )}
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     )}
 
@@ -216,6 +222,7 @@ const TabSystem = () => {
                     {/* Goods Issue */}
                     {activeTab === "Goods Issue" && (
                         <div className="table-container" activeTab="Goods Issue">
+                            <div className="table-wrapper">
                             <table className="billing-table">
                                 <thead>
                                     <tr>
@@ -240,6 +247,7 @@ const TabSystem = () => {
                                     ))}
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     )}
                 </div>

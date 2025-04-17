@@ -6,9 +6,13 @@ import { Slide } from 'react-toastify';
 
 
 
+
+
+
 const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
+
 
   const [selectedStatus, setSelectedStatus] = useState("Draft");
   const [activeTab, setActiveTab] = useState("document");
@@ -20,7 +24,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
 
+
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
+
 
   const [selectedVendor, setSelectedVendor] = useState("");
   const [selectedOwner, setSelectedOwner] = useState(
@@ -34,6 +40,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const [error, setError] = useState(null);
   const [invoices, setInvoices] = useState([]);
   const [loadingInvoices, setLoadingInvoices] = useState(false);
+
 
   const fetchVendors = async () => {
     try {
@@ -65,6 +72,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
    
   }, []);
 
+
   const handleInvoiceSelect = (invoiceId) => {
     if (!invoiceId) {
       setDocumentDetails(prev => ({
@@ -75,13 +83,13 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       }));
       return;
     }
-  
+ 
     const selectedInvoice = invoices.find(inv => inv.invoice_id === invoiceId);
     if (!selectedInvoice) return;
-  
+ 
     // Format the date by removing the time portion
     const formattedDate = selectedInvoice.invoice_date.split('T')[0];
-  
+ 
     setDocumentDetails(prev => ({
       ...prev,
       invoice_id: selectedInvoice.invoice_id,
@@ -98,7 +106,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       const selectedInvoice = invoices.find(inv => inv.invoice_id === selectedData.invoice_id);
       if (selectedInvoice) {
         const formattedDate = selectedInvoice.invoice_date?.split('T')[0] || date_today;
-        
+       
         setDocumentDetails(prev => ({
           ...prev,
           invoice_id: selectedInvoice.invoice_id,
@@ -109,6 +117,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }
   }, [selectedData, invoices, date_today]);
 
+
   const handleVendorChange = (e) => {
     const customerName = e.target.value;
     setSelectedVendor(customerName);
@@ -116,6 +125,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     setVendorID(selectedVendorData ? selectedVendorData.customer_id : null);
     setContactPerson(selectedVendorData ? selectedVendorData.contact_person : "");
   };
+
+
 
 
   useEffect(() => {
@@ -133,10 +144,15 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }
   }, [vendorList, selectedData.buyer, employeeList, selectedData.employee_id]);
 
-  
+
+ 
   const [documentItems, setDocumentItems] = useState(
     isCreateMode ? [{}] : [...selectedData.document_items, {}]
   );
+
+
+
+
 
 
 
@@ -166,6 +182,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     freight: isCreateMode ? 0 : selectedData.freight || 0,
     transaction_cost: isCreateMode ? 0 : selectedData.transaction_cost || 0,
   });
+
+
+
+
 
 
 
@@ -201,9 +221,15 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
   const handleInputChange = async (e, index, field) => {
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
+
+
 
 
     // Handle date fields
@@ -219,6 +245,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       updatedItems[index][field] = e.target.value;
     }
     setDocumentItems(updatedItems);
+
+
+
+
 
 
 
@@ -350,9 +380,17 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
         if (!newItem) {
           throw new Error('Newly created item not found in reloaded data');
         }
+
+
+
+
 
 
 
@@ -378,9 +416,13 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
 
 
+
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
+
+
 
 
         const updatedDoc = await response.json();  
@@ -392,6 +434,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           cost: '',
           warehouse_id: ''
         });
+
+
 
 
         setDocumentItems(updatedDoc.document_items);  
@@ -408,17 +452,21 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   const isRowFilled = (row) => {
     return (
-      row.item_id &&
-      row.item_name &&
-      row.unit_of_measure &&
-      row.quantity &&
-      row.cost &&
-      row.warehouse_id
+      row.item_id,
+      row.item_name,
+      row.quantity,
+      row.cost
     );
   };
 
 
+
+
   const [warehouseOptions, setWarehouseOptions] = useState([]);
+
+
+
+
 
 
 
@@ -439,11 +487,19 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
   useEffect(() => {
     fetch('http://127.0.0.1:8000/operation/item-data/')
       .then(res => res.json())
       .then(data => {
         const options = [];
+
+
+
+
 
 
 
@@ -461,6 +517,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
         data.material.forEach(mat => {
           options.push({
             id: mat.material_id,
@@ -470,6 +530,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             type: 'material',
           });
         });
+
+
+
+
 
 
 
@@ -487,9 +551,17 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
         setItemOptions(options);
       });
   }, []);
+
+
+
+
 
 
 
@@ -517,6 +589,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
 
 
+
+
           await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
@@ -527,6 +601,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             }),
           });
          
+
+
 
 
         } catch (error) {
@@ -574,9 +650,14 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
   useEffect(() => {
     const invoiceAmount = parseFloat(documentDetails.invoice_amount) || 0;
     const taxRate = parseFloat(documentDetails.tax_rate) || 0;
+
 
     const tax_amount = (taxRate / 100) * invoiceAmount;
     const total = parseFloat(invoiceAmount + invoiceAmount +tax_amount).toFixed(2);
@@ -619,7 +700,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
-        document_no: documentDetails?.document_no || null, 
+        document_no: documentDetails?.document_no || null,
         transaction_id: documentDetails.transaction_id,
         ar_credit_memo: documentDetails.ar_credit_memo,
         initial_amount: documentDetails.initialAmount,
@@ -653,10 +734,18 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Create failed: ${JSON.stringify(errorData)}`);
       }
+
+
+
+
 
 
 
@@ -671,6 +760,14 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       toast.error(`Failed to create document: ${error.message}`);
     }
   };
+
+
+
+
+
+
+
+
 
 
 
@@ -785,13 +882,13 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       }
  
       const goodsTrackingResult = await goodsTrackingResponse.json();
-      console.log('GoodsTrackingData update successful:', goodsTrackingResult);
+      toast.loading("Updating...");
       }
       if (onSuccess) {
         await onSuccess();  // Refresh the data in GoodsTracking
       }
  
-      // ✅ Then call onBack to close GoodsReceiptPO and go back
+      
       if (onBack) {
         onBack();  // Navigate back to GoodsTracking
       }
@@ -804,8 +901,16 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedPO, setSelectedPO] = useState("");
+
+
+
+
 
 
 
@@ -823,6 +928,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       setError(error.message);
     }
   };
+
+
+
+
 
 
 
@@ -887,6 +996,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
   useEffect(() => {
     if (isCreateMode) {
       fetchPurchaseOrders();
@@ -906,6 +1019,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, documentDetails.invoice_balance, initialAmount]);
 
 
+
+
   useEffect(() => {
     const newInitialAmount = documentItems
       .slice(0, -1) // exclude the last empty row
@@ -913,12 +1028,13 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         return sum + (parseFloat(item.quantity || 0) * parseFloat(item.cost || 0));
       }, 0)
       .toFixed(2);
-    
+   
     setInitialAmount(newInitialAmount);
   }, [documentItems]);
 
+
   return (
-    <div className="gr">
+    <div className="ar-cred">
       <div className="body-content-container">
         <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
         <div className="content-wrapper">
@@ -944,6 +1060,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                   )}
                 </select>
 
+
               </div>
               <div className="detail-row">
                 <label>Contact Person</label>
@@ -967,14 +1084,18 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
               </div>
               <div className="detail-row">
                 <label>Credit Memo ID</label>
-                <input 
-                  type="text" 
-                  value={documentDetails.ar_credit_memo || selectedData?.ar_credit_memo || ""} 
-                  readOnly 
+                <input
+                  type="text"
+                  value={documentDetails.ar_credit_memo || selectedData?.ar_credit_memo || ""}
+                  readOnly
                   style={{ cursor: 'not-allowed' }}
                 />              
               </div>
             </div>
+
+
+
+
 
 
 
@@ -1000,17 +1121,17 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                   <div className="left-column">
                     <div className="detail-row">
                       <label>Transaction ID</label>
-                      <input 
-                        type="text" 
-                        value={documentDetails.transaction_id} 
+                      <input
+                        type="text"
+                        value={documentDetails.transaction_id}
                         readOnly
-                        style={{ cursor: 'not-allowed' }} 
+                        style={{ cursor: 'not-allowed' }}
                       />
                     </div>
                     <div className="detail-row dropdown-scrollbar">
                       <label>Invoice ID</label>
-                      <select 
-                        value={documentDetails.invoice_id || ""} 
+                      <select
+                        value={documentDetails.invoice_id || ""}
                         onChange={(e) => {
                           handleDocumentDetailChange(e, "invoice_id");
                           handleInvoiceSelect(e.target.value);
@@ -1048,12 +1169,12 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <div className="detail-row">
                       <label>Invoice Date</label>
                       <div className="date-input clickable">
-                        <input 
-                          type="date" 
-                          value={documentDetails.invoice_date || date_today} 
+                        <input
+                          type="date"
+                          value={documentDetails.invoice_date || date_today}
                           onChange={(e) => handleDocumentDetailChange(e, "invoice_date")}
                           readOnly
-                          style={{ cursor: 'not-allowed' }} 
+                          style={{ cursor: 'not-allowed' }}
                         />
                         <span className="calendar-icon">📅</span>
                       </div>
@@ -1069,6 +1190,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
+
 
                     </div>
                     <div className="detail-row">
@@ -1089,18 +1211,18 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                 <div className="tab-content credit-details">
                   <div className="detail-row">
                     <label>Initial Amount</label>
-                    <input 
-                      type="text" 
-                      value={initialAmount} 
+                    <input
+                      type="text"
+                      value={initialAmount}
                       readOnly
                       style={{ cursor: 'not-allowed' }}
                     />
                   </div>
                   <div className="detail-row">
                     <label>Invoice Balance</label>
-                    <input 
-                      type="text" 
-                      value={documentDetails.invoice_balance ? parseFloat(documentDetails.invoice_balance).toFixed(2) : "0.00"} 
+                    <input
+                      type="text"
+                      value={documentDetails.invoice_balance ? parseFloat(documentDetails.invoice_balance).toFixed(2) : "0.00"}
                       onChange={(e) => handleDocumentDetailChange(e, "invoice_balance")}
                       readOnly
                       style={{ cursor: 'not-allowed' }}
@@ -1124,9 +1246,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                   </div>
                   <div className="detail-row">
                     <label>Tax Amount</label>
-                    <input 
-                      type="text" 
-                      value={documentDetails.tax_amount.toFixed(2)} 
+                    <input
+                      type="text"
+                      value={documentDetails.tax_amount.toFixed(2)}
                       readOnly
                       style={{ cursor: 'not-allowed' }}
                     />
@@ -1135,6 +1257,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
               )}
             </div>
           </div>
+
+
+
+
 
 
 
@@ -1204,13 +1330,18 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
           <div className="button-section">
-          <button 
-            className="copy-from-button" 
+          <button
+            className="copy-from-button"
             style={{ backgroundColor: '#098F8F', color: 'white', cursor: 'not-allowed' }}
             >
             Copy From
           </button>
+
 
           <div className="right-buttons">
               <button className="cancel-button" onClick={onBack}>Cancel</button>
@@ -1225,6 +1356,15 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
 export default ARCreditMemo;
+
+
+
+
+
 
 

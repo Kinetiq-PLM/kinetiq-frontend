@@ -377,8 +377,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       row.item_name &&
       row.unit_of_measure &&
       row.quantity &&
-      row.cost &&
-      row.warehouse_id
+      row.cost
     );
   };
 
@@ -750,13 +749,13 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       }
  
       const goodsTrackingResult = await goodsTrackingResponse.json();
-      console.log('GoodsTrackingData update successful:', goodsTrackingResult);
+      toast.loading("Updating...");
       }
       if (onSuccess) {
         await onSuccess();  // Refresh the data in GoodsTracking
       }
  
-      // ✅ Then call onBack to close GoodsReceiptPO and go back
+
       if (onBack) {
         onBack();  // Navigate back to GoodsTracking
       }

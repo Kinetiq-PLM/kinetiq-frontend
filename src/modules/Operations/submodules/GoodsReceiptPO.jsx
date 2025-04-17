@@ -4,14 +4,16 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
 
+
 const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
-  
+ 
   const [selectedStatus, setSelectedStatus] = useState("Open");
   const [activeTab, setActiveTab] = useState("document");
   const [showSerialModal, setShowSerialModal] = useState(false);
   const [selectedSerialNumbers, setSelectedSerialNumbers] = useState([]);
+
 
   const calculateInitialAmount = () => {
     if (isCreateMode) return 0;
@@ -21,7 +23,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
 
+
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
+
 
   const [selectedVendor, setSelectedVendor] = useState("");
   const [selectedOwner, setSelectedOwner] = useState(
@@ -34,11 +38,13 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+
   useEffect(() => {
     if (selectedData?.status) {
       setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
     }
   }, [selectedData]);
+
 
   const fetchVendors = async () => {
     try {
@@ -47,13 +53,19 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       if (!response.ok) throw new Error("Connection to database failed");
 
 
+
+
       const data = await response.json();
+
+
 
 
       if (!Array.isArray(data.vendors)) throw new Error("Invalid goods data format");
       setVendorList(data.vendors);
       if (!Array.isArray(data.employees)) throw new Error("Invalid goods data format");
       setEmployeeList(data.employees)
+
+
 
 
     } catch (error) {
@@ -67,6 +79,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
    
   }, []);
 
+
   const handleVendorChange = (e) => {
     const vendorName = e.target.value;
     setSelectedVendor(vendorName);
@@ -74,6 +87,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     setVendorID(selectedVendorData ? selectedVendorData.vendor_code : null);
     setContactPerson(selectedVendorData ? selectedVendorData.contact_person : "");
   };
+
 
   useEffect(() => {
     if (vendorList.length > 0) {
@@ -90,9 +104,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     }
   }, [vendorList, selectedData.vendor_code, employeeList, selectedData.employee_id]);
 
+
   const [documentItems, setDocumentItems] = useState(
     isCreateMode ? [{}] : [...selectedData.document_items, {}]
   );
+
+
 
 
  
@@ -118,6 +135,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     freight: isCreateMode ? 0 : selectedData.freight || 0,
     transaction_cost: isCreateMode ? 0 : selectedData.transaction_cost || 0,
   });
+
+
 
 
   useEffect(() => {
@@ -146,9 +165,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   }, [isCreateMode]);
 
 
+
+
   const handleInputChange = async (e, index, field) => {
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
+
 
     // Handle date fields
     if (field === 'manuf_date' || field === 'expiry_date') {
@@ -163,6 +185,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       updatedItems[index][field] = e.target.value;
     }
     setDocumentItems(updatedItems);
+
+
 
 
     // Check if the row is NOT the last row and the item_name was cleared
@@ -290,9 +314,13 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         );
 
 
+
+
         if (!newItem) {
           throw new Error('Newly created item not found in reloaded data');
         }
+
+
 
 
         // Update state with the fresh data
@@ -315,9 +343,11 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         setDocumentItems(updatedItems);
         const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
 
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
+
 
         const updatedDoc = await response.json();  
         updatedDoc.document_items.push({          
@@ -328,6 +358,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           cost: '',
           warehouse_id: ''
         });
+
 
         setDocumentItems(updatedDoc.document_items);  
       }
@@ -346,13 +377,18 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       row.item_id &&
       row.item_name &&
       row.unit_of_measure &&
+      (row.product_details.manuf_date || !row.item_id.startsWith('ADMIN-PROD')) &&
+      (row.product_details.expiry_date || !row.item_id.startsWith('ADMIN-PROD')) &&
       row.quantity &&
       row.cost &&
       row.warehouse_id
     );
   };
 
+
   const [warehouseOptions, setWarehouseOptions] = useState([]);
+
+
 
 
   useEffect(() => {
@@ -369,11 +405,15 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const [itemOptions, setItemOptions] = useState([]);
 
 
+
+
   useEffect(() => {
     fetch('http://127.0.0.1:8000/operation/item-data/')
       .then(res => res.json())
       .then(data => {
         const options = [];
+
+
 
 
         data.products.forEach(prod => {
@@ -387,6 +427,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         });
 
 
+
+
         data.material.forEach(mat => {
           options.push({
             id: mat.material_id,
@@ -396,6 +438,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
             type: 'material',
           });
         });
+
+
 
 
         data.asset?.forEach(asset => {
@@ -409,9 +453,13 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         });
 
 
+
+
         setItemOptions(options);
       });
   }, []);
+
+
 
 
   const handleItemSelection = async (index, selectedName) => {
@@ -436,6 +484,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           }
  
 
+
           await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
@@ -445,7 +494,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
               document_id: "",  // or null, depending on the backend expectations
             }),
           });
-          
+         
+
 
         } catch (error) {
           toast.error('Error deleting row from database:', error);
@@ -490,6 +540,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   };
 
 
+
+
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
@@ -510,6 +562,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       [field]: e.target.value
     }));
   };
+
+
 
 
  
@@ -570,10 +624,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       });
 
 
+
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Create failed: ${JSON.stringify(errorData)}`);
       }
+
+
 
 
       const result = await response.json();
@@ -586,6 +644,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       toast.error(`Failed to create document: ${error.message}`);
     }
   };
+
+
+
+
 
 
 
@@ -691,13 +753,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       }
  
       const goodsTrackingResult = await goodsTrackingResponse.json();
-      console.log('GoodsTrackingData update successful:', goodsTrackingResult);
+      toast.loading("Updating...");
       }
       if (onSuccess) {
         await onSuccess();  // Refresh the data in GoodsTracking
       }
-  
-      // ✅ Then call onBack to close GoodsReceiptPO and go back
+ 
       if (onBack) {
         onBack();  // Navigate back to GoodsTracking
       }
@@ -708,8 +769,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
  
 
 
+
+
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedPO, setSelectedPO] = useState("");
+
+
 
 
   // Fetch purchase orders
@@ -725,6 +790,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       setError(error.message);
     }
   };
+
+
 
 
   const handlePOSelect = async (poId) => {
@@ -785,6 +852,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
  
 
 
+
+
   useEffect(() => {
     if (isCreateMode) {
       fetchPurchaseOrders();
@@ -799,7 +868,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       parseFloat(tax_amount) -
       parseFloat(discount_amount) +
       parseFloat(documentDetails.freight || 0)
-    ).toFixed(2); 
+    ).toFixed(2);
     setDocumentDetails(prev => ({
       ...prev,
       tax_amount: tax_amount,
@@ -814,12 +883,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           return sum + (parseFloat(item.quantity || 0) * parseFloat(item.cost || 0));
         }, 0)
         .toFixed(2);
-      
+     
       setInitialAmount(newInitialAmount);
     }, [documentItems]);
-    
+   
   return (
-    <div className="grpo">
+    <div className="goods-r-po">
       <div className="body-content-container">
         <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
         <div className="content-wrapper">
@@ -831,6 +900,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                 <label>Vendor Code</label>
                 <input type="text" value={vendorID} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
+
+
 
 
               {/* Vendor Name Dropdown */}
@@ -856,6 +927,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
               </div>
 
 
+
+
               <div className="detail-row">
                 <label>Buyer</label>
                 <input
@@ -864,6 +937,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                   onChange={(e) => handleDocumentDetailChange(e, "buyer")}
                 />
               </div>
+
+
 
 
               <div className="detail-row">
@@ -1026,7 +1101,16 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           </div>
 
 
+
+
           {/* Item Document */}
+
+
+
+
+
+
+
 
 
 
@@ -1106,14 +1190,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                       <td>{(item.quantity * item.cost || 0).toFixed(2)}</td>
                       <td>
                       {!item.item_id?.startsWith('ADMIN-PROD') ? (
-                        <input 
-                          type="text" 
-                          value="N/A" 
-                          readOnly 
+                        <input
+                          type="text"
+                          value="N/A"
+                          readOnly
                           style={{ cursor: 'not-allowed' }}
                         />
                       ) : (
-                        <input 
+                        <input
                           type="date"
                           value={item.product_details?.manuf_date || ''}
                           onChange={(e) => {
@@ -1125,14 +1209,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                     </td>
                     <td>
                       {!item.item_id?.startsWith('ADMIN-PROD') ? (
-                        <input 
-                          type="text" 
-                          value="N/A" 
-                          readOnly 
+                        <input
+                          type="text"
+                          value="N/A"
+                          readOnly
                           style={{ cursor: 'not-allowed' }}
                         />
                       ) : (
-                        <input 
+                        <input
                           type="date"
                           value={item.product_details?.expiry_date || ''}
                           onChange={(e) => handleInputChange(e, index, 'expiry_date')}
@@ -1168,6 +1252,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
 
+
+
+
+
+
+
+
+
           <div className="button-section">
             <div className="copy-from-button">
             <select
@@ -1191,6 +1283,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       </div>
 
 
+
+
     </div>
   );
 };
@@ -1202,7 +1296,20 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
 
+
+
+
+
+
+
+
+
 export default GoodsReceiptPO;
  
+
+
+
+
+
 
 

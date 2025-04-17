@@ -123,6 +123,7 @@ const ItemRemoval = () => {
           </div>
 
           <div className="table-itemremoval-container">
+            
             <table className="table">
               <thead>
                 <tr>

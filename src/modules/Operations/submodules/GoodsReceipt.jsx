@@ -4,11 +4,16 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
 
+
 const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
 
 
+
+
   const isCreateMode = selectedButton === "Create";
+
+
 
 
  
@@ -26,7 +31,11 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
 
 
+
+
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
+
+
 
 
   const [selectedVendor, setSelectedVendor] = useState("");
@@ -43,11 +52,19 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
   useEffect(() => {
     if (selectedData?.status) {
       setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
     }
   }, [selectedData]);
+
+
+
+
 
 
 
@@ -65,7 +82,23 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
       const data = await response.json();
+
+
+
+
+
+
+
+
 
 
 
@@ -78,6 +111,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       setVendorList(data.vendors);
       if (!Array.isArray(data.employees)) throw new Error("Invalid goods data format");
       setEmployeeList(data.employees)
+
+
+
+
+
+
+
+
 
 
 
@@ -100,6 +141,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
   const handleVendorChange = (e) => {
     const vendorName = e.target.value;
     setSelectedVendor(vendorName);
@@ -107,6 +152,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     setVendorID(selectedVendorData ? selectedVendorData.vendor_code : null);
     setContactPerson(selectedVendorData ? selectedVendorData.contact_person : "");
   };
+
+
+
+
 
 
 
@@ -129,9 +178,21 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
   const [documentItems, setDocumentItems] = useState(
     isCreateMode ? [{}] : [...selectedData.document_items, {}]
   );
+
+
+
+
+
+
+
+
 
 
 
@@ -163,6 +224,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     freight: isCreateMode ? 0 : selectedData.freight || 0,
     transaction_cost: isCreateMode ? 0 : selectedData.transaction_cost || 0,
   });
+
+
+
+
+
+
+
+
 
 
 
@@ -203,9 +272,21 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
   const handleInputChange = async (e, index, field) => {
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
+
+
+
+
 
 
 
@@ -223,6 +304,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       updatedItems[index][field] = e.target.value;
     }
     setDocumentItems(updatedItems);
+
+
+
+
+
+
+
+
 
 
 
@@ -362,9 +451,25 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
         if (!newItem) {
           throw new Error('Newly created item not found in reloaded data');
         }
+
+
+
+
+
+
+
+
 
 
 
@@ -396,9 +501,17 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
+
+
+
+
 
 
 
@@ -412,6 +525,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           cost: '',
           warehouse_id: ''
         });
+
+
+
+
 
 
 
@@ -442,7 +559,19 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
   const [warehouseOptions, setWarehouseOptions] = useState([]);
+
+
+
+
+
+
+
+
 
 
 
@@ -471,11 +600,27 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
   useEffect(() => {
     fetch('http://127.0.0.1:8000/operation/item-data/')
       .then(res => res.json())
       .then(data => {
         const options = [];
+
+
+
+
+
+
+
+
 
 
 
@@ -501,6 +646,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
         data.material.forEach(mat => {
           options.push({
             id: mat.material_id,
@@ -510,6 +663,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
             type: 'material',
           });
         });
+
+
+
+
+
+
+
+
 
 
 
@@ -535,9 +696,25 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
         setItemOptions(options);
       });
   }, []);
+
+
+
+
+
+
+
+
 
 
 
@@ -571,6 +748,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
           await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
@@ -581,6 +762,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
             }),
           });
          
+
+
+
+
 
 
 
@@ -634,6 +819,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
@@ -654,6 +847,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       [field]: e.target.value
     }));
   };
+
+
+
+
+
+
+
+
 
 
 
@@ -726,10 +927,26 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Create failed: ${JSON.stringify(errorData)}`);
       }
+
+
+
+
+
+
+
+
 
 
 
@@ -748,6 +965,22 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       toast.error(`Failed to create document: ${error.message}`);
     }
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -865,7 +1098,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       }
  
       const goodsTrackingResult = await goodsTrackingResponse.json();
-      console.log('GoodsTrackingData update successful:', goodsTrackingResult);
+      toast.loading("Updating...");
       }
       if (onSuccess) {
         await onSuccess();  // Refresh the data in GoodsTracking
@@ -887,8 +1120,24 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedPO, setSelectedPO] = useState("");
+
+
+
+
+
+
+
+
 
 
 
@@ -910,6 +1159,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       setError(error.message);
     }
   };
+
+
+
+
+
+
+
+
 
 
 
@@ -982,6 +1239,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
   useEffect(() => {
     if (isCreateMode) {
       fetchPurchaseOrders();
@@ -1012,8 +1277,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }, [documentItems]);
 
 
+
+
   return (
-    <div className="gr">
+    <div className="goods-r">
       <div className="body-content-container">
         <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
         <div className="content-wrapper">
@@ -1024,6 +1291,8 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                 <label>Vendor Code</label>
                 <input type="text" value={vendorID} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
+
+
 
 
               {/* Vendor Name Dropdown */}
@@ -1055,6 +1324,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
+
+
+
               <div className="detail-row">
                 <label>Buyer</label>
                 <input
@@ -1063,6 +1340,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                   onChange={(e) => handleDocumentDetailChange(e, "buyer")}
                 />
               </div>
+
 
               <div className="detail-row">
                 <label>Owner</label>
@@ -1074,7 +1352,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                       ? employeeList.find(e => e.employee_id === selectedData.employee_id)?.employee_name || selectedData.employee_id
                       : employeeList.find(e => e.employee_id === employee_id)?.employee_name || employee_id
                   }
-                  
+                 
                   style={{
                     cursor: 'not-allowed',
                     backgroundColor: '#f8f8f8'
@@ -1082,6 +1360,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                 />
               </div>
             </div>
+
 
             {/* Details Document */}
             <div className="details-section tabbed-section">
@@ -1175,12 +1454,13 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                 </div>
               ) : (
 
+
                 <div className="tab-content cost-details">
                   <div className="detail-row">
                     <label>Initial Amount</label>
-                    <input 
-                      type="text" 
-                      value={initialAmount} 
+                    <input
+                      type="text"
+                      value={initialAmount}
                       style={{
                         backgroundColor: '#f8f8f8',
                         cursor: 'not-allowed'
@@ -1213,9 +1493,9 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                   </div>
                   <div className="detail-row">
                     <label>Tax Amount</label>
-                    <input 
-                      type="text" 
-                      value={documentDetails.tax_amount.toFixed(2)} 
+                    <input
+                      type="text"
+                      value={documentDetails.tax_amount.toFixed(2)}
                       readOnly
                       style={{
                         backgroundColor: '#f8f8f8',
@@ -1225,13 +1505,13 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                   </div>
                   <div className="detail-row">
                     <label>Discount Amount</label>
-                    <input 
-                      type="text" 
-                      value={documentDetails.discount_amount.toFixed(2)} 
+                    <input
+                      type="text"
+                      value={documentDetails.discount_amount.toFixed(2)}
                       style={{
                         backgroundColor: '#f8f8f8',
                         cursor: 'not-allowed'
-                      }} 
+                      }}
                       readOnly
                     />
                   </div>
@@ -1264,9 +1544,13 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
           {/* Item Document */}
           <div className="operation_table_container">
-            <div className="grpo-table">
+            <div className="gr-table">
               <table className="materials-table">
                 <thead>
                   <tr>
@@ -1391,6 +1675,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
             </div>
           </div>
 
+
           <div className="button-section">
             <button
               className="copy-from-button"
@@ -1408,6 +1693,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
     </div>
   );
 };
@@ -1416,4 +1705,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
+
+
+
+
+
 export default GoodsReceipt;
+
