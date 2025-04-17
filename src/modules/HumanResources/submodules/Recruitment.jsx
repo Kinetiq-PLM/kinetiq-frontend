@@ -10,6 +10,21 @@ const Recruitment = () => {
   const [jobPostings, setJobPostings] = useState([]);
   const [archivedJobPostings, setArchivedJobPostings] = useState([]);
   const [resignations, setResignations] = useState([]);
+  const [showAddJobModal, setShowAddJobModal] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [newJobPosting, setNewJobPosting] = useState({
+    dept_id: "",
+    position_id: "",
+    position_title: "",
+    description: "",
+    requirements: "",
+    employment_type: "Regular",
+    base_salary: "",
+    daily_rate: "",
+    duration_days: "",
+    posting_status: "Draft"
+  });
 
   // UI States
   const [activeTab, setActiveTab] = useState("Candidates");
@@ -21,29 +36,48 @@ const Recruitment = () => {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [dotsMenuOpen, setDotsMenuOpen] = useState(null);
+  const [showEditJobModal, setShowEditJobModal] = useState(false);
+  const [editingJobPosting, setEditingJobPosting] = useState(null);
 
   // Fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        // Existing fetch calls
         const [candidatesRes, archivedCandidatesRes] = await Promise.all([
           axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
           axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
         ]);
-
+  
         const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
           axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/"),
           axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/archived/")
         ]);
-
+  
         const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
-
+  
+        // New fetch calls for departments and positions
+        const [deptsRes, positionsRes] = await Promise.all([
+          axios.get("http://127.0.0.1:8000/api/departments/department/"),
+          axios.get("http://127.0.0.1:8000/api/positions/positions/")
+        ]);
+  
+        // Add this debugging to see what's coming back
+        console.log('Departments data:', deptsRes.data);
+        console.log('Positions data:', positionsRes.data);
+  
+        // Ensure we're working with arrays
+        const departmentsData = ensureArray(deptsRes.data);
+        const positionsData = ensureArray(positionsRes.data);
+        
         setCandidates(candidatesRes.data);
         setArchivedCandidates(archivedCandidatesRes.data);
         setJobPostings(jobPostingsRes.data);
         setArchivedJobPostings(archivedJobPostingsRes.data);
         setResignations(resignationsRes.data);
+        setDepartments(departmentsData);
+        setPositions(positionsData);
       } catch (err) {
         console.error("Error fetching data:", err);
         showToast("Failed to fetch data", false);
@@ -51,9 +85,31 @@ const Recruitment = () => {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
+  
+  // Add this helper function near the top of your component
+  const ensureArray = (data) => {
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && typeof data === 'object') {
+      // If it's an object, it might be a response with results property
+      if (data.results && Array.isArray(data.results)) {
+        return data.results;
+      }
+      // Or it might be an object where values are what we want
+      return Object.values(data);
+    }
+    // Default to empty array
+    return [];
+  };
+  
+  // Also add a showToast function if it doesn't exist yet
+  const showToast = (message, success = true) => {
+    setToast({ message, success });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   // Utility functions
   const filterAndPaginate = (data) => {
@@ -154,7 +210,12 @@ const Recruitment = () => {
                           ⋮
                           {dotsMenuOpen === index && (
                             <div className="recruitment-dropdown">
-                              <div className="recruitment-dropdown-item">Edit</div>
+                              <div 
+                                className="recruitment-dropdown-item"
+                                onClick={() => handleEditJobPosting(posting)}
+                              >
+                                Edit
+                              </div>
                               <div className="recruitment-dropdown-item">
                                 {isArchived ? "Restore" : "Archive"}
                               </div>
@@ -326,6 +387,326 @@ const Recruitment = () => {
     </div>
   );
 
+
+  const handleEditJobPosting = (posting) => {
+    // Create a copy of the posting to edit
+    setEditingJobPosting({
+      ...posting,
+      // Ensure fields are properly set for editing
+      base_salary: posting.base_salary || "",
+      daily_rate: posting.daily_rate || "",
+      duration_days: posting.duration_days || ""
+    });
+    setShowEditJobModal(true);
+    setDotsMenuOpen(null);
+  };
+
+  const handleAddClick = () => {
+    if (activeTab === "Job Postings") {
+      setNewJobPosting({
+        dept_id: "",
+        position_id: "",
+        position_title: "",
+        description: "",
+        requirements: "",
+        employment_type: "Regular",
+        base_salary: "",
+        daily_rate: "",
+        duration_days: "",
+        posting_status: "Draft"
+      });
+      setShowAddJobModal(true);
+    }
+    // Add handlers for other tabs when needed
+  };
+
+const handleJobPostingChange = (e) => {
+  const { name, value, type } = e.target;
+  
+  // If changing position, update position_title automatically
+  if (name === "position_id") {
+    const selectedPosition = positions.find(p => p.position_id === value);
+    setNewJobPosting(prev => ({
+      ...prev,
+      [name]: value,
+      position_title: selectedPosition?.position_title || ""
+    }));
+  } 
+  // Handle employment type changes with proper field handling
+  else if (name === "employment_type") {
+    if (value === "Regular") {
+      setNewJobPosting(prev => ({
+        ...prev,
+        employment_type: value,
+        base_salary: prev.base_salary || "", // Keep existing value or use empty string
+        daily_rate: null, // Explicitly set to null for Regular
+        duration_days: null  // Set duration_days to null for Regular employees
+      }));
+    } else if (value === "Contractual") {
+      setNewJobPosting(prev => ({
+        ...prev,
+        employment_type: value,
+        base_salary: null, // Explicitly set to null for Contractual
+        daily_rate: prev.daily_rate || "", // Keep existing value or use empty string
+        duration_days: prev.duration_days || 30 // Set default to minimum valid value
+      }));
+    } else if (value === "Seasonal") {
+      setNewJobPosting(prev => ({
+        ...prev,
+        employment_type: value,
+        base_salary: null, // Explicitly set to null for Seasonal
+        daily_rate: prev.daily_rate || "", // Keep existing value or use empty string
+        duration_days: prev.duration_days || 1 // Set default to minimum valid value
+      }));
+    }
+  }
+  // Handle numeric inputs
+  else if (type === "number") {
+    const numValue = value === "" ? "" : 
+                    (name === "duration_days" ? parseInt(value) : parseFloat(value));
+    setNewJobPosting(prev => ({
+      ...prev,
+      [name]: numValue
+    }));
+  }
+  // Handle all other inputs
+  else {
+    setNewJobPosting(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+};
+
+const handleEditJobPostingSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Create a copy of the data to send to the API
+  const jobPostingData = { ...editingJobPosting };
+  
+  try {
+    // Validate required fields
+    if (!jobPostingData.dept_id || !jobPostingData.position_id || 
+        !jobPostingData.description || !jobPostingData.requirements) {
+      showToast("Please fill all required fields", false);
+      return;
+    }
+    
+    // Apply the same formatting and validation as in the create function
+    if (jobPostingData.employment_type === "Regular") {
+      if (!jobPostingData.base_salary) {
+        showToast("Base salary is required for Regular positions", false);
+        return;
+      }
+      jobPostingData.daily_rate = 0;
+      jobPostingData.duration_days = null;
+      jobPostingData.base_salary = parseFloat(jobPostingData.base_salary);
+    } else if (jobPostingData.employment_type === "Contractual") {
+      if (!jobPostingData.daily_rate) {
+        showToast("Daily rate is required for Contractual positions", false);
+        return;
+      }
+      if (!jobPostingData.duration_days || 
+          jobPostingData.duration_days < 30 || 
+          jobPostingData.duration_days > 180) {
+        showToast("Contractual positions require duration between 30 and 180 days", false);
+        return;
+      }
+      jobPostingData.base_salary = 0;
+      jobPostingData.daily_rate = parseFloat(jobPostingData.daily_rate);
+    } else if (jobPostingData.employment_type === "Seasonal") {
+      if (!jobPostingData.daily_rate) {
+        showToast("Daily rate is required for Seasonal positions", false);
+        return;
+      }
+      if (!jobPostingData.duration_days || 
+          jobPostingData.duration_days < 1 || 
+          jobPostingData.duration_days > 29) {
+        showToast("Seasonal positions require duration between 1 and 29 days", false);
+        return;
+      }
+      jobPostingData.base_salary = 0;
+      jobPostingData.daily_rate = parseFloat(jobPostingData.daily_rate);
+    }
+    
+    // Convert duration_days to a number if it exists and not null
+    if (jobPostingData.duration_days !== null) {
+      jobPostingData.duration_days = parseInt(jobPostingData.duration_days);
+    }
+    
+    await axios.patch(
+      `http://127.0.0.1:8000/api/job_posting/job_postings/${editingJobPosting.job_id}/`, 
+      jobPostingData
+    );
+    
+    showToast("Job posting updated successfully", true);
+    setShowEditJobModal(false);
+    
+    // Refresh job postings
+    const jobPostingsRes = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
+    setJobPostings(jobPostingsRes.data);
+  } catch (err) {
+    console.error("Error updating job posting:", err.response?.data || err);
+    const errorMessage = err.response?.data?.detail || 
+                       Object.values(err.response?.data || {}).flat().join(", ") || 
+                       "Failed to update job posting";
+    showToast(errorMessage, false);
+  }
+};
+
+const handleEditJobPostingChange = (e) => {
+  const { name, value, type } = e.target;
+  
+  // If changing position, update position_title automatically
+  if (name === "position_id") {
+    const selectedPosition = positions.find(p => p.position_id === value);
+    setEditingJobPosting(prev => ({
+      ...prev,
+      [name]: value,
+      position_title: selectedPosition?.position_title || ""
+    }));
+  } 
+  // Handle employment type changes with proper field handling
+  else if (name === "employment_type") {
+    if (value === "Regular") {
+      setEditingJobPosting(prev => ({
+        ...prev,
+        employment_type: value,
+        base_salary: prev.base_salary || "", 
+        daily_rate: null,
+        duration_days: null
+      }));
+    } else if (value === "Contractual") {
+      setEditingJobPosting(prev => ({
+        ...prev,
+        employment_type: value,
+        base_salary: null,
+        daily_rate: prev.daily_rate || "", 
+        duration_days: prev.duration_days || 30
+      }));
+    } else if (value === "Seasonal") {
+      setEditingJobPosting(prev => ({
+        ...prev,
+        employment_type: value,
+        base_salary: null,
+        daily_rate: prev.daily_rate || "",
+        duration_days: prev.duration_days || 1
+      }));
+    }
+  }
+  // Handle numeric inputs
+  else if (type === "number") {
+    const numValue = value === "" ? "" : 
+                   (name === "duration_days" ? parseInt(value) : parseFloat(value));
+    setEditingJobPosting(prev => ({
+      ...prev,
+      [name]: numValue
+    }));
+  }
+  // Handle all other inputs
+  else {
+    setEditingJobPosting(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+};
+
+const handleJobPostingSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Create a copy of the data to send to the API
+  const jobPostingData = { ...newJobPosting };
+  
+  try {
+    // Validate required fields
+    if (!jobPostingData.dept_id || !jobPostingData.position_id || 
+        !jobPostingData.description || !jobPostingData.requirements) {
+      showToast("Please fill all required fields", false);
+      return;
+    }
+    
+    // Apply proper formatting and validation based on employment type
+    if (jobPostingData.employment_type === "Regular") {
+      if (!jobPostingData.base_salary) {
+        showToast("Base salary is required for Regular positions", false);
+        return;
+      }
+      // For Regular positions, set daily_rate to null explicitly and duration_days to null
+      jobPostingData.daily_rate = 0;
+      jobPostingData.duration_days = null;
+      
+      // Ensure base_salary is a number
+      jobPostingData.base_salary = parseFloat(jobPostingData.base_salary);
+    } else if (jobPostingData.employment_type === "Contractual") {
+      // For Contractual positions
+      if (!jobPostingData.daily_rate) {
+        showToast("Daily rate is required for Contractual positions", false);
+        return;
+      }
+      
+      // Validate duration days for Contractual (30-180 days)
+      if (!jobPostingData.duration_days || 
+          jobPostingData.duration_days < 30 || 
+          jobPostingData.duration_days > 180) {
+        showToast("Contractual positions require duration between 30 and 180 days", false);
+        return;
+      }
+      
+      // Set base_salary to null explicitly
+      jobPostingData.base_salary = 0;
+      
+      // Ensure daily_rate is a number
+      jobPostingData.daily_rate = parseFloat(jobPostingData.daily_rate);
+    } else if (jobPostingData.employment_type === "Seasonal") {
+      // For Seasonal positions
+      if (!jobPostingData.daily_rate) {
+        showToast("Daily rate is required for Seasonal positions", false);
+        return;
+      }
+      
+      // Validate duration days for Seasonal (1-29 days)
+      if (!jobPostingData.duration_days || 
+          jobPostingData.duration_days < 1 || 
+          jobPostingData.duration_days > 29) {
+        showToast("Seasonal positions require duration between 1 and 29 days", false);
+        return;
+      }
+      
+      // Set base_salary to null explicitly
+      jobPostingData.base_salary = 0;
+      
+      // Ensure daily_rate is a number
+      jobPostingData.daily_rate = parseFloat(jobPostingData.daily_rate);
+    }
+    
+    // Convert duration_days to a number if it exists and not null
+    if (jobPostingData.duration_days !== null) {
+      jobPostingData.duration_days = parseInt(jobPostingData.duration_days);
+    }
+    
+    console.log("Sending job posting data:", jobPostingData);
+    
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/job_posting/job_postings/", 
+      jobPostingData
+    );
+    
+    showToast("Job posting created successfully", true);
+    setShowAddJobModal(false);
+    
+    // Refresh job postings
+    const jobPostingsRes = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
+    setJobPostings(jobPostingsRes.data);
+  } catch (err) {
+    console.error("Error creating job posting:", err.response?.data || err);
+    const errorMessage = err.response?.data?.detail || 
+                       Object.values(err.response?.data || {}).flat().join(", ") || 
+                       "Failed to create job posting";
+    showToast(errorMessage, false);
+  }
+};
+
   return (
     <div className="recruitment">
       <div className="recruitment-body-content-container">
@@ -351,7 +732,7 @@ const Recruitment = () => {
                 <option value="id">Sort by ID</option>
                 <option value="status">Sort by Status</option>
               </select>
-              <button className="recruitment-add-btn">+ Add</button>
+              <button className="recruitment-add-btn" onClick={handleAddClick}>+ Add</button>
               <button
                 className="recruitment-add-btn"
                 onClick={() => setShowArchived(!showArchived)}
@@ -412,6 +793,338 @@ const Recruitment = () => {
           {toast.message}
         </div>
       )}
+
+      {showAddJobModal && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3>Add New Job Posting</h3>
+            <form onSubmit={handleJobPostingSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Department *</label>
+                    <select 
+                      name="dept_id" 
+                      value={newJobPosting.dept_id} 
+                      onChange={handleJobPostingChange}
+                      required
+                    >
+                      <option value="">-- Select Department --</option>
+                      {Array.isArray(departments) ? departments.map(dept => (
+                        <option key={dept.dept_id} value={dept.dept_id}>
+                          {dept.dept_name}
+                        </option>
+                      )) : <option value="">No departments available</option>}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Position *</label>
+                    <select 
+                      name="position_id" 
+                      value={newJobPosting.position_id} 
+                      onChange={handleJobPostingChange}
+                      required
+                    >
+                      <option value="">-- Select Position --</option>
+                      {Array.isArray(positions) ? positions.map(pos => (
+                        <option key={pos.position_id} value={pos.position_id}>
+                          {pos.position_title}
+                        </option>
+                      )) : <option value="">No positions available</option>}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Employment Type *</label>
+                    <select 
+                      name="employment_type" 
+                      value={newJobPosting.employment_type} 
+                      onChange={handleJobPostingChange}
+                      required
+                    >
+                      <option value="Regular">Regular</option>
+                      <option value="Contractual">Contractual</option>
+                      <option value="Seasonal">Seasonal</option>
+                    </select>
+                  </div>
+                  
+                  {/* Conditionally render salary field based on employment type */}
+                  {newJobPosting.employment_type === "Regular" ? (
+                    <div className="form-group">
+                      <label>Base Salary *</label>
+                      <input 
+                        type="number" 
+                        name="base_salary" 
+                        value={newJobPosting.base_salary} 
+                        onChange={handleJobPostingChange}
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                  ) : (
+                    <div className="form-group">
+                      <label>Daily Rate *</label>
+                      <input 
+                        type="number" 
+                        name="daily_rate" 
+                        value={newJobPosting.daily_rate} 
+                        onChange={handleJobPostingChange}
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Duration (Days){newJobPosting.employment_type !== "Regular" ? " *" : ""}</label>
+                    <input 
+                      type="number" 
+                      name="duration_days" 
+                      value={newJobPosting.employment_type === "Regular" ? "" : newJobPosting.duration_days} 
+                      onChange={handleJobPostingChange}
+                      min={newJobPosting.employment_type === "Seasonal" ? 1 : 30}
+                      max={newJobPosting.employment_type === "Seasonal" ? 29 : 180}
+                      disabled={newJobPosting.employment_type === "Regular"}
+                      className={newJobPosting.employment_type === "Regular" ? "disabled-input" : ""}
+                      required={newJobPosting.employment_type !== "Regular"}
+                    />
+                    {newJobPosting.employment_type === "Regular" && 
+                      <small className="input-help-text">Not applicable for Regular employees</small>
+                    }
+                    {newJobPosting.employment_type === "Contractual" && 
+                      <small className="input-help-text">Must be between 30 and 180 days</small>
+                    }
+                    {newJobPosting.employment_type === "Seasonal" && 
+                      <small className="input-help-text">Must be between 1 and 29 days</small>
+                    }
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Posting Status *</label>
+                    <select 
+                      name="posting_status" 
+                      value={newJobPosting.posting_status} 
+                      onChange={handleJobPostingChange}
+                      required
+                    >
+                      <option value="Draft">Draft</option>
+                      <option value="Open">Open</option>
+                      <option value="Closed">Closed</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Description *</label>
+                    <textarea 
+                      name="description" 
+                      value={newJobPosting.description} 
+                      onChange={handleJobPostingChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Requirements *</label>
+                    <textarea 
+                      name="requirements" 
+                      value={newJobPosting.requirements} 
+                      onChange={handleJobPostingChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button type="submit" className="submit-btn">Add</button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowAddJobModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+{/* Edit Job Posting Modal */}
+{showEditJobModal && editingJobPosting && (
+  <div className="recruitment-modal-overlay">
+    <div className="recruitment-modal">
+      <h3>Edit Job Posting</h3>
+      <form onSubmit={handleEditJobPostingSubmit} className="recruitment-form">
+        <div className="recruitment-form-two-columns">
+          <div className="form-column">
+            <div className="form-group">
+              <label>Job ID</label>
+              <input 
+                type="text" 
+                value={editingJobPosting.job_id || ''}
+                disabled
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Department *</label>
+              <select 
+                name="dept_id" 
+                value={editingJobPosting.dept_id || ''} 
+                onChange={handleEditJobPostingChange}
+                required
+              >
+                <option value="">-- Select Department --</option>
+                {Array.isArray(departments) ? departments.map(dept => (
+                  <option key={dept.dept_id} value={dept.dept_id}>
+                    {dept.dept_name}
+                  </option>
+                )) : <option value="">No departments available</option>}
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Position *</label>
+              <select 
+                name="position_id" 
+                value={editingJobPosting.position_id || ''} 
+                onChange={handleEditJobPostingChange}
+                required
+              >
+                <option value="">-- Select Position --</option>
+                {Array.isArray(positions) ? positions.map(pos => (
+                  <option key={pos.position_id} value={pos.position_id}>
+                    {pos.position_title}
+                  </option>
+                )) : <option value="">No positions available</option>}
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Employment Type *</label>
+              <select 
+                name="employment_type" 
+                value={editingJobPosting.employment_type || 'Regular'} 
+                onChange={handleEditJobPostingChange}
+                required
+              >
+                <option value="Regular">Regular</option>
+                <option value="Contractual">Contractual</option>
+                <option value="Seasonal">Seasonal</option>
+              </select>
+            </div>
+            
+            {editingJobPosting.employment_type === "Regular" ? (
+              <div className="form-group">
+                <label>Base Salary *</label>
+                <input 
+                  type="number" 
+                  name="base_salary" 
+                  value={editingJobPosting.base_salary || ''} 
+                  onChange={handleEditJobPostingChange}
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+            ) : (
+              <div className="form-group">
+                <label>Daily Rate *</label>
+                <input 
+                  type="number" 
+                  name="daily_rate" 
+                  value={editingJobPosting.daily_rate || ''} 
+                  onChange={handleEditJobPostingChange}
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+            )}
+          </div>
+          
+          <div className="form-column">
+            <div className="form-group">
+              <label>Duration (Days){editingJobPosting.employment_type !== "Regular" ? " *" : ""}</label>
+              <input 
+                type="number" 
+                name="duration_days" 
+                value={editingJobPosting.employment_type === "Regular" ? "" : editingJobPosting.duration_days || ""} 
+                onChange={handleEditJobPostingChange}
+                min={editingJobPosting.employment_type === "Seasonal" ? 1 : 30}
+                max={editingJobPosting.employment_type === "Seasonal" ? 29 : 180}
+                disabled={editingJobPosting.employment_type === "Regular"}
+                className={editingJobPosting.employment_type === "Regular" ? "disabled-input" : ""}
+                required={editingJobPosting.employment_type !== "Regular"}
+              />
+              {editingJobPosting.employment_type === "Regular" && 
+                <small className="input-help-text">Not applicable for Regular employees</small>
+              }
+              {editingJobPosting.employment_type === "Contractual" && 
+                <small className="input-help-text">Must be between 30 and 180 days</small>
+              }
+              {editingJobPosting.employment_type === "Seasonal" && 
+                <small className="input-help-text">Must be between 1 and 29 days</small>
+              }
+            </div>
+            
+            <div className="form-group">
+              <label>Posting Status *</label>
+              <select 
+                name="posting_status" 
+                value={editingJobPosting.posting_status || 'Draft'} 
+                onChange={handleEditJobPostingChange}
+                required
+              >
+                <option value="Draft">Draft</option>
+                <option value="Open">Open</option>
+                <option value="Closed">Closed</option>
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Description *</label>
+              <textarea 
+                name="description" 
+                value={editingJobPosting.description || ''} 
+                onChange={handleEditJobPostingChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Requirements *</label>
+              <textarea 
+                name="requirements" 
+                value={editingJobPosting.requirements || ''} 
+                onChange={handleEditJobPostingChange}
+                required
+              />
+            </div>
+          </div>
+        </div>
+        
+        <div className="recruitment-modal-buttons">
+          <button type="submit" className="submit-btn">Save Changes</button>
+          <button 
+            type="button" 
+            className="cancel-btn" 
+            onClick={() => setShowEditJobModal(false)}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
