@@ -379,7 +379,6 @@ function App() {
     },
     "Production": {
       "Equipment and Labor": "Equipment&Labor",
-      "Quality Control": "QualityControl",
       "Cost of Production": "CostOfProduction"
     },
     "MRP": {
