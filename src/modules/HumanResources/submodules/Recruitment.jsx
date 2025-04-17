@@ -10,6 +10,10 @@ const Recruitment = () => {
   const [jobPostings, setJobPostings] = useState([]);
   const [archivedJobPostings, setArchivedJobPostings] = useState([]);
   const [resignations, setResignations] = useState([]);
+  
+  // New states for departments and positions
+  const [departments, setDepartments] = useState([]);
+  const [positions, setPositions] = useState([]);
 
   // UI States
   const [activeTab, setActiveTab] = useState("Candidates");
@@ -21,12 +25,31 @@ const Recruitment = () => {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [dotsMenuOpen, setDotsMenuOpen] = useState(null);
+  const [showAddJobModal, setShowAddJobModal] = useState(false);
+  const [newJobPosting, setNewJobPosting] = useState({
+    dept_id: "",
+    position_id: "",
+    description: "",
+    requirements: "",
+    base_salary: null,
+    daily_rate: null,
+    posting_status: "Draft"
+  });
+  const [showEditJobModal, setShowEditJobModal] = useState(false);
+  const [editingJobPosting, setEditingJobPosting] = useState(null);
+
+  // Show toast message
+  const showToast = (message, success = true) => {
+    setToast({ message, success });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   // Fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        // Fetch candidates and job postings
         const [candidatesRes, archivedCandidatesRes] = await Promise.all([
           axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
           axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
@@ -38,12 +61,20 @@ const Recruitment = () => {
         ]);
 
         const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
+        
+        // Fetch departments and positions for dropdowns
+        const [departmentsRes, positionsRes] = await Promise.all([
+          axios.get("http://127.0.0.1:8000/api/departments/"),
+          axios.get("http://127.0.0.1:8000/api/positions/")
+        ]);
 
         setCandidates(candidatesRes.data);
         setArchivedCandidates(archivedCandidatesRes.data);
         setJobPostings(jobPostingsRes.data);
         setArchivedJobPostings(archivedJobPostingsRes.data);
         setResignations(resignationsRes.data);
+        setDepartments(departmentsRes.data);
+        setPositions(positionsRes.data);
       } catch (err) {
         console.error("Error fetching data:", err);
         showToast("Failed to fetch data", false);
@@ -75,12 +106,32 @@ const Recruitment = () => {
       });
     });
   
+    // The existing filterAndPaginate function logic handles sorting well
     if (sortField !== "all") {
       filtered.sort((a, b) => {
         if (!a || !b) return 0;
-        const valA = a[sortField] != null ? a[sortField].toString().toLowerCase() : '';
-        const valB = b[sortField] != null ? b[sortField].toString().toLowerCase() : '';
-        return valA.localeCompare(valB);
+        
+        // Get values to compare
+        const valA = a[sortField];
+        const valB = b[sortField];
+        
+        // Handle null/undefined values
+        if (valA == null && valB == null) return 0;
+        if (valA == null) return 1;
+        if (valB == null) return -1;
+        
+        // Handle dates (check if field might contain date values)
+        if (sortField.includes('date') || sortField.includes('created_at') || sortField.includes('updated_at')) {
+          return new Date(valA) - new Date(valB);
+        }
+        
+        // Handle numeric values (IDs or numbers)
+        if (sortField.includes('id') || !isNaN(valA)) {
+          return Number(valA) - Number(valB);
+        }
+        
+        // Default: case-insensitive string comparison
+        return valA.toString().toLowerCase().localeCompare(valB.toString().toLowerCase());
       });
     }
   
@@ -91,6 +142,148 @@ const Recruitment = () => {
     return { paginated, totalPages };
   };
 
+  // Handle form input changes
+  const handleJobPostingChange = (e) => {
+    const { name, value, type } = e.target;
+    
+    // Log selected department for debugging
+    if (name === "dept_id") {
+      console.log("Selected department:", value);
+      console.log("Available departments:", departments);
+    }
+    
+    // Handle base_salary and daily_rate mutual exclusivity
+    if (name === "base_salary" && value) {
+      setNewJobPosting((prev) => ({
+        ...prev,
+        [name]: value,
+        daily_rate: null
+      }));
+    } else if (name === "daily_rate" && value) {
+      setNewJobPosting((prev) => ({
+        ...prev,
+        [name]: value,
+        base_salary: null
+      }));
+    } else {
+      setNewJobPosting((prev) => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  // Handle form submission
+  const handleAddJobPosting = async (e) => {
+    e.preventDefault();
+    try {
+      // Add validation logic as needed
+      if (!newJobPosting.dept_id || !newJobPosting.description || 
+          !newJobPosting.requirements || (!newJobPosting.base_salary && !newJobPosting.daily_rate)) {
+        showToast("Please fill in all required fields", false);
+        return;
+      }
+
+      // API call to add job posting
+      await axios.post("http://127.0.0.1:8000/api/job_posting/job_postings/", newJobPosting);
+      
+      setShowAddJobModal(false);
+      showToast("Job posting added successfully");
+      
+      // Refresh job postings data
+      const jobPostingsRes = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
+      setJobPostings(jobPostingsRes.data);
+    } catch (err) {
+      console.error("Add job posting error:", err);
+      showToast("Failed to add job posting", false);
+    }
+  };
+
+  const handleEditJobPosting = async (e) => {
+    e.preventDefault();
+    try {
+      if (!editingJobPosting.dept_id || !editingJobPosting.description || 
+          !editingJobPosting.requirements || (!editingJobPosting.base_salary && !editingJobPosting.daily_rate)) {
+        showToast("Please fill in all required fields", false);
+        return;
+      }
+
+      await axios.patch(`http://127.0.0.1:8000/api/job_posting/job_postings/${editingJobPosting.job_id}/`, editingJobPosting);
+      
+      setShowEditJobModal(false);
+      showToast("Job posting updated successfully");
+      
+      // Refresh job postings data
+      const jobPostingsRes = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
+      setJobPostings(jobPostingsRes.data);
+    } catch (err) {
+      console.error("Edit job posting error:", err);
+      showToast("Failed to update job posting", false);
+    }
+  };
+
+  const handleArchiveJobPosting = async (jobId) => {
+    try {
+      await axios.post(`http://127.0.0.1:8000/api/job_posting/job_postings/${jobId}/archive/`);
+      showToast("Job posting archived successfully");
+      
+      // Refresh job postings data
+      const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
+        axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/"),
+        axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/archived/")
+      ]);
+      
+      setJobPostings(jobPostingsRes.data);
+      setArchivedJobPostings(archivedJobPostingsRes.data);
+    } catch (err) {
+      console.error("Archive job posting error:", err);
+      showToast("Failed to archive job posting", false);
+    }
+  };
+
+  const handleUnarchiveJobPosting = async (jobId) => {
+    try {
+      await axios.post(`http://127.0.0.1:8000/api/job_posting/job_postings/${jobId}/unarchive/`);
+      showToast("Job posting unarchived successfully");
+      
+      // Refresh job postings data
+      const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
+        axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/"),
+        axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/archived/")
+      ]);
+      
+      setJobPostings(jobPostingsRes.data);
+      setArchivedJobPostings(archivedJobPostingsRes.data);
+    } catch (err) {
+      console.error("Unarchive job posting error:", err);
+      showToast("Failed to unarchive job posting", false);
+    }
+  };
+
+  // Helper function for duration class
+  const getDurationClass = (days) => {
+    if (!days) return "unknown";
+    if (days <= 30) return "short-duration";
+    if (days <= 90) return "medium-duration";
+    return "long-duration";
+  };
+
+  // Helper function for finance approval class
+  const getFinanceApprovalClass = (status) => {
+    if (!status) return "pending-finance";
+    if (status.toLowerCase().includes("approved")) return "approved-finance";
+    if (status.toLowerCase().includes("rejected")) return "rejected-finance";
+    return "pending-finance";
+  };
+
+  // Add a helper function for clearance status
+  const getClearanceStatusClass = (status) => {
+    if (!status) return "pending-clearance";
+    if (status.toLowerCase().includes("cleared")) return "cleared";
+    if (status.toLowerCase().includes("rejected")) return "rejected-clearance";
+    return "pending-clearance";
+  };
+
   // Render functions for each table
   const renderJobPostingsTable = (data, isArchived = false) => {
     const { paginated, totalPages } = filterAndPaginate(data);
@@ -99,76 +292,111 @@ const Recruitment = () => {
     if (!paginated.length) return <div className="recruitment-no-results">No job postings found.</div>;
 
     return (
-      <div className="recruitment-table-wrapper">
-        <div className="recruitment-table-scrollable">
-          <table className="recruitment-table">
-            <thead>
-              <tr>
-                {isArchived && <th>Select</th>}
-                <th>Job ID</th>
-                <th>Department</th>
-                <th>Position</th>
-                <th>Description</th>
-                <th>Requirements</th>
-                <th>Employment Type</th>
-                <th>Base Salary</th>
-                <th>Daily Rate</th>
-                <th>Duration (Days)</th>
-                <th>Finance Approval</th>
-                <th>Posting Status</th>
-                <th>Created At</th>
-                <th>Updated At</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-                      {paginated.map((posting, index) => (
-                    <tr key={posting.job_id} className={isArchived ? "recruitment-archived-row" : ""}>
-                      {isArchived && (
-                        <td>
-                          <input type="checkbox" />
-                        </td>
-                      )}
-                      <td>{posting.job_id}</td>
-                      <td>{posting.dept_id}</td>
-                      <td>{posting.position_title}</td>
-                      <td>{posting.description}</td>
-                      <td>{posting.requirements}</td>
-                      <td>{posting.employment_type}</td>
-                      <td>{posting.base_salary}</td>
-                      <td>{posting.daily_rate}</td>
-                      <td>{posting.duration_days}</td>
-                      <td>{posting.finance_approval_status}</td>
+      <>
+        <div className="recruitment-table-wrapper">
+          <div className="recruitment-table-scrollable">
+            <table className="recruitment-table">
+              <thead>
+                <tr>
+                  {isArchived && <th>Select</th>}
+                  <th>Job ID</th>
+                  <th>Department</th>
+                  <th>Position</th>
+                  <th>Description</th>
+                  <th>Requirements</th>
+                  <th>Employment Type</th>
+                  <th>Base Salary</th>
+                  <th>Daily Rate</th>
+                  <th>Duration (Days)</th>
+                  <th>Finance Approval</th>
+                  <th>Posting Status</th>
+                  <th>Created At</th>
+                  <th>Updated At</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.map((posting, index) => (
+                  <tr key={posting.job_id} className={isArchived ? "recruitment-archived-row" : ""}>
+                    {isArchived && (
                       <td>
-                        <span className={`recruitment-tag ${posting.status ? posting.status.toLowerCase() : 'unknown'}`}>
-                          {posting.status || 'Unknown'}
+                        <input type="checkbox" />
+                      </td>
+                    )}
+                    <td>{posting.job_id}</td>
+                    <td>{posting.dept_id}</td>
+                    <td>{posting.position_title}</td>
+                    <td>{posting.description}</td>
+                    <td>{posting.requirements}</td>
+                    <td>
+                      <span className={`recruitment-tag ${posting.employment_type ? posting.employment_type.toLowerCase() : 'unknown'}`}>
+                        {posting.employment_type || 'Unknown'}
+                      </span>
+                    </td>
+                    <td>{posting.base_salary}</td>
+                    <td>{posting.daily_rate}</td>
+                    <td>
+                      {posting.duration_days ? (
+                        <span className={`recruitment-tag ${getDurationClass(posting.duration_days)}`}>
+                          {posting.duration_days} days
                         </span>
-                      </td>
-                      <td>{posting.created_at}</td>
-                      <td>{posting.updated_at}</td>
-                      <td className="recruitment-actions">
-                        <div
-                          className="recruitment-dots"
-                          onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                        >
-                          ⋮
-                          {dotsMenuOpen === index && (
-                            <div className="recruitment-dropdown">
-                              <div className="recruitment-dropdown-item">Edit</div>
-                              <div className="recruitment-dropdown-item">
-                                {isArchived ? "Restore" : "Archive"}
-                              </div>
+                      ) : "—"}
+                    </td>
+                    <td>
+                      <span className={`recruitment-tag ${getFinanceApprovalClass(posting.finance_approval_status)}`}>
+                        {posting.finance_approval_status || 'Pending'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`recruitment-tag ${posting.status ? posting.status.toLowerCase() : 'unknown'}`}>
+                        {posting.status || 'Unknown'}
+                      </span>
+                    </td>
+                    <td>{posting.created_at}</td>
+                    <td>{posting.updated_at}</td>
+                    <td className="recruitment-actions">
+                      <div
+                        className="recruitment-dots"
+                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="recruitment-dropdown">
+                            <div 
+                              className="recruitment-dropdown-item" 
+                              onClick={() => {
+                                setEditingJobPosting(posting);
+                                setShowEditJobModal(true);
+                                setDotsMenuOpen(null);
+                              }}
+                            >
+                              Edit
                             </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-            </tbody>
-          </table>
+                            <div 
+                              className="recruitment-dropdown-item"
+                              onClick={() => {
+                                if (isArchived) {
+                                  handleUnarchiveJobPosting(posting.job_id);
+                                } else {
+                                  handleArchiveJobPosting(posting.job_id);
+                                }
+                                setDotsMenuOpen(null);
+                              }}
+                            >
+                              {isArchived ? "Restore" : "Archive"}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {renderPagination(totalPages)}
-      </div>
+      </>
     );
   };
 
@@ -177,64 +405,66 @@ const Recruitment = () => {
     if (loading) return <div className="recruitment-no-results">Loading candidates...</div>;
     if (!paginated.length) return <div className="recruitment-no-results">No candidates found.</div>;
     return (
-      <div className="recruitment-table-wrapper">
-        <div className="recruitment-table-scrollable">
-          <table className="recruitment-table">
-            <thead>
-              <tr>
-                {isArchived && <th>Select</th>}
-                <th>ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Status</th>
-                <th>Applied Position</th>
-                <th>Applied Date</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.map((candidate, index) => (
-                <tr key={candidate.id} className={isArchived ? "recruitment-archived-row" : ""}>
-                  {isArchived && (
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                  )}
-                  <td>{candidate.id}</td>
-                  <td>{candidate.first_name}</td>
-                  <td>{candidate.last_name}</td>
-                  <td>{candidate.email}</td>
-                  <td>{candidate.phone}</td>
-                  <td>
-                    <span className={`recruitment-tag ${candidate.status ? candidate.status.toLowerCase() : 'unknown'}`}>
-                      {candidate.status || 'Unknown'}
-                    </span>
-                  </td>
-                  <td>{candidate.applied_position}</td>
-                  <td>{candidate.applied_date}</td>
-                  <td className="recruitment-actions">
-                    <div
-                      className="recruitment-dots"
-                      onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                    >
-                      ⋮
-                      {dotsMenuOpen === index && (
-                        <div className="recruitment-dropdown">
-                          <div className="recruitment-dropdown-item">Edit</div>
-                          <div className="recruitment-dropdown-item">Archive</div>
-                        </div>
-                      )}
-                    </div>
-                  </td>
+      <>
+        <div className="recruitment-table-wrapper">
+          <div className="recruitment-table-scrollable">
+            <table className="recruitment-table">
+              <thead>
+                <tr>
+                  {isArchived && <th>Select</th>}
+                  <th>ID</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Status</th>
+                  <th>Applied Position</th>
+                  <th>Applied Date</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {paginated.map((candidate, index) => (
+                  <tr key={candidate.id} className={isArchived ? "recruitment-archived-row" : ""}>
+                    {isArchived && (
+                      <td>
+                        <input type="checkbox" />
+                      </td>
+                    )}
+                    <td>{candidate.id}</td>
+                    <td>{candidate.first_name}</td>
+                    <td>{candidate.last_name}</td>
+                    <td>{candidate.email}</td>
+                    <td>{candidate.phone}</td>
+                    <td>
+                      <span className={`recruitment-tag ${candidate.status ? candidate.status.toLowerCase() : 'unknown'}`}>
+                        {candidate.status || 'Unknown'}
+                      </span>
+                    </td>
+                    <td>{candidate.applied_position}</td>
+                    <td>{candidate.applied_date}</td>
+                    <td className="recruitment-actions">
+                      <div
+                        className="recruitment-dots"
+                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="recruitment-dropdown">
+                            <div className="recruitment-dropdown-item">Edit</div>
+                            <div className="recruitment-dropdown-item">Archive</div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {renderPagination(totalPages)}
-      </div>
+      </>
     );
   };
 
@@ -243,74 +473,78 @@ const Recruitment = () => {
     if (loading) return <div className="recruitment-no-results">Loading resignations...</div>;
     if (!paginated.length) return <div className="recruitment-no-results">No resignations found.</div>;
     return (
-      <div className="recruitment-table-wrapper">
-        <div className="recruitment-table-scrollable">
-          <table className="recruitment-table">
-            <thead>
-              <tr>
-                <th>Resignation ID</th>
-                <th>Employee ID</th>
-                <th>Submission Date</th>
-                <th>Notice Period (Days)</th>
-                <th>HR Approver</th>
-                <th>Approval Status</th>
-                <th>Clearance Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.map((resignation, index) => (
-                <tr key={resignation.resignation_id}>
-                  <td>{resignation.resignation_id}</td>
-                  <td>{resignation.employee_id}</td>
-                  <td>{resignation.submission_date ? new Date(resignation.submission_date).toLocaleDateString() : 'N/A'}</td>
-                  <td>{resignation.notice_period_days || 'N/A'}</td>
-                  <td>{resignation.hr_approver_id || 'Pending'}</td>
-                  <td>
-                    <span className={`recruitment-tag ${resignation.approval_status ? resignation.approval_status.toLowerCase() : 'unknown'}`}>
-                      {resignation.approval_status || 'Unknown'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`recruitment-tag ${resignation.clearance_status ? resignation.clearance_status.toLowerCase() : 'unknown'}`}>
-                      {resignation.clearance_status || 'Unknown'}
-                    </span>
-                  </td>
-                  <td className="recruitment-actions">
-                    <div
-                      className="recruitment-dots"
-                      onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                    >
-                      ⋮
-                      {dotsMenuOpen === index && (
-                        <div className="recruitment-dropdown">
-                          <div className="recruitment-dropdown-item">View</div>
-                          <div className="recruitment-dropdown-item">Archive</div>
-                        </div>
-                      )}
-                    </div>
-                  </td>
+      <>
+        <div className="recruitment-table-wrapper">
+          <div className="recruitment-table-scrollable">
+            <table className="recruitment-table">
+              <thead>
+                <tr>
+                  <th>Resignation ID</th>
+                  <th>Employee ID</th>
+                  <th>Submission Date</th>
+                  <th>Notice Period (Days)</th>
+                  <th>HR Approver</th>
+                  <th>Approval Status</th>
+                  <th>Clearance Status</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {paginated.map((resignation, index) => (
+                  <tr key={resignation.resignation_id}>
+                    <td>{resignation.resignation_id}</td>
+                    <td>{resignation.employee_id}</td>
+                    <td>{resignation.submission_date ? new Date(resignation.submission_date).toLocaleDateString() : 'N/A'}</td>
+                    <td>{resignation.notice_period_days || 'N/A'}</td>
+                    <td>{resignation.hr_approver_id || 'Pending'}</td>
+                    <td>
+                      <span className={`recruitment-tag ${resignation.approval_status ? resignation.approval_status.toLowerCase() : 'unknown'}`}>
+                        {resignation.approval_status || 'Unknown'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`recruitment-tag ${getClearanceStatusClass(resignation.clearance_status)}`}>
+                        {resignation.clearance_status || 'Pending'}
+                      </span>
+                    </td>
+                    <td className="recruitment-actions">
+                      <div
+                        className="recruitment-dots"
+                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="recruitment-dropdown">
+                            <div className="recruitment-dropdown-item">View</div>
+                            <div className="recruitment-dropdown-item">Archive</div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {renderPagination(totalPages)}
-      </div>
+      </>
     );
   };
 
   const renderPagination = (totalPages) => (
     <div className="recruitment-pagination">
-      {[...Array(totalPages)].map((_, i) => (
-        <button
-          key={i}
-          className={i + 1 === currentPage ? "active" : ""}
-          onClick={() => setCurrentPage(i + 1)}
-        >
-          {i + 1}
-        </button>
-      ))}
+      <div className="recruitment-pagination-numbers">
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            className={i + 1 === currentPage ? "active" : ""}
+            onClick={() => setCurrentPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
       <select
         className="recruitment-pagination-size"
         value={itemsPerPage}
@@ -348,16 +582,63 @@ const Recruitment = () => {
                 onChange={(e) => setSortField(e.target.value)}
               >
                 <option value="all">No Sorting</option>
-                <option value="id">Sort by ID</option>
-                <option value="status">Sort by Status</option>
+                {activeTab === "Candidates" ? (
+                  <>
+                    <option value="id">Sort by ID</option>
+                    <option value="first_name">Sort by First Name</option>
+                    <option value="last_name">Sort by Last Name</option>
+                    <option value="email">Sort by Email</option>
+                    <option value="phone">Sort by Phone</option>
+                    <option value="status">Sort by Status</option>
+                    <option value="applied_position">Sort by Applied Position</option>
+                    <option value="applied_date">Sort by Applied Date</option>
+                  </>
+                ) : activeTab === "Job Postings" ? (
+                  <>
+                    <option value="job_id">Sort by Job ID</option>
+                    <option value="dept_id">Sort by Department</option>
+                    <option value="position_title">Sort by Position</option>
+                    <option value="description">Sort by Description</option>
+                    <option value="employment_type">Sort by Employment Type</option>
+                    <option value="base_salary">Sort by Base Salary</option>
+                    <option value="daily_rate">Sort by Daily Rate</option>
+                    <option value="status">Sort by Status</option>
+                    <option value="created_at">Sort by Created Date</option>
+                  </>
+                ) : (
+                  // Resignations tab
+                  <>
+                    <option value="resignation_id">Sort by Resignation ID</option>
+                    <option value="employee_id">Sort by Employee ID</option>
+                    <option value="submission_date">Sort by Submission Date</option>
+                    <option value="notice_period_days">Sort by Notice Period</option>
+                    <option value="approval_status">Sort by Approval Status</option>
+                    <option value="clearance_status">Sort by Clearance Status</option>
+                  </>
+                )}
               </select>
-              <button className="recruitment-add-btn">+ Add</button>
-              <button
-                className="recruitment-add-btn"
-                onClick={() => setShowArchived(!showArchived)}
+              <button 
+                className="recruitment-add-btn" 
+                onClick={() => {
+                  if (activeTab === "Job Postings") {
+                    setShowAddJobModal(true);
+                  }
+                  // Add handling for other tabs if needed
+                }}
               >
-                {showArchived ? "View Active" : "View Archived"}
+                {activeTab === "Candidates" && "+ Add Candidate"}
+                {activeTab === "Job Postings" && "+ Add Job Posting"}
+                {activeTab === "Resignations" && "+ Add Resignation"}
               </button>
+              {/* Only show View Archived button for Candidates and Job Postings */}
+              {activeTab !== "Resignations" && (
+                <button
+                  className="recruitment-add-btn"
+                  onClick={() => setShowArchived(!showArchived)}
+                >
+                  {showArchived ? "View Active" : "View Archived"}
+                </button>
+              )}
             </div>
           </div>
 
@@ -369,6 +650,7 @@ const Recruitment = () => {
                   setActiveTab("Candidates");
                   setShowArchived(false);
                   setCurrentPage(1);
+                  setSortField("all"); // Reset sort field
                 }}
               >
                 Candidates <span className="recruitment-count">{candidates.length}</span>
@@ -410,6 +692,265 @@ const Recruitment = () => {
           style={{ backgroundColor: toast.success ? "#4CAF50" : "#F44336" }}
         >
           {toast.message}
+        </div>
+      )}
+
+      {showAddJobModal && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3 style={{ marginBottom: "1rem" }}>Add New Job Posting</h3>
+            <form onSubmit={handleAddJobPosting} className="recruitment-modal-form recruitment-two-col">
+              {/* Left Column */}
+              <div className="form-group">
+                <label>Department *</label>
+                <select
+                  name="dept_id"
+                  value={newJobPosting.dept_id}
+                  onChange={handleJobPostingChange}
+                  required
+                >
+                  <option value="">-- Select Department --</option>
+                  {departments && departments.length > 0 && departments.map(dept => (
+                    <option 
+                      key={dept.dept_id || dept.id} 
+                      value={dept.dept_id || dept.id}
+                    >
+                      {dept.dept_name || dept.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Position *</label>
+                <select
+                  name="position_id"
+                  value={newJobPosting.position_id}
+                  onChange={handleJobPostingChange}
+                  required
+                >
+                  <option value="">-- Select Position --</option>
+                  {positions.map(pos => (
+                    <option key={pos.position_id} value={pos.position_id}>
+                      {pos.position_title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Base Salary</label>
+                <input
+                  type="number"
+                  name="base_salary"
+                  value={newJobPosting.base_salary || ''}
+                  onChange={handleJobPostingChange}
+                  disabled={newJobPosting.daily_rate !== null}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Daily Rate</label>
+                <input
+                  type="number"
+                  name="daily_rate"
+                  value={newJobPosting.daily_rate || ''}
+                  onChange={handleJobPostingChange}
+                  disabled={newJobPosting.base_salary !== null}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Status *</label>
+                <select
+                  name="posting_status"
+                  value={newJobPosting.posting_status}
+                  onChange={handleJobPostingChange}
+                  required
+                >
+                  <option value="Draft">Draft</option>
+                  <option value="Open">Open</option>
+                  <option value="Closed">Closed</option>
+                </select>
+              </div>
+              
+              {/* Right Column - Full width textareas */}
+              <div className="form-group full-width">
+                <label>Job Description *</label>
+                <textarea
+                  name="description"
+                  value={newJobPosting.description}
+                  onChange={handleJobPostingChange}
+                  required
+                  rows="5"
+                ></textarea>
+              </div>
+              
+              <div className="form-group full-width">
+                <label>Requirements *</label>
+                <textarea
+                  name="requirements"
+                  value={newJobPosting.requirements}
+                  onChange={handleJobPostingChange}
+                  required
+                  rows="5"
+                ></textarea>
+              </div>
+              
+              <div className="recruitment-modal-buttons recruitment-two-col-buttons">
+                <button type="submit" className="submit-btn">Add</button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowAddJobModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditJobModal && editingJobPosting && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3 style={{ marginBottom: "1rem" }}>Edit Job Posting</h3>
+            <form onSubmit={handleEditJobPosting} className="recruitment-modal-form recruitment-two-col">
+              {/* Left Column */}
+              <div className="form-group">
+                <label>Job ID</label>
+                <input
+                  type="text"
+                  value={editingJobPosting.job_id || ''}
+                  disabled
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Department *</label>
+                <select
+                  name="dept_id"
+                  value={editingJobPosting.dept_id || ''}
+                  onChange={(e) => setEditingJobPosting({...editingJobPosting, dept_id: e.target.value})}
+                  required
+                >
+                  <option value="">-- Select Department --</option>
+                  {departments && departments.length > 0 && departments.map(dept => (
+                    <option 
+                      key={dept.dept_id || dept.id} 
+                      value={dept.dept_id || dept.id}
+                    >
+                      {dept.dept_name || dept.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Position *</label>
+                <select
+                  name="position_id"
+                  value={editingJobPosting.position_id || ''}
+                  onChange={(e) => setEditingJobPosting({...editingJobPosting, position_id: e.target.value})}
+                  required
+                >
+                  <option value="">-- Select Position --</option>
+                  {positions.map(pos => (
+                    <option key={pos.position_id} value={pos.position_id}>
+                      {pos.position_title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Base Salary</label>
+                <input
+                  type="number"
+                  name="base_salary"
+                  value={editingJobPosting.base_salary || ''}
+                  onChange={(e) => setEditingJobPosting({
+                    ...editingJobPosting, 
+                    base_salary: e.target.value,
+                    daily_rate: null
+                  })}
+                  disabled={editingJobPosting.daily_rate !== null}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Daily Rate</label>
+                <input
+                  type="number"
+                  name="daily_rate"
+                  value={editingJobPosting.daily_rate || ''}
+                  onChange={(e) => setEditingJobPosting({
+                    ...editingJobPosting, 
+                    daily_rate: e.target.value,
+                    base_salary: null
+                  })}
+                  disabled={editingJobPosting.base_salary !== null}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Status *</label>
+                <select
+                  name="posting_status"
+                  value={editingJobPosting.posting_status || 'Draft'}
+                  onChange={(e) => setEditingJobPosting({...editingJobPosting, posting_status: e.target.value})}
+                  required
+                >
+                  <option value="Draft">Draft</option>
+                  <option value="Open">Open</option>
+                  <option value="Closed">Closed</option>
+                </select>
+              </div>
+              
+              {/* Right Column - Full width textareas */}
+              <div className="form-group full-width">
+                <label>Job Description *</label>
+                <textarea
+                  name="description"
+                  value={editingJobPosting.description || ''}
+                  onChange={(e) => setEditingJobPosting({...editingJobPosting, description: e.target.value})}
+                  required
+                  rows="5"
+                ></textarea>
+              </div>
+              
+              <div className="form-group full-width">
+                <label>Requirements *</label>
+                <textarea
+                  name="requirements"
+                  value={editingJobPosting.requirements || ''}
+                  onChange={(e) => setEditingJobPosting({...editingJobPosting, requirements: e.target.value})}
+                  required
+                  rows="5"
+                ></textarea>
+              </div>
+              
+              <div className="recruitment-modal-buttons recruitment-two-col-buttons">
+                <button type="submit" className="submit-btn">Save Changes</button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowEditJobModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

@@ -9,7 +9,7 @@
 /* Main content container */
 .hr .hr-body-content-container {
   width: 100%;
-  height: 38.1rem; /* Fixed height */
+  height: 100%; /* Fixed height */
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
@@ -293,15 +293,15 @@
 .hr-performance-table-container {
   display: flex;
   flex-direction: column;
-  height: 200px; /* Fixed height for the table container */
-  overflow: hidden; /* Hide overflow to prevent double scrollbars */
+  height: 200px; /* Keep fixed height for the container */
+  overflow: hidden; /* Prevent outer scrollbar */
 }
 
 .hr-performance-table-container table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  overflow: hidden; /* Explicitly hide overflow on the table itself */
+  table-layout: fixed;
 }
 
 .hr-performance-table-container thead {
@@ -311,17 +311,10 @@
   background-color: #f3f9fa;
 }
 
-.hr-performance-table-container th {
-  padding: 0.75rem;
-  border-bottom: 1px solid #eee;
-  text-align: left;
-  background-color: #f3f9fa;
-}
-
 .hr-performance-tbody {
   display: block;
   overflow-y: auto;
-  max-height: 170px; /* Set max height to leave room for the header */
+  height: 100%; /* Fill available height instead of max-height */
   width: 100%;
 }
 

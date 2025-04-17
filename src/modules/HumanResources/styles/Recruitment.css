@@ -1,4 +1,6 @@
-/* Container Layout */
+/* ---------------------------------------------------------
+   CONTAINER + LAYOUT
+   --------------------------------------------------------- */
 .recruitment {
   display: flex;
   width: 100%;
@@ -7,7 +9,7 @@
 
 .recruitment-body-content-container {
   width: 100%;
-  height: 38.1rem;
+  height: 100%;
   max-width: 1222px;
   margin: 0 auto;
   border-radius: 0.5rem;
@@ -40,7 +42,9 @@
   border-radius: 4px;
 }
 
-/* Heading and Controls */
+/* ---------------------------------------------------------
+   PAGE HEADING + CONTROLS
+   --------------------------------------------------------- */
 .recruitment-heading {
   display: flex;
   align-items: center;
@@ -63,7 +67,6 @@
   justify-content: flex-end;
 }
 
-/* Search */
 .recruitment-search-wrapper {
   position: relative;
   margin-right: 0.5rem;
@@ -87,15 +90,45 @@
   font-size: 0.95rem;
 }
 
+.recruitment-search:hover {
+  border-color: #00b0b5;
+}
+
+.recruitment-search:focus {
+  outline: none;
+  border-color: #00b0b5;
+  box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.1);
+}
+
 .recruitment-filter {
   height: 36px;
+  min-width: 200px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 0.95rem;
   padding: 0 0.75rem;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
 }
 
-/* Buttons */
+.recruitment-filter:hover {
+  border-color: #00b0b5;
+}
+
+.recruitment-filter:focus {
+  outline: none;
+  border-color: #00b0b5;
+  box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.1);
+}
+
+.recruitment-filter option {
+  padding: 8px;
+}
+
+/* ---------------------------------------------------------
+   BUTTONS
+   --------------------------------------------------------- */
 .recruitment-add-btn {
   background-color: teal;
   color: white;
@@ -112,7 +145,9 @@
   background-color: #006666;
 }
 
-/* Tabs */
+/* ---------------------------------------------------------
+   TABS HEADER
+   --------------------------------------------------------- */
 .recruitment-header {
   position: sticky;
   top: 0;
@@ -155,7 +190,9 @@
   margin-left: 6px;
 }
 
-/* Table Container */
+/* ---------------------------------------------------------
+   TABLE CONTAINER + STYLES
+   --------------------------------------------------------- */
 .recruitment-table-container {
   background-color: white;
   border-radius: 8px;
@@ -164,6 +201,7 @@
   flex: 1;
   min-height: 0;
   margin-bottom: 1rem;
+  max-height: calc(100vh - 250px);
 }
 
 .recruitment-table-wrapper {
@@ -172,6 +210,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .recruitment-table-scrollable {
@@ -179,25 +218,34 @@
   overflow: auto;
   flex: 1;
   min-height: 0;
+  position: relative;
 }
 
-/* Table Styles */
 .recruitment-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.95rem;
   min-width: 1400px;
 }
 
-.recruitment-table thead th {
+.recruitment-table thead {
   position: sticky;
   top: 0;
   background-color: #f3f9fa;
-  /* z-index: 10; */
-  border-bottom: 1px solid #eee;
 }
 
-.recruitment-table th,
+.recruitment-table th {
+  position: sticky;
+  top: 0;
+  background-color: #f3f9fa;
+  z-index: 2;
+  border-bottom: 1px solid #eee;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
 .recruitment-table td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #eee;
@@ -205,46 +253,40 @@
   white-space: nowrap;
 }
 
-/* Status Tags */
-.recruitment-tag {
-  padding: 0.3rem 0.6rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  display: inline-block;
+.recruitment-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Scrollbar styling */
+.recruitment-table-scrollable::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.recruitment-table-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.recruitment-table-scrollable::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* No results message */
+.recruitment-no-results {
   text-align: center;
-  white-space: nowrap;
+  font-style: italic;
+  padding: 2rem;
+  color: #888;
 }
 
-.recruitment-tag.applied {
-  background-color: #e2e3e5;
-  color: #41464b;
-}
-
-.recruitment-tag.shortlisted {
-  background-color: #cfe2ff;
-  color: #084298;
-}
-
-.recruitment-tag.interviewing {
-  background-color: #fff3cd;
-  color: #664d03;
-}
-
-.recruitment-tag.hired {
-  background-color: #d1e7dd;
-  color: #0f5132;
-}
-
-.recruitment-tag.rejected {
-  background-color: #f8d7da;
-  color: #842029;
-}
-
-/* Action Menu */
+/* ---------------------------------------------------------
+   ACTION MENU (3-dot)
+   --------------------------------------------------------- */
 .recruitment-actions {
   position: relative;
   text-align: right;
+  z-index: 200; /* Add z-index to the container */
 }
 
 .recruitment-dots {
@@ -263,7 +305,7 @@
   background-color: white;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   border-radius: 6px;
-  z-index: 100;
+  z-index: 900; /* Increase z-index to ensure it's above other elements */
 }
 
 .recruitment-dropdown-item {
@@ -276,7 +318,316 @@
   background-color: #f5f5f5;
 }
 
-/* Toast Notification */
+/* ---------------------------------------------------------
+   TAG STYLES (STATUS)
+   --------------------------------------------------------- */
+.recruitment-tag {
+  padding: 0.3rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Status-specific colors */
+.recruitment-tag.draft,
+.recruitment-tag.pending {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.recruitment-tag.open,
+.recruitment-tag.approved {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.recruitment-tag.closed,
+.recruitment-tag.rejected {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.recruitment-tag.active {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.recruitment-tag.unknown {
+  background-color: #e2e3e5;
+  color: #41464b;
+}
+
+/* Employment Type Pills */
+.recruitment-tag.regular {
+  background-color: #e6f3ff;
+  color: #0066cc;
+}
+
+.recruitment-tag.contractual {
+  background-color: #fff3e6;
+  color: #cc6600;
+}
+
+.recruitment-tag.seasonal {
+  background-color: #ffb6f0;
+  color: #3d0033;
+}
+
+/* Duration Days Pills */
+.recruitment-tag.short-duration {
+  background-color: #e6ffe6;
+  color: #008000;
+}
+
+.recruitment-tag.medium-duration {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.recruitment-tag.long-duration {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+/* Finance Approval Pills */
+.recruitment-tag.pending-finance {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.recruitment-tag.approved-finance {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.recruitment-tag.rejected-finance {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+/* Clearance Status Pills */
+.recruitment-tag.cleared {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.recruitment-tag.pending-clearance {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.recruitment-tag.rejected-clearance {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+/* ---------------------------------------------------------
+   ARCHIVED ROW
+   --------------------------------------------------------- */
+.recruitment-archived-row {
+  color: #888;
+}
+
+/* ---------------------------------------------------------
+   PAGINATION
+   --------------------------------------------------------- */
+.recruitment-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  gap: 0.5rem;
+  background-color: white;
+  border-radius: 8px;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.recruitment-pagination-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: calc(100% - 100px);
+  margin-right: 0.5rem;
+}
+
+.recruitment-pagination button {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.recruitment-pagination button.active {
+  background-color: #00b0b5;
+  color: white;
+  border-color: #00b0b5;
+}
+
+.recruitment-pagination-size {
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* ---------------------------------------------------------
+   MODALS
+   --------------------------------------------------------- */
+.recruitment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.recruitment-modal {
+  width: 1000px;
+  max-width: 90vw;
+  max-height: 90vh;
+  padding: 2rem;
+  border-radius: 8px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Add shadow for better visibility */
+  z-index: 1001; /* Ensure it's above the overlay */
+  position: relative; /* Creates new stacking context */
+}
+
+.recruitment-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-right: 1rem;
+  margin-bottom: 1rem;
+}
+
+.recruitment-modal-form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.recruitment-modal-form label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  color: #374151;
+}
+
+.recruitment-modal-form input,
+.recruitment-modal-form select,
+.recruitment-modal-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  background-color: white;
+}
+
+.recruitment-modal-form input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  color: #666;
+}
+
+.recruitment-modal-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.recruitment-modal-form select {
+  cursor: pointer;
+}
+
+.recruitment-modal-form input[type="checkbox"] {
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+.recruitment-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Two-column form layout */
+.recruitment-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.recruitment-two-col .form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.recruitment-two-col-buttons {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Button styles in modals */
+.submit-btn, 
+.cancel-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.submit-btn {
+  background-color: #00b0b5;
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #009ba0;
+}
+
+.cancel-btn {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.cancel-btn:hover {
+  background-color: #d1d5db;
+}
+
+/* Modal scrollbar */
+.recruitment-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.recruitment-modal::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------
+   TOAST NOTIFICATION
+   --------------------------------------------------------- */
 .recruitment-toast {
   position: fixed;
   bottom: 20px;
@@ -296,27 +647,4 @@
 @keyframes fadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
-}
-
-/* Loading & Error States */
-.recruitment-loading,
-.recruitment-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  padding: 2rem;
-}
-
-.recruitment-error {
-  color: #842029;
-}
-
-.recruitment-no-results {
-  text-align: center;
-  font-style: italic;
-  padding: 2rem;
-  color: #888;
 }
