@@ -235,7 +235,8 @@ const TabSystem = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {tableData.map((row, index) => (
+                                    {tableData.length > 0 ? (
+                                        tableData.map((row, index) => (
                                         <tr key={index}>
                                             <td className="checkbox-cell"><input type="checkbox" /></td>
                                             <td>{row.goods_issue_id}</td>
@@ -244,7 +245,12 @@ const TabSystem = () => {
                                             <td>{row.item_name}</td>
                                             <td>{row.item_quantity}</td>
                                         </tr>
-                                    ))}
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="5" className="no-records">No records found.</td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                             </div>
