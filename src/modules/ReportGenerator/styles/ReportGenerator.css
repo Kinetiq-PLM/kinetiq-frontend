@@ -229,12 +229,13 @@
 
 .repgen .chat-history {
   display: flex;
-  max-width: 100vh;
+  width: 100%;
   flex-direction: column;
   gap: 10px;
   padding: 15px;
   max-height: 400px;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .repgen .chat-history::-webkit-scrollbar {
@@ -252,15 +253,20 @@
   align-self: flex-end;
   background-color: #F7F9FB;
   text-align: right;
+  margin-left: auto;
+  margin-right: 10px;
 }
 
 .repgen .chat-message.bot {
   align-self: flex-start;
+  margin-left: 10px;
+  margin-right: auto;
 }
 
 .repgen .chat-table-response {
   border-radius: 8px;
   margin-top: 10px;
+  width: 100%; 
 }
 
 .repgen .res-head {

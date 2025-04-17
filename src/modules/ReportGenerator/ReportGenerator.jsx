@@ -15,7 +15,7 @@ const BodyContent = (user_id) => {
     const [isBotResponding, setIsBotResponding] = useState(false);
     const authToken = "dummy-token";
     const textareaRef = useRef(null);
-    const currentUserId = user_id;
+    const currentUserId = "muge";
 
     // API base URL - would typically come from environment variables
     const API_BASE_URL = "http://127.0.0.1:8000/";
@@ -667,13 +667,51 @@ const BodyContent = (user_id) => {
                                                     {filteredChatHistory.today.map(chat => (
                                                         <li 
                                                             key={chat.convo_id} 
-                                                            // Add 'disabled' class and prevent click if bot is responding
-                                                            className={`history-item ${chat.active ? 'active' : ''} ${isBotResponding ? 'disabled' : ''}`}
-                                                            onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
-                                                            // Optional: Add style for disabled state in CSS for .history-item.disabled
-                                                            style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', opacity: isBotResponding ? 0.6 : 1 }} 
+                                                            // Apply base class and active class. Make li a flex container.
+                                                            className={`history-item ${chat.active ? 'active' : ''}`}
+                                                            // Add flex styles to position title and icon
+                                                            style={{ 
+                                                                display: 'flex', 
+                                                                justifyContent: 'space-between', 
+                                                                alignItems: 'center',
+                                                                // Apply opacity based on bot state for the whole item
+                                                                opacity: isBotResponding ? 0.6 : 1 
+                                                            }} 
                                                         >
-                                                            {chat.title}
+                                                            {/* Wrap title in a span and attach fetchMessages click here */}
+                                                            <span 
+                                                                onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
+                                                                // Make the title span take up available space and allow clicking
+                                                                style={{ 
+                                                                    flexGrow: 1, 
+                                                                    cursor: isBotResponding ? 'not-allowed' : 'pointer', 
+                                                                    paddingRight: '10px', // Add space between title and icon
+                                                                    overflow: 'hidden', // Prevent long titles from overlapping icon
+                                                                    textOverflow: 'ellipsis', // Add ellipsis for long titles
+                                                                    whiteSpace: 'nowrap' // Keep title on one line
+                                                                }}
+                                                            >
+                                                                {chat.title}
+                                                            </span>
+                                                            
+                                                            {/* Add the archive icon */}
+                                                            <img
+                                                                src="../../icons/repgen-icons/archive-icon.png" // Verify path
+                                                                alt="Archive"
+                                                                // Add disabled class based on bot state
+                                                                className={`archive-icon ${isBotResponding ? 'disabled' : ''}`} 
+                                                                // Attach archiveConversation click here, prevent if bot is responding
+                                                                onClick={!isBotResponding ? (e) => {
+                                                                    e.stopPropagation(); // Prevent triggering fetchMessages if li had a handler
+                                                                    archiveConversation(chat.convo_id); 
+                                                                } : undefined}
+                                                                style={{
+                                                                    cursor: isBotResponding ? 'not-allowed' : 'pointer',
+                                                                    width: '24px',  // Adjust size as needed
+                                                                    height: '24px', 
+                                                                    flexShrink: 0 // Prevent icon from shrinking
+                                                                }}
+                                                            />
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -687,11 +725,22 @@ const BodyContent = (user_id) => {
                                                     {filteredChatHistory.previous7Days.map(chat => (
                                                         <li 
                                                             key={chat.convo_id} 
-                                                            className={`history-item ${chat.active ? 'active' : ''} ${isBotResponding ? 'disabled' : ''}`}
-                                                            onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
-                                                            style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', opacity: isBotResponding ? 0.6 : 1 }} 
+                                                            className={`history-item ${chat.active ? 'active' : ''}`}
+                                                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isBotResponding ? 0.6 : 1 }} 
                                                         >
-                                                            {chat.title}
+                                                            <span 
+                                                                onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
+                                                                style={{ flexGrow: 1, cursor: isBotResponding ? 'not-allowed' : 'pointer', paddingRight: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                                                            >
+                                                                {chat.title}
+                                                            </span>
+                                                            <img
+                                                                src="../../icons/repgen-icons/archive-icon.png" 
+                                                                alt="Archive"
+                                                                className={`archive-icon ${isBotResponding ? 'disabled' : ''}`} 
+                                                                onClick={!isBotResponding ? (e) => { e.stopPropagation(); archiveConversation(chat.convo_id); } : undefined}
+                                                                style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', width: '24px', height: '24px', flexShrink: 0 }}
+                                                            />
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -705,11 +754,22 @@ const BodyContent = (user_id) => {
                                                     {filteredChatHistory.previous30Days.map(chat => (
                                                         <li 
                                                             key={chat.convo_id} 
-                                                            className={`history-item ${chat.active ? 'active' : ''} ${isBotResponding ? 'disabled' : ''}`}
-                                                            onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
-                                                            style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', opacity: isBotResponding ? 0.6 : 1 }} 
+                                                            className={`history-item ${chat.active ? 'active' : ''}`}
+                                                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isBotResponding ? 0.6 : 1 }} 
                                                         >
-                                                            {chat.title}
+                                                            <span 
+                                                                onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
+                                                                style={{ flexGrow: 1, cursor: isBotResponding ? 'not-allowed' : 'pointer', paddingRight: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                                                            >
+                                                                {chat.title}
+                                                            </span>
+                                                            <img
+                                                                src="../../icons/repgen-icons/archive-icon.png" 
+                                                                alt="Archive"
+                                                                className={`archive-icon ${isBotResponding ? 'disabled' : ''}`} 
+                                                                onClick={!isBotResponding ? (e) => { e.stopPropagation(); archiveConversation(chat.convo_id); } : undefined}
+                                                                style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', width: '24px', height: '24px', flexShrink: 0 }}
+                                                            />
                                                         </li>
                                                     ))}
                                                 </ul>
