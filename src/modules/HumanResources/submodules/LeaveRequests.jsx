@@ -9,6 +9,7 @@ const LeaveRequests = () => {
   const [archivedLeaveRequests, setArchivedLeaveRequests] = useState([]);
   const [leaveBalances, setLeaveBalances] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [currentEmployeeBalance, setCurrentEmployeeBalance] = useState(null);
 
   // UI States
   const [activeTab, setActiveTab] = useState("LeaveRequests");
@@ -38,57 +39,32 @@ const LeaveRequests = () => {
     is_paid: false
   });
 
-  const handleLeaveRequestChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setNewLeaveRequest(prev => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value
-    }));
-  };
-
-  const handleAddLeaveRequest = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/", newLeaveRequest);
-      setShowAddModal(false);
-      showToast("Leave request added successfully");
-      fetchData(); // Refresh data
-    } catch (err) {
-      console.error("Add leave request error:", err);
-      showToast(err.response?.data?.detail || "Failed to add leave request", false);
-    }
-  };
-
-  // Toast helper
+  // Toast helper with longer timeout for errors
   const showToast = (message, success = true) => {
     setToast({ message, success });
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), success ? 3000 : 5000); // Show errors longer
   };
 
   // Fetch data
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [requestsRes, archivedRes, balancesRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/"),
-          axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/archived/"),
-          axios.get("http://127.0.0.1:8000/api/employee_leave_balances/employee_leave_balances/")
-        ]);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [requestsRes, archivedRes, balancesRes] = await Promise.all([
+        axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/"),
+        axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/archived/"),
+        axios.get("http://127.0.0.1:8000/api/employee_leave_balances/employee_leave_balances/")
+      ]);
 
-        setLeaveRequests(requestsRes.data);
-        setArchivedLeaveRequests(archivedRes.data);
-        setLeaveBalances(balancesRes.data);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        showToast("Failed to fetch data", false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+      setLeaveRequests(requestsRes.data);
+      setArchivedLeaveRequests(archivedRes.data);
+      setLeaveBalances(balancesRes.data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      showToast("Failed to fetch data", false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchEmployees = async () => {
     try {
@@ -101,8 +77,311 @@ const LeaveRequests = () => {
   };
 
   useEffect(() => {
+    fetchData();
     fetchEmployees();
   }, []);
+
+  // Calculate total days between two dates
+  const calculateTotalDays = (startDate, endDate) => {
+    if (!startDate || !endDate) return null;
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    // Reset time part to avoid time zone issues
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    
+    // Calculate the difference in milliseconds
+    const differenceMs = end - start;
+    
+    // Convert to days and add 1 to include both start and end date
+    return Math.floor(differenceMs / (1000 * 60 * 60 * 24)) + 1;
+  };
+
+  // Check if employee has sufficient leave balance
+  const checkLeaveBalance = (employeeId, leaveType, totalDays) => {
+    if (!employeeId || !leaveType || !totalDays) return { valid: true, message: "" };
+    
+    const balance = leaveBalances.find(b => b.employee_id === employeeId);
+    if (!balance) return { valid: true, message: "No balance record found. Will be validated by the server." };
+    
+    switch (leaveType) {
+      case "Sick":
+        if (totalDays > balance.sick_leave_remaining) {
+          return { 
+            valid: false, 
+            message: `Insufficient sick leave balance. Requested: ${totalDays} days, Available: ${balance.sick_leave_remaining} days` 
+          };
+        }
+        break;
+      case "Vacation":
+        if (totalDays > balance.vacation_leave_remaining) {
+          return { 
+            valid: false, 
+            message: `Insufficient vacation leave balance. Requested: ${totalDays} days, Available: ${balance.vacation_leave_remaining} days` 
+          };
+        }
+        break;
+      case "Maternity":
+        if (totalDays > 105) {
+          return { valid: false, message: `Maternity leave cannot exceed 105 days` };
+        }
+        if (totalDays > balance.maternity_leave_remaining) {
+          return { 
+            valid: false, 
+            message: `Insufficient maternity leave balance. Requested: ${totalDays} days, Available: ${balance.maternity_leave_remaining} days` 
+          };
+        }
+        break;
+      case "Paternity":
+        if (totalDays > 7) {
+          return { valid: false, message: `Paternity leave cannot exceed 7 days` };
+        }
+        if (totalDays > balance.paternity_leave_remaining) {
+          return { 
+            valid: false, 
+            message: `Insufficient paternity leave balance. Requested: ${totalDays} days, Available: ${balance.paternity_leave_remaining} days` 
+          };
+        }
+        break;
+      case "Solo Parent":
+        if (totalDays > 7) {
+          return { valid: false, message: `Solo parent leave cannot exceed 7 days per year` };
+        }
+        if (totalDays > balance.solo_parent_leave_remaining) {
+          return { 
+            valid: false, 
+            message: `Insufficient solo parent leave balance. Requested: ${totalDays} days, Available: ${balance.solo_parent_leave_remaining} days` 
+          };
+        }
+        break;
+      default:
+        // For other leave types like unpaid
+        break;
+    }
+    
+    return { valid: true, message: "" };
+  };
+
+  // Update current employee balance when employee selection changes
+  useEffect(() => {
+    if (newLeaveRequest.employee_id) {
+      const selectedBalance = leaveBalances.find(b => b.employee_id === newLeaveRequest.employee_id);
+      setCurrentEmployeeBalance(selectedBalance || null);
+    } else {
+      setCurrentEmployeeBalance(null);
+    }
+  }, [newLeaveRequest.employee_id, leaveBalances]);
+
+  const handleLeaveRequestChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setNewLeaveRequest(prev => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value
+    }));
+  };
+
+  const handleAddLeaveRequest = async (e) => {
+    e.preventDefault();
+    
+    // Validate required fields
+    if (!newLeaveRequest.employee_id || !newLeaveRequest.leave_type || 
+        !newLeaveRequest.start_date || !newLeaveRequest.end_date) {
+      showToast("Please fill out all required fields", false);
+      return;
+    }
+    
+    // Validate dates
+    const startDate = new Date(newLeaveRequest.start_date);
+    const endDate = new Date(newLeaveRequest.end_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time portion for fair comparison
+    
+    if (endDate < startDate) {
+      showToast("End date must be after start date", false);
+      return;
+    }
+    
+    // Uncomment this check if you want to enforce the no-past-dates rule in the frontend
+    if (startDate < today) {
+      showToast("Start date cannot be in the past", false);
+      return;
+    }
+    
+    // Calculate total days for client-side validation
+    const totalDays = calculateTotalDays(newLeaveRequest.start_date, newLeaveRequest.end_date);
+    
+    // Check leave balance on client side first
+    const balanceCheck = checkLeaveBalance(
+      newLeaveRequest.employee_id,
+      newLeaveRequest.leave_type,
+      totalDays
+    );
+    
+    if (!balanceCheck.valid) {
+      showToast(balanceCheck.message, false);
+      return;
+    }
+    
+    // Create the request payload
+    const requestPayload = {
+      employee_id: newLeaveRequest.employee_id,
+      leave_type: newLeaveRequest.leave_type,
+      start_date: newLeaveRequest.start_date,
+      end_date: newLeaveRequest.end_date,
+      is_paid: newLeaveRequest.is_paid
+    };
+    
+    // Add immediate_superior_id and management_approval_id only if they're not empty
+    if (newLeaveRequest.immediate_superior_id) {
+      requestPayload.immediate_superior_id = newLeaveRequest.immediate_superior_id;
+    }
+    
+    if (newLeaveRequest.management_approval_id) {
+      requestPayload.management_approval_id = newLeaveRequest.management_approval_id;
+    }
+    
+    // Console log for debugging
+    console.log("Sending leave request payload:", requestPayload);
+    
+    try {
+      setLoading(true); // Show loading state
+      
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/", 
+        requestPayload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      
+      // Clear form
+      setNewLeaveRequest({
+        employee_id: "",
+        leave_type: "",
+        start_date: "",
+        end_date: "",
+        is_paid: false,
+        immediate_superior_id: "",
+        management_approval_id: ""
+      });
+      
+      setShowAddModal(false);
+      showToast("Leave request added successfully");
+      fetchData(); // Refresh data
+    } catch (err) {
+      console.error("Add leave request error:", err);
+      
+      // Better error handling to show the specific backend error
+      let errorMessage = "Failed to add leave request";
+      
+      if (err.response) {
+        if (err.response.data.detail) {
+          errorMessage = err.response.data.detail;
+        } else if (err.response.data.errors) {
+          // Handle structured validation errors
+          const errorsObj = err.response.data.errors;
+          const errorMessages = [];
+          
+          // Convert the errors object to an array of error messages
+          Object.keys(errorsObj).forEach(key => {
+            if (Array.isArray(errorsObj[key])) {
+              errorMessages.push(`${key}: ${errorsObj[key].join(' ')}`);
+            } else {
+              errorMessages.push(`${key}: ${errorsObj[key]}`);
+            }
+          });
+          
+          // Join all error messages with line breaks
+          errorMessage = errorMessages.join('\n');
+        } else if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        }
+      }
+      
+      showToast(errorMessage, false);
+    } finally {
+      setLoading(false); // Hide loading state
+    }
+  };
+
+  // Display leave balance information in the form
+  const renderLeaveBalanceInfo = () => {
+    if (!currentEmployeeBalance) return null;
+    
+    const selectedLeaveType = newLeaveRequest.leave_type;
+    let balanceToShow = null;
+    
+    switch (selectedLeaveType) {
+      case "Sick":
+        balanceToShow = {
+          label: "Sick Leave Balance",
+          value: currentEmployeeBalance.sick_leave_remaining
+        };
+        break;
+      case "Vacation":
+        balanceToShow = {
+          label: "Vacation Leave Balance",
+          value: currentEmployeeBalance.vacation_leave_remaining
+        };
+        break;
+      case "Maternity":
+        balanceToShow = {
+          label: "Maternity Leave Balance",
+          value: currentEmployeeBalance.maternity_leave_remaining
+        };
+        break;
+      case "Paternity":
+        balanceToShow = {
+          label: "Paternity Leave Balance",
+          value: currentEmployeeBalance.paternity_leave_remaining
+        };
+        break;
+      case "Solo Parent":
+        balanceToShow = {
+          label: "Solo Parent Leave Balance",
+          value: currentEmployeeBalance.solo_parent_leave_remaining
+        };
+        break;
+      default:
+        return null;
+    }
+    
+    if (!balanceToShow) return null;
+    
+    // Calculate days for selected dates
+    const startDate = newLeaveRequest.start_date;
+    const endDate = newLeaveRequest.end_date;
+    const totalDays = calculateTotalDays(startDate, endDate);
+    
+    return (
+      <div className="leave-balance-info">
+        <div className="balance-row">
+          <span className="balance-label">{balanceToShow.label}:</span>
+          <span className={`balance-value ${balanceToShow.value <= 3 ? 'low-balance' : ''}`}>
+            {balanceToShow.value} days
+          </span>
+        </div>
+        {totalDays && (
+          <div className="balance-row">
+            <span className="balance-label">Requested Leave:</span>
+            <span className="balance-value">{totalDays} days</span>
+          </div>
+        )}
+        {totalDays && balanceToShow && (
+          <div className="balance-row">
+            <span className="balance-label">Remaining After Request:</span>
+            <span className={`balance-value ${balanceToShow.value - totalDays < 0 ? 'negative-balance' : ''}`}>
+              {balanceToShow.value - totalDays} days
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Search and filter logic
   const filterAndPaginate = (dataArray) => {
@@ -490,6 +769,7 @@ const LeaveRequests = () => {
                       <option value="Personal">Personal</option>
                       <option value="Maternity">Maternity</option>
                       <option value="Paternity">Paternity</option>
+                      <option value="Solo Parent">Solo Parent</option>
                       <option value="Unpaid">Unpaid</option>
                     </select>
                   </div>
@@ -527,12 +807,30 @@ const LeaveRequests = () => {
                       onChange={handleLeaveRequestChange} 
                     />
                   </div>
+                  
+                  {/* Balance information showing current values */}
+                  {renderLeaveBalanceInfo()}
                 </div>
               </div>
 
               <div className="leave-requests-modal-buttons">
                 <button type="submit" className="submit-btn">Add</button>
-                <button type="button" className="cancel-btn" onClick={() => setShowAddModal(false)}>Cancel</button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setNewLeaveRequest({
+                      employee_id: "",
+                      leave_type: "",
+                      start_date: "",
+                      end_date: "",
+                      is_paid: false
+                    });
+                  }}
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
@@ -570,6 +868,7 @@ const LeaveRequests = () => {
                       <option value="Personal">Personal</option>
                       <option value="Maternity">Maternity</option>
                       <option value="Paternity">Paternity</option>
+                      <option value="Solo Parent">Solo Parent</option>
                       <option value="Unpaid">Unpaid</option>
                     </select>
                   </div>
@@ -630,8 +929,11 @@ const LeaveRequests = () => {
                 <label>Employee</label>
                 <select name="employee_id" required>
                   <option value="">-- Select Employee --</option>
-                  <option value="EMP001">John Doe</option>
-                  <option value="EMP002">Jane Smith</option>
+                  {employees.map(emp => (
+                    <option key={emp.employee_id} value={emp.employee_id}>
+                      {emp.employee_id} - {emp.first_name} {emp.last_name}
+                    </option>
+                  ))}
                 </select>
               </div>
               
