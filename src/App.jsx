@@ -323,9 +323,10 @@ function App() {
       "Official Receipts": "OfficialReceipts",
     },
     "Financials": {
-      "Budgeting": "Budgeting",
-      "Cash Flow": "CashFlow",
-      "Financial Reports": "FinancialReports",
+      "Reports": "Reports",
+      "Validations" : "Validations",
+      "Approvals" : "Approvals",
+      "Forms" : "Forms"
     },
     "Purchasing": {
       "Supplier Management": "SupplierManagement",
