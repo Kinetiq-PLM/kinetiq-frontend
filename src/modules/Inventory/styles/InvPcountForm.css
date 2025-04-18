@@ -51,12 +51,12 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 0.875rem;
-    color: #555;
+    /* color: #555; */
   }
   
   .inv .modal-content textarea {
     resize: vertical;
-    min-height: 4rem; 
+    min-height: 3.2rem; 
   }
   
 
@@ -68,7 +68,7 @@
 
   .inv .modal-content .form-actions {
     display: flex;
-    justify-content: space-between;
+    align-items: flex-start;
     margin-top: 1rem;
   }
   
