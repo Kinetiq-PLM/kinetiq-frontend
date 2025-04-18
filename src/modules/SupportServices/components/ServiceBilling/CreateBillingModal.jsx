@@ -6,7 +6,7 @@ import ServiceBillingIcon from "/icons/SupportServices/ServiceBillingIcon.svg"
 
 import { GET } from "../../api/api"
 
-const CreateBillingModal = ({ isOpen, onClose, onCreate }) => {
+const CreateBillingModal = ({ isOpen, onClose, onCreate, technician }) => {
   const [isOpenStatusDD, setOpenStatusDD] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -137,7 +137,9 @@ const [isRenewalDropdown, setOpenRenewal] = useState(false);
 
 const fetchRenewals = async () => {
   try {
-    const response = await GET(`warranty-renewals/`); 
+    const response = await GET(`renewal/renewals/technician/${technician}/`);
+    // const response = await GET(`renewal/renewals/technician/HR-EMP-2025-a66f9c/`);
+    //const response = await GET(`renewal/`); 
     console.log("renewals", response)
     setRenewals(response);
   } catch (error) {
@@ -175,7 +177,9 @@ const [isRequestDropdown, setRequestDropdown] = useState(false);
 
 const fetchRequests = async () => {
   try {
-    const response = await GET(`service-requests/`); 
+    const response = await GET(`request/requests/technician/${technician}/`);
+    // const response = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
+    //const response = await GET(`request/`); 
     console.log("requests", response)
     setRequests(response);
   } catch (error) {
@@ -204,7 +208,7 @@ const [isAnalysesDropdown, setAnalysesDropdown] = useState(false);
 
 const fetchAnalyses = async () => {
   try {
-    const response = await GET(`analyses-billing/${formData.requestId}/`); 
+    const response = await GET(`analysis/request/${formData.requestId}/`); 
     console.log("analyses", response)
     setAnalyses(response);
   } catch (error) {
@@ -233,7 +237,7 @@ const [isOrderDropdown, setOpenOrder] = useState(false);
 
 const fetchOrders = async () => {
   try {
-    const response = await GET(`orders/billings/${formData.analysisId}/`); 
+    const response = await GET(`order/orders/${formData.analysisId}/`); 
     console.log("orders", response)
     setOrders(response);
   } catch (error) {
@@ -262,7 +266,7 @@ const [isOpCostDropdown, setOpenOpCost] = useState(false);
 
 const fetchOpCosts = async () => {
   try {
-    const response = await GET(`operational-costs/`); 
+    const response = await GET(`billing/billings/operational-costs/`); 
     console.log("operational costs", response)
     setOperationalCosts(response);
   } catch (error) {

@@ -11,8 +11,11 @@ import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET } from "../../../api/api.jsx";
 
-const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
+import loading from "../../Assets/kinetiq-loading.gif";
+
+const QuotationListModal = ({ isOpen, onClose, setQuotation, query }) => {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [quotationList, setQuotationList] = useState([]);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
@@ -21,8 +24,8 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
   const [filteredData, setFilteredData] = useState([]);
 
   const quotationQuery = useQuery({
-    queryKey: ["quotationsLIst"],
-    queryFn: async () => await GET("sales/quotation?status=Pending"),
+    queryKey: ["quotationsList"],
+    queryFn: async () => await GET(`sales/quotation?${query}`),
     enabled: isOpen,
     retry: 2,
   });
@@ -84,8 +87,8 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
 
       const formattedData = data.map((quotation) => ({
         ...quotation,
-        customer_name: quotation.statement.customer.name,
-        total_price: Number(quotation.statement.total_amount).toLocaleString(
+        customer_name: quotation.statement?.customer?.name,
+        total_price: Number(quotation.statement?.total_amount).toLocaleString(
           "en-US",
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),
@@ -93,6 +96,7 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
       }));
       setQuotationList(formattedData);
       setFilteredData(formattedData);
+      setIsLoading(false);
     } else if (quotationQuery.status === "error") {
       showAlert({
         type: "error",
@@ -151,13 +155,19 @@ const QuotationListModal = ({ isOpen, onClose, setQuotation }) => {
               }}
             />
           </div>
-          <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
-            <Table
-              columns={columns}
-              data={filteredData}
-              onSelect={setSelectedQuotation}
-            />
-          </div>
+          {isLoading ? (
+            <div className="h-[300px] rounded-md flex justify-center items-center">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
+              <Table
+                columns={columns}
+                data={filteredData}
+                onSelect={setSelectedQuotation}
+              />
+            </div>
+          )}
           <div className="mt-4 flex justify-between">
             <div>
               <Button

@@ -16,7 +16,8 @@ const Table = ({ billings, onRowClick, onViewBilling, selectedBilling }) => {
             </tr>
           </thead>
           <tbody>
-            {billings.map((billing, index) => (
+            {billings.length > 0 ? (
+              billings.map((billing, index) => (
               <tr 
                 key={billing.service_billing_id || `billing-${index}`} 
                 className={`${
@@ -45,7 +46,14 @@ const Table = ({ billings, onRowClick, onViewBilling, selectedBilling }) => {
                   </button>
                 </td>
               </tr>
-            ))}
+            ))
+            ) : (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center", padding: "1rem" }}>
+                  No billings available
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
     </div>

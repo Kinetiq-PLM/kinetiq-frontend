@@ -7,7 +7,7 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(9);
+  const [itemsPerPage] = useState(7);
   
   // Handle sort change
   const handleSort = (field) => {
@@ -208,9 +208,11 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
                   <td>{failedShipment.shipment_details?.tracking_number || 'N/A'}</td>
                   <td>{formatDate(failedShipment.failure_date)}</td>
                   <td className="failure-reason-cell">
-                    {failedShipment.failure_reason.length > 50 
-                      ? `${failedShipment.failure_reason.substring(0, 50)}...` 
-                      : failedShipment.failure_reason}
+                    {failedShipment.failure_reason ? 
+                      (failedShipment.failure_reason.length > 50 
+                        ? `${failedShipment.failure_reason.substring(0, 50)}...` 
+                        : failedShipment.failure_reason)
+                      : 'N/A'}
                   </td>
                   <td className="centered-cell">{failedShipment.shipment_details?.delivery_type || 'Unknown'}</td>
                   <td className={`status-cell ${getResolutionStatusClass(failedShipment.resolution_status)}`}>

@@ -9,17 +9,41 @@ const ResolutionModal = ({ isOpen, onClose, onUpdate, onShowGeneral, onShowReque
   const [wasResolved, setWasResolved] = useState("No")
   const [activeTab, setActiveTab] = useState("resolution")
   const [isResolvedDD, setOpenResolvedDD] = useState(false);
+  const [callId, setCallId] = useState("")
+  const [customerId, setCustomerId] = useState("")
+  const [productId, setProductId] = useState("")
+  const [contractNo, setContractNo] = useState("")
+  const [callType, setCallType] = useState("")
+  const [ticketId, setTicketId] = useState("")
+  const [status, setStatus] = useState("")
+  const [priority, setPriority] = useState("")
 
   useEffect(() => {
     if (callData) {
       console.log("asdasd", callData)
       // Reset all fields to empty to show placeholders
       setResolutionDetails(callData.resolution || "")
+      setCallId(callData.service_call_id || "")
+      setCustomerId(callData.customer?.customer_id || "")
+      setStatus(callData.call_status || "")
+      setPriority(callData.priority_level || "")
+      setTicketId(callData.service_ticket?.ticket_id || "")
+      setProductId(callData.product?.product_id || "");
+      setContractNo(callData.contract?.contract_id || "")
+      setCallType(callData.call_type || "")
     }
   }, [callData])
 
   const handleSubmit = () => {
     onUpdate({
+      service_call_id: callId,
+      customer_id: customerId,
+      product_id: productId,
+      contract_id: contractNo,
+      call_type: callType,
+      ticket_id: ticketId,
+      call_status: status,
+      priority_level: priority,
       resolution: resolutionDetails
     })
   }

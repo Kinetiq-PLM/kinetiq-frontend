@@ -1,188 +1,99 @@
 .dashboard-container {
-    font-family: sans-serif;
-    border: 1px solid #d0e8f2;
-    width: 1248px;
-    height: 721px;
-    box-sizing: border-box;
-    background-color: white;
-  }
-  
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  
-  .breadcrumbs {
-    font-size: 14px;
-    color: #333;
-  }
-  
-  
-  .search-bar {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 200px;
-  }
-  
-  
-  .user-profile {
-    font-weight: bold;
-    color: #333;
-  }
-  
-  
-  .content-area {
-    padding: 20px;
-  }
-  
-  
-  .page-title {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-  }
-  
-  
-  .stats-container {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-  }
-  
-  
-  .stat-card {
-    background-color: #e0f7fa;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    width: 150px;
-  }
-  
-  
-  .stat-label {
-    font-size: 16px;
-    color: #333;
-  }
-  
-  
-  .stat-value {
-    font-size: 32px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  
-  .lower-content {
-    display: flex;
-    gap: 20px;
-  }
-  
-  
-  .requests-table, .calendar-container {
-    flex: 1;
-  }
-  
-  
-  .requests-title {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #333;
-  }
-  
-  
-  .requests-data {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-  }
-  
-  
-  .requests-data th, .requests-data td {
-    border-bottom: 1px solid #ddd; /* Only horizontal borders */
-    padding: 10px;
-    text-align: left;
-  }
-  
-  
-  .requests-data th {
-    background-color: #f2f2f2;
-    font-weight: 500;
-  }
-  
-  
-  .calendar-container {
-    flex: 1;
-    overflow-y: auto;
-  }
-  
-  
-  .calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  
-  .calendar-nav {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  
-  
-  .calendar-month {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  
-  .calendar {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  
-  .calendar th, .calendar td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-  }
-  
-  
-  .calendar th {
-    background-color: #f2f2f2;
-    font-weight: 500;
-  }
-  
-  
-  /* Scrollbar styling for calendar */
-  .calendar-container::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  
-  .calendar-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
-  
-  .calendar-container::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-  }
-  
-  
-  .calendar-container::-webkit-scrollbar-thumb:hover {
-    background: #bbb;
-  }
-  
+  background-color: white; /* Add white background */
+  padding: 20px;
+   font-family: sans-serif;
+}
+
+.top-section {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.status-box {
+ padding: 35px;
+  border-radius: 20px;
+  text-align: center;
+   width: 150px;
+}
+
+.status-box p {
+  margin: 0;
+  font-weight: bold;
+}
+
+.status-box span {
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.status-box.approved {
+  background-color: #e6f7e9;
+  color: #389e0d;
+}
+
+.status-box.pending {
+  background-color: #fffbe6;
+  color: #d48806;
+}
+
+.status-box.rejected {
+  background-color: #fdecea; /* Light red background */
+  color: #d93025; /* Dark red text */
+}
+
+.requests-section {
+  margin-top: 20px;
+}
+
+.requests-section h2 {
+  margin-bottom: 15px;
+}
+
+.requests-table-container {
+  overflow-x: auto;
+}
+
+
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.requests-table th,
+.requests-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.requests-table th {
+  background-color: #f2f2f2;
+}
+
+.requests-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+.requests-table-container {
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 400px; /* Set a maximum height for the table container */
+}
+
+
+.table-body-scroll {
+  overflow-y: auto; /* Add vertical scrollbar */
+  max-height: 300px; /* Set a maximum height for the scrollable area */
+}
+/* Scrollbar styling */
+.requests-table-container::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.requests-table-container::-webkit-scrollbar-thumb {
+  background-color: #00A8A8; /* Color of the scrollbar thumb */
+  border-radius: 4px; /* Rounded corners for the scrollbar thumb */
+}
+
+.requests-table-container::-webkit-scrollbar-track {
+  background-color: #f2f2f2; /* Color of the scrollbar track */
+}
