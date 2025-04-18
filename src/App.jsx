@@ -329,8 +329,12 @@ function App() {
       "Forms" : "Forms"
     },
     "Purchasing": {
-      "Supplier Management": "SupplierManagement",
-      "Purchase Orders": "PurchaseOrders",
+      "Purchase Request List": "PurchaseReqList",
+      "Puchase Quotation List": "PurchaseQuot",
+      "Purchase Order Status": "PurchaseOrdStat",
+      "A/P Invoice": "PurchaseAPInvoice",
+      "Credit Memo": "PurchaseCredMemo",
+      "Vendor Application Form": "VendorAppForm",
     },
     Operations: {
       "Goods Tracking": "GoodsTracking",
