@@ -5,23 +5,24 @@ import { PATCH } from "../api/api";
 
 const tabs = ["Budget Submission List", "Budget Request List", "Returns List"];
 const departmentIds = {
-  "MAR016": "Marketing",
-  "OPER015": "Operations",
-  "IT014": "IT",
-  "ACC013": "Accounting",
-  "PUR012": "Purchasing",
-  "SUP011": "Support and Services",
-  "MAN010": "Management",
-  "MRP009": "MRP",
-  "INV008": "Inventory",
-  "PM007": "Project Management",
-  "HR006": "Human Resources",
-  "SAL001": "Sales",
-  "ADM002": "Administration",
-  "FIN003": "Financials",
-  "PRO004": "Production",
-  "DIS005": "Distribution",
+  "HR-DEPT-2025-105fd9": "Report Generator",
+  "HR-DEPT-2025-60cafa": "CRM",
+  "HR-DEPT-2025-7a126": "Financials",
+  "HR-DEPT-2025-84ee38": "Sales",
+  "HR-DEPT-2025-8cc307": "Accounting",
+  "HR-DEPT-2025-8f325e": "Inventory",
+  "HR-DEPT-2025-8fe431": "Distribution",
+  "HR-DEPT-2025-9f99d0": "Support & Services",
+  "HR-DEPT-2025-a5da8b": "Operations",
+  "HR-DEPT-2025-a73184": "Administration",
+  "HR-DEPT-2025-b2c9fd": "MRP",
+  "HR-DEPT-2025-e56f4d": "Project Management",
+  "HR-DEPT-2025-e8572a": "Management",
+  "HR-DEPT-2025-e9fa93": "Human Resources",
+  "HR-DEPT-2025-eee3c0": "Purchasing",
+  "HR-DEPT-2025-fe9854": "Production",
 };
+
 const initialDepartmentBudgets = {
   "Marketing": { allocatedBudget: 1500000, totalSpent: 0, remainingBudget: 1500000 },
   "Operations": { allocatedBudget: 1000000, totalSpent: 0, remainingBudget: 1000000 },
@@ -340,7 +341,7 @@ const BodyContent = () => {
       setOriginalReturnsData(data.map(sub=> ({
         validationId: sub.validation_id,
         returnsId: sub?.budget_return?.budget_return_id || "",
-        departmentId: sub?.budget_return?.dept_id || "",
+        departmentId: sub?.budget_return?.dept?.dept_name|| "",
         returnDate: sub?.budget_return?.return_date || "",
         originTotalBudget: sub.final_approved_amount || "",
         returnedAmount: sub?.budget_return?.returned_amount || "",
@@ -361,7 +362,7 @@ const BodyContent = () => {
       setOriginalRequestData(data.map(sub=> ({
         validationId: sub.validation_id,
         reqID: sub?.budget_request?.budget_request_id || "",
-        departmentId: sub?.budget_request?.dept_id || "",
+        departmentId: sub?.budget_request?.dept?.dept_name || "",
         amount: sub?.budget_request?.amount_requested || "",
         requestDate: sub?.budget_request?.requested_date || "",
         validatedBy: sub?.validated_by || "",
@@ -381,7 +382,7 @@ const fetch = async () => {
     setOriginalData(data.map(sub=> ({
       validationId: sub.validation_id,
       requestId: sub?.budget_submission?.budget_submission_id || "",
-      departmentId: sub?.budget_submission?.dept_id || "",
+      departmentId: sub?.budget_submission?.dept?.dept_name || "",
       amount: sub.amount_requested || "",
       submissionDate: sub?.budget_submission?.date_submitted || "",
       validatedBy: sub.validated_by || "",
@@ -399,7 +400,6 @@ useEffect(() => {
   fetchRequests();
   fetchReturns();
 }, []);
-
 
 const patchEditedRows = async () => {
   try {
