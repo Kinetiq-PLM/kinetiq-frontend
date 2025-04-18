@@ -105,7 +105,15 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
 
 
   const [documentItems, setDocumentItems] = useState(
-    isCreateMode ? [{}] : [...selectedData.document_items, {}]
+    isCreateMode 
+      ? [{ product_details: {} }] 
+      : [
+          ...selectedData.document_items.map(item => ({
+            ...item,
+            product_details: item.product_details || {}
+          })), 
+          { product_details: {} }
+        ]
   );
 
 
@@ -250,7 +258,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
             unit_of_measure: '',
             quantity: '',
             cost: '',
-            warehouse_id: ''
+            warehouse_id: '',
+            product_details: {}
           });
  
           setDocumentItems(updatedItems);
@@ -376,8 +385,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       row.item_id &&
       row.item_name &&
       row.unit_of_measure &&
-      row.quantity &&
-      row.cost
+      row.quantity
     );
   };
 
@@ -541,13 +549,13 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0).toFixed(2);
+    const total = parseFloat(initialAmount).toFixed(2);
  
     setDocumentDetails(prev => ({
       ...prev,
       tax_amount: tax_amount,
       discount_amount: discount_amount,
-      total: total,
+      transaction_cost: total,
     }));
   }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
  
@@ -860,7 +868,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = (parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0)).toFixed(2);
+    const total = (parseFloat(initialAmount) + parseFloat(tax_amount) - parseFloat(discount_amount) + parseFloat(documentDetails.freight || 0)).toFixed(2);
  
     setDocumentDetails(prev => ({
       ...prev,
@@ -1079,7 +1087,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                   <div className="detail-row">
                     <label>Total</label>
                     <input type="text" value={
-                      documentDetails.total
+                      documentDetails.transaction_cost
                     }  
                     style={{ cursor: 'not-allowed' }}
                     readOnly
@@ -1229,7 +1237,6 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                           />
                         )}
                       </td>
-                      
                       <td>
                         <select
                           value={item.warehouse_id || ''}
@@ -1264,7 +1271,6 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
             </button>
             <div className="right-buttons">
               <button className="cancel-button" onClick={onBack}>Cancel</button>
-              <button className="send-to-button">Send To</button>
             </div>
           </div>
         </div>

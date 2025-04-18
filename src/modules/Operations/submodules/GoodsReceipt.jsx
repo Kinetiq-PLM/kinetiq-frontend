@@ -183,7 +183,15 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
   const [documentItems, setDocumentItems] = useState(
-    isCreateMode ? [{}] : [...selectedData.document_items, {}]
+    isCreateMode 
+      ? [{ product_details: {} }] 
+      : [
+          ...selectedData.document_items.map(item => ({
+            ...item,
+            product_details: item.product_details || {}
+          })), 
+          { product_details: {} }
+        ]
   );
 
 
@@ -376,13 +384,15 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           };
          
           // Add new empty row
+          // In handleAddRow, when adding new empty rows:
           updatedItems.push({
             item_id: '',
             item_name: '',
             unit_of_measure: '',
             quantity: '',
             cost: '',
-            warehouse_id: ''
+            warehouse_id: '',
+            product_details: {} 
           });
  
           setDocumentItems(updatedItems);
@@ -492,7 +502,8 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           unit_of_measure: '',
           quantity: '',
           cost: '',
-          warehouse_id: ''
+          warehouse_id: '',
+          product_details: {}
         });
  
         setDocumentItems(updatedItems);
@@ -550,6 +561,9 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       row.item_id &&
       row.item_name &&
       row.unit_of_measure &&
+      (row.item_id.startsWith('ADMIN-PROD') 
+        ? (row.product_details?.manuf_date && row.product_details?.expiry_date)
+        : true) &&
       row.quantity &&
       row.cost &&
       row.warehouse_id
@@ -830,13 +844,13 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = (parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0)).toFixed(2);
+    const total = (parseFloat(initialAmount) + parseFloat(tax_amount) - parseFloat(discount_amount) + parseFloat(documentDetails.freight || 0)).toFixed(2);
  
     setDocumentDetails(prev => ({
       ...prev,
       tax_amount: tax_amount,
       discount_amount: discount_amount,
-      total: total,
+      transcation_cost: total,
     }));
   }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
  
@@ -1256,7 +1270,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0).toFixed(2);
+    const total = (parseFloat(initialAmount) + parseFloat(tax_amount) - parseFloat(discount_amount) + parseFloat(documentDetails.freight || 0)).toFixed(2);
  
     setDocumentDetails(prev => ({
       ...prev,
@@ -1471,7 +1485,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Tax Rate</label>
                     <input
                       type="text"
-                      value={documentDetails.tax_rate}
+                      value={documentDetails?.tax_rate || "---"}
                       readOnly
                       style={{
                         backgroundColor: '#f8f8f8',
@@ -1483,7 +1497,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Discount Rate</label>
                     <input
                       type="text"
-                      value={documentDetails.discount_rate}
+                      value={documentDetails?.discount_rate || "---"}
                       readOnly
                       style={{
                         backgroundColor: '#f8f8f8',
@@ -1495,7 +1509,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Tax Amount</label>
                     <input
                       type="text"
-                      value={documentDetails.tax_amount.toFixed(2)}
+                      value={documentDetails?.tax_amount  || "---"}
                       readOnly
                       style={{
                         backgroundColor: '#f8f8f8',
@@ -1507,7 +1521,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Discount Amount</label>
                     <input
                       type="text"
-                      value={documentDetails.discount_amount.toFixed(2)}
+                      value={documentDetails?.discount_amount  || "---"}
                       style={{
                         backgroundColor: '#f8f8f8',
                         cursor: 'not-allowed'
@@ -1528,7 +1542,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Freight</label>
                     <input
                       type="text"
-                      value={documentDetails.freight}
+                      value={documentDetails?.freight  || "---"}
                       style={{
                         backgroundColor: '#f8f8f8',
                         cursor: 'not-allowed'
