@@ -133,6 +133,42 @@ const Shipment = () => {
     fetchEmployees();
   }, [refreshTrigger]);
   
+  // Listen for failed shipment updates from rework completions
+  useEffect(() => {
+    // Create a reusable fetchFailedShipments function
+    const fetchFailedShipmentsOnly = async () => {
+      try {
+        // Use the dedicated endpoint for failed shipments
+        const response = await fetch('http://127.0.0.1:8000/api/failed-shipments/');
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || 'Failed to fetch failed shipments');
+        }
+        
+        const data = await response.json();
+        setFailedShipments(data);
+      } catch (err) {
+        console.error('Error fetching failed shipments:', err);
+      }
+    };
+  
+    // Event handler for the custom event
+    const handleRefreshFailedShipments = () => {
+      fetchFailedShipmentsOnly();
+      // Show toast notification for better UX
+      toast.info('A rework has been completed - Failed shipments updated');
+    };
+    
+    // Add event listener
+    window.addEventListener('refreshFailedShipments', handleRefreshFailedShipments);
+    
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener('refreshFailedShipments', handleRefreshFailedShipments);
+    };
+  }, []); // Empty dependency array means this runs once on mount and cleans up on unmount
+  
   // Get employee full name by employee id
   const getEmployeeFullName = (employeeId) => {
     const employee = employees.find(emp => emp.employee_id === employeeId);

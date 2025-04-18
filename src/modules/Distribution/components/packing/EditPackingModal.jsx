@@ -10,6 +10,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     labor_cost: 0,
     total_packing_cost: 0
   });
+  const [maxItemsCount, setMaxItemsCount] = useState(0);
   
   // Check if packing list is already packed or shipped (both are final states for this module)
   const isPacked = packingList?.packing_status === 'Packed';
@@ -27,11 +28,52 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     }
   }, [packingList]);
   
+  useEffect(() => {
+    // If we have picking_list_id, fetch the items_count to use as max value
+    if (packingList && packingList.picking_list_id) {
+      const fetchPickingListDetails = async () => {
+        try {
+          const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${packingList.picking_list_id}/`);
+          if (response.ok) {
+            const pickingList = await response.json();
+            if (pickingList.items_count) {
+              // Store the max items count
+              setMaxItemsCount(pickingList.items_count);
+              
+              // If total_items_packed is null, initialize it with items_count
+              if (!packingList.total_items_packed || packingList.total_items_packed === null) {
+                handleInputChange('total_items_packed', pickingList.items_count);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching picking list:", error);
+        }
+      };
+      
+      fetchPickingListDetails();
+    }
+  }, [packingList]);
+
   // Handle input changes
   const handleInputChange = (field, value) => {
     // Don't update if packed or shipped
     if (isNotEditable) return;
     
+    // For total_items_packed, limit to the max items count from picking list
+    if (field === 'total_items_packed') {
+      const numValue = parseInt(value) || 0;
+      // Ensure value doesn't exceed the max items count
+      const limitedValue = Math.min(numValue, maxItemsCount);
+      
+      setEditedValues(prev => ({
+        ...prev,
+        [field]: limitedValue
+      }));
+      return;
+    }
+    
+    // For other fields, update normally
     setEditedValues(prev => ({
       ...prev,
       [field]: value
@@ -179,8 +221,24 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                 </span>
               </div>
               <div className="info-item">
-                <span className="info-label">Items Count:</span>
-                <span className="info-value">{packingList.total_items_packed || '0'}</span>
+                <span className="info-label">Packed Items Count (Max: {maxItemsCount} items): </span>
+                {isNotEditable ? (
+                  <span className="info-value">{packingList.total_items_packed || '0'}</span>
+                ) : (
+                  <div className="items-count-input">
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={editedValues.total_items_packed || packingList.total_items_packed || ''}
+                      onChange={(e) => handleInputChange('total_items_packed', parseInt(e.target.value) || 0)}
+                      min="0"
+                      max={maxItemsCount}
+                    />
+                    {maxItemsCount > 0 && (
+                      <small className="max-count-hint"></small>
+                    )}
+                  </div>
+                )}
               </div>
               {packingList.packing_date && (
                 <div className="info-item">

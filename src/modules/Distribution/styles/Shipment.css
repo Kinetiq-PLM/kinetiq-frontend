@@ -273,7 +273,7 @@
 .shipment .status-cell::before {
   content: '';
   position: absolute;
-  left: 0.75rem;
+  left: 1.5rem;
   top: 50%;
   transform: translateY(-50%);
   width: 0.5rem;

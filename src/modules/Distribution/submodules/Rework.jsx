@@ -225,6 +225,18 @@ const Rework = () => {
       setShowCompleteModal(false);
       setRefreshTrigger(prev => prev + 1);
       
+      // Trigger a refresh of the failed shipments if this was a failed shipment rework
+      if (selectedRework.rework_types === 'Failed Shipment' && selectedRework.failed_shipment_info) {
+        // Use a custom event to trigger the refresh in the Shipment component
+        const refreshEvent = new CustomEvent('refreshFailedShipments');
+        window.dispatchEvent(refreshEvent);
+        
+        // Also update the resolution status in the current rework record in case it's viewed again
+        if (selectedRework.failed_shipment_info) {
+          selectedRework.failed_shipment_info.resolution_status = 'Resolved';
+        }
+      }
+      
       // Show success notification
       toast.success('Rework marked as completed successfully!');
       
