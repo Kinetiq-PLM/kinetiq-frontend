@@ -6,6 +6,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [flag, setFlag] = useState(0);
     const [printBOM, setPrintBOM] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const baseurl = "http://127.0.0.1:8000";
+    //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
     const [bomData, setBomData] = useState([]);
     const [bomDetails, setBomDetails] = useState([]);
@@ -20,7 +22,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     useEffect(() => {
         const fetchBomData = async () => {
             try {
-                const response = await fetch("https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/bomlist/"); // Replace with your API endpoint
+                const response = await fetch(`${baseurl}/bills_of_material/bomlist/`); // Replace with your API endpoint
                 if (!response.ok) {
                     throw new Error("Failed to fetch BOM data");
                 }
@@ -45,7 +47,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     useEffect(() => {
         const fetchBomDetails = async () => {
             try {
-                const response = await fetch("https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/product-costs/");
+                const response = await fetch(`${baseurl}/bills_of_material/product-costs/`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch BOM details");
                 }

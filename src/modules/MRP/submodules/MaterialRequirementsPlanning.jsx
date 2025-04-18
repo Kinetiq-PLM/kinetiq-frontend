@@ -25,37 +25,40 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [selectedRowData, setSelectedRowData] = useState(null); // State to store selected row data
     const [selectedOrderNo, setSelectedOrderNo] = useState([]); // State to store only the Order No. as a string
     const [bomDetails, setBomDetails] = useState([]);
+    const [npProducts, setNPProducts] = useState([]);
     const [selectedProductId, setSelectedProductId] = useState(null); // New state to store selected product_id
     const [rawMaterials, setRawMaterials] = useState([]);
     const [costOfProduction, setCostOfProduction] = useState([]);
     const totalCostofRawMaterial = rawMaterials.reduce((sum,item) => sum + parseFloat(item.rmtotalCost),0);
     const overallTotalCost = bomDetails.reduce((sum, item) => sum + parseFloat(item.totalCost),0).toFixed(2);
+    const npOverallProductCost = npProducts.reduce((sum, item) => sum + parseFloat(item.np_totalCost),0).toFixed(2);
     const [selectedStatementId, setSelectedStatementId] = useState(null);
     const [mrpData, setMrpData] = useState([]);
     const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
     const [totalLaborCost, setTotalLaborCost] = useState(0);
     const [totalOrderCost, setTotalOrderCost] = useState(0);
+    const baseurl = "http://127.0.0.1:8000";
+    //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
 
 
     useEffect(() => {
         const fetchMrpData = async () => {
             try {
-                const response = await fetch("https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/orderlist/"); // Replace with your API endpoint
+                const response = await fetch(`${baseurl}/bills_of_material/orderlist/`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch MRP data");
                 }
                 const data = await response.json();
 
-                // Map the API response to match the expected structure
                 const formattedData = data.map((item) => ({
                     number: item.order_no,
                     type: item.type,
                     details: item.details,
-                    date: item.date.trim(), // Trim any extra spaces in the date
+                    date: item.date.trim(),
                 }));
 
-                setMrpData(formattedData); // Update the state with the fetched data
+                setMrpData(formattedData);
             } catch (error) {
                 console.error("Error fetching MRP data:", error);
             }
@@ -66,18 +69,18 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const fetchOrderStatement = async (orderId) => {
         try {
-            const response = await fetch(`https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/orderstatements/by-order/${orderId}/`); // Replace with your API endpoint
+            const response = await fetch(`${baseurl}/bills_of_material/orderstatements/by-order/${orderId}/`); // Replace with your API endpoint
             if (!response.ok) {
                 throw new Error("Failed to fetch order statements");
             }
             const data = await response.json();
             const statementIds = data.map((item) => item.statement_id);
 
-            console.log(statementIds); // Log the statement IDs to verify
+            console.log(statementIds);
 
             if (statementIds.length > 0) {
-                // Use the first statementid to fetch BOM details
                 fetchBomDetails(statementIds[0]);
+                fetchNonProjectProduct(statementIds[0])
             } else {
                 console.warn("No statement IDs found.");
             }
@@ -90,32 +93,54 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     
     const fetchBomDetails = async (statementId) => {
         try {
-            const response = await fetch(`https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/productpricing/by-statement/${statementId}/`); // Replace with your API endpoint
+            const response = await fetch(`${baseurl}/bills_of_material/productpricing/by-statement/${statementId}/`);
             if (!response.ok) {
                 throw new Error("Failed to fetch BOM details");
             }
             const data = await response.json();
 
-            // Map the API response to match the expected structure
             const formattedData = data.map((item, index) => ({
-                no: index + 1, // Add a sequential number
+                no: index + 1,
                 product_id: item.product_id,
                 product_name: item.product_name,
                 product_description: item.product_description,
-                qtyProduct: item.quantity, // Assuming this is the raw material
-                totalCost: parseFloat(item.cost), // Total cost
+                qtyProduct: item.quantity,
+                totalCost: parseFloat(item.cost),
             }));
 
-            setBomDetails(formattedData); // Update the state with the fetched data
+            setBomDetails(formattedData);
         } catch (error) {
             console.error("Error fetching BOM details:", error);
+        }
+    };
+
+    const fetchNonProjectProduct = async (statementId) => {
+        try {
+            const response = await fetch(`${baseurl}/bills_of_material/npproductcost/statement/${statementId}/`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch Products");
+            }
+            const data = await response.json();
+
+            const formattedData = data.map((item, index) => ({
+                number: index + 1,
+                np_product_id: item.product_id,
+                np_product_name: item.product_name,
+                np_product_description: item.description,
+                np_qtyProduct: item.quantity,
+                np_totalCost: parseFloat(item.product_cost),
+            }));
+
+            setNPProducts(formattedData);
+        } catch (error) {
+            console.error("Error fetching Non Project Products:", error);
         }
     };
 
 
     const fetchRawMaterials = async (productId) => {
     try {
-        const response = await fetch(`https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/costofrawmats/by-product/${productId}/`); // Replace with your API endpoint
+        const response = await fetch(`${baseurl}/bills_of_material/costofrawmats/by-product/${productId}/`);
         if (!response.ok) {
             throw new Error("Failed to fetch raw materials");
         }
@@ -129,7 +154,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             rmtotalCost: parseFloat(item.total_cost).toFixed(2),
         }));
 
-        setRawMaterials(formattedData); // Update the state with fetched raw materials
+        setRawMaterials(formattedData);
     } catch (error) {
         console.error("Error fetching raw materials:", error);
     }
@@ -137,7 +162,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const fetchCostProduction = async (orderId) => {
     try {
-        const response = await fetch(`https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/orderproductioncost/${orderId}/`); // Replace with your API endpoint
+        const response = await fetch(`${baseurl}/bills_of_material/orderproductioncost/${orderId}/`);
         if (!response.ok) {
             throw new Error("Failed to fetch production costs");
         }
@@ -158,7 +183,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const fetchCostLabor = async (orderId) => {
     try {
-        const response = await fetch(`https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/employeeorder/${orderId}/`); // Replace with your API endpoint
+        const response = await fetch(`${baseurl}/bills_of_material/employeeorder/${orderId}/`);
         if (!response.ok) {
             throw new Error("Failed to fetch employee order");
         }
@@ -181,9 +206,10 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     };
 
     useEffect(() => {
-        const total = (parseFloat(overallTotalCost) + totalCostOfProduction + totalLaborCost).toFixed(2);
+        const total = isProjectType ? (parseFloat(overallTotalCost) + totalCostOfProduction + totalLaborCost).toFixed(2)
+                                    : (parseFloat(npOverallProductCost) + totalCostOfProduction + totalLaborCost).toFixed(2);
         setTotalOrderCost(total);
-    }, [overallTotalCost, totalCostOfProduction, totalLaborCost]);
+    }, [isProjectType, overallTotalCost, npOverallProductCost, totalCostOfProduction, totalLaborCost]);
 
     // const mrpData = [
     //     { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
@@ -402,17 +428,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     )}
                                 </div>
 
-                                {bomDetails.map((item, index) => (
+                                {npProducts.map((item, index) => (
                                     <div
                                     key={index}
                                     className="table-row"
                                     style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
-                                    <div style={rowCellStyle}>{item.no}</div>
-                                    <div style={rowCellStyle}>{item.product_id}</div>
-                                    <div style={rowCellStyle}>{item.product_name}</div>
-                                    <div style={rowCellStyle}>{item.product_description}</div>
-                                    <div style={rowCellStyle}>{item.qtyProduct} pcs</div>
-                                    <div style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
+                                    <div style={rowCellStyle}>{item.number}</div>
+                                    <div style={rowCellStyle}>{item.np_product_id}</div>
+                                    <div style={rowCellStyle}>{item.np_product_name}</div>
+                                    <div style={rowCellStyle}>{item.np_product_description}</div>
+                                    <div style={rowCellStyle}>{item.np_qtyProduct} pcs</div>
+                                    <div style={rowCellStyle}>₱{item.np_totalCost.toLocaleString()}</div>
                                     </div>
                                 ))}
                                 </div>
@@ -423,7 +449,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{overallTotalCost}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{npOverallProductCost}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -602,7 +628,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{overallTotalCost}</div>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{isProjectType ? overallTotalCost : npOverallProductCost}</div>
                                 </div>
                                 </div>
                             </div>
