@@ -309,6 +309,7 @@ function App() {
       "Audit Logs": "AuditLogs",
       "Policy": "Policy",
       "Currency": "Currency",
+      "Warehouse": "Warehouse",
       "Notification": "Notification",
     },
     "Accounting": {

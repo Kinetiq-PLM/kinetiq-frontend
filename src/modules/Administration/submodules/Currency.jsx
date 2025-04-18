@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import "../styles/Currency.css";
 
-// Dynamically generate dates starting from today
 const generateNextSevenDays = () => {
     const today = new Date();
     return Array.from({ length: 8 }, (_, i) => {
         const date = new Date(today);
         date.setDate(today.getDate() + i);
-        return date.getDate(); // Only the day of the month
+        return date.getDate();
     });
 };
 
@@ -26,64 +25,74 @@ const initialRates = [
 const Currency = () => {
     const [selectedMonth, setSelectedMonth] = useState("APR");
     const [selectedYear, setSelectedYear] = useState("2025");
-    const [rates, setRates] = useState(initialRates);
+    const [rates] = useState(initialRates);
 
     return (
-        <div className="currency-container">
-            <h2 className="currency-title">Exchange Rates</h2>
+        <div className="p-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Exchange Rates</h2>
 
-            <div className="currency-table-wrapper">
-                <div className="currency-controls">
-                    <select className="currency-select">
-                        {["APR", "MAY", "JUN"].map((m) => (
-                            <option key={m}>{m}</option>
-                        ))}
-                    </select>
-                    <select className="currency-select">
-                        {["2025", "2024"].map((y) => (
-                            <option key={y}>{y}</option>
-                        ))}
-                    </select>
-                    <button className="currency-close-btn">✕</button>
+            <div className="bg-white rounded-xl shadow-md p-4 relative">
+                <div className="flex justify-between items-center mb-4">
+                    <div className="flex gap-3">
+                        <select
+                            className="border border-gray-300 rounded px-3 py-2 text-sm"
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                        >
+                            {["APR", "MAY", "JUN"].map((m) => (
+                                <option key={m}>{m}</option>
+                            ))}
+                        </select>
+                        <select
+                            className="border border-gray-300 rounded px-3 py-2 text-sm"
+                            value={selectedYear}
+                            onChange={(e) => setSelectedYear(e.target.value)}
+                        >
+                            {["2025", "2024"].map((y) => (
+                                <option key={y}>{y}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <button className="text-gray-500 text-xl hover:text-red-500">✕</button>
                 </div>
 
-                <div className="currency-scroll-table">
-                    <table className="currency-table">
-                        <thead>
-                            <tr>
-                                <th>{selectedMonth}</th>
-                                {dates.map((d) => (
-                                    <th key={d}>{d}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {rates.map((entry, i) => (
-                                <tr key={i}>
-                                    <td>{entry.country}</td>
-                                    {entry.rates.map((rate, j) => (
-                                        <td key={j}>{rate}</td>
+                <div
+                    className="border border-gray-200 rounded-xl overflow-auto relative"
+                    style={{
+                        maxHeight: "380px",
+                        paddingBottom: "12px",
+                        paddingRight: "12px",
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "#14b8a6 #f1f1f1"
+                    }}
+                >
+                    <div style={{ minWidth: "800px", overflow: "auto" }}>
+                        <table className="min-w-full border-collapse">
+                            <thead className="bg-gray-100 text-left">
+                                <tr>
+                                    <th className="p-3 border border-gray-200">{selectedMonth}</th>
+                                    {dates.map((d, i) => (
+                                        <th key={i} className="p-3 border border-gray-200">{d}</th>
                                     ))}
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {rates.map((entry, i) => (
+                                    <tr key={i} className="odd:bg-gray-50 hover:bg-gray-100">
+                                        <td className="p-3 border border-gray-200 font-medium">{entry.country}</td>
+                                        {entry.rates.map((rate, j) => (
+                                            <td key={j} className="p-3 border border-gray-200">{rate}</td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            <div className="currency-footer">
-                <div className="currency-actions-left">
-                    <button className="btn-update">Update</button>
-                    <button className="btn-cancel">Cancel</button>
+                <div className="flex justify-start mt-6">
+                    <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Update</button>
                 </div>
-                <div className="currency-actions-right">
-                    <button className="btn-export">Auto Export</button>
-                    <button className="btn-import">Auto Import</button>
-                </div>
-            </div>
-
-            <div className="currency-criteria-btn">
-                <button>Set rate for Selection Criteria</button>
             </div>
         </div>
     );
