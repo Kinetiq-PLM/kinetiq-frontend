@@ -41,7 +41,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     useEffect(() => {
         const fetchMrpData = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:8000/bills_of_material/orderlist/"); // Replace with your API endpoint
+                const response = await fetch("https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/orderlist/"); // Replace with your API endpoint
                 if (!response.ok) {
                     throw new Error("Failed to fetch MRP data");
                 }
@@ -66,7 +66,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const fetchOrderStatement = async (orderId) => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/bills_of_material/orderstatements/by-order/${orderId}/`); // Replace with your API endpoint
+            const response = await fetch(`https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/orderstatements/by-order/${orderId}/`); // Replace with your API endpoint
             if (!response.ok) {
                 throw new Error("Failed to fetch order statements");
             }
@@ -90,7 +90,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     
     const fetchBomDetails = async (statementId) => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/bills_of_material/productpricing/by-statement/${statementId}/`); // Replace with your API endpoint
+            const response = await fetch(`https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/productpricing/by-statement/${statementId}/`); // Replace with your API endpoint
             if (!response.ok) {
                 throw new Error("Failed to fetch BOM details");
             }
@@ -115,7 +115,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const fetchRawMaterials = async (productId) => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/bills_of_material/costofrawmats/by-product/${productId}/`); // Replace with your API endpoint
+        const response = await fetch(`https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/costofrawmats/by-product/${productId}/`); // Replace with your API endpoint
         if (!response.ok) {
             throw new Error("Failed to fetch raw materials");
         }
@@ -137,7 +137,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const fetchCostProduction = async (orderId) => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/bills_of_material/orderproductioncost/${orderId}/`); // Replace with your API endpoint
+        const response = await fetch(`https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/orderproductioncost/${orderId}/`); // Replace with your API endpoint
         if (!response.ok) {
             throw new Error("Failed to fetch production costs");
         }
@@ -158,7 +158,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const fetchCostLabor = async (orderId) => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/bills_of_material/employeeorder/${orderId}/`); // Replace with your API endpoint
+        const response = await fetch(`https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/employeeorder/${orderId}/`); // Replace with your API endpoint
         if (!response.ok) {
             throw new Error("Failed to fetch employee order");
         }

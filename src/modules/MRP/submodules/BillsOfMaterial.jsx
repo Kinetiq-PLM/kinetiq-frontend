@@ -1,31 +1,101 @@
 import React from "react";
 import "../styles/BillsOfMaterial.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [flag, setFlag] = useState(0);
     const [printBOM, setPrintBOM] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
 
-    const bomData = [
-        { number: "000000001", type: "Project", status: "Pending", date: "July 3 2025" },
-        { number: "000000002", type: "Non Project", status: "Approved", date: "July 3 2025" },
-
-    ];
-    const bomDetails = [
-        { no: 1, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600, bomId: "BOM001", projectId: "PRJ001", productMatsId: "MAT001", productionOrderDetailId: "POD001", laborCostId: "LAB001"},
-        { no: 2, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", qtyRawMaterial: 80, unit: "kg", costPerUnit: 100, totalCost: 800, bomId: "BOM002", projectId: "PRJ002", productMatsId: "MAT002", productionOrderDetailId: "POD002",laborCostId: "LAB002"},
-        { no: 3, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600, bomId: "BOM003", projectId: "PRJ001", productMatsId: "MAT003", productionOrderDetailId: "POD003", laborCostId: "LAB003"},
-        { no: 4, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", qtyRawMaterial: 80, unit: "kg", costPerUnit: 100, totalCost: 800, bomId: "BOM004", projectId: "PRJ002", productMatsId: "MAT004", productionOrderDetailId: "POD004", laborCostId: "LAB004"}
-    ];
-
-    const bomCostDetails = {
-        rawMaterial: 40000.80,
+    const [bomData, setBomData] = useState([]);
+    const [bomDetails, setBomDetails] = useState([]);
+    const [bomCostDetails, setBomCostDetails] = useState({
+        rawMaterial: 0,
         subtotal: 10000,
         production: 40000.80,
         labor: 40000.80,
-        total: 90001.60
-    };
+        total: 90001.60,
+    });
+
+    useEffect(() => {
+        const fetchBomData = async () => {
+            try {
+                const response = await fetch("https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/bomlist/"); // Replace with your API endpoint
+                if (!response.ok) {
+                    throw new Error("Failed to fetch BOM data");
+                }
+                const data = await response.json();
+
+                const formattedData = data.map((item) => ({
+                    number: item.bom_no,
+                    type: item.type,
+                    status: item.status,
+                    date: new Date(item.date_created).toLocaleDateString(),
+                }));
+
+                setBomData(formattedData);
+            } catch (error) {
+                console.error("Error fetching BOM data:", error);
+            }
+        };
+
+        fetchBomData();
+    }, []);
+
+    useEffect(() => {
+        const fetchBomDetails = async () => {
+            try {
+                const response = await fetch("https://bmd9yddtah.execute-api.ap-southeast-1.amazonaws.com/dev/bills_of_material/product-costs/");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch BOM details");
+                }
+                const data = await response.json();
+
+                const formattedData = data.map((item, index) => ({
+                    no: index + 1,
+                    product: item.product || "N/A",
+                    qtyProduct: item.quantity_of_product || "N/A",
+                    rawMaterial: item.raw_material || "N/A",
+                    qtyRawMaterial: item.quantity_of_raw_material || "N/A",
+                    unit: item.unit_of_measure || "N/A",
+                    costPerUnit: parseFloat(item.cost_per_raw_material),
+                    totalCost: parseFloat(item.total_cost_of_raw_materials),
+                }));
+
+                setBomDetails(formattedData);
+                const totalRawMaterialCost = formattedData.reduce((sum, item) => sum + item.totalCost, 0);
+
+                setBomCostDetails((prevDetails) => ({
+                    ...prevDetails,
+                    rawMaterial: totalRawMaterialCost,
+                }));
+            } catch (error) {
+                console.error("Error fetching BOM details:", error);
+            }
+        };
+
+        fetchBomDetails();
+    }, []);
+
+    // const bomData = [
+    //     { number: "000000001", type: "Project", status: "Pending", date: "July 3 2025" },
+    //     { number: "000000002", type: "Non Project", status: "Approved", date: "July 3 2025" },
+
+    // ];
+    // const bomDetails = [
+    //     { no: 1, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600, bomId: "BOM001", projectId: "PRJ001", productMatsId: "MAT001", productionOrderDetailId: "POD001", laborCostId: "LAB001"},
+    //     { no: 2, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", qtyRawMaterial: 80, unit: "kg", costPerUnit: 100, totalCost: 800, bomId: "BOM002", projectId: "PRJ002", productMatsId: "MAT002", productionOrderDetailId: "POD002",laborCostId: "LAB002"},
+    //     { no: 3, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600, bomId: "BOM003", projectId: "PRJ001", productMatsId: "MAT003", productionOrderDetailId: "POD003", laborCostId: "LAB003"},
+    //     { no: 4, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", qtyRawMaterial: 80, unit: "kg", costPerUnit: 100, totalCost: 800, bomId: "BOM004", projectId: "PRJ002", productMatsId: "MAT004", productionOrderDetailId: "POD004", laborCostId: "LAB004"}
+    // ];
+
+    // const bomCostDetails = {
+    //     rawMaterial: 40000.80,
+    //     subtotal: 10000,
+    //     production: 40000.80,
+    //     labor: 40000.80,
+    //     total: 90001.60
+    // };
 
     const cellStyle = (width) => ({
         width, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px 12px', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 400, textAlign: 'center', lineHeight: 1, wordWrap: 'break-word'
