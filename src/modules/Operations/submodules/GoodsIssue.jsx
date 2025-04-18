@@ -579,8 +579,10 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       if (!selectedOwner || !documentDetails.buyer){
         if(!selectedOwner){
           toast.error("Owner is required")
+          return
         }else if(!documentDetails.buyer){
           toast.error("Buyer Required")
+          return
         }
         return
       }

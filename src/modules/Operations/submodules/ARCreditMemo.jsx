@@ -679,10 +679,13 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       if (!selectedOwner || !vendorID){
         if(!selectedOwner){
           toast.error("Owner is required")
+          return
         }else if(!documentDetails.buyer){
           toast.error("Buyer Required")
+          return
         }else if(!(documentDetails.invoice_id)){
           toast.error("Invoice ID required")
+          return
         }
         return
       }

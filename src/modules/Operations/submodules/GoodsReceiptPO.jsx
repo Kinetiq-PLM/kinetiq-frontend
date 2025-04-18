@@ -580,8 +580,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       if (!selectedOwner || !documentDetails.buyer){
         if(!selectedOwner){
           toast.error("Owner is required")
+          return
         }else if(!documentDetails.buyer){
           toast.error("Buyer Required")
+          return
         }
         return
       }
