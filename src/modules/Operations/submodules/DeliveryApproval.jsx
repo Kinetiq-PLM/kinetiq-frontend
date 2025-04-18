@@ -34,6 +34,10 @@ const BodyContent = ({employee_id}) => {
             toast.error("Please select a record to update. ")
             return;
         }
+        if (selectedData.approvalStatus != "Approved"){
+            toast.error("Please set the status to 'Approved' before sending.")
+            return
+        }
         const approval_status = selectedData.approval_status;
         const approval_date = current_date;
         const approved_by = selectedData.approved_by;
