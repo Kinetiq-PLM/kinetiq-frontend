@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./styles/ReportGenerator.css";
 
-const BodyContent = (user_id) => {
+const BodyContent = ({user_id}) => {
     const [isSidebarVisible, setIsSidebarVisible] = useState(false);
     const [messages, setMessages] = useState([]); 
     const [inputText, setInputText] = useState("");
@@ -13,16 +13,41 @@ const BodyContent = (user_id) => {
     const [activeConversationId, setActiveConversationId] = useState(null);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
     const [isBotResponding, setIsBotResponding] = useState(false);
-    const authToken = "dummy-token";
+    const [userName, setUserName] = useState(user_id || '');
     const textareaRef = useRef(null);
-    const currentUserId = user_id;
 
     // API base URL - would typically come from environment variables
+    // const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
     const API_BASE_URL = "http://127.0.0.1:8000/";
 
     useEffect(() => {
-        fetchConversations();
-    }, []);
+        if (user_id) { // Only fetch if user_id is available
+            fetchUserName();
+            fetchConversations();
+        }
+    }, [user_id]); 
+    
+    const fetchUserName = async () => {
+        if (!user_id) return; // Guard clause
+        try {
+            // Use the new backend endpoint
+            const response = await fetch(`${API_BASE_URL}chatbot/load_user_details/${user_id}/`);
+            if (!response.ok) {
+                // Handle potential errors like 404 Not Found
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`HTTP error! status: ${response.status} - ${errorData.error || 'User details not found'}`);
+            }
+            const userData = await response.json();
+            // Set the user name, fallback to employee_id or 'User' if first_name is missing
+            setUserName(userData.first_name || user_id || 'User');
+        } catch (err) {
+            console.error("Failed to fetch user name:", err);
+            // Fallback to employee_id if fetching fails
+            setUserName(user_id || 'User');
+            // Optionally set an error state specific to user name fetching if needed
+            // setError(prev => ({ ...prev, userNameError: `Could not load user name: ${err.message}` }));
+        }
+    };
 
     const fetchConversations = async () => {
         setLoading(true);
@@ -30,7 +55,7 @@ const BodyContent = (user_id) => {
         try {
             // Construct the API URL using the base URL and the user ID
             // Assuming your Django URL pattern is something like 'api/conversations/user/<int:user_id>/'
-            const response = await fetch(`${API_BASE_URL}chatbot/load_conversations/${currentUserId}/`, {
+            const response = await fetch(`${API_BASE_URL}chatbot/load_conversations/${user_id}/`, {
                 method: 'GET', // Explicitly set method, though GET is default
                 headers: {
                     // Include authentication headers if required by your backend
@@ -123,7 +148,7 @@ const BodyContent = (user_id) => {
         setError(null); // Clear previous errors
         // Optionally set a loading state specific to creating a conversation
         // setLoading(true); // Or a more specific state like setIsCreatingConversation(true);
-        
+        console.log("Creating new conversation for user ID:", user_id);
         try {
             // API call to create a new conversation
             const response = await fetch(`${API_BASE_URL}chatbot/create_conversation/`, {
@@ -135,7 +160,7 @@ const BodyContent = (user_id) => {
               },
               // Send the required user_id in the body
               body: JSON.stringify({ 
-                  user_id: currentUserId 
+                  user_id: user_id
                   // Add role_id here if needed: role_id: someRoleId 
               }) 
             });
@@ -500,7 +525,6 @@ const BodyContent = (user_id) => {
         }
     };
 
-    //CURRENTLY NOT BEING USED SINCE NO UI ELEMENT YET FOR ARCHIVE
     const archiveConversation = async (conversationIdToArchive) => {
         // Prevent archiving if the bot is currently responding
         if (isBotResponding) {
@@ -812,7 +836,7 @@ const BodyContent = (user_id) => {
                                 <div className="chat-history">
                                     {messages.length === 0 ? (
                                         <div className="welres-container">
-                                            <h1 className="welc-text">Hello, Crusch K.</h1>
+                                            <h1 className="welc-text">Hello {userName}</h1>
                                         </div>
                                     ) : (
                                         messages.map((msg, index) => (
