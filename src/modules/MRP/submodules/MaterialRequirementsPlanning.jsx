@@ -34,6 +34,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const npOverallProductCost = npProducts.reduce((sum, item) => sum + parseFloat(item.np_totalCost),0).toFixed(2);
     const [selectedStatementId, setSelectedStatementId] = useState(null);
     const [mrpData, setMrpData] = useState([]);
+    const [principalOrder, setPrincipalItemOrder] = useState([]);
     const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
     const [totalLaborCost, setTotalLaborCost] = useState(0);
     const [totalOrderCost, setTotalOrderCost] = useState(0);
@@ -65,6 +66,30 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         };
 
         fetchMrpData();
+    }, []);
+
+    useEffect(() => {
+        const fetchServiceOrderItems = async () => {
+            try {
+                const response = await fetch(`${baseurl}/bills_of_material/principalorders/`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch service order items");
+                }
+                const data = await response.json();
+        
+                const formattedData = data.map((item) => ({
+                    serviceOrderItemId: item.service_order_item_id,
+                    type: item.type,
+                    description: item.description,
+                    date: item.date.trim(),
+                }));
+        
+                setPrincipalItemOrder(formattedData);
+            } catch (error) {
+                console.error("Error fetching service order items:", error);
+            }
+        };
+        fetchServiceOrderItems();
     }, []);
 
     const fetchOrderStatement = async (orderId) => {
