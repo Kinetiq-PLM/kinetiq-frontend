@@ -47,7 +47,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     useEffect(() => {
         const fetchBomDetails = async () => {
             try {
-                const response = await fetch(`${baseurl}/bills_of_material/product-costs/`);
+                const response = await fetch(`${baseurl}/bills_of_material/projectbomdetail/by-statement/SALES-STM-2025-149a07/`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch BOM details");
                 }
@@ -55,13 +55,13 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
                 const formattedData = data.map((item, index) => ({
                     no: index + 1,
-                    product: item.product || "N/A",
-                    qtyProduct: item.quantity_of_product || "N/A",
-                    rawMaterial: item.raw_material || "N/A",
-                    qtyRawMaterial: item.quantity_of_raw_material || "N/A",
-                    unit: item.unit_of_measure || "N/A",
-                    costPerUnit: parseFloat(item.cost_per_raw_material),
-                    totalCost: parseFloat(item.total_cost_of_raw_materials),
+                    product: item.product_name || "N/A",
+                    qtyProduct: item.qty_of_product || "N/A",
+                    rawMaterial: item.raw_material_name || "N/A",
+                    qtyRawMaterial: item.qty_of_raw_material || "N/A",
+                    unit: item.units || "N/A",
+                    costPerUnit: parseFloat(item.cost_per_rm),
+                    totalCost: parseFloat(item.total_cost_per_rm),
                 }));
 
                 setBomDetails(formattedData);
