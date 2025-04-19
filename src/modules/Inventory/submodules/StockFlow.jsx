@@ -47,7 +47,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/warehousemovement-data/");
+                const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-data/");
                 if (!response.ok) throw new Error("Failed to fetch data");
                 const data = await response.json();
                 setWarehouseMovementsView(data);
@@ -66,7 +66,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchWarehouseItemsData = async () => { 
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/warehouse-item-list/");
+                const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-item-list/");
                 if (!response.ok) throw new Error("Failed to fetch data");
                 const data = await response.json();
                 setWarehouseItemsData(data);
@@ -88,7 +88,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchWarehouseListData = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/warehouse-list/");
+                const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
                 if (!response.ok) throw new Error("Failed to fetch data");
                 const data = await response.json();
                 setWarehouseListData(data);
