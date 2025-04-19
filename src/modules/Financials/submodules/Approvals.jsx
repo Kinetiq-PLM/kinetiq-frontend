@@ -279,7 +279,6 @@ const patchEditedRows = async () => {
           validated_by: row.validatedBy || "",
           remarks: row.remarks || "",
           comments: row.comments || "N/A",
-          // Include the expense history breakdown if needed
           expense_history_breakdown: row.attachedFile || "",
         };
       } else {
