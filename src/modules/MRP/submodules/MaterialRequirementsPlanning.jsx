@@ -292,6 +292,12 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     return sum + (unitCost * quantity);
     }, 0);
 
+    const renderOneValuePerItem = (item, index) => {
+        return index % 2 === 0
+          ? item.np_product_id
+          : item.np_product_name;
+    };
+
     return (      
         <div className="reqplan">
             <div style={{width: '100%', height: '100%', padding: '2rem', background: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)', overflow: 'hidden', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', rowGap: 25,}}>
@@ -434,7 +440,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     className="table-row"
                                     style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
                                     <div style={rowCellStyle}>{item.number}</div>
-                                    <div style={rowCellStyle}>{item.np_product_id}</div>
+                                    <div style={rowCellStyle}>{renderOneValuePerItem(item, index)}</div>
                                     <div style={rowCellStyle}>{item.np_product_name}</div>
                                     <div style={rowCellStyle}>{item.np_product_description}</div>
                                     <div style={rowCellStyle}>{item.np_qtyProduct} pcs</div>

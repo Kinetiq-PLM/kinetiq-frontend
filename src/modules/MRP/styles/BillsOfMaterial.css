@@ -127,7 +127,7 @@
   background-color: #f0f0f0;
 }
 
-@media (max-width: 1090px) {
+@media (max-width: 1300px) {
   .bom .body-content-container,
   .bom .sub-body-content-container {
     padding: 1rem;

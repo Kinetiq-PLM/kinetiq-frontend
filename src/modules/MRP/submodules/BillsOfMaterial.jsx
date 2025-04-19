@@ -47,7 +47,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     useEffect(() => {
         const fetchBomDetails = async () => {
             try {
-                const response = await fetch(`${baseurl}/bills_of_material/projectbomdetail/by-statement/SALES-STM-2025-149a07/`);
+                const response = await fetch(`${baseurl}/bills_of_material/product-costs/`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch BOM details");
                 }
@@ -55,13 +55,13 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
                 const formattedData = data.map((item, index) => ({
                     no: index + 1,
-                    product: item.product_name || "N/A",
-                    qtyProduct: item.qty_of_product || "N/A",
-                    rawMaterial: item.raw_material_name || "N/A",
-                    qtyRawMaterial: item.qty_of_raw_material || "N/A",
-                    unit: item.units || "N/A",
-                    costPerUnit: parseFloat(item.cost_per_rm),
-                    totalCost: parseFloat(item.total_cost_per_rm),
+                    product: item.product || "N/A",
+                    qtyProduct: item.quantity_of_product || "N/A",
+                    rawMaterial: item.raw_material || "N/A",
+                    qtyRawMaterial: item.quantity_of_raw_material || "N/A",
+                    unit: item.unit_of_measure || "N/A",
+                    costPerUnit: parseFloat(item.cost_per_raw_material),
+                    totalCost: parseFloat(item.total_cost_of_raw_materials),
                 }));
 
                 setBomDetails(formattedData);
@@ -107,8 +107,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         return bomData.filter((item) => {
           const matchesFlag =
             flag === 0 ||
-            (flag === 1 && item.type === "Project") ||
-            (flag === 2 && item.type === "Non Project");
+            (flag === 1 && item.type === "Project Based") ||
+            (flag === 2 && item.type === "Non-Project Based") ||
+            (flag === 3 && item.type === "Principal Items Based");
       
           const term = (searchTerm || "").toLowerCase(); // prevent null error
       
@@ -146,7 +147,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
           // Restore the original document
           document.body.innerHTML = originalContents;
           window.scrollTo(0, originalScroll); // Restore scroll position
-          window.location.reload();
+          window.location.reload()
         }, 200); // 200ms delay to let DOM reflow before printing
     }
       
@@ -161,7 +162,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 <div className="title">BILLS OF MATERIAL LIST</div>
                 <div style={{width: '100%', maxWidth: 1300, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', rowGap: 10,paddingLeft: 80, paddingRight: 80,}}>
                     <div className="tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 15,flex: '1 1 auto', minWidth: 200,}}>
-                        {['All BOM', 'Project BOM', 'Non-Project BOM'].map((label, i) => (
+                        {['All BOM', 'Project BOM', 'Non-Project BOM', 'Principal Items BOM'].map((label, i) => (
                         <div key={label}
                             onClick={() => {setFlag(i), setFlagType(i)}}
                             onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")}
@@ -186,7 +187,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     flexWrap: 'wrap',
                     borderBottom: '1px solid #E8E8E8',
                 }}>
-                    {['Bom No.', 'Type', 'Status', 'Created Date'].map((label, i) => (
+                    {['Order No.', 'Type', 'Status', 'Created Date'].map((label, i) => (
                         <div
                             className="table-cell2"
                             key={label}
