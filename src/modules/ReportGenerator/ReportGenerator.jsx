@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./styles/ReportGenerator.css";
 
-const BodyContent = ({user_id}) => {
+const BodyContent = ({employee_id}) => {
     const [isSidebarVisible, setIsSidebarVisible] = useState(false);
     const [messages, setMessages] = useState([]); 
     const [inputText, setInputText] = useState("");
@@ -12,26 +12,26 @@ const BodyContent = ({user_id}) => {
     const [error, setError] = useState(null);
     const [activeConversationId, setActiveConversationId] = useState(null);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+    const [isCreatingConversation, setIsCreatingConversation] = useState(false);
     const [isBotResponding, setIsBotResponding] = useState(false);
-    const [userName, setUserName] = useState(user_id || '');
+    const [userName, setUserName] = useState(employee_id || '');
     const textareaRef = useRef(null);
 
-    // API base URL - would typically come from environment variables
-    // const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
-    const API_BASE_URL = "http://127.0.0.1:8000/";
+    const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
+    // const API_BASE_URL = "http://127.0.0.1:8000/";
 
     useEffect(() => {
-        if (user_id) { // Only fetch if user_id is available
+        if (employee_id) { // Only fetch if user_id is available
             fetchUserName();
             fetchConversations();
         }
-    }, [user_id]); 
+    }, [employee_id]); 
     
     const fetchUserName = async () => {
-        if (!user_id) return; // Guard clause
+        if (!employee_id) return; // Guard clause
         try {
             // Use the new backend endpoint
-            const response = await fetch(`${API_BASE_URL}chatbot/load_user_details/${user_id}/`);
+            const response = await fetch(`${API_BASE_URL}chatbot/load_user_details/${employee_id}/`);
             if (!response.ok) {
                 // Handle potential errors like 404 Not Found
                 const errorData = await response.json().catch(() => ({}));
@@ -39,23 +39,24 @@ const BodyContent = ({user_id}) => {
             }
             const userData = await response.json();
             // Set the user name, fallback to employee_id or 'User' if first_name is missing
-            setUserName(userData.first_name || user_id || 'User');
+            setUserName(userData.first_name || employee_id || 'User');
         } catch (err) {
             console.error("Failed to fetch user name:", err);
             // Fallback to employee_id if fetching fails
-            setUserName(user_id || 'User');
+            setUserName(employee_id || 'User');
             // Optionally set an error state specific to user name fetching if needed
             // setError(prev => ({ ...prev, userNameError: `Could not load user name: ${err.message}` }));
         }
     };
 
     const fetchConversations = async () => {
+        if (!employee_id) return;
         setLoading(true);
         setError(null);
         try {
             // Construct the API URL using the base URL and the user ID
             // Assuming your Django URL pattern is something like 'api/conversations/user/<int:user_id>/'
-            const response = await fetch(`${API_BASE_URL}chatbot/load_conversations/${user_id}/`, {
+            const response = await fetch(`${API_BASE_URL}chatbot/load_conversations/${employee_id}/`, {
                 method: 'GET', // Explicitly set method, though GET is default
                 headers: {
                     // Include authentication headers if required by your backend
@@ -71,17 +72,25 @@ const BodyContent = ({user_id}) => {
 
             const data = await response.json();
 
-            // Map the backend response fields to the frontend state structure
-            const formattedConversations = data.map(conv => ({
-                convo_id: conv.conversation_id, // Map conversation_id to id
-                user_id: conv.user_id,
-                created_at: conv.started_at, // Map started_at to created_at
-                updated_at: conv.updated_at,
-                // Generate a title if not provided by the backend
-                title: `Conversation ${conv.conversation_id.substring(0, 15)}` 
-            }));
+            // Map the backend response fields
+            const formattedConversations = data.map(conv => {
+                // Use conversation_title from backend if available, otherwise generate
+                let title = conv.conversation_title;
+                if (!title) {
+                    // Generate title based on ID (e.g., last parts)
+                    const parts = conv.conversation_id.split('_'); // Assuming "convo_..." format
+                    title = `Convo ${parts[1] ? parts[1].substring(0, 8) : conv.conversation_id.substring(0, 8)}`;
+                }
+                return {
+                    convo_id: conv.conversation_id,
+                    employee_id: conv.employee_id, // Store employee_id
+                    created_at: conv.started_at,
+                    updated_at: conv.updated_at,
+                    title: title // Use the determined title
+                };
+            });
 
-            setConversations(formattedConversations);
+            setConversations(formattedConversations);       
 
         } catch (err) {
             console.error('Error fetching conversations:', err);
@@ -145,24 +154,29 @@ const BodyContent = ({user_id}) => {
     };
 
     const createNewConversation = async () => {
+        if (!employee_id) {
+            setError("Employee ID is missing, cannot create conversation.");
+            throw new Error("Employee ID is missing.");
+        }
         setError(null); // Clear previous errors
+        setIsCreatingConversation(true);
         // Optionally set a loading state specific to creating a conversation
         // setLoading(true); // Or a more specific state like setIsCreatingConversation(true);
-        console.log("Creating new conversation for user ID:", user_id);
+        console.log("Creating new conversation for employee ID:", employee_id);
         try {
             // API call to create a new conversation
             const response = await fetch(`${API_BASE_URL}chatbot/create_conversation/`, {
-              method: 'POST',
-              headers: { 
-                // Include authentication headers if required by your backend
-                // 'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-              },
-              // Send the required user_id in the body
-              body: JSON.stringify({ 
-                  user_id: user_id
-                  // Add role_id here if needed: role_id: someRoleId 
-              }) 
+                method: 'POST',
+                headers: { 
+                    // Include authentication headers if required by your backend
+                    // 'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                // Send the required employee_id in the body
+                body: JSON.stringify({ 
+                    employee_id: employee_id
+                    // Add role_id here if needed: role_id: someRoleId 
+                }) 
             });
 
             if (!response.ok) {
@@ -173,11 +187,16 @@ const BodyContent = ({user_id}) => {
             
             // Parse the response which contains the new conversation object
             const newConversationData = await response.json();
-
+            // Use title from response if available
+            let title = newConversationData.conversation_title;
+            if (!title) {
+                 const parts = newConversationData.conversation_id.split('_');
+                 title = `Convo ${parts[1] ? parts[1].substring(0, 8) : newConversationData.conversation_id.substring(0, 8)}`;
+            }
             // Format the new conversation data to match the frontend state structure
             const formattedNewConversation = {
                 convo_id: newConversationData.conversation_id,
-                user_id: newConversationData.user_id,
+                employee_id: newConversationData.employee_id,
                 created_at: newConversationData.started_at,
                 updated_at: newConversationData.updated_at,
                 title: `Conversation ${newConversationData.conversation_id.substring(0, 15)}` // Generate title
@@ -201,8 +220,7 @@ const BodyContent = ({user_id}) => {
             // Re-throw the error if the calling function needs to know about the failure
             throw err; 
         } finally {
-             // Reset loading state if you set one
-             // setLoading(false); // Or setIsCreatingConversation(false);
+            setIsCreatingConversation(false);
         }
     };
 
@@ -248,7 +266,7 @@ const BodyContent = ({user_id}) => {
                 sender: savedMessage.sender,
                 text: savedMessage.message,
                 type: "text", // Adjust if backend provides type info
-                // created_at: savedMessage.created_at // Include if needed
+                conversation_title: savedMessage.conversation_title
             };
 
         } catch (err) {
@@ -484,26 +502,28 @@ const BodyContent = ({user_id}) => {
             };
 
             // 3. Save bot response to backend
-            const savedBotMessage = await saveMessage(currentConversationId, botMessageDataForSaving);
+            const savedBotMessageResult = await saveMessage(currentConversationId, botMessageDataForSaving);
 
-            // 4. Add final bot message to UI (using saved data + UI-specific fields like type/data)
+            // --- *** ADD THIS BLOCK TO UPDATE THE CONVERSATION TITLE *** ---
+            if (savedBotMessageResult.conversation_title) {
+                setConversations(prevConvos =>
+                    prevConvos.map(conv =>
+                        conv.convo_id === currentConversationId
+                            ? { ...conv, title: savedBotMessageResult.conversation_title } // Update title
+                            : conv // Keep others unchanged
+                    )
+                );
+            }
+            // --- *** END OF TITLE UPDATE BLOCK *** ---
+
+            // 4. Add final bot message to UI
             const finalBotMessageForUI = {
-                ...savedBotMessage, // Includes id, sender, text from backend
-                type: botMessageType, // Set the correct type for rendering
-                // Add the table data if it exists for the Table component
-                ...(botTableData && { 
-                    // Structure this according to your Table component's props
-                    tables: [{ 
-                        title: "Generated Report", // Example title
-                        headers: botTableData.headers, 
-                        rows: botTableData.rows 
-                    }],
-                    // You might need additional text fields your table component uses
-                    title2: "Analysis", 
-                    text2: "Here is the data based on your request." 
-                })
+                id: savedBotMessageResult.id, // Use ID from saved result
+                sender: savedBotMessageResult.sender,
+                text: savedBotMessageResult.text, // Use text from saved result
+                type: botMessageType,
+                 ...(botTableData && { /* ... table data structure ... */ })
             };
-
             setMessages(prev => [...prev, finalBotMessageForUI]);
 
         } catch (botProcessingErr) {
@@ -654,9 +674,9 @@ const BodyContent = ({user_id}) => {
                                     <div className="sidebar-icons-ham-icon-wrapper">
                                         <div 
                                             // Add 'disabled' class and prevent click if bot is responding
-                                            className={`ham-menu-icon active ${isBotResponding ? 'disabled' : ''}`} 
-                                            onClick={!isBotResponding ? toggleSidebar : undefined}
-                                            style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', opacity: isBotResponding ? 0.6 : 1 }} 
+                                            className={`ham-menu-icon active ${isBotResponding || isCreatingConversation  ? 'disabled' : ''}`} 
+                                            onClick={!(isBotResponding || isCreatingConversation) ? toggleSidebar : undefined}
+                                            style={{ cursor: (isBotResponding || isCreatingConversation) ? 'not-allowed' : 'pointer', opacity: (isBotResponding || isCreatingConversation) ? 0.6 : 1 }} 
                                         >
                                             <span></span>
                                             <span></span>
@@ -667,10 +687,10 @@ const BodyContent = ({user_id}) => {
                                                 src="../../icons/repgen-icons/newchat.png" 
                                                 alt="New" 
                                                 // Add 'disabled' class and prevent click if bot is responding
-                                                className={`newchat-icon ${isBotResponding ? 'disabled' : ''}`}
-                                                onClick={!isBotResponding ? startNewChat : undefined}
+                                                className={`newchat-icon ${isBotResponding || isCreatingConversation ? 'disabled' : ''}`}
+                                                onClick={!(isBotResponding || isCreatingConversation) ? startNewChat : undefined}
                                                 // Optional: Add style for disabled state in CSS for .newchat-icon.disabled
-                                                style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', opacity: isBotResponding ? 0.6 : 1 }} 
+                                                style={{ cursor: (isBotResponding || isCreatingConversation) ? 'not-allowed' : 'pointer', opacity: (isBotResponding || isCreatingConversation) ? 0.6 : 1 }} 
                                             />
                                         </div>
                                     </div>
@@ -699,16 +719,16 @@ const BodyContent = ({user_id}) => {
                                                                 justifyContent: 'space-between', 
                                                                 alignItems: 'center',
                                                                 // Apply opacity based on bot state for the whole item
-                                                                opacity: isBotResponding ? 0.6 : 1 
+                                                                opacity: (isBotResponding || isCreatingConversation) ? 0.6 : 1 
                                                             }} 
                                                         >
                                                             {/* Wrap title in a span and attach fetchMessages click here */}
                                                             <span 
-                                                                onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? () => fetchMessages(chat.convo_id) : undefined}
                                                                 // Make the title span take up available space and allow clicking
                                                                 style={{ 
                                                                     flexGrow: 1, 
-                                                                    cursor: isBotResponding ? 'not-allowed' : 'pointer', 
+                                                                    cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', 
                                                                     paddingRight: '10px', // Add space between title and icon
                                                                     overflow: 'hidden', // Prevent long titles from overlapping icon
                                                                     textOverflow: 'ellipsis', // Add ellipsis for long titles
@@ -723,14 +743,14 @@ const BodyContent = ({user_id}) => {
                                                                 src="../../icons/repgen-icons/archive-icon.png" // Verify path
                                                                 alt="Archive"
                                                                 // Add disabled class based on bot state
-                                                                className={`archive-icon ${isBotResponding ? 'disabled' : ''}`} 
+                                                                className={`archive-icon ${isBotResponding || isCreatingConversation  ? 'disabled' : ''}`} 
                                                                 // Attach archiveConversation click here, prevent if bot is responding
-                                                                onClick={!isBotResponding ? (e) => {
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? (e) => {
                                                                     e.stopPropagation(); // Prevent triggering fetchMessages if li had a handler
                                                                     archiveConversation(chat.convo_id); 
                                                                 } : undefined}
                                                                 style={{
-                                                                    cursor: isBotResponding ? 'not-allowed' : 'pointer',
+                                                                    cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer',
                                                                     width: '24px',  // Adjust size as needed
                                                                     height: '24px', 
                                                                     flexShrink: 0 // Prevent icon from shrinking
@@ -750,20 +770,20 @@ const BodyContent = ({user_id}) => {
                                                         <li 
                                                             key={chat.convo_id} 
                                                             className={`history-item ${chat.active ? 'active' : ''}`}
-                                                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isBotResponding ? 0.6 : 1 }} 
+                                                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: (isBotResponding || isCreatingConversation)  ? 0.6 : 1 }} 
                                                         >
                                                             <span 
-                                                                onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
-                                                                style={{ flexGrow: 1, cursor: isBotResponding ? 'not-allowed' : 'pointer', paddingRight: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? () => fetchMessages(chat.convo_id) : undefined}
+                                                                style={{ flexGrow: 1, cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', paddingRight: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                                                             >
                                                                 {chat.title}
                                                             </span>
                                                             <img
                                                                 src="../../icons/repgen-icons/archive-icon.png" 
                                                                 alt="Archive"
-                                                                className={`archive-icon ${isBotResponding ? 'disabled' : ''}`} 
-                                                                onClick={!isBotResponding ? (e) => { e.stopPropagation(); archiveConversation(chat.convo_id); } : undefined}
-                                                                style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', width: '24px', height: '24px', flexShrink: 0 }}
+                                                                className={`archive-icon ${isBotResponding || isCreatingConversation  ? 'disabled' : ''}`} 
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? (e) => { e.stopPropagation(); archiveConversation(chat.convo_id); } : undefined}
+                                                                style={{ cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', width: '24px', height: '24px', flexShrink: 0 }}
                                                             />
                                                         </li>
                                                     ))}
@@ -779,20 +799,20 @@ const BodyContent = ({user_id}) => {
                                                         <li 
                                                             key={chat.convo_id} 
                                                             className={`history-item ${chat.active ? 'active' : ''}`}
-                                                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isBotResponding ? 0.6 : 1 }} 
+                                                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: (isBotResponding || isCreatingConversation)  ? 0.6 : 1 }} 
                                                         >
                                                             <span 
-                                                                onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
-                                                                style={{ flexGrow: 1, cursor: isBotResponding ? 'not-allowed' : 'pointer', paddingRight: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? () => fetchMessages(chat.convo_id) : undefined}
+                                                                style={{ flexGrow: 1, cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', paddingRight: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                                                             >
                                                                 {chat.title}
                                                             </span>
                                                             <img
                                                                 src="../../icons/repgen-icons/archive-icon.png" 
                                                                 alt="Archive"
-                                                                className={`archive-icon ${isBotResponding ? 'disabled' : ''}`} 
-                                                                onClick={!isBotResponding ? (e) => { e.stopPropagation(); archiveConversation(chat.convo_id); } : undefined}
-                                                                style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', width: '24px', height: '24px', flexShrink: 0 }}
+                                                                className={`archive-icon ${(isBotResponding || isCreatingConversation)  ? 'disabled' : ''}`} 
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? (e) => { e.stopPropagation(); archiveConversation(chat.convo_id); } : undefined}
+                                                                style={{ cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', width: '24px', height: '24px', flexShrink: 0 }}
                                                             />
                                                         </li>
                                                     ))}
@@ -814,9 +834,9 @@ const BodyContent = ({user_id}) => {
                             {!isSidebarVisible && (
                                 <div 
                                     // Add 'disabled' class and prevent click if bot is responding
-                                    className={`sidebar-icons-ham-icon-wrapper ${isBotResponding ? 'disabled' : ''}`} 
-                                    onClick={!isBotResponding ? toggleSidebar : undefined}
-                                    style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', opacity: isBotResponding ? 0.6 : 1 }} 
+                                    className={`sidebar-icons-ham-icon-wrapper ${(isBotResponding || isCreatingConversation)  ? 'disabled' : ''}`} 
+                                    onClick={!(isBotResponding || isCreatingConversation)  ? toggleSidebar : undefined}
+                                    style={{ cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', opacity: (isBotResponding || isCreatingConversation)  ? 0.6 : 1 }} 
                                 >
                                     <div className="ham-menu-icon">
                                         <span></span>
