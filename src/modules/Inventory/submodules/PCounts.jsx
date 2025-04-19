@@ -54,7 +54,7 @@ const BodyContent = () => {
     setLoading(true);
     setError(null);
 
-    fetch("http://127.0.0.1:8000/api/warehouses/")
+    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouses/")
     .then((res) => {
       if (!res.ok) {
         throw new Error(`HTTP error fetching warehouses! Status: ${res.status}`);
@@ -71,7 +71,7 @@ const BodyContent = () => {
       console.error("Error fetching warehouses:", err);
     });
 
-    fetch("http://127.0.0.1:8000/api/inventory-items/")
+    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error fetching inventory items! Status: ${res.status}`);
@@ -97,7 +97,7 @@ const BodyContent = () => {
         console.error("Error fetching inventory items:", err);
       });
 
-    fetch("http://127.0.0.1:8000/api/cyclic_counts/")
+    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/")
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error fetching cyclic counts! Status: ${res.status}`);
@@ -165,7 +165,7 @@ const BodyContent = () => {
   const confirmStatusUpdate = () => {
     if (!pendingStatusChange || !selectedRow) return;
     
-    fetch(`http://127.0.0.1:8000/api/cyclic_counts/${selectedRow.inventory_count_id}/status/`, {
+    fetch(`https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/${selectedRow.inventory_count_id}/status/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
