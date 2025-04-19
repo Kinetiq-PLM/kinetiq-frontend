@@ -308,6 +308,20 @@ const LeaveRequests = () => {
     }
   };
 
+  // Add this function near your other handler functions
+  const handleArchiveLeaveRequest = async (leaveId) => {
+    if (!window.confirm("Are you sure you want to archive this leave request?")) return;
+    
+    try {
+      await axios.post(`http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/archived/`);
+      showToast("Leave request archived successfully");
+      fetchData(); // Refresh data after archiving
+    } catch (err) {
+      console.error("Archive leave request error:", err);
+      showToast("Failed to archive leave request", false);
+    }
+  };
+
   // Display leave balance information in the form
   const renderLeaveBalanceInfo = () => {
     if (!currentEmployeeBalance) return null;
@@ -513,6 +527,14 @@ const LeaveRequests = () => {
                           >
                             Edit
                           </div>
+                          {!isArchived && (
+                            <div
+                              className="leave-requests-dropdown-item"
+                              onClick={() => handleArchiveLeaveRequest(request.leave_id)}
+                            >
+                              Archive
+                            </div>
+                          )}
                         </div>
                       )}
                     </td>
@@ -604,17 +626,116 @@ const LeaveRequests = () => {
   // Render pagination controls
   const renderPagination = (totalPages) => (
     <div className="hr-leave-requests-pagination">
+      <button 
+        className="hr-leave-requests-pagination-arrow" 
+        onClick={() => setCurrentPage(1)} 
+        disabled={currentPage === 1}
+      >
+        &#171; {/* Double left arrow */}
+      </button>
+      
+      <button 
+        className="hr-leave-requests-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+        disabled={currentPage === 1}
+      >
+        &#8249; {/* Single left arrow */}
+      </button>
+      
       <div className="hr-leave-requests-pagination-numbers">
-        {[...Array(totalPages)].map((_, i) => (
-          <button
-            key={i}
-            className={i + 1 === currentPage ? "active" : ""}
-            onClick={() => setCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
+        {(() => {
+          const pageNumbers = [];
+          const maxVisiblePages = 5;
+          
+          if (totalPages <= maxVisiblePages + 2) {
+            // Show all pages if there are few
+            for (let i = 1; i <= totalPages; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+          } else {
+            // Always show first page
+            pageNumbers.push(
+              <button
+                key={1}
+                className={1 === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(1)}
+              >
+                1
+              </button>
+            );
+            
+            // Calculate range around current page
+            let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+            
+            // Adjust if we're near the end
+            if (endPage - startPage < maxVisiblePages - 1) {
+              startPage = Math.max(2, endPage - maxVisiblePages + 1);
+            }
+            
+            // Add ellipsis after first page if needed
+            if (startPage > 2) {
+              pageNumbers.push(<span key="ellipsis1" className="hr-leave-requests-pagination-ellipsis">...</span>);
+            }
+            
+            // Add middle pages
+            for (let i = startPage; i <= endPage; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+            
+            // Add ellipsis before last page if needed
+            if (endPage < totalPages - 1) {
+              pageNumbers.push(<span key="ellipsis2" className="hr-leave-requests-pagination-ellipsis">...</span>);
+            }
+            
+            // Always show last page
+            pageNumbers.push(
+              <button
+                key={totalPages}
+                className={totalPages === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(totalPages)}
+              >
+                {totalPages}
+              </button>
+            );
+          }
+          
+          return pageNumbers;
+        })()}
       </div>
+      
+      <button 
+        className="hr-leave-requests-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+        disabled={currentPage === totalPages}
+      >
+        &#8250; {/* Single right arrow */}
+      </button>
+      
+      <button 
+        className="hr-leave-requests-pagination-arrow" 
+        onClick={() => setCurrentPage(totalPages)} 
+        disabled={currentPage === totalPages}
+      >
+        &#187; {/* Double right arrow */}
+      </button>
+      
       <select
         className="hr-leave-requests-pagination-size"
         value={itemsPerPage}
