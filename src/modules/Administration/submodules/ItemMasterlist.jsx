@@ -49,10 +49,12 @@ const { TextArea } = Input;
 const ItemMasterManagement = () => {
   // State variables
   const [activeTab, setActiveTab] = useState("items");
+
   const [items, setItems] = useState([]);
   const [assets, setAssets] = useState([]);
   const [products, setProducts] = useState([]);
   const [rawMaterials, setRawMaterials] = useState([]);
+
   const [vendors, setVendors] = useState([]);
   const [contentIds, setContentIds] = useState([]);
   
@@ -109,12 +111,16 @@ const ItemMasterManagement = () => {
 
   // Unit of measure options
   const uomOptions = [
-    "Each", "Pair", "Set", "Pack", "Box", "Carton", "Pallet",
-    "Meter", "Centimeter", "Foot", "Inch", "Yard",
-    "Kilogram", "Gram", "Pound", "Ounce", "Ton",
-    "Liter", "Milliliter", "Gallon", "Quart", "Pint",
-    "Hour", "Minute", "Day", "Week", "Month",
-    "Square Meter", "Square Foot", "Cubic Meter", "Cubic Foot"
+    "kg",
+    "mm",
+    "sh",
+    "bx",
+    "l",
+    "m",
+    "gal",
+    "pcs",
+    "set",
+    "unit",
   ];
 
   // Fetch data when component mounts or tab changes
@@ -128,18 +134,6 @@ const ItemMasterManagement = () => {
     } else if (activeTab === "materials") {
       fetchRawMaterials();
     }
-    
-    // Fetch vendors for dropdowns
-    fetchVendors();
-    
-    // Mock content IDs for demonstration (replace with actual API if available)
-    const mockContentIds = [
-      "OPS-DOI-2025-32ef23",
-      "FIN-DOI-2025-ab7812",
-      "HR-DOI-2025-9df451",
-      "PROD-DOI-2025-f45e12"
-    ];
-    setContentIds(mockContentIds);
   }, [activeTab]);
 
   useEffect(() => {
@@ -232,20 +226,18 @@ const ItemMasterManagement = () => {
     }
   };
 
-  const fetchVendors = async () => {
-    try {
-      const data = await vendorAPI.getVendors();
-      setVendors(data.results || data);
-    } catch (error) {
-      console.error('Error fetching vendors:', error);
-      // Don't show an error message to users since this is background data
-    }
-  };
-
-  const fetchArchivedItems = async (searchTerm = "") => {
+  const fetchArchivedItems = async (searchTerm = "", orderField = "", orderDirection = "") => {
     setLoading(true);
     try {
-      const data = await itemMasterDataAPI.getArchivedItems({ search: searchTerm });
+      const params = {
+        search: searchTerm || "",
+      };
+  
+      if (orderField) {
+        params.ordering = orderDirection === "descend" ? `-${orderField}` : orderField;
+      }
+  
+      const data = await itemMasterDataAPI.getArchivedItems(params);
       setArchivedItems(data.results || data);
       setArchiveType("items");
       setArchiveModalVisible(true);
@@ -256,11 +248,19 @@ const ItemMasterManagement = () => {
       setLoading(false);
     }
   };
-
-  const fetchArchivedAssets = async (searchTerm = "") => {
+  
+  const fetchArchivedAssets = async (searchTerm = "", orderField = "", orderDirection = "") => {
     setLoading(true);
     try {
-      const data = await assetsAPI.getArchivedAssets({ search: searchTerm });
+      const params = {
+        search: searchTerm || "",
+      };
+  
+      if (orderField) {
+        params.ordering = orderDirection === "descend" ? `-${orderField}` : orderField;
+      }
+  
+      const data = await assetsAPI.getArchivedAssets(params);
       setArchivedAssets(data.results || data);
       setArchiveType("assets");
       setArchiveModalVisible(true);
@@ -271,11 +271,19 @@ const ItemMasterManagement = () => {
       setLoading(false);
     }
   };
-
-  const fetchArchivedProducts = async (searchTerm = "") => {
+  
+  const fetchArchivedProducts = async (searchTerm = "", orderField = "", orderDirection = "") => {
     setLoading(true);
     try {
-      const data = await productsAPI.getArchivedProducts({ search: searchTerm });
+      const params = {
+        search: searchTerm || "",
+      };
+  
+      if (orderField) {
+        params.ordering = orderDirection === "descend" ? `-${orderField}` : orderField;
+      }
+  
+      const data = await productsAPI.getArchivedProducts(params);
       setArchivedProducts(data.results || data);
       setArchiveType("products");
       setArchiveModalVisible(true);
@@ -286,11 +294,19 @@ const ItemMasterManagement = () => {
       setLoading(false);
     }
   };
-
-  const fetchArchivedRawMaterials = async (searchTerm = "") => {
+  
+  const fetchArchivedRawMaterials = async (searchTerm = "", orderField = "", orderDirection = "") => {
     setLoading(true);
     try {
-      const data = await rawMaterialsAPI.getArchivedRawMaterials({ search: searchTerm });
+      const params = {
+        search: searchTerm || "",
+      };
+  
+      if (orderField) {
+        params.ordering = orderDirection === "descend" ? `-${orderField}` : orderField;
+      }
+  
+      const data = await rawMaterialsAPI.getArchivedRawMaterials(params);
       setArchivedRawMaterials(data.results || data);
       setArchiveType("materials");
       setArchiveModalVisible(true);
@@ -301,6 +317,7 @@ const ItemMasterManagement = () => {
       setLoading(false);
     }
   };
+  
 
   // Handle archived search
   const handleArchivedSearch = (value) => {
@@ -1025,5 +1042,854 @@ const ItemMasterManagement = () => {
         ),
     },
     ];
+    
+const archivedProductColumns = [
+    {
+      title: "Product ID",
+      dataIndex: "product_id",
+      key: "product_id",
+      sorter: true,
+      width: 180,
+    },
+    {
+      title: "Product Name",
+      dataIndex: "product_name",
+      key: "product_name",
+      sorter: true,
+      width: 180,
+    },
+    // Add other product columns as needed
+    {
+      title: "Actions",
+      key: "actions",
+      width: 80,
+      align: "center",
+      render: (_, record) => (
+        <Popconfirm
+          title="Are you sure you want to restore this product?"
+          onConfirm={() => handleRestoreProduct(record.product_id)}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button 
+            type="primary" 
+            icon={<UndoOutlined />} 
+            size="small"
+          />
+        </Popconfirm>
+      ),
+    },
+  ];
+
+  const archivedMaterialColumns = [
+    {
+      title: "Material ID",
+      dataIndex: "material_id",
+      key: "material_id",
+      sorter: true,
+      width: 180,
+    },
+    {
+      title: "Material Name",
+      dataIndex: "material_name",
+      key: "material_name",
+      sorter: true,
+      width: 180,
+    },
+    // Add other material columns as needed
+    {
+      title: "Actions",
+      key: "actions",
+      width: 80,
+      align: "center",
+      render: (_, record) => (
+        <Popconfirm
+          title="Are you sure you want to restore this raw material?"
+          onConfirm={() => handleRestoreMaterial(record.material_id)}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button 
+            type="primary" 
+            icon={<UndoOutlined />} 
+            size="small"
+          />
+        </Popconfirm>
+      ),
+    },
+  ];
+
+  // Calculate table data for pagination
+  const getItemTableData = () => {
+    const { current, pageSize } = itemPagination;
+    const start = (current - 1) * pageSize;
+    const end = start + pageSize;
+    return items.slice(start, end);
+  };
+
+  const getAssetTableData = () => {
+    const { current, pageSize } = assetPagination;
+    const start = (current - 1) * pageSize;
+    const end = start + pageSize;
+    return assets.slice(start, end);
+  };
+
+  const getProductTableData = () => {
+    const { current, pageSize } = productPagination;
+    const start = (current - 1) * pageSize;
+    const end = start + pageSize;
+    return products.slice(start, end);
+  };
+
+  const getMaterialTableData = () => {
+    const { current, pageSize } = materialPagination;
+    const start = (current - 1) * pageSize;
+    const end = start + pageSize;
+    return rawMaterials.slice(start, end);
+  };
+
+  // Render main component
+  return (
+    <div className="item-master">
+      <div className="item-master-container">
+        <Title level={4} className="page-title">
+          {activeTab === "items" ? "Item Master" :
+           activeTab === "assets" ? "Asset Management" :
+           activeTab === "products" ? "Product Management" :
+           "Raw Material Management"}
+        </Title>
+        <Divider className="title-divider" />
+        
+        <div className="tabs-wrapper">
+          <Tabs 
+            activeKey={activeTab} 
+            onChange={handleTabChange}
+            size="middle"
+            tabBarGutter={8}
+            className="item-tabs"
+            type={windowWidth <= 768 ? "card" : "line"}
+            tabPosition="top"
+            destroyInactiveTabPane={false}
+            tabBarExtraContent={{
+              right: (
+                <div className="header-right-content">
+                  <div className="search-container">
+                    <Input.Search
+                      placeholder={`Search ${activeTab}...`}
+                      allowClear
+                      onSearch={handleSearch}
+                      value={searchValue}
+                      onChange={(e) => setSearchValue(e.target.value)}
+                      prefix={<SearchOutlined />}
+                    />
+                  </div>
+                  <div className="action-buttons">
+                    {activeTab === "items" && (
+                      <Button 
+                        icon={<EyeOutlined />} 
+                        onClick={() => fetchArchivedItems("")}
+                        className={`archive-btn ${windowWidth <= 576 ? "icon-only-btn" : ""}`}
+                      >
+                        {windowWidth > 576 ? "View Archived" : ""}
+                      </Button>
+                    )}
+                    {activeTab === "assets" && (
+                      <>
+                        <Button 
+                          icon={<EyeOutlined />} 
+                          onClick={() => fetchArchivedAssets("")}
+                          className={`archive-btn ${windowWidth <= 576 ? "icon-only-btn" : ""}`}
+                        >
+                          {windowWidth > 576 ? "View Archived" : ""}
+                        </Button>
+                        <Button 
+                          type="primary" 
+                          icon={<PlusOutlined />} 
+                          onClick={handleAddAsset}
+                          className={windowWidth <= 576 ? "icon-only-btn" : ""}
+                        >
+                          {windowWidth > 576 ? "Add Asset" : ""}
+                        </Button>
+                      </>
+                    )}
+                    {activeTab === "products" && (
+                      <>
+                        <Button 
+                          icon={<EyeOutlined />} 
+                          onClick={() => fetchArchivedProducts("")}
+                          className={`archive-btn ${windowWidth <= 576 ? "icon-only-btn" : ""}`}
+                        >
+                          {windowWidth > 576 ? "View Archived" : ""}
+                        </Button>
+                        <Button 
+                          type="primary" 
+                          icon={<PlusOutlined />} 
+                          onClick={handleAddProduct}
+                          className={windowWidth <= 576 ? "icon-only-btn" : ""}
+                        >
+                          {windowWidth > 576 ? "Add Product" : ""}
+                        </Button>
+                      </>
+                    )}
+                    {activeTab === "materials" && (
+                      <>
+                        <Button 
+                          icon={<EyeOutlined />} 
+                          onClick={() => fetchArchivedRawMaterials("")}
+                          className={`archive-btn ${windowWidth <= 576 ? "icon-only-btn" : ""}`}
+                        >
+                          {windowWidth > 576 ? "View Archived" : ""}
+                        </Button>
+                        <Button 
+                          type="primary" 
+                          icon={<PlusOutlined />} 
+                          onClick={handleAddMaterial}
+                          className={windowWidth <= 576 ? "icon-only-btn" : ""}
+                        >
+                          {windowWidth > 576 ? "Add Material" : ""}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )
+            }}
+          >
+            <TabPane 
+              tab={<span><AppstoreOutlined /> {windowWidth > 576 ? "Items" : ""}</span>} 
+              key="items"
+            >
+              {/* Items tab content */}
+              <div className="table-meta-info">
+                <span className="record-count">Total Items: {items.length}</span>
+                <div className="table-pagination">
+                  <Pagination 
+                    current={itemPagination.current}
+                    pageSize={itemPagination.pageSize}
+                    total={items.length}
+                    onChange={handleItemPaginationChange}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
+              </div>
+              
+              <div className="table-container">
+                <Table 
+                  dataSource={getItemTableData()} 
+                  columns={itemColumns} 
+                  rowKey="item_id"
+                  loading={loading}
+                  scroll={{ x: true }}
+                  pagination={false}
+                  bordered
+                  size="middle"
+                  showSorterTooltip={false}
+                  sortDirections={['ascend', 'descend']}
+                  onChange={handleTableChange}
+                  className="scrollable-table"
+                />
+              </div>
+            </TabPane>
+
+            <TabPane 
+              tab={<span><ToolOutlined /> {windowWidth > 576 ? "Assets" : ""}</span>} 
+              key="assets"
+            >
+              {/* Assets tab content */}
+              <div className="table-meta-info">
+                <span className="record-count">Total Assets: {assets.length}</span>
+                <div className="table-pagination">
+                  <Pagination 
+                    current={assetPagination.current}
+                    pageSize={assetPagination.pageSize}
+                    total={assets.length}
+                    onChange={handleAssetPaginationChange}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
+              </div>
+              <div className="table-container">
+                <Table 
+                  dataSource={getAssetTableData()} 
+                  columns={assetColumns} 
+                  rowKey="asset_id"
+                  loading={loading}
+                  scroll={{ x: true }}
+                  pagination={false}
+                  bordered
+                  size="middle"
+                  showSorterTooltip={false}
+                  sortDirections={['ascend', 'descend']}
+                  onChange={handleTableChange}
+                  className="scrollable-table"
+                />
+              </div>
+            </TabPane>
+
+            <TabPane 
+              tab={<span><ShoppingOutlined /> {windowWidth > 576 ? "Products" : ""}</span>} 
+              key="products"
+            >
+              {/* Products tab content */}
+              <div className="table-meta-info">
+                <span className="record-count">Total Products: {products.length}</span>
+                <div className="table-pagination">
+                  <Pagination 
+                    current={productPagination.current}
+                    pageSize={productPagination.pageSize}
+                    total={products.length}
+                    onChange={handleProductPaginationChange}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
+              </div>
+              <div className="table-container">
+                <Table 
+                  dataSource={getProductTableData()} 
+                  columns={productColumns} 
+                  rowKey="product_id"
+                  loading={loading}
+                  scroll={{ x: true }}
+                  pagination={false}
+                  bordered
+                  size="middle"
+                  showSorterTooltip={false}
+                  sortDirections={['ascend', 'descend']}
+                  onChange={handleTableChange}
+                  className="scrollable-table"
+                />
+              </div>
+            </TabPane>
+
+            <TabPane 
+              tab={<span><ExperimentOutlined /> {windowWidth > 576 ? "Raw Materials" : ""}</span>} 
+              key="materials"
+            >
+              {/* Raw Materials tab content */}
+              <div className="table-meta-info">
+                <span className="record-count">Total Raw Materials: {rawMaterials.length}</span>
+                <div className="table-pagination">
+                  <Pagination 
+                    current={materialPagination.current}
+                    pageSize={materialPagination.pageSize}
+                    total={rawMaterials.length}
+                    onChange={handleMaterialPaginationChange}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
+              </div>
+              <div className="table-container">
+                <Table 
+                  dataSource={getMaterialTableData()} 
+                  columns={materialColumns} 
+                  rowKey="material_id"
+                  loading={loading}
+                  scroll={{ x: true }}
+                  pagination={false}
+                  bordered
+                  size="middle"
+                  showSorterTooltip={false}
+                  sortDirections={['ascend', 'descend']}
+                  onChange={handleTableChange}
+                  className="scrollable-table"
+                />
+              </div>
+            </TabPane>
+          </Tabs>
+        </div>
+
+        {/* Item Modal */}
+        <Modal
+          title={modalMode === "view" ? "View Item Details" : "Edit Item Details"}
+          visible={itemModalVisible}
+          onCancel={() => setItemModalVisible(false)}
+          footer={modalMode === "view" ? [
+            <Button key="close" onClick={() => setItemModalVisible(false)}>
+              Close
+            </Button>
+          ] : null}
+          width={600}
+          className="custom-modal"
+        >
+          <Form
+            form={itemForm}
+            layout="vertical"
+            disabled={modalMode === "view"}
+            onFinish={handleItemFormSubmit}
+          >
+            <Form.Item
+              name="preferred_vendor"
+              label="Preferred Vendor"
+            >
+              <Select allowClear placeholder="Select a vendor">
+                {vendors.map(vendor => (
+                  <Option key={vendor.vendor_id} value={vendor.vendor_id}>
+                    {vendor.vendor_name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="preferred_vendor_name"
+              label="Alternate Vendor Name"
+              extra="Use this if vendor is not in the system"
+            >
+              <Input />
+            </Form.Item>
+
+            <Divider orientation="left">Purchasing Information</Divider>
+            <Form.Item
+              name="purchasing_uom"
+              label="Purchasing UOM"
+            >
+              <Select allowClear placeholder="Select unit of measure">
+                {uomOptions.map(uom => (
+                  <Option key={uom} value={uom}>
+                    {uom}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="items_per_purchase_unit"
+              label="Items Per Purchase Unit"
+            >
+              <InputNumber min={0} style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item
+              name="purchase_quantity_per_package"
+              label="Purchase Quantity Per Package"
+            >
+              <InputNumber min={0} style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Divider orientation="left">Sales Information</Divider>
+            <Form.Item
+              name="sales_uom"
+              label="Sales UOM"
+            >
+              <Select allowClear placeholder="Select unit of measure">
+                {uomOptions.map(uom => (
+                  <Option key={uom} value={uom}>
+                    {uom}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="items_per_sale_unit"
+              label="Items Per Sale Unit"
+            >
+              <InputNumber min={0} style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item
+              name="sales_quantity_per_package"
+              label="Sales Quantity Per Package"
+            >
+              <InputNumber min={0} style={{ width: '100%' }} />
+            </Form.Item>
+
+            {modalMode !== "view" && (
+              <Form.Item className="form-actions">
+                <Space>
+                  <Button type="primary" htmlType="submit">
+                    Update
+                  </Button>
+                  <Button onClick={() => setItemModalVisible(false)}>
+                    Cancel
+                  </Button>
+                </Space>
+              </Form.Item>
+            )}
+          </Form>
+        </Modal>
+
+        {/* Asset Modal */}
+        <Modal
+          title={modalMode === "add" ? "Add New Asset" : modalMode === "edit" ? "Edit Asset" : "View Asset"}
+          visible={assetModalVisible}
+          onCancel={() => setAssetModalVisible(false)}
+          footer={modalMode === "view" ? [
+            <Button key="close" onClick={() => setAssetModalVisible(false)}>
+              Close
+            </Button>
+          ] : null}
+          width={600}
+          className="custom-modal"
+        >
+          <Form
+            form={assetForm}
+            layout="vertical"
+            disabled={modalMode === "view"}
+            onFinish={handleAssetFormSubmit}
+          >
+            <Form.Item
+              name="asset_name"
+              label="Asset Name"
+              rules={[{ required: true, message: "Please enter asset name" }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="purchase_date"
+              label="Purchase Date"
+            >
+              <DatePicker style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item
+              name="purchase_price"
+              label="Purchase Price"
+            >
+              <InputNumber 
+                min={0}
+                style={{ width: '100%' }}
+                formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                parser={value => value.replace(/\$\s?|(,*)/g, '')}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="serial_no"
+              label="Serial Number"
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="content_id"
+              label="Content ID"
+            >
+              <Select allowClear placeholder="Select content ID">
+                {contentIds.map(id => (
+                  <Option key={id} value={id}>
+                    {id}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            {modalMode !== "view" && (
+              <Form.Item className="form-actions">
+                <Space>
+                  <Button type="primary" htmlType="submit">
+                    {modalMode === "add" ? "Create" : "Update"}
+                  </Button>
+                  <Button onClick={() => setAssetModalVisible(false)}>
+                    Cancel
+                  </Button>
+                </Space>
+              </Form.Item>
+            )}
+          </Form>
+        </Modal>
+
+        {/* Product Modal */}
+        <Modal
+          title={modalMode === "add" ? "Add New Product" : modalMode === "edit" ? "Edit Product" : "View Product"}
+          visible={productModalVisible}
+          onCancel={() => setProductModalVisible(false)}
+          footer={modalMode === "view" ? [
+            <Button key="close" onClick={() => setProductModalVisible(false)}>
+              Close
+            </Button>
+          ] : null}
+          width={600}
+          className="custom-modal"
+        >
+          <Form
+            form={productForm}
+            layout="vertical"
+            disabled={modalMode === "view"}
+            onFinish={handleProductFormSubmit}
+          >
+            <Form.Item
+              name="product_name"
+              label="Product Name"
+              rules={[{ required: true, message: "Please enter product name" }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="sku"
+              label="SKU"
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="description"
+              label="Description"
+            >
+              <TextArea rows={4} />
+            </Form.Item>
+
+            <Form.Item
+              name="category"
+              label="Category"
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="unit_price"
+              label="Unit Price"
+            >
+              <InputNumber 
+                min={0}
+                style={{ width: '100%' }}
+                formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                parser={value => value.replace(/\$\s?|(,*)/g, '')}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="unit_of_measure"
+              label="Unit of Measure"
+            >
+              <Select allowClear placeholder="Select unit of measure">
+                {uomOptions.map(uom => (
+                  <Option key={uom} value={uom}>
+                    {uom}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            {modalMode !== "view" && (
+              <Form.Item className="form-actions">
+                <Space>
+                  <Button type="primary" htmlType="submit">
+                    {modalMode === "add" ? "Create" : "Update"}
+                  </Button>
+                  <Button onClick={() => setProductModalVisible(false)}>
+                    Cancel
+                  </Button>
+                </Space>
+              </Form.Item>
+            )}
+          </Form>
+        </Modal>
+
+        {/* Raw Material Modal */}
+        <Modal
+          title={modalMode === "add" ? "Add New Raw Material" : modalMode === "edit" ? "Edit Raw Material" : "View Raw Material"}
+          visible={materialModalVisible}
+          onCancel={() => setMaterialModalVisible(false)}
+          footer={modalMode === "view" ? [
+            <Button key="close" onClick={() => setMaterialModalVisible(false)}>
+              Close
+            </Button>
+          ] : null}
+          width={600}
+          className="custom-modal"
+        >
+          <Form
+            form={materialForm}
+            layout="vertical"
+            disabled={modalMode === "view"}
+            onFinish={handleMaterialFormSubmit}
+          >
+            <Form.Item
+              name="material_name"
+              label="Material Name"
+              rules={[{ required: true, message: "Please enter material name" }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="material_code"
+              label="Material Code"
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="description"
+              label="Description"
+            >
+              <TextArea rows={4} />
+            </Form.Item>
+
+            <Form.Item
+              name="category"
+              label="Category"
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="unit_cost"
+              label="Unit Cost"
+            >
+              <InputNumber 
+                min={0}
+                style={{ width: '100%' }}
+                formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                parser={value => value.replace(/\$\s?|(,*)/g, '')}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="unit_of_measure"
+              label="Unit of Measure"
+            >
+              <Select allowClear placeholder="Select unit of measure">
+                {uomOptions.map(uom => (
+                  <Option key={uom} value={uom}>
+                    {uom}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="preferred_vendor"
+              label="Preferred Vendor"
+            >
+              <Select allowClear placeholder="Select a vendor">
+                {vendors.map(vendor => (
+                  <Option key={vendor.vendor_id} value={vendor.vendor_id}>
+                    {vendor.vendor_name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            {modalMode !== "view" && (
+              <Form.Item className="form-actions">
+                <Space>
+                  <Button type="primary" htmlType="submit">
+                    {modalMode === "add" ? "Create" : "Update"}
+                  </Button>
+                  <Button onClick={() => setMaterialModalVisible(false)}>
+                    Cancel
+                  </Button>
+                </Space>
+              </Form.Item>
+            )}
+          </Form>
+        </Modal>
+
+        {/* Archive Modal */}
+        <Modal
+          title={`Archived ${
+            archiveType === "items" ? "Items" : 
+            archiveType === "assets" ? "Assets" : 
+            archiveType === "products" ? "Products" : 
+            "Raw Materials"
+          }`}
+          visible={archiveModalVisible}
+          onCancel={() => setArchiveModalVisible(false)}
+          footer={[
+            <Button key="close" onClick={() => setArchiveModalVisible(false)}>
+              Close
+            </Button>
+          ]}
+          width={900}
+          className="custom-modal"
+        >
+          <div className="archived-search-container" style={{ marginBottom: '16px' }}>
+            <Input.Search
+              placeholder={`Search archived ${
+                archiveType === "items" ? "items" : 
+                archiveType === "assets" ? "assets" : 
+                archiveType === "products" ? "products" : 
+                "raw materials"
+              }...`}
+              allowClear
+              onSearch={handleArchivedSearch}
+              value={archivedSearchValue}
+              onChange={(e) => setArchivedSearchValue(e.target.value)}
+              prefix={<SearchOutlined />}
+            />
+          </div>
+          {archiveType === "items" && (
+            <Table 
+              dataSource={archivedItems} 
+              columns={archivedItemColumns} 
+              rowKey="item_id"
+              loading={loading}
+              scroll={{ x: 'max-content' }}
+              pagination={{ 
+                pageSize: 7,
+                responsive: true,
+                size: 'small',
+                position: ['bottomCenter']
+              }}
+              bordered
+              size="middle"
+            />
+          )}
+          {archiveType === "assets" && (
+            <Table 
+              dataSource={archivedAssets} 
+              columns={archivedAssetColumns} 
+              rowKey="asset_id"
+              loading={loading}
+              scroll={{ x: 'max-content' }}
+              pagination={{ 
+                pageSize: 7,
+                responsive: true,
+                size: 'small',
+                position: ['bottomCenter']
+              }}
+              bordered
+              size="middle"
+            />
+          )}
+          {archiveType === "products" && (
+            <Table 
+              dataSource={archivedProducts} 
+              columns={archivedProductColumns} 
+              rowKey="product_id"
+              loading={loading}
+              scroll={{ x: 'max-content' }}
+              pagination={{ 
+                pageSize: 7,
+                responsive: true,
+                size: 'small',
+                position: ['bottomCenter']
+              }}
+              bordered
+              size="middle"
+            />
+          )}
+          {archiveType === "materials" && (
+            <Table 
+              dataSource={archivedRawMaterials} 
+              columns={archivedMaterialColumns} 
+              rowKey="material_id"
+              loading={loading}
+              scroll={{ x: 'max-content' }}
+              pagination={{ 
+                pageSize: 7,
+                responsive: true,
+                size: 'small',
+                position: ['bottomCenter']
+              }}
+              bordered
+              size="middle"
+            />
+          )}
+        </Modal>
+      </div>
+    </div>
+  );
+};
+
+export default ItemMasterManagement;
 
 

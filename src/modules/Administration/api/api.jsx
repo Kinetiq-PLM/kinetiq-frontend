@@ -254,7 +254,7 @@ export const assetsAPI = {
   // Get all assets with optional search and ordering
   getAssets: async (params = {}) => {
     try {
-      const response = await api.get('/item_master/assets/', { params });
+      const response = await api.get('/item-master/assets/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching assets:', error);
@@ -265,7 +265,7 @@ export const assetsAPI = {
   // Create a new asset
   createAsset: async (assetData) => {
     try {
-      const response = await api.post('/item_master/assets/', assetData);
+      const response = await api.post('/item-master/assets/', assetData);
       return response.data;
     } catch (error) {
       console.error('Error creating asset:', error);
@@ -276,7 +276,7 @@ export const assetsAPI = {
   // Update an asset
   updateAsset: async (assetId, assetData) => {
     try {
-      const response = await api.put(`/item_master/assets/${assetId}/`, assetData);
+      const response = await api.put(`/item-master/assets/${assetId}/`, assetData);
       return response.data;
     } catch (error) {
       console.error('Error updating asset:', error);
@@ -287,7 +287,7 @@ export const assetsAPI = {
   // Get a single asset
   getAsset: async (assetId) => {
     try {
-      const response = await api.get(`/item_master/assets/${assetId}/`);
+      const response = await api.get(`/item-master/assets/${assetId}/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching asset:', error);
@@ -298,7 +298,7 @@ export const assetsAPI = {
   // Archive (soft delete) an asset
   archiveAsset: async (assetId) => {
     try {
-      const response = await api.delete(`/item_master/assets/${assetId}/`);
+      const response = await api.delete(`/item-master/assets/${assetId}/`);
       return response.data;
     } catch (error) {
       console.error('Error archiving asset:', error);
@@ -309,7 +309,7 @@ export const assetsAPI = {
   // Get archived assets
   getArchivedAssets: async () => {
     try {
-      const response = await api.get('/item_master/assets/archived/', { params });
+      const response = await api.get('/item-master/assets/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived assets:', error);
@@ -320,7 +320,7 @@ export const assetsAPI = {
   // Restore an archived asset
   restoreAsset: async (assetId) => {
     try {
-      const response = await api.patch(`/item_master/assets/${assetId}/restore/`);
+      const response = await api.patch(`/item-master/assets/${assetId}/restore/`);
       return response.data;
     } catch (error) {
       console.error('Error restoring asset:', error);
@@ -334,7 +334,7 @@ export const productsAPI = {
   // Get all products with optional search and ordering
   getProducts: async (params = {}) => {
     try {
-      const response = await api.get('/item_master/products/', { params });
+      const response = await api.get('/item-master/products/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -345,7 +345,7 @@ export const productsAPI = {
   // Create a new product
   createProduct: async (productData) => {
     try {
-      const response = await api.post('/item_master/products/', productData);
+      const response = await api.post('/item-master/products/', productData);
       return response.data;
     } catch (error) {
       console.error('Error creating product:', error);
@@ -356,7 +356,7 @@ export const productsAPI = {
   // Update a product
   updateProduct: async (productId, productData) => {
     try {
-      const response = await api.put(`/item_master/products/${productId}/`, productData);
+      const response = await api.put(`/item-master/products/${productId}/`, productData);
       return response.data;
     } catch (error) {
       console.error('Error updating product:', error);
@@ -367,7 +367,7 @@ export const productsAPI = {
   // Get a single product
   getProduct: async (productId) => {
     try {
-      const response = await api.get(`/item_master/products/${productId}/`);
+      const response = await api.get(`/item-master/products/${productId}/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -378,7 +378,7 @@ export const productsAPI = {
   // Archive (soft delete) a product
   archiveProduct: async (productId) => {
     try {
-      const response = await api.delete(`/item_master/products/${productId}/`);
+      const response = await api.delete(`/item-master/products/${productId}/`);
       return response.data;
     } catch (error) {
       console.error('Error archiving product:', error);
@@ -389,7 +389,7 @@ export const productsAPI = {
   // Get archived products
   getArchivedProducts: async () => {
     try {
-      const response = await api.get('/item_master/products/archived/', { params }, { params });
+      const response = await api.get('/item-master/products/archived/', { params }, { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived products:', error);
@@ -400,7 +400,7 @@ export const productsAPI = {
   // Restore an archived product
   restoreProduct: async (productId) => {
     try {
-      const response = await api.patch(`/item_master/products/${productId}/restore/`);
+      const response = await api.patch(`/item-master/products/${productId}/restore/`);
       return response.data;
     } catch (error) {
       console.error('Error restoring product:', error);
@@ -414,7 +414,7 @@ export const rawMaterialsAPI = {
   // Get all raw materials with optional search and ordering
   getRawMaterials: async (params = {}) => {
     try {
-      const response = await api.get('/item_master/raw-materials/', { params });
+      const response = await api.get('/item-master/raw-materials/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching raw materials:', error);
@@ -425,7 +425,7 @@ export const rawMaterialsAPI = {
   // Create a new raw material
   createRawMaterial: async (materialData) => {
     try {
-      const response = await api.post('/item_master/raw-materials/', materialData);
+      const response = await api.post('/item-master/raw-materials/', materialData);
       return response.data;
     } catch (error) {
       console.error('Error creating raw material:', error);
@@ -436,7 +436,7 @@ export const rawMaterialsAPI = {
   // Update a raw material
   updateRawMaterial: async (materialId, materialData) => {
     try {
-      const response = await api.put(`/item_master/raw-materials/${materialId}/`, materialData);
+      const response = await api.put(`/item-master/raw-materials/${materialId}/`, materialData);
       return response.data;
     } catch (error) {
       console.error('Error updating raw material:', error);
@@ -447,7 +447,7 @@ export const rawMaterialsAPI = {
   // Get a single raw material
   getRawMaterial: async (materialId) => {
     try {
-      const response = await api.get(`/item_master/raw-materials/${materialId}/`);
+      const response = await api.get(`/item-master/raw-materials/${materialId}/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching raw material:', error);
@@ -458,7 +458,7 @@ export const rawMaterialsAPI = {
   // Archive (soft delete) a raw material
   archiveRawMaterial: async (materialId) => {
     try {
-      const response = await api.delete(`/item_master/raw-materials/${materialId}/`);
+      const response = await api.delete(`/item-master/raw-materials/${materialId}/`);
       return response.data;
     } catch (error) {
       console.error('Error archiving raw material:', error);
@@ -469,7 +469,7 @@ export const rawMaterialsAPI = {
   // Get archived raw materials
   getArchivedRawMaterials: async () => {
     try {
-      const response = await api.get('/item_master/raw-materials/archived/', { params });
+      const response = await api.get('/item-master/raw-materials/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived raw materials:', error);
@@ -480,7 +480,7 @@ export const rawMaterialsAPI = {
   // Restore an archived raw material
   restoreRawMaterial: async (materialId) => {
     try {
-      const response = await api.patch(`/item_master/raw-materials/${materialId}/restore/`);
+      const response = await api.patch(`/item-master/raw-materials/${materialId}/restore/`);
       return response.data;
     } catch (error) {
       console.error('Error restoring raw material:', error);
@@ -494,7 +494,7 @@ export const itemMasterDataAPI = {
   // Get all items with optional search and ordering
   getItems: async (params = {}) => {
     try {
-      const response = await api.get('/item_master/items/', { params });
+      const response = await api.get('/item-master/item-master/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching items:', error);
@@ -505,7 +505,7 @@ export const itemMasterDataAPI = {
   // Update an item
   updateItem: async (itemId, itemData) => {
     try {
-      const response = await api.put(`/item_master/items/${itemId}/`, itemData);
+      const response = await api.put(`/item-master/item-master/${itemId}/`, itemData);
       return response.data;
     } catch (error) {
       console.error('Error updating item:', error);
@@ -516,7 +516,7 @@ export const itemMasterDataAPI = {
   // Get a single item
   getItem: async (itemId) => {
     try {
-      const response = await api.get(`/item_master/items/${itemId}/`);
+      const response = await api.get(`/item-master/item-master/${itemId}/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching item:', error);
@@ -527,7 +527,7 @@ export const itemMasterDataAPI = {
   // Archive (soft delete) an item
   archiveItem: async (itemId) => {
     try {
-      const response = await api.delete(`/item_master/items/${itemId}/`);
+      const response = await api.delete(`/item-master/item-master/${itemId}/`);
       return response.data;
     } catch (error) {
       console.error('Error archiving item:', error);
@@ -535,10 +535,10 @@ export const itemMasterDataAPI = {
     }
   },
 
-  // Get archived items
+  // Get archived item-master
   getArchivedItems: async () => {
     try {
-      const response = await api.get('/item_master/items/archived/', { params });
+      const response = await api.get('/item-master/item-master/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived items:', error);
@@ -549,7 +549,7 @@ export const itemMasterDataAPI = {
   // Restore an archived item
   restoreItem: async (itemId) => {
     try {
-      const response = await api.patch(`/item_master/items/${itemId}/restore/`);
+      const response = await api.patch(`/item_master/item-master/${itemId}/restore/`);
       return response.data;
     } catch (error) {
       console.error('Error restoring item:', error);

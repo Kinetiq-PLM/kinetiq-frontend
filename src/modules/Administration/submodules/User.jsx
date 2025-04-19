@@ -30,7 +30,6 @@ import {
   EyeOutlined,
   SearchOutlined
 } from "@ant-design/icons";
-import { AlignCenter } from "lucide-react";
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
@@ -171,7 +170,13 @@ const UserManagement = () => {
     setActiveTab(key);
     setSearchValue(""); // Clear search when switching tabs
     
-    // Restore scroll position after state update
+    // Explicitly fetch data for the selected tab
+    if (key === "users") {
+      fetchUsers("", null, null); // Load users with default sorting
+    } else if (key === "roles") {
+      fetchRoles("", null, null); // Load roles with default sorting
+    }
+
     setTimeout(() => {
       window.scrollTo(0, scrollPosition);
     }, 0);
@@ -185,7 +190,7 @@ const UserManagement = () => {
       
       if (activeTab === "users") {
         fetchUsers(searchValue, orderField, orderDirection);
-      } else {
+      } else if (activeTab === "roles") {
         fetchRoles(searchValue, orderField, orderDirection);
       }
     }
@@ -621,7 +626,7 @@ const UserManagement = () => {
 
   // Render main component
   return (
-    <div className="users">
+    <div className="user-manage">
       <div className="users-container">
         <Title level={4} className="page-title">
           {activeTab === "users" ? "User Management" : "Role Management"}
@@ -763,6 +768,8 @@ const UserManagement = () => {
             </TabPane>
           </Tabs>
         </div>
+        
+        
         {/* User Modal */}
         <Modal
           title={modalMode === "add" ? "Add New User" : "Edit User"}
