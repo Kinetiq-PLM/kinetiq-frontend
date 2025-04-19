@@ -536,7 +536,7 @@ export const itemMasterDataAPI = {
   },
 
   // Get archived item-master
-  getArchivedItems: async () => {
+  getArchivedItems: async (params = {}) => {
     try {
       const response = await api.get('/item-master/item-master/archived/', { params });
       return response.data;

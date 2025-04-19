@@ -39,6 +39,7 @@ const { TextArea } = Input;
 const UserManagement = () => {
   // State variables
   const [activeTab, setActiveTab] = useState("users");
+
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [archivedRoles, setArchivedRoles] = useState([]);
@@ -169,13 +170,6 @@ const UserManagement = () => {
     
     setActiveTab(key);
     setSearchValue(""); // Clear search when switching tabs
-    
-    // Explicitly fetch data for the selected tab
-    if (key === "users") {
-      fetchUsers("", null, null); // Load users with default sorting
-    } else if (key === "roles") {
-      fetchRoles("", null, null); // Load roles with default sorting
-    }
 
     setTimeout(() => {
       window.scrollTo(0, scrollPosition);

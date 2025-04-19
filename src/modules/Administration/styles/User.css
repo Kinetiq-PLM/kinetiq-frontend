@@ -1,3 +1,4 @@
+/* ========== Base Styles ========== */
 .user-manage {
   width: 100%;
   padding: 10px;
@@ -23,7 +24,7 @@
 /* ========== Typography & Headers ========== */
 .user-manage .page-title {
   margin-bottom: 0 !important;
-  color: #00A8A8;
+  color: #00a8a8;
 }
 
 .user-manage .title-divider {
@@ -72,11 +73,21 @@
   padding-bottom: 2px;
   flex-wrap: wrap;
   width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.user-manage .user-tabs .ant-tabs-nav::-webkit-scrollbar {
+  display: none; /* Optional: hide scrollbar on WebKit browsers */
 }
 
 .user-manage .user-tabs .ant-tabs-nav-list {
   display: flex;
   width: auto;
+  flex-wrap: nowrap; /* Prevent wrapping to a new line */
 }
 
 /* Improve tab selection area for better click targets */
@@ -100,11 +111,11 @@
 }
 
 .user-manage .user-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #00A8A8;
+  color: #00a8a8;
 }
 
 .user-manage .user-tabs .ant-tabs-ink-bar {
-  background: #00A8A8;
+  background: #00a8a8;
 }
 
 /* Make content area take remaining space */
@@ -133,9 +144,12 @@
   margin: 0 2px;
 }
 
-.user-manage .user-tabs.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab.ant-tabs-tab-active {
+.user-manage
+  .user-tabs.ant-tabs-card
+  > .ant-tabs-nav
+  .ant-tabs-tab.ant-tabs-tab-active {
   background-color: #e6f7f7;
-  border-color: #00A8A8;
+  border-color: #00a8a8;
 }
 
 /* ========== Control and Header Styles ========== */
@@ -187,8 +201,49 @@
 }
 
 .user-manage .ant-table-thead > tr > th {
-  background-color: #c5eaeac0;
+  background-color: #267979c4;
   font-weight: 600;
+  color: #ffffff;
+  border-right: 1px solid #267979c4 !important;
+  border-bottom: 0px !important;
+}
+
+.user-manage .ant-table-thead > tr > th:hover {
+  background-color: #6b9b9bc4 !important;
+  color: #ffffff !important;
+}
+
+.user-manage .ant-table-column-has-sorter > th {
+  cursor: pointer;
+}
+
+.user-manage .ant-table-column-sort > th {
+  background-color: #6b9b9bc4 !important;
+}
+
+.user-manage .ant-table-thead > tr > th.ant-table-column-sort {
+  background-color: #7fb2b2 !important;
+  color: #ffffff !important;
+}
+
+.user-manage .ant-table-thead > tr > th .ant-table-column-sorter-up.active,
+.user-manage .ant-table-thead > tr > th .ant-table-column-sorter-down.active {
+  color: #6f9090c4 !important;
+}
+
+.user-manage .ant-table-thead > tr > th .ant-table-column-sorter-up,
+.user-manage .ant-table-thead > tr > th .ant-table-column-sorter-down {
+  color: #4a6e6ec4; /* dim inactive arrow */
+}
+
+.user-manage .ant-table-tbody > tr > td {
+  border-right: 1px solid #cce3e3 !important;
+  border-bottom: 1px solid #cce3e3 !important;
+}
+
+.user-manage .ant-table-thead > tr > th:last-child,
+.user-manage .ant-table-tbody > tr > td:last-child {
+  border-right: none !important;
 }
 
 .user-manage .ant-table-tbody > tr:nth-child(odd) > td {
@@ -196,11 +251,11 @@
 }
 
 .user-manage .ant-table-tbody > tr:nth-child(even) > td {
-  background-color: #f0fafa;
+  background-color: #f3f9f9;
 }
 
 .user-manage .ant-table-tbody > tr:hover > td {
-  background-color: #e6f7f7 !important;
+  background-color: #d5e5e5 !important;
 }
 
 .user-manage .ant-table-tbody > tr.ant-table-row-selected > td {
@@ -232,12 +287,31 @@
 }
 
 /* ========== Form & Modal Styles ========== */
+.custom-modal .ant-modal-title {
+  color: rgb(49, 49, 49);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.custom-modal .ant-modal-close-x {
+  color: rgb(44, 146, 148);
+}
+
 .custom-modal .ant-modal-content {
   border-radius: 8px;
 }
 
 .custom-modal .ant-modal-header {
   border-radius: 8px 8px 0 0;
+}
+
+.custom-modal .ant-checkbox-inner {
+  border-color: #00a8a8;
+}
+
+.custom-modal .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #00a8a8;
+  border-color: #00a8a8;
 }
 
 .form-actions {
@@ -270,7 +344,7 @@
 }
 
 .permission-tag {
-  color: #00A8A8 !important;
+  color: #00a8a8 !important;
   background: #e6f7f7 !important;
   border-color: #b3e0e0 !important;
 }
@@ -278,8 +352,8 @@
 .more-tag {
   cursor: pointer;
   background-color: #f0f7f7 !important;
-  color: #00A8A8 !important;
-  border-color: #00A8A8 !important;
+  color: #00a8a8 !important;
+  border-color: #00a8a8 !important;
 }
 
 .more-tag:hover {
@@ -296,55 +370,54 @@
   padding: 4px;
   background-color: #fafffe;
 }
-
-/* Pagination Styles */
+/* ========== Pagination Styles ========== */
 .ant-pagination-item-active {
-  border-color: #00A8A8 !important;
+  border-color: #00a8a8 !important;
 }
 
 .ant-pagination-item-active a {
-  color: #00A8A8 !important;
+  color: #00a8a8 !important;
 }
 
 .ant-pagination-item:hover:not(.ant-pagination-item-active) {
-  border-color: #00A8A8;
+  border-color: #00a8a8;
 }
 
 .ant-pagination-item:hover:not(.ant-pagination-item-active) a {
-  color: #00A8A8;
+  color: #00a8a8;
 }
 
 .ant-pagination-item-active:hover {
-  border-color: #00A8A8 !important;
+  border-color: #00a8a8 !important;
 }
 
 .ant-pagination-item-active:hover a {
-  color: #00A8A8 !important;
+  color: #00a8a8 !important;
 }
 
 .ant-pagination-prev:hover .ant-pagination-item-link,
 .ant-pagination-next:hover .ant-pagination-item-link {
-  border-color: #00A8A8;
-  color: #00A8A8;
+  border-color: #00a8a8;
+  color: #00a8a8;
 }
 
 .ant-pagination-jump-prev:hover .ant-pagination-item-link-icon,
 .ant-pagination-jump-next:hover .ant-pagination-item-link-icon,
 .ant-pagination-jump-prev:hover .ant-pagination-item-ellipsis,
 .ant-pagination-jump-next:hover .ant-pagination-item-ellipsis {
-  color: #00A8A8;
+  color: #00a8a8;
 }
 
 .ant-pagination-options-quick-jumper input:hover,
 .ant-pagination-options-quick-jumper input:focus {
-  border-color: #00A8A8;
+  border-color: #00a8a8;
 }
 
-/* Button Styles */
+/* ========== Button Styles ========== */
 .user-manage .ant-btn-primary,
 .custom-modal .ant-btn-primary {
-  background-color: #00A8A8;
-  border-color: #00A8A8;
+  background-color: #00a8a8;
+  border-color: #00a8a8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -368,7 +441,7 @@
   color: #ff4d4f;
 }
 
-/* Scrollbar Styles */
+/* ========== Scroll Bar Styles ========== */
 .users-container::-webkit-scrollbar,
 .scrollable-table .ant-table-body::-webkit-scrollbar,
 .popover-tags::-webkit-scrollbar {
@@ -385,7 +458,7 @@
 .users-container::-webkit-scrollbar-thumb,
 .scrollable-table .ant-table-body::-webkit-scrollbar-thumb,
 .popover-tags::-webkit-scrollbar-thumb {
-  background: #00A8A8;
+  background: #00a8a8;
   border-radius: 4px;
 }
 
@@ -400,23 +473,23 @@
 .scrollable-table .ant-table-body,
 .popover-tags {
   scrollbar-width: thin;
-  scrollbar-color: #00A8A8 #f0f0f0;
+  scrollbar-color: #00a8a8 #f0f0f0;
 }
 
-/* Responsive Styles */
+/* ========== Responsive Styles ========== */
 @media (max-width: 992px) {
   .user-manage .users-container {
     padding: 12px;
   }
-  
+
   .user-manage .ant-tabs-tab {
     padding: 8px 12px !important;
   }
-  
+
   .user-manage .header-right-content {
     gap: 8px;
   }
-  
+
   .user-manage .search-container {
     max-width: 220px;
   }
@@ -426,65 +499,65 @@
   .user-manage {
     padding: 8px;
   }
-  
+
   .user-manage .users-container {
     padding: 8px;
     border-radius: 4px;
     overflow-x: hidden;
   }
-  
+
   /* Compact header to save space */
   .user-manage .page-title {
     font-size: 18px !important;
   }
-  
+
   .user-manage .title-divider {
     margin: 8px 0 12px !important;
   }
-  
+
   /* Make the search and buttons more compact */
   .user-manage .header-right-content {
     flex-wrap: nowrap;
     width: auto;
     align-items: center;
   }
-  
+
   .user-manage .search-container {
     max-width: 150px;
     min-width: 100px;
   }
-  
+
   /* Make table meta info more compact */
   .user-manage .table-meta-info {
     padding: 4px 0;
     margin-bottom: 4px;
   }
-  
+
   .user-manage .record-count {
     font-size: 12px;
   }
-  
+
   /* Make tabs more touch-friendly but compact */
   .user-manage .user-tabs .ant-tabs-nav {
     margin-bottom: 8px;
   }
-  
+
   .user-manage .user-tabs .ant-tabs-tab {
     padding: 6px 4px !important;
     min-height: 36px;
   }
-  
+
   /* Make icons more prominent on mobile when text is hidden */
   .user-manage .user-tabs .ant-tabs-tab .anticon {
     font-size: 16px;
     margin-right: 0;
   }
-  
+
   /* Special mobile layout for tab navigation area */
   .user-manage .user-tabs .ant-tabs-nav-wrap {
     flex: 1;
   }
-  
+
   .user-manage .user-tabs .ant-tabs-extra-content {
     flex: 2;
   }
@@ -495,49 +568,49 @@
     max-height: calc(100vh - 120px);
     padding: 8px 4px;
   }
-  
+
   .user-manage .ant-table-cell {
     padding: 6px 4px !important;
     white-space: nowrap;
   }
-  
+
   /* Stack search and buttons for very small screens */
   .user-manage .header-right-content {
     flex-direction: row;
     align-items: center;
     gap: 4px;
   }
-  
+
   .user-manage .search-container {
     max-width: 120px;
     min-width: 80px;
   }
-  
+
   .user-manage .ant-input-search .ant-input {
     padding-right: 4px !important;
   }
-  
+
   .user-manage .ant-input-search .ant-input-suffix {
     right: 4px !important;
   }
-  
+
   /* Shrink buttons to icon-only */
   .user-manage .action-buttons .ant-btn {
     min-width: 32px;
     height: 32px;
     padding: 0 8px;
   }
-  
+
   .user-manage .action-buttons .ant-btn .anticon {
     font-size: 14px;
   }
-  
+
   /* Compact pagination */
   .user-manage .table-pagination .ant-pagination {
     display: flex;
     justify-content: center;
   }
-  
+
   .user-manage .table-pagination .ant-pagination-item,
   .user-manage .table-pagination .ant-pagination-prev,
   .user-manage .table-pagination .ant-pagination-next {
@@ -546,17 +619,17 @@
     height: 24px;
     line-height: 22px;
   }
-  
+
   /* Reduce space between tab nav and content */
   .user-manage .user-tabs .ant-tabs-nav {
     margin-bottom: 4px;
   }
-  
+
   /* Reduce page title size further */
   .user-manage .page-title {
     font-size: 16px !important;
   }
-  
+
   .user-manage .title-divider {
     margin: 6px 0 8px !important;
   }
@@ -567,20 +640,20 @@
   .user-manage .ant-tabs-content {
     transition: none !important;
   }
-  
+
   .user-manage .ant-tabs-tabpane {
     transition: none !important;
   }
-  
+
   /* Ensure tab content is properly sized */
   .user-manage .ant-tabs-content {
     height: 100% !important;
   }
-  
+
   .user-manage .ant-tabs-tabpane {
     height: 100% !important;
   }
-  
+
   .user-manage .ant-tabs-tabpane-hidden {
     display: none !important;
   }

@@ -4,7 +4,8 @@ import {
   assetsAPI, 
   productsAPI, 
   rawMaterialsAPI,
-  vendorAPI
+  vendorAPI,
+  policiesAPI
 } from "../api/api";
 import "../styles/ItemMasterlist.css";
 import {
@@ -56,6 +57,7 @@ const ItemMasterManagement = () => {
   const [rawMaterials, setRawMaterials] = useState([]);
 
   const [vendors, setVendors] = useState([]);
+  const [policies, setPolicies] = useState([]);
   const [contentIds, setContentIds] = useState([]);
   
   const [archivedItems, setArchivedItems] = useState([]);
@@ -127,6 +129,7 @@ const ItemMasterManagement = () => {
   useEffect(() => {
     if (activeTab === "items") {
       fetchItems();
+      fetchVendors();
     } else if (activeTab === "assets") {
       fetchAssets();
     } else if (activeTab === "products") {
@@ -223,6 +226,19 @@ const ItemMasterManagement = () => {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchVendors = async () => {
+    setLoading(true);
+    try {
+        const data = await vendorAPI.getVendors();
+        setVendors(data.results || data);
+    } catch (error) {
+        message.error("Failed to fetch vendors");
+        console.error(error);
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -364,6 +380,23 @@ const ItemMasterManagement = () => {
     }
   };
 
+  const handleArchivedTableChange = (pagination, filters, sorter, extra) => {
+    if (sorter && sorter.field) {
+      const orderField = sorter.field;
+      const orderDirection = sorter.order;
+      
+      if (activeTab === "items") {
+        fetchArchivedItems(searchValue, orderField, orderDirection);
+      } else if (activeTab === "assets") {
+        fetchArchivedAssets(searchValue, orderField, orderDirection);
+      } else if (activeTab === "products") {
+        fetchArchivedProducts(searchValue, orderField, orderDirection);
+      } else if (activeTab === "materials") {
+        fetchArchivedRawMaterials(searchValue, orderField, orderDirection);
+      }
+    }
+  };
+
   // Handle pagination changes
   const handleItemPaginationChange = (page, pageSize) => {
     setItemPagination(prev => ({
@@ -401,14 +434,8 @@ const ItemMasterManagement = () => {
   const handleViewItem = (record) => {
     setModalMode("view");
     setSelectedRecord(record);
-    itemForm.setFieldsValue({
-      item_name: record.item_name,
-      item_type: record.item_type,
-      unit_of_measure: record.unit_of_measure,
-      item_status: record.item_status,
-      manage_item_by: record.manage_item_by,
+    itemForm.setFieldsValue({      
       preferred_vendor: record.preferred_vendor,
-      preferred_vendor_name: record.preferred_vendor_name,
       purchasing_uom: record.purchasing_uom,
       items_per_purchase_unit: record.items_per_purchase_unit,
       purchase_quantity_per_package: record.purchase_quantity_per_package,
@@ -424,7 +451,6 @@ const ItemMasterManagement = () => {
     setSelectedRecord(record);
     itemForm.setFieldsValue({
       preferred_vendor: record.preferred_vendor,
-      preferred_vendor_name: record.preferred_vendor_name,
       purchasing_uom: record.purchasing_uom,
       items_per_purchase_unit: record.items_per_purchase_unit,
       purchase_quantity_per_package: record.purchase_quantity_per_package,
@@ -661,7 +687,31 @@ const ItemMasterManagement = () => {
       dataIndex: "item_id",
       key: "item_id",
       sorter: true,
-      width: 180,
+      width: 150,
+    },
+    {
+     title: "Asset ID",
+     dataIndex: "asset_id",
+     key: "asset_id",
+     sorter: true,
+     width: 150,
+     render: (text) => text || "---",
+    },
+    {
+     title: "Product ID",
+     dataIndex: "product_id",
+     key: "product_id",
+     sorter: true,
+     width: 150,
+     render: (text) => text || "---",
+    },
+    {
+     title: "Material ID",
+     dataIndex: "material_id",
+     key: "material_id",
+     sorter: true,
+     width: 150,
+     render: (text) => text || "---",
     },
     {
       title: "Item Name",
@@ -671,11 +721,11 @@ const ItemMasterManagement = () => {
       width: 180,
     },
     {
-      title: "Item Type",
+      title: "Type",
       dataIndex: "item_type",
       key: "item_type",
       sorter: true,
-      width: 100,
+      width: 40,
       render: (type) => {
         let color = "default";
         if (type === "Asset") color = "blue";
@@ -690,18 +740,18 @@ const ItemMasterManagement = () => {
       },
     },
     {
-      title: "Unit of Measure",
+      title: "UOM",
       dataIndex: "unit_of_measure",
       key: "unit_of_measure",
       sorter: true,
-      width: 120,
+      width: 80,
     },
     {
       title: "Status",
       dataIndex: "item_status",
       key: "item_status",
       sorter: true,
-      width: 100,
+      width: 80,
       render: (status) => (
         <Tag color={status === "Active" ? "green" : "red"}>
           {status}
@@ -709,11 +759,11 @@ const ItemMasterManagement = () => {
       ),
     },
     {
-      title: "Preferred Vendor",
-      dataIndex: "preferred_vendor_name",
-      key: "preferred_vendor_name",
+      title: "Manage By",
+      dataIndex: "manage_item_by",
+      key: "manage_item_by",
       sorter: true,
-      width: 150,
+      width: 110,
       render: (text) => text || "None",
     },
     {
@@ -920,58 +970,116 @@ const ItemMasterManagement = () => {
 
   const archivedItemColumns = [
     {
-      title: "Item ID",
-      dataIndex: "item_id",
-      key: "item_id",
-      sorter: true,
-      width: 180,
-    },
-    {
-      title: "Item Name",
-      dataIndex: "item_name",
-      key: "item_name",
-      sorter: true,
-      width: 180,
-    },
-    {
-      title: "Item Type",
-      dataIndex: "item_type",
-      key: "item_type",
-      sorter: true,
-      width: 100,
-      render: (type) => {
-        let color = "default";
-        if (type === "Asset") color = "blue";
-        if (type === "Product") color = "green";
-        if (type === "Raw Material") color = "orange";
-        
-        return (
-          <Tag color={color}>
-            {type}
-          </Tag>
-        );
+        title: "Item ID",
+        dataIndex: "item_id",
+        key: "item_id",
+        sorter: true,
+        width: 180,
       },
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      width: 80,
-      align: "center",
-      render: (_, record) => (
-        <Popconfirm
-          title="Are you sure you want to restore this item?"
-          onConfirm={() => handleRestoreItem(record.item_id)}
-          okText="Yes"
-          cancelText="No"
-        >
-          <Button 
-            type="primary" 
-            icon={<UndoOutlined />} 
-            size="small"
-          />
-        </Popconfirm>
-      ),
-    },
+      {
+       title: "Asset ID",
+       dataIndex: "asset_id",
+       key: "asset_id",
+       sorter: true,
+       width: 150,
+       render: (text) => text || "---",
+      },
+      {
+       title: "Product ID",
+       dataIndex: "product_id",
+       key: "product_id",
+       sorter: true,
+       width: 150,
+       render: (text) => text || "---",
+      },
+      {
+       title: "Material ID",
+       dataIndex: "material_id",
+       key: "material_id",
+       sorter: true,
+       width: 150,
+       render: (text) => text || "---",
+      },
+      {
+        title: "Item Name",
+        dataIndex: "item_name",
+        key: "item_name",
+        sorter: true,
+        width: 180,
+      },
+      {
+        title: "Item Type",
+        dataIndex: "item_type",
+        key: "item_type",
+        sorter: true,
+        width: 60,
+        render: (type) => {
+          let color = "default";
+          if (type === "Asset") color = "blue";
+          if (type === "Product") color = "green";
+          if (type === "Raw Material") color = "orange";
+          
+          return (
+            <Tag color={color}>
+              {type}
+            </Tag>
+          );
+        },
+      },
+      {
+        title: "Unit of Measure",
+        dataIndex: "unit_of_measure",
+        key: "unit_of_measure",
+        sorter: true,
+        width: 120,
+      },
+      {
+        title: "Status",
+        dataIndex: "item_status",
+        key: "item_status",
+        sorter: true,
+        width: 100,
+        render: (status) => (
+          <Tag color={status === "Active" ? "green" : "red"}>
+            {status}
+          </Tag>
+        ),
+      },
+      {
+        title: "Manage By",
+        dataIndex: "manage_item_by",
+        key: "manage_item_by",
+        sorter: true,
+        width: 150,
+        render: (text) => text || "None",
+      },
+      {
+        title: "Actions",
+        key: "actions",
+        width: 100,
+        align: "center",
+        render: (_, record) => (
+          <Space size="small">
+            <Button 
+              icon={<EyeOutlined />} 
+              size="small"
+              onClick={() => handleViewItem(record)}
+            />
+            <Popconfirm
+            title="Are you sure you want to restore this item?"
+            onConfirm={() => handleRestoreRole(record.item_id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button 
+              type="primary" 
+              icon={<UndoOutlined />} 
+              size="small"
+            />
+          </Popconfirm>
+          </Space>
+        ),
+      },
   ];
 
   const archivedAssetColumns = [
@@ -1404,114 +1512,182 @@ const archivedProductColumns = [
 
         {/* Item Modal */}
         <Modal
-          title={modalMode === "view" ? "View Item Details" : "Edit Item Details"}
-          visible={itemModalVisible}
-          onCancel={() => setItemModalVisible(false)}
-          footer={modalMode === "view" ? [
-            <Button key="close" onClick={() => setItemModalVisible(false)}>
-              Close
-            </Button>
-          ] : null}
-          width={600}
-          className="custom-modal"
-        >
-          <Form
-            form={itemForm}
-            layout="vertical"
-            disabled={modalMode === "view"}
-            onFinish={handleItemFormSubmit}
-          >
-            <Form.Item
-              name="preferred_vendor"
-              label="Preferred Vendor"
+            title={modalMode === "view" ? "Item Details" : "Edit Item Details"}
+            visible={itemModalVisible}
+            onCancel={() => setItemModalVisible(false)}
+            footer={modalMode === "view" ? [
+                <Button key="close" onClick={() => setItemModalVisible(false)}>
+                Close
+                </Button>
+            ] : null}
+            width={600}
+            className="custom-modal"
             >
-              <Select allowClear placeholder="Select a vendor">
-                {vendors.map(vendor => (
-                  <Option key={vendor.vendor_id} value={vendor.vendor_id}>
-                    {vendor.vendor_name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
+            {modalMode === "view" ? (
+                <div className="info-view">
+                <div className="info-section">
+                    <h3>Vendor Information</h3>
+                    <div className="info-content">
+                    <div className="info-item">
+                        <span className="info-label">Preferred Vendor:</span>
+                        <span className="info-value">{
+                        selectedRecord?.preferred_vendor ? 
+                            vendors.find(v => v.vendor_code === selectedRecord.preferred_vendor)?.vendor_name || 'None' : 
+                            'None'
+                        }</span>
+                    </div>
+                    </div>
+                </div>
 
-            <Form.Item
-              name="preferred_vendor_name"
-              label="Alternate Vendor Name"
-              extra="Use this if vendor is not in the system"
-            >
-              <Input />
-            </Form.Item>
+                <div className="info-section">
+                    <h3>Purchasing Information</h3>
+                    <div className="info-content">
+                    <div className="info-item">
+                        <span className="info-label">Purchasing UOM:</span>
+                        <span className="info-value">{selectedRecord?.purchasing_uom || 'None'}</span>
+                    </div>
+                    <div className="info-item">
+                        <span className="info-label">Items Per Purchase Unit:</span>
+                        <span className="info-value">{selectedRecord?.items_per_purchase_unit || '0'}</span>
+                    </div>
+                    <div className="info-item">
+                        <span className="info-label">Purchase Quantity Per Package:</span>
+                        <span className="info-value">{selectedRecord?.purchase_quantity_per_package || '0'}</span>
+                    </div>
+                    </div>
+                </div>
+                
+                <div className="info-section">
+                    <h3>Sales Information</h3>
+                    <div className="info-content">
+                    <div className="info-item">
+                        <span className="info-label">Sales UOM:</span>
+                        <span className="info-value">{selectedRecord?.sales_uom || 'None'}</span>
+                    </div>
+                    <div className="info-item">
+                        <span className="info-label">Items Per Sale Unit:</span>
+                        <span className="info-value">{selectedRecord?.items_per_sale_unit || '0'}</span>
+                    </div>
+                    <div className="info-item">
+                        <span className="info-label">Sales Quantity Per Package:</span>
+                        <span className="info-value">{selectedRecord?.sales_quantity_per_package || '0'}</span>
+                    </div>
+                    </div>
+                </div>
+                
+                <div className="action-row">
+                    <Button 
+                    type="primary" 
+                    onClick={() => {
+                        setModalMode("edit");
+                        itemForm.setFieldsValue({
+                        preferred_vendor: selectedRecord?.preferred_vendor,
+                        purchasing_uom: selectedRecord?.purchasing_uom,
+                        items_per_purchase_unit: selectedRecord?.items_per_purchase_unit,
+                        purchase_quantity_per_package: selectedRecord?.purchase_quantity_per_package,
+                        sales_uom: selectedRecord?.sales_uom,
+                        items_per_sale_unit: selectedRecord?.items_per_sale_unit,
+                        sales_quantity_per_package: selectedRecord?.sales_quantity_per_package
+                        });
+                    }}
+                    style={{ backgroundColor: '#00A8A8', borderColor: '#00A8A8' }}
+                    >
+                    Edit
+                    </Button>
+                </div>
+                </div>
+            ) : (
+                <Form
+                form={itemForm}
+                layout="vertical"
+                onFinish={handleItemFormSubmit}
+                >
+                <Form.Item
+                    name="preferred_vendor"
+                    label="Preferred Vendor"
+                >
+                    <Select allowClear placeholder="Select a vendor">
+                    {vendors.map(vendor => (
+                        <Option key={vendor.vendor_code} value={vendor.vendor_code}>
+                        {vendor.vendor_name}
+                        </Option>
+                    ))}
+                    </Select>
+                </Form.Item>
 
-            <Divider orientation="left">Purchasing Information</Divider>
-            <Form.Item
-              name="purchasing_uom"
-              label="Purchasing UOM"
-            >
-              <Select allowClear placeholder="Select unit of measure">
-                {uomOptions.map(uom => (
-                  <Option key={uom} value={uom}>
-                    {uom}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
+                <Divider orientation="left" style={{ borderColor: '#00A8A8', color: '#00A8A8' }}>Purchasing Information</Divider>
+                <Form.Item
+                    name="purchasing_uom"
+                    label="Purchasing UOM"
+                >
+                    <Select allowClear placeholder="Select unit of measure">
+                    {uomOptions.map(uom => (
+                        <Option key={uom} value={uom}>
+                        {uom}
+                        </Option>
+                    ))}
+                    </Select>
+                </Form.Item>
 
-            <Form.Item
-              name="items_per_purchase_unit"
-              label="Items Per Purchase Unit"
-            >
-              <InputNumber min={0} style={{ width: '100%' }} />
-            </Form.Item>
+                <Form.Item
+                    name="items_per_purchase_unit"
+                    label="Items Per Purchase Unit"
+                >
+                    <InputNumber min={0} style={{ width: '100%' }} />
+                </Form.Item>
 
-            <Form.Item
-              name="purchase_quantity_per_package"
-              label="Purchase Quantity Per Package"
-            >
-              <InputNumber min={0} style={{ width: '100%' }} />
-            </Form.Item>
+                <Form.Item
+                    name="purchase_quantity_per_package"
+                    label="Purchase Quantity Per Package"
+                >
+                    <InputNumber min={0} style={{ width: '100%' }} />
+                </Form.Item>
 
-            <Divider orientation="left">Sales Information</Divider>
-            <Form.Item
-              name="sales_uom"
-              label="Sales UOM"
-            >
-              <Select allowClear placeholder="Select unit of measure">
-                {uomOptions.map(uom => (
-                  <Option key={uom} value={uom}>
-                    {uom}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
+                <Divider orientation="left" style={{ borderColor: '#00A8A8', color: '#00A8A8' }}>Sales Information</Divider>
+                <Form.Item
+                    name="sales_uom"
+                    label="Sales UOM"
+                >
+                    <Select allowClear placeholder="Select unit of measure">
+                    {uomOptions.map(uom => (
+                        <Option key={uom} value={uom}>
+                        {uom}
+                        </Option>
+                    ))}
+                    </Select>
+                </Form.Item>
 
-            <Form.Item
-              name="items_per_sale_unit"
-              label="Items Per Sale Unit"
-            >
-              <InputNumber min={0} style={{ width: '100%' }} />
-            </Form.Item>
+                <Form.Item
+                    name="items_per_sale_unit"
+                    label="Items Per Sale Unit"
+                >
+                    <InputNumber min={0} style={{ width: '100%' }} />
+                </Form.Item>
 
-            <Form.Item
-              name="sales_quantity_per_package"
-              label="Sales Quantity Per Package"
-            >
-              <InputNumber min={0} style={{ width: '100%' }} />
-            </Form.Item>
+                <Form.Item
+                    name="sales_quantity_per_package"
+                    label="Sales Quantity Per Package"
+                >
+                    <InputNumber min={0} style={{ width: '100%' }} />
+                </Form.Item>
 
-            {modalMode !== "view" && (
-              <Form.Item className="form-actions">
-                <Space>
-                  <Button type="primary" htmlType="submit">
-                    Update
-                  </Button>
-                  <Button onClick={() => setItemModalVisible(false)}>
-                    Cancel
-                  </Button>
-                </Space>
-              </Form.Item>
+                <Form.Item className="form-actions">
+                    <Space>
+                    <Button 
+                        type="primary" 
+                        htmlType="submit"
+                        style={{ backgroundColor: '#00A8A8', borderColor: '#00A8A8' }}
+                    >
+                        Update
+                    </Button>
+                    <Button onClick={() => setItemModalVisible(false)}>
+                        Cancel
+                    </Button>
+                    </Space>
+                </Form.Item>
+                </Form>
             )}
-          </Form>
-        </Modal>
+            </Modal>
 
         {/* Asset Modal */}
         <Modal
@@ -1831,6 +2007,9 @@ const archivedProductColumns = [
               }}
               bordered
               size="middle"
+              showSorterTooltip={false}
+              sortDirections={['ascend', 'descend']}
+              onChange={handleArchivedTableChange}
             />
           )}
           {archiveType === "assets" && (
