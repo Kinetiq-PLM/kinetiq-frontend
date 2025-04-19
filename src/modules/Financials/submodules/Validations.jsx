@@ -4,6 +4,7 @@ import { GET } from "../api/api";
 import { PATCH } from "../api/api";
 
 const tabs = ["Budget Submission List", "Budget Request List", "Returns List"];
+
 const departmentIds = {
   "HR-DEPT-2025-105fd9": "Report Generator",
   "HR-DEPT-2025-60cafa": "CRM",
@@ -23,28 +24,9 @@ const departmentIds = {
   "HR-DEPT-2025-fe9854": "Production",
 };
 
-const initialDepartmentBudgets = {
-  "Marketing": { allocatedBudget: 1500000, totalSpent: 0, remainingBudget: 1500000 },
-  "Operations": { allocatedBudget: 1000000, totalSpent: 0, remainingBudget: 1000000 },
-  "IT": { allocatedBudget: 1300000, totalSpent: 0, remainingBudget: 1300000 },
-  "Accounting": { allocatedBudget: 1200000, totalSpent: 0, remainingBudget: 1200000 },
-  "Purchasing": { allocatedBudget: 1900000, totalSpent: 0, remainingBudget: 1900000 },
-  "Support and Services": { allocatedBudget: 1100000, totalSpent: 0, remainingBudget: 1100000 },
-  "Management": { allocatedBudget: 3200000, totalSpent: 0, remainingBudget: 3200000 },
-  "MRP": { allocatedBudget: 2300000, totalSpent: 0, remainingBudget: 2300000 },
-  "Inventory": { allocatedBudget: 1200000, totalSpent: 0, remainingBudget: 1200000 },
-  "Project Management": { allocatedBudget: 2500000, totalSpent: 0, remainingBudget: 2500000 },
-  "Human Resources": { allocatedBudget: 3700000, totalSpent: 0, remainingBudget: 3700000 },
-  "Sales": { allocatedBudget: 5100000, totalSpent: 0, remainingBudget: 5100000 },
-  "Administration": { allocatedBudget: 6200000, totalSpent: 0, remainingBudget: 6200000 },
-  "Financials": { allocatedBudget: 2400000, totalSpent: 0, remainingBudget: 2400000 },
-  "Production": { allocatedBudget: 1500000, totalSpent: 0, remainingBudget: 1500000 },
-  "Distribution": { allocatedBudget: 2200000, totalSpent: 0, remainingBudget: 2200000 },
-};
 const InfoCard = ({ title, value, color, children, className }) => (
   <div className={`info-card ${className}`}>{children}</div>
 );
-
 
 const BodyContent = () => {
   const [activeTab, setActiveTab] = useState(tabs[0]);
@@ -52,10 +34,9 @@ const BodyContent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState("Last 30 days");
   const [filterBy, setFilterBy] = useState("All");
-  const [originalData, setOriginalData] = useState([]); 
+  const [originalData, setOriginalData] = useState([]);
   const [originalRequestData, setOriginalRequestData] = useState([]);
   const [originalReturnsData, setOriginalReturnsData] = useState([]);
-
   const [filteredData, setFilteredData] = useState(originalData);
   const [filteredRequestData, setFilteredRequestData] = useState(originalRequestData);
   const [filteredReturnsData, setFilteredReturnsData] = useState(originalReturnsData);
@@ -74,21 +55,27 @@ const BodyContent = () => {
   const [returnRemarks, setReturnRemarks] = useState({});
   const [returnComments, setReturnComments] = useState({});
 
-  const closeWarningPopup = () => { setIsWarningPopupVisible(false); };
+  const closeWarningPopup = () => {
+    setIsWarningPopupVisible(false);
+  };
+
   useEffect(() => {
     let tempData = filterDataByDate(originalData, dateRange);
     tempData = filterDataBySearch(tempData, searchTerm);
     tempData = sortData(tempData, filterBy);
     setFilteredData(tempData);
+
     let tempRequestData = filterDataByDate(originalRequestData, dateRange, 'requestDate');
     tempRequestData = filterDataBySearch(tempRequestData, searchTerm, 'reqID');
     tempRequestData = sortData(tempRequestData, filterBy, 'reqID', 'requestDate');
     setFilteredRequestData(tempRequestData);
+
     let tempReturnsData = filterDataByDate(originalReturnsData, dateRange, 'returnDate');
     tempReturnsData = filterDataBySearch(tempReturnsData, searchTerm, 'returnsId');
     tempReturnsData = sortData(tempReturnsData, filterBy, 'returnsId', 'returnDate');
     setFilteredReturnsData(tempReturnsData);
   }, [dateRange, searchTerm, filterBy, originalData, originalRequestData, originalReturnsData]);
+
   useEffect(() => {
     const handleResize = () => {
       setIsCompact(window.innerWidth < 768);
@@ -128,29 +115,33 @@ const BodyContent = () => {
       return [];
     }
   };
+
   const filterDataBySearch = (data, term, requestIdField = 'requestId') => {
     try {
       if (!term) return data;
       const lowerTerm = term.toLowerCase();
       return data.filter(item => {
-        return (item[requestIdField].toLowerCase().includes(lowerTerm) ||
-          item.departmentId.toLowerCase().includes(lowerTerm) ||
-          item.amount.toLowerCase().includes(lowerTerm) ||
+        return (
+          item[requestIdField]?.toLowerCase().includes(lowerTerm) ||
+          item.departmentId?.toLowerCase().includes(lowerTerm) ||
+          item.amount?.toLowerCase().includes(lowerTerm) ||
           (item.submissionDate ? item.submissionDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
           (item.requestDate ? item.requestDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
           (item.returnDate ? item.returnDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
-          item.validatedBy.toLowerCase().includes(lowerTerm) ||
-          item.remarks.toLowerCase().includes(lowerTerm) ||
-          item.approvedAmount.toLowerCase().includes(lowerTerm) ||
-          item.validationStatus.toLowerCase().includes(lowerTerm) ||
+          item.validatedBy?.toLowerCase().includes(lowerTerm) ||
+          item.remarks?.toLowerCase().includes(lowerTerm) ||
+          item.approvedAmount?.toLowerCase().includes(lowerTerm) ||
+          item.validationStatus?.toLowerCase().includes(lowerTerm) ||
           (item.validationDate ? item.validationDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
-          item.comments.toLowerCase().includes(lowerTerm));
+          item.comments?.toLowerCase().includes(lowerTerm)
+        );
       });
     } catch (error) {
       console.error("Error in filterDataBySearch:", error);
       return [];
     }
   };
+
   const sortData = (data, sortBy, requestIdField = 'requestId', dateField = 'submissionDate') => {
     try {
       if (sortBy === "All") return data;
@@ -158,14 +149,14 @@ const BodyContent = () => {
       sortedData.sort((a, b) => {
         let comparison = 0;
         if (sortBy === "lowest amount") {
-          const amountA = parseFloat(a.amount.replace(/,/g, ''));
-          const amountB = parseFloat(b.amount.replace(/,/g, ''));
+          const amountA = parseFloat(a.amount?.replace(/,/g, '')) || parseFloat(a.returnedAmount?.replace(/,/g, ''));
+          const amountB = parseFloat(b.amount?.replace(/,/g, '')) || parseFloat(b.returnedAmount?.replace(/,/g, ''));
           if (isNaN(amountA)) return 1;
           if (isNaN(amountB)) return -1;
           comparison = amountA - amountB;
         } else if (sortBy === "highest amount") {
-          const amountA = parseFloat(a.amount.replace(/,/g, ''));
-          const amountB = parseFloat(b.amount.replace(/,/g, ''));
+          const amountA = parseFloat(a.amount?.replace(/,/g, '')) || parseFloat(a.returnedAmount?.replace(/,/g, ''));
+          const amountB = parseFloat(b.amount?.replace(/,/g, '')) || parseFloat(b.returnedAmount?.replace(/,/g, ''));
           if (isNaN(amountA)) return 1;
           if (isNaN(amountB)) return -1;
           comparison = amountB - amountA;
@@ -182,11 +173,12 @@ const BodyContent = () => {
       return [];
     }
   };
+
   const updateValidationTable = (updatedData) => {
     const departmentTotals = {};
     let totalAllocated = 0;
     updatedData.forEach(item => {
-      if (item.validationStatus === "Validated") {
+      if (item.validationStatus === "Validated" && item.approvedAmount) {
         const departmentName = departmentIds[item.departmentId] || item.departmentId;
         const amount = parseFloat(item.approvedAmount.replace(/,/g, '')) || 0;
         if (departmentTotals[departmentName]) {
@@ -198,40 +190,84 @@ const BodyContent = () => {
       }
     });
     const tableData = Object.keys(departmentTotals).map(dept => ({
-      department: dept, allocatedBudget: departmentTotals[dept].toLocaleString(undefined, { minimumFractionDigits: 2 }), totalSpent: "N/A",
+      department: dept,
+      allocatedBudget: departmentTotals[dept].toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      totalSpent: "N/A",
       remainingBudget: departmentTotals[dept].toLocaleString(undefined, { minimumFractionDigits: 2 })
     }));
     setValidationTableData(tableData);
     setTotalBudget(totalAllocated);
   };
-  const updateRequestValidationTable = () => {
-    const tableData = Object.keys(departmentBudgets).map(dept => ({
-      department: dept,
-      allocatedBudget: departmentBudgets[dept].allocatedBudget.toLocaleString(undefined, { minimumFractionDigits: 2 }),
-      totalSpent: departmentBudgets[dept].totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 }),
-      remainingBudget: departmentBudgets[dept].remainingBudget.toLocaleString(undefined, { minimumFractionDigits: 2 })
+
+  const updateRequestValidationTable = (requestData) => {
+    const departmentApproved = {};
+    let totalApproved = 0;
+    requestData.forEach(item => {
+      if (item.validationStatus === "Validated" && item.approvedAmount) {
+        const departmentName = departmentIds[item.departmentId] || item.departmentId;
+        const approvedAmount = parseFloat(item.approvedAmount.replace(/,/g, '')) || 0;
+        if (departmentApproved[departmentName]) {
+          departmentApproved[departmentName] += approvedAmount;
+        } else {
+          departmentApproved[departmentName] = approvedAmount;
+        }
+        totalApproved += approvedAmount;
+      }
+    });
+
+    const departmentData = {};
+    originalData.forEach(item => {
+      const departmentName = departmentIds[item.departmentId] || item.departmentId;
+      if (!departmentData[departmentName]) {
+        departmentData[departmentName] = { allocatedBudget: 0, totalSpent: 0 };
+      }
+      if (item.validationStatus === "Validated" && item.approvedAmount) {
+        departmentData[departmentName].allocatedBudget += parseFloat(item.approvedAmount.replace(/,/g, '')) || 0;
+      }
+    });
+
+    originalRequestData.forEach(item => {
+      const departmentName = departmentIds[item.departmentId] || item.departmentId;
+      if (item.validationStatus === "Validated" && item.approvedAmount) {
+        if (!departmentData[departmentName]) {
+          departmentData[departmentName] = { allocatedBudget: 0, totalSpent: 0 };
+        }
+        departmentData[departmentName].totalSpent += parseFloat(item.approvedAmount.replace(/,/g, '')) || 0;
+      }
+    });
+
+    const tableData = Object.keys(departmentData).map(deptName => ({
+      department: deptName,
+      allocatedBudget: departmentData[deptName].allocatedBudget.toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      totalSpent: departmentData[deptName].totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      remainingBudget: (departmentData[deptName].allocatedBudget - departmentData[deptName].totalSpent).toLocaleString(undefined, { minimumFractionDigits: 2 }),
     }));
+
     setValidationTableData(tableData);
-    setTotalBudget(Object.values(departmentBudgets).reduce((acc, curr) => acc + curr.allocatedBudget, 0));
+    setTotalBudget(totalApproved);
   };
+
+
   const updateTotalReturns = (returnsData) => {
     const totalReturned = returnsData.reduce((acc, item) => {
       if (item.validationStatus === "Validated") {
-        return acc + parseFloat(item.returnedAmount.replace(/,/g, '')) || 0;
+        return acc + parseFloat(item.returnedAmount?.replace(/,/g, '')) || 0;
       }
       return acc;
     }, 0);
     setTotalBudget(totalReturned);
   };
+
   useEffect(() => {
     if (activeTab === "Budget Submission List") {
       updateValidationTable(originalData);
     } else if (activeTab === "Budget Request List") {
-      updateRequestValidationTable();
+      updateRequestValidationTable(originalRequestData);
     } else if (activeTab === "Returns List") {
       updateTotalReturns(originalReturnsData);
     }
-  }, [originalData, originalRequestData, originalReturnsData, activeTab, departmentBudgets]);
+  }, [originalData, originalRequestData, originalReturnsData, activeTab]);
+
   const handleRowSelect = (rowId) => {
     if (selectedRows.includes(rowId)) {
       setSelectedRows(selectedRows.filter(id => id !== rowId));
@@ -239,6 +275,7 @@ const BodyContent = () => {
       setSelectedRows([...selectedRows, rowId]);
     }
   };
+
   const handleEditClick = () => {
     if (selectedRows.length === 0) {
       setIsWarningPopupVisible(true);
@@ -246,16 +283,11 @@ const BodyContent = () => {
     }
     setIsEditModalOpen(true);
   };
+
   const handleEditChange = (rowId, field, value) => {
     if (activeTab === "Returns List" && field === "remarks") {
-      setReturnRemarks(prevRemarks => ({
-        ...prevRemarks,
-        [rowId]: value,
-      }));
-      setReturnComments(prevComments => ({
-        ...prevComments,
-        [rowId]: value,
-      }));
+      setReturnRemarks(prevRemarks => ({ ...prevRemarks, [rowId]: value, }));
+      setReturnComments(prevComments => ({ ...prevComments, [rowId]: value, }));
     } else {
       setEditedData(prevData => ({
         ...prevData,
@@ -266,6 +298,7 @@ const BodyContent = () => {
       }));
     }
   };
+
   const handleCommitChanges = () => {
     let hasEmptyFields = false;
     let newValidatedByError = {};
@@ -286,12 +319,21 @@ const BodyContent = () => {
       return;
     }
     const editedDataForConfirmation = selectedRows.map(rowId => {
-      const activeRow = activeTab === "Budget Submission List" ? originalData.find(row => row.requestId === rowId) : activeTab === "Budget Request List" ? originalRequestData.find(row => row.reqID === rowId) : originalReturnsData.find(row => row.returnsId === rowId);
+      const activeRow =
+        activeTab === "Budget Submission List" ?
+        originalData.find(row => row.requestId === rowId) :
+        activeTab === "Budget Request List" ?
+        originalRequestData.find(row => row.reqID === rowId) :
+        originalReturnsData.find(row => row.returnsId === rowId);
       return {
-        ...(activeTab === "Budget Submission List" ? originalData.find(row => row.requestId === rowId) : activeTab === "Budget Request List" ? originalRequestData.find(row => row.reqID === rowId) : originalReturnsData.find(row => row.returnsId === rowId)),
+        ...(activeTab === "Budget Submission List" ?
+          originalData.find(row => row.requestId === rowId) :
+          activeTab === "Budget Request List" ?
+          originalRequestData.find(row => row.reqID === rowId) :
+          originalReturnsData.find(row => row.returnsId === rowId)),
         validatedBy: editedData[rowId]?.validatedBy || "",
         approvedAmount: editedData[rowId]?.approvedAmount || "",
-        remarks: activeTab === "Returns List" ? returnRemarks[rowId] || "" : activeRow.remarks,
+        remarks: activeTab === "Returns List" ? returnRemarks[rowId] || "" : activeRow?.remarks || "",
         comments: activeTab === "Returns List" ? returnComments[rowId] || "" : "N/A",
       };
     });
@@ -303,23 +345,26 @@ const BodyContent = () => {
     patchEditedRows();
     setIsConfirmationVisible(false);
   };
-  
+
   const getSortedFilteredData = () => {
     const validated = filteredData.filter(item => item.validationStatus === "Validated");
     const pending = filteredData.filter(item => item.validationStatus === "Pending");
     return [...validated, ...pending];
   };
+
   const getSortedFilteredRequestData = () => {
     const validated = filteredRequestData.filter(item => item.validationStatus === "Validated");
     const pending = filteredRequestData.filter(item => item.validationStatus === "Pending");
     return [...validated, ...pending];
   };
+
   const getSortedFilteredReturnsData = () => {
     const validated = filteredReturnsData.filter(item => item.validationStatus === "Validated");
     const pending = filteredReturnsData.filter(item => item.validationStatus === "Pending");
     const toReview = filteredReturnsData.filter(item => item.validationStatus === "To Review");
     return [...validated, ...pending, ...toReview];
   };
+
   const handleCancelEdit = () => {
     setIsEditModalOpen(false);
     setSelectedRows([]);
@@ -327,21 +372,22 @@ const BodyContent = () => {
     setReturnRemarks({});
     setReturnComments({});
   };
+
   const handleCancelConfirmation = () => {
     setIsConfirmationVisible(false);
   };
+
   const handleCancelReviewConfirmation = () => {
     setIsReviewConfirmationVisible(false);
   }
 
-
   const fetchReturns = async () => {
     try {
       const data = await GET("/validation/budget-returns/");
-      setOriginalReturnsData(data.map(sub=> ({
+      setOriginalReturnsData(data.map(sub => ({
         validationId: sub.validation_id,
         returnsId: sub?.budget_return?.budget_return_id || "",
-        departmentId: sub?.budget_return?.dept?.dept_name|| "",
+        departmentId: sub?.budget_return?.dept_id || "",
         returnDate: sub?.budget_return?.return_date || "",
         originTotalBudget: sub.final_approved_amount || "",
         returnedAmount: sub?.budget_return?.returned_amount || "",
@@ -350,6 +396,7 @@ const BodyContent = () => {
         comments: sub.comments || "",
         validationStatus: sub.validation_status || "",
         validationDate: sub.validation_date || "",
+        validatedBy: sub.validated_by || "",
       })));
     } catch (error) {
       console.error("Error fetching returns:", error)
@@ -359,10 +406,10 @@ const BodyContent = () => {
   const fetchRequests = async () => {
     try {
       const data = await GET("/validation/budget-requests/");
-      setOriginalRequestData(data.map(sub=> ({
+      setOriginalRequestData(data.map(sub => ({
         validationId: sub.validation_id,
         reqID: sub?.budget_request?.budget_request_id || "",
-        departmentId: sub?.budget_request?.dept?.dept_name || "",
+        departmentId: sub?.budget_request?.dept_id || "",
         amount: sub?.budget_request?.amount_requested || "",
         requestDate: sub?.budget_request?.requested_date || "",
         validatedBy: sub?.validated_by || "",
@@ -376,111 +423,126 @@ const BodyContent = () => {
     }
   }
 
-const fetch = async () => {
-  try {
-    const data = await GET("/validation/budget-submissions/");
-    setOriginalData(data.map(sub=> ({
-      validationId: sub.validation_id,
-      requestId: sub?.budget_submission?.budget_submission_id || "",
-      departmentId: sub?.budget_submission?.dept?.dept_name || "",
-      amount: sub.amount_requested || "",
-      submissionDate: sub?.budget_submission?.date_submitted || "",
-      validatedBy: sub.validated_by || "",
-      remarks: sub.remarks || "",
-      approvedAmount: sub.final_approved_amount || "",
-      validationStatus: sub.validation_status || "",
-      validationDate: sub.validation_date || "",
-    })));
-  } catch (error) {
-    console.error("Error fetching budget validations:", error)
-  }
-}
-useEffect(() => {
-  fetch();
-  fetchRequests();
-  fetchReturns();
-}, []);
-
-const patchEditedRows = async () => {
-  try {
-    for (const row of editedDataForConfirmation) {
-      const requestId = row.requestId || row.reqID || row.returnsId;
-      if (!requestId) {
-        console.error("Error: ID is undefined for row:", row);
-        continue; 
-      }
-
-      let endpoint = "";
-      let payload = {};
-      let dateValidated = new Date().toISOString().split('T')[0];
-      console.log ("Date Validated:", dateValidated);
-
-      if (activeTab === "Budget Submission List" && row.requestId) {
-        endpoint = `/validation/budget-submissions/${row.validationId}/`;
-        payload = {
-          validated_by: editedData[row.requestId].validatedBy || "",
-          final_approved_amount: editedData[row.requestId].approvedAmount || "",
-          validation_date: dateValidated || "",
-          remarks: 'Approved' || "",
-          validation_status: 'Validated' || "",
-        };
-      } else if (activeTab === "Budget Request List" && row.reqID) {
-        endpoint = `/validation/budget-requests/${row.validationId}/`;
-        payload = {
-          validated_by: editedData[row.reqID].validatedBy || "",
-          final_approved_amount: editedData[row.reqID].approvedAmount || "",
-          validation_date: dateValidated || "",
-          remarks: 'Approved' || "",
-          validation_status: 'Validated' || "",
-        };
-      } else if (activeTab === "Returns List" && row.returnsId) {
-        endpoint = `/validation/budget-returns/${row.validationId}/`;
-        payload = {
-          validated_by: editedData[row.returnsId].validatedBy || "",
-          remarks: row.remarks || "",
-          validation_date: dateValidated || "",
-          comments: row.comments || "N/A",
-          expense_history_breakdown: row.attachedFile || "",
-        };
-      } else {
-        console.error("Unsupported tab or missing ID:", row);
-        continue;
-      }
-
-      console.log("Updating row with endpoint:", endpoint, "and payload:", payload);
-
-      try {
-        const response = await PATCH(endpoint, payload);
-        console.log("Row updated successfully:", response);
-      } catch (error) {
-        console.error("Error updating row:", error);
-      }
+  const fetch = async () => {
+    try {
+      const data = await GET("/validation/budget-submissions/");
+      setOriginalData(data.map(sub => ({
+        validationId: sub.validation_id,
+        requestId: sub?.budget_submission?.budget_submission_id || "",
+        departmentId: sub?.budget_submission?.dept_id || "",
+        amount: sub.amount_requested || "",
+        submissionDate: sub?.budget_submission?.date_submitted || "",
+        validatedBy: sub.validated_by || "",
+        remarks: sub.remarks || "",
+        approvedAmount: sub.final_approved_amount || "",
+        validationStatus: sub.validation_status || "",
+        validationDate: sub.validation_date || "",
+      })));
+    } catch (error) {
+      console.error("Error fetching budget validations:", error)
     }
+  }
 
-    setIsConfirmationVisible(false);
+  useEffect(() => {
     fetch();
     fetchRequests();
     fetchReturns();
-  } catch (error) {
-    console.error("Error in patching rows:", error);
-    alert("An error occurred while updating rows. Please try again.");
-  }
-};
+  }, []);
+
+  const patchEditedRows = async () => {
+    try {
+      for (const row of editedDataForConfirmation) {
+        const requestId = row.requestId || row.reqID || row.returnsId;
+        if (!requestId) {
+          console.error("Error: ID is undefined for row:", row);
+          continue;
+        }
+        let endpoint = "";
+        let payload = {};
+        let dateValidated = new Date().toISOString().split('T')[0];
+        console.log("Date Validated:", dateValidated);
+        if (activeTab === "Budget Submission List" && row.requestId) {
+          endpoint = `/validation/budget-submissions/${row.validationId}/`;
+          payload = {
+            validated_by: editedData[row.requestId]?.validatedBy || "",
+            final_approved_amount: editedData[row.requestId]?.approvedAmount || "",
+            validation_date: dateValidated || "",
+            remarks: 'Approved' || "",
+            validation_status: 'Validated' || "",
+          };
+        } else if (activeTab === "Budget Request List" && row.reqID) {
+          endpoint = `/validation/budget-requests/${row.validationId}/`;
+          payload = {
+            validated_by: editedData[row.reqID]?.validatedBy || "",
+            final_approved_amount: editedData[row.reqID]?.approvedAmount || "",
+            validation_date: dateValidated || "",
+            remarks: 'Approved' || "",
+            validation_status: 'Validated' || "",
+          };
+        } else if (activeTab === "Returns List" && row.returnsId) {
+          endpoint = `/validation/budget-returns/${row.validationId}/`;
+          payload = {
+            validated_by: editedData[row.returnsId]?.validatedBy || "",
+            remarks: row.remarks || "",
+            validation_date: dateValidated || "",
+            comments: row.comments || "N/A",
+            expense_history_breakdown: row.attachedFile || "",
+          };
+        } else {
+          console.error("Unsupported tab or missing ID:", row);
+          continue;
+        }
+        console.log("Updating row with endpoint:", endpoint, "and payload:", payload);
+        try {
+          const response = await PATCH(endpoint, payload);
+          console.log("Row updated successfully:", response);
+        } catch (error) {
+          console.error("Error updating row:", error);
+        }
+      }
+      setIsConfirmationVisible(false);
+      fetch();
+      fetchRequests();
+      fetchReturns();
+    } catch (error) {
+      console.error("Error in patching rows:", error);
+      alert("An error occurred while updating rows. Please try again.");
+    }
+  };
+
+  const handleRequestReview = () => {
+    setIsReviewConfirmationVisible(true);
+  };
+
+  const handleProceedReview = () => {
+    // Logic to handle proceeding with the review process
+    setIsConfirmationVisible(false);
+    alert("Review process initiated.");
+  };
 
   return (
     <div className="valid">
-        <div className="body-content-container">
-            <div className="tabs">{isCompact ? (
-                <div className="compact-tabs">
-                    <button className="tab-button active">{activeTab}</button>
-                    <button onClick={() => handlePageChange("prev")} className="nav-button" disabled={activeTab ===tabs[0]}>&#60;</button>
-                    <button onClick={() => handlePageChange("next")} className="nav-button"disabled={activeTab === tabs[tabs.length - 1]}>&#62;</button></div>) : (
-                        <div className="full-tabs">{tabs.map(tab => (<button key={tab} className={`tab-button ${activeTab === tab ? "active" : ""}`} onClick={() => setActiveTab(tab)}>{tab}</button>))}
-                            <button className="nav-button" onClick={() => handlePageChange("prev")}>&#60;</button>{[1, 2, 3].map((num, index) => (<button key={num} className={`page-button ${activeTab === tabs[index] ? "active" : ""}`} onClick={() => setActiveTab(tabs[index])}>{num}</button>))}
-                            <button className="nav-button" onClick={() => handlePageChange("next")}>&#62;</button>
-                        </div>
-                    )}
-                </div>
+      <div className="body-content-container">
+        <div className="tabs">
+          {isCompact ? (
+            <div className="compact-tabs">
+              <button className="tab-button active">{activeTab}</button>
+              <button onClick={() => handlePageChange("prev")} className="nav-button" disabled={activeTab === tabs[0]}>&#60;</button>
+              <button onClick={() => handlePageChange("next")} className="nav-button" disabled={activeTab === tabs[tabs.length - 1]}>&#62;</button>
+            </div>
+          ) : (
+            <div className="full-tabs">
+              {tabs.map(tab => (
+                <button key={tab} className={`tab-button ${activeTab === tab ? "active" : ""}`} onClick={() => setActiveTab(tab)}>{tab}</button>
+              ))}
+              <button className="nav-button" onClick={() => handlePageChange("prev")}>&#60;</button>
+              {[1, 2, 3].map((num, index) => (
+                <button key={num} className={`page-button ${activeTab === tabs[index] ? "active" : ""}`} onClick={() => setActiveTab(tabs[index])}>{num}</button>
+              ))}
+              <button className="nav-button" onClick={() => handlePageChange("next")}>&#62;</button>
+            </div>
+          )}
+        </div>
         {activeTab === "Budget Submission List" && (
           <div className="content-container">
             <InfoCard className="summary-infocard">
@@ -563,16 +625,40 @@ const patchEditedRows = async () => {
                   <tbody>
                     {originalData.map((row, index) => (
                       <tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Validated" ? "#f0f0f0" : "white" }}>
-                        <td><div className="row-wrapper"><input type="checkbox" checked={selectedRows.includes(row.requestId)} readOnly /></div></td>
-                        <td><div className="row-wrapper">{row.requestId}</div></td>
-                        <td><div className="row-wrapper">{row.departmentId}</div></td>
-                        <td><div className="row-wrapper">{row.amount}</div></td>
-                        <td><div className="row-wrapper">{row.submissionDate}</div></td>
-                        <td><div className="row-wrapper">{row.validationDate ? row.validationDate : "N/A"}</div></td>
-                        <td><div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.validatedBy}</div></td>
-                        <td><div className="row-wrapper">{row.remarks}</div></td>
-                        <td><div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.approvedAmount}</div></td>
-                        <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+                        <td>
+                          <div className="row-wrapper">
+                            <input type="checkbox" checked={selectedRows.includes(row.requestId)} readOnly />
+                          </div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.requestId}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.departmentId}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.amount}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.submissionDate}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.validationDate ? row.validationDate : "N/A"}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.validatedBy}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.remarks}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.approvedAmount}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">
+                            <span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -586,10 +672,10 @@ const patchEditedRows = async () => {
           <div className="content-container">
             <InfoCard className="summary-infocard">
               <div className="summary-container">
-                <div className="summary-date-range">August 2025 - August 2026</div>
+                <div className="summary-date-range">August 2025-August 2026</div>
                 <div className="summary-details">
                   <div className="summary-total-budget">
-                    Total Budget
+                    Total Approved Amount
                     <p>₱{totalBudget.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                   </div>
                   <div className="summary-status">
@@ -664,16 +750,40 @@ const patchEditedRows = async () => {
                   <tbody>
                     {originalRequestData.map((row, index) => (
                       <tr key={index} onClick={() => handleRowSelect(row.reqID)} className={selectedRows.includes(row.reqID) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Validated" ? "#f0f0f0" : "white" }}>
-                        <td><div className="row-wrapper"><input type="checkbox" checked={selectedRows.includes(row.reqID)} readOnly /></div></td>
-                        <td><div className="row-wrapper">{row.reqID}</div></td>
-                        <td><div className="row-wrapper">{row.departmentId}</div></td>
-                        <td><div className="row-wrapper">{row.amount}</div></td>
-                        <td><div className="row-wrapper">{row.requestDate}</div></td>
-                        <td><div className="row-wrapper">{row.validationDate ? row.validationDate: "N/A"}</div></td>
-                        <td><div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.validatedBy}</div></td>
-                        <td><div className="row-wrapper">{row.remarks}</div></td>
-                        <td><div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.approvedAmount}</div></td>
-                        <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+                        <td>
+                          <div className="row-wrapper">
+                            <input type="checkbox" checked={selectedRows.includes(row.reqID)} readOnly />
+                          </div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.reqID}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.departmentId}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.amount}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.requestDate}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.validationDate ? row.validationDate : "N/A"}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.validationStatus === "Pending"? "N/A" : row.validatedBy}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.remarks}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.approvedAmount}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">
+                            <span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -749,29 +859,50 @@ const patchEditedRows = async () => {
                   <tbody>
                     {originalReturnsData.map((row, index) => (
                       <tr key={index} onClick={() => handleRowSelect(row.returnsId)} className={selectedRows.includes(row.returnsId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Validated" ? "#f0f0f0" : "white" }}>
-                        <td><div className="row-wrapper"><input type="checkbox" checked={selectedRows.includes(row.returnsId)} readOnly /></div></td>
-                        <td><div className="row-wrapper">{row.returnsId}</div></td>
-                        <td><div className="row-wrapper">{row.departmentId}</div></td>
-                        <td><div className="row-wrapper">{row.returnDate}</div></td>
-                        <td><div className="row-wrapper">{row.originTotalBudget}</div></td>
-                        <td><div className="row-wrapper">{row.returnedAmount}</div></td>
-                        <td><div className="row-wrapper">PDF</div></td> 
-                        <td><div className="row-wrapper">{row.validationDate ? row.validationDate: "N/A"}</div></td>
-                        <td><div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.validatedBy}</div></td>
                         <td>
                           <div className="row-wrapper">
-                            {row.validationStatus === "Validated"
-                              ? "Approved"
-                              : row.validationStatus === "Pending"
-                                ? "Awaiting Validation"
-                                : row.validationStatus === "To Review"
-                                  ? "For Resubmission"
-                                  : "N/A"}
+                            <input type="checkbox" checked={selectedRows.includes(row.returnsId)} readOnly />
                           </div>
                         </td>
-                        <td><div className="row-wrapper">{row.comments || "N/A"}</div></td>
-                        <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
-                        
+                        <td>
+                          <div className="row-wrapper">{row.returnsId}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.departmentId}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.returnDate}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.originTotalBudget}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.returnedAmount}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">
+                            {row.attachedFile ? <a href={row.attachedFile} target="_blank" rel="noopener noreferrer">View File</a> : "N/A"}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.validationDate ? row.validationDate : "N/A"}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.validatedBy}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">
+                            {row.validationStatus === "Validated" ? "Approved" : row.validationStatus === "Pending" ? "Awaiting Validation" : row.validationStatus === "To Review" ? "For Resubmission" : "N/A"}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">{row.comments || "N/A"}</div>
+                        </td>
+                        <td>
+                          <div className="row-wrapper">
+                            <span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -799,21 +930,42 @@ const patchEditedRows = async () => {
                         <input type="checkbox" style={{ transform: 'scale(1.5)' }} checked={selectedRows.includes(rowId)} readOnly />
                       </div>
                       <div className="edit-modal-details">
-                        <p><strong>{activeTab === "Budget Submission List" ? "Submission ID:" : activeTab === "Budget Request List" ? "Request ID:" : "Returns ID:"}</strong> {activeRow.requestId || activeRow.reqID || activeRow.returnsId}</p>
-                        <p><strong> Department ID:</strong> {activeRow.departmentId}</p>
-                        <p> <strong>Amount:</strong> {activeRow.amount || activeRow.returnedAmount}</p>
-                        <p><strong>{activeTab === "Budget Submission List" ? "Submission Date:" : activeTab === "Budget Request List" ? "Request Date:" : "Return Date:"} </strong>{activeRow.submissionDate ? activeRow.submissionDate: activeRow.requestDate ? activeRow.requestDate : activeRow.returnDate}</p>
+                        <p>
+                          <strong>{activeTab === "Budget Submission List" ? "Submission ID:" : activeTab === "Budget Request List" ? "Request ID:" : "Returns ID:"}</strong>
+                          {activeRow?.requestId || activeRow?.reqID || activeRow?.returnsId}
+                        </p>
+                        <p>
+                          <strong> Department ID:</strong>{activeRow?.departmentId}
+                        </p>
+                        <p>
+                          <strong>Amount:</strong> {activeRow?.amount || activeRow?.returnedAmount}
+                        </p>
+                        <p>
+                          <strong>{activeTab === "Budget Submission List" ? "Submission Date:" : activeTab === "Budget Request List" ? "Request Date:" : "Return Date:"} </strong>
+                          {activeRow?.submissionDate ? activeRow.submissionDate : activeRow?.requestDate ? activeRow.requestDate : activeRow?.returnDate}
+                        </p>
                         <div className="edit-modal-input-group validated-by-group">
                           <div className="edit-modal-label-input">
-                            <label><strong>Validated By:</strong></label>
-                            <input type="text" value={editedData[rowId]?.validatedBy || ""} onChange={(e) => { handleEditChange(rowId, "validatedBy", e.target.value); setValidatedByError(prevErrors => ({ ...prevErrors, [rowId]: false })); }} />
+                            <label>
+                              <strong>Validated By:</strong>
+                            </label>
+                            <input
+                              type="text"
+                              value={editedData[rowId]?.validatedBy || ""}
+                              onChange={(e) => {
+                                handleEditChange(rowId, "validatedBy", e.target.value);
+                                setValidatedByError(prevErrors => ({ ...prevErrors, [rowId]: false }));
+                              }}
+                            />
                           </div>
                           {validatedByError[rowId] && <p className="error-message">Validated By is required</p>}
                         </div>
                         {activeTab === "Returns List" ? (
                           <div className="edit-modal-input-group remarks-group">
                             <div className="edit-modal-label-input">
-                              <label><strong>Remarks:</strong></label>
+                              <label>
+                                <strong>Remarks:</strong>
+                              </label>
                               <select
                                 value={returnRemarks[rowId] || ""}
                                 onChange={(e) => handleEditChange(rowId, "remarks", e.target.value)}
@@ -831,14 +983,30 @@ const patchEditedRows = async () => {
                         ) : (
                           <div className="edit-modal-input-group approved-amount-group">
                             <div className="edit-modal-label-input">
-                              <label><strong>Approved Amount:</strong></label>
-                              <input type="text" value={editedData[rowId]?.approvedAmount || ""} onChange={(e) => { handleEditChange(rowId, "approvedAmount", e.target.value); setApprovedAmountError(prevErrors => ({ ...prevErrors, [rowId]: false })); }} />
+                              <label>
+                                <strong>Approved Amount:</strong>
+                              </label>
+                              <input
+                                type="text"
+                                value={editedData[rowId]?.approvedAmount || ""}
+                                onChange={(e) => {
+                                  handleEditChange(rowId, "approvedAmount", e.target.value);
+                                  setApprovedAmountError(prevErrors => ({ ...prevErrors, [rowId]: false }));
+                                }}
+                              />
                             </div>
-                            {approvedAmountError[rowId] && <p className="error-message">Approved Amount is required</p>}
+                            {approvedAmountError[rowId] && <p className="error-message">Please fill out this field</p>}
                           </div>
                         )}
                         {activeTab === "Returns List" && (
-                          <p> <strong>Attached File:</strong> <a href={activeRow.attachedFile} target="_blank" rel="noopener noreferrer">View File</a></p>
+                          <p>
+                            <strong>Attached File:</strong>
+                            {activeRow?.attachedFile ? (
+                              <a href={activeRow.attachedFile} target="_blank" rel="noopener noreferrer">View File</a>
+                            ) : (
+                              "N/A"
+                            )}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -864,7 +1032,8 @@ const patchEditedRows = async () => {
                 <ul>
                   {editedDataForConfirmation.map(item => (
                     <li key={item.requestId || item.reqID || item.returnsId}>
-                      {activeTab === "Budget Submission List" ? `Submission ID: ${item.requestId}` : activeTab === "Budget Request List" ? `Request ID: ${item.reqID}` : `Returns ID: ${item.returnsId}`} - Validated By: {item.validatedBy}, {activeTab === "Returns List" ? `Remarks: ${item.remarks}` : `Approved Amount: ${item.approvedAmount}`}
+                      {activeTab === "Budget Submission List" ? `Submission ID:${item.requestId}` : activeTab === "Budget Request List" ? `Request ID: ${item.reqID}` : `Returns ID:${item.returnsId}`} - Validated By: {item.validatedBy},
+                      {activeTab === "Returns List" ? `Remarks: ${item.remarks}` : `Approved Amount:${item.approvedAmount}`}
                     </li>
                   ))}
                 </ul>
@@ -872,22 +1041,6 @@ const patchEditedRows = async () => {
               <div className="popup-buttons">
                 <button className="cancel-button" onClick={handleCancelConfirmation}>Cancel</button>
                 <button className="proceed-button" onClick={handleConfirmSubmit}>Proceed</button>
-              </div>
-            </div>
-          </InfoCard>
-        )}
-        {isReviewConfirmationVisible && (
-          <InfoCard className="popup-overlay">
-            <div className="popup-content">
-              <div className="popup-title">
-                <h3>Confirm Review Request</h3>
-              </div>
-              <div className="popup-message">
-                <p>Are you sure you want to request a review for the selected data?</p>
-              </div>
-              <div className="popup-buttons">
-                <button className="cancel-button" onClick={handleCancelReviewConfirmation}>Cancel</button>
-                <button className="proceed-button" onClick={handleProceedReview}>Proceed</button>
               </div>
             </div>
           </InfoCard>
@@ -901,8 +1054,25 @@ const patchEditedRows = async () => {
             </div>
           </div>
         )}
+        {isReviewConfirmationVisible && (
+          <InfoCard className="popup-overlay">
+            <div className="popup-content">
+              <div className="popup-title">
+                <h3>Request Review</h3>
+              </div>
+              <div className="popup-message">
+                <p>Are you sure you want to request a review for the selected returns?</p>
+              </div>
+              <div className="popup-buttons">
+                <button className="cancel-button" onClick={handleCancelReviewConfirmation}>Cancel</button>
+                <button className="proceed-button" onClick={handleProceedReview}>Proceed</button>
+              </div>
+            </div>
+          </InfoCard>
+        )}
       </div>
     </div>
   );
 };
+
 export default BodyContent;
