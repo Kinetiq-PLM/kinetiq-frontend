@@ -15,7 +15,7 @@ const BodyContent = () => {
     const fetchProductionData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://127.0.0.1:8000/api/cost-of-production/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/cost-of-production/");
         setProductionData(response.data);
         setLoading(false);
       } catch (err) {
@@ -26,7 +26,7 @@ const BodyContent = () => {
 
     const fetchReworkCostData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/rework-cost/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/rework-cost/");
         setReworkCostData(response.data);
       } catch (err) {
         console.error("Failed to fetch rework cost data.");
@@ -58,7 +58,7 @@ const BodyContent = () => {
   
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/cost-of-production/${prodToUpdate.production_order_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/cost-of-production/${prodToUpdate.production_order_id}/`,
         { actual_quantity: value },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -103,7 +103,7 @@ const filteredData = productionData.filter((item) => {
   
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/cost-of-production/${productionOrderId}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/cost-of-production/${productionOrderId}/`,
         {
           [field]: updatedValue,
         },
@@ -152,7 +152,7 @@ const filteredData = productionData.filter((item) => {
   
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/rework-cost/${itemToUpdate.production_order_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/rework-cost/${itemToUpdate.production_order_id}/`,
         {
           [field]: itemToUpdate[field],
           total_rework_cost: total,

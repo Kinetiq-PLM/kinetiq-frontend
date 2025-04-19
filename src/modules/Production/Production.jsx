@@ -16,7 +16,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchProductionData = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:8000/api/production/");
+                const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/production/");
                 setProductionData(response.data);
                 setStatuses(response.data.map((order) => order.status)); // Initialize statuses based on fetched data
                 setLoading(false);
@@ -31,7 +31,7 @@ const BodyContent = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:8000/api/tasks/");
+                const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/tasks/");
                 setTasks(response.data);
                 setTasksLoading(false);
             } catch (error) {
@@ -55,7 +55,7 @@ const BodyContent = () => {
 
         try {
             // Make an API call to update the status in the database
-            await axios.patch(`http://127.0.0.1:8000/api/production/${updatedOrder.production_order_id}/`, {
+            await axios.patch(`https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/production/${updatedOrder.production_order_id}/`, {
                 status: newStatus.trim(),
             });
             console.log("Status updated successfully in the database.");

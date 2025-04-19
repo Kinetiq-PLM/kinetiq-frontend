@@ -11,7 +11,7 @@ const EquipmentTable = ({ searchTerm }) => {
   useEffect(() => {
     const fetchEquipmentData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/equipment/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/");
         setEquipmentData(response.data);
         setLoading(false);
       } catch (err) {
@@ -31,7 +31,7 @@ const EquipmentTable = ({ searchTerm }) => {
 
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/equipment/${equipmentToUpdate.equipment_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/${equipmentToUpdate.equipment_id}/`,
         equipmentToUpdate
       );
       console.log("Availability status updated successfully");
@@ -49,7 +49,7 @@ const EquipmentTable = ({ searchTerm }) => {
 
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/equipment/${equipmentToUpdate.equipment_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/${equipmentToUpdate.equipment_id}/`,
         equipmentToUpdate
       );
     } catch (error) {
@@ -66,7 +66,7 @@ const EquipmentTable = ({ searchTerm }) => {
 
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/equipment/${equipmentToUpdate.equipment_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/${equipmentToUpdate.equipment_id}/`,
         equipmentToUpdate
       );
     } catch (error) {
@@ -159,7 +159,7 @@ const LaborTable = ({ searchTerm }) => {
   useEffect(() => {
     const fetchLaborData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/labor/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/labor/");
         setLaborData(response.data);
         setLoading(false);
       } catch (err) {
@@ -179,7 +179,7 @@ const LaborTable = ({ searchTerm }) => {
 
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/labor/${laborToUpdate.labor_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/labor/${laborToUpdate.labor_id}/`,
         { date_worked: value },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -198,7 +198,7 @@ const LaborTable = ({ searchTerm }) => {
 
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/labor/${laborToUpdate.labor_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/labor/${laborToUpdate.labor_id}/`,
         { days_worked: value },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -322,7 +322,7 @@ const BodyContent = () => {
 
   const fetchProjectEquipment = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/project-equipment/");
+      const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/project-equipment/");
       setProjectEquipmentData(response.data);
       setPeLoading(false);
     } catch (error) {
