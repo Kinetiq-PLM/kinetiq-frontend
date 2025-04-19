@@ -295,7 +295,6 @@ const BodyContent = ({employee_id}) => {
         };
         
         conversations.forEach(conversation => {
-            // Use updated_at for grouping instead of created_at
             const convDate = new Date(conversation.updated_at); 
             
             if (convDate >= today) {
@@ -348,13 +347,10 @@ const BodyContent = ({employee_id}) => {
     // Function to call the chatbot backend API
     const getBotResponse = async (userMessageText) => {
         try {
-            // Encode the user message to be safely included in the URL
             const encodedMessage = encodeURIComponent(userMessageText);
             const response = await fetch(`${API_BASE_URL}chatbot/chatbot/?message=${encodedMessage}`, {
                 method: 'GET',
                 headers: {
-                    // Include authentication headers if required by your backend
-                    // 'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json', 
                 }
             });
@@ -915,31 +911,32 @@ const BodyContent = ({employee_id}) => {
                                 <div className="textbar-container">
                                     <textarea
                                         ref={textareaRef}
-                                        // Update placeholder and add disabled attribute based on isBotResponding
-                                        placeholder={isBotResponding ? "Waiting for response..." : "Ask anything"}
+                                        // Update placeholder and add disabled attribute based on BOTH states
+                                        placeholder={(isBotResponding || isCreatingConversation) ? "Processing..." : "Ask anything"}
                                         className="text-input"
                                         value={inputText}
                                         onChange={handleInputChange}
                                         onKeyDown={(e) => {
-                                            // Prevent Enter key if bot is responding
-                                            if (e.key === "Enter" && !e.shiftKey && !isBotResponding) {
+                                            // Prevent Enter key if bot is responding OR creating conversation
+                                            if (e.key === "Enter" && !e.shiftKey && !(isBotResponding || isCreatingConversation)) {
                                                 e.preventDefault();
-                                                handleSendMessage(); 
+                                                handleSendMessage();
                                             }
                                         }}
                                         rows="1"
                                         style={{ height: '40px' }}
-                                        disabled={isBotResponding} // <-- Disable textarea
+                                        // Disable textarea if bot is responding OR creating conversation
+                                        disabled={isBotResponding || isCreatingConversation}
                                     />
                                     <img
                                         src="../../icons/repgen-icons/sendmsg.png"
                                         // Add a class to visually disable the icon if needed
-                                        className={`sendmsg-icon ${isBotResponding ? 'disabled' : ''}`} 
+                                        className={`sendmsg-icon ${(isBotResponding || isCreatingConversation) ? 'disabled' : ''}`} 
                                         // Prevent click if bot is responding
-                                        onClick={!isBotResponding ? handleSendMessage : undefined} 
+                                        onClick={!(isBotResponding || isCreatingConversation) ? handleSendMessage : undefined} 
                                         alt="Send"
                                         // Optional: style changes for disabled state in CSS
-                                        style={{ opacity: isBotResponding ? 0.5 : 1, cursor: isBotResponding ? 'not-allowed' : 'pointer' }}
+                                        style={{ opacity: (isBotResponding || isCreatingConversation) ? 0.5 : 1, cursor: (isBotResponding || isCreatingConversation) ? 'not-allowed' : 'pointer' }}
                                     />
                                 </div>
                             </>
