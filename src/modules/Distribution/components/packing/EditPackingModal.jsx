@@ -58,7 +58,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     if (packingList && packingList.picking_list_id) {
       const fetchPickingListDetails = async () => {
         try {
-          const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${packingList.picking_list_id}/`);
+          const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${packingList.picking_list_id}/`);
           if (response.ok) {
             const pickingList = await response.json();
             if (pickingList.items_count) {
