@@ -49,7 +49,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const fetchVendors = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://127.0.0.1:8000/operation/supplier/");
+      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
       if (!response.ok) throw new Error("Connection to database failed");
 
 
@@ -148,7 +148,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     const fetchNextDocumentIds = async () => {
       if (isCreateMode) {
         try {
-          const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/get-next-doc-ids/');
+          const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/get-next-doc-ids/');
           if (!response.ok) throw new Error('Failed to fetch next document IDs');
          
           const data = await response.json();
@@ -195,7 +195,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
       // If this item exists in the database, delete it
       try {
-        await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
+        await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -221,7 +221,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
  
   const reloadDocumentItems = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
+      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
       if (!response.ok) throw new Error('Failed to reload document');
       const updatedData = await response.json();
       return updatedData.document_items;
@@ -275,7 +275,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           payload.asset_id = lastRow.item_id;
         } else if (lastRow.item_id.startsWith("ADMIN-PROD")) {
           // First create product docu item
-          const productDocuResponse = await fetch('http://127.0.0.1:8000/operation/create-items/create-product-docu-item/', {
+          const productDocuResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-product-docu-item/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -295,7 +295,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         }
  
         // Create the document item
-        const createResponse = await fetch('http://127.0.0.1:8000/operation/create-items/create-document-item/', {
+        const createResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-document-item/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -345,7 +345,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         });
  
         setDocumentItems(updatedItems);
-        const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
+        const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
 
 
         if (!response.ok) {
@@ -397,7 +397,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/operation/get-warehouseID/')
+    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
         // Sort A–Z by location
@@ -413,7 +413,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/operation/item-data/')
+    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item-data/')
       .then(res => res.json())
       .then(data => {
         const options = [];
@@ -490,7 +490,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
  
 
 
-          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -622,7 +622,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         }))
       };
       // Call the create API
-      const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
+      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -673,7 +673,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         const updatedDocumentItemData = {
           product_id: item.item_id,
         };
-        const documentItemResponse = await fetch(`http://127.0.0.1:8000/operation/product-docu-item/${item.productdocu_id}/`, {
+        const documentItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/product-docu-item/${item.productdocu_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -708,7 +708,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         } else if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
           updateDocomentItems.productdocu_id = item.productdocu_id;
         }
-        const productDocuItemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/${item.content_id}/`, {
+        const productDocuItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -746,7 +746,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         freight: parseFloat(documentDetails.freight) || 0,
         transaction_cost: parseFloat(documentDetails.total).toFixed(2) || 0,
       };
-      const goodsTrackingResponse = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`, {
+      const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -787,7 +787,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/operation/purchase_order/");
+      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
       if (!response.ok) throw new Error("Failed to fetch purchase orders");
      
       const data = await response.json();
@@ -807,7 +807,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
  
     try {
       // Fetch the selected purchase order details
-      const response = await fetch(`http://127.0.0.1:8000/operation/purchase_order/${poId}/`);
+      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
       const selectedPO = await response.json();
