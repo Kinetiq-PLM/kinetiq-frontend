@@ -82,7 +82,7 @@ const VendorAppForm = () => {
             console.log("📤 Submitting Vendor Application Payload:", payload);
 
             const response = await axios.post(
-                "http://127.0.0.1:8000/api/VendorApp/create/",
+                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/VendorApp/create/",
                 payload
             );
             console.log("✅ Response from server:", response.data);

@@ -21,7 +21,7 @@ const PurchaseQuotBody = ({ onBackToDashboard }) => {
     ];
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/purchase_quotation/list/")
+        fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/")
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Failed to fetch quotations");

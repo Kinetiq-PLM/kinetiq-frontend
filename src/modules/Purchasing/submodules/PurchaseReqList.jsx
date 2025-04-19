@@ -18,7 +18,7 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
   useEffect(() => {
     const fetchPurchaseRequests = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/prf/list/");
+        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
         // Sort the purchase requests by request_id in descending order
         const sortedRequests = response.data.sort((a, b) => {
           const idA = parseInt(a.request_id, 10);
@@ -36,11 +36,14 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
 
     const fetchEmployees = async () => {
         try {
-          const response = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+          const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
           // Create a map of employee_id to full name (first_name + last_name)
           const employeeData = response.data.reduce((map, employee) => {
             const fullName = `${employee.first_name} ${employee.last_name}`.trim(); // Combine first_name and last_name
-            map[employee.employee_id] = fullName;
+            map[employee.employee_id] = {
+            name: fullName, 
+            dept_id: employee.dept_id,
+            }
             return map;
           }, {});
           setEmployeeMap(employeeData);
@@ -163,8 +166,8 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
                   <div key={index} className="purchreq-row" onClick={() => handleRequestClick(request)}>
                     <div className="purchreq-checkbox"><input type="checkbox" onClick={handleCheckboxClick} /></div>
                     <div>{request.request_id}</div>
-                    <div>{employeeMap[request.employee_id] || " "}</div>
-                    <div>{request.department}</div>
+                    <div>{employeeMap[request.employee_id]?.name || " "}</div>
+                    <div>{employeeMap[request.employee_id]?.dept_id || " "}</div>
                     <div>{request.document_date}</div>
                     <div>{request.valid_date}</div>
                   </div>

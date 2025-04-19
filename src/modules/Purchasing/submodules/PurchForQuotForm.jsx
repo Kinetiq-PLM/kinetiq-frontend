@@ -38,7 +38,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   useEffect(() => {
     const fetchVendors = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/vendor/list/");
+        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/");
         setVendors(response.data);
       } catch (error) {
         console.error("Error fetching vendors:", error.response?.data || error.message);
@@ -52,7 +52,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
     }
 
     try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/quotation-content/list/`);
+        const response = await axios.get(`https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/list/`);
         const filteredItems = response.data.filter((item) => item.request_id === requestId);
         console.log("Filtered Items for Request ID:", filteredItems); // Debugging
         setItems(filteredItems); // Set only the items related to the request_id
@@ -63,7 +63,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
 
     const fetchMaterials = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/quotation-content/materials/list/");
+        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/materials/list/");
         setMaterials(response.data);
       } catch (error) {
         console.error("Error fetching materials:", error.response?.data || error.message);
@@ -72,7 +72,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
 
     const fetchAssets = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/quotation-content/assets/list/");
+        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/");
         setAssets(response.data);
       } catch (error) {
         console.error("Error fetching assets:", error.response?.data || error.message);
@@ -266,7 +266,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/purchase_quotation/create/",
+        "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/create/",
         payload
       );
       console.log("✅ Response from server:", response.data);
@@ -282,7 +282,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   try {
     // 1. First get ALL existing quotations to check for duplicates
     const checkResponse = await axios.get(
-      `http://127.0.0.1:8000/api/purchase_quotation/list/`
+      `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/`
     );
     
     // 2. Find if this exact document_no exists (with same request_id)
@@ -323,13 +323,13 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
     if (existingQuotation) {
       console.log("Updating existing quotation ID:", existingQuotation.quotation_id);
       apiResponse = await axios.put(
-        `http://127.0.0.1:8000/api/purchase_quotation/edit/${existingQuotation.quotation_id}/`,
+        `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/edit/${existingQuotation.quotation_id}/`,
         payload
       );
     } else {
       console.log("Creating new quotation");
       apiResponse = await axios.post(
-        "http://127.0.0.1:8000/api/purchase_quotation/create/",
+        "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/create/",
         payload
       );
     }
@@ -376,7 +376,7 @@ const handleSendTo = async () => {
 
     // Create purchase order
     const response = await axios.post(
-      "http://127.0.0.1:8000/api/purchase-orders/list/",
+      "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/",
       poPayload,
       {
         headers: {

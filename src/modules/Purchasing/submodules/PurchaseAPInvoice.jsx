@@ -30,7 +30,7 @@ const PurchaseAPInvoiceBody = () => {
 
     useEffect(() => {
         // Fetch invoices from the API
-        fetch("http://127.0.0.1:8000/api/invoices/list/")
+        fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/list/")
             .then((response) => response.json())
             .then((data) => {
                 console.log("Fetched data:", data);

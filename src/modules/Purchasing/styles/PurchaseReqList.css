@@ -111,7 +111,7 @@
 .purchreq-row {
   display: grid;
   grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
-  gap: 1rem;
+  gap: 5rem;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #f0f0f0;
   align-items: center;

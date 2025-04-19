@@ -15,6 +15,7 @@ const PurchaseCredMemoBody = () => {
   const [showStatusFilter, setShowStatusFilter] = useState(false);
 
   const timeOptions = [
+    "All",
     "Last 30 days",
     "Last 20 days",
     "Last 10 days",
@@ -41,7 +42,8 @@ const PurchaseCredMemoBody = () => {
   useEffect(() => {
     const fetchCreditMemos = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/credit-memo/list/");
+        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/credit-memo/list/");
+        console.log("API Response:", response.data);
         setCreditMemos(response.data);
         setFilteredMemos(response.data);
       } catch (error) {
@@ -61,36 +63,51 @@ const PurchaseCredMemoBody = () => {
 
     // Date filter
     if (selectedDate !== "All") {
-      const days = parseInt(selectedDate.match(/\d+/)[0], 10);
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - days);
-      result = result.filter(memo => new Date(memo.document_date) >= cutoffDate);
+        const days = parseInt(selectedDate.match(/\d+/)[0], 10); // Extract the number of days from the selectedDate
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days); // Calculate the cutoff date
+        console.log("Cutoff Date:", cutoffDate);
+
+        result = result.filter(memo => {
+            if (!memo.document_date) {
+                return true; // Include items with missing dates
+            }
+            return new Date(memo.document_date) >= cutoffDate;
+        });
+        console.log("After Date Filter:", result.length);
     }
 
     // Status filter
     if (selectedStatus !== "All") {
-      result = result.filter(memo => {
-        if (selectedStatus === "Completed") {
-          // Completed: status is 'Completed'
-          return memo.status === "Completed";
-        }
-        return memo.status === selectedStatus;
-      });
+        result = result.filter(memo => {
+            if (selectedStatus === "Completed") {
+                return memo.status === "Completed";
+            }
+            return memo.status === selectedStatus;
+        });
+        console.log("After Status Filter:", result.length);
     }
 
     // Search filter
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(memo => 
-        (memo.credit_memo_id && memo.credit_memo_id.toString().toLowerCase().includes(term)) ||
-        (memo.purchase_order && memo.purchase_order.toString().toLowerCase().includes(term)) ||
-        (memo.document_date && memo.document_date.toString().toLowerCase().includes(term)) ||
-        (memo.status && memo.status.toLowerCase().includes(term))
-      );
+        const term = searchTerm.toLowerCase();
+        result = result.filter(memo => 
+            (memo.credit_memo_id && memo.credit_memo_id.toString().toLowerCase().includes(term)) ||
+            (memo.purchase_order && memo.purchase_order.toString().toLowerCase().includes(term)) ||
+            (memo.document_date && memo.document_date.toString().toLowerCase().includes(term)) ||
+            (memo.status && memo.status.toLowerCase().includes(term))
+        );
+        console.log("After Search Filter:", result.length);
+    }
+
+    // If no filters are applied, show all credit memos
+    if (selectedDate === "All" && selectedStatus === "All" && !searchTerm) {
+        result = [...creditMemos];
+        console.log("No filters applied, showing all credit memos:", result.length);
     }
 
     setFilteredMemos(result);
-  };
+};
 
   const handleDateOptionSelect = (option) => {
     setSelectedDate(option);

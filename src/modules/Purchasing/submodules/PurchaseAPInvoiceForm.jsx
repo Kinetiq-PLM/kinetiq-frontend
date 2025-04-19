@@ -28,7 +28,7 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
     const fetchEmployeesFromPRF = async (request_id) => {
         try {
             console.log("Fetching PRF data for request_id:", request_id); // Debugging
-            const prfResponse = await axios.get("http://127.0.0.1:8000/api/prf/list/");
+            const prfResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
             console.log("PRF API Response:", prfResponse.data); // Debugging
 
             // Find the PRF entry matching the request_id
@@ -46,7 +46,7 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
             console.log("Employee ID:", employee_id);
 
             // Fetch employee details using employee_id
-            const employeesResponse = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+            const employeesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
             const matchedEmployee = employeesResponse.data.find((employee) => employee.employee_id === employee_id);
 
             if (!matchedEmployee) {
@@ -65,7 +65,7 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
             console.log("Fetching vendor data for quotation_id:", quotation_id);
     
             // Fetch vendor data using quotation_id
-            const vendorResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
+            const vendorResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
             const matchedVendor = vendorResponse.data.find(
                 (vendor) => vendor.quotation_id === quotation_id
             );
@@ -90,7 +90,7 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
             console.log("Fetching vendor name for vendor_code:", vendor_code);
     
             // Fetch vendor name using vendor_code
-            const vendorListResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/vendor/list/");
+            const vendorListResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/");
             const matchedVendor = vendorListResponse.data.find(
                 (vendor) => vendor.vendor_code === vendor_code
             );
@@ -118,14 +118,14 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
             console.log("Fetching data for content_id:", content_id);
     
             // Fetch all invoices
-            const invoicesResponse = await axios.get("http://127.0.0.1:8000/api/invoices/list/");
+            const invoicesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/list/");
             const invoice = invoicesResponse.data.find((inv) => inv.content_id === content_id);
             if (!invoice) throw new Error("Invoice not found for the given content_id");
     
             console.log("Matched Invoice:", invoice);
     
             // Fetch external_module data
-            const externalModulesResponse = await axios.get("http://127.0.0.1:8000/api/invoices/external-modules/");
+            const externalModulesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/external-modules/");
             const matchedExternalModule = externalModulesResponse.data.find(
                 (module) => module.content_id === content_id
             );
@@ -140,7 +140,7 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                 fetchEmployeesFromPRF(matchedExternalModule.request_id);
     
                 // Fetch purchase_quotation data using request_id from external_module
-                const purchaseQuotationResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
+                const purchaseQuotationResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
                 const matchedPurchaseQuotation = purchaseQuotationResponse.data.filter(
                     (quotation) => quotation.request_id === matchedExternalModule.request_id
                 );
@@ -169,8 +169,8 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                     }
     
                     // Fetch materials and assets
-                    const materialsResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/materials/list/");
-                    const assetsResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/assets/list/");
+                    const materialsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/materials/list/");
+                    const assetsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/");
                     const materials = materialsResponse.data;
                     const assets = assetsResponse.data;
     
@@ -178,7 +178,7 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                     console.log("Assets:", assets); // Debugging
     
                     // Fetch quotation content data
-                    const quotationContentResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/list/");
+                    const quotationContentResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/list/");
                     const matchedQuotationContent = quotationContentResponse.data.filter(
                         (content) => content.request_id === matchedExternalModule.request_id
                     );
