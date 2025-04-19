@@ -309,7 +309,7 @@ export const assetsAPI = {
   // Get archived assets
   getArchivedAssets: async () => {
     try {
-      const response = await api.get('/item_master/assets/archived/');
+      const response = await api.get('/item_master/assets/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived assets:', error);
@@ -389,7 +389,7 @@ export const productsAPI = {
   // Get archived products
   getArchivedProducts: async () => {
     try {
-      const response = await api.get('/item_master/products/archived/');
+      const response = await api.get('/item_master/products/archived/', { params }, { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived products:', error);
@@ -469,7 +469,7 @@ export const rawMaterialsAPI = {
   // Get archived raw materials
   getArchivedRawMaterials: async () => {
     try {
-      const response = await api.get('/item_master/raw-materials/archived/');
+      const response = await api.get('/item_master/raw-materials/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived raw materials:', error);
@@ -538,7 +538,7 @@ export const itemMasterDataAPI = {
   // Get archived items
   getArchivedItems: async () => {
     try {
-      const response = await api.get('/item_master/items/archived/');
+      const response = await api.get('/item_master/items/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived items:', error);
@@ -751,7 +751,7 @@ export const warehouseAPI = {
   // Get archived warehouses
   getArchivedWarehouses: async () => {
     try {
-      const response = await api.get('/warehouses/archived/');
+      const response = await api.get('/warehouses/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived warehouses:', error);

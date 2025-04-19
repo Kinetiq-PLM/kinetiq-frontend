@@ -47,6 +47,7 @@ const UserManagement = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const [archivedSearchValue, setArchivedSearchValue] = useState("");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
   // Pagination states
   const [userPagination, setUserPagination] = useState({
@@ -80,6 +81,15 @@ const UserManagement = () => {
       fetchRoles();
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Data fetching functions
   const fetchUsers = async (searchTerm = "", orderField = "", orderDirection = "") => {
@@ -152,6 +162,21 @@ const UserManagement = () => {
     setArchivedSearchValue(value);
     fetchArchivedRoles(value);
   };
+
+  // Prevent layout jump when changing tabs
+  const handleTabChange = (key) => {
+    // Save current scroll position
+    const scrollPosition = window.scrollY;
+    
+    setActiveTab(key);
+    setSearchValue(""); // Clear search when switching tabs
+    
+    // Restore scroll position after state update
+    setTimeout(() => {
+      window.scrollTo(0, scrollPosition);
+    }, 0);
+  };
+
 
   const handleTableChange = (pagination, filters, sorter, extra) => {
     if (sorter && sorter.field) {
@@ -603,18 +628,18 @@ const UserManagement = () => {
         </Title>
         <Divider className="title-divider" />
         
-        <Tabs 
-          activeKey={activeTab} 
-          onChange={(key) => {
-            setActiveTab(key);
-            setSearchValue(""); // Clear search when switching tabs
-          }}
-          size="middle"
-          tabBarGutter={8}
-          className="user-tabs"
-          type="line"
-          tabBarExtraContent={{
-            right: (
+        <div className="tabs-wrapper">
+          <Tabs 
+            activeKey={activeTab} 
+            onChange={handleTabChange}
+            size="middle"
+            tabBarGutter={8}
+            className="user-tabs"
+            type={windowWidth <= 768 ? "card" : "line"}
+            tabPosition="top"
+            destroyInactiveTabPane={false}
+            tabBarExtraContent={{
+              right: (
                 <div className="header-right-content">
                   <div className="search-container">
                     <Input.Search
@@ -632,8 +657,9 @@ const UserManagement = () => {
                         type="primary" 
                         icon={<PlusOutlined />} 
                         onClick={handleAddUser}
+                        className={windowWidth <= 576 ? "icon-only-btn" : ""}
                       >
-                        Add User
+                        {windowWidth > 576 ? "Add User" : ""}
                       </Button>
                     )}
                     {activeTab === "roles" && (
@@ -644,16 +670,17 @@ const UserManagement = () => {
                             setArchivedSearchValue("");
                             fetchArchivedRoles("");
                           }}
-                          className="archive-btn"
+                          className={`archive-btn ${windowWidth <= 576 ? "icon-only-btn" : ""}`}
                         >
-                          View Archived
+                          {windowWidth > 576 ? "View Archived" : ""}
                         </Button>
                         <Button 
                           type="primary" 
                           icon={<PlusOutlined />} 
                           onClick={handleAddRole}
+                          className={windowWidth <= 576 ? "icon-only-btn" : ""}
                         >
-                          Add Role
+                          {windowWidth > 576 ? "Add Role" : ""}
                         </Button>
                       </>
                     )}
@@ -662,11 +689,12 @@ const UserManagement = () => {
               )
             }}
           >
-          <TabPane 
-            tab={<span><UserOutlined /> Users</span>} 
-            key="users"
-          >
-            <div className="table-meta-info">
+            <TabPane 
+              tab={<span><UserOutlined /> {windowWidth > 576 ? "Users" : ""}</span>} 
+              key="users"
+            >
+              {/* Users tab content */}
+              <div className="table-meta-info">
                 <span className="record-count">Total Users: {users.length}</span>
                 <div className="table-pagination">
                   <Pagination 
@@ -678,31 +706,32 @@ const UserManagement = () => {
                     size="small"
                   />
                 </div>
-            </div>
+              </div>
+              
+              <div className="table-container">
+                <Table 
+                  dataSource={getUserTableData()} 
+                  columns={userColumns} 
+                  rowKey="user_id"
+                  loading={loading}
+                  scroll={{ x: true, y: 400 }}
+                  pagination={false}
+                  bordered
+                  size="middle"
+                  showSorterTooltip={false}
+                  sortDirections={['ascend', 'descend']}
+                  onChange={handleTableChange}
+                  className="scrollable-table"
+                />
+              </div>
+            </TabPane>
 
-            <div className="table-container">
-              <Table 
-                dataSource={getUserTableData()} 
-                columns={userColumns} 
-                rowKey="user_id"
-                loading={loading}
-                scroll={{ x: 'max-content', y: 400 }}
-                pagination={false} // Disable default pagination
-                bordered
-                size="middle"
-                showSorterTooltip={false}
-                sortDirections={['ascend', 'descend']}
-                onChange={handleTableChange}
-                className="scrollable-table"
-              />
-            </div>
-          </TabPane>
-
-          <TabPane 
-            tab={<span><TeamOutlined /> Roles</span>} 
-            key="roles"
-          >
-            <div className="table-meta-info">
+            <TabPane 
+              tab={<span><TeamOutlined /> {windowWidth > 576 ? "Roles" : ""}</span>} 
+              key="roles"
+            >
+              {/* Roles tab content */}
+              <div className="table-meta-info">
                 <span className="record-count">Total Roles: {roles.length}</span>
                 <div className="table-pagination">
                   <Pagination 
@@ -714,26 +743,26 @@ const UserManagement = () => {
                     size="small"
                   />
                 </div>
-            </div>
-            <div className="table-container">
-              <Table 
-                dataSource={getRoleTableData()} 
-                columns={roleColumns} 
-                rowKey="role_id"
-                loading={loading}
-                scroll={{ x: 'max-content', y: 400 }}
-                pagination={false} // Disable default pagination
-                bordered
-                size="middle"
-                showSorterTooltip={false}
-                sortDirections={['ascend', 'descend']}
-                onChange={handleTableChange}
-                className="scrollable-table"
-              />
-            </div>
-          </TabPane>
-        </Tabs>
-
+              </div>
+              <div className="table-container">
+                <Table 
+                  dataSource={getRoleTableData()} 
+                  columns={roleColumns} 
+                  rowKey="role_id"
+                  loading={loading}
+                  scroll={{ x: true, y: 400 }}
+                  pagination={false}
+                  bordered
+                  size="middle"
+                  showSorterTooltip={false}
+                  sortDirections={['ascend', 'descend']}
+                  onChange={handleTableChange}
+                  className="scrollable-table"
+                />
+              </div>
+            </TabPane>
+          </Tabs>
+        </div>
         {/* User Modal */}
         <Modal
           title={modalMode === "add" ? "Add New User" : "Edit User"}
