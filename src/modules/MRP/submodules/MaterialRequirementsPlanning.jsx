@@ -675,7 +675,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
                         <div
                         style={{width: '100%',  display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto',}}>
-                            <button onClick={() => { setAdditionalCost(false), setIsOpen2(true); }} style={buttonStyle2('#fff')}>
+                            <button onClick={() => {if (isProjectType) {setIsOpen2(true);} else {setIsOpen3(true);}setAdditionalCost(false);}} style={buttonStyle2('#fff')}>
                                 <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
                                 <span style={{ color: '#969696' }}>Back</span>
                             </button>

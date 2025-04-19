@@ -120,10 +120,35 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             number.includes(term) ||
             date.includes(term) ||
             status.includes(term);
-      
+
           return matchesFlag && searchMatch;
         });
-      };
+    };
+
+    function printBOMContent() {
+        const printContents = document.getElementById("printable-bom").innerHTML;
+        const originalContents = document.body.innerHTML;
+        const originalScroll = window.scrollY;
+      
+        // Set body content to the printable section
+        document.body.innerHTML = printContents;
+      
+        // Optional: Set print-safe styles manually here if needed
+        document.body.style.margin = "0";
+        document.body.style.padding = "0";
+        document.body.style.overflow = "visible";
+        
+      
+        // Delay print to allow DOM re-render
+        setTimeout(() => {
+          window.print();
+      
+          // Restore the original document
+          document.body.innerHTML = originalContents;
+          window.scrollTo(0, originalScroll); // Restore scroll position
+          window.location.reload();
+        }, 200); // 200ms delay to let DOM reflow before printing
+    }
       
     const filteredData = getFilteredData();
     
@@ -197,10 +222,10 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
 
             {printBOM && (
-                <div className="bom-print-modal" onClick={(e) => e.stopPropagation()}>
+                <div id="printable-bom" className="bom-print-modal" onClick={(e) => e.stopPropagation()}>
                     <div className="bom-print-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="scroll-container">
-                            <div style={{width: 1128,height: dynamicHeight, position: 'relative', background: 'white', overflow: 'hidden'}}>
+                        <div className="scroll-container" style={{maxHeight: '90vh', overflowY: 'auto'}}>
+                            <div style={{width: 1128, position: 'relative', background: 'white'}}>
                                 <div style={{width: 1128, left: 0, top: 104, position: 'absolute'}} />
                                 <div style={{left: 663, top: 67, position: 'absolute', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                                     <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 387, display: 'flex'}}>
@@ -271,7 +296,10 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                     </div>
                                                 </div>
                                                 {bomDetails.map((item, index) => (
-                                                <div key={index} style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', display: 'inline-flex'}}>
+                                                <React.Fragment key={index}>
+                                                    <div
+                                                    className="print-row"
+                                                    style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', display: 'inline-flex'}}>
                                                     <div style={cellStyle(82)}>{item.no}</div>
                                                     <div style={cellStyle(145)}>{item.product}</div>
                                                     <div style={cellStyle(96)}>{item.qtyProduct}</div>
@@ -280,7 +308,12 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                     <div style={cellStyle(87)}>{item.unit}</div>
                                                     <div style={cellStyle(183)}>₱{item.costPerUnit.toLocaleString()}</div>
                                                     <div style={cellStyle(183)}>₱{item.totalCost.toLocaleString()}</div>
-                                                </div>
+                                                    </div>
+
+                                                    {(index + 1) % 3000 === 0 && (
+                                                    <div className="print-page-break" style={{ height: 1 }} />
+                                                    )}
+                                                </React.Fragment>
                                                 ))}
                                             </div>
                                         </div>
@@ -305,20 +338,19 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                             ))}
                                         </div>
                                     </div>
-                                    <button onClick={() => setPrintBOM(false)} style={{ marginTop: 30 }}><div style={{width: 115, height: 35, paddingTop: 8, paddingBottom: 8, paddingLeft: 72, paddingRight: 24, left: 52, position: 'absolute', background: 'white', overflow: 'hidden', borderRadius: 8, outline: '1.50px #A4A4A4 solid', outlineOffset: '-1.50px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                                        <div style={{width: 130, justifyContent: 'center', alignItems: 'center', gap: 13, display: 'inline-flex'}}>
-                                            <div style={{justifyContent: 'center', alignItems: 'center', gap: 0, display: 'inline-flex'}}>
-                                                <div className="MRPIcon3" style={{width: 15, height: 21, paddingRight: 25 }} />
-                                                <div style={{width: 90, paddingLeft: 0, paddingRight: 2, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                                                    <div style={{justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#969696', fontSize: 18, fontFamily: 'Inter', fontWeight: '500', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>back</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div></button>
-                                    <button onClick={() => {window.print();}}><div data-property-1="Disabled" style={{width: 140, height: 35, padding: 10, left: 935, position: 'absolute', background: '#00A8A8', borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 30, display: 'inline-flex'}}>
-                                        <div style={{color: 'white', fontSize: 17, fontFamily: 'Inter', fontWeight: '400', wordWrap: 'break-word'}}>Download</div>
-                                    </div></button>
-                                    
+                                </div>
+                                <div style={{width: '100%', marginTop: 30, display: 'flex', justifyContent: 'space-between', padding: '0 40px 40px 40px'}}>
+                                    <div className="print-button-container2">    
+                                    <button onClick={() => setPrintBOM(false)} style={{ background: '#fff', border: '1.5px solid #A4A4A4',borderRadius: 8, padding: '10px 24px', fontSize: 16, color: '#969696', fontWeight: '500', display: 'flex', alignItems: 'center', gap: 8}}>
+                                        <div className="MRPIcon3" style={{ width: 15, height: 21 }} />
+                                        Back
+                                    </button>
+                                    </div>
+                                    <div className="print-button-container">                
+                                    <button onClick={printBOMContent} style={{background: '#00A8A8', border: 'none', borderRadius: 10, padding: '10px 24px', fontSize: 16, color: 'white', fontWeight: '500'}}>
+                                        Download
+                                    </button>
+                                    </div>
                                 </div>
                                 <img style={{width: 132.34, height: 196, left: 91, top: 170, position: 'absolute'}} src="/icons/module-icons/MRP-icons/MRPBOMLogo.png" />
                             </div>
