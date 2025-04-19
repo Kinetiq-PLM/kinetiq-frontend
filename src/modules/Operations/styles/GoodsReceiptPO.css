@@ -1,11 +1,17 @@
-.grpo {
+.goods-r-po {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
 
-.grpo .body-content-container {
+
+
+
+
+
+
+.goods-r-po .body-content-container {
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
@@ -20,7 +26,13 @@
 }
 
 
-.content-wrapper {
+
+
+
+
+
+
+.goods-r-po .content-wrapper {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -33,7 +45,13 @@
 }
 
 
-.back-button {
+
+
+
+
+
+
+.goods-r-po .back-button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -45,7 +63,13 @@
 }
 
 
-.details-grid {
+
+
+
+
+
+
+.goods-r-po .details-grid {
   display: grid;
   grid-template-columns: 250px 1fr;
   gap: 0.75rem;
@@ -54,7 +78,13 @@
 }
 
 
-.details-section {
+
+
+
+
+
+
+.goods-r-po .details-section {
   background: white;
   padding: 0.75rem;
   border-radius: 0.375rem;
@@ -63,7 +93,13 @@
 }
 
 
-.detail-row {
+
+
+
+
+
+
+.goods-r-po .detail-row {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
@@ -71,20 +107,38 @@
 }
 
 
-.detail-row:last-child {
+
+
+
+
+
+
+.goods-r-po .detail-row:last-child {
   margin-bottom: 0;
 }
 
 
-.detail-row label {
+
+
+
+
+
+
+.goods-r-po .detail-row label {
   color: #4B5563;
   font-size: 0.75rem;
 }
 
 
-.detail-row input,
-.detail-row select,
-.date-input input {
+
+
+
+
+
+
+.goods-r-po .detail-row input,
+.goods-r-po .detail-row select,
+.goods-r-po .date-input input {
   width: 100%;
   padding: 0.15rem 0.4rem;
   border: 1px solid #E5E7EB;
@@ -96,19 +150,52 @@
 }
 
 
-.tabbed-section {
+.goods-r-po .dropdown-scrollbar select::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+
+.goods-r-po .dropdown-scrollbar select::-webkit-scrollbar-thumb {
+  background: #0d9488;
+  border-radius: 3px;
+}
+
+
+.goods-r-po .dropdown-scrollbar select::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+
+
+
+
+
+.goods-r-po .tabbed-section {
   padding: 0 !important;
 }
 
 
-.section-tabs {
+
+
+
+
+
+
+.goods-r-po .section-tabs {
   display: flex;
   border-bottom: 1px solid #E5E7EB;
   background: #F9FAFB;
 }
 
 
-.tab-button {
+
+
+
+
+
+
+.goods-r-po .tab-button {
   flex: 1;
   padding: 0.5rem;
   background: none;
@@ -120,13 +207,25 @@
 }
 
 
-.tab-button.active {
+
+
+
+
+
+
+.goods-r-po .tab-button.active {
   color: #0d9488;
   background: white;
 }
 
 
-.tab-button.active::after {
+
+
+
+
+
+
+.goods-r-po .tab-button.active::after {
   content: '';
   position: absolute;
   bottom: -1px;
@@ -137,7 +236,13 @@
 }
 
 
-.tab-content {
+
+
+
+
+
+
+.goods-r-po .tab-content {
   padding: 0.5rem;
   background: white;
   display: grid;
@@ -147,7 +252,13 @@
 }
 
 
-.tab-content.cost-details {
+
+
+
+
+
+
+.goods-r-po .tab-content.cost-details {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.4rem 1rem;
@@ -155,12 +266,24 @@
 }
 
 
-.tab-content.cost-details .detail-row {
+
+
+
+
+
+
+.goods-r-po .tab-content.cost-details .detail-row {
   margin-bottom: 0.25rem;
 }
 
 
-.operation_table_container {
+
+
+
+
+
+
+.goods-r-po .operation_table_container {
   width: 100%;
   margin-top: 0.5rem;
   position: relative;
@@ -168,7 +291,13 @@
 }
 
 
-.grpo-table {
+
+
+
+
+
+
+.goods-r-po .grpo-table {
   min-width: 100%;
   height: 100%;
   overflow: auto;
@@ -180,24 +309,48 @@
 }
 
 
-.grpo-table::-webkit-scrollbar {
+
+
+
+
+
+
+.goods-r-po .grpo-table::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 
-.grpo-table::-webkit-scrollbar-thumb {
+
+
+
+
+
+
+.goods-r-po .grpo-table::-webkit-scrollbar-thumb {
   background: #0d9488;
   border-radius: 3px;
 }
 
 
-.grpo-table::-webkit-scrollbar-track {
+
+
+
+
+
+
+.goods-r-po .grpo-table::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
 
 
-.table-container {
+
+
+
+
+
+
+.goods-r-po .table-container {
   margin-top: 1rem;
   flex: 1;
   min-height: 0;
@@ -206,14 +359,26 @@
 }
 
 
-.table-container table {
+
+
+
+
+
+
+.goods-r-po .table-container table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
 }
 
 
-.table-container thead {
+
+
+
+
+
+
+.goods-r-po .table-container thead {
   position: sticky;
   top: 0;
   z-index: 1;
@@ -221,7 +386,13 @@
 }
 
 
-.table-container th {
+
+
+
+
+
+
+.goods-r-po .table-container th {
   text-align: left;
   padding: 1rem;
   background-color: #f8fafc;
@@ -231,7 +402,13 @@
 }
 
 
-.table-container td {
+
+
+
+
+
+
+.goods-r-po .table-container td {
   padding: 1rem;
   border-bottom: 1px solid #e2e8f0;
   color: #334155;
@@ -239,122 +416,245 @@
 }
 
 
-.table-container tbody tr:hover {
+
+
+
+
+
+
+.goods-r-po .table-container tbody tr:hover {
   background-color: #f8fafc;
 }
 
 
-.materials-table {
+
+
+
+
+
+
+.goods-r-po .materials-table {
   width: 100%;
   min-width: 1200px;
   border-collapse: collapse;
 }
 
 
-.materials-table th,
-.materials-table td {
+
+
+
+
+
+
+.goods-r-po .materials-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #F9FAFB;
+}
+
+
+
+
+
+
+
+
+.goods-r-po .materials-table th,
+.goods-r-po .materials-table td {
   padding: 0.25rem 0.75rem;
   text-align: left;
   border-bottom: 1px solid #E5E7EB;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 0.9rem;
   height: 32px;
   vertical-align: middle;
+  line-height: 1.7;
 }
 
 
-.materials-table th {
+
+
+
+
+
+
+.goods-r-po .materials-table th {
   background-color: #F9FAFB;
   font-weight: 500;
   color: #374151;
 }
 
 
-.materials-table td {
+
+
+
+
+
+
+.goods-r-po .materials-table td {
   color: #4B5563;
 }
 
 
-.table-header .materials-table th:nth-child(1),
-.table-body .materials-table td:nth-child(1) {
+
+
+
+
+
+
+.goods-r-po .table-header .materials-table th:nth-child(1),
+.goods-r-po .table-body .materials-table td:nth-child(1) {
   width: 60px; /* No. */
 }
 
 
-.table-header .materials-table th:nth-child(2),
-.table-body .materials-table td:nth-child(2) {
+
+
+
+
+
+
+.goods-r-po .table-header .materials-table th:nth-child(2),
+.goods-r-po .table-body .materials-table td:nth-child(2) {
   width: 120px; /* Material ID */
 }
 
 
-.table-header .materials-table th:nth-child(3),
-.table-body .materials-table td:nth-child(3),
-.table-header .materials-table th:nth-child(4),
-.table-body .materials-table td:nth-child(4) {
+
+
+
+
+
+
+.goods-r-po .table-header .materials-table th:nth-child(3),
+.goods-r-po .table-body .materials-table td:nth-child(3),
+.goods-r-po .table-header .materials-table th:nth-child(4),
+.goods-r-po .table-body .materials-table td:nth-child(4) {
   width: 200px; /* Item Name & Material Name */
 }
 
 
-.table-header .materials-table th:nth-child(5),
-.table-body .materials-table td:nth-child(5) {
+
+
+
+
+
+
+.goods-r-po .table-header .materials-table th:nth-child(5),
+.goods-r-po .table-body .materials-table td:nth-child(5) {
   width: 80px; /* UoM */
 }
 
 
-.table-header .materials-table th:nth-child(6),
-.table-body .materials-table td:nth-child(6) {
+
+
+
+
+
+
+.goods-r-po .table-header .materials-table th:nth-child(6),
+.goods-r-po .table-body .materials-table td:nth-child(6) {
   width: 100px; /* Quantity */
 }
 
 
-.table-header .materials-table th:nth-child(7),
-.table-body .materials-table td:nth-child(7),
-.table-header .materials-table th:nth-child(8),
-.table-body .materials-table td:nth-child(8) {
+
+
+
+
+
+
+.goods-r-po .table-header .materials-table th:nth-child(7),
+.goods-r-po .table-body .materials-table td:nth-child(7),
+.goods-r-po .table-header .materials-table th:nth-child(8),
+.goods-r-po .table-body .materials-table td:nth-child(8) {
   width: 120px; /* Cost Per Unit & Total */
 }
 
 
-.table-header .materials-table th:nth-child(9),
-.table-body .materials-table td:nth-child(9),
-.table-header .materials-table th:nth-child(10),
-.table-body .materials-table td:nth-child(10) {
+
+
+
+
+
+
+.goods-r-po .table-header .materials-table th:nth-child(9),
+.goods-r-po .table-body .materials-table td:nth-child(9),
+.goods-r-po .table-header .materials-table th:nth-child(10),
+.goods-r-po .table-body .materials-table td:nth-child(10) {
   width: 150px; /* Manufacturing Date & Expiry Date */
 }
 
 
-.table-header .materials-table th:nth-child(11),
-.table-body .materials-table td:nth-child(11) {
+
+
+
+
+
+
+.goods-r-po .table-header .materials-table th:nth-child(11),
+.goods-r-po .table-body .materials-table td:nth-child(11) {
   width: 150px; /* Warehouse Location */
 }
 
 
-.table-header .materials-table th:nth-child(12),
-.table-body .materials-table td:nth-child(12) {
+
+
+
+
+
+
+.goods-r-po .table-header .materials-table th:nth-child(12),
+.goods-r-po .table-body .materials-table td:nth-child(12) {
   width: 120px; /* Serial No. */
 }
 
 
-.materials-table tbody tr:hover td {
+
+
+
+
+
+
+.goods-r-po .materials-table tbody tr:hover td {
   background: #f8fafc;
 }
 
 
-.button-section {
+
+
+
+
+
+
+.goods-r-po .button-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 
-.right-buttons {
+
+
+
+
+
+
+.goods-r-po .right-buttons {
   display: flex;
   gap: 0.75rem;
 }
 
 
-.copy-from-button,
-.cancel-button {
+
+
+
+
+
+
+.goods-r-po .copy-from-button,
+.goods-r-po .cancel-button {
   padding: 0.5rem 1rem;
   border: 1px solid #E5E7EB;
   background: white;
@@ -365,13 +665,25 @@
 }
 
 
-.copy-from-button:hover,
-.cancel-button:hover {
+
+
+
+
+
+
+.goods-r-po .copy-from-button:hover,
+.goods-r-po .cancel-button:hover {
   background: #F9FAFB;
 }
 
 
-.send-to-button {
+
+
+
+
+
+
+.goods-r-po .send-to-button {
   padding: 0.5rem 1rem;
   background: #0d9488;
   border: none;
@@ -382,12 +694,24 @@
 }
 
 
-.send-to-button:hover {
+
+
+
+
+
+
+.goods-r-po .send-to-button:hover {
   background: #0f766e;
 }
 
 
-.teal-checkbox {
+
+
+
+
+
+
+.goods-r-po .teal-checkbox {
   appearance: none;
   width: 1rem;
   height: 1rem;
@@ -399,12 +723,24 @@
 }
 
 
-.teal-checkbox:checked {
+
+
+
+
+
+
+.goods-r-po .teal-checkbox:checked {
   background: #0d9488;
 }
 
 
-.teal-checkbox:checked::after {
+
+
+
+
+
+
+.goods-r-po .teal-checkbox:checked::after {
   content: '';
   position: absolute;
   left: 4px;
@@ -417,7 +753,13 @@
 }
 
 
-.date-input {
+
+
+
+
+
+
+.goods-r-po .date-input {
   position: relative;
   display: flex;
   align-items: center;
@@ -425,18 +767,36 @@
 }
 
 
-.date-input.clickable {
+
+
+
+
+
+
+.goods-r-po .date-input.clickable {
   cursor: pointer;
 }
 
 
-.date-input.clickable input {
+
+
+
+
+
+
+.goods-r-po .date-input.clickable input {
   cursor: pointer;
   color: #374151;
 }
 
 
-.date-input input[type="date"] {
+
+
+
+
+
+
+.goods-r-po .date-input input[type="date"] {
   padding-right: 2.5rem;
   width: 100%;
   border: 1px solid #E5E7EB;
@@ -447,7 +807,13 @@
 }
 
 
-.date-input input[type="date"]::-webkit-calendar-picker-indicator {
+
+
+
+
+
+
+.goods-r-po .date-input input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
   width: 100%;
   height: 100%;
@@ -458,7 +824,13 @@
 }
 
 
-.calendar-icon {
+
+
+
+
+
+
+.goods-r-po .calendar-icon {
   position: absolute;
   right: 0.75rem;
   color: #6B7280;
@@ -468,7 +840,13 @@
 }
 
 
-.form-select {
+
+
+
+
+
+
+.goods-r-po .form-select {
   appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
@@ -478,157 +856,29 @@
 }
 
 
-.table-section,
-.table-header,
-.table-body {
+
+
+
+
+
+
+.goods-r-po .table-section,
+.goods-r-po .table-header,
+.goods-r-po .table-body {
   display: none;
 }
 
 
-.serial-dots-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  color: #374151;
-  padding: 0 4px;
-}
 
 
-.serial-dots-button:hover {
-  color: #0d9488;
-}
 
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
 
 
-.serial-modal {
-  background: white;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
 
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #E5E7EB;
-}
 
 
-.modal-header h3 {
-  margin: 0;
-  color: #374151;
-  font-size: 1.125rem;
-}
-
-
-.close-button {
-  background: #f3f4f6;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  color: #374151;
-  font-size: 0.875rem;
-}
-
-
-.close-button:hover {
-  background: #e5e7eb;
-}
- 
-.modal-content {
-  padding: 1rem;
-  overflow-y: auto;
-  max-height: 400px;
-}
-
-
-.modal-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-
-.modal-content::-webkit-scrollbar-thumb {
-  background: #0d9488;
-  border-radius: 4px;
-}
-
-
-.modal-content::-webkit-scrollbar-track {
-  background: #ddd;
-}
-
-
-.serial-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-  table-layout: fixed;
-}
-
-
-.serial-table thead {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background-color: #F9FAFB;
-}
-
-
-.serial-table th,
-.serial-table td {
-  padding: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid #E5E7EB;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-.serial-table th:nth-child(1) { width: 10%; }  /* No. column */
-.serial-table th:nth-child(2) { width: 20%; }  /* Item ID column */
-.serial-table th:nth-child(3) { width: 35%; }  /* Item Name column */
-.serial-table th:nth-child(4) { width: 35%; }  /* Serial No. column */
-
-
-.serial-table th {
-  background-color: #F9FAFB;
-  font-weight: 500;
-  color: #374151;
-}
-
-
-.serial-table tr:hover {
-  background-color: #F9FAFB;
-}
-
-
-.serial-table td {
-  color: #4B5563;
-}
 
 
 

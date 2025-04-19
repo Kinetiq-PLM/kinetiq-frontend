@@ -21,47 +21,52 @@ const Table = ({ columns, data, enableCheckbox }) => {
     };
 
     return (
-        <div className={`table-container ${enableCheckbox ? 'checkbox-enabled' : ''}`}>
-            <table>
-                <thead>
-                    <tr>
-                        {enableCheckbox && <th></th>}
-                        {columns.map((column, index) => (
-                            <th key={index}>{column}</th>
-                        ))}
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {data.map((row, rowIndex) => (
-                        <tr key={rowIndex}>
-                            {enableCheckbox && (
-                                <td>
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRows.includes(rowIndex)}
-                                        onChange={() => handleCheckboxChange(rowIndex)}
-                                    />
-                                </td>
-                            )}
-                            {row.map((cell, cellIndex) => {
-                                // Check if this column is the "Status" column
-                                const isStatusColumn = columns[cellIndex] === "Status";
-                                // Check if this cell is a number and format it
-                                const formattedCell = formatNumber(cell);
-
-                                return (
-                                    <td key={cellIndex} className={isStatusColumn ? "status-cell" : ""}>
-                                        <div className={isStatusColumn ? (cell === "Active" ? "status-active" : "status-inactive") : ""}>
-                                            {isStatusColumn ? cell : formattedCell}
-                                        </div>
-                                    </td>
-                                );
-                            })}
+        <div className="accounting-table">
+            <div className={`table-container ${enableCheckbox ? 'checkbox-enabled' : ''}`}>
+                <table>
+                    <thead>
+                        <tr>
+                            {enableCheckbox && <th></th>}
+                            {columns.map((column, index) => (
+                                <th key={index}>{column}</th>
+                            ))}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        {data.map((row, rowIndex) => (
+                            <tr
+                            key={rowIndex}
+                            className={selectedRows.includes(rowIndex) ? "selected-row" : ""}
+                          >                          
+                                {enableCheckbox && (
+                                    <td>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedRows.includes(rowIndex)}
+                                            onChange={() => handleCheckboxChange(rowIndex)}
+                                        />
+                                    </td>
+                                )}
+                                {row.map((cell, cellIndex) => {
+                                    // Check if this column is the "Status" column
+                                    const isStatusColumn = columns[cellIndex] === "Status";
+                                    // Check if this cell is a number and format it
+                                    const formattedCell = formatNumber(cell);
+
+                                    return (
+                                        <td key={cellIndex} className={isStatusColumn ? "status-cell" : ""}>
+                                            <div className={isStatusColumn ? (cell === "Active" ? "status-active" : "status-inactive") : ""}>
+                                                {isStatusColumn ? cell : formattedCell}
+                                            </div>
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

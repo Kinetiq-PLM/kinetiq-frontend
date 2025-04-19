@@ -74,8 +74,8 @@ const Departments = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/departments/"),
-        axios.get("http://127.0.0.1:8000/api/departments/archived/"),
+        axios.get("http://127.0.0.1:8000/api/departments/department/"),
+        axios.get("http://127.0.0.1:8000/api/departments/department/archived/"),
       ]);
       setDepartments(activeRes.data);
       setArchivedDepartments(archivedRes.data);
@@ -94,8 +94,8 @@ const Departments = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/department_superiors/"),
-        axios.get("http://127.0.0.1:8000/api/department_superiors/archived/"),
+        axios.get("http://127.0.0.1:8000/api/department_superiors/department-superiors/"),
+        axios.get("http://127.0.0.1:8000/api/department_superiors/department-superiors/archived/"),
       ]);
       setSuperiors(activeRes.data);
       setArchivedSuperiors(archivedRes.data);
@@ -112,11 +112,13 @@ const Departments = () => {
    **************************************/
   const fetchPositions = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/positions/");
-      setPositions(res.data);
+      // const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/admin/positions/position/");
+      const res = await axios.get("http://127.0.0.1:8000/api/positions/positions/");
+      setPositions(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Fetch positions error:", err);
       showToast("Failed to fetch positions for autofill", false);
+      setPositions([]); // Set to empty array on error
     }
   };
 
@@ -137,32 +139,50 @@ const Departments = () => {
     };
   };
   const handleSearch = debounce((value) => {
-    setSearchTerm(value.toLowerCase());
+    setSearchTerm((value || '').toLowerCase());
     setCurrentPage(1);
   }, 300);
 
   /**************************************
    * 4) Filter + Sort + Paginate
    **************************************/
+  // Update the filterAndPaginate function to handle undefined values
   const filterAndPaginate = (data, sortField) => {
-    const term = searchTerm.toLowerCase();
-    let filtered = data.filter((item) =>
-      Object.values(item).some((val) => val?.toString().toLowerCase().includes(term))
-    );
-
-    // Sorting example
+    // Handle undefined or null data
+    if (!data || !Array.isArray(data)) {
+      return { data: [], totalPages: 0, totalFiltered: 0 };
+    }
+    
+    // Handle undefined searchTerm
+    const term = (searchTerm || '').toLowerCase();
+    
+    let filtered = data.filter(item => {
+      if (!item) return false;
+      return Object.values(item).some(val => {
+        if (val == null) return false;
+        try {
+          return val.toString().toLowerCase().includes(term);
+        } catch (err) {
+          return false;
+        }
+      });
+    });
+  
+    // Sorting
     if (sortField !== "all") {
       filtered.sort((a, b) => {
-        const valA = a[sortField]?.toString().toLowerCase() || "";
-        const valB = b[sortField]?.toString().toLowerCase() || "";
+        if (!a || !b) return 0;
+        const valA = a[sortField] != null ? a[sortField].toString().toLowerCase() : '';
+        const valB = b[sortField] != null ? b[sortField].toString().toLowerCase() : '';
         return valA.localeCompare(valB);
       });
     }
-
+    
     // Pagination
     const start = (currentPage - 1) * itemsPerPage;
     const paginated = filtered.slice(start, start + itemsPerPage);
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+    
     return {
       data: paginated,
       totalPages,
@@ -186,7 +206,8 @@ const Departments = () => {
     // if you need to handle newDeptId, do so here
     try {
       // If your backend auto-generates dept_id, you can just pass dept_name
-      await axios.post("http://127.0.0.1:8000/api/departments/", { dept_name: newDeptName });
+      // await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/admin/departments/department/", { dept_name: newDeptName });
+      await axios.post("http://127.0.0.1:8000/api/departments/department/", { dept_name: newDeptName });
       setShowDeptModal(false);
       showToast("Department added successfully");
       fetchDepartments();
@@ -207,7 +228,7 @@ const Departments = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.patch(`http://127.0.0.1:8000/api/departments/${editingDept.dept_id}/`, {
+      await axios.patch(`http://127.0.0.1:8000/api/departments/department/${editingDept.dept_id}/`, {
         dept_name: editingDept.dept_name,
       });
       setShowEditModal(false);
@@ -223,7 +244,7 @@ const Departments = () => {
   const handleDeptArchive = async (id) => {
     if (!window.confirm("Archive this department?")) return;
     try {
-      await axios.post(`http://127.0.0.1:8000/api/departments/${id}/archive/`);
+      await axios.post(`http://127.0.0.1:8000/api/departments/department/${id}/archive/`);
       showToast("Department archived successfully");
       fetchDepartments();
     } catch (err) {
@@ -238,7 +259,7 @@ const Departments = () => {
   };
   const handleDeptUnarchive = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/departments/${id}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8000/api/departments/department/${id}/unarchive/`);
       setShowConfirmUnarchive(null);
       showToast("Department unarchived successfully");
       fetchDepartments();
@@ -257,7 +278,7 @@ const Departments = () => {
   const bulkUnarchive = async () => {
     try {
       await Promise.all(
-        selectedArchived.map((id) => axios.post(`http://127.0.0.1:8000/api/departments/${id}/unarchive/`))
+        selectedArchived.map((id) => axios.post(`http://127.0.0.1:8000/api/departments/department/${id}/unarchive/`))
       );
       showToast("Departments unarchived successfully");
       setSelectedArchived([]);
@@ -284,13 +305,22 @@ const Departments = () => {
   const submitSuperiorModal = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://127.0.0.1:8000/api/department_superiors/", newSuperior);
+      const formData = {
+        dept_name: newSuperior.dept_name,
+        position_title: newSuperior.position_title,
+        hierarchy_level: parseInt(newSuperior.hierarchy_level),
+        is_archived: false
+      };
+
+      await axios.post("http://127.0.0.1:8000/api/department_superiors/department-superiors/", formData);
+      
       setShowSuperiorModal(false);
       showToast("Department superior added successfully");
       fetchDepartmentSuperiors();
     } catch (err) {
       console.error("Add superior error:", err);
-      showToast("Failed to add department superior", false);
+      const errorMsg = err.response?.data?.detail || "Failed to add department superior";
+      showToast(errorMsg, false);
     }
   };
 
@@ -308,20 +338,21 @@ const Departments = () => {
   const handleSuperiorEditSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formData = {
+        hierarchy_level: parseInt(editingSuperior.hierarchy_level) // Only update hierarchy_level
+      };
+
       await axios.patch(
-        `http://127.0.0.1:8000/api/department_superiors/${editingSuperior.dept_superior_id}/`,
-        {
-          dept_name: editingSuperior.dept_name,
-          position_title: editingSuperior.position_title,
-          hierarchy_level: parseInt(editingSuperior.hierarchy_level),
-        }
+        `http://127.0.0.1:8000/api/department_superiors/department-superiors/${editingSuperior.dept_superior_id}/`,
+        formData
       );
       setShowEditSuperiorModal(false);
       showToast("Department superior updated successfully");
       fetchDepartmentSuperiors();
     } catch (err) {
       console.error("Update superior error:", err);
-      showToast("Failed to update department superior", false);
+      const errorMsg = err.response?.data?.detail || "Failed to update department superior";
+      showToast(errorMsg, false);
     }
   };
 
@@ -334,7 +365,7 @@ const Departments = () => {
 
     if (!window.confirm("Archive this department superior?")) return;
     try {
-      await axios.post(`http://127.0.0.1:8000/api/department_superiors/${id}/archive/`);
+      await axios.post(`http://127.0.0.1:8000/api/department_superiors/department-superiors/${id}/archive/`);
       showToast("Department superior archived successfully");
       fetchDepartmentSuperiors();
     } catch (err) {
@@ -349,7 +380,7 @@ const Departments = () => {
   };
   const handleSuperiorUnarchive = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/department_superiors/${id}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8000/api/department_superiors/department-superiors/${id}/unarchive/`);
       setShowConfirmUnarchiveSuperior(null);
       showToast("Department superior unarchived successfully");
       fetchDepartmentSuperiors();
@@ -369,7 +400,7 @@ const Departments = () => {
     try {
       await Promise.all(
         selectedSuperiorArchived.map((id) =>
-          axios.post(`http://127.0.0.1:8000/api/department_superiors/${id}/unarchive/`)
+          axios.post(`http://127.0.0.1:8000/api/department_superiors/department-superiors/${id}/unarchive/`)
         )
       );
       showToast("Department superiors unarchived successfully");
@@ -388,12 +419,14 @@ const Departments = () => {
   /**************************************
    * RENDER TABLES
    **************************************/
-  const renderDeptTable = (rawData, isArchived = false) => {
-    const { data, totalPages, totalFiltered } = filterAndPaginate(rawData, sortField);
-    if (loading) return <div className="hr-no-results">Loading departments...</div>;
-    if (totalFiltered === 0) return <div className="hr-no-results">No departments found.</div>;
+// Update renderDeptTable function
+const renderDeptTable = (rawData, isArchived = false) => {
+  const { data, totalPages, totalFiltered } = filterAndPaginate(rawData, sortField);
+  if (loading) return <div className="hr-no-results">Loading departments...</div>;
+  if (totalFiltered === 0) return <div className="hr-no-results">No departments found.</div>;
 
-    return (
+  return (
+    <>
       <div className="hr-department-no-scroll-wrapper">
         <div className="hr-department-table-scrollable">
           <table className="hr-department-table hr-department-no-scroll-table">
@@ -456,154 +489,158 @@ const Departments = () => {
               ))}
             </tbody>
           </table>
-
-          {/* Pagination */}
-          <div className="hr-pagination">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={i + 1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <select
-              className="hr-pagination-size"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(parseInt(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
-          </div>
         </div>
       </div>
-    );
-  };
+      
+      {/* Pagination moved outside */}
+      <div className="hr-pagination">
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            className={i + 1 === currentPage ? "active" : ""}
+            onClick={() => setCurrentPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <select
+          className="hr-pagination-size"
+          value={itemsPerPage}
+          onChange={(e) => {
+            setItemsPerPage(parseInt(e.target.value));
+            setCurrentPage(1);
+          }}
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+        </select>
+      </div>
+    </>
+  );
+};
 
-  const renderSuperiorTable = (rawData, isArchived = false) => {
-    const { data, totalPages, totalFiltered } = filterAndPaginate(rawData, sortField);
-    if (loading) return <div className="hr-no-results">Loading department superiors...</div>;
-    if (totalFiltered === 0) return <div className="hr-no-results">No department superiors found.</div>;
+const renderSuperiorTable = (rawData, isArchived = false) => {
+  const { data, totalPages, totalFiltered } = filterAndPaginate(rawData, sortField);
+  if (loading) return <div className="hr-no-results">Loading department superiors...</div>;
+  if (totalFiltered === 0) return <div className="hr-no-results">No department superiors found.</div>;
 
-    return (
+  return (
+    <>
       <div className="hr-department-table-wrapper">
         <div className="hr-department-table-scrollable">
-          <table className="hr-department-table">
-            <thead>
-              <tr>
-                {isArchived && <th>Select</th>}
-                <th>Dept Superior ID</th>
-                <th>Department ID</th>
-                <th>Department Name</th>
-                <th>Position ID</th>
-                <th>Position Title</th>
-                <th>Employee ID</th>
-                <th>Superior Name</th>
-                <th>Phone</th>
-                <th>Employee Status</th>
-                <th>Hierarchy Level</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((sup, index) => (
-                <tr key={sup.dept_superior_id} className={isArchived ? "hr-archived-row" : ""}>
-                  {isArchived && (
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedSuperiorArchived.includes(sup.dept_superior_id)}
-                        onChange={() => toggleSelectSuperiorArchived(sup.dept_superior_id)}
-                      />
-                    </td>
-                  )}
-                  <td>{sup.dept_superior_id}</td>
-                  <td>{sup.dept_id}</td>
-                  <td>{sup.dept_name}</td>
-                  <td>{sup.position_id}</td>
-                  <td>{sup.position_title}</td>
-                  <td>{sup.employee_id}</td>
-                  <td>{sup.superior_name}</td>
-                  <td>{sup.phone}</td>
-                  <td>{sup.employee_status}</td>
+        <table className="hr-department-table">
+          <thead>
+            <tr>
+              {isArchived && <th>Select</th>}
+              <th>Dept Superior ID</th>
+              <th>Department ID</th>
+              <th>Department Name</th>
+              <th>Position ID</th>
+              <th>Position Title</th>
+              <th>Employee ID</th>
+              <th>Superior Name</th>
+              <th>Phone</th>
+              <th>Employee Status</th>
+              <th>Hierarchy Level</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((sup, index) => (
+              <tr key={sup.dept_superior_id} className={isArchived ? "hr-archived-row" : ""}>
+                {isArchived && (
                   <td>
-                    <span className={`hr-tag level-${sup.hierarchy_level}`}>
-                      {sup.hierarchy_level}
-                    </span>
+                    <input
+                      type="checkbox"
+                      checked={selectedSuperiorArchived.includes(sup.dept_superior_id)}
+                      onChange={() => toggleSelectSuperiorArchived(sup.dept_superior_id)}
+                    />
                   </td>
-                  <td className="hr-department-actions">
-                    <div
-                      className="hr-department-dots"
-                      onClick={() =>
-                        setSuperDropdownOpen(superDropdownOpen === index ? null : index)
-                      }
-                    >
-                      ⋮
-                      {superDropdownOpen === index && (
-                        <div className="hr-department-dropdown">
+                )}
+                <td>{sup.dept_superior_id}</td>
+                <td>{sup.dept_id}</td>
+                <td>{sup.dept_name}</td>
+                <td>{sup.position_id}</td>
+                <td>{sup.position_title}</td>
+                <td>{sup.employee_id}</td>
+                <td>{sup.superior_name}</td>
+                <td>{sup.phone}</td>
+                <td>{sup.employee_status}</td>
+                <td>
+                  <span className={`hr-tag level-${sup.hierarchy_level}`}>
+                    {sup.hierarchy_level}
+                  </span>
+                </td>
+                <td className="hr-department-actions">
+                  <div
+                    className="hr-department-dots"
+                    onClick={() =>
+                      setSuperDropdownOpen(superDropdownOpen === index ? null : index)
+                    }
+                  >
+                    ⋮
+                    {superDropdownOpen === index && (
+                      <div className="hr-department-dropdown">
+                        <div
+                          className="hr-department-dropdown-item"
+                          onClick={() => openEditSuperiorModal(sup)}
+                        >
+                          Edit
+                        </div>
+                        {!isArchived ? (
                           <div
                             className="hr-department-dropdown-item"
-                            onClick={() => openEditSuperiorModal(sup)}
+                            onClick={() => handleSuperiorArchive(sup.dept_superior_id)}
                           >
-                            Edit
+                            Archive
                           </div>
-                          {!isArchived ? (
-                            <div
-                              className="hr-department-dropdown-item"
-                              onClick={() => handleSuperiorArchive(sup.dept_superior_id)}
-                            >
-                              Archive
-                            </div>
-                          ) : (
-                            <div
-                              className="hr-department-dropdown-item"
-                              onClick={() => confirmUnarchiveSuperior(sup.dept_superior_id)}
-                            >
-                              Unarchive
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {/* Pagination */}
-          <div className="hr-pagination">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={i + 1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
+                        ) : (
+                          <div
+                            className="hr-department-dropdown-item"
+                            onClick={() => confirmUnarchiveSuperior(sup.dept_superior_id)}
+                          >
+                            Unarchive
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </td>
+              </tr>
             ))}
-            <select
-              className="hr-pagination-size"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(parseInt(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
-          </div>
+          </tbody>
+        </table>
         </div>
       </div>
-    );
-  };
+
+      {/* Pagination moved outside */}
+      <div className="hr-pagination">
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            className={i + 1 === currentPage ? "active" : ""}
+            onClick={() => setCurrentPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <select
+          className="hr-pagination-size"
+          value={itemsPerPage}
+          onChange={(e) => {
+            setItemsPerPage(parseInt(e.target.value));
+            setCurrentPage(1);
+          }}
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+        </select>
+      </div>
+    </>
+  );
+};
 
   /**************************************
    * RENDER
@@ -833,11 +870,11 @@ const Departments = () => {
                     required
                   >
                     <option value="">-- Select --</option>
-                    {positions.map((pos) => (
+                    {Array.isArray(positions) ? positions.map((pos) => (
                       <option key={pos.position_id} value={pos.position_title}>
                         {pos.position_title}
                       </option>
-                    ))}
+                    )) : <option value="">Loading positions...</option>}
                   </select>
                 </div>
 

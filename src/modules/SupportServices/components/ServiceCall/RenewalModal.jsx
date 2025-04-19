@@ -74,7 +74,7 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
   // fetches a list of techs
   const fetchContracts = async () => {
       try {
-        const response = await GET(`contracts/${productId}/${customerId}/`);
+        const response = await GET(`contract/contracts/${productId}/${customerId}/`);
         console.log("contracts", response)
         setContracts(response);
       } catch (error) {
@@ -240,7 +240,6 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
                       type="text"
                       id="contractId"
                       value={contractId}
-                      readOnly
                       onChange={(e) => {
                         setContractId(e.target.value);
                         setOpenContractDD(true);
@@ -270,7 +269,7 @@ const RenewalModal = ({ isOpen, onClose, onSubmit, callData }) => {
                   </div>
                 
                 <div className="form-group">
-                <label htmlFor="duration">Duration <span className="required">*</span> </label>
+                <label htmlFor="duration">Duration in years <span className="required">*</span> </label>
                 <input
                   type="text"
                   id="duration"

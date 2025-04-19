@@ -1104,9 +1104,6 @@
   cursor: pointer;
 }
 
-/* ShipmentModal.css - Specific styling for the shipment modal component
-   All selectors must use the .shipment namespace to avoid style leaking */
-
 /* Modal Base Styling */
 .shipment .modal-overlay {
   position: fixed;

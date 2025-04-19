@@ -1,0 +1,563 @@
+.purchord {
+  display: flex;
+  width: 100%;
+  height: auto;
+}
+
+.purchord .body-content-container {
+  width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+}
+
+.po-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.po-confirm-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+}
+
+.po-confirm-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.confirm-yes,
+.confirm-no {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.confirm-yes {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.confirm-no {
+  background-color: #f44336;
+  color: white;
+}
+.purchord-qc-button {
+  margin-left: 1rem;
+  padding: 6px 12px;
+  background-color: #3c91e6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.purchord-qc-form label {
+  display: block;
+  margin: 10px 0;
+}
+
+.purchord-qc-form input,
+.purchord-qc-form textarea {
+  width: 100%;
+  padding: 6px;
+  margin-top: 4px;
+  box-sizing: border-box;
+  resize: none;
+}
+.po-edit-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.po-edit-content {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.po-edit-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+
+.po-edit-content h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.po-edit-form-group {
+  margin-bottom: 20px;
+}
+
+.po-edit-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #444;
+}
+
+.po-edit-form-group select,
+.po-edit-form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.po-edit-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.po-edit-cancel,
+.po-edit-submit {
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.po-edit-cancel {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #333;
+}
+
+.po-edit-submit {
+  background-color: #0066cc;
+  color: white;
+  border: none;
+}
+
+.po-edit-submit:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.purchord-edit-button {
+  margin-left: 10px;
+  padding: 2px 8px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.purchord-edit-button:hover {
+  background-color: #e0e0e0;
+}
+
+
+/* Back Button */
+.purchord-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.purchord-back-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #111;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0 0.75rem;
+  z-index: 2;
+}
+
+.purchord-back-button:hover {
+  color: #333;
+}
+
+.purchord-title {
+  margin: 0 auto;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+.purchord-header .purchord-qc-button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #00bcd4;
+  color: #fff;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  z-index: 2;
+}
+
+.purchord-header .purchord-qc-button:hover {
+  background-color: #00A8A8;
+}
+
+/* Main Container - Wraps Everything Except Title & Back Button */
+.purchord-main-container {
+  width: 100%;
+  max-width: 1200px;
+  background: rgb(255, 255, 255);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #D2D2D2;
+}
+
+/* Customer & Supplier Details */
+.purchord-details-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+.purchord-customer-container,
+.purchord-supplier-container {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.purchord-customer-container p,
+.purchord-supplier-container p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0.25rem 0;
+  color: #444;
+}
+
+.purchord-customer-container p strong,
+.purchord-supplier-container p strong {
+  color: #666;
+}
+
+/* Items Container */
+.purchord-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  padding: 1rem;
+  border: none;
+}
+
+/* Item Cards */
+.purchord-item-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.purchord-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 168, 168, 0.1);
+}
+
+.purchord-item-card.selected {
+  border-color: #00A8A8;
+  background-color: rgba(0, 168, 168, 0.05);
+}
+
+.purchord-item-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.purchord-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.purchord-item-details h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.purchord-item-details p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.purchord-item-pricing {
+  display: grid;
+  gap: 0.25rem;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.purchord-item-pricing p {
+  margin: 0;
+  color: #444;
+}
+
+/* Summary Section */
+.purchord-summary {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-align: right;
+}
+
+.purchord-summary p {
+  margin: 0.5rem 0;
+  color: #444;
+  font-size: 0.9rem;
+}
+
+.purchord-summary h3 {
+  margin: 1rem 0 0 0;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Modal Styles */
+.purchord-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.purchord-modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 800px;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.purchord-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+.purchord-modal-header {
+  margin-bottom: 2rem;
+}
+
+.purchord-modal-header h2 {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.purchord-modal-body {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+}
+
+.purchord-modal-image-container {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.purchord-modal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.purchord-modal-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.purchord-modal-info h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #666;
+  margin: 0 0 0.5rem 0;
+}
+
+.purchord-modal-info p {
+  margin: 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.purchord-modal-pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.purchord-modal-price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  color: #444;
+}
+
+.purchord-modal-price-item.total {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.form-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0 1.5rem;
+}
+
+.cancel-btn, .submit-btn {
+  background-color: #00bcd4;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.28rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  outline: none;
+  display: inline-block;
+}
+
+.cancel-btn:hover, .submit-btn:hover {
+  background-color: #00A8A8;
+}
+
+/* Scrollable wrapper for Purchase Orders content, similar to VendorAppForm */
+.purchord-scrollable-wrapper {
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd #f5f5f5;
+}
+.purchord-scrollable-wrapper::-webkit-scrollbar {
+  width: 8px;
+  background: #f5f5f5;
+}
+.purchord-scrollable-wrapper::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+  border-radius: 8px;
+}
+
+.purchord-scrollable-wrapper .body-content-container {
+  height: auto !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+.purchord-modal-content h2 {
+  text-align: center;
+  width: 100%;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.po-edit-form-group textarea{
+  resize: none;
+  width: 100%;
+  border: 1px solid #ddd;
+}

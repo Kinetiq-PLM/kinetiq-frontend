@@ -7,7 +7,6 @@ import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 import { GET } from "../../api/api"
 
 const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
-  console.log("aaaa tx data", ticket)
   const [technicians, setTechnicians] = useState([]);
   const [isTechDropdown, setOpenTechDD] = useState(false);
   const [products, setProducts] = useState([]);
@@ -22,6 +21,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   const [technicianId, setTechnicianId] = useState("");
   const [technicianName, setTechnicianName] = useState("");
   const [callType, setCallType] = useState("");
+  const [priority, setPriority] = useState("");
 
   useEffect(() => {
     if (ticket) {
@@ -29,6 +29,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
       setCustomerId(ticket.customer?.customer_id || ""); 
       setName(ticket.customer?.name || ""); 
       setEmailAddress(ticket.customer?.email_address || ""); 
+      setPriority(ticket.priority || ""); 
     }
   }, [ticket]);
 
@@ -38,7 +39,8 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
       product_id: productId,
       customer_id: customerId,
       technician: technicianId,
-      call_type: callType
+      call_type: callType, 
+      priority_level: priority
     })
 
     // reset form
@@ -55,7 +57,10 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   // fetches a list of techs
   const fetchTechnicians = async () => {
     try {
-      const response = await GET("/technicians/");
+      // this list all employees:
+      // const response = await GET("call/calls/technicians/");
+      // only list supp specialists:
+      const response = await GET("call/calls/support-specialists/");
       console.log("techs", response)
       setTechnicians(response);
     } catch (error) {
@@ -92,7 +97,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   // fetches a list of products
   const fetchProducts = async () => {
     try {
-      const response = await GET("/products/");
+      const response = await GET("call/calls/products/");
       console.log("prods", response)
       setProducts(response);
     } catch (error) {

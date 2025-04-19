@@ -11,12 +11,16 @@ import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET } from "../../../api/api.jsx";
+
+import loading from "../../Assets/kinetiq-loading.gif";
+
 const BlanketAgreementListModal = ({
   isOpen,
   onClose,
   setBlanketAgreement,
 }) => {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [agreementList, setAgreementList] = useState([]);
 
@@ -98,6 +102,7 @@ const BlanketAgreementListModal = ({
       }));
       setFilteredData(formattedData);
       setAgreementList(formattedData);
+      setIsLoading(false);
     } else if (agreementQuery.status === "error") {
       showAlert({ type: "error", title: "Failed to fetch Agreements." });
     }
@@ -159,13 +164,19 @@ const BlanketAgreementListModal = ({
               }}
             />
           </div>
-          <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
-            <Table
-              columns={columns}
-              data={filteredData}
-              onSelect={setSelectedBlanketAgreement}
-            />
-          </div>
+          {isLoading ? (
+            <div className="h-[300px] rounded-md flex justify-center items-center">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
+              <Table
+                columns={columns}
+                data={filteredData}
+                onSelect={setSelectedBlanketAgreement}
+              />
+            </div>
+          )}
           <div className="mt-4 flex justify-between">
             <div>
               <Button

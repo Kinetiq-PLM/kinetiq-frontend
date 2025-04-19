@@ -7,7 +7,11 @@ import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "../../../Sales/components/Context/AlertContext";
 
+import loading from "../../../Sales/components/Assets/kinetiq-loading.gif";
+
 export default function OpportunityTab({ setActiveTab }) {
+  const [isLoading, setIsLoading] = useState(true);
+
   const showAlert = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
@@ -77,8 +81,8 @@ export default function OpportunityTab({ setActiveTab }) {
         ...opp,
         opportunity_id: opp.opportunity_id,
         description: opp.description,
-        customer_id: opp.customer.customer_id,
-        customer_name: opp.customer.name,
+        customer_id: opp.customer?.customer_id,
+        customer_name: opp.customer?.name,
         start_date: new Date(opp.starting_date).toLocaleString(),
         end_date: new Date(opp.expected_closed_date).toLocaleDateString(),
         stage: opp.stage,
@@ -98,6 +102,7 @@ export default function OpportunityTab({ setActiveTab }) {
         reason_lost: opp.reason_lost || "-",
       }));
       setCustomers(data);
+      setIsLoading(false);
     } else if (opportunityQuery.status === "error") {
       showAlert({
         type: "error",
@@ -110,54 +115,67 @@ export default function OpportunityTab({ setActiveTab }) {
   return (
     <section className="h-full">
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+      <div className="mb-4">
         {/* Filters */}
-        <div className="flex flex-1/2 items-center space-x-2 gap-2 w-fit flex-wrap">
-          {/* Date Filter Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={dateFilters}
-              onChange={setDateFilter}
-              value={dateFilter}
-            />
+        <div className="flex justify-between gap-2 w-full flex-wrap">
+          <div className="h-fit items-center flex flex-row flex-1 space-x-4">
+            {/* Date Filter Dropdown */}
+            <div className="w-full max-w-[200px]">
+              <Dropdown
+                options={dateFilters}
+                onChange={setDateFilter}
+                value={dateFilter}
+              />
+            </div>
+
+            {/* Search By Dropdown */}
+            <div className="w-full max-w-[200px]">
+              <Dropdown
+                options={searchFields.map((field) => field.label)}
+                onChange={(selected) => {
+                  const field = searchFields.find((f) => f.label === selected);
+                  if (field) setSearchBy(field.key);
+                }}
+                value={searchFields.find((f) => f.key === searchBy)?.label}
+              />
+            </div>
+
+            {/* Search Input */}
+            <div className="flex items-center w-full max-w-[600px]">
+              <div className="h-[40px] w-full">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Search By Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={searchFields.map((field) => field.label)}
-              onChange={(selected) => {
-                const field = searchFields.find((f) => f.label === selected);
-                if (field) setSearchBy(field.key);
-              }}
-              value={searchFields.find((f) => f.key === searchBy)?.label}
-            />
-          </div>
-
-          {/* Search Input */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          {/* New Quotation Button (No onClick) */}
+          <Button
+            onClick={() => setActiveTab("Main Page")}
+            type="primary"
+            className={"!max-w-[200px] py-2 flex-1"}
+          >
+            New Opportunity
+          </Button>
         </div>
-
-        {/* New Quotation Button (No onClick) */}
-        <Button
-          onClick={() => setActiveTab("Main Page")}
-          type="primary"
-          className={"w-[200px] py-2"}
-        >
-          New Opportunity
-        </Button>
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
-      </div>
+
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table data={filteredQuotations} columns={columns} />
+        </div>
+      )}
     </section>
   );
 }

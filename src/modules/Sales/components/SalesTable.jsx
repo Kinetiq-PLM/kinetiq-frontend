@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { TAX_RATE } from "../temp_data/sales_data";
 import { useAlert } from "./Context/AlertContext";
-
+import { GET } from "../api/api";
 const SalesTable = ({
   columns,
   data,
@@ -12,6 +12,8 @@ const SalesTable = ({
   onDataChange,
   minWidth = false,
   updateData,
+  isQuotation = false,
+  canEditTable,
 }) => {
   const { showAlert } = useAlert();
 
@@ -62,6 +64,20 @@ const SalesTable = ({
         : Number(editValue);
 
     // Validate discount
+
+    if (
+      editingCell.columnKey === "discount" &&
+      newData[rowIndex].selling_price === 0 &&
+      isQuotation
+    ) {
+      showAlert({
+        type: "error",
+        title: "Cannot apply discount on project order item",
+      });
+      cancelEdit();
+      return;
+    }
+
     if (
       editingCell.columnKey === "discount" &&
       (newValue < 0 || newValue > newData[rowIndex].total_price)
@@ -84,6 +100,7 @@ const SalesTable = ({
       });
       return;
     }
+
     if (
       editingCell.columnKey === "quantity" &&
       newValue > Number(newData[rowIndex].stock_level)
@@ -128,17 +145,31 @@ const SalesTable = ({
     };
 
     const updatedData = newData.map((item) => {
-      const unitPrice = Number(item.selling_price); // Keep selling_price as a number
-      const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
-      const total = unitPrice * item.quantity + tax - Number(item.discount);
-      return {
-        ...item,
-        selling_price: unitPrice, // Convert to string only for display
-        tax: tax, // Ensure tax is formatted properly
-        total_price: total, // Calculate total price
-      };
-    });
+      console.log("asdfasdf");
+      console.log(!item.special_requests);
 
+      if (item.special_requests && isQuotation) {
+        return {
+          ...item,
+          selling_price: 0, // Convert to string only for display
+          tax: 0, // Ensure tax is formatted properly
+          total_price: 0, // Calculate total price
+        };
+      } else {
+        const unitPrice =
+          newData[rowIndex].selling_price === 0
+            ? Number(item.backup_price)
+            : item.selling_price; // Keep selling_price as a number
+        const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
+        const total = unitPrice * item.quantity + tax - Number(item.discount);
+        return {
+          ...item,
+          selling_price: unitPrice, // Convert to string only for display
+          tax: tax, // Ensure tax is formatted properly
+          total_price: total, // Calculate total price
+        };
+      }
+    });
     setTableData(updatedData);
     updateData(updatedData);
 

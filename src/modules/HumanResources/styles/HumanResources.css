@@ -9,7 +9,7 @@
 /* Main content container */
 .hr .hr-body-content-container {
   width: 100%;
-  height: 38.1rem; /* Fixed height */
+  height: 92%; /* Fixed height */
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
@@ -29,21 +29,18 @@
 }
 
 .hr-dashboard h2 {
-  position: sticky;
   top: 0;
-  background-color: white;
   padding: 1rem 0;
   margin: 0;
   margin-bottom: 1.5rem;
-  z-index: 10;
   font-size: 1.75rem;
 }
 
-/* Layout */
+/* Layout - Keep the flex layout but align items at the top */
 .hr-layout {
   display: flex;
   gap: 2rem;
-  align-items: stretch; /* Ensures both columns align vertically */
+  align-items: flex-start;
   margin-bottom: 2rem;
 }
 
@@ -54,12 +51,49 @@
   gap: 2rem;
 }
 
-.hr-interview-calendar {
-  flex: 1;
+/* Replace the hr-calendar-container with a direct styling for the Calendar */
+.hr-layout > .hr-calendar {
+  width: 550px;
+  max-height: 550px; /* Set a reasonable max-height */
+  border: 1px solid #cdcdcd;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  border: 1px solid #cdcdcd;
+}
+
+/* Add these styles to better size the internal calendar components */
+.hr-calendar-grid {
+  flex: 1;
+  min-height: 0; /* Allows the grid to shrink if needed */
+}
+
+/* Adjust holidays list to take less vertical space */
+.hr-calendar-holidays {
+  padding: 0 1rem;
+  margin-top: 0.5rem;
+}
+
+.hr-calendar-holidays h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.hr-calendar-holidays ul {
+  max-height: 120px; /* Reduce from 160px */
+}
+
+.hr-calendar-holidays li {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* Style for the Calendar heading that was inside the container */
+.hr-layout > h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
 }
 
 /* Summary container */
@@ -115,10 +149,9 @@
   padding: 1.25rem;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  height: 250px;
-  overflow-y: auto;
+  height: auto; /* Changed from fixed height */
+  overflow-y: visible; /* Changed from auto to remove scrollbar */
   border: 1px solid #cdcdcd;
-
 }
 
 .hr-candidates-section table {
@@ -134,47 +167,6 @@
   text-align: left;
 }
 
-/* Interview section */
-.hr-interview-calendar {
-  background: #fff;
-  padding: 1.25rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.hr-calendar-box {
-  height: 250px;
-  background-color: #f3f3f3;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-style: italic;
-  color: #777;
-}
-
-.hr-interview-item {
-  display: flex;
-  justify-content: space-between;
-  background-color: #eefbfd;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  align-items: center;
-}
-
-.hr-tag {
-  background-color: #c0f0f2;
-  color: #007b80;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  margin-right: 0.5rem;
-}
-
 /* Leave requests section */
 .hr-leave-requests-section {
   background: #fff;
@@ -185,13 +177,24 @@
 }
 
 .hr-leave-requests-table {
-  max-height: 250px;
-  overflow-y: auto;
+  height: 200px; /* Match the performance table height */
+  overflow-y: auto; /* Keep scrolling at container level */
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-top: 0.5rem;
 }
 
 .hr-leave-requests-table table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
+}
+
+.hr-leave-requests-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #f3f9fa;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
 }
 
 .hr-leave-requests-table th,
@@ -201,11 +204,34 @@
   text-align: left;
 }
 
-.hr-leave-requests-table select {
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background-color: white;
+/* Update scrollbar styling to match performance table */
+.hr-leave-requests-table::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-leave-requests-table::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-leave-requests-table::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Add these scrollbar styles for the leave requests table */
+.hr-leave-requests-table::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-leave-requests-table::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-leave-requests-table::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* Scrollable dashboard content */
@@ -229,7 +255,6 @@
   background-color: #f3f9fa;
   position: sticky;
   top: 0;
-  z-index: 1;
 }
 /* Leave type tags */
 .hr-tag.sick {
@@ -287,4 +312,67 @@
 .hr-tag.recorded-in-hris {
   background-color: #e2e3e5;
   color: #343a40;
+}
+
+/* Performance table scrollable styling */
+.hr-performance-table-container {
+  height: 200px; /* Keep fixed height for the container */
+  overflow-y: auto; /* Keep scrolling at container level */
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.hr-performance-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.hr-performance-table-container thead {
+  position: sticky;
+  top: 0;
+  background-color: #f3f9fa;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+}
+
+/* Keep scrollbar styling only on the container */
+.hr-performance-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-performance-table-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-performance-table-container::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Rating tag styles */
+.hr-tag.rating-5 {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.hr-tag.rating-4 {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.hr-tag.rating-3 {
+  background-color: #e2e3e5;
+  color: #343a40;
+}
+
+.hr-tag.rating-2 {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.hr-tag.rating-1 {
+  background-color: #f8d7da;
+  color: #842029;
 }

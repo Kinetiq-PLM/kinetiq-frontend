@@ -7,6 +7,7 @@ const NumberInputField = ({
   validation = () => "",
   isValidationVisible = false,
   isPercent = false,
+  max = true,
 }) => {
   const [error, setError] = useState("");
 
@@ -14,15 +15,20 @@ const NumberInputField = ({
     setError(validation());
   }, [value]);
 
-  const formatNumber = (num) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-
   const handleChange = (e) => {
     let inputValue = e.target.value.replace(/[^0-9.]/g, ""); // Allow only numbers and dots
-    if (isPercent && parseFloat(inputValue) > 100) {
+
+    // Prevent multiple dots
+    const parts = inputValue.split(".");
+    if (parts.length > 2) {
+      inputValue = parts[0] + "." + parts[1]; // Keep only the first dot and part after it
+    }
+
+    // Cap the percentage to 100 if isPercent is true and max is true
+    if (max && isPercent && parseFloat(inputValue) > 100) {
       inputValue = "100"; // Prevent values above 100 if percentage
     }
+
     setValue(inputValue);
   };
 
@@ -34,15 +40,9 @@ const NumberInputField = ({
       </p>
       <div className="mt-2 relative">
         <input
-          className="bg-[#F7F7F7] w-full py-2 px-3 rounded pr-6"
+          className="bg-[#F7F7F7] w-full py-2 px-3 rounded pr-6 !mb-0"
           type="text"
-          value={
-            value !== ""
-              ? isPercent
-                ? `${formatNumber(value)}%`
-                : formatNumber(value)
-              : ""
-          }
+          value={value !== "" ? (isPercent ? `${value}%` : value) : ""}
           onChange={handleChange}
           required
         />

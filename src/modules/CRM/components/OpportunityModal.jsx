@@ -44,6 +44,7 @@ const OpportunityModal = ({
   const [grossProfit, setGrossProfit] = useState("");
   const [grossProfitTotal, setGrossProfitTotal] = useState("");
   const [interestLevel, setInterestLevel] = useState("");
+  const [probability, setProbability] = useState("");
   const opportunityMutation = useMutation({
     mutationFn: async (data) =>
       await PATCH(`crm/opportunities/${details.opportunity_id}/`, data),
@@ -69,12 +70,14 @@ const OpportunityModal = ({
     const validators = [
       validateDescription,
       validateStage,
+      validateProbability,
       validateStartDate,
       validateEndDate,
       validateStatus,
       validateEstimatedValue,
       validateWeightedAmount,
       validateGrossProfit,
+      validateProbability,
       // validateGrossProfitTotal,
       validateLevelOfInterest,
     ];
@@ -90,16 +93,19 @@ const OpportunityModal = ({
 
     if (errorCount === 0) {
       // Reset form fields
+      const eVal = estimatedValue || details.estimatedValue;
+      const gp = grossProfitTotal || details.grossProfitTotal;
       const request = {
         customer: selectedCustomer.customer_id,
         partner: selectedCustomer.partner.partner_id,
         salesrep: selectedEmployee.employee_id,
         starting_date: startDate,
         expected_closed_date: endDate,
-        estimated_value: Number(estimatedValue.replace(",", "")),
+        estimated_value: Number(eVal.replace(/,/g, "")),
         weighted_amount: Number(weightedAmount),
         gross_profit_percentage: Number(grossProfit),
         gross_profit_total: Number(grossProfitTotal),
+        probability_percentage: Number(probability),
         stage,
         status,
         description,
@@ -117,7 +123,9 @@ const OpportunityModal = ({
       setWeightedAmount("");
       setGrossProfit("");
       setGrossProfitTotal("");
+      setProbability("");
       setInterestLevel("");
+      setProbability("");
       setIsValidationVisible(false);
 
       setCanSave(true);
@@ -132,6 +140,12 @@ const OpportunityModal = ({
     }
   };
 
+  const validateProbability = () => {
+    if (!probability.trim()) {
+      return "Probability is required.";
+    }
+    return "";
+  };
   const validateDescription = () => {
     if (!description.trim()) {
       return "Description is required.";
@@ -266,6 +280,7 @@ const OpportunityModal = ({
 
   useEffect(() => {
     if (details) {
+      console.log(details);
       setDescription(details.description);
       setStartDate(new Date(details.starting_date).toISOString().split("T")[0]);
       setEndDate(details.expected_closed_date);
@@ -274,9 +289,11 @@ const OpportunityModal = ({
       setLostReason(details.reason_lost);
       setGrossProfit(details.gross_profit_percentage.replace(".00", ""));
       setGrossProfitTotal(details.gross_profit_total);
+      setProbability(details.probability);
       setEstimatedValue(details.estimated_value);
       setWeightedAmount(details.weighted_amount);
       setInterestLevel(details.interest_level);
+      setProbability(details.probability_percentage || "0");
     } else {
       setDescription("");
       setStartDate("");
@@ -289,17 +306,29 @@ const OpportunityModal = ({
       setGrossProfit("");
       setGrossProfitTotal("");
       setInterestLevel("");
+      setProbability("");
     }
     setIsValidationVisible(false);
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen && grossProfit && estimatedValue) {
-      setGrossProfitTotal(
-        Number(estimatedValue.replace(",", "")) * (Number(grossProfit) / 100)
-      );
+    const estimated = parseFloat(estimatedValue.toString().replace(/,/g, ""));
+    const profit = parseFloat(grossProfit.toString().replace(/,/g, ""));
+
+    if (!isNaN(estimated) && !isNaN(profit) && isOpen) {
+      setGrossProfitTotal((estimated * (profit / 100)).toFixed(2));
+    } else {
+      setGrossProfitTotal("");
     }
-  }, [grossProfit, estimatedValue]);
+  }, [grossProfit, estimatedValue, isOpen]);
+
+  useEffect(() => {
+    const gp = parseFloat(grossProfitTotal.replace(/,/g, ""));
+    const prob = parseFloat(probability.replace(/,/g, ""));
+    if (!isNaN(grossProfitTotal) && !isNaN(prob) && isOpen) {
+      setWeightedAmount((gp * (prob / 100)).toFixed(2));
+    }
+  }, [probability, grossProfitTotal, isOpen]);
   if (!isOpen) return null;
 
   return (
@@ -417,6 +446,17 @@ const OpportunityModal = ({
                 value={grossProfitTotal}
                 disabled={true}
               />
+            </div>
+            <div className="flex gap-2">
+              <NumberInputField
+                label={"Probabiility"}
+                value={probability}
+                setValue={setProbability}
+                validation={validateProbability}
+                isValidationVisible={isValidationVisible}
+                isPercent={true}
+              />
+              <div className="flex-1"></div>
             </div>
             <Dropup
               label="Level of Interest"

@@ -36,157 +36,329 @@ const dummyUsers = [
     }
 ];
 
-const User = () => {
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [deactivatedUsers, setDeactivatedUsers] = useState([]);
-    const [activeDropdown, setActiveDropdown] = useState(null);
-    const [showRoleDropdown, setShowRoleDropdown] = useState(false);
-    const [showCustomizeDropdown, setShowCustomizeDropdown] = useState(false);
+const dummyRoles = [
+    { roleId: "Maria", roleName: "Clara", description: "Sad", permissions: "Qwdw" },
+    { roleId: "Maria", roleName: "Clara", description: "Sad", permissions: "Qwdw" },
+    { roleId: "Maria", roleName: "Clara", description: "Sad", permissions: "Qwdw" },
+];
 
-    const roleRef = useRef(null);
-    const customizeRef = useRef(null);
+const User = () => {
+    const [activeTab, setActiveTab] = useState("User");
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [activeDropdown, setActiveDropdown] = useState(null);
+    const [showAddDropdown, setShowAddDropdown] = useState(false);
+    const addDropdownRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (!e.target.closest(".dropdown-action")) {
                 setActiveDropdown(null);
             }
-            if (roleRef.current && !roleRef.current.contains(e.target)) {
-                setShowRoleDropdown(false);
-            }
-            if (customizeRef.current && !customizeRef.current.contains(e.target)) {
-                setShowCustomizeDropdown(false);
+            if (addDropdownRef.current && !addDropdownRef.current.contains(e.target)) {
+                setShowAddDropdown(false);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handleCheckboxChange = (user) => {
-        setSelectedUser((prev) => (prev?.email === user.email ? null : user));
+    const renderEditForm = () => {
+        if (!selectedUser) return null;
+
+        return (
+            <div
+                ref={addDropdownRef}
+                className="absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-lg p-6 z-50 w-[700px] max-h-[75vh] overflow-y-auto"
+            >
+                <h3 className="text-xl font-semibold text-teal-600 mb-4 border-b pb-2">Edit User</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    {[
+                        { label: "First name", key: "firstName", type: "text" },
+                        { label: "Last name", key: "lastName", type: "text" },
+                        { label: "Email", key: "email", type: "email" },
+                        { label: "Password", key: "password", type: "password" },
+                    ].map(({ label, key, type }) => (
+                        <div key={key}>
+                            <label className="block text-sm font-semibold text-teal-600 mb-1">{label}</label>
+                            <input
+                                type={type}
+                                defaultValue={selectedUser[key]}
+                                className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                            />
+                        </div>
+                    ))}
+
+                    {/* Role Dropdown */}
+                    <div>
+                        <label className="block text-sm font-semibold text-teal-600 mb-1">Role</label>
+                        <select
+                            defaultValue={selectedUser.roleId.toLowerCase()}
+                            className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                        >
+                            <option value="admin">Admin</option>
+                            <option value="editor">Editor</option>
+                            <option value="viewer">Viewer</option>
+                        </select>
+                    </div>
+
+                    {/* Status Dropdown */}
+                    <div>
+                        <label className="block text-sm font-semibold text-teal-600 mb-1">Status</label>
+                        <select
+                            defaultValue={selectedUser.status.toLowerCase()}
+                            className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                        >
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+
+                    {/* Type Dropdown (Assume default to Employee for now) */}
+                    <div>
+                        <label className="block text-sm font-semibold text-teal-600 mb-1">Type</label>
+                        <select
+                            defaultValue="employee"
+                            className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                        >
+                            <option value="employee">Employee</option>
+                            <option value="contractor">Contractor</option>
+                            <option value="intern">Intern</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end mt-6 gap-3">
+                    <button className="bg-teal-500 text-white px-6 py-2 rounded-md">Save</button>
+                    <button
+                        className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md"
+                        onClick={() => setActiveDropdown(null)}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        );
     };
 
-    const handleDeactivate = (email) => {
-        if (!deactivatedUsers.includes(email)) {
-            setDeactivatedUsers((prev) => [...prev, email]);
+    const renderEditRoleForm = () => {
+        if (!selectedUser) return null;
+
+        return (
+            <div
+                ref={addDropdownRef}
+                className="absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-lg p-6 z-50 w-[450px]"
+            >
+                <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Edit Role</h3>
+                <div className="space-y-4">
+                    <div>
+                        <label className="text-sm text-teal-600">Role ID</label>
+                        <input
+                            type="text"
+                            defaultValue={selectedUser.roleId}
+                            className="w-full border px-3 py-2 rounded-md text-sm"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm text-teal-600">Role Name</label>
+                        <input
+                            type="text"
+                            defaultValue={selectedUser.roleName}
+                            className="w-full border px-3 py-2 rounded-md text-sm"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm text-teal-600">Description</label>
+                        <input
+                            type="text"
+                            defaultValue={selectedUser.description}
+                            className="w-full border px-3 py-2 rounded-md text-sm"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm text-teal-600">Permissions</label>
+                        <input
+                            type="text"
+                            defaultValue={selectedUser.permissions}
+                            className="w-full border px-3 py-2 rounded-md text-sm"
+                        />
+                    </div>
+                </div>
+                <div className="flex justify-end gap-3 mt-6">
+                    <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Save</button>
+                    <button
+                        className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm"
+                        onClick={() => setActiveDropdown(null)}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+    const renderAddForm = () => {
+        if (activeTab === "Roles") {
+            return (
+                <div ref={addDropdownRef} className="absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-lg p-6 z-50 w-[450px]">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Roles permission</h3>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="text-sm text-teal-600">Role ID</label>
+                            <input type="text" placeholder="Please enter document name" className="w-full border px-3 py-2 rounded-md text-sm" />
+                        </div>
+                        <div>
+                            <label className="text-sm text-teal-600">Role Name</label>
+                            <input type="text" placeholder="Please select category" className="w-full border px-3 py-2 rounded-md text-sm" />
+                        </div>
+                        <div>
+                            <label className="text-sm text-teal-600">Description</label>
+                            <input type="text" placeholder="Please select category" className="w-full border px-3 py-2 rounded-md text-sm" />
+                        </div>
+                        <div>
+                            <label className="text-sm text-teal-600">Permissions</label>
+                            <input type="text" placeholder="Please select category" className="w-full border px-3 py-2 rounded-md text-sm" />
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-3 mt-6">
+                        <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
+                        <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">Edit</button>
+                        <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Archive</button>
+                    </div>
+                </div>
+            );
         }
-    };
 
-    const handleActivate = (email) => {
-        setDeactivatedUsers((prev) => prev.filter((e) => e !== email));
+        if (activeTab === "User") {
+            return (
+                <div
+                    ref={addDropdownRef}
+                    className="absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-lg p-6 z-50 w-[700px] max-h-[75vh] overflow-y-auto"
+                >
+                    <h3 className="text-xl font-semibold text-teal-600 mb-4 border-b pb-2">User – Setup</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* First Name */}
+                        <div>
+                            <label className="block text-sm font-semibold text-teal-600 mb-1">First name</label>
+                            <input
+                                type="text"
+                                placeholder="Enter First name"
+                                className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                            />
+                        </div>
+
+                        {/* Last Name */}
+                        <div>
+                            <label className="block text-sm font-semibold text-teal-600 mb-1">Last name</label>
+                            <input
+                                type="text"
+                                placeholder="Enter Last name"
+                                className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                            />
+                        </div>
+
+                        {/* Email */}
+                        <div>
+                            <label className="block text-sm font-semibold text-teal-600 mb-1">Email</label>
+                            <input
+                                type="email"
+                                placeholder="Enter Email"
+                                className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                            />
+                        </div>
+
+                        {/* Password */}
+                        <div>
+                            <label className="block text-sm font-semibold text-teal-600 mb-1">Password</label>
+                            <input
+                                type="password"
+                                placeholder="Enter Password"
+                                className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                            />
+                        </div>
+
+                        {/* Role - Dropdown */}
+                        <div>
+                            <label className="block text-sm font-semibold text-teal-600 mb-1">Role</label>
+                            <select
+                                className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                                defaultValue=""
+                            >
+                                <option value="" disabled>Select role</option>
+                                <option value="admin">Admin</option>
+                                <option value="editor">Editor</option>
+                                <option value="viewer">Viewer</option>
+                            </select>
+                        </div>
+
+                        {/* Status - Dropdown */}
+                        <div>
+                            <label className="block text-sm font-semibold text-teal-600 mb-1">Status</label>
+                            <select
+                                className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                                defaultValue="active"
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+
+                        {/* Type - Dropdown */}
+                        <div>
+                            <label className="block text-sm font-semibold text-teal-600 mb-1">Type</label>
+                            <select
+                                className="w-full border border-gray-300 px-3 py-2 rounded-md text-sm"
+                                defaultValue="employee"
+                            >
+                                <option value="employee">Employee</option>
+                                <option value="contractor">Contractor</option>
+                                <option value="intern">Intern</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end mt-6 gap-3">
+                        <button className="bg-teal-500 text-white px-6 py-2 rounded-md">Add</button>
+                        <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md">Edit</button>
+                        <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md">Delete</button>
+                    </div>
+                </div>
+            );
+        }
+
+
+        return null;
     };
 
     return (
         <div className="admin p-6 relative">
-            <h2 className="text-2xl font-bold text-gray-800">User</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">User</h2>
 
-            <div className="flex justify-between items-center mb-4 mt-2 relative">
-                {/* Role Button */}
-                <div className="relative" ref={roleRef}>
+            {/* Tabs */}
+            <div className="flex items-center border-b mb-4 gap-4">
+                {["User", "Roles"].map((tab, idx) => (
                     <button
-                        className={`px-4 py-2 ${selectedUser
-                                ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                : "bg-gray-100 text-gray-400"
-                            } rounded-lg shadow`}
-                        onClick={() => selectedUser && setShowRoleDropdown(!showRoleDropdown)}
+                        key={idx}
+                        onClick={() => setActiveTab(tab)}
+                        className={`pb-2 px-4 border-b-2 ${activeTab === tab
+                                ? "border-teal-500 text-teal-600 font-semibold"
+                                : "border-transparent text-gray-600"
+                            }`}
                     >
-                        Role
+                        {tab}
                     </button>
-                    {showRoleDropdown && selectedUser && (
-                        <div className="absolute left-0 mt-2 bg-white rounded-2xl p-6 w-[450px] shadow-lg z-50">
-                            <h3 className="text-xl font-semibold mb-4 border-b pb-2">Roles permission</h3>
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="text-sm text-gray-700">Role Id</label>
-                                    <input className="w-full border p-2 rounded mt-1" defaultValue={selectedUser.roleId} />
-                                </div>
-                                <div>
-                                    <label className="text-sm text-gray-700">Role Name</label>
-                                    <input className="w-full border p-2 rounded mt-1" />
-                                </div>
-                                <div>
-                                    <label className="text-sm text-gray-700">Description</label>
-                                    <input className="w-full border p-2 rounded mt-1" />
-                                </div>
-                                <div>
-                                    <label className="text-sm text-gray-700">Access Level</label>
-                                    <select className="w-full border p-2 rounded mt-1">
-                                        <option>Choices...</option>
-                                        <option>Full Access</option>
-                                        <option>Read-Only</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-sm text-gray-700">Permissions</label>
-                                    <input className="w-full border p-2 rounded mt-1" />
-                                </div>
-                            </div>
-                            <div className="flex justify-end gap-2 mt-6">
-                                <button className="px-4 py-1 bg-teal-500 text-white rounded hover:bg-teal-600">Add</button>
-                                <button className="px-4 py-1 bg-white text-teal-500 border border-teal-500 rounded hover:bg-teal-50">Remove</button>
-                                <button className="px-4 py-1 bg-white text-teal-500 border border-teal-500 rounded hover:bg-teal-50">Modify</button>
-                                <button
-                                    className="px-4 py-1 bg-white text-gray-600 border border-gray-400 rounded hover:bg-gray-100"
-                                    onClick={() => setShowRoleDropdown(false)}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Search + Customize */}
-                <div className="flex space-x-2 relative" ref={customizeRef}>
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                    />
-                    <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300">Hide</button>
-
-                    <div className="relative">
-                        <button
-                            onClick={() => selectedUser && setShowCustomizeDropdown(!showCustomizeDropdown)}
-                            className={`px-4 py-2 ${selectedUser ? "bg-gray-200 text-gray-700 hover:bg-gray-300" : "bg-gray-100 text-gray-400"
-                                } rounded-lg shadow`}
-                        >
-                            Customize
-                        </button>
-
-                        {showCustomizeDropdown && selectedUser && (
-                            <div
-                                className="absolute right-0 mt-2 bg-white rounded-2xl p-6 w-[600px] shadow-lg z-50"
-                            >
-                                <h3 className="text-xl font-semibold mb-4 border-b pb-2">User – Setup</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label>User Id</label><input className="w-full border p-2 rounded" defaultValue={selectedUser.id} /></div>
-                                    <div><label>Create At</label><input className="w-full border p-2 rounded" defaultValue={selectedUser.createdAt} /></div>
-                                    <div><label>First Name</label><input className="w-full border p-2 rounded" defaultValue={selectedUser.firstName} /></div>
-                                    <div><label>Updated At</label><input className="w-full border p-2 rounded" defaultValue={selectedUser.updatedAt} /></div>
-                                    <div><label>Last Name</label><input className="w-full border p-2 rounded" defaultValue={selectedUser.lastName} /></div>
-                                    <div><label>Role ID</label><input className="w-full border p-2 rounded" defaultValue={selectedUser.roleId} /></div>
-                                    <div><label>Email</label><input className="w-full border p-2 rounded" defaultValue={selectedUser.email} /></div>
-                                    <div><label>Role Name</label><input className="w-full border p-2 rounded" /></div>
-                                    <div><label>Password</label><input className="w-full border p-2 rounded" defaultValue={selectedUser.password} /></div>
-                                    <div><label>Description</label><input className="w-full border p-2 rounded" /></div>
-                                    <div><label>Status</label><input className="w-full border p-2 rounded" defaultValue={selectedUser.status} /></div>
-                                    <div><label>Permissions</label><input className="w-full border p-2 rounded" /></div>
-                                </div>
-                                <div className="flex justify-end gap-2 mt-6">
-                                    <button className="px-4 py-1 bg-teal-500 text-white rounded hover:bg-teal-600">Add</button>
-                                    <button className="px-4 py-1 bg-white text-blue-500 border border-blue-400 rounded hover:bg-blue-50">Alter</button>
-                                    <button className="px-4 py-1 bg-white text-red-500 border border-red-400 rounded hover:bg-red-50">Delete</button>
-                                    <button
-                                        className="px-4 py-1 bg-white text-gray-600 border border-gray-400 rounded hover:bg-gray-100"
-                                        onClick={() => setShowCustomizeDropdown(false)}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                ))}
+                <div className="ml-auto relative">
+                    <button
+                        onClick={() => setShowAddDropdown((prev) => !prev)}
+                        className="bg-teal-500 text-white px-4 py-2 rounded-md text-sm"
+                    >
+                        Add
+                    </button>
+                    {showAddDropdown && renderAddForm()}
                 </div>
             </div>
 
@@ -195,78 +367,83 @@ const User = () => {
                 <table className="w-full border-collapse border border-gray-200 rounded-xl">
                     <thead>
                         <tr className="bg-gray-100">
-                            <th className="p-3 border border-gray-200 text-left rounded-tl-xl"> </th>
-                            <th className="p-3 border border-gray-200 text-left">User Id</th>
-                            <th className="p-3 border border-gray-200 text-left">First Name</th>
-                            <th className="p-3 border border-gray-200 text-left">Last Name</th>
-                            <th className="p-3 border border-gray-200 text-left">Email</th>
-                            <th className="p-3 border border-gray-200 text-left">Password</th>
-                            <th className="p-3 border border-gray-200 text-left">Role ID</th>
-                            <th className="p-3 border border-gray-200 text-left">Status</th>
-                            <th className="p-3 border border-gray-200 text-left">Created At</th>
-                            <th className="p-3 border border-gray-200 text-left">Updated At</th>
-                            <th className="p-3 border border-gray-200 text-left rounded-tr-xl">Actions</th>
+                            {activeTab === "Roles" ? (
+                                <>
+                                    <th className="p-3 border border-gray-200 text-left">Role ID</th>
+                                    <th className="p-3 border border-gray-200 text-left">Role Name</th>
+                                    <th className="p-3 border border-gray-200 text-left">Description</th>   
+                                    <th className="p-3 border border-gray-200 text-left">Permission</th>
+                                    <th className="p-3 border border-gray-200 text-left">Action</th>
+
+                                </>
+                            ) : (   
+                                <>
+                                    <th className="p-3 border border-gray-200 text-left">User ID</th>
+                                    <th className="p-3 border border-gray-200 text-left">First Name</th>
+                                    <th className="p-3 border border-gray-200 text-left">Last Name</th>
+                                    <th className="p-3 border border-gray-200 text-left">Email</th>
+                                    <th className="p-3 border border-gray-200 text-left">Password</th>
+                                    <th className="p-3 border border-gray-200 text-left">Role ID</th>
+                                    <th className="p-3 border border-gray-200 text-left">Status</th>
+                                    <th className="p-3 border border-gray-200 text-left">Created At</th>
+                                    <th className="p-3 border border-gray-200 text-left">Updated At</th>
+                                    <th className="p-3 border border-gray-200 text-left">Action</th>
+
+                                </>
+                            )}
                         </tr>
                     </thead>
                     <tbody>
-                        {dummyUsers.map((user, idx) => (
-                            <tr key={idx} className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100">
-                                <td className="p-3 border border-gray-200">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedUser?.email === user.email}
-                                        onChange={() => handleCheckboxChange(user)}
-                                    />
-                                </td>
-                                <td className={`p-3 border border-gray-200 font-semibold ${deactivatedUsers.includes(user.email) ? "text-gray-400" : "text-teal-600"
-                                    }`}>
-                                    {user.id}
-                                </td>
-                                <td className="p-3 border border-gray-200">{user.firstName}</td>
-                                <td className="p-3 border border-gray-200">{user.lastName}</td>
-                                <td className="p-3 border border-gray-200">{user.email}</td>
-                                <td className="p-3 border border-gray-200">{user.password}</td>
-                                <td className="p-3 border border-gray-200">{user.roleId}</td>
-                                <td className="p-3 border border-gray-200">{user.status}</td>
-                                <td className="p-3 border border-gray-200">{user.createdAt}</td>
-                                <td className="p-3 border border-gray-200">{user.updatedAt}</td>
-                                <td className="p-3 border border-gray-200 rounded-br-xl relative dropdown-action">
-                                    <button
-                                        className="text-xl px-2"
-                                        onClick={() =>
-                                            setActiveDropdown(activeDropdown === idx ? null : idx)
-                                        }
-                                    >
-                                        ⋮
-                                    </button>
-                                    {activeDropdown === idx && (
-                                        <div className="absolute right-0 mt-2 bg-white border shadow rounded p-2 z-50 w-32">
-                                            {deactivatedUsers.includes(user.email) ? (
-                                                <button
-                                                    className="text-green-600 hover:underline block w-full text-left"
-                                                    onClick={() => {
-                                                        handleActivate(user.email);
-                                                        setActiveDropdown(null);
-                                                    }}
-                                                >
-                                                    Activate
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    className="text-red-600 hover:underline block w-full text-left"
-                                                    onClick={() => {
-                                                        handleDeactivate(user.email);
-                                                        setActiveDropdown(null);
-                                                    }}
-                                                >
-                                                    Deactivate
-                                                </button>
-                                            )}
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
+                        {activeTab === "Roles" ? (
+                            dummyRoles.map((role, idx) => (
+                                <tr key={idx} className="odd:bg-gray-50 hover:bg-gray-100">
+                                    <td className="p-3 border border-gray-200">{role.roleId}</td>
+                                    <td className="p-3 border border-gray-200">{role.roleName}</td>
+                                    <td className="p-3 border border-gray-200">{role.description}</td>
+                                    <td className="p-3 border border-gray-200">{role.permissions}</td>
+                                    <td className="p-3 border border-gray-200 relative">
+                                        <button
+                                            className="dropdown-action"
+                                            onClick={() => {
+                                                setSelectedUser(role);
+                                                setActiveDropdown(idx);
+                                                setShowAddDropdown(false);
+                                            }}
+                                        >
+                                            &#x22EE;
+                                        </button>
+                                        {activeDropdown === idx && renderEditRoleForm()}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            dummyUsers.map((user, idx) => (
+                                <tr key={idx} className="odd:bg-gray-50 hover:bg-gray-100">
+                                    <td className="p-3 border border-gray-200">{user.id}</td>
+                                    <td className="p-3 border border-gray-200">{user.firstName}</td>
+                                    <td className="p-3 border border-gray-200">{user.lastName}</td>
+                                    <td className="p-3 border border-gray-200">{user.email}</td>
+                                    <td className="p-3 border border-gray-200">{user.password}</td>
+                                    <td className="p-3 border border-gray-200">{user.roleId}</td>
+                                    <td className="p-3 border border-gray-200">{user.status}</td>
+                                    <td className="p-3 border border-gray-200">{user.createdAt}</td>
+                                    <td className="p-3 border border-gray-200">{user.updatedAt}</td>
+                                    <td className="p-3 border border-gray-200 relative">
+                                        <button
+                                            className="dropdown-action"
+                                            onClick={() => {
+                                                setSelectedUser(user);
+                                                setActiveDropdown(idx);
+                                                setShowAddDropdown(false);
+                                            }}
+                                        >
+                                            &#x22EE;
+                                        </button>
+                                        {activeDropdown === idx && renderEditForm()}
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>

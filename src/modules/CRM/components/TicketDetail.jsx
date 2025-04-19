@@ -82,7 +82,7 @@ const TicketDetail = ({ isOpen, onClose, ticket, setIsTicketResolveOpen }) => {
               />
               <InputField
                 label={"Status"}
-                value={ticket.customer_id}
+                value={ticket.status}
                 isDisabled={true}
               />
             </div>
@@ -115,6 +115,7 @@ const TicketDetail = ({ isOpen, onClose, ticket, setIsTicketResolveOpen }) => {
                 className={"mr-2"}
                 submit={true}
                 onClick={() => setIsTicketResolveOpen(true)}
+                disabled={ticket.status === "Closed"}
               >
                 Resolve
               </Button>

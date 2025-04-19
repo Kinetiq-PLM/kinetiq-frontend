@@ -15,7 +15,7 @@ import { GET } from "../api/api"
 import { POST } from "../api/api"
 import { PATCH } from "../api/api"
 
-const ServiceReport = () => {
+const ServiceReport = ({employee_id}) => {
   // State for form fields
   const [ticketSubject, setTicketSubject] = useState("")
   const [requestType, setRequestType] = useState("")
@@ -44,7 +44,12 @@ const ServiceReport = () => {
 
   const fetchReports = async () => {
     try {
-      const data = await GET("service-reports/");
+      // this filters out reports so that only the service reports assigned to the one currently logged in will show:
+      // const data = await GET(`report/reports/technician/HR-EMP-2025-8d9f9b/`);
+      const data = await GET(`report/reports/technician/${employee_id}/`);
+
+      // all reports:
+      //const data = await GET("report/");
       setReports(data);
     } catch (error) {
       console.error("Error fetching reports:", error)
@@ -58,7 +63,7 @@ const ServiceReport = () => {
   // table row clicking func
   const handleRowClick = async (report) => {
     try {
-      const data = await GET(`service-reports/${report.report_id}`); 
+      const data = await GET(`report/${report.report_id}`); 
       console.log("Fetched data:", data);
 
       setTicketSubject(data.service_ticket?.subject || "");
@@ -107,7 +112,7 @@ const ServiceReport = () => {
     console.log("Updating report:", reportData);
 
     try {
-      await PATCH(`service-reports/${reportId}/update/`, reportData);
+      await PATCH(`report/${reportId}/`, reportData);
       setShowUpdateModal(false);
       fetchReports();
     } catch (error) {
@@ -134,7 +139,7 @@ const ServiceReport = () => {
   const handleSubmitReport = async (reportData) => {
     console.log("Submitting report:", reportData)
     try {
-      const data = await POST("/create-report/", reportData);
+      const data = await POST("report/", reportData);
       console.log("Report created successfully:", data);
       setShowSubmitModal(false);
       fetchReports();
@@ -181,7 +186,7 @@ const ServiceReport = () => {
     }
     console.log("Updating ticket:", ticketData)
     try {
-      await PATCH(`update-ticket/${selectedTicketId}/`, ticketData);
+      await PATCH(`ticket/${selectedTicketId}/`, ticketData);
       setShowModal(false);
       fetchReports();
     } catch (error) {
@@ -344,7 +349,6 @@ const ServiceReport = () => {
               )}
             </div>
             </div>
-            
           </div>
 
           {/* Table Component */}
@@ -386,12 +390,14 @@ const ServiceReport = () => {
         onClose={() => setShowUpdateModal(false)}
         onUpdate={handleUpdateReport}
         report={selectedReport}
+        technician={employee_id}
       />
 
       <SubmitReportModal
         isOpen={showSubmitModal}
         onClose={() => setShowSubmitModal(false)}
         onSubmit={handleSubmitReport}
+        technician={employee_id}
       />
 
       {showModal && (

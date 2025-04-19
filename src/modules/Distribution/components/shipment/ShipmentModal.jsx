@@ -470,6 +470,7 @@ const ShipmentModal = ({
     return carrier ? carrier.carrier_name : 'Not Assigned';
   };
 
+
   // Determine if shipment can be marked as shipped
   const canBeShipped = shipment.shipment_status === 'Pending';
   
@@ -1513,6 +1514,7 @@ const ShipmentModal = ({
                   )}
                 </div>
               )}
+              
             </div>
           </div>
           
