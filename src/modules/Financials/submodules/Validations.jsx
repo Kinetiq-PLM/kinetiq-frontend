@@ -387,7 +387,7 @@ const BodyContent = () => {
       setOriginalReturnsData(data.map(sub => ({
         validationId: sub.validation_id,
         returnsId: sub?.budget_return?.budget_return_id || "",
-        departmentId: sub?.budget_return?.dept_id || "",
+        departmentId: sub?.budget_return?.dept?.dept_name || "",
         returnDate: sub?.budget_return?.return_date || "",
         originTotalBudget: sub.final_approved_amount || "",
         returnedAmount: sub?.budget_return?.returned_amount || "",
@@ -409,7 +409,7 @@ const BodyContent = () => {
       setOriginalRequestData(data.map(sub => ({
         validationId: sub.validation_id,
         reqID: sub?.budget_request?.budget_request_id || "",
-        departmentId: sub?.budget_request?.dept_id || "",
+        departmentId: sub?.budget_request?.dept?.dept_name || "",
         amount: sub?.budget_request?.amount_requested || "",
         requestDate: sub?.budget_request?.requested_date || "",
         validatedBy: sub?.validated_by || "",
@@ -429,7 +429,7 @@ const BodyContent = () => {
       setOriginalData(data.map(sub => ({
         validationId: sub.validation_id,
         requestId: sub?.budget_submission?.budget_submission_id || "",
-        departmentId: sub?.budget_submission?.dept_id || "",
+        departmentId: sub?.budget_submission?.dept?.dept_name || "",
         amount: sub.amount_requested || "",
         submissionDate: sub?.budget_submission?.date_submitted || "",
         validatedBy: sub.validated_by || "",
