@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Validations.css";
-import { GET } from "../api/api";
-import { PATCH } from "../api/api";
+import { GET, PATCH } from "../api/api";
 
 const tabs = ["Budget Submission List", "Budget Request List", "Returns List"];
 
@@ -37,9 +36,9 @@ const BodyContent = () => {
   const [originalData, setOriginalData] = useState([]);
   const [originalRequestData, setOriginalRequestData] = useState([]);
   const [originalReturnsData, setOriginalReturnsData] = useState([]);
-  const [filteredData, setFilteredData] = useState(originalData);
-  const [filteredRequestData, setFilteredRequestData] = useState(originalRequestData);
-  const [filteredReturnsData, setFilteredReturnsData] = useState(originalReturnsData);
+  const [filteredData, setFilteredData] = useState([]); // Initialize as empty arrays
+  const [filteredRequestData, setFilteredRequestData] = useState([]);
+  const [filteredReturnsData, setFilteredReturnsData] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editedData, setEditedData] = useState({});
@@ -60,20 +59,30 @@ const BodyContent = () => {
   };
 
   useEffect(() => {
+    console.log("Date Range:", dateRange);
+    console.log("Search Term:", searchTerm);
+    console.log("Filter By:", filterBy);
+    console.log("Original Data (Submissions):", originalData);
+
     let tempData = filterDataByDate(originalData, dateRange);
     tempData = filterDataBySearch(tempData, searchTerm);
     tempData = sortData(tempData, filterBy);
     setFilteredData(tempData);
+    console.log("Filtered Data (Submissions):", tempData);
 
+    console.log("Original Data (Requests):", originalRequestData);
     let tempRequestData = filterDataByDate(originalRequestData, dateRange, 'requestDate');
     tempRequestData = filterDataBySearch(tempRequestData, searchTerm, 'reqID');
     tempRequestData = sortData(tempRequestData, filterBy, 'reqID', 'requestDate');
     setFilteredRequestData(tempRequestData);
+    console.log("Filtered Data (Requests):", tempRequestData);
 
+    console.log("Original Data (Returns):", originalReturnsData);
     let tempReturnsData = filterDataByDate(originalReturnsData, dateRange, 'returnDate');
     tempReturnsData = filterDataBySearch(tempReturnsData, searchTerm, 'returnsId');
     tempReturnsData = sortData(tempReturnsData, filterBy, 'returnsId', 'returnDate');
     setFilteredReturnsData(tempReturnsData);
+    console.log("Filtered Data (Returns):", tempReturnsData);
   }, [dateRange, searchTerm, filterBy, originalData, originalRequestData, originalReturnsData]);
 
   useEffect(() => {
@@ -125,14 +134,14 @@ const BodyContent = () => {
           item[requestIdField]?.toLowerCase().includes(lowerTerm) ||
           item.departmentId?.toLowerCase().includes(lowerTerm) ||
           item.amount?.toLowerCase().includes(lowerTerm) ||
-          (item.submissionDate ? item.submissionDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
-          (item.requestDate ? item.requestDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
-          (item.returnDate ? item.returnDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
+          (item.submissionDate ? item.submissionDate.toLowerCase().includes(lowerTerm) : false) ||
+          (item.requestDate ? item.requestDate.toLowerCase().includes(lowerTerm) : false) ||
+          (item.returnDate ? item.returnDate.toLowerCase().includes(lowerTerm) : false) ||
           item.validatedBy?.toLowerCase().includes(lowerTerm) ||
           item.remarks?.toLowerCase().includes(lowerTerm) ||
           item.approvedAmount?.toLowerCase().includes(lowerTerm) ||
           item.validationStatus?.toLowerCase().includes(lowerTerm) ||
-          (item.validationDate ? item.validationDate.toISOString().toLowerCase().includes(lowerTerm) : false) ||
+          (item.validationDate ? item.validationDate.toLowerCase().includes(lowerTerm) : false) ||
           item.comments?.toLowerCase().includes(lowerTerm)
         );
       });
@@ -149,16 +158,12 @@ const BodyContent = () => {
       sortedData.sort((a, b) => {
         let comparison = 0;
         if (sortBy === "lowest amount") {
-          const amountA = parseFloat(a.amount?.replace(/,/g, '')) || parseFloat(a.returnedAmount?.replace(/,/g, ''));
-          const amountB = parseFloat(b.amount?.replace(/,/g, '')) || parseFloat(b.returnedAmount?.replace(/,/g, ''));
-          if (isNaN(amountA)) return 1;
-          if (isNaN(amountB)) return -1;
+          const amountA = parseFloat(a.amount?.replace(/,/g, '')) || parseFloat(a.returnedAmount?.replace(/,/g, '')) || 0;
+          const amountB = parseFloat(b.amount?.replace(/,/g, '')) || parseFloat(b.returnedAmount?.replace(/,/g, '')) || 0;
           comparison = amountA - amountB;
         } else if (sortBy === "highest amount") {
-          const amountA = parseFloat(a.amount?.replace(/,/g, '')) || parseFloat(a.returnedAmount?.replace(/,/g, ''));
-          const amountB = parseFloat(b.amount?.replace(/,/g, '')) || parseFloat(b.returnedAmount?.replace(/,/g, ''));
-          if (isNaN(amountA)) return 1;
-          if (isNaN(amountB)) return -1;
+          const amountA = parseFloat(a.amount?.replace(/,/g, '')) || parseFloat(a.returnedAmount?.replace(/,/g, '')) || 0;
+          const amountB = parseFloat(b.amount?.replace(/,/g, '')) || parseFloat(b.returnedAmount?.replace(/,/g, '')) || 0;
           comparison = amountB - amountA;
         } else if (sortBy === "oldest requests") {
           comparison = new Date(a[dateField]) - new Date(b[dateField]);
@@ -202,6 +207,8 @@ const BodyContent = () => {
   const updateRequestValidationTable = (requestData) => {
     const departmentApproved = {};
     let totalApproved = 0;
+
+    // Calculate total approved for each department
     requestData.forEach(item => {
       if (item.validationStatus === "Validated" && item.approvedAmount) {
         const departmentName = departmentIds[item.departmentId] || item.departmentId;
@@ -215,6 +222,7 @@ const BodyContent = () => {
       }
     });
 
+    // Calculate allocated and spent for each department based on submission and request data
     const departmentData = {};
     originalData.forEach(item => {
       const departmentName = departmentIds[item.departmentId] || item.departmentId;
@@ -236,17 +244,22 @@ const BodyContent = () => {
       }
     });
 
-    const tableData = Object.keys(departmentData).map(deptName => ({
-      department: deptName,
-      allocatedBudget: departmentData[deptName].allocatedBudget.toLocaleString(undefined, { minimumFractionDigits: 2 }),
-      totalSpent: departmentData[deptName].totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 }),
-      remainingBudget: (departmentData[deptName].allocatedBudget - departmentData[deptName].totalSpent).toLocaleString(undefined, { minimumFractionDigits: 2 }),
-    }));
+    // Create table data with calculated values
+    const tableData = Object.keys(departmentData).map(deptName => {
+      const allocated = departmentData[deptName].allocatedBudget;
+      const spent = departmentData[deptName].totalSpent;
+      const remaining = allocated - spent;
+      return {
+        department: deptName,
+        allocatedBudget: allocated.toLocaleString(undefined, { minimumFractionDigits: 2 }),
+        totalSpent: spent.toLocaleString(undefined, { minimumFractionDigits: 2 }),
+        remainingBudget: remaining.toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      };
+    });
 
     setValidationTableData(tableData);
     setTotalBudget(totalApproved);
   };
-
 
   const updateTotalReturns = (returnsData) => {
     const totalReturned = returnsData.reduce((acc, item) => {
@@ -260,13 +273,13 @@ const BodyContent = () => {
 
   useEffect(() => {
     if (activeTab === "Budget Submission List") {
-      updateValidationTable(originalData);
+      updateValidationTable(filteredData); // Use filtered data
     } else if (activeTab === "Budget Request List") {
-      updateRequestValidationTable(originalRequestData);
+      updateRequestValidationTable(filteredRequestData); // Use filtered data
     } else if (activeTab === "Returns List") {
-      updateTotalReturns(originalReturnsData);
+      updateTotalReturns(filteredReturnsData);  // Use filtered data
     }
-  }, [originalData, originalRequestData, originalReturnsData, activeTab]);
+  }, [filteredData, filteredRequestData, filteredReturnsData, activeTab]);
 
   const handleRowSelect = (rowId) => {
     if (selectedRows.includes(rowId)) {
@@ -321,16 +334,16 @@ const BodyContent = () => {
     const editedDataForConfirmation = selectedRows.map(rowId => {
       const activeRow =
         activeTab === "Budget Submission List" ?
-        originalData.find(row => row.requestId === rowId) :
-        activeTab === "Budget Request List" ?
-        originalRequestData.find(row => row.reqID === rowId) :
-        originalReturnsData.find(row => row.returnsId === rowId);
+          originalData.find(row => row.requestId === rowId) :
+          activeTab === "Budget Request List" ?
+            originalRequestData.find(row => row.reqID === rowId) :
+            originalReturnsData.find(row => row.returnsId === rowId);
       return {
         ...(activeTab === "Budget Submission List" ?
           originalData.find(row => row.requestId === rowId) :
           activeTab === "Budget Request List" ?
-          originalRequestData.find(row => row.reqID === rowId) :
-          originalReturnsData.find(row => row.returnsId === rowId)),
+            originalRequestData.find(row => row.reqID === rowId) :
+            originalReturnsData.find(row => row.returnsId === rowId)),
         validatedBy: editedData[rowId]?.validatedBy || "",
         approvedAmount: editedData[rowId]?.approvedAmount || "",
         remarks: activeTab === "Returns List" ? returnRemarks[rowId] || "" : activeRow?.remarks || "",
@@ -346,45 +359,10 @@ const BodyContent = () => {
     setIsConfirmationVisible(false);
   };
 
-  const getSortedFilteredData = () => {
-    const validated = filteredData.filter(item => item.validationStatus === "Validated");
-    const pending = filteredData.filter(item => item.validationStatus === "Pending");
-    return [...validated, ...pending];
-  };
-
-  const getSortedFilteredRequestData = () => {
-    const validated = filteredRequestData.filter(item => item.validationStatus === "Validated");
-    const pending = filteredRequestData.filter(item => item.validationStatus === "Pending");
-    return [...validated, ...pending];
-  };
-
-  const getSortedFilteredReturnsData = () => {
-    const validated = filteredReturnsData.filter(item => item.validationStatus === "Validated");
-    const pending = filteredReturnsData.filter(item => item.validationStatus === "Pending");
-    const toReview = filteredReturnsData.filter(item => item.validationStatus === "To Review");
-    return [...validated, ...pending, ...toReview];
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditModalOpen(false);
-    setSelectedRows([]);
-    setEditedData({});
-    setReturnRemarks({});
-    setReturnComments({});
-  };
-
-  const handleCancelConfirmation = () => {
-    setIsConfirmationVisible(false);
-  };
-
-  const handleCancelReviewConfirmation = () => {
-    setIsReviewConfirmationVisible(false);
-  }
-
   const fetchReturns = async () => {
     try {
       const data = await GET("/validation/budget-returns/");
-      setOriginalReturnsData(data.map(sub => ({
+      const mappedData = data.map(sub => ({
         validationId: sub.validation_id,
         returnsId: sub?.budget_return?.budget_return_id || "",
         departmentId: sub?.budget_return?.dept_id || "",
@@ -397,16 +375,17 @@ const BodyContent = () => {
         validationStatus: sub.validation_status || "",
         validationDate: sub.validation_date || "",
         validatedBy: sub.validated_by || "",
-      })));
+      }));
+      setOriginalReturnsData(mappedData);
     } catch (error) {
-      console.error("Error fetching returns:", error)
+      console.error("Error fetching returns:", error);
     }
   }
 
   const fetchRequests = async () => {
     try {
       const data = await GET("/validation/budget-requests/");
-      setOriginalRequestData(data.map(sub => ({
+      const mappedData = data.map(sub => ({
         validationId: sub.validation_id,
         reqID: sub?.budget_request?.budget_request_id || "",
         departmentId: sub?.budget_request?.dept_id || "",
@@ -417,16 +396,17 @@ const BodyContent = () => {
         approvedAmount: sub.final_approved_amount || "",
         validationStatus: sub.validation_status || "",
         validationDate: sub.validation_date || "",
-      })));
+      }));
+      setOriginalRequestData(mappedData);
     } catch (error) {
-      console.error("Error fetching requests:", error)
+      console.error("Error fetching requests:", error);
     }
   }
 
   const fetch = async () => {
     try {
       const data = await GET("/validation/budget-submissions/");
-      setOriginalData(data.map(sub => ({
+      const mappedData = data.map(sub => ({
         validationId: sub.validation_id,
         requestId: sub?.budget_submission?.budget_submission_id || "",
         departmentId: sub?.budget_submission?.dept_id || "",
@@ -437,9 +417,10 @@ const BodyContent = () => {
         approvedAmount: sub.final_approved_amount || "",
         validationStatus: sub.validation_status || "",
         validationDate: sub.validation_date || "",
-      })));
+      }));
+      setOriginalData(mappedData);
     } catch (error) {
-      console.error("Error fetching budget validations:", error)
+      console.error("Error fetching budget validations:", error);
     }
   }
 
@@ -520,6 +501,20 @@ const BodyContent = () => {
     alert("Review process initiated.");
   };
 
+  const handleCancelEdit = () => {
+    setIsEditModalOpen(false);
+    setValidatedByError({});
+    setApprovedAmountError({});
+  };
+
+  const handleCancelConfirmation = () => {
+    setIsConfirmationVisible(false);
+  };
+
+  const handleCancelReviewConfirmation = () => {
+    setIsReviewConfirmationVisible(false);
+  };
+
   return (
     <div className="valid">
       <div className="body-content-container">
@@ -554,13 +549,12 @@ const BodyContent = () => {
                     <p>₱{totalBudget.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                   </div>
                   <div className="summary-status">
-                    <div className="summary-validated">
-                      Validated <span className="status-circle validated"></span>
+                    <div className="summary-validated">Validated <span className="status-circle validated"></span>
                       <p>{originalData.filter(item => item.validationStatus === "Validated").length}</p>
                     </div>
                     <div className="summary-pending">
                       Pending <span className="status-circle pending"></span>
-                      <p>{originalData.filter(item => item.validationStatus === "Pending").length}</p>
+                      <p>{originalData.filter(item => item.validationStatus=== "Pending").length}</p>
                     </div>
                   </div>
                 </div>
@@ -623,7 +617,7 @@ const BodyContent = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {originalData.map((row, index) => (
+                    {filteredData.map((row, index) => ( // Use filteredData here
                       <tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Validated" ? "#f0f0f0" : "white" }}>
                         <td>
                           <div className="row-wrapper">
@@ -702,7 +696,7 @@ const BodyContent = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {validationTableData.map(row => (
+                  {validationTableData.map(row => ( // Use validationTableData
                     <tr key={row.department}>
                       <td>{row.department}</td>
                       <td>{row.allocatedBudget}</td>
@@ -748,7 +742,7 @@ const BodyContent = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {originalRequestData.map((row, index) => (
+                    {filteredRequestData.map((row, index) => (  
                       <tr key={index} onClick={() => handleRowSelect(row.reqID)} className={selectedRows.includes(row.reqID) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Validated" ? "#f0f0f0" : "white" }}>
                         <td>
                           <div className="row-wrapper">
@@ -771,7 +765,7 @@ const BodyContent = () => {
                           <div className="row-wrapper">{row.validationDate ? row.validationDate : "N/A"}</div>
                         </td>
                         <td>
-                          <div className="row-wrapper">{row.validationStatus === "Pending"? "N/A" : row.validatedBy}</div>
+                          <div className="row-wrapper">{row.validationStatus === "Pending" ? "N/A" : row.validatedBy}</div>
                         </td>
                         <td>
                           <div className="row-wrapper">{row.remarks}</div>
@@ -806,15 +800,15 @@ const BodyContent = () => {
                   <div className="summary-status">
                     <div className="summary-validated">
                       Validated <span className="status-circle validated"></span>
-                      <p>{originalReturnsData.filter(item => item.validationStatus === "Validated").length}</p>
+                      <p>{filteredReturnsData.filter(item => item.validationStatus === "Validated").length}</p>
                     </div>
                     <div className="summary-pending">
                       Pending <span className="status-circle pending"></span>
-                      <p>{originalReturnsData.filter(item => item.validationStatus === "Pending").length}</p>
+                      <p>{filteredReturnsData.filter(item => item.validationStatus === "Pending").length}</p>
                     </div>
                     <div className="summary-toreview">
                       To Review <span className="status-circle toreview"></span>
-                      <p>{originalReturnsData.filter(item => item.validationStatus === "To Review").length}</p>
+                      <p>{filteredReturnsData.filter(item => item.validationStatus === "To Review").length}</p>
                     </div>
                   </div>
                 </div>
@@ -857,7 +851,7 @@ const BodyContent = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {originalReturnsData.map((row, index) => (
+                    {filteredReturnsData.map((row, index) => ( // Use filteredReturnsData
                       <tr key={index} onClick={() => handleRowSelect(row.returnsId)} className={selectedRows.includes(row.returnsId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Validated" ? "#f0f0f0" : "white" }}>
                         <td>
                           <div className="row-wrapper">
@@ -900,7 +894,7 @@ const BodyContent = () => {
                         </td>
                         <td>
                           <div className="row-wrapper">
-                            <span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span>
+                          <span className={`status-label ${row.validationStatus.toLowerCase()} ${row.validationStatus.trim().toLowerCase() === 'to review' ? 'status-toreview' : ''}`}>{row.validationStatus}</span>
                           </div>
                         </td>
                       </tr>
@@ -945,56 +939,50 @@ const BodyContent = () => {
                           {activeRow?.submissionDate ? activeRow.submissionDate : activeRow?.requestDate ? activeRow.requestDate : activeRow?.returnDate}
                         </p>
                         <div className="edit-modal-input-group validated-by-group">
-                          <div className="edit-modal-label-input">
-                            <label>
-                              <strong>Validated By:</strong>
-                            </label>
-                            <input
-                              type="text"
-                              value={editedData[rowId]?.validatedBy || ""}
-                              onChange={(e) => {
-                                handleEditChange(rowId, "validatedBy", e.target.value);
-                                setValidatedByError(prevErrors => ({ ...prevErrors, [rowId]: false }));
-                              }}
-                            />
-                          </div>
+                          <label>
+                            <strong>Validated By:</strong>
+                          </label>
+                          <input
+                            type="text"
+                            value={editedData[rowId]?.validatedBy || ""}
+                            onChange={(e) => {
+                              handleEditChange(rowId, "validatedBy", e.target.value);
+                              setValidatedByError(prevErrors => ({ ...prevErrors, [rowId]: false }));
+                            }}
+                          />
                           {validatedByError[rowId] && <p className="error-message">Validated By is required</p>}
                         </div>
                         {activeTab === "Returns List" ? (
                           <div className="edit-modal-input-group remarks-group">
-                            <div className="edit-modal-label-input">
-                              <label>
-                                <strong>Remarks:</strong>
-                              </label>
-                              <select
-                                value={returnRemarks[rowId] || ""}
-                                onChange={(e) => handleEditChange(rowId, "remarks", e.target.value)}
-                              >
-                                <option value="">Select Remarks</option>
-                                <option value="Exact Amount Returned">Exact Amount Returned</option>
-                                <option value="Budget Mismatched">Budget Mismatched</option>
-                                <option value="Overreturned">Overreturned</option>
-                                <option value="Underreturned">Underreturned</option>
-                                <option value="Revalidation Needed">Revalidation Needed</option>
-                                <option value="Document Issue">Document Issue</option>
-                              </select>
-                            </div>
+                            <label>
+                              <strong>Remarks:</strong>
+                            </label>
+                            <select
+                              value={returnRemarks[rowId] || ""}
+                              onChange={(e) => handleEditChange(rowId, "remarks", e.target.value)}
+                            >
+                              <option value="">Select Remarks</option>
+                              <option value="Exact Amount Returned">Exact Amount Returned</option>
+                              <option value="Budget Mismatched">Budget Mismatched</option>
+                              <option value="Overreturned">Overreturned</option>
+                              <option value="Underreturned">Underreturned</option>
+                              <option value="Revalidation Needed">Revalidation Needed</option>
+                              <option value="Document Issue">Document Issue</option>
+                            </select>
                           </div>
                         ) : (
                           <div className="edit-modal-input-group approved-amount-group">
-                            <div className="edit-modal-label-input">
-                              <label>
-                                <strong>Approved Amount:</strong>
-                              </label>
-                              <input
-                                type="text"
-                                value={editedData[rowId]?.approvedAmount || ""}
-                                onChange={(e) => {
-                                  handleEditChange(rowId, "approvedAmount", e.target.value);
-                                  setApprovedAmountError(prevErrors => ({ ...prevErrors, [rowId]: false }));
-                                }}
-                              />
-                            </div>
+                            <label>
+                              <strong>Approved Amount:</strong>
+                            </label>
+                            <input
+                              type="text"
+                              value={editedData[rowId]?.approvedAmount || ""}
+                              onChange={(e) => {
+                                handleEditChange(rowId, "approvedAmount", e.target.value);
+                                setApprovedAmountError(prevErrors => ({ ...prevErrors, [rowId]: false }));
+                              }}
+                            />
                             {approvedAmountError[rowId] && <p className="error-message">Please fill out this field</p>}
                           </div>
                         )}
@@ -1076,3 +1064,4 @@ const BodyContent = () => {
 };
 
 export default BodyContent;
+
