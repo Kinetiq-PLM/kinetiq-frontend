@@ -44,7 +44,7 @@ const BodyContent = () => {
     setLoadingProducts(true);
 
     // Fetch basic product data
-    fetch("http://127.0.0.1:8000/api/products/")
+    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/products/")
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
@@ -60,7 +60,7 @@ const BodyContent = () => {
       });
 
     // Fetch product inventory data from new endpoint
-    fetch(`http://127.0.0.1:8000/api/product-inventory/`)
+    fetch(`https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/product-inventory/`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
@@ -88,7 +88,7 @@ const BodyContent = () => {
     setLoadingAssets(true);
 
     // Fetch basic asset data
-    fetch("http://127.0.0.1:8000/api/assets/")
+    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/assets/")
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
@@ -104,7 +104,7 @@ const BodyContent = () => {
       });
 
     // Fetch asset inventory data
-    fetch("http://127.0.0.1:8000/api/asset-inventory/")
+    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/asset-inventory/")
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
@@ -132,7 +132,7 @@ const BodyContent = () => {
     setLoadingRawMats(true);
 
     // Fetch basic raw material data
-    fetch("http://127.0.0.1:8000/api/raw-materials/")
+    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/raw-materials/")
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
@@ -148,7 +148,7 @@ const BodyContent = () => {
       });
 
     // Fetch material inventory data
-    fetch(`http://127.0.0.1:8000/api/material-inventory/`)
+    fetch(`https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/material-inventory/`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
