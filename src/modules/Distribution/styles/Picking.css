@@ -866,6 +866,8 @@
   justify-content: center;
 }
 
+/* Add these styles to your existing Picking.css file */
+
 /* Improved Modal Styles */
 .picking .edit-picking-modal.improved {
   width: 600px;

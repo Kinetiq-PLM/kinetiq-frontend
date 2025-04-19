@@ -187,7 +187,6 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
             onClick={onConfirm}
           >
             <FaCheck className="button-icon" />
-            <FaCheck className="button-icon" />
             Complete Picking
           </button>
         </div>

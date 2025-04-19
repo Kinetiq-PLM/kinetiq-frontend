@@ -551,9 +551,7 @@
 }
 
 /* .packing .status-update-button.status-packed:hover {
-/* .packing .status-update-button.status-packed:hover {
   background-color: #0069d9;
-} */
 } */
 
 .packing .status-update-button.status-shipped {
@@ -601,11 +599,6 @@
 }
 
 .packing .save-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.packing .status-update-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }
