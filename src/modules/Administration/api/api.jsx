@@ -116,9 +116,9 @@ export const roleAPI = {
   },
 
   // Get archived roles
-  getArchivedRoles: async () => {
+  getArchivedRoles: async (params = {}) => {
     try {
-      const response = await api.get('/manage/roles/archived/');
+      const response = await api.get('/manage/roles/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived roles:', error);

@@ -15,8 +15,10 @@ import {
   message,
   Spin,
   Checkbox,
+  Popover,
   Typography,
-  Divider
+  Divider,
+  Pagination
 } from "antd";
 import { 
   UserOutlined, 
@@ -28,6 +30,7 @@ import {
   EyeOutlined,
   SearchOutlined
 } from "@ant-design/icons";
+import { AlignCenter } from "lucide-react";
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
@@ -43,6 +46,20 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [searchValue, setSearchValue] = useState("");
+  const [archivedSearchValue, setArchivedSearchValue] = useState("");
+  
+  // Pagination states
+  const [userPagination, setUserPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
+  
+  const [rolePagination, setRolePagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
 
   // Modal states
   const [userModalVisible, setUserModalVisible] = useState(false);
@@ -65,11 +82,18 @@ const UserManagement = () => {
   }, [activeTab]);
 
   // Data fetching functions
-  const fetchUsers = async (searchTerm = "") => {
+  const fetchUsers = async (searchTerm = "", orderField = "", orderDirection = "") => {
     setLoading(true);
     try {
-      const data = await userAPI.getUsers({ search: searchTerm });
+      const data = await userAPI.getUsers({ 
+        search: searchTerm,
+        ordering: orderDirection === "descend" ? `-${orderField}` : orderField
+      });
       setUsers(data.results || data);
+      setUserPagination(prev => ({
+        ...prev,
+        total: (data.results || data).length
+      }));
     } catch (error) {
       message.error("Failed to fetch users");
       console.error(error);
@@ -78,11 +102,19 @@ const UserManagement = () => {
     }
   };
 
-  const fetchRoles = async (searchTerm = "") => {
+  const fetchRoles = async (searchTerm = "", orderField = "", orderDirection = "") => {
     setLoading(true);
     try {
-      const data = await roleAPI.getRoles({ search: searchTerm });
+      // Make sure to pass search param correctly to API
+      const data = await roleAPI.getRoles({ 
+        search: searchTerm,
+        ordering: orderDirection === "descend" ? `-${orderField}` : orderField
+      });
       setRoles(data.results || data);
+      setRolePagination(prev => ({
+        ...prev,
+        total: (data.results || data).length
+      }));
     } catch (error) {
       message.error("Failed to fetch roles");
       console.error(error);
@@ -91,10 +123,20 @@ const UserManagement = () => {
     }
   };
 
-  const fetchArchivedRoles = async () => {
+  const fetchArchivedRoles = async (searchTerm = "", orderField = "", orderDirection = "") => {
     setLoading(true);
     try {
-      const data = await roleAPI.getArchivedRoles();
+      // Create params object with search term
+      const params = {
+        search: searchTerm || "",
+      };
+      
+      // Add ordering if provided
+      if (orderField) {
+        params.ordering = orderDirection === "descend" ? `-${orderField}` : orderField;
+      }
+      
+      const data = await roleAPI.getArchivedRoles(params);
       setArchivedRoles(data.results || data);
       setArchiveModalVisible(true);
     } catch (error) {
@@ -103,6 +145,51 @@ const UserManagement = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Update the handleArchivedSearch function
+  const handleArchivedSearch = (value) => {
+    setArchivedSearchValue(value);
+    fetchArchivedRoles(value);
+  };
+
+  const handleTableChange = (pagination, filters, sorter, extra) => {
+    if (sorter && sorter.field) {
+      const orderField = sorter.field;
+      const orderDirection = sorter.order;
+      
+      if (activeTab === "users") {
+        fetchUsers(searchValue, orderField, orderDirection);
+      } else {
+        fetchRoles(searchValue, orderField, orderDirection);
+      }
+    }
+  };
+
+  const handleArchivedTableChange = (pagination, filters, sorter, extra) => {
+    if (sorter && sorter.field) {
+      const orderField = sorter.field;
+      const orderDirection = sorter.order;
+      
+      fetchArchivedRoles(archivedSearchValue, orderField, orderDirection);
+    }
+  };
+
+  // Handle pagination changes
+  const handleUserPaginationChange = (page, pageSize) => {
+    setUserPagination(prev => ({
+      ...prev,
+      current: page,
+      pageSize
+    }));
+  };
+
+  const handleRolePaginationChange = (page, pageSize) => {
+    setRolePagination(prev => ({
+      ...prev,
+      current: page,
+      pageSize
+    }));
   };
 
   // User form handlers
@@ -214,14 +301,14 @@ const UserManagement = () => {
     try {
       await roleAPI.restoreRole(roleId);
       message.success("Role restored successfully");
-      fetchArchivedRoles(); // Refresh archived roles list
+      fetchArchivedRoles(archivedSearchValue); // Keep current search term
       fetchRoles(); // Refresh active roles list
     } catch (error) {
       message.error("Failed to restore role");
     }
   };
 
-  // Handle search
+  // Handle search with debounce
   const handleSearch = (value) => {
     setSearchValue(value);
     if (activeTab === "users") {
@@ -231,71 +318,116 @@ const UserManagement = () => {
     }
   };
 
+  const DepartmentPermissions = ({ permissions }) => {
+    if (!permissions || permissions.length === 0) return null;
+  
+    const displayCount = permissions.length === 4 ? 4 : 3;
+    const hasMore = permissions.length > displayCount;
+    const displayed = permissions.slice(0, displayCount);
+    const hidden = permissions.slice(displayCount);
+  
+    const content = (
+      <div className="popover-tags">
+        {hidden.map((perm) => (
+          <Tag color="blue" key={perm} className="permission-tag">{perm}</Tag>
+        ))}
+      </div>
+    );
+  
+    return (
+      <div className="tag-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+        {displayed.map((perm) => (
+          <Tag color="blue" key={perm} className="permission-tag">{perm}</Tag>
+        ))}
+        {hasMore && (
+          <Popover 
+            content={content} 
+            trigger="click"
+            overlayClassName="permissions-popover"
+            placement="bottom"
+          >
+            <Tag className="more-tag" style={{ cursor: 'pointer' }}>
+              +{hidden.length} More
+            </Tag>
+          </Popover>
+        )}
+      </div>
+    );
+  };
+
   // Table columns definitions with sorting added
   const userColumns = [
     {
       title: "User ID",
       dataIndex: "user_id",
       key: "user_id",
-      sorter: (a, b) => a.user_id.localeCompare(b.user_id),
+      sorter: true,
+      width: 180,
     },
     {
       title: "First Name",
       dataIndex: "first_name",
       key: "first_name",
-      sorter: (a, b) => a.first_name.localeCompare(b.first_name),
+      sorter: true,
+      width: 120,
     },
     {
       title: "Last Name",
       dataIndex: "last_name",
       key: "last_name",
-      sorter: (a, b) => a.last_name.localeCompare(b.last_name),
+      sorter: true,
+      width: 120,
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      sorter: (a, b) => a.email.localeCompare(b.email),
+      sorter: true,
+      width: 200,
     },
     {
       title: "Role",
       dataIndex: "role_display",
       key: "role_display",
-      sorter: (a, b) => {
-        const roleA = a.role_display || "No Role Assigned";
-        const roleB = b.role_display || "No Role Assigned";
-        return roleA.localeCompare(roleB);
-      },
+      sorter: true,
+      width: 200,
       render: (text) => text || "No Role Assigned",
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      sorter: (a, b) => a.status.localeCompare(b.status),
+      sorter: true,
+      width: 50,
       render: (status) => (
         <Tag color={status === "Active" ? "green" : "red"}>
           {status}
         </Tag>
       ),
+      
     },
     {
       title: "Created At",
       dataIndex: "created_at",
       key: "created_at",
-      sorter: (a, b) => new Date(a.created_at) - new Date(b.created_at),
-      render: (text) => new Date(text).toLocaleDateString(),
+      sorter: true,
+      width: 100,
+      render: (text) => text ? new Date(text).toLocaleDateString() : '-',
     },
     {
-        title: "Updated At",
-        dataIndex: "updated_at",
-        key: "updated_at",
-        sorter: (a, b) => new Date(a.updated_at || a.created_at) - new Date(b.updated_at || b.created_at),
-        render: (text) => new Date(text).toLocaleDateString(),
-      },
+      title: "Updated At",
+      dataIndex: "updated_at",
+      key: "updated_at",
+      sorter: true,
+      width: 100,
+      render: (text, record) => text ? new Date(text).toLocaleDateString() : 
+        (record.created_at ? new Date(record.created_at).toLocaleDateString() : '-'),
+    },
     {
       title: "Actions",
       key: "actions",
+      width: 60, // Fixed width for actions column
+      align: "center",
       render: (_, record) => (
         <Space size="small">
           <Button 
@@ -314,41 +446,35 @@ const UserManagement = () => {
       title: "Role ID",
       dataIndex: "role_id",
       key: "role_id",
-      sorter: (a, b) => a.role_id.localeCompare(b.role_id),
+      sorter: true,
+      width: 200,
     },
     {
       title: "Role Name",
       dataIndex: "role_name",
       key: "role_name",
-      sorter: (a, b) => a.role_name.localeCompare(b.role_name),
+      sorter: true,
+      width: 220,
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
-      sorter: (a, b) => {
-        const descA = a.description || "";
-        const descB = b.description || "";
-        return descA.localeCompare(descB);
-      },
+      sorter: true,
+      width: 400,
     },
     {
       title: "Department Permissions",
       dataIndex: "department_permissions",
       key: "department_permissions",
-      render: (permissions) => (
-        <div className="tag-container">
-          {permissions && permissions.map((perm) => (
-            <Tag color="blue" key={perm}>
-              {perm}
-            </Tag>
-          ))}
-        </div>
-      ),
+      render: (permissions) => <DepartmentPermissions permissions={permissions} />,
+      width: 400,
     },
     {
       title: "Actions",
       key: "actions",
+      width: 80, // Fixed width for actions column
+      align: "center",
       render: (_, record) => (
         <Space size="small">
           <Button 
@@ -359,6 +485,7 @@ const UserManagement = () => {
           />
           <Popconfirm
             title="Are you sure you want to archive this role?"
+            popupPlacement="topRight"
             onConfirm={() => handleArchiveRole(record.role_id)}
             okText="Yes"
             cancelText="No"
@@ -379,42 +506,36 @@ const UserManagement = () => {
       title: "Role ID",
       dataIndex: "role_id",
       key: "role_id",
-      sorter: (a, b) => a.role_id.localeCompare(b.role_id),
+      sorter: true,
+      sortDirections: ['ascend', 'descend'],
+      width: 200,
     },
     {
       title: "Role Name",
       dataIndex: "role_name",
       key: "role_name",
-      sorter: (a, b) => a.role_name.replace("ARCHIVED_", "").localeCompare(b.role_name.replace("ARCHIVED_", "")),
+      sorter: true,
+      sortDirections: ['ascend', 'descend'],
       render: (text) => text.replace("ARCHIVED_", ""),
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
-      sorter: (a, b) => {
-        const descA = a.description || "";
-        const descB = b.description || "";
-        return descA.localeCompare(descB);
-      },
+      sorter: true,
+      sortDirections: ['ascend', 'descend'],
     },
     {
       title: "Department Permissions",
       dataIndex: "department_permissions",
       key: "department_permissions",
-      render: (permissions) => (
-        <div className="tag-container">
-          {permissions && permissions.map((perm) => (
-            <Tag color="blue" key={perm}>
-              {perm}
-            </Tag>
-          ))}
-        </div>
-      ),
+      render: (permissions) => <DepartmentPermissions permissions={permissions} />
     },
     {
       title: "Actions",
       key: "actions",
+      width: 10, // Fixed width for actions column
+      align: "center",
       render: (_, record) => (
         <Space size="small">
           <Popconfirm
@@ -438,20 +559,40 @@ const UserManagement = () => {
   const departmentOptions = [
     'Accounting',
     'Administration',
+    'CRM',
     'Distribution',
     'Finance',
     'Human Resources',
     'Inventory',
+    'Job Posting',
     'Management',
     'MRP',
     'Operations',
     'Production',
     'Project Management',
+    'Project Request',
     'Purchasing',
+    'Purchase Request',
     'Sales',
-    'Services',
-    'Solution Customizing'
+    'Support & Services',
+    'Report Generator',
+    'Workforce Request'
   ];
+
+  // Calculate table data for pagination
+  const getUserTableData = () => {
+    const { current, pageSize } = userPagination;
+    const start = (current - 1) * pageSize;
+    const end = start + pageSize;
+    return users.slice(start, end);
+  };
+
+  const getRoleTableData = () => {
+    const { current, pageSize } = rolePagination;
+    const start = (current - 1) * pageSize;
+    const end = start + pageSize;
+    return roles.slice(start, end);
+  };
 
   // Render main component
   return (
@@ -464,16 +605,20 @@ const UserManagement = () => {
         
         <Tabs 
           activeKey={activeTab} 
-          onChange={setActiveTab}
+          onChange={(key) => {
+            setActiveTab(key);
+            setSearchValue(""); // Clear search when switching tabs
+          }}
           size="middle"
           tabBarGutter={8}
           className="user-tabs"
+          type="line"
           tabBarExtraContent={{
             right: (
                 <div className="header-right-content">
                   <div className="search-container">
                     <Input.Search
-                      placeholder={activeTab === "users" ? "Search users or roles..." : "Search roles or departments..."}
+                      placeholder={activeTab === "users" ? "Search users..." : "Search roles..."}
                       allowClear
                       onSearch={handleSearch}
                       value={searchValue}
@@ -495,7 +640,10 @@ const UserManagement = () => {
                       <>
                         <Button 
                           icon={<EyeOutlined />} 
-                          onClick={fetchArchivedRoles}
+                          onClick={() => {
+                            setArchivedSearchValue("");
+                            fetchArchivedRoles("");
+                          }}
                           className="archive-btn"
                         >
                           View Archived
@@ -520,32 +668,32 @@ const UserManagement = () => {
           >
             <div className="table-meta-info">
                 <span className="record-count">Total Users: {users.length}</span>
+                <div className="table-pagination">
+                  <Pagination 
+                    current={userPagination.current}
+                    pageSize={userPagination.pageSize}
+                    total={users.length}
+                    onChange={handleUserPaginationChange}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
             </div>
-            {/* <div className="table-search-container">
-              <Input.Search
-                placeholder="Search users..."
-                allowClear
-                onSearch={handleSearch}
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                prefix={<SearchOutlined />}
-              />
-            </div> */}
+
             <div className="table-container">
               <Table 
-                dataSource={users} 
+                dataSource={getUserTableData()} 
                 columns={userColumns} 
                 rowKey="user_id"
                 loading={loading}
-                scroll={{ x: 'max-content' }}
-                pagination={{ 
-                  pageSize: 10,
-                  responsive: true,
-                  size: 'small',
-                  position: ['bottomCenter']
-                }}
+                scroll={{ x: 'max-content', y: 400 }}
+                pagination={false} // Disable default pagination
                 bordered
                 size="middle"
+                showSorterTooltip={false}
+                sortDirections={['ascend', 'descend']}
+                onChange={handleTableChange}
+                className="scrollable-table"
               />
             </div>
           </TabPane>
@@ -556,33 +704,31 @@ const UserManagement = () => {
           >
             <div className="table-meta-info">
                 <span className="record-count">Total Roles: {roles.length}</span>
+                <div className="table-pagination">
+                  <Pagination 
+                    current={rolePagination.current}
+                    pageSize={rolePagination.pageSize}
+                    total={roles.length}
+                    onChange={handleRolePaginationChange}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
             </div>
-            {/* <div className="table-search-container">
-              <Input.Search
-                placeholder="Search roles..."
-                allowClear
-                onSearch={handleSearch}
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                prefix={<SearchOutlined />}
-              />
-            </div> */}
             <div className="table-container">
               <Table 
-                dataSource={roles} 
+                dataSource={getRoleTableData()} 
                 columns={roleColumns} 
                 rowKey="role_id"
                 loading={loading}
-                scroll={{ x: 'max-content' }}
-                pagination={{ 
-                  pageSize: 10,
-                  showSizeChanger: false,
-                  responsive: true,
-                  size: 'small',
-                  position: ['bottomCenter']
-                }}
+                scroll={{ x: 'max-content', y: 400 }}
+                pagination={false} // Disable default pagination
                 bordered
                 size="middle"
+                showSorterTooltip={false}
+                sortDirections={['ascend', 'descend']}
+                onChange={handleTableChange}
+                className="scrollable-table"
               />
             </div>
           </TabPane>
@@ -774,6 +920,16 @@ const UserManagement = () => {
           width={900}
           className="custom-modal"
         >
+          <div className="archived-search-container" style={{ marginBottom: '16px' }}>
+            <Input.Search
+              placeholder="Search archived roles..."
+              allowClear
+              onSearch={handleArchivedSearch}
+              value={archivedSearchValue}
+              onChange={(e) => setArchivedSearchValue(e.target.value)}
+              prefix={<SearchOutlined />}
+            />
+          </div>
           <Table 
             dataSource={archivedRoles} 
             columns={archivedRoleColumns} 
@@ -781,13 +937,16 @@ const UserManagement = () => {
             loading={loading}
             scroll={{ x: 'max-content' }}
             pagination={{ 
-              pageSize: 10,
+              pageSize: 7,
               responsive: true,
               size: 'small',
               position: ['bottomCenter']
             }}
             bordered
             size="middle"
+            showSorterTooltip={false}
+            sortDirections={['ascend', 'descend']}
+            onChange={handleArchivedTableChange}
           />
         </Modal>
       </div>
