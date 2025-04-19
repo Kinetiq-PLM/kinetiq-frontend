@@ -153,7 +153,7 @@ const PurchaseReqForm = ({ onClose }) => {
         }
 
         try {
-            const res = await fetch("http://127.0.0.1:8000/api/prf/list/");
+            const res = await fetch("http://127.0.0.1:8000/api/prf/null/");
             const data = await res.json();
             const latest = data[data.length - 1]?.request_id;
             setLatestRequestId(latest);
@@ -336,7 +336,7 @@ const PurchaseReqForm = ({ onClose }) => {
                         </div>
                         <div className="form-group">
                             <label>Document Date</label>
-                            <input type="date" name="documentDate" value={formData.documentDate} onChange={handleInputChange} />
+                            <input type="date" name="documentDate" value={formData.documentDate} onChange={handleInputChange} readOnly  />
                         </div>
                         <div className="form-group">
                             <label>Valid Date</label>

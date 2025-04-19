@@ -9,9 +9,11 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
     const [quotationMaterials, setQuotationMaterials] = useState([]);
     const [quotationAssets, setQuotationAssets] = useState([]);
     const [quotationContentData, setQuotationContentData] = useState([]);
+    const [employees, setEmployees] = useState([]); // State for employees
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [amountPaid, setAmountPaid] = useState(0); // New state for user input
+    
 
     const handleBack = () => {
         onClose?.();
@@ -23,93 +25,181 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
 
     const { content_id } = invoiceData || {};
 
+    const fetchEmployeesFromPRF = async (request_id) => {
+        try {
+            console.log("Fetching PRF data for request_id:", request_id); // Debugging
+            const prfResponse = await axios.get("http://127.0.0.1:8000/api/prf/list/");
+            console.log("PRF API Response:", prfResponse.data); // Debugging
+
+            // Find the PRF entry matching the request_id
+            const matchedPRF = prfResponse.data.find((prf) => prf.request_id === request_id);
+            if (!matchedPRF) {
+                console.log("No PRF entry found for the given request_id");
+                setEmployees([]); // Clear employees if no match is found
+                return;
+            }
+
+            console.log("Matched PRF Entry:", matchedPRF);
+
+            // Extract the employee_id from the matched PRF entry
+            const { employee_id } = matchedPRF;
+            console.log("Employee ID:", employee_id);
+
+            // Fetch employee details using employee_id
+            const employeesResponse = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+            const matchedEmployee = employeesResponse.data.find((employee) => employee.employee_id === employee_id);
+
+            if (!matchedEmployee) {
+                console.log("No employee found for the given employee_id");
+                setEmployees([]); // Clear employees if no match is found
+            } else {
+                console.log("Matched Employee:", matchedEmployee);
+                setEmployees([matchedEmployee]); // Set the matched employee in the state
+            }
+        } catch (error) {
+            console.error("Error fetching employees from PRF:", error.message);
+        }
+    };
+    const fetchVendorData = async (quotation_id) => {
+        try {
+            console.log("Fetching vendor data for quotation_id:", quotation_id);
+    
+            // Fetch vendor data using quotation_id
+            const vendorResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
+            const matchedVendor = vendorResponse.data.find(
+                (vendor) => vendor.quotation_id === quotation_id
+            );
+    
+            if (!matchedVendor) {
+                console.log("No vendor found for the given quotation_id");
+                return null;
+            }
+    
+            console.log("Matched Vendor:", matchedVendor);
+    
+            // Return the vendor_code
+            return matchedVendor.vendor_code;
+        } catch (error) {
+            console.error("Error fetching vendor data:", error.message);
+            return null;
+        }
+    };
+    
+    const fetchVendorName = async (vendor_code) => {
+        try {
+            console.log("Fetching vendor name for vendor_code:", vendor_code);
+    
+            // Fetch vendor name using vendor_code
+            const vendorListResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/vendor/list/");
+            const matchedVendor = vendorListResponse.data.find(
+                (vendor) => vendor.vendor_code === vendor_code
+            );
+    
+            if (!matchedVendor) {
+                console.log("No vendor found for the given vendor_code");
+                return "N/A";
+            }
+    
+            console.log("Matched Vendor Name:", matchedVendor.vendor_name);
+    
+            // Return the vendor_name
+            return matchedVendor.vendor_name;
+        } catch (error) {
+            console.error("Error fetching vendor name:", error.message);
+            return "N/A";
+        }
+    };
+
     const fetchDataFromContentId = async (content_id) => {
         try {
             setLoading(true);
             setError("");
-
+    
             console.log("Fetching data for content_id:", content_id);
-
+    
             // Fetch all invoices
             const invoicesResponse = await axios.get("http://127.0.0.1:8000/api/invoices/list/");
             const invoice = invoicesResponse.data.find((inv) => inv.content_id === content_id);
             if (!invoice) throw new Error("Invoice not found for the given content_id");
-
+    
             console.log("Matched Invoice:", invoice);
-
+    
             // Fetch external_module data
             const externalModulesResponse = await axios.get("http://127.0.0.1:8000/api/invoices/external-modules/");
             const matchedExternalModule = externalModulesResponse.data.find(
                 (module) => module.content_id === content_id
             );
-
+    
             if (!matchedExternalModule) {
                 console.log("No external module found for the given content_id");
             } else {
                 console.log("Matched External Module:", matchedExternalModule);
                 setExternalModuleData(matchedExternalModule);
-
+    
+                // Fetch employees from PRF using request_id
+                fetchEmployeesFromPRF(matchedExternalModule.request_id);
+    
                 // Fetch purchase_quotation data using request_id from external_module
                 const purchaseQuotationResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
                 const matchedPurchaseQuotation = purchaseQuotationResponse.data.filter(
                     (quotation) => quotation.request_id === matchedExternalModule.request_id
                 );
-
+    
                 if (matchedPurchaseQuotation.length === 0) {
                     console.log("No purchase quotation found for the given request_id");
                 } else {
                     console.log("Matched Purchase Quotation:", matchedPurchaseQuotation);
                     setPurchaseQuotationData(matchedPurchaseQuotation);
-
-                    // Fetch vendor data
-                    const vendorResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/vendor/list/");
-                    const matchedVendor = vendorResponse.data.find(
-                        (vendor) => vendor.vendor_code === matchedPurchaseQuotation[0]?.vendor_code
-                    );
-
-                    if (matchedVendor) {
-                        console.log("Matched Vendor:", matchedVendor);
-                        setPurchaseQuotationData((prev) => ({
-                            ...prev,
-                            vendor_name: matchedVendor.vendor_name,
-                            vendor_address: matchedVendor.vendor_address,
-                        }));
-                    } else {
-                        console.log("No vendor found for the given vendor_code");
+    
+                    // Fetch vendor_code using quotation_id
+                    const vendor_code = await fetchVendorData(matchedPurchaseQuotation[0]?.quotation_id);
+                    console.log("Vendor Code:", vendor_code);
+    
+                    if (vendor_code) {
+                        // Fetch vendor_name using vendor_code
+                        const vendor_name = await fetchVendorName(vendor_code);
+                        console.log("Vendor Name:", vendor_name);
+    
+                        // Update purchaseQuotationData with vendor_name
+                        setPurchaseQuotationData((prevData) =>
+                            prevData.map((item, index) =>
+                                index === 0 ? { ...item, vendor_name } : item
+                            )
+                        );
                     }
-
+    
                     // Fetch materials and assets
                     const materialsResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/materials/list/");
-                    const matchedMaterials = materialsResponse.data.filter(
-                        (material) => material.request_id === matchedExternalModule.request_id
-                    );
-
                     const assetsResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/assets/list/");
-                    const matchedAssets = assetsResponse.data.filter(
-                        (asset) => asset.request_id === matchedExternalModule.request_id
-                    );
-
+                    const materials = materialsResponse.data;
+                    const assets = assetsResponse.data;
+    
+                    console.log("Materials:", materials); // Debugging
+                    console.log("Assets:", assets); // Debugging
+    
                     // Fetch quotation content data
                     const quotationContentResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/list/");
                     const matchedQuotationContent = quotationContentResponse.data.filter(
                         (content) => content.request_id === matchedExternalModule.request_id
                     );
-
+    
                     // Merge with material/asset info
                     const enrichedItems = matchedQuotationContent.map((item) => {
                         if (item.material_id) {
-                            const matchedMaterial = matchedMaterials.find(
+                            const matchedMaterial = materials.find(
                                 (mat) => mat.material_id === item.material_id
                             );
+                            console.log("Matched Material:", matchedMaterial); // Debugging
                             return {
                                 ...item,
                                 material_name: matchedMaterial?.material_name || "N/A",
                                 unit_price: matchedMaterial?.cost_per_unit || "N/A",
                             };
                         } else if (item.asset_id) {
-                            const matchedAsset = matchedAssets.find(
+                            const matchedAsset = assets.find(
                                 (ast) => ast.asset_id === item.asset_id
                             );
+                            console.log("Matched Asset:", matchedAsset); // Debugging
                             return {
                                 ...item,
                                 asset_name: matchedAsset?.asset_name || "N/A",
@@ -118,12 +208,12 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                         }
                         return item;
                     });
-
+    
+                    console.log("Enriched Quotation Content:", enrichedItems); // Debugging
                     setQuotationContentData(enrichedItems);
-                    invoice.items = enrichedItems; // Add enriched items to the invoice
                 }
             }
-
+    
             setFetchedData(invoice);
         } catch (error) {
             console.error("Error fetching data:", error.message);
@@ -189,25 +279,28 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                                 <div className="purchase-ap-invoice-addresses">
                                     <div className="purchase-ap-invoice-from">
                                         <h3>From</h3>
-                                        <h2>{purchaseQuotationData?.vendor_code || "N/A"}</h2>
-                                        <p>SoftwareTech.com</p>
-                                        <p>8970678878898</p>
-                                        <p>LA, U.S</p>
+                                        <h2>{purchaseQuotationData?.[0]?.vendor_name || "N/A"}</h2>
+                                            {console.log("Rendering Vendor Name:", purchaseQuotationData?.[0]?.vendor_name)}
+                                        
                                     </div>
                                     <div className="purchase-ap-invoice-to">
                                         <div>
-                                            <h3>Bill To</h3>
-                                            <h2></h2>
-                                            <p>{purchaseQuotationData?.[0]?.delivery_loc || fetchedData.delivery_loc || "N/A"}</p>
-                                            <p>SoftwareTech.com</p>
-                                            <p>8970678878898</p>
-                                            <p>LA, U.S</p>
-                                            <p>Track #: RO123456789</p>
+                                        <h3>Bill To</h3>
+                                        {employees.length > 0 ? (
+                                         employees.map((employee, index) => (
+                                        <p key={index}>
+                                         {employee.first_name} {employee.last_name}
+                                            </p>
+                                                    ))
+                                                ) : (
+                                                    <p>No employees found</p>
+                                                )}
+                                            
                                         </div>
                                         <div>
                                             <h3>Ship To</h3>
                                             <p>{purchaseQuotationData?.[0]?.delivery_loc || fetchedData.delivery_loc || "N/A"}</p>
-                                            <p>Track #: RO123456789</p>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -226,18 +319,18 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {fetchedData?.items?.length > 0 ? (
-                                                fetchedData.items.map((item, index) => (
-                                                    <tr key={index}>
-                                                        <td>{index + 1}</td>
-                                                        <td>{item.material_id || item.asset_id || "N/A"}</td>
-                                                        <td>{item.material_name || item.asset_name || "N/A"}</td>
-                                                        <td>{item.unit_price || "N/A"}</td>
-                                                        <td>{item.purchase_quantity || "N/A"}</td>
-                                                        
-                                                    </tr>
-                                                ))
-                                            ) : (
+                                        {console.log("Rendering Quotation Content Data:", quotationContentData)} {/* Debugging */}   
+                                        {quotationContentData?.length > 0 ? (
+                                        quotationContentData.map((item, index) => (
+                                        <tr key={index}>
+                                        <td>{index + 1}</td>
+                                        <td>{item.material_id || item.asset_id || "N/A"}</td>
+                                        <td>{item.material_name || item.asset_name || "N/A"}</td>
+                                        <td>{item.unit_price || "N/A"}</td>
+                                        <td>{item.purchase_quantity || "N/A"}</td>
+                                        </tr>
+                                                 ))
+                                        ) : (
                                                 <tr>
                                                     <td colSpan="6">No items found</td>
                                                 </tr>
@@ -251,12 +344,9 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                                     <div className="purchase-ap-invoice-payment">
                                         <h3>Payment Instruction</h3>
                                         <div className="payment-details">
-                                            <p>Kinetiq</p>
-                                            <p>Bank name: Kinetiq Bank</p>
-                                            <p>Account Number: 1234567</p>
+                                            
                                             <p>Ref. Number: {fetchedData.content_id || "N/A"}</p>
-                                            <p>Routing: 1234567</p>
-                                            <p>Tax Code: 1234567</p>
+                                            <p>Tax Code: {quotationContentData?.[0]?.tax_code || fetchedData.tax_code || "N/A"}</p>
                                         </div>
                                     </div>
                                     <div className="purchase-ap-invoice-totals">
@@ -274,7 +364,7 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                                         </div>
                                         <div className="total-row">
                                             <span>Total Downpayment:</span>
-                                            <span>{purchaseQuotationData?.[0]?.downpayment_request || fetchedData.downpayment_request || "N/A"}</span>
+                                            <span>{purchaseQuotationData?.[0]?.downpayment_request || fetchedData.downpayment_request || "0.00"}</span>
                                         </div>
                                         <div className="total-row">
                                             <span>Shipping Cost:</span>
