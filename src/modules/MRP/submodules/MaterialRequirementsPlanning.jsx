@@ -12,11 +12,13 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [created, setCreated] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [isOpen2, setIsOpen2] = useState(false);
+    const [isOpen3, setIsOpen3] = useState(false);
+    const [isOpen4, setIsOpen4] = useState(false);
     const [flag, setFlag] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [showHelpOptions, setShowHelpOptions] = useState(false);
-    const [isOpen3, setIsOpen3] = useState(false);
-    const [isProjectType, setIsProjectType] = useState(null); 
+    const [isProjectType, setIsProjectType] = useState(null);
+    const [fetchMrpData, setFetchMrpData] = useState([]);
 
     const costOfProducts = 40000.00;
     //const costOfProduction = 15000.00;
@@ -262,7 +264,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
           const matchesFlag =
             flag === 0 ||
             (flag === 1 && item.type === "Project") ||
-            (flag === 2 && item.type === "Non Project");
+            (flag === 2 && item.type === "Non Project") ||
+            (flag === 3 && item.type === "Item Principal");
       
           const term = (searchTerm || "").toLowerCase(); // prevent null error
       
@@ -280,6 +283,15 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     };
 
     const filteredData = getFilteredData();
+
+    const mergedRows = [...(filteredData || []), ...(principalOrder || [])].map((item) => ({
+        number: item.number || item.serviceOrderItemId,
+        type: item.type,
+        details: item.details || item.description,
+        date: item.date,
+    }));
+
+    
     const buttonStyle = (bg, border, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer', });
     const buttonStyle2 = (bg, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, border: '0.5px solid #585757', color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer',});
     const rowCellStyle = {flex: '1 1 14%', minWidth: 120, padding: '12px', textAlign: 'center', fontFamily: 'Inter', fontSize: 15, color: '#585757'};
@@ -317,10 +329,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     return sum + (unitCost * quantity);
     }, 0);
 
-    const renderOneValuePerItem = (item, index) => {
-        return index % 2 === 0
-          ? item.np_product_id
-          : item.np_product_name;
+    const renderOneValuePerItem = (products, index) => {
+        const half = products.length;
+      
+        // First half = product IDs
+        if (index < half) {
+          return products[index].np_product_id;
+        }
+      
+        // Second half = product names
+        const adjustedIndex = index - half;
+        return products[adjustedIndex].np_product_name;
     };
 
     return (      
@@ -329,7 +348,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 <div className="title">MRP LIST</div>
                 <div style={{width: '100%', maxWidth: 1300, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', rowGap: 10,paddingLeft: 80, paddingRight: 80,}}>
                     <div className="tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 15,flex: '1 1 auto', minWidth: 200,}}>
-                        {['All Orders', 'Project Orders', 'Non-Project Orders'].map((label, i) => (
+                        {['All Orders', 'Project Orders', 'Non-Project Orders', 'Principal Items'].map((label, i) => (
                         <div key={label}
                             onClick={() => {setFlag(i), setFlagType(i)}}
                             onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")}
@@ -347,42 +366,33 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 </div>
 
                 <div className="reqplan-table-scroll" style={{width: '100%', maxWidth: 1159, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflowY: 'auto', maxHeight: '450px', borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '1rem'}}>
+                    <div className="table-header" style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        borderBottom: '1px solid #E8E8E8',
+                    }}>
+                        {['Order No.', 'Type', 'Details', 'Date'].map((label, i) => (
+                        <div
+                            className="table-cell2"
+                            key={label}
+                            data-label={label} 
+                            style={{flex: '1 1 25%', minWidth: 150, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter',fontSize: 18}}>
+                            {label}
+                        </div>
+                        ))}
+                    </div>
 
-                <div className="table-header" style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    borderBottom: '1px solid #E8E8E8',
-                }}>
-                    {['Order No.', 'Type', 'Details', 'Date'].map((label, i) => (
+                    {mergedRows.map((item, index) => (
                     <div
-                        className="table-cell2"
-                        key={label}
-                        data-label={label} 
-                        style={{flex: '1 1 25%', minWidth: 150, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter',fontSize: 18}}>
-                        {label}
+                        key={index}
+                        className="table-row"
+                        onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchCostProduction(item.number); fetchCostLabor(item.number); setIsProjectType(item.type); setIsOpen(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) =>(e.currentTarget.style.background = "transparent")}style={{display: "flex", flexWrap: "wrap", cursor: "pointer", borderBottom: "1px solid #E8E8E8"}}>
+                        <div className="table-cell" style={rowCellStyle} data-label="Order No.">{item.number}</div>
+                        <div className="table-cell" style={rowCellStyle} data-label="Type">{item.type}</div>
+                        <div className="table-cell" style={rowCellStyle} data-label="Details">{item.details}</div>
+                        <div className="table-cell" style={rowCellStyle} data-label="Date">{item.date}</div>
                     </div>
                     ))}
-                </div>
-
-                {filteredData.map((item, index) => (
-                    <div
-                    className="table-row"
-                    key={index}
-                    onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchCostProduction(item.number);fetchCostLabor(item.number); setIsProjectType(item.type === "Project"); setIsOpen(true);}}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    style={{display: 'flex', flexWrap: 'wrap', cursor: 'pointer',borderBottom: '1px solid #E8E8E8',}}>
-                    {[item.number, item.type, item.details, item.date].map((val, idx) => (
-                    <div
-                        className="table-cell"
-                        key={idx}
-                        data-label={['Order No.', 'Type', 'Details', 'Date'][idx]}
-                        style={{flex: '1 1 25%', minWidth: 150, padding: '12px', textAlign: 'center', fontFamily: 'Inter', fontSize: 16, color: '#585757'}}>
-                        {val}
-                    </div>
-                    ))}
-                    </div>
-                ))}
                 </div>
                 
                 <div className="reqplan-help-wrapper">
@@ -429,13 +439,85 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     </button>
 
                     <button
-                        onClick={() => {if (isProjectType) {setIsOpen2(true);} else {setIsOpen3(true);}setIsOpen(false);}}
+                        onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false)}}
                         style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                         <span>Next</span>
                         <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                     </button>
                     </div>
                 </div>
+                </div>
+            </div>
+            )}
+
+            
+
+            {isOpen2 && (
+            <div className="bom-print-modal">
+                <div className="fixed inset-0 flex items-center justify-center">
+                    <div style={{width: '90vw', maxWidth: 1360, height: '90vh', maxHeight: 760, background: 'white', borderRadius: 10, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem',}}>
+                        <div style={{fontSize: 'clamp(24px, 3vw, 35px)', fontFamily: 'Inter', fontWeight: 500, textAlign: 'center',color: '#130101',}}>Product Pricing</div>
+                        <div className="reqplan-table-scroll2" style={{flex: 1, overflowY: 'auto', overflowX: 'auto', marginBottom: 30, borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.15)',padding: 0,}}>
+                            <div style={{width: '100%', flex: 1, background: 'white',borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '0.5rem',}}>
+                                <div className="table-header" style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8',}}>
+                                    {['No.', 'Product ID', 'Product', 'Product Description', 'Quantity', 'Raw Materials', 'Cost'].map(
+                                    (label) => (
+                                        <div
+                                        key={label}
+                                        style={{ flex: '1 1 14%', minWidth: 120, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 16 }}>
+                                        {label}
+                                        </div>
+                                    )
+                                    )}
+                                </div>
+
+                                {bomDetails.map((item, index) => (
+                                    <div
+                                    key={index}
+                                    className="table-row"
+                                    style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
+                                    <div className="table-cell" style={rowCellStyle} data-label="No.">{item.no}</div>
+                                    <div className="table-cell" data-label="Product ID" style={rowCellStyle}>{item.product_id}</div>
+                                    <div className="table-cell" data-label="Product" style={rowCellStyle}>{item.product_name}</div>
+                                    <div className="table-cell" data-label="Product Description" style={rowCellStyle}><span>{item.product_description}</span></div>
+                                    <div className="table-cell" data-label="Quantity" style={rowCellStyle}>{item.qtyProduct} pcs</div>
+                                    <div className="table-cell" data-label="Raw Materials" onClick={() => {setSelectedProductId(item.product_id); fetchRawMaterials(item.product_id); setRawMaterial(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
+                                    <div className="table-cell" data-label="Cost" style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
+                                    </div>
+                                ))}
+                                </div>
+                            </div>
+
+                            <div style={{width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem',}}>
+                           
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
+                                    <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                                        <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{overallTotalCost}</span>
+                                    </div>
+
+                                    <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10}}>
+                                            <span style={{ fontWeight: 500, color: '#585757' }}><b>Order No.</b></span>
+                                        <div
+                                        style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500}}>{selectedRowData.number}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{width: '100%',  display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto',}}>
+                            <button onClick={() => { setIsOpen2(false); setIsOpen(true); }} style={buttonStyle2('#fff')}>
+                                <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
+                                <span style={{ color: '#969696' }}>Back</span>
+                            </button>
+
+                            <button onClick={() => { setIsOpen2(false), setAdditionalCost(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                                <span>Next</span>
+                                <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             )}
@@ -465,7 +547,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     className="table-row"
                                     style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
                                     <div style={rowCellStyle}>{item.number}</div>
-                                    <div style={rowCellStyle}>{renderOneValuePerItem(item, index)}</div>
+                                    <div style={rowCellStyle}>{item.np_product_id}</div>
                                     <div style={rowCellStyle}>{item.np_product_name}</div>
                                     <div style={rowCellStyle}>{item.np_product_description}</div>
                                     <div style={rowCellStyle}>{item.np_qtyProduct} pcs</div>
@@ -509,7 +591,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             </div>
             )}
 
-            {isOpen2 && (
+            {isOpen4 && (
             <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center">
                     <div style={{width: '90vw', maxWidth: 1360, height: '90vh', maxHeight: 760, background: 'white', borderRadius: 10, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflow: 'hidden', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem',}}>
@@ -517,7 +599,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <div className="reqplan-table-scroll2" style={{flex: 1, overflowY: 'auto', overflowX: 'auto', marginBottom: 30, borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.15)',padding: 0,}}>
                             <div style={{width: '100%', flex: 1, background: 'white',borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '0.5rem',}}>
                                 <div className="table-header" style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8',}}>
-                                    {['No.', 'Product ID', 'Product', 'Product Description', 'Quantity', 'Raw Materials', 'Cost'].map(
+                                    {['No.', 'Item ID', 'Principal ID', 'Item Name', 'Item Quantity', 'Item Price'].map(
                                     (label) => (
                                         <div
                                         key={label}
@@ -528,18 +610,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     )}
                                 </div>
 
-                                {bomDetails.map((item, index) => (
+                                {npProducts.map((item, index) => (
                                     <div
                                     key={index}
                                     className="table-row"
                                     style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
-                                    <div style={rowCellStyle}>{item.no}</div>
-                                    <div style={rowCellStyle}>{item.product_id}</div>
-                                    <div style={rowCellStyle}>{item.product_name}</div>
-                                    <div style={rowCellStyle}>{item.product_description}</div>
-                                    <div style={rowCellStyle}>{item.qtyProduct} pcs</div>
-                                    <div onClick={() => {setSelectedProductId(item.product_id); fetchRawMaterials(item.product_id); setRawMaterial(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
-                                    <div style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
+                                    <div style={rowCellStyle}>{item.number}</div>
+                                    <div style={rowCellStyle}>{item.np_product_id}</div>
+                                    <div style={rowCellStyle}>{item.np_product_name}</div>
+                                    <div style={rowCellStyle}>{item.np_product_description}</div>
+                                    <div style={rowCellStyle}>{item.np_qtyProduct} pcs</div>
+                                    <div style={rowCellStyle}>₱{item.np_totalCost.toLocaleString()}</div>
                                     </div>
                                 ))}
                                 </div>
@@ -550,7 +631,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{overallTotalCost}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{npOverallProductCost}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -564,12 +645,12 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </div>
 
                         <div style={{width: '100%',  display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto',}}>
-                            <button onClick={() => { setIsOpen2(false); setIsOpen(true); }} style={buttonStyle2('#fff')}>
+                            <button onClick={() => { setIsOpen4(false); setIsOpen(true); }} style={buttonStyle2('#fff')}>
                                 <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
                                 <span style={{ color: '#969696' }}>Back</span>
                             </button>
 
-                            <button onClick={() => { setIsOpen2(false), setAdditionalCost(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                            <button onClick={() => { setIsOpen4(false); setAdditionalCost(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                                 <span>Next</span>
                                 <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                             </button>
@@ -583,34 +664,27 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             <div className="bom-print-modal2 fixed inset-0 flex items-center justify-center z-50 px-4">
                 <div style={{width: 967, maxHeight: '90vh', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', borderRadius: 10, display: 'flex', flexDirection: 'column', padding: '25px 20px', overflow: 'hidden', position: 'relative',}}>
                     <div style={{width: '100%', textAlign: 'center', color: '#130101', fontSize: 35, fontFamily: 'Inter',fontWeight: '400', textTransform: 'capitalize', letterSpacing: 1.4, marginBottom: 25}}>Cost of Raw Materials</div>
-                    <div className="reqplan-table-scroll2"style={{flex: 1, overflowY: 'auto', overflowX: 'auto', marginBottom: 30, borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.15)', padding: 0,}}>
-                        <table style={{minWidth: 800, width: '100%', borderCollapse: 'collapse', fontFamily: 'Inter'}}>
-                            <thead>
-                                <tr style={{ borderBottom: '1px solid #E8E8E8', background: 'rgba(255, 255, 255, 0.05)' }}>
-                                    {['Raw Material', 'Material ID', 'Quantity', 'Units', 'Unit Cost', 'Total Cost'].map((header, idx) => (
-                                        <th key={idx} style={{padding: '10px 12px', color: '#585757', fontSize: 18, fontWeight: 700, textAlign: 'center', whiteSpace: 'nowrap'}}>
-                                        {header}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {rawMaterials.map((item, idx) => {
-                                //const totalCost = parseFloat(item.unit_cost) * parseFloat(item.rm_quantity);
-                                return (
-                                    <tr key={idx} style={{ borderBottom: '1px solid #E8E8E8' }}>
-                                    <td style={tdStyle}>{item.rawMaterial}</td>
-                                    <td style={tdStyle}>{item.materialId}</td>
-                                    <td style={tdStyle}>{item.rmquantity}</td>
-                                    <td style={tdStyle}>{item.rmunits}</td>
-                                    <td style={tdStyle}>₱{parseFloat(item.rmunitCost).toFixed(2)}</td>
-                                    <td style={tdStyle}>₱{parseFloat(item.rmtotalCost).toFixed(2)}</td>
-                                    </tr>
-                                );
-                                })}
-                            </tbody>
-                        </table>
+                    <div className="reqplan-table-scroll2" style={{flex: 1, overflowY: 'auto', overflowX: 'auto', marginBottom: 30, borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.15)', padding: 0}}>
+                        <div style={{width: '100%', flex: 1, background: 'white', borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '0.5rem'}}>
+                            <div className="table-header" style={{display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8'}}>
+                            {['Raw Material', 'Material ID', 'Quantity', 'Units', 'Unit Cost', 'Total Cost'].map((label) => (
+                                <div key={label} style={{flex: '1 1 14%', minWidth: 120, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 16}}>{label}</div>
+                            ))}
+                            </div>
+
+                            {rawMaterials.map((item, idx) => (
+                            <div key={idx} className="table-row" style={{display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8', padding: '12px 0'}}>
+                                <div className="table-cell" style={rowCellStyle} data-label="Raw Material">{item.rawMaterial}</div>
+                                <div className="table-cell" style={rowCellStyle} data-label="Material ID">{item.materialId}</div>
+                                <div className="table-cell" style={rowCellStyle} data-label="Quantity">{item.rmquantity}</div>
+                                <div className="table-cell" style={rowCellStyle} data-label="Units">{item.rmunits}</div>
+                                <div className="table-cell" style={rowCellStyle} data-label="Unit Cost">₱{parseFloat(item.rmunitCost).toFixed(2)}</div>
+                                <div className="table-cell" style={rowCellStyle} data-label="Total Cost">₱{parseFloat(item.rmtotalCost).toFixed(2)}</div>
+                            </div>
+                            ))}
+                        </div>
                     </div>
+
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12,width: '100%'}}>
                         <div style={{width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem',}}>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
@@ -706,7 +780,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
                         <div
                         style={{width: '100%',  display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto',}}>
-                            <button onClick={() => {if (isProjectType) {setIsOpen2(true);} else {setIsOpen3(true);}setAdditionalCost(false);}} style={buttonStyle2('#fff')}>
+                            <button onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setAdditionalCost(false);}} style={buttonStyle2('#fff')}>
                                 <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
                                 <span style={{ color: '#969696' }}>Back</span>
                             </button>
