@@ -323,7 +323,7 @@ const EditPickingModal = ({
                     disabled={isStatusUpdateDisabled()}
                   >
                     <span className="button-icon">
-                      {pickingList.picked_status === 'Not Started' ? '▶️' : '✓'}
+                      {pickingList.picked_status === 'Not Started' ? '▶' : '✓'}
                     </span>
                     {getStatusActionLabel(pickingList.picked_status)}
                   </button>
