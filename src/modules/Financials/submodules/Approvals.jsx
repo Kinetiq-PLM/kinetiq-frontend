@@ -45,7 +45,7 @@ const [selectedRows, setSelectedRows] = useState([]);
 const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
 const [confirmationMessage, setConfirmationMessage] = useState("");
 const [validationTableData, setValidationTableData] = useState([]);
-const [totalBudget, setTotalBudget] = useState(0);
+const [totalBudget, setTotalBudget] = useState({});
 const [isWarningPopupVisible, setIsWarningPopupVisible] = useState(false);
 const [departmentBudgets, setDepartmentBudgets] = useState(initialDepartmentBudgets);
 const [rejectedData, setRejectedData] = useState([]);
@@ -350,7 +350,7 @@ remainingBudget: formatNumber(departmentBudgets[dept].remainingBudget)
 }));
 
 //setValidationTableData(tableData);
-setTotalBudget(totalBudget);
+// setTotalBudget(totalBudget);
 };
 
 const updateSubmissionTable = (data) => {
@@ -365,12 +365,12 @@ return acc + (parseFloat(item.approvedAmount?.replace(/,/g, '')) || 0);
 return acc;
 }, 0);
 
-setTotalBudget({
-approvedAmount: formatNumber(totalApprovedAmount)
-});
+// setTotalBudget({
+// approvedAmount: formatNumber(totalApprovedAmount)
+// });
 
 const rejectedItems = data.filter(item => item.validationStatus === "Rejected");
-setRejectedData(rejectedItems);
+// setRejectedData(rejectedItems);
 };
 
 useEffect(() => {
@@ -591,39 +591,75 @@ setIsAllocatedBudgetUpdated(false)
 const fetchAllocation = async () => {
 try {
   const data = await GET("/approvals/budget-allocation/");
-  console.log("Fetched Budget Allocation:", data);
-  setValidationTableData(data.map(item => ({
-    budgetAllocationId: item.budget_allocation_id || "",
-    department: item?.budget_approvals?.validation?.budget_submission.dept.dept_id,
-    allocatedBudget: item?.allocated_budget || 0,
-    totalSpent: item.total_allocated_spent || 0,
-    remainingBudget: item.allocated_remaining || 0,
-  })));
+console.log("Fetched Budget Allocation:", data);
+
+const mappedData = data.map(item => ({
+  budgetAllocationId: item.budget_allocation_id || "",
+  department: item?.budget_approvals?.validation?.budget_submission?.dept?.dept_name || "",
+  allocatedBudget: item?.allocated_budget || 0,
+  totalSpent: item.total_allocated_spent || 0,
+  remainingBudget: item.allocated_remaining_budget || 0,
+}));
+
+setValidationTableData(mappedData);
+
+const totals = mappedData.reduce(
+  (acc, item) => {
+    acc.allocated += parseFloat(item.allocatedBudget) || 0;
+    acc.spent += parseFloat(item.totalSpent) || 0;
+    acc.remaining += parseFloat(item.remainingBudget) || 0;
+    return acc;
+  },
+  { allocated: 0, spent: 0, remaining: 0 }
+);
+
+setTotalBudget(prev => ({
+  ...prev,
+  allocated: totals.allocated,
+  spent: totals.spent,
+  remaining: totals.remaining
+}));
   } catch (error) {
     console.error("Error fetching allocation:", error);
   }
 }
 
 const fetchApprovals = async () => {
+console.log("here")
 try {
-const data = await GET("/approvals/budget-submissions/");
-console.log("Fetched Budget Approvals:", data);
-setOriginalData(data.map(sub => ({
-approvalsId: sub.budget_approvals_id || "",
-requestId: sub?.validation?.budget_submission?.budget_submission_id || "",
-departmentId: sub?.validation?.budget_submission?.dept_id || "",
-amount: sub?.validation?.amount_requested || "",
-approvedAmount: sub?.validation?.final_approved_amount || "",
-submissionDate: sub?.validation?.budget_submission?.date_submitted || "",
-validatedBy: sub?.validation?.validated_by || "",
-validationDate: sub?.validation?.validation_date || "",
-approvedBy: sub?.approved_by || "",
-approvalDate: sub?.approval_date || "",
-remarks: sub?.remarks || "",
-validationStatus: sub?.validation?.validation_status || ""
-})));
+  const data = await GET("/approvals/budget-submissions/");
+  console.log("Fetched Budget Approvals:", data);
+  
+  const mappedData = data.map(sub => ({
+    approvalsId: sub.budget_approvals_id || "",
+    requestId: sub?.validation?.budget_submission?.budget_submission_id || "",
+    departmentId: sub?.validation?.budget_submission?.dept?.dept_id || "",
+    amount: sub?.validation?.amount_requested || "",
+    approvedAmount: sub?.validated_amount || "",
+    submissionDate: sub?.validation?.budget_submission?.date_submitted || "",
+    validatedBy: sub?.validation?.validated_by || "",
+    validationDate: sub?.validation?.validation_date || "",
+    approvedBy: sub?.approved_by || "",
+    approvalDate: sub?.approval_date || "",
+    remarks: sub?.remarks || "",
+    validationStatus: sub?.validation?.validation_status || "",
+    approvalStatus: sub.approval_status || ""
+  }));
+  
+  setOriginalData(mappedData);
+  
+  // Calculate total approved amount
+  const totalApproved = mappedData.reduce((sum, item) => {
+    const amount = parseFloat(item.approvedAmount) || 0;
+    return sum + amount;
+  }, 0);
+  
+  setTotalBudget(prev => ({
+    ...prev,
+    approvedAmount: totalApproved
+  }));
 } catch (error) {
-console.error("Error fetching returns:", error);
+console.error("Error fetching approvals:", error);
 }
 };
 
@@ -652,6 +688,7 @@ const fetchBudgetRequests = async () => {
 useEffect(() => {
 fetchAllocation();
 fetchApprovals();
+fetchRejectedApprovals();
 fetchBudgetRequests();
 }, []);
 
@@ -660,24 +697,20 @@ fetchBudgetRequests();
 const fetchRejectedApprovals = async () => {
 try {
 const data = await GET("/approvals/rejected-budget-submissions/");
-const formattedData = data.map(item => ({
+console.log("Fetched rejected:", data);
+setRejectedData(data.map(item => ({
 approvalsId: item.budget_approvals_id || "",
 requestId: item?.validation?.budget_submission?.budget_submission_id || "",
-amount: item?.validation?.budget_validation?.amount_requested || "",
+amount: item?.validation?.amount_requested || "",
 requestDate: item?.validation?.budget_submission?.date_submitted || "",
 approvedBy: item.approved_by || "",
 remarks: item.remarks || "",
 validationStatus: item.approval_status || "",
-}));
-setRejectedData(formattedData);
+})));
 } catch (error) {
 console.error("Failed to load rejected approvals:", error);
 }
 };
-
-useEffect(() => {
-fetchRejectedApprovals();
-}, []);
 
 const getSelectedRows = () => {
   if (activeTab === "Budget Submission List") {
@@ -767,21 +800,21 @@ Total Remaining
 <div className="summary-details">
 <div className="summary-total-budget">
 Total Approved Amount
-<p>₱{totalBudget.approvedAmount}</p>
+<p>₱{formatNumber(totalBudget.approvedAmount)}</p>
 </div>
 
 <div className="summary-status">
 <div className="summary-approved">
 Approved <span className="status-circle approved"></span>
-<p>{originalData.filter(item => item.validationStatus === "Approved").length}</p>
+<p>{originalData.filter(item => item.approvalStatus === "Approved").length}</p>
 </div>
 <div className="summary-pending">
 Pending <span className="status-circle pending"></span>
-<p>{originalData.filter(item => item.validationStatus === "Pending").length}</p>
+<p>{originalData.filter(item => item.approvalStatus === "Pending").length}</p>
 </div>
 <div className="summary-rejected">
 Rejected <span className="status-circle rejected"></span>
-<p>{originalData.filter(item => item.validationStatus === "Rejected").length}</p>
+<p>{originalData.filter(item => item.approvalStatus === "Rejected").length}</p>
 </div>
 </div>
 </div>
@@ -824,7 +857,7 @@ Rejected <span className="status-circle rejected"></span>
 </tr>
 </thead>
 <tbody>
-{filteredData.map((row, index) => (
+{originalData.map((row, index) => (
 <tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedSubmissionRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Approved" ? "#f0f0f0" : "white" }}>
 <td><div className="row-wrapper"><input type="checkbox" checked={selectedSubmissionRows.includes(row.requestId)} readOnly /></div></td>
 <td><div className="row-wrapper">{row.requestId}</div></td>
@@ -947,16 +980,17 @@ Save Changes
 </tr>
 </thead>
 <tbody>
-{rejectedData.map((row, index) => (
-<tr key={index}>
-<td><div className="row-wrapper">{row.requestId}</div></td>
-<td><div className="row-wrapper">{row.amount}</div></td>
-<td><div className="row-wrapper">{formatDate(row.submissionDate)}</div></td>
-<td><div className="row-wrapper">{row.approvedBy}</div></td>
-<td><div className="row-wrapper">{row.remarks === "Rejected" ? "For Resubmission" : row.remarks}</div></td>
-<td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
-
-</tr>
+{rejectedData
+  .filter(row => row.requestId !== "")
+  .map((row, index) => (
+    <tr key={index}>
+      <td><div className="row-wrapper">{row.requestId}</div></td>
+      <td><div className="row-wrapper">{row.amount}</div></td>
+      <td><div className="row-wrapper">{formatDate(row.requestDate)}</div></td>
+      <td><div className="row-wrapper">{row.approvedBy}</div></td>
+      <td><div className="row-wrapper">{row.remarks === "Rejected" ? "For Resubmission" : row.remarks}</div></td>
+      <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+    </tr>
 ))}
 </tbody>
 </table>
