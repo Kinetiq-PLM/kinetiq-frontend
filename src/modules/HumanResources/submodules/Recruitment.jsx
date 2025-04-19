@@ -191,14 +191,24 @@ const Recruitment = () => {
                     <td>{posting.position_title}</td>
                     <td>{posting.description}</td>
                     <td>{posting.requirements}</td>
-                    <td>{posting.employment_type}</td>
+                    <td>
+                      <span className={`recruitment-tag ${posting.employment_type?.toLowerCase() || 'unknown'}`}>
+                        {posting.employment_type || 'Unknown'}
+                      </span>
+                    </td>
                     <td>{posting.base_salary}</td>
                     <td>{posting.daily_rate}</td>
                     <td>{posting.duration_days}</td>
-                    <td>{posting.finance_approval_status}</td>
                     <td>
-                      <span className={`recruitment-tag ${posting.status ? posting.status.toLowerCase() : 'unknown'}`}>
-                        {posting.status || 'Unknown'}
+                      <span className={`recruitment-tag ${posting.finance_approval_status ? 
+                        `${posting.finance_approval_status.toLowerCase()}-finance` : 'pending-finance'}`}>
+                        {posting.finance_approval_status || 'Pending'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`recruitment-tag ${posting.posting_status ? 
+                        posting.posting_status.toLowerCase() : 'unknown'}`}>
+                        {posting.posting_status || 'Unknown'}
                       </span>
                     </td>
                     <td>{posting.created_at}</td>
@@ -369,15 +379,116 @@ const Recruitment = () => {
 
   const renderPagination = (totalPages) => (
     <div className="recruitment-pagination">
-      {[...Array(totalPages)].map((_, i) => (
-        <button
-          key={i}
-          className={i + 1 === currentPage ? "active" : ""}
-          onClick={() => setCurrentPage(i + 1)}
-        >
-          {i + 1}
-        </button>
-      ))}
+      <button 
+        className="recruitment-pagination-arrow" 
+        onClick={() => setCurrentPage(1)} 
+        disabled={currentPage === 1}
+      >
+        &#171; {/* Double left arrow */}
+      </button>
+      
+      <button 
+        className="recruitment-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+        disabled={currentPage === 1}
+      >
+        &#8249; {/* Single left arrow */}
+      </button>
+      
+      <div className="recruitment-pagination-numbers">
+        {(() => {
+          const pageNumbers = [];
+          const maxVisiblePages = 5;
+          
+          if (totalPages <= maxVisiblePages + 2) {
+            // Show all pages if there are few
+            for (let i = 1; i <= totalPages; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+          } else {
+            // Always show first page
+            pageNumbers.push(
+              <button
+                key={1}
+                className={1 === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(1)}
+              >
+                1
+              </button>
+            );
+            
+            // Calculate range around current page
+            let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+            
+            // Adjust if we're near the end
+            if (endPage - startPage < maxVisiblePages - 1) {
+              startPage = Math.max(2, endPage - maxVisiblePages + 1);
+            }
+            
+            // Add ellipsis after first page if needed
+            if (startPage > 2) {
+              pageNumbers.push(<span key="ellipsis1" className="recruitment-pagination-ellipsis">...</span>);
+            }
+            
+            // Add middle pages
+            for (let i = startPage; i <= endPage; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+            
+            // Add ellipsis before last page if needed
+            if (endPage < totalPages - 1) {
+              pageNumbers.push(<span key="ellipsis2" className="recruitment-pagination-ellipsis">...</span>);
+            }
+            
+            // Always show last page
+            pageNumbers.push(
+              <button
+                key={totalPages}
+                className={totalPages === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(totalPages)}
+              >
+                {totalPages}
+              </button>
+            );
+          }
+          
+          return pageNumbers;
+        })()}
+      </div>
+      
+      <button 
+        className="recruitment-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+        disabled={currentPage === totalPages}
+      >
+        &#8250; {/* Single right arrow */}
+      </button>
+      
+      <button 
+        className="recruitment-pagination-arrow" 
+        onClick={() => setCurrentPage(totalPages)} 
+        disabled={currentPage === totalPages}
+      >
+        &#187; {/* Double right arrow */}
+      </button>
+      
       <select
         className="recruitment-pagination-size"
         value={itemsPerPage}
@@ -392,7 +503,6 @@ const Recruitment = () => {
       </select>
     </div>
   );
-
 
   const handleEditJobPosting = (posting) => {
     // Create a copy of the posting to edit
@@ -738,7 +848,14 @@ const handleJobPostingSubmit = async (e) => {
                 <option value="id">Sort by ID</option>
                 <option value="status">Sort by Status</option>
               </select>
-              <button className="recruitment-add-btn" onClick={handleAddClick}>+ Add</button>
+              <button 
+                className="recruitment-add-btn" 
+                onClick={handleAddClick}
+              >
+                {activeTab === "Candidates" ? "+ Add Candidate" : 
+                 activeTab === "Job Postings" ? "+ Add Job Posting" : 
+                 "+ Add Resignation"}
+              </button>
               <button
                 className="recruitment-add-btn"
                 onClick={() => setShowArchived(!showArchived)}

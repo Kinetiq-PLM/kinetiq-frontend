@@ -314,6 +314,28 @@
   border: 1px solid #ccc;
 }
 
+.hr-leave-requests-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hr-leave-requests-pagination button:hover:not(.active):not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.hr-leave-requests-pagination-arrow {
+  font-weight: bold;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hr-leave-requests-pagination-ellipsis {
+  padding: 0.4rem;
+  color: #666;
+}
+
 /* Toast notification */
 .hr-leave-requests-toast {
   position: fixed;
@@ -617,8 +639,8 @@
 
 .hr-employee-body-content-container {
   width: 100%;
-  height: 38.1rem;
-  max-width: 1222px;
+  height: 100%;
+  max-width: 1600px;
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;

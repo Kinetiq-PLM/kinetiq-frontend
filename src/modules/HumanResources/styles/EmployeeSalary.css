@@ -231,6 +231,37 @@
   border: 1px solid #ccc;
 }
 
+.hr-employee-salary-pagination-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: calc(100% - 100px);
+  margin-right: 0.5rem;
+}
+
+.hr-employee-salary-pagination-arrow {
+  font-weight: bold;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hr-employee-salary-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hr-employee-salary-pagination button:hover:not(.active):not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.hr-employee-salary-pagination-ellipsis {
+  padding: 0.4rem;
+  color: #666;
+}
+
 /* TOAST NOTIFICATION (Optional) */
 .hr-employee-salary-toast {
   position: fixed;

@@ -61,6 +61,36 @@ const Payroll = () => {
     return { paginated, totalPages };
   };
 
+  const getPaymentTag = (amount) => {
+    const value = typeof amount === 'string' ? parseFloat(amount) : amount;
+    let category = 'low';
+    if (value >= 30000) {
+      category = 'high';
+    } else if (value >= 15000) {
+      category = 'medium';
+    }
+    return (
+      <span className={`hr-tag payment-${category}`}>
+        {amount}
+      </span>
+    );
+  };
+
+  const getDeductionTag = (amount) => {
+    const value = typeof amount === 'string' ? parseFloat(amount) : amount;
+    let category = 'low';
+    if (value >= 5000) {
+      category = 'high';
+    } else if (value >= 2000) {
+      category = 'medium';
+    }
+    return (
+      <span className={`hr-tag deduction-${category}`}>
+        {amount}
+      </span>
+    );
+  };
+
   const renderPayrollTable = () => {
     if (loading) return <div className="hr-payroll-no-results">Loading payroll data...</div>;
 
@@ -107,7 +137,11 @@ const Payroll = () => {
                     <td>{pay.employee_id}</td>
                     <td>{pay.pay_period_start}</td>
                     <td>{pay.pay_period_end}</td>
-                    <td>{pay.employment_type}</td>
+                    <td>
+                      <span className={`hr-tag employment-${pay.employment_type?.toLowerCase() || 'unknown'}`}>
+                        {pay.employment_type || 'Unknown'}
+                      </span>
+                    </td>
                     <td>{pay.base_salary}</td>
                     <td>{pay.overtime_hours}</td>
                     <td>{pay.overtime_pay}</td>
@@ -122,8 +156,12 @@ const Payroll = () => {
                     <td>{pay.late_deduction}</td>
                     <td>{pay.absent_deduction}</td>
                     <td>{pay.undertime_deduction}</td>
-                    <td>{pay.total_deductions}</td>
-                    <td>{pay.net_pay}</td>
+                    <td>
+                      {getDeductionTag(pay.total_deductions)}
+                    </td>
+                    <td>
+                      {getPaymentTag(pay.net_pay)}
+                    </td>
                     <td>
                       {pay.status === "processing" ? (
                         <span>-</span>
@@ -142,17 +180,95 @@ const Payroll = () => {
           </div>
         </div>
         <div className="hr-payroll-pagination">
+          <button 
+            className="hr-payroll-pagination-arrow" 
+            onClick={() => setCurrentPage(1)} 
+            disabled={currentPage === 1}
+          >
+            &#171;
+          </button>
+          <button 
+            className="hr-payroll-pagination-arrow" 
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+            disabled={currentPage === 1}
+          >
+            &#8249;
+          </button>
           <div className="hr-payroll-pagination-numbers">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={i + 1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
+            {(() => {
+              const pageNumbers = [];
+              const maxVisiblePages = 5;
+              if (totalPages <= maxVisiblePages + 2) {
+                for (let i = 1; i <= totalPages; i++) {
+                  pageNumbers.push(
+                    <button
+                      key={i}
+                      className={i === currentPage ? "active" : ""}
+                      onClick={() => setCurrentPage(i)}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+              } else {
+                pageNumbers.push(
+                  <button
+                    key={1}
+                    className={1 === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(1)}
+                  >
+                    1
+                  </button>
+                );
+                let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+                if (endPage - startPage < maxVisiblePages - 1) {
+                  startPage = Math.max(2, endPage - maxVisiblePages + 1);
+                }
+                if (startPage > 2) {
+                  pageNumbers.push(<span key="ellipsis1" className="hr-payroll-pagination-ellipsis">...</span>);
+                }
+                for (let i = startPage; i <= endPage; i++) {
+                  pageNumbers.push(
+                    <button
+                      key={i}
+                      className={i === currentPage ? "active" : ""}
+                      onClick={() => setCurrentPage(i)}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+                if (endPage < totalPages - 1) {
+                  pageNumbers.push(<span key="ellipsis2" className="hr-payroll-pagination-ellipsis">...</span>);
+                }
+                pageNumbers.push(
+                  <button
+                    key={totalPages}
+                    className={totalPages === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(totalPages)}
+                  >
+                    {totalPages}
+                  </button>
+                );
+              }
+              return pageNumbers;
+            })()}
           </div>
+          <button 
+            className="hr-payroll-pagination-arrow" 
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+            disabled={currentPage === totalPages}
+          >
+            &#8250;
+          </button>
+          <button 
+            className="hr-payroll-pagination-arrow" 
+            onClick={() => setCurrentPage(totalPages)} 
+            disabled={currentPage === totalPages}
+          >
+            &#187;
+          </button>
           <select
             className="hr-payroll-pagination-size"
             value={itemsPerPage}

@@ -476,6 +476,28 @@
   border: 1px solid #ccc;
 }
 
+.recruitment-pagination-arrow {
+  font-weight: bold;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recruitment-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.recruitment-pagination button:hover:not(.active):not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.recruitment-pagination-ellipsis {
+  padding: 0.4rem;
+  color: #666;
+}
+
 /* ---------------------------------------------------------
    MODALS
    --------------------------------------------------------- */

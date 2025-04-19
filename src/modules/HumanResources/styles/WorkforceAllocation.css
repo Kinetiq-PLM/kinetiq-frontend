@@ -250,6 +250,38 @@
   border-color: #00b0b5;
 }
 
+/* Add these pagination styles after .workforceallocation-pagination */
+.workforceallocation-pagination-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: calc(100% - 100px);
+  margin-right: 0.5rem;
+}
+
+.workforceallocation-pagination-arrow {
+  font-weight: bold;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.workforceallocation-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.workforceallocation-pagination button:hover:not(.active):not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.workforceallocation-pagination-ellipsis {
+  padding: 0.4rem;
+  color: #666;
+}
+
 .workforceallocation-pagination-size {
   padding: 0.4rem;
   font-size: 0.9rem;
