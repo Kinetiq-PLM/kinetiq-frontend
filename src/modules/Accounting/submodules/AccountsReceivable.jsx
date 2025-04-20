@@ -2,14 +2,22 @@ import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
 import Table from "../components/Table";
 import Search from "../components/Search";
+import NotifModal from "../components/modalNotif/NotifModal";
+import axios from "axios";
 
 const AccountsReceivable = () => {
   // Use states
   const [data, setData] = useState([]);
   const [searching, setSearching] = useState("");
+  const [validation, setValidation] = useState({
+    isOpen: false,
+    type: "warning",
+    title: "",
+    message: "",
+  });
   const columns = [
     "Entry Line ID",
-    "GL Account ID", 
+    "GL Account ID",
     "Account Name",
     "Journal ID",
     "Debit",
@@ -17,60 +25,82 @@ const AccountsReceivable = () => {
     "Description",
   ];
 
+  // API endpoint
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+  const GENERAL_LEDGER_ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
 
   // Fetch data
-  const fetchData = () => {
-    fetch("http://127.0.0.1:8000/api/general-ledger-jel-view/")
-      .then((response) => response.json())
-      .then((result) => {
-        console.log("API Response:", result);
-        const combinedData = result
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(GENERAL_LEDGER_ENDPOINT);
+      console.log("API Response:", response.data);
+
+      // Get journal IDs for entries involving "Accounts Receivable" or "Raw Materials Used"
+      const relevantJournalIds = new Set(
+        response.data
           .filter(
             (entry) =>
               (entry.account_name === "Accounts Receivable" ||
-                entry.account_name === "Sales Revenue") &&
+                entry.account_name === "Raw Materials Used") &&
               (entry.debit_amount != 0 || entry.credit_amount != 0)
           )
-          .map((entry) => [
-            entry.entry_line_id,
-            entry.gl_account_id || "N/A", // 1: GL Account ID
-            entry.account_name || "No Account", // 2: Account Name
-            entry.journal_id || "-", // 3: Journal ID
-            parseFloat(entry.debit_amount || "0.00").toFixed(2), // 4: Debit
-            parseFloat(entry.credit_amount || "0.00").toFixed(2), // 5: Credit
-            entry.description || "-", // 6: Description
-          ]);
-        console.log("Combined AR and Sales Data:", combinedData);
-        setData(combinedData);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+          .map((entry) => entry.journal_id)
+      );
+
+      // Include all entries for those journal IDs to capture both debit and credit sides
+      const combinedData = response.data
+        .filter((entry) => relevantJournalIds.has(entry.journal_id))
+        .map((entry) => [
+          entry.entry_line_id || "N/A",
+          entry.gl_account_id || "N/A",
+          entry.account_name || "No Account",
+          entry.journal_id || "-",
+          parseFloat(entry.debit_amount || "0.00").toFixed(2),
+          parseFloat(entry.credit_amount || "0.00").toFixed(2),
+          entry.description || "-",
+        ]);
+
+      console.log("Combined Data:", combinedData);
+      setData(combinedData);
+    } catch (error) {
+      console.error("Error fetching data:", error.response ? error.response.data : error);
+      setValidation({
+        isOpen: true,
+        type: "error",
+        title: "Fetch Error",
+        message: "Failed to load accounts receivable data. Please check your connection.",
+      });
+    }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
 
-
   // Calculates the total debit and credit
-  const totalDebit = data.reduce((sum, row) => sum + (parseFloat(row[4]) || 0), 0); // Fixed to Debit (index 4)
-  const totalCredit = data.reduce((sum, row) => sum + (parseFloat(row[5]) || 0), 0); // Fixed to Credit (index 5)
-  
+  const totalDebit = data.reduce((sum, row) => sum + parseFloat(row[4] || 0), 0);
+  const totalCredit = data.reduce((sum, row) => sum + parseFloat(row[5] || 0), 0);
 
   // Search Filter based on columns
   const filteredData = data.filter((row) =>
-    [row[0], row[1], row[2], row[3], row[6]] 
+    [row[0], row[1], row[2], row[3], row[6]]
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
       .includes(searching.toLowerCase())
   );
 
-
   // Format the total with comma
   const formatNumber = (num) =>
     num.toLocaleString("en-US", { minimumFractionDigits: 2 });
   const formattedTotalDebit = formatNumber(totalDebit);
   const formattedTotalCredit = formatNumber(totalCredit);
+
+  // Log totals for debugging
+  useEffect(() => {
+    console.log("Total Debit:", totalDebit, "Total Credit:", totalCredit);
+  }, [totalDebit, totalCredit]);
 
   return (
     <div className="accountsReceivable">
@@ -94,6 +124,15 @@ const AccountsReceivable = () => {
           <div>{formattedTotalCredit}</div>
           <div></div>
         </div>
+        {validation.isOpen && (
+          <NotifModal
+            isOpen={validation.isOpen}
+            onClose={() => setValidation({ ...validation, isOpen: false })}
+            type={validation.type}
+            title={validation.title}
+            message={validation.message}
+          />
+        )}
       </div>
     </div>
   );
