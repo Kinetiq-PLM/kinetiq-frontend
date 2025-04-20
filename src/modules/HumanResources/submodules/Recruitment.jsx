@@ -30,16 +30,16 @@ const Recruitment = () => {
   const [positions, setPositions] = useState([]);
   const [employees, setEmployees] = useState([]); // Add the employees state variable
   const [newJobPosting, setNewJobPosting] = useState({
-    dept_id: null,
-    position_id: null,
+    dept_id: "",
+    position_id: "",
     position_title: "",
     description: "",
     requirements: "",
-    employment_type: null,
-    base_salary: null,
-    daily_rate: null,
-    duration_days: null,
-    posting_status: null
+    employment_type: "",
+    base_salary: "",
+    daily_rate: "",
+    duration_days: "",
+    posting_status: "Draft" // Default status
   });
 
   const [newResignation, setNewResignation] = useState({
@@ -1173,32 +1173,42 @@ const handleJobPostingChange = (e) => {
   } 
   // Handle employment type changes with proper field handling
   else if (name === "employment_type") {
+    // Set appropriate values based on employment type
     if (value === "Regular") {
       setNewJobPosting(prev => ({
         ...prev,
         employment_type: value,
-        base_salary: prev.base_salary || "", // Keep existing value or use empty string
-        daily_rate: null, // Explicitly set to null for Regular
-        duration_days: null  // Set duration_days to null for Regular employees
+        // Keep base_salary as is
+        daily_rate: null,
+        duration_days: null
       }));
-    } 
-    // Handle employment type changes with proper field handling
-    else if (name === "employment_type") {
-      // Your code here
-    } else {
-      // Handle other fields
+    } else if (value === "Contractual") {
       setNewJobPosting(prev => ({
         ...prev,
         employment_type: value,
-        base_salary: null, // Explicitly set to null for Seasonal
-        daily_rate: prev.daily_rate || "", // Keep existing value or use empty string
-        duration_days: prev.duration_days || 1 // Set default to minimum valid value
+        base_salary: null,
+        // Keep daily_rate as is
+        duration_days: prev.duration_days || 30
+      }));
+    } else if (value === "Seasonal") {
+      setNewJobPosting(prev => ({
+        ...prev,
+        employment_type: value,
+        base_salary: null,
+        // Keep daily_rate as is
+        duration_days: prev.duration_days || 1
+      }));
+    } else {
+      // Empty selection
+      setNewJobPosting(prev => ({
+        ...prev,
+        employment_type: value
       }));
     }
   }
   // Handle numeric inputs
   else if (type === "number") {
-    const numValue = value === "" ? "" : 
+    const numValue = value === "" ? null : 
                     (name === "duration_days" ? parseInt(value) : parseFloat(value));
     setNewJobPosting(prev => ({
       ...prev,
@@ -1276,46 +1286,43 @@ const handleEditJobPostingSubmit = async (e) => {
       return;
     }
     
-    // Apply the same formatting and validation as in the create function
+    // Apply proper formatting based on employment type
     if (jobPostingData.employment_type === "Regular") {
       if (!jobPostingData.base_salary) {
         showToast("Base salary is required for Regular positions", false);
         return;
       }
-      jobPostingData.daily_rate = 0;
+      jobPostingData.daily_rate = null;
       jobPostingData.duration_days = null;
-      jobPostingData.base_salary = parseFloat(jobPostingData.base_salary);
     } else if (jobPostingData.employment_type === "Contractual") {
       if (!jobPostingData.daily_rate) {
         showToast("Daily rate is required for Contractual positions", false);
         return;
       }
+      jobPostingData.base_salary = null;
       if (!jobPostingData.duration_days || 
           jobPostingData.duration_days < 30 || 
           jobPostingData.duration_days > 180) {
         showToast("Contractual positions require duration between 30 and 180 days", false);
         return;
       }
-      jobPostingData.base_salary = 0;
-      jobPostingData.daily_rate = parseFloat(jobPostingData.daily_rate);
     } else if (jobPostingData.employment_type === "Seasonal") {
       if (!jobPostingData.daily_rate) {
         showToast("Daily rate is required for Seasonal positions", false);
         return;
       }
+      jobPostingData.base_salary = null;
       if (!jobPostingData.duration_days || 
           jobPostingData.duration_days < 1 || 
           jobPostingData.duration_days > 29) {
         showToast("Seasonal positions require duration between 1 and 29 days", false);
         return;
       }
-      jobPostingData.base_salary = 0;
-      jobPostingData.daily_rate = parseFloat(jobPostingData.daily_rate);
     }
     
-    // Convert duration_days to a number if it exists and not null
-    if (jobPostingData.duration_days !== null) {
-      jobPostingData.duration_days = parseInt(jobPostingData.duration_days);
+    // Set a default posting status if not provided
+    if (jobPostingData.posting_status === null || jobPostingData.posting_status === "") {
+      jobPostingData.posting_status = "Draft";
     }
     
     await axios.patch(
@@ -1380,7 +1387,7 @@ const handleEditJobPostingChange = (e) => {
   }
   // Handle numeric inputs
   else if (type === "number") {
-    const numValue = value === "" ? "" : 
+    const numValue = value === "" ? null : 
                    (name === "duration_days" ? parseInt(value) : parseFloat(value));
     setEditingJobPosting(prev => ({
       ...prev,
@@ -1399,90 +1406,82 @@ const handleEditJobPostingChange = (e) => {
 const handleJobPostingSubmit = async (e) => {
   e.preventDefault();
   
-  // Create a copy of the data to send to the API
-  const jobPostingData = { ...newJobPosting };
-  
   try {
-    // Validate required fields
-    if (!jobPostingData.dept_id || !jobPostingData.position_id || 
-        !jobPostingData.description || !jobPostingData.requirements) {
-      showToast("Please fill all required fields", false);
+    // Create a copy of the job posting data
+    const jobPostingData = {...newJobPosting};
+    
+    // Make sure employment type is set
+    if (!jobPostingData.employment_type) {
+      showToast("Please select a valid employment type", false);
       return;
     }
     
-    // Apply proper formatting and validation based on employment type
+    // Set appropriate values based on employment type
     if (jobPostingData.employment_type === "Regular") {
+      // For Regular employees, explicitly set daily_rate and duration_days to null
+      jobPostingData.daily_rate = null;
+      jobPostingData.duration_days = null;
+      
       if (!jobPostingData.base_salary) {
         showToast("Base salary is required for Regular positions", false);
         return;
       }
-      // For Regular positions, set daily_rate to null explicitly and duration_days to null
-      jobPostingData.daily_rate = 0;
-      jobPostingData.duration_days = null;
+    } else if (["Contractual", "Seasonal"].includes(jobPostingData.employment_type)) {
+      // For Contractual/Seasonal employees, explicitly set base_salary to null
+      jobPostingData.base_salary = null;
       
-      // Ensure base_salary is a number
-      jobPostingData.base_salary = parseFloat(jobPostingData.base_salary);
-    } else if (jobPostingData.employment_type === "Contractual") {
       if (!jobPostingData.daily_rate) {
-        showToast("Daily rate is required for Contractual positions", false);
+        showToast("Daily rate is required for Contractual/Seasonal positions", false);
         return;
       }
       
-      // Validate duration days for Contractual (30-180 days)
-      if (!jobPostingData.duration_days || 
-          jobPostingData.duration_days < 30 || 
-          jobPostingData.duration_days > 180) {
-        showToast("Contractual positions require duration between 30 and 180 days", false);
-        return;
+      // Validate duration_days based on employment type
+      if (jobPostingData.employment_type === "Contractual") {
+        if (!jobPostingData.duration_days || jobPostingData.duration_days < 30 || jobPostingData.duration_days > 180) {
+          showToast("Contractual positions require duration between 30 and 180 days", false);
+          return;
+        }
+      } else if (jobPostingData.employment_type === "Seasonal") {
+        if (!jobPostingData.duration_days || jobPostingData.duration_days < 1 || jobPostingData.duration_days > 29) {
+          showToast("Seasonal positions require duration between 1 and 29 days", false);
+          return;
+        }
       }
-      
-      // Set base_salary to null explicitly
-      jobPostingData.base_salary = 0;
-      
-      // Ensure daily_rate is a number
-      jobPostingData.daily_rate = parseFloat(jobPostingData.daily_rate);
-    } else if (jobPostingData.employment_type === "Seasonal") {
-      // For Seasonal positions
-      if (!jobPostingData.daily_rate) {
-        showToast("Daily rate is required for Seasonal positions", false);
-        return;
-      }
-      
-      // Validate duration days for Seasonal (1-29 days)
-      if (!jobPostingData.duration_days || 
-          jobPostingData.duration_days < 1 || 
-          jobPostingData.duration_days > 29) {
-        showToast("Seasonal positions require duration between 1 and 29 days", false);
-        return;
-      }
-      
-      // Set base_salary to null explicitly
-      jobPostingData.base_salary = 0;
-      
-      // Ensure daily_rate is a number
-      jobPostingData.daily_rate = parseFloat(jobPostingData.daily_rate);
+    } else {
+      showToast("Please select a valid employment type", false);
+      return;
     }
     
-    // Convert duration_days to a number if it exists and not null
-    if (jobPostingData.duration_days !== null) {
-      jobPostingData.duration_days = parseInt(jobPostingData.duration_days);
+    // Set a default posting status if not provided
+    if (jobPostingData.posting_status === null || jobPostingData.posting_status === "") {
+      jobPostingData.posting_status = "Draft";
     }
     
-    console.log("Sending job posting data:", jobPostingData);
+    console.log("Submitting job posting data:", jobPostingData);
+    // Submit the modified data
+    const response = await axios.post("http://127.0.0.1:8000/api/job_posting/job_postings/", jobPostingData);
+    showToast("Job posting created successfully!", true);
     
-    const response = await axios.post(
-      "http://127.0.0.1:8000/api/job_posting/job_postings/", 
-      jobPostingData
-    );
-    
-    showToast("Job posting created successfully", true);
-    setShowAddJobModal(false);
-    
-    // Refresh job postings
+    // Refresh job postings and close modal
     const jobPostingsRes = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
     setJobPostings(jobPostingsRes.data);
+    setShowAddJobModal(false);
+    
+    // Reset form
+    setNewJobPosting({
+      dept_id: "",
+      position_id: "",
+      position_title: "",
+      description: "",
+      requirements: "",
+      employment_type: "",
+      base_salary: "",
+      daily_rate: "",
+      duration_days: "",
+      posting_status: "Draft"
+    });
   } catch (err) {
-    console.error("Error creating job posting:", err.response?.data || err);
+    console.error("Error creating job posting:", err);
     const errorMessage = err.response?.data?.detail || 
                        Object.values(err.response?.data || {}).flat().join(", ") || 
                        "Failed to create job posting";
@@ -1950,10 +1949,11 @@ const submitCandidateForm = async (e) => {
                     <label>Employment Type *</label>
                     <select
                       name="employment_type"
-                      value={newJobPosting.employment_type}
+                      value={newJobPosting.employment_type || ""}
                       onChange={handleJobPostingChange}
                       required
                     >
+                      <option value="">-- Select Employment Type --</option>
                       <option value="Regular">Regular</option>
                       <option value="Contractual">Contractual</option>
                       <option value="Seasonal">Seasonal</option>
@@ -1966,7 +1966,7 @@ const submitCandidateForm = async (e) => {
                       <input 
                         type="number" 
                         name="base_salary" 
-                        value={newJobPosting.base_salary} 
+                        value={newJobPosting.base_salary || ""} 
                         onChange={handleJobPostingChange}
                         min="0"
                         step="0.01"
@@ -1974,15 +1974,34 @@ const submitCandidateForm = async (e) => {
                       />
                     </div>
                   ) : (
+                    <>
+                      {newJobPosting.employment_type && (
+                        <div className="form-group">
+                          <label>Daily Rate *</label>
+                          <input 
+                            type="number" 
+                            name="daily_rate" 
+                            value={newJobPosting.daily_rate || ""} 
+                            onChange={handleJobPostingChange}
+                            min="0"
+                            step="0.01"
+                            required
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {newJobPosting.employment_type && newJobPosting.employment_type !== "Regular" && (
                     <div className="form-group">
-                      <label>Daily Rate *</label>
+                      <label>Duration (Days) *</label>
                       <input 
                         type="number" 
-                        name="daily_rate" 
-                        value={newJobPosting.daily_rate} 
+                        name="duration_days" 
+                        value={newJobPosting.duration_days || ""} 
                         onChange={handleJobPostingChange}
-                        min="0"
-                        step="0.01"
+                        min={newJobPosting.employment_type === "Seasonal" ? 1 : 30}
+                        max={newJobPosting.employment_type === "Seasonal" ? 29 : 180}
                         required
                       />
                     </div>
@@ -2000,20 +2019,7 @@ const submitCandidateForm = async (e) => {
                     />
                   </div>
                   
-                  {newJobPosting.employment_type !== "Regular" && (
-                    <div className="form-group">
-                      <label>Duration (Days){newJobPosting.employment_type !== "Regular" ? " *" : ""}</label>
-                      <input 
-                        type="number" 
-                        name="duration_days" 
-                        value={newJobPosting.duration_days || ""} 
-                        onChange={handleJobPostingChange}
-                        min={newJobPosting.employment_type === "Seasonal" ? 1 : 30}
-                        max={newJobPosting.employment_type === "Seasonal" ? 29 : 180}
-                        required={newJobPosting.employment_type !== "Regular"}
-                      />
-                    </div>
-                  )}
+
                   
                   <div className="form-group">
                     <label>Requirements *</label>
@@ -2794,28 +2800,6 @@ const submitCandidateForm = async (e) => {
                   </div>
                   
                   <div className="form-group">
-                    <label>Description *</label>
-                    <textarea
-                      name="description"
-                      value={editingJobPosting.description || ""}
-                      onChange={handleEditJobPostingChange}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Requirements *</label>
-                    <textarea 
-                      name="requirements" 
-                      value={editingJobPosting.requirements || ""} 
-                      onChange={handleEditJobPostingChange}
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-column">
-                  <div className="form-group">
                     <label>Employment Type *</label>
                     <select
                       name="employment_type"
@@ -2823,6 +2807,7 @@ const submitCandidateForm = async (e) => {
                       onChange={handleEditJobPostingChange}
                       required
                     >
+                      <option value="">-- Select Employment Type --</option>
                       <option value="Regular">Regular</option>
                       <option value="Contractual">Contractual</option>
                       <option value="Seasonal">Seasonal</option>
@@ -2843,19 +2828,50 @@ const submitCandidateForm = async (e) => {
                       />
                     </div>
                   ) : (
+                    <>
+                      {editingJobPosting.employment_type && (
+                        <div className="form-group">
+                          <label>Daily Rate *</label>
+                          <input 
+                            type="number" 
+                            name="daily_rate" 
+                            value={editingJobPosting.daily_rate || ""} 
+                            onChange={handleEditJobPostingChange}
+                            min="0"
+                            step="0.01"
+                            required
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {editingJobPosting.employment_type && editingJobPosting.employment_type !== "Regular" && (
                     <div className="form-group">
-                      <label>Daily Rate *</label>
+                      <label>Duration (Days) *</label>
                       <input 
                         type="number" 
-                        name="daily_rate" 
-                        value={editingJobPosting.daily_rate || ""} 
+                        name="duration_days" 
+                        value={editingJobPosting.duration_days || ""} 
                         onChange={handleEditJobPostingChange}
-                        min="0"
-                        step="0.01"
+                        min={editingJobPosting.employment_type === "Seasonal" ? 1 : 30}
+                        max={editingJobPosting.employment_type === "Seasonal" ? 29 : 180}
                         required
                       />
                     </div>
                   )}
+                </div>
+                
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Description *</label>
+                    <textarea
+                      name="description"
+                      value={editingJobPosting.description || ""}
+                      onChange={handleEditJobPostingChange}
+                      required
+                    />
+                  </div>
                   
                   {editingJobPosting.employment_type !== "Regular" && (
                     <div className="form-group">
@@ -2871,6 +2887,16 @@ const submitCandidateForm = async (e) => {
                       />
                     </div>
                   )}
+                  
+                  <div className="form-group">
+                    <label>Requirements *</label>
+                    <textarea 
+                      name="requirements" 
+                      value={editingJobPosting.requirements || ""} 
+                      onChange={handleEditJobPostingChange}
+                      required
+                    />
+                  </div>
                   
                   <div className="form-group">
                     <label>Posting Status</label>
