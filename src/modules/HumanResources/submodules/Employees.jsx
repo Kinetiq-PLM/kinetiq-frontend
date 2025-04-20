@@ -466,8 +466,8 @@ const Employees = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/employees/employees/"),
-        axios.get("http://127.0.0.1:8000/api/employees/employees/archived/")
+        axios.get("http://127.0.0.1:8000/api/employees"),
+        axios.get("http://127.0.0.1:8000/api/employees/archived/")
       ]);
       setEmployees(activeRes.data);
       setArchivedEmployees(archivedRes.data);
@@ -695,7 +695,7 @@ const Employees = () => {
       // Add logging to debug
       console.log("Sending employee data:", JSON.stringify(employeeData));
   
-      const response = await axios.post("http://127.0.0.1:8000/api/employees/employees/", employeeData);
+      const response = await axios.post("http://127.0.0.1:8000/api/employees/", employeeData);
       setShowEmployeeModal(false);
       showToast("Employee added successfully");
       fetchEmployees();
@@ -778,7 +778,7 @@ const Employees = () => {
       };
 
       await axios.patch(
-        `http://127.0.0.1:8000/api/employees/employees/${editingEmployee.employee_id}/`,
+        `http://127.0.0.1:8000/api/employees/${editingEmployee.employee_id}/`,
         employeeData
       );
       setShowEditEmployeeModal(false);
@@ -795,7 +795,7 @@ const Employees = () => {
   const handleArchiveEmployee = async (id) => {
     if (!window.confirm("Archive this employee?")) return;
     try {
-      await axios.post(`http://127.0.0.1:8000/api/employees/employees/${id}/archive/`);
+      await axios.post(`http://127.0.0.1:8000/api/employees/${id}/archive/`);
       showToast("Employee archived successfully");
       fetchEmployees();
     } catch (err) {
@@ -811,7 +811,7 @@ const Employees = () => {
 
   const handleUnarchiveEmployee = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/employees/employees/${id}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8000/api/employees/${id}/unarchive/`);
       setShowConfirmUnarchiveEmployee(null);
       showToast("Employee unarchived successfully");
       fetchEmployees();
@@ -832,7 +832,7 @@ const Employees = () => {
     try {
       await Promise.all(
         selectedArchivedEmployees.map((id) =>
-          axios.post(`http://127.0.0.1:8000/api/employees/employees/${id}/unarchive/`)
+          axios.post(`http://127.0.0.1:8000/api/employees/${id}/unarchive/`)
         )
       );
       showToast("Employees unarchived successfully");
@@ -1149,7 +1149,9 @@ const Employees = () => {
 
   const handleUnarchivePosition = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/positions/positions/${id}/unarchive/`);
+      // Make sure to encode the ID for URLs with special characters
+      const encodedId = encodeURIComponent(id);
+      await axios.post(`http://127.0.0.1:8000/api/positions/positions/${encodedId}/unarchive/`);
       setShowConfirmUnarchivePosition(null);
       showToast("Position unarchived successfully");
       fetchPositions();
