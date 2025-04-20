@@ -30,17 +30,16 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     useEffect(() => {
         const fetchBomData = async () => {
             try {
-                const response = await fetch(`${baseurl}/bills_of_material/bomlist/`);
+                const response = await fetch(`${baseurl}/bills_of_material/orderlist/`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch BOM data");
                 }
                 const data = await response.json();
 
                 const formattedData = data.map((item) => ({
-                    number: item.bom_no,
+                    number: item.order_no,
                     type: item.type,
-                    details: item.status,
-                    date: new Date(item.date_created).toLocaleDateString(),
+                    date: item.date.trim(),
                 }));
 
                 setBomData(formattedData);
