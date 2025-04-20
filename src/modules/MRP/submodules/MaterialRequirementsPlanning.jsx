@@ -713,7 +713,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{overallTotalCost}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{overallTotalCost.toLocaleString(undefined, {minimumFractionDigits: 2,  maximumFractionDigits: 2, })}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -782,7 +782,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{npOverallProductCost}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{npOverallProductCost.toLocaleString(undefined, {minimumFractionDigits: 2,  maximumFractionDigits: 2, })}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -852,7 +852,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{prinOverallCost}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{prinOverallCost.toLocaleString(undefined, {minimumFractionDigits: 2,  maximumFractionDigits: 2, })}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>

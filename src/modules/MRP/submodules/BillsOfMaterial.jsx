@@ -268,9 +268,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         return bomData.filter((item) => {
           const matchesFlag =
             flag === 0 ||
-            (flag === 1 && item.type === "Project Based") ||
-            (flag === 2 && item.type === "Non-Project Based") ||
-            (flag === 3 && item.type === "Principal Items Based");
+            (flag === 1 && item.type === "Project") ||
+            (flag === 2 && item.type === "Non Project") ||
+            (flag === 3 && item.type === "Principal Items");
       
           const term = (searchTerm || "").toLowerCase();
       
