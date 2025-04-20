@@ -34,7 +34,7 @@ const BodyContent = ({ onClose }) => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/prf/employees/")
+        const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/")
         const data = await response.json()
         setEmployees(data)
       } catch {
@@ -50,8 +50,8 @@ const BodyContent = ({ onClose }) => {
       try {
         const url =
           formData.requestType === "Material"
-            ? "http://127.0.0.1:8000/api/quotation-content/materials/list/"
-            : "http://127.0.0.1:8000/api/quotation-content/assets/list/"
+            ? "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/materials/list/"
+            : "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/"
         const response = await fetch(url)
         const data = await response.json()
         formData.requestType === "Material" ? setMaterials(data) : setAssets(data)
@@ -98,7 +98,7 @@ const BodyContent = ({ onClose }) => {
         purchase_quantity: item.purchase_quantity,
       }
 
-      const response = await fetch("http://127.0.0.1:8000/api/quotation-content/create/", {
+      const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/create/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -119,7 +119,7 @@ const BodyContent = ({ onClose }) => {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/prf/null/")
+      const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/null/")
       const data = await res.json()
       const latest = data[data.length - 1]?.request_id
       setLatestRequestId(latest)
@@ -164,7 +164,7 @@ const BodyContent = ({ onClose }) => {
         items: formData.items,
       }
 
-      const res = await fetch("http://127.0.0.1:8000/api/prf/submit/", {
+      const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/submit/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
