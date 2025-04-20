@@ -91,6 +91,10 @@ const Recruitment = () => {
   const [uploadingFile, setUploadingFile] = useState(null);
   const [uploadingStatus, setUploadingStatus] = useState('idle'); // Upload-specific state
 
+  // Add these state variables after the other state declarations
+  const [selectedArchivedCandidates, setSelectedArchivedCandidates] = useState([]);
+  const [selectedArchivedJobPostings, setSelectedArchivedJobPostings] = useState([]);
+
   // Fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
@@ -450,6 +454,118 @@ const Recruitment = () => {
     }
   };
 
+  // Add these toggle selection functions
+  const toggleSelectArchivedCandidate = (id) => {
+    if (selectedArchivedCandidates.includes(id)) {
+      setSelectedArchivedCandidates(prev => prev.filter(item => item !== id));
+    } else {
+      setSelectedArchivedCandidates(prev => [...prev, id]);
+    }
+  };
+
+  const toggleSelectArchivedJobPosting = (id) => {
+    if (selectedArchivedJobPostings.includes(id)) {
+      setSelectedArchivedJobPostings(prev => prev.filter(item => item !== id));
+    } else {
+      setSelectedArchivedJobPostings(prev => [...prev, id]);
+    }
+  };
+
+  // Add bulk unarchive functions
+  const bulkUnarchiveCandidates = async () => {
+    try {
+      setLoading(true);
+      
+      // Create an array of promises for each selected candidate
+      const promises = selectedArchivedCandidates.map(id => 
+        axios.post(`http://127.0.0.1:8000/api/candidates/candidates/${id}/restore/`)
+      );
+      
+      // Execute all promises
+      await Promise.all(promises);
+      
+      // Show success message
+      showToast("Selected candidates restored successfully", true);
+      
+      // Reset selection
+      setSelectedArchivedCandidates([]);
+      
+      // Refresh candidate lists
+      const [candidatesRes, archivedCandidatesRes] = await Promise.all([
+        axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
+        axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
+      ]);
+      
+      setCandidates(candidatesRes.data);
+      setArchivedCandidates(archivedCandidatesRes.data);
+    } catch (err) {
+      console.error("Error restoring candidates:", err);
+      showToast("Failed to restore candidates", false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const bulkUnarchiveJobPostings = async () => {
+    try {
+      setLoading(true);
+      
+      // Create an array of promises for each selected job posting
+      const promises = selectedArchivedJobPostings.map(id => {
+        // Find the job posting to restore
+        const jobPosting = archivedJobPostings.find(job => job.job_id === id);
+        
+        // Create update data similar to handleRestoreJobPosting
+        const updateData = {
+          is_archived: false,
+          employment_type: jobPosting.employment_type || "Seasonal",
+          dept_id: jobPosting.dept_id,
+          position_id: jobPosting.position_id || "",
+          position_title: jobPosting.position_title || "",
+          description: jobPosting.description || "",
+          requirements: jobPosting.requirements || "",
+          base_salary: jobPosting.employment_type === "Regular" ? 
+                        (jobPosting.base_salary || 0) : 0,
+          daily_rate: jobPosting.employment_type !== "Regular" ? 
+                      (jobPosting.daily_rate || 0) : 0,
+          duration_days: jobPosting.duration_days || 
+                        (jobPosting.employment_type === "Seasonal" ? 1 : 
+                          jobPosting.employment_type === "Contractual" ? 30 : null),
+          posting_status: jobPosting.posting_status || "Draft"
+        };
+        
+        // Send update request
+        return axios.patch(
+          `http://127.0.0.1:8000/api/job_posting/job_postings/${id}/`, 
+          updateData
+        );
+      });
+      
+      // Execute all promises
+      await Promise.all(promises);
+      
+      // Show success message
+      showToast("Selected job postings restored successfully", true);
+      
+      // Reset selection
+      setSelectedArchivedJobPostings([]);
+      
+      // Refresh job posting lists
+      const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
+        axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/"),
+        axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/archived/")
+      ]);
+      
+      setJobPostings(jobPostingsRes.data);
+      setArchivedJobPostings(archivedJobPostingsRes.data);
+    } catch (err) {
+      console.error("Error restoring job postings:", err);
+      showToast("Failed to restore job postings", false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Utility functions
   const filterAndPaginate = (data) => {
     // Filter based on search term
@@ -522,7 +638,11 @@ const Recruitment = () => {
                   <tr key={posting.job_id} className={isArchived ? "recruitment-archived-row" : ""}>
                     {isArchived && (
                       <td>
-                        <input type="checkbox" />
+                        <input 
+                          type="checkbox" 
+                          checked={selectedArchivedJobPostings.includes(posting.job_id)}
+                          onChange={() => toggleSelectArchivedJobPosting(posting.job_id)}
+                        />
                       </td>
                     )}
                     <td>{posting.job_id}</td>
@@ -583,6 +703,16 @@ const Recruitment = () => {
             </table>
           </div>
         </div>
+        {isArchived && selectedArchivedJobPostings.length > 0 && (
+          <div className="recruitment-bulk-actions">
+            <button 
+              className="recruitment-bulk-action-btn" 
+              onClick={bulkUnarchiveJobPostings}
+            >
+              Restore Selected Job Postings
+            </button>
+          </div>
+        )}
         {renderPagination(totalPages)}
       </>
     );
@@ -624,7 +754,11 @@ const Recruitment = () => {
                   <tr key={candidate.id} className={isArchived ? "recruitment-archived-row" : ""}>
                     {isArchived && (
                       <td>
-                        <input type="checkbox" />
+                        <input 
+                          type="checkbox" 
+                          checked={selectedArchivedCandidates.includes(candidate.candidate_id || candidate.id)}
+                          onChange={() => toggleSelectArchivedCandidate(candidate.candidate_id || candidate.id)}
+                        />
                       </td>
                     )}
                     <td>{candidate.candidate_id || candidate.id}</td>
@@ -633,7 +767,6 @@ const Recruitment = () => {
                     <td>{candidate.first_name}</td>
                     <td>{candidate.last_name}</td>
                     <td>{candidate.email}</td>
-                    <td>{candidate.phone}</td>
                     <td>
                       {candidate.resume_path ? (
                         <a href={candidate.resume_path} target="_blank" rel="noopener noreferrer">
@@ -765,6 +898,16 @@ const Recruitment = () => {
             </table>
           </div>
         </div>
+        {isArchived && selectedArchivedCandidates.length > 0 && (
+          <div className="recruitment-bulk-actions">
+            <button 
+              className="recruitment-bulk-action-btn" 
+              onClick={bulkUnarchiveCandidates}
+            >
+              Restore Selected Candidates
+            </button>
+          </div>
+        )}
         {renderPagination(totalPages)}
       </>
     );
@@ -1662,12 +1805,31 @@ const submitCandidateForm = async (e) => {
                   <FiPlus className="icon" /> Add Resignation
                 </button>
               )}
+              
               {activeTab !== "Resignations" && (
                 <button
                   className="recruitment-add-btn"
                   onClick={() => setShowArchived(!showArchived)}
                 >
                   {showArchived ? "View Active" : "View Archived"}
+                </button>
+              )}
+              
+              {activeTab === "Candidates" && showArchived && selectedArchivedCandidates.length > 0 && (
+                <button
+                  className="recruitment-add-btn"
+                  onClick={bulkUnarchiveCandidates}
+                >
+                  Unarchive Selected ({selectedArchivedCandidates.length})
+                </button>
+              )}
+              
+              {activeTab === "Job Postings" && showArchived && selectedArchivedJobPostings.length > 0 && (
+                <button
+                  className="recruitment-add-btn"
+                  onClick={bulkUnarchiveJobPostings}
+                >
+                  Unarchive Selected ({selectedArchivedJobPostings.length})
                 </button>
               )}
             </div>
