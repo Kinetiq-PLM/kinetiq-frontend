@@ -63,7 +63,7 @@ const BodyContent = () => {
         isOpen: true,
         type: "error",
         title: "Fetch Error",
-        message: "Failed to load journal dates. Please check your connection.",
+        message: "Failed to load general ledger data. Please check your connection.",
       });
     }
   };
