@@ -61,8 +61,8 @@ function ManagementDashboard() {
               {approvals.map((approval) => (
                 <tr key={approval.approvalId}>
                   <td>
-                    <button 
-                      className="approval-button" 
+                    <button
+                      className="approval-button"
                       onClick={() => handleApprovalClick(approval.approvalId)}
                     >
                       {approval.approvalId}

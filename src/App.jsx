@@ -80,10 +80,7 @@ function App() {
   const moduleSubmoduleFileNames = {
     Management: {
       "Dashboard": "ManagementDashboard",
-      "Project Approval": "ManagementApprovals",
-      "User Roles": "UserRoles",
-      "Access Control": "AccessControl",
-      Settings: "Settings",
+       "Project Approval": "ManagementApprovals",
     },
     Administration: {
       "Company Policies": "CompanyPolicies",

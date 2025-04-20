@@ -89,8 +89,7 @@ function Approvals() {
       <div className="content">
         <h1>Approvals</h1>
 
-
-        <div className="search-id">
+         <div className="search-id">
           <input type="text" placeholder="Search ID..." value={searchId} onChange={handleSearchIdChange} />
         </div>
 
@@ -155,13 +154,17 @@ function Approvals() {
             <label>Remarks</label>
             <textarea name="remarks" value={formData.remarks} onChange={handleInputChange}></textarea>
           </div>
-        </div>
+        </div> 
 
 
         <div className="form-actions">
-          <button className="back-button" onClick={handleBack}>Back</button>
-          <button className="save-button" onClick={handleSave}>Save</button>
-        </div>
+          <button className="back-button" onClick={handleBack}>
+               Back
+          </button>
+          <button className="save-button" onClick={handleSave}>
+             Save
+          </button>
+       </div>
 
 
         {/* Table List */}
@@ -204,6 +207,8 @@ function Approvals() {
     </div>
   );
 }
+
+
 
 
 export default Approvals;
