@@ -19,8 +19,7 @@
   box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
-  min-width: 40rem;
-  min-height: 30rem;
+  min-width: unset; /* Remove fixed min-width */
   box-sizing: border-box;
   overflow: hidden; /* scrolled inside .hr-department-scrollable */
 }
@@ -186,7 +185,7 @@
 
 /* The table itself */
 .hr-department-table {
-  width: 100%;
+  width: 100%; /* Make tables responsive by default */
   border-collapse: collapse;
   font-size: 0.95rem;
   min-width: 1400px; /* Force minimum width to ensure horizontal scroll */
@@ -549,4 +548,284 @@
 .hr-tag.level-5 {
   background-color: #ffebee;
   color: #c62828;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE DESIGN
+   --------------------------------------------------------- */
+
+/* Base responsive adjustments */
+.hr-department-body-content-container {
+  min-width: unset; /* Remove fixed min-width */
+  width: 100%;
+  max-width: 1600px;
+  padding: 1rem;
+}
+
+.hr-department-table {
+  width: 100%; /* Make tables responsive by default */
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1200px) {
+  .hr-department-body-content-container {
+    padding: 1.5rem;
+  }
+  
+  .hr-department-scrollable {
+    padding: 1.75rem;
+  }
+  
+  /* Set min-width only on large screens */
+  .hr-department-table {
+    min-width: 1400px;
+  }
+}
+
+/* Medium screens (tablets and small desktops) */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .hr-department-scrollable {
+    padding: 1.25rem;
+  }
+  
+  .hr-department-heading {
+    margin-bottom: 1.25rem;
+  }
+  
+  .hr-department-heading h2 {
+    font-size: 1.5rem;
+  }
+  
+  .hr-department-right-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .hr-department-search {
+    width: 200px;
+  }
+  
+  .hr-department-filter {
+    min-width: 150px;
+  }
+  
+  .hr-department-table-container {
+    max-height: calc(100vh - 200px);
+  }
+  
+  .hr-department-two-column-form {
+    gap: 1.25rem;
+  }
+  
+  .hr-department-modal {
+    width: 90vw;
+    max-width: 90vw;
+  }
+}
+
+/* Small screens (mobile) */
+@media (max-width: 767px) {
+  .hr-department-body-content-container {
+    padding: 0.75rem;
+    min-height: auto;
+  }
+  
+  .hr-department-scrollable {
+    padding: 1rem 0.75rem;
+  }
+  
+  /* Header and controls */
+  .hr-department-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .hr-department-heading h2 {
+    font-size: 1.4rem;
+  }
+  
+  .hr-department-right-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .hr-department-search-wrapper {
+    width: 100%;
+    margin-right: 0;
+  }
+  
+  .hr-department-search {
+    width: 100%;
+  }
+  
+  .hr-department-filter {
+    width: 100%;
+  }
+  
+  .hr-department-add-btn {
+    width: 100%;
+    padding: 0.75rem;
+  }
+  
+  /* Tabs header */
+  .hr-department-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .hr-department-tabs {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .hr-department-tabs button {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.25rem;
+    white-space: nowrap;
+  }
+  
+  /* Tables */
+  .hr-department-table-container {
+    max-height: none;
+  }
+  
+  .hr-department-table-scrollable {
+    overflow-x: auto;
+  }
+  
+  .hr-department-table th,
+  .hr-department-table td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Pagination */
+  .hr-pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .hr-pagination-numbers {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+  }
+  
+  .hr-pagination button {
+    min-width: 36px;
+    padding: 0.35rem 0.6rem;
+  }
+  
+  /* Modals */
+  .hr-department-modal {
+    width: 95vw;
+    padding: 1.25rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .hr-department-modal-form .form-group {
+    margin-bottom: 0.75rem;
+  }
+  
+  .hr-department-two-column-form {
+    grid-template-columns: 1fr; /* Single column on mobile */
+    gap: 0.75rem;
+  }
+  
+  .hr-department-modal-buttons {
+    flex-direction: column-reverse; /* Primary button on top */
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  /* Level tags */
+  .hr-tag {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  /* Action dropdown positioning fix */
+  .hr-department-dropdown {
+    right: 0;
+    width: 160px;
+  }
+}
+
+/* Very small screens (smaller mobile devices) */
+@media (max-width: 480px) {
+  .hr-department-body-content-container {
+    padding: 0.5rem;
+  }
+  
+  .hr-department-scrollable {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .hr-department-heading h2 {
+    font-size: 1.25rem;
+  }
+  
+  .hr-department-modal {
+    padding: 1rem;
+  }
+  
+  .hr-department-table th,
+  .hr-department-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .hr-department-dropdown {
+    width: 150px;
+  }
+}
+
+/* Enhanced scrollbar behavior for all screen sizes */
+@media (hover: hover) {
+  .hr-department-table-scrollable::-webkit-scrollbar,
+  .hr-department-modal::-webkit-scrollbar,
+  .hr-department-scrollable::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Print media query for better printing */
+@media print {
+  .hr-department-add-btn,
+  .hr-department-filter,
+  .hr-department-search-wrapper,
+  .hr-department-actions,
+  .hr-pagination {
+    display: none;
+  }
+  
+  .hr-department-body-content-container {
+    box-shadow: none;
+  }
+  
+  .hr-department-table {
+    min-width: 100%;
+  }
+  
+  .hr-department-table-container,
+  .hr-department-table-scrollable {
+    max-height: none;
+    overflow: visible;
+  }
 }
