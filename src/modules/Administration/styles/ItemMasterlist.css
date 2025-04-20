@@ -448,34 +448,34 @@
 }
 
 /* ========== Scroll Bar Styles ========== */
-.users-container::-webkit-scrollbar,
+.item-master-container::-webkit-scrollbar,
 .scrollable-table .ant-table-body::-webkit-scrollbar,
 .popover-tags::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-.users-container::-webkit-scrollbar-track,
+.item-master-container::-webkit-scrollbar-track,
 .scrollable-table .ant-table-body::-webkit-scrollbar-track,
 .popover-tags::-webkit-scrollbar-track {
   background: #f0f0f0;
 }
 
-.users-container::-webkit-scrollbar-thumb,
+.item-master-container::-webkit-scrollbar-thumb,
 .scrollable-table .ant-table-body::-webkit-scrollbar-thumb,
 .popover-tags::-webkit-scrollbar-thumb {
   background: #00a8a8;
   border-radius: 4px;
 }
 
-.users-container::-webkit-scrollbar-thumb:hover,
+.item-master-container::-webkit-scrollbar-thumb:hover,
 .scrollable-table .ant-table-body::-webkit-scrollbar-thumb:hover,
 .popover-tags::-webkit-scrollbar-thumb:hover {
   background: #008080;
 }
 
 /* Firefox scrollbar */
-.users-container,
+.item-master-container,
 .scrollable-table .ant-table-body,
 .popover-tags {
   scrollbar-width: thin;
@@ -484,142 +484,142 @@
 
 /* ========== Responsive Styles ========== */
 @media (max-width: 992px) {
-    .user-manage .users-container {
+    .item-master .users-container {
       padding: 12px;
     }
   
-    .user-manage .ant-tabs-tab {
+    .item-master .ant-tabs-tab {
       padding: 8px 12px !important;
     }
   
-    .user-manage .header-right-content {
+    .item-master .header-right-content {
       gap: 8px;
     }
   
-    .user-manage .search-container {
+    .item-master .search-container {
       max-width: 220px;
     }
   }
   
   @media (max-width: 820px) {
-    .user-manage {
+    .item-master {
       padding: 8px;
     }
   
-    .user-manage .users-container {
+    .item-master .users-container {
       padding: 8px;
       border-radius: 4px;
       overflow-x: hidden;
     }
   
     /* Compact header to save space */
-    .user-manage .page-title {
+    .item-master .page-title {
       font-size: 18px !important;
     }
   
-    .user-manage .title-divider {
+    .item-master .title-divider {
       margin: 8px 0 12px !important;
     }
   
     /* Make the search and buttons more compact */
-    .user-manage .header-right-content {
+    .item-master .header-right-content {
       flex-wrap: nowrap;
       width: auto;
       align-items: center;
     }
   
-    .user-manage .search-container {
+    .item-master .search-container {
       max-width: 150px;
       min-width: 100px;
     }
   
     /* Make table meta info more compact */
-    .user-manage .table-meta-info {
+    .item-master .table-meta-info {
       padding: 4px 0;
       margin-bottom: 4px;
     }
   
-    .user-manage .record-count {
+    .item-master .record-count {
       font-size: 12px;
     }
   
     /* Make tabs more touch-friendly but compact */
-    .user-manage .user-tabs .ant-tabs-nav {
+    .item-master .user-tabs .ant-tabs-nav {
       margin-bottom: 8px;
     }
   
-    .user-manage .user-tabs .ant-tabs-tab {
+    .item-master .user-tabs .ant-tabs-tab {
       padding: 6px 4px !important;
       min-height: 36px;
     }
   
     /* Make icons more prominent on mobile when text is hidden */
-    .user-manage .user-tabs .ant-tabs-tab .anticon {
+    .item-master .user-tabs .ant-tabs-tab .anticon {
       font-size: 16px;
       margin-right: 0;
     }
   
     /* Special mobile layout for tab navigation area */
-    .user-manage .user-tabs .ant-tabs-nav-wrap {
+    .item-master .user-tabs .ant-tabs-nav-wrap {
       flex: 1;
     }
   
-    .user-manage .user-tabs .ant-tabs-extra-content {
+    .item-master .user-tabs .ant-tabs-extra-content {
       flex: 2;
     }
   }
   
   @media (max-width: 576px) {
-    .user-manage .users-container {
+    .item-master .users-container {
       max-height: calc(100vh - 120px);
       padding: 8px 4px;
     }
   
-    .user-manage .ant-table-cell {
+    .item-master .ant-table-cell {
       padding: 6px 4px !important;
       white-space: nowrap;
     }
   
     /* Stack search and buttons for very small screens */
-    .user-manage .header-right-content {
+    .item-master .header-right-content {
       flex-direction: row;
       align-items: center;
       gap: 4px;
     }
   
-    .user-manage .search-container {
+    .item-master .search-container {
       max-width: 120px;
       min-width: 80px;
     }
   
-    .user-manage .ant-input-search .ant-input {
+    .item-master .ant-input-search .ant-input {
       padding-right: 4px !important;
     }
   
-    .user-manage .ant-input-search .ant-input-suffix {
+    .item-master .ant-input-search .ant-input-suffix {
       right: 4px !important;
     }
   
     /* Shrink buttons to icon-only */
-    .user-manage .action-buttons .ant-btn {
+    .item-master .action-buttons .ant-btn {
       min-width: 32px;
       height: 32px;
       padding: 0 8px;
     }
   
-    .user-manage .action-buttons .ant-btn .anticon {
+    .item-master .action-buttons .ant-btn .anticon {
       font-size: 14px;
     }
   
     /* Compact pagination */
-    .user-manage .table-pagination .ant-pagination {
+    .item-master .table-pagination .ant-pagination {
       display: flex;
       justify-content: center;
     }
   
-    .user-manage .table-pagination .ant-pagination-item,
-    .user-manage .table-pagination .ant-pagination-prev,
-    .user-manage .table-pagination .ant-pagination-next {
+    .item-master .table-pagination .ant-pagination-item,
+    .item-master .table-pagination .ant-pagination-prev,
+    .item-master .table-pagination .ant-pagination-next {
       margin: 0 2px;
       min-width: 24px;
       height: 24px;
@@ -627,40 +627,40 @@
     }
   
     /* Reduce space between tab nav and content */
-    .user-manage .user-tabs .ant-tabs-nav {
+    .item-master .user-tabs .ant-tabs-nav {
       margin-bottom: 4px;
     }
   
     /* Reduce page title size further */
-    .user-manage .page-title {
+    .item-master .page-title {
       font-size: 16px !important;
     }
   
-    .user-manage .title-divider {
+    .item-master .title-divider {
       margin: 6px 0 8px !important;
     }
   }
   
   /* Fix for unwanted transitions */
   @media (max-width: 820px) {
-    .user-manage .ant-tabs-content {
+    .item-master .ant-tabs-content {
       transition: none !important;
     }
   
-    .user-manage .ant-tabs-tabpane {
+    .item-master .ant-tabs-tabpane {
       transition: none !important;
     }
   
     /* Ensure tab content is properly sized */
-    .user-manage .ant-tabs-content {
+    .item-master .ant-tabs-content {
       height: 100% !important;
     }
   
-    .user-manage .ant-tabs-tabpane {
+    .item-master .ant-tabs-tabpane {
       height: 100% !important;
     }
   
-    .user-manage .ant-tabs-tabpane-hidden {
+    .item-master .ant-tabs-tabpane-hidden {
       display: none !important;
     }
   }

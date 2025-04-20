@@ -132,8 +132,10 @@ const ItemMasterManagement = () => {
       fetchVendors();
     } else if (activeTab === "assets") {
       fetchAssets();
+      fetchContentIds();
     } else if (activeTab === "products") {
       fetchProducts();
+      fetchPolicies();
     } else if (activeTab === "materials") {
       fetchRawMaterials();
     }
@@ -186,6 +188,25 @@ const ItemMasterManagement = () => {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchContentIds = async () => {
+    try {
+      const data = await assetsAPI.getContentIds();
+      setContentIds(data);
+    } catch (error) {
+      console.error('Failed to fetch content IDs:', error);
+    }
+  };
+
+  const fetchPolicies = async () => {
+    try {
+      const data = await productsAPI.getPolicies();
+      setPolicies(data.results || data);
+    } catch (error) {
+      message.error("Failed to fetch policies");
+      console.error(error);
     }
   };
 
@@ -526,7 +547,15 @@ const ItemMasterManagement = () => {
     // Set form values based on your product structure
     productForm.setFieldsValue({
       product_name: record.product_name,
-      // Add other product fields
+      description: record.description,
+      selling_price: record.selling_price,
+      stock_level: record.stock_level,
+      unit_of_measure: record.unit_of_measure,
+      batch_no: record.batch_no,
+      item_status: record.item_status,
+      warranty_period: record.warranty_period,
+      policy_id: record.policy_id,
+      content_id: record.content_id
     });
     setProductModalVisible(true);
   };
@@ -830,7 +859,7 @@ const ItemMasterManagement = () => {
       key: "purchase_price",
       sorter: true,
       width: 120,
-      render: (price) => price ? `$${parseFloat(price).toFixed(2)}` : '-',
+      render: (price) => price ? `₱${parseFloat(price).toFixed(2)}` : '-',
     },
     {
       title: "Serial No",
@@ -882,16 +911,83 @@ const ItemMasterManagement = () => {
       dataIndex: "product_id",
       key: "product_id",
       sorter: true,
-      width: 180,
+      width: 140,
     },
     {
       title: "Product Name",
       dataIndex: "product_name",
       key: "product_name",
       sorter: true,
+      width: 100,
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+      sorter: true,
       width: 180,
     },
-    // Add other product columns as needed
+    {
+      title: "Price",
+      dataIndex: "selling_price",
+      key: "selling_price",
+      sorter: true,
+      width: 100,
+    },
+    {
+      title: "Stock Qty",
+      dataIndex: "stock_level",
+      key: "stock_level",
+      sorter: true,
+      width: 80,
+    },
+    {
+      title: "UOM",
+      dataIndex: "unit_of_measure",
+      key: "unit_of_measure",
+      sorter: true,
+      width: 60,
+    },
+    {
+      title: "Batch No",
+      dataIndex: "batch_no",
+      key: "batch_no",
+      sorter: true,
+      width: 100,
+    },
+    {
+      title: "Status",
+      dataIndex: "item_status",
+      key: "item_status",
+      sorter: true,
+      width: 80,
+      render: (status) => (
+        <Tag color={status === "Active" ? "green" : "red"}>
+          {status}
+        </Tag>
+      ),
+    },
+    {
+      title: "Warranty Period",
+      dataIndex: "warranty_period",
+      key: "warranty_period",
+      sorter: true,
+      width: 80,
+    },
+    {
+      title: "Policy ID",
+      dataIndex: "policy_id",
+      key: "policy_id",
+      sorter: true,
+      width: 100,
+    },
+    {
+      title: "Content ID",
+      dataIndex: "content_id",
+      key: "content_id",
+      sorter: true,
+      width: 100,
+    },
     {
       title: "Actions",
       key: "actions",
@@ -928,16 +1024,43 @@ const ItemMasterManagement = () => {
       dataIndex: "material_id",
       key: "material_id",
       sorter: true,
-      width: 180,
+      width: 100,
     },
     {
       title: "Material Name",
       dataIndex: "material_name",
       key: "material_name",
       sorter: true,
-      width: 180,
+      width: 120,
     },
-    // Add other material columns as needed
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+      sorter: true,
+      width: 140,
+    },
+    {
+      title: "UOM",
+      dataIndex: "unit_of_measure",
+      key: "unit_of_measure",
+      sorter: true,
+      width: 60,
+    },
+    {
+      title: "Cost",
+      dataIndex: "cost_per_unit",
+      key: "cost_per_unit",
+      sorter: true,
+      width: 80,
+    },
+    {
+      title: "Vendor Code",
+      dataIndex: "vendor_code",
+      key: "vendor_code",
+      sorter: true,
+      width: 100,
+    },
     {
       title: "Actions",
       key: "actions",
@@ -1111,7 +1234,7 @@ const ItemMasterManagement = () => {
         key: "purchase_price",
         sorter: true,
         width: 120,
-        render: (price) => price ? `$${parseFloat(price).toFixed(2)}` : '-',
+        render: (price) => price ? `₱${parseFloat(price).toFixed(2)}` : '-',
     },
     {
         title: "Serial No",
@@ -1157,20 +1280,87 @@ const archivedProductColumns = [
       dataIndex: "product_id",
       key: "product_id",
       sorter: true,
-      width: 180,
+      width: 120,
     },
     {
       title: "Product Name",
       dataIndex: "product_name",
       key: "product_name",
       sorter: true,
+      width: 140,
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+      sorter: true,
       width: 180,
     },
-    // Add other product columns as needed
+    {
+      title: "Price",
+      dataIndex: "selling_price",
+      key: "selling_price",
+      sorter: true,
+      width: 100,
+    },
+    {
+      title: "Stock Qty",
+      dataIndex: "stock_level",
+      key: "stock_level",
+      sorter: true,
+      width: 80,
+    },
+    {
+      title: "UOM",
+      dataIndex: "unit_of_measure",
+      key: "unit_of_measure",
+      sorter: true,
+      width: 60,
+    },
+    {
+      title: "Batch No",
+      dataIndex: "batch_no",
+      key: "batch_no",
+      sorter: true,
+      width: 100,
+    },
+    {
+    title: "Status",
+    dataIndex: "item_status",
+    key: "item_status",
+    sorter: true,
+    width: 80,
+    render: (status) => (
+      <Tag color={status === "Active" ? "green" : "red"}>
+        {status}
+      </Tag>
+      ),
+    },
+    {
+      title: "Warranty Period",
+      dataIndex: "warranty_period",
+      key: "policy_id",
+      sorter: true,
+      width: 60,
+    },
+    {
+      title: "Policy ID",
+      dataIndex: "policy_id",
+      key: "policy_id",
+      sorter: true,
+      width: 100,
+    },
+    {
+      title: "Content ID",
+      dataIndex: "content_id",
+      key: "content_id",
+      sorter: true,
+      width: 100,
+    },
     {
       title: "Actions",
       key: "actions",
-      width: 80,
+      width: 100,
       align: "center",
       render: (_, record) => (
         <Popconfirm
@@ -1195,20 +1385,47 @@ const archivedProductColumns = [
       dataIndex: "material_id",
       key: "material_id",
       sorter: true,
-      width: 180,
+      width: 100,
     },
     {
       title: "Material Name",
       dataIndex: "material_name",
       key: "material_name",
       sorter: true,
-      width: 180,
+      width: 120,
     },
-    // Add other material columns as needed
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+      sorter: true,
+      width: 140,
+    },
+    {
+      title: "UOM",
+      dataIndex: "unit_of_measure",
+      key: "unit_of_measure",
+      sorter: true,
+      width: 60,
+    },
+    {
+      title: "Cost",
+      dataIndex: "cost_per_unit",
+      key: "cost_per_unit",
+      sorter: true,
+      width: 80,
+    },
+    {
+      title: "Vendor Code",
+      dataIndex: "vendor_code",
+      key: "vendor_code",
+      sorter: true,
+      width: 100,
+    },
     {
       title: "Actions",
       key: "actions",
-      width: 80,
+      width: 100,
       align: "center",
       render: (_, record) => (
         <Popconfirm
@@ -1388,7 +1605,7 @@ const archivedProductColumns = [
                   columns={itemColumns} 
                   rowKey="item_id"
                   loading={loading}
-                  scroll={{ x: true }}
+                  scroll={{ x: true, y: 400 }}
                   pagination={false}
                   bordered
                   size="middle"
@@ -1424,7 +1641,7 @@ const archivedProductColumns = [
                   columns={assetColumns} 
                   rowKey="asset_id"
                   loading={loading}
-                  scroll={{ x: true }}
+                  scroll={{ x: true, y: 400 }}
                   pagination={false}
                   bordered
                   size="middle"
@@ -1460,7 +1677,7 @@ const archivedProductColumns = [
                   columns={productColumns} 
                   rowKey="product_id"
                   loading={loading}
-                  scroll={{ x: true }}
+                  scroll={{ x: true, y: 400 }}
                   pagination={false}
                   bordered
                   size="middle"
@@ -1496,7 +1713,7 @@ const archivedProductColumns = [
                   columns={materialColumns} 
                   rowKey="material_id"
                   loading={loading}
-                  scroll={{ x: true }}
+                  scroll={{ x: true, y: 400 }}
                   pagination={false}
                   bordered
                   size="middle"
@@ -1730,8 +1947,6 @@ const archivedProductColumns = [
               <InputNumber 
                 min={0}
                 style={{ width: '100%' }}
-                formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                parser={value => value.replace(/\$\s?|(,*)/g, '')}
               />
             </Form.Item>
 
@@ -1747,9 +1962,9 @@ const archivedProductColumns = [
               label="Content ID"
             >
               <Select allowClear placeholder="Select content ID">
-                {contentIds.map(id => (
-                  <Option key={id} value={id}>
-                    {id}
+                {contentIds.map(contentIds => (
+                  <Option key={contentIds} value={contentIds}>
+                    {contentIds}
                   </Option>
                 ))}
               </Select>
@@ -1798,13 +2013,6 @@ const archivedProductColumns = [
             </Form.Item>
 
             <Form.Item
-              name="sku"
-              label="SKU"
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
               name="description"
               label="Description"
             >
@@ -1812,21 +2020,24 @@ const archivedProductColumns = [
             </Form.Item>
 
             <Form.Item
-              name="category"
-              label="Category"
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              name="unit_price"
-              label="Unit Price"
+              name="selling_price"
+              label="Selling Price"
             >
               <InputNumber 
                 min={0}
                 style={{ width: '100%' }}
-                formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                formatter={value => `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 parser={value => value.replace(/\$\s?|(,*)/g, '')}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="stock_level"
+              label="Stock Level"
+            >
+              <InputNumber 
+                min={0}
+                style={{ width: '100%' }}
               />
             </Form.Item>
 
@@ -1838,6 +2049,60 @@ const archivedProductColumns = [
                 {uomOptions.map(uom => (
                   <Option key={uom} value={uom}>
                     {uom}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="batch_no"
+              label="Batch No"
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="item_status"
+              label="Status"
+              initialValue="Active"
+            >
+              <Select>
+                <Option value="Active">Active</Option>
+                <Option value="Inactive">Inactive</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="warranty_period"
+              label="Warranty Period"
+            >
+              <InputNumber 
+                min={0}
+                style={{ width: '100%' }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="policy_id"
+              label="Policy ID"
+            >
+              <Select allowClear placeholder="Select policy ID">
+                {policies.map(policies => (
+                  <Option key={policies} value={policies}>
+                    {policies}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="content_id"
+              label="Content ID"
+            >
+              <Select allowClear placeholder="Select content ID">
+                {contentIds.map(contentIds => (
+                  <Option key={contentIds} value={contentIds}>
+                    {contentIds}
                   </Option>
                 ))}
               </Select>
@@ -2027,6 +2292,9 @@ const archivedProductColumns = [
               }}
               bordered
               size="middle"
+              showSorterTooltip={false}
+              sortDirections={['ascend', 'descend']}
+              onChange={handleArchivedTableChange}
             />
           )}
           {archiveType === "products" && (
@@ -2044,6 +2312,9 @@ const archivedProductColumns = [
               }}
               bordered
               size="middle"
+              showSorterTooltip={false}
+              sortDirections={['ascend', 'descend']}
+              onChange={handleArchivedTableChange}
             />
           )}
           {archiveType === "materials" && (
@@ -2061,6 +2332,9 @@ const archivedProductColumns = [
               }}
               bordered
               size="middle"
+              showSorterTooltip={false}
+              sortDirections={['ascend', 'descend']}
+              onChange={handleArchivedTableChange}
             />
           )}
         </Modal>

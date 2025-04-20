@@ -295,6 +295,16 @@ export const assetsAPI = {
     }
   },
 
+  getContentIds: async () => {
+    try {
+      const response = await api.get('/item-master/assets/content_ids/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching content IDs:', error);
+      throw error;
+    }
+  },
+
   // Archive (soft delete) an asset
   archiveAsset: async (assetId) => {
     try {
@@ -307,7 +317,7 @@ export const assetsAPI = {
   },
 
   // Get archived assets
-  getArchivedAssets: async () => {
+  getArchivedAssets: async (params = {}) => {
     try {
       const response = await api.get('/item-master/assets/archived/', { params });
       return response.data;
@@ -338,6 +348,16 @@ export const productsAPI = {
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
+      throw error;
+    }
+  },
+
+  getPolicies: async () => {
+    try {
+      const response = await api.get('/item-master/products/policy_id/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching policy IDs:', error);
       throw error;
     }
   },
@@ -387,9 +407,9 @@ export const productsAPI = {
   },
 
   // Get archived products
-  getArchivedProducts: async () => {
+  getArchivedProducts: async (params = {}) => {
     try {
-      const response = await api.get('/item-master/products/archived/', { params }, { params });
+      const response = await api.get('/item-master/products/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived products:', error);
@@ -467,7 +487,7 @@ export const rawMaterialsAPI = {
   },
 
   // Get archived raw materials
-  getArchivedRawMaterials: async () => {
+  getArchivedRawMaterials: async (params = {}) => {
     try {
       const response = await api.get('/item-master/raw-materials/archived/', { params });
       return response.data;
@@ -563,7 +583,7 @@ export const businessPartnerAPI = {
   // Get all business partners with optional search and ordering
   getBusinessPartners: async (params = {}) => {
     try {
-      const response = await api.get('/partner-master/', { params });
+      const response = await api.get('/partner-master/partners/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching business partners:', error);
@@ -574,7 +594,7 @@ export const businessPartnerAPI = {
   // Update a business partner
   updateBusinessPartner: async (partnerId, partnerData) => {
     try {
-      const response = await api.put(`/partner-master/${partnerId}/`, partnerData);
+      const response = await api.put(`/partner-master/partners/${partnerId}/`, partnerData);
       return response.data;
     } catch (error) {
       console.error('Error updating business partner:', error);
@@ -585,7 +605,7 @@ export const businessPartnerAPI = {
   // Get a single business partner
   getBusinessPartner: async (partnerId) => {
     try {
-      const response = await api.get(`/partner-master/${partnerId}/`);
+      const response = await api.get(`/partner-master/partners/${partnerId}/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching business partner:', error);
@@ -696,7 +716,7 @@ export const warehouseAPI = {
   // Get all warehouses with optional search and ordering
   getWarehouses: async (params = {}) => {
     try {
-      const response = await api.get('/warehouses/', { params });
+      const response = await api.get('/warehouse/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching warehouses:', error);
@@ -707,7 +727,7 @@ export const warehouseAPI = {
   // Create a new warehouse
   createWarehouse: async (warehouseData) => {
     try {
-      const response = await api.post('/warehouses/', warehouseData);
+      const response = await api.post('/warehouse/', warehouseData);
       return response.data;
     } catch (error) {
       console.error('Error creating warehouse:', error);
@@ -718,7 +738,7 @@ export const warehouseAPI = {
   // Update a warehouse
   updateWarehouse: async (warehouseId, warehouseData) => {
     try {
-      const response = await api.put(`/warehouses/${warehouseId}/`, warehouseData);
+      const response = await api.put(`/warehouse/${warehouseId}/`, warehouseData);
       return response.data;
     } catch (error) {
       console.error('Error updating warehouse:', error);
@@ -729,7 +749,7 @@ export const warehouseAPI = {
   // Get a single warehouse
   getWarehouse: async (warehouseId) => {
     try {
-      const response = await api.get(`/warehouses/${warehouseId}/`);
+      const response = await api.get(`/warehouse/${warehouseId}/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching warehouse:', error);
