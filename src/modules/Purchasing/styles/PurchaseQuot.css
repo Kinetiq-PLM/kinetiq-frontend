@@ -142,7 +142,6 @@
     flex-direction: column;
     width: 100%;
     overflow: hidden;
-    max-height: calc(100vh - 20rem);
 }
 
 .purchquote .purchquote-table-header {
@@ -154,7 +153,6 @@
     border-bottom: 1px solid #eee;
     position: sticky;
     top: 0;
-    z-index: 2;
     align-items: center;
     text-align: center;
 }
