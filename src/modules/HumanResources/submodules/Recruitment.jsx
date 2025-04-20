@@ -23,6 +23,7 @@ const Recruitment = () => {
   const [showUploadDocumentModal, setShowUploadDocumentModal] = useState(false);
   const [showEditCandidateModal, setShowEditCandidateModal] = useState(false);
   const [showAddCandidateModal, setShowAddCandidateModal] = useState(false);
+  const [showEditJobModal, setShowEditJobModal] = useState(false);
   
   // Reference data
   const [departments, setDepartments] = useState([]);
@@ -65,6 +66,7 @@ const Recruitment = () => {
   });
 
   const [editingCandidate, setEditingCandidate] = useState(null);
+  const [editingJobPosting, setEditingJobPosting] = useState(null);
 
   // UI States
   const [activeTab, setActiveTab] = useState("Candidates");
@@ -76,8 +78,6 @@ const Recruitment = () => {
   const [loading, setLoading] = useState(false); // General loading state
   const [toast, setToast] = useState(null);
   const [dotsMenuOpen, setDotsMenuOpen] = useState(null);
-  const [showEditJobModal, setShowEditJobModal] = useState(false);
-  const [editingJobPosting, setEditingJobPosting] = useState(null);
   const [viewingDocuments, setViewingDocuments] = useState(null);
   const [viewingInterviewDetails, setViewingInterviewDetails] = useState(null);
   const [viewingOfferDetails, setViewingOfferDetails] = useState(null);
@@ -2482,6 +2482,168 @@ const submitCandidateForm = async (e) => {
                   disabled={loading}
                 >
                   {loading ? "Saving..." : "Add Candidate"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Job Posting Modal */}
+      {showEditJobModal && editingJobPosting && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3>Edit Job Posting</h3>
+            <form onSubmit={handleEditJobPostingSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Department *</label>
+                    <select 
+                      name="dept_id" 
+                      value={editingJobPosting.dept_id || ""} 
+                      onChange={handleEditJobPostingChange}
+                      required
+                    >
+                      <option value="">-- Select Department --</option>
+                      {departments.map(dept => (
+                        <option key={dept.dept_id} value={dept.dept_id}>
+                          {dept.dept_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Position *</label>
+                    <select
+                      name="position_id"
+                      value={editingJobPosting.position_id || ""}
+                      onChange={handleEditJobPostingChange}
+                      required
+                    >
+                      <option value="">-- Select Position --</option>
+                      {positions.map(pos => (
+                        <option key={pos.position_id} value={pos.position_id}>
+                          {pos.position_title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Position Title</label>
+                    <input
+                      type="text"
+                      name="position_title"
+                      value={editingJobPosting.position_title || ""}
+                      disabled
+                      placeholder="Auto-filled from position selection"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Description *</label>
+                    <textarea
+                      name="description"
+                      value={editingJobPosting.description || ""}
+                      onChange={handleEditJobPostingChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Requirements *</label>
+                    <textarea 
+                      name="requirements" 
+                      value={editingJobPosting.requirements || ""} 
+                      onChange={handleEditJobPostingChange}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Employment Type *</label>
+                    <select
+                      name="employment_type"
+                      value={editingJobPosting.employment_type || ""}
+                      onChange={handleEditJobPostingChange}
+                      required
+                    >
+                      <option value="Regular">Regular</option>
+                      <option value="Contractual">Contractual</option>
+                      <option value="Seasonal">Seasonal</option>
+                    </select>
+                  </div>
+                  
+                  {editingJobPosting.employment_type === "Regular" ? (
+                    <div className="form-group">
+                      <label>Base Salary *</label>
+                      <input 
+                        type="number" 
+                        name="base_salary" 
+                        value={editingJobPosting.base_salary || ""} 
+                        onChange={handleEditJobPostingChange}
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                  ) : (
+                    <div className="form-group">
+                      <label>Daily Rate *</label>
+                      <input 
+                        type="number" 
+                        name="daily_rate" 
+                        value={editingJobPosting.daily_rate || ""} 
+                        onChange={handleEditJobPostingChange}
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                  )}
+                  
+                  {editingJobPosting.employment_type !== "Regular" && (
+                    <div className="form-group">
+                      <label>Duration (Days){editingJobPosting.employment_type !== "Regular" ? " *" : ""}</label>
+                      <input 
+                        type="number" 
+                        name="duration_days" 
+                        value={editingJobPosting.duration_days || ""} 
+                        onChange={handleEditJobPostingChange}
+                        min={editingJobPosting.employment_type === "Seasonal" ? 1 : 30}
+                        max={editingJobPosting.employment_type === "Seasonal" ? 29 : 180}
+                        required={editingJobPosting.employment_type !== "Regular"}
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="form-group">
+                    <label>Posting Status</label>
+                    <select
+                      name="posting_status"
+                      value={editingJobPosting.posting_status || ""}
+                      onChange={handleEditJobPostingChange}
+                    >
+                      <option value="Draft">Draft</option>
+                      <option value="Open">Open</option>
+                      <option value="Closed">Closed</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button type="submit" className="submit-btn">Save Changes</button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowEditJobModal(false)}
+                >
+                  Cancel
                 </button>
               </div>
             </form>
