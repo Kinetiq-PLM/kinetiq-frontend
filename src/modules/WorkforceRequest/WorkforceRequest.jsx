@@ -34,7 +34,7 @@ const WorkforceRequest = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/departments/");
+        const response = await axios.get("http://127.0.0.1:8000/api/departments/department/");
         setDepartments(response.data.filter(dept => !dept.is_archived));
       } catch (err) {
         console.error("Error fetching departments:", err);
@@ -44,7 +44,7 @@ const WorkforceRequest = () => {
 
     const fetchRequests = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/workforce_requests/");
+        const response = await axios.get("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/");
         setRequests(response.data);
       } catch (err) {
         console.error("Error fetching requests:", err);
@@ -71,7 +71,7 @@ const WorkforceRequest = () => {
     e.preventDefault();
     
     try {
-      await axios.post("http://127.0.0.1:8000/api/workforce_requests/", formData);
+      await axios.post("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/", formData);
       showToast("Request submitted successfully");
       setFormData({
         requesting_dept_id: "",
@@ -207,12 +207,12 @@ const WorkforceRequest = () => {
               >
                 Workforce Request Form
               </button>
-              <button
+              {/* <button
                 className={activeTab === "list" ? "active" : ""}
                 onClick={() => setActiveTab("list")}
               >
                 Workforce Request List
-              </button>
+              </button> */}
             </div>
           </div>
 
