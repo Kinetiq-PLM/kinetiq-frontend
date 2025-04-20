@@ -906,3 +906,192 @@
     overflow: visible;
   }
 }
+
+/* ---------------------------------------------------------
+   IMPROVED MODAL STYLING
+   --------------------------------------------------------- */
+   .hr-employee-modal-improved {
+    max-width: 800px;
+    padding: 0;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    overflow: hidden;
+  }
+  
+  /* Modal Header */
+  .hr-employee-modal-header {
+    padding: 1.5rem 2rem;
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .hr-employee-modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #111827;
+  }
+  
+  .hr-employee-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0;
+    height: 24px;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .hr-employee-modal-close:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+  
+  /* Modal Tabs */
+  .hr-employee-modal-tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: #fff;
+    overflow-x: auto;
+    padding: 0 1.5rem;
+  }
+  
+  .hr-employee-modal-tabs button {
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #6b7280;
+    white-space: nowrap;
+  }
+  
+  .hr-employee-modal-tabs button:hover {
+    color: #111827;
+  }
+  
+  .hr-employee-modal-tabs button.active {
+    color: #00b0b5;
+    border-bottom-color: #00b0b5;
+  }
+  
+  /* Section Styling */
+  .hr-employee-modal-section {
+    display: none;
+    padding: 1.5rem 2rem;
+  }
+  
+  .hr-employee-modal-section.active {
+    display: block;
+  }
+  
+  .hr-section-heading {
+    margin-bottom: 1.5rem;
+  }
+  
+  .hr-section-heading h4 {
+    margin: 0 0 0.5rem 0;
+    color: #111827;
+    font-size: 1rem;
+  }
+  
+  .hr-section-heading p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+  
+  /* Enhanced Form Elements */
+  .hr-employee-modal .input-with-icon {
+    position: relative;
+  }
+  
+  .hr-employee-modal .input-with-icon input,
+  .hr-employee-modal .input-with-icon select {
+    padding-left: 2.5rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  
+  .hr-employee-modal .input-with-icon.readonly input {
+    background-color: #f9fafb;
+  }
+  
+  .hr-employee-modal .input-with-icon i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-style: normal;
+  }
+  
+  /* Required field indicator */
+  .hr-employee-modal .required {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+  
+  /* Small helper text */
+  .hr-employee-modal small {
+    display: block;
+    margin-top: 0.375rem;
+    color: #6b7280;
+    font-size: 0.75rem;
+  }
+  
+  /* Status select styling */
+  .hr-employee-modal .status-select.active {
+    border-color: #10b981;
+  }
+  
+  .hr-employee-modal .status-select.inactive {
+    border-color: #ef4444;
+  }
+  
+  /* Checkbox styling */
+  .hr-employee-modal .checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .hr-employee-modal input[type="checkbox"] {
+    margin-right: 0.75rem;
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  .hr-employee-modal .checkbox-label {
+    margin-bottom: 0;
+    cursor: pointer;
+  }
+  
+  /* Button container */
+  .hr-employee-modal .hr-employee-modal-buttons {
+    padding: 1.5rem 2rem;
+    background-color: #f9fafb;
+    margin-top: 0;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  /* On hover states for inputs */
+  .hr-employee-modal input:not([disabled]):hover,
+  .hr-employee-modal select:not([disabled]):hover {
+    border-color: #00b0b5;
+  }
+  
+  .hr-employee-modal input:not([disabled]):focus,
+  .hr-employee-modal select:not([disabled]):focus {
+    border-color: #00b0b5;
+    box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.25);
+    outline: none;
+  }
