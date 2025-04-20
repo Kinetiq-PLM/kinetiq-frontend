@@ -50,6 +50,19 @@ const Recruitment = () => {
           axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
         ]);
   
+        console.log('Candidates data:', candidatesRes.data);
+        if (candidatesRes.data && candidatesRes.data.length > 0) {
+          console.log('Sample candidate:', candidatesRes.data[0]);
+        }
+  
+        // Add this debugging code
+        console.log('CANDIDATE DATA STRUCTURE:');
+        if (candidatesRes.data && candidatesRes.data.length > 0) {
+          const sampleCandidate = candidatesRes.data[0];
+          console.log('Sample candidate object keys:', Object.keys(sampleCandidate));
+          console.log('Full sample candidate:', sampleCandidate);
+        }
+  
         const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
           axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/"),
           axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/archived/")
@@ -257,14 +270,15 @@ const Recruitment = () => {
               <thead>
                 <tr>
                   {isArchived && <th>Select</th>}
-                  <th>ID</th>
+                  <th>Candidate ID</th>
+                  <th>Job ID</th>
+                  <th>Position</th>
                   <th>First Name</th>
                   <th>Last Name</th>
                   <th>Email</th>
                   <th>Phone</th>
-                  <th>Status</th>
-                  <th>Applied Position</th>
-                  <th>Applied Date</th>
+                  <th>Application Status</th>
+                  <th>Created At</th>
                   <th></th>
                 </tr>
               </thead>
@@ -276,18 +290,25 @@ const Recruitment = () => {
                         <input type="checkbox" />
                       </td>
                     )}
-                    <td>{candidate.id}</td>
+                    <td>{candidate.candidate_id || candidate.id}</td>
+                    <td>{candidate.job?.job_id || candidate.job_posting_id || candidate.job_id || candidate.jobId || candidate.posting_id || candidate.jobPostingId || "-"}</td>
+                    <td>{candidate.position_title || candidate.applied_position}</td>
                     <td>{candidate.first_name}</td>
                     <td>{candidate.last_name}</td>
                     <td>{candidate.email}</td>
                     <td>{candidate.phone}</td>
                     <td>
-                      <span className={`recruitment-tag ${candidate.status ? candidate.status.toLowerCase() : 'unknown'}`}>
-                        {candidate.status || 'Unknown'}
+                      <span className={`recruitment-tag ${
+                        candidate.application_status 
+                          ? candidate.application_status.toLowerCase().replace(/\s+/g, '-')
+                          : candidate.status
+                            ? candidate.status.toLowerCase().replace(/\s+/g, '-')
+                            : 'unknown'
+                      }`}>
+                        {candidate.application_status || candidate.status || 'Unknown'}
                       </span>
                     </td>
-                    <td>{candidate.applied_position}</td>
-                    <td>{candidate.applied_date}</td>
+                    <td>{candidate.created_at}</td>
                     <td className="recruitment-actions">
                       <div
                         className="recruitment-dots"

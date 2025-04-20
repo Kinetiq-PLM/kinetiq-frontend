@@ -322,13 +322,15 @@
    TAG STYLES (STATUS)
    --------------------------------------------------------- */
 .recruitment-tag {
-  padding: 0.3rem 0.6rem;
-  border-radius: 1rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 500;
   display: inline-block;
   text-align: center;
   white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  letter-spacing: 0.02em;
 }
 
 /* Status-specific colors */
@@ -422,6 +424,43 @@
 .recruitment-tag.rejected-clearance {
   background-color: #f8d7da;
   color: #842029;
+}
+
+/* Candidate Application Status Pills */
+.recruitment-tag.applied {
+  background-color: #e6f7ff;
+  color: #0050b3;
+  border: 1px solid #91d5ff;
+}
+
+.recruitment-tag.screening {
+  background-color: #f6ffed;
+  color: #389e0d;
+  border: 1px solid #b7eb8f;
+}
+
+.recruitment-tag.interviewing {
+  background-color: #fffbe6;
+  color: #ad8b00;
+  border: 1px solid #ffe58f;
+}
+
+.recruitment-tag.hired {
+  background-color: #e6fffb;
+  color: #006d75;
+  border: 1px solid #87e8de;
+}
+
+.recruitment-tag.rejected {
+  background-color: #fff1f0;
+  color: #cf1322;
+  border: 1px solid #ffa39e;
+}
+
+.recruitment-tag.waitlisted {
+  background-color: #f9f0ff;
+  color: #531dab;
+  border: 1px solid #d3adf7;
 }
 
 /* ---------------------------------------------------------
