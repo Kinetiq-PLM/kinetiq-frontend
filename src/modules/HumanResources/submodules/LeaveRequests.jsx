@@ -813,25 +813,21 @@ const handleEditLeaveRequest = async (e) => {
   setLoading(true);
   
   try {
-    // Create payload with only the fields that are acceptable to the backend
-    const payloadToSend = {
-      employee_id: editingRequest.employee_id,
+    // Only send fields that we want to update
+    const requestData = {
       leave_type: editedLeaveRequest.leave_type,
       start_date: editedLeaveRequest.start_date,
       end_date: editedLeaveRequest.end_date,
-      is_paid: editedLeaveRequest.is_paid
+      is_paid: editedLeaveRequest.is_paid,
+      status: editedLeaveRequest.status
     };
     
-    // If status exists in your backend API, add it separately
-    // This is the conditional approach that will work whether status is accepted or not
-    if (editedLeaveRequest.status) {
-      payloadToSend.status = editedLeaveRequest.status;
-    }
+    // Do not include employee_id in the PATCH request
     
-    // Make API call with filtered payload
+    // Make API call with only the fields we want to update
     await axios.patch(
       `http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/${editingRequest.leave_id}/`,
-      payloadToSend
+      requestData
     );
     
     setShowEditModal(false);
