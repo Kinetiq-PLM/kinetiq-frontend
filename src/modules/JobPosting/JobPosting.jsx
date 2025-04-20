@@ -124,8 +124,8 @@ const JobPostingReqs = () => {
         ...newPosting,
         position_title: selectedPosition?.position_title || "",
         base_salary: newPosting.employment_type === "Regular" ? 
-          (parseFloat(newPosting.base_salary) || null) : null,
-        daily_rate: !isRegular ? (parseFloat(newPosting.daily_rate) || 0) : null, 
+          (parseFloat(newPosting.base_salary) || 0) : 0,
+        daily_rate: !isRegular ? (parseFloat(newPosting.daily_rate) || 0) : 0, 
         duration_days: !isRegular ? parseInt(newPosting.duration_days) : null
       };
       
@@ -391,13 +391,10 @@ const JobPostingReqs = () => {
                       onChange={(e) => {
                         const value = e.target.value;
                         const numValue = value === '' ? null : parseFloat(value);
-                        
-                        // Only reject the input if user entered an actual non-positive number
-                        if (value !== '' && numValue <= 0 && newPosting.employment_type !== "Regular") {
-                          // Don't accept negative values for non-regular positions
+                        if (numValue <= 0 && newPosting.employment_type !== "Regular") {
+                          // Don't accept zero or negative values for non-regular positions
                           return;
                         }
-                        
                         setNewPosting(prev => ({
                           ...prev,
                           daily_rate: numValue
