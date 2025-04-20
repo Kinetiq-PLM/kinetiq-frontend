@@ -155,7 +155,6 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
         {!showNewForm && !showPurchQuot && (
           <div className="purchreq-table-container">
             <div className="purchreq-table-header">
-              <div className="purchreq-checkbox"><input type="checkbox" onClick={handleCheckboxClick} /></div>
               <div>PR No.</div>
               <div>Employee Name</div>
               <div>Department</div>
@@ -166,7 +165,6 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
               <div className="purchreq-table-rows">
                 {filteredRequests.length > 0 ? filteredRequests.map((request, index) => (
                   <div key={index} className="purchreq-row" onClick={() => handleRequestClick(request)}>
-                    <div className="purchreq-checkbox"><input type="checkbox" onClick={handleCheckboxClick} /></div>
                     <div>{request.request_id}</div>
                     <div>{employeeMap[request.employee_id]?.name || " "}</div>
                     <div>{employeeMap[request.employee_id]?.dept_id || " "}</div>
@@ -178,11 +176,6 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
                 )}
               </div>
             </div>
-          </div>
-        )}
-        {!showNewForm && !showPurchQuot && (
-          <div className="purchreq-footer">
-            <button className="purchreq-new-form" onClick={handleNewRequest}>New Form</button>
           </div>
         )}
       </div>

@@ -225,7 +225,7 @@
 
 .credmemo .credmemo-table-header {
     display: grid;
-    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
     padding: 1rem;
     background-color: #f8f9fa;
@@ -245,7 +245,7 @@
 
 .credmemo .credmemo-row {
     display: grid;
-    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
     padding: 1rem;
     border-bottom: 1px solid #eee;

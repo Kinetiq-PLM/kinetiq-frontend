@@ -30,7 +30,7 @@
 
 .apinvoice-table-header {
     display: grid;
-    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
     padding: 1rem;
     background-color: #f8f9fa;
@@ -57,7 +57,7 @@
 
 .apinvoice-row {
     display: grid;
-    grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
     padding: 1rem;
     border-bottom: 1px solid #eee;
@@ -66,12 +66,6 @@
 
 .apinvoice-row > div {
     text-align: center;
-}
-
-.apinvoice-table-header > div:last-child,
-.apinvoice-row > div:last-child {
-  width: 100px; /* Fixed width for actions column */
-  text-align: center;
 }
 
 .apinvoice-actions {

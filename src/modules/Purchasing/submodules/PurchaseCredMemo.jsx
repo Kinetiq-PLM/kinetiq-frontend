@@ -187,9 +187,6 @@ const PurchaseCredMemoBody = () => {
 
           <div className="credmemo-content">
             <div className="credmemo-table-header">
-              <div className="credmemo-checkbox">
-                <input type="checkbox" />
-              </div>
               <div>Credit Memo</div>
               <div>Invoice ID</div>
               <div>Status</div>
@@ -205,9 +202,6 @@ const PurchaseCredMemoBody = () => {
                       className="credmemo-row"
                       onClick={() => setSelectedMemo(memo)}
                     >
-                      <div className="credmemo-checkbox">
-                        <input type="checkbox" />
-                      </div>
                       <div>{memo.credit_memo_id}</div>
                       <div>{memo.invoice_id || "N/A"}</div>
                       <div>

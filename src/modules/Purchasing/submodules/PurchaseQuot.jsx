@@ -107,7 +107,6 @@ const PurchaseQuotBody = ({ onBackToDashboard }) => {
 
                     <div className="purchquote-content">
                         <div className="purchquote-table-header">
-                            <div className="purchquote-checkbox"><input type="checkbox" /></div>
                             <div>Document No</div>
                             <div>Quotation ID</div>
                             <div>Status</div>
@@ -122,7 +121,6 @@ const PurchaseQuotBody = ({ onBackToDashboard }) => {
                                             className="purchquote-row"
                                             onClick={() => handleRowClick(q)}
                                         >
-                                            <div className="purchquote-checkbox"><input type="checkbox" /></div>
                                             <div>{q.document_no}</div>
                                             <div>{q.quotation_id}</div>
                                             <div>

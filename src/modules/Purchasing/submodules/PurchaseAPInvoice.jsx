@@ -202,7 +202,6 @@ const PurchaseAPInvoiceBody = () => {
 
                     <div className="apinvoice-content">
                         <div className="apinvoice-table-header">
-                            <div className="apinvoice-checkbox"><input type="checkbox" /></div>
                             <div>Invoice ID</div>
                             <div>Purchase Order</div>
                             <div>Status</div>
@@ -218,9 +217,6 @@ const PurchaseAPInvoiceBody = () => {
                                             className="apinvoice-row"
                                             onClick={() => handleInvoiceClick(invoice)}
                                         >
-                                            <div className="apinvoice-checkbox">
-                                                <input type="checkbox" />
-                                            </div>
                                             <div>{invoice.invoice_id}</div>
                                             <div>{purchaseOrders[invoice.content_id] || "N/A"}</div>
                                             <div>

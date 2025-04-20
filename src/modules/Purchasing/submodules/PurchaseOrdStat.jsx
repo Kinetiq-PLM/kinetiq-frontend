@@ -188,7 +188,6 @@ const PurchaseOrdStatBody = () => {
         {/* --- TABLE SECTION UPDATED --- */}
         <div className="purchordstat-content">
           <div className="purchordstat-table-header">
-            <div className="purchordstat-checkbox"><input type="checkbox" /></div>
             <div>Purchase Order</div>
             <div>Ref: RFQ</div>
             <div>Status</div>
@@ -205,7 +204,6 @@ const PurchaseOrdStatBody = () => {
                   onClick={() => handleRowClick(order)}
                   style={{ cursor: "pointer" }}
                 >
-                  <div className="purchordstat-checkbox"><input type="checkbox" /></div>
                   <div>{order.purchase_id}</div>
                   <div>{order.quotation_id}</div>
                   <div>
