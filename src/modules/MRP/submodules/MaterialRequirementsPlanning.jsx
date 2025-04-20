@@ -27,6 +27,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [selectedRowData, setSelectedRowData] = useState(null); // State to store selected row data
     const [selectedOrderNo, setSelectedOrderNo] = useState([]); // State to store only the Order No. as a string
     const [bomDetails, setBomDetails] = useState([]);
+    const [projPro, setProjMats] = useState([]);
     const [principalItems, setPrincipalItems] = useState([]);
     const [npProducts, setNPProducts] = useState([]);
     const [selectedProductId, setSelectedProductId] = useState(null); // New state to store selected product_id
@@ -159,6 +160,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             if (statementIds.length > 0) {
                 fetchBomDetails(statementIds[0]);
                 fetchNonProjectProduct(statementIds[0])
+                fetchProjectProductMats(statementIds[0])
             } else {
                 console.warn("No statement IDs found.");
             }
@@ -327,45 +329,37 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             console.error("Error fetching production costs:", error);
         }
         };
-
-    const fetchAllRawMaterials = async () => {
-        const allRawMats = [];
-    
-        for (const product of bomDetails) {
-            const res = await fetch(`${baseurl}/bills_of_material/costofrawmats/by-product/${product.product_id}/`);
-            if (res.ok) {
-                const data = await res.json();
-                const formatted = data.map(item => ({
-                    rawMaterial: item.raw_material,
-                    materialId: item.material_id,
-                    rmquantity: item.rm_quantity,
-                    rmunits: item.units,
-                    rmunitCost: parseFloat(item.unit_cost).toFixed(2),
-                    rmtotalCost: parseFloat(item.total_cost).toFixed(2),
-                }));
-                allRawMats.push(...formatted);
-            }
-        }
-    
-        return allRawMats;
-    };
         
+    const fetchProjectProductMats = async (statementId) => {
+        try {
+            const response = await fetch(`${baseurl}/bills_of_material/projectproductmats/by-statement/${statementId}/`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch Project Product Mats");
+            }
+            const data = await response.json();
+
+            const formattedData = data.map((item) => ({
+                proj_product_mats_id: item.product_mats_id,
+                proj_quantity_required: item.quantity_required,
+                proj_cost_per_raw_material: item.cost_per_raw_material,
+                proj_total_cost_of_raw_materials: item.total_cost_of_raw_materials,
+            }));
+
+            setProjMats(formattedData);
+        } catch (error) {
+            console.error("Error fetching Project Product Mats:", error);
+        }
+    };
 
         const sendProjectData = async () => {
             try {
 
-                const allRawMats = await fetchAllRawMaterials(); // 🧠 fetch all mats here
-                if (allRawMats.length === 0) {
-                    console.warn("⚠️ No raw materials found for this BOM.");
-                    return;
-                }
-
-                const payload = rawMaterials.map(item => ({
+                const payload = projPro.map(item => ({
                     project_id: projectId[0]?.projectID || null,
-                    product_mats_id: null,
-                    overall_quantity_of_material: parseInt(item.rmquantity) || 1,
-                    cost_per_raw_material: parseFloat(item.rmunitCost) || 1.00,
-                    total_cost_of_raw_materials: parseFloat(item.rmtotalCost) || 1.00,
+                    product_mats_id: item.proj_product_mats_id,
+                    overall_quantity_of_material: parseInt(item.proj_quantity_required) || 1,
+                    cost_per_raw_material: parseFloat(item.proj_cost_per_raw_material) || 1.00,
+                    total_cost_of_raw_materials: parseFloat(item.proj_total_cost_of_raw_materials) || 1.00,
                     production_order_detail_id: null,
                     labor_cost_id: null,
                     total_cost: parseFloat(totalOrderCost) || 1.00
