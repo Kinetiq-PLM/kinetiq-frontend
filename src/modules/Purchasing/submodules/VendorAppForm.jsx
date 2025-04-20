@@ -154,15 +154,6 @@ const VendorAppForm = () => {
                                         />
                                     </div>
                                 ))}
-                                <div className="form-group">
-                                    <label>Tax Exempt</label>
-                                    <input
-                                        type="checkbox"
-                                        name="tax_exempt"
-                                        checked={formData.tax_exempt}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
                             </div>
                         </div>
 
@@ -200,9 +191,43 @@ const VendorAppForm = () => {
                             </div>
                         </div>
 
-                        {/* Checks and Card */}
+                        {/* Tax Exempt, Checks and Card */}
                         <div className="vendorappform-bottom">
                             <div className="vendorappform-checks">
+                            <div className="check-group">
+                                    <h4>Tax Exempt</h4>
+                                    <div className="radio-group">
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                name="tax_exempt"
+                                                checked={formData.tax_exempt}
+                                                onChange={() =>
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        tax_exempt: true,
+                                                    }))
+                                                }
+                                            />
+                                            Yes
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                name="tax_exempt"
+                                                checked={!formData.tax_exempt}
+                                                onChange={() =>
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        tax_exempt: false,
+                                                    }))
+                                                }
+                                            />
+                                            No
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <div className="check-group">
                                     <h4>Separate Checks?</h4>
                                     <div className="radio-group">
@@ -263,40 +288,6 @@ const VendorAppForm = () => {
                                                     setFormData((prev) => ({
                                                         ...prev,
                                                         purchasing_card: false,
-                                                    }))
-                                                }
-                                            />
-                                            No
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div className="check-group">
-                                    <h4>Tax Exempt</h4>
-                                    <div className="radio-group">
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="tax_exempt"
-                                                checked={formData.tax_exempt}
-                                                onChange={() =>
-                                                    setFormData((prev) => ({
-                                                        ...prev,
-                                                        tax_exempt: true,
-                                                    }))
-                                                }
-                                            />
-                                            Yes
-                                        </label>
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="tax_exempt"
-                                                checked={!formData.tax_exempt}
-                                                onChange={() =>
-                                                    setFormData((prev) => ({
-                                                        ...prev,
-                                                        tax_exempt: false,
                                                     }))
                                                 }
                                             />
