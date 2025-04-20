@@ -1,36 +1,110 @@
-/* REMINDER! All of your elements must use your unique namespace '.admin' at the start to avoid leaking */
+/* Base Admin Container */
 .admin {
-  display: flex;
   width: 100%;
   height: 100%;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background-color: #f9fafa;
 }
 
-.admin .body-content-container {
-    width: 100%;
-    height: 100%;
-    border-radius: 0.5rem;
-    background-color: white;
+/* Typography */
+.admin h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.admin p {
+  margin: 0;
+}
+
+/* Module Card Base Style */
+.admin .module-card {
+  background: #fffcfc;
+  background: linear-gradient(90deg, rgba(255, 252, 252, 1) 0%, rgba(213, 232, 232, 1) 100%, rgba(255, 255, 255, 1) 53%);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Hover effect */
+.admin .module-card:hover {
+  background-color: #00a8a8;
+  background-image: none;
+}
+
+/* Icons */
+.admin .module-card img {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+  transition: filter 0.2s;
+}
+
+/* Text Styling */
+.admin .text-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.admin .text-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.admin .text-sub {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* Hover Text + Icon */
+.admin .module-card:hover .text-label,
+.admin .module-card:hover .text-value,
+.admin .module-card:hover .text-sub {
+  color: white;
+}
+
+.admin .module-card:hover img {
+  filter: brightness(0) invert(1);
+}
+
+/* Scrollbar customization */
+.admin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+  border-radius: 3px;
+}
+
+.admin {
+  scrollbar-color: #00a8a8 transparent;
+  scrollbar-width: thin;
+}
+
+/* Responsive Grid Spacing */
+@media (max-width: 768px) {
+  .admin {
     padding: 1rem;
-    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 40rem;
-    min-height: 30rem;
   }
 
-    /* Scrollbar customization */
-.custom-scroll::-webkit-scrollbar {
-  width: 3px;
-}
+  .admin .module-card {
+    flex-direction: row;
+    align-items: center;
+  }
 
-.custom-scroll::-webkit-scrollbar-thumb {
-  background-color: #00A8A8;
-  border-radius: 2px;
-}
-
-.custom-scroll {
-  scrollbar-color: #00A8A8;
-  scrollbar-width: thin;
+  .admin .text-value {
+    font-size: 1.125rem;
+  }
 }

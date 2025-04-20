@@ -1,111 +1,483 @@
-.warehouse-container {
-    padding: 24px;
+/* ========== Base Styles ========== */
+.warehouse {
+    width: 100%;
+    padding: 10px;
+    height: 100%;
+    overflow: hidden;
 }
 
-.warehouse-header {
+.warehouse .warehouse-container {
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    max-height: calc(100vh - 140px);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    isolation: isolate;
+    /* Creates a new stacking context */
+    position: relative;
+    overflow: hidden;
+    /* Prevent content from overflowing */
+}
+
+/* ========== Typography & Headers ========== */
+.warehouse .page-title {
+    margin-bottom: 0 !important;
+    color: #00a8a8;
+}
+
+.warehouse .title-divider {
+    margin: 12px 0 16px !important;
+}
+
+.warehouse .record-count {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ========== Control and Header Styles ========== */
+.warehouse .header-right-content {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: nowrap;
+    /* Prevent wrapping by default */
+}
+
+.warehouse .search-container {
+    flex: 1;
+    min-width: 0;
+    /* Allow container to shrink below content size */
+}
+
+.warehouse .search-container .ant-input-search {
+    width: 100%;
+}
+
+.warehouse .action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+}
+
+/* Icon-only buttons for small screens */
+.warehouse .icon-only-btn {
+    padding: 0 8px;
+    min-width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========== Table Styles ========== */
+.warehouse .table-container {
+    flex: 1;
+    min-height: 0;
+    padding-bottom: 10px;
+    border: 0px solid #90d7d33d;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.warehouse .ant-table {
+    border-radius: 8px;
+    overflow: auto;
+}
+
+.warehouse .ant-table-thead>tr>th {
+    background-color: #267979c4;
+    font-weight: 600;
+    color: #ffffff;
+    border-right: 1px solid #267979c4 !important;
+    border-bottom: 0px !important;
+}
+
+.warehouse .ant-table-thead>tr>th:hover {
+    background-color: #6b9b9bc4 !important;
+    color: #ffffff !important;
+}
+
+.warehouse .ant-table-column-has-sorter>th {
+    cursor: pointer;
+}
+
+.warehouse .ant-table-column-sort>th {
+    background-color: #6b9b9bc4 !important;
+}
+
+.warehouse .ant-table-thead>tr>th.ant-table-column-sort {
+    background-color: #7fb2b2 !important;
+    color: #ffffff !important;
+}
+
+.warehouse .ant-table-thead>tr>th .ant-table-column-sorter-up.active,
+.warehouse .ant-table-thead>tr>th .ant-table-column-sorter-down.active {
+    color: #6f9090c4 !important;
+}
+
+.warehouse .ant-table-thead>tr>th .ant-table-column-sorter-up,
+.warehouse .ant-table-thead>tr>th .ant-table-column-sorter-down {
+    color: #4a6e6ec4;
+    /* dim inactive arrow */
+}
+
+.warehouse .ant-table-tbody>tr>td {
+    border-right: 1px solid #cce3e3 !important;
+    border-bottom: 1px solid #cce3e3 !important;
+}
+
+.warehouse .ant-table-thead>tr>th:last-child,
+.warehouse.ant-table-tbody>tr>td:last-child {
+    border-right: none !important;
+}
+
+.warehouse .ant-table-tbody>tr:nth-child(odd)>td {
+    background-color: #ffffffe8;
+}
+
+.warehouse .ant-table-tbody>tr:nth-child(even)>td {
+    background-color: #f3f9f9;
+}
+
+.warehouse .ant-table-tbody>tr:hover>td {
+    background-color: #d5e5e5 !important;
+}
+
+.warehouse .ant-table-tbody>tr.ant-table-row-selected>td {
+    background-color: #d9f0f0 !important;
+}
+
+.warehouse .table-meta-info {
+    padding: 4px 0;
+    color: #666;
+    font-weight: 500;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.warehouse-controls input,
-.warehouse-controls select {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-left: 8px;
+/* ========== Search & Filter Controls ========== */
+.warehouse .table-search-container {
+    min-width: 200px;
+    flex-grow: 1;
 }
 
-.warehouse-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 16px;
+.warehouse .table-search-container .ant-input-search {
+    max-width: 300px;
 }
 
-.warehouse-table th,
-.warehouse-table td {
-    padding: 12px;
-    border: 1px solid #e5e7eb;
-    text-align: left;
+/* ========== Form & Modal Styles ========== */
+.custom-modal .ant-modal-title {
+    color: rgb(49, 49, 49);
+    font-size: 20px;
+    font-weight: 600;
 }
 
-.warehouse-modal {
-    position: fixed;
-    top: 20%;
-    left: 30%;
-    background: white;
-    padding: 20px;
-    border: 1px solid #ccc;
+.custom-modal .ant-modal-close-x {
+    color: rgb(44, 146, 148);
+}
+
+.custom-modal .ant-modal-content {
     border-radius: 8px;
-    width: 40%;
-    z-index: 100;
 }
 
-.warehouse-modal input {
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+.custom-modal .ant-modal-header {
+    border-radius: 8px 8px 0 0;
 }
 
-.warehouse-btns {
+.custom-modal .ant-checkbox-inner {
+    border-color: #00a8a8;
+}
+
+.custom-modal .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #00a8a8;
+    border-color: #00a8a8;
+}
+
+.form-actions {
+    margin-top: 24px;
+    margin-bottom: 0;
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    margin-top: 12px;
 }
 
-.btn-submit {
-    background-color: #14b8a6;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
+.ant-form-item-label {
+    font-weight: 500;
 }
 
-.btn-edit {
-    background-color: #38bdf8;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
+/* ========== Pagination Styles ========== */
+.ant-pagination-item-active {
+    border-color: #00a8a8 !important;
 }
 
-.btn-delete {
-    background-color: #ef4444;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
+.ant-pagination-item-active a {
+    color: #00a8a8 !important;
 }
 
-.warehouse-preview {
-    position: fixed;
-    top: 10%;
-    left: 25%;
-    width: 50%;
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #ccc;
-    z-index: 999;
-    padding: 24px;
+.ant-pagination-item:hover:not(.ant-pagination-item-active) {
+    border-color: #00a8a8;
 }
 
-.preview-header {
+.ant-pagination-item:hover:not(.ant-pagination-item-active) a {
+    color: #00a8a8;
+}
+
+.ant-pagination-item-active:hover {
+    border-color: #00a8a8 !important;
+}
+
+.ant-pagination-item-active:hover a {
+    color: #00a8a8 !important;
+}
+
+.ant-pagination-prev:hover .ant-pagination-item-link,
+.ant-pagination-next:hover .ant-pagination-item-link {
+    border-color: #00a8a8;
+    color: #00a8a8;
+}
+
+.ant-pagination-jump-prev:hover .ant-pagination-item-link-icon,
+.ant-pagination-jump-next:hover .ant-pagination-item-link-icon,
+.ant-pagination-jump-prev:hover .ant-pagination-item-ellipsis,
+.ant-pagination-jump-next:hover .ant-pagination-item-ellipsis {
+    color: #00a8a8;
+}
+
+.ant-pagination-options-quick-jumper input:hover,
+.ant-pagination-options-quick-jumper input:focus {
+    border-color: #00a8a8;
+}
+
+/* ========== Button Styles ========== */
+.warehouse .ant-btn-primary,
+.custom-modal .ant-btn-primary {
+    background-color: #00a8a8;
+    border-color: #00a8a8;
     display: flex;
-    justify-content: space-between;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #ccc;
-    font-weight: bold;
+    align-items: center;
+    justify-content: center;
 }
 
-.preview-body {
-    padding-top: 12px;
-    font-size: 14px;
+.ant-btn-primary:hover,
+.ant-btn-primary:focus,
+.custom-modal .ant-btn-primary:hover,
+.custom-modal .ant-btn-primary:focus {
+    background-color: #55cfcf !important;
+    border-color: #55cfcf !important;
+    color: #fff !important;
 }
 
-.preview-body div {
-    margin-bottom: 12px;
+/* ========== Scroll Bar Styles ========== */
+.warehouse-container::-webkit-scrollbar,
+.scrollable-table .ant-table-body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.warehouse-container::-webkit-scrollbar-track,
+.scrollable-table .ant-table-body::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+.warehouse-container::-webkit-scrollbar-thumb,
+.scrollable-table .ant-table-body::-webkit-scrollbar-thumb {
+    background: #00a8a8;
+    border-radius: 4px;
+}
+
+.warehouse-container::-webkit-scrollbar-thumb:hover,
+.scrollable-table .ant-table-body::-webkit-scrollbar-thumb:hover {
+    background: #008080;
+}
+
+/* Firefox scrollbar */
+.warehouse-container,
+.scrollable-table .ant-table-body {
+    scrollbar-width: thin;
+    scrollbar-color: #00a8a8 #f0f0f0;
+}
+
+/* ========== Responsive Styles ========== */
+@media (max-width: 992px) {
+    .warehouse .warehouse-container {
+        padding: 12px;
+    }
+
+    .warehouse .ant-tabs-tab {
+        padding: 8px 12px !important;
+    }
+
+    .warehouse .header-right-content {
+        gap: 8px;
+    }
+
+    .warehouse .search-container {
+        max-width: 220px;
+    }
+}
+
+@media (max-width: 820px) {
+    .warehouse {
+        padding: 8px;
+    }
+
+    .warehouse .warehouse-container {
+        padding: 8px;
+        border-radius: 4px;
+        overflow-x: hidden;
+    }
+
+    /* Compact header to save space */
+    .warehouse .page-title {
+        font-size: 18px !important;
+    }
+
+    .warehouse .title-divider {
+        margin: 8px 0 12px !important;
+    }
+
+    /* Make the search and buttons more compact */
+    .warehouse .header-right-content {
+        flex-wrap: nowrap;
+        width: auto;
+        align-items: center;
+    }
+
+    .warehouse .search-container {
+        max-width: 150px;
+        min-width: 100px;
+    }
+
+    /* Make table meta info more compact */
+    .warehouse .table-meta-info {
+        padding: 4px 0;
+        margin-bottom: 4px;
+    }
+
+    .warehouse .record-count {
+        font-size: 12px;
+    }
+
+    /* Make tabs more touch-friendly but compact */
+    .warehouse .ant-tabs-nav {
+        margin-bottom: 8px;
+    }
+
+    .warehouse .ant-tabs-tab {
+        padding: 6px 4px !important;
+        min-height: 36px;
+    }
+
+    /* Make icons more prominent on mobile when text is hidden */
+    .warehouse .ant-tabs-tab .anticon {
+        font-size: 16px;
+        margin-right: 0;
+    }
+
+    /* Special mobile layout for tab navigation area */
+    .warehouse .ant-tabs-nav-wrap {
+        flex: 1;
+    }
+
+    .warehouse .ant-tabs-extra-content {
+        flex: 2;
+    }
+}
+
+@media (max-width: 576px) {
+    .warehouse .warehouse-container {
+        max-height: calc(100vh - 120px);
+        padding: 8px 4px;
+    }
+
+    .warehouse .ant-table-cell {
+        padding: 6px 4px !important;
+        white-space: nowrap;
+    }
+
+    /* Stack search and buttons for very small screens */
+    .warehouse .header-right-content {
+        flex-direction: row;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .warehouse .search-container {
+        max-width: 120px;
+        min-width: 80px;
+    }
+
+    .warehouse .ant-input-search .ant-input {
+        padding-right: 4px !important;
+    }
+
+    .warehouse .ant-input-search .ant-input-suffix {
+        right: 4px !important;
+    }
+
+    /* Shrink buttons to icon-only */
+    .warehouse .action-buttons .ant-btn {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 8px;
+    }
+
+    .warehouse .action-buttons .ant-btn .anticon {
+        font-size: 14px;
+    }
+
+    /* Compact pagination */
+    .warehouse .table-pagination .ant-pagination {
+        display: flex;
+        justify-content: center;
+    }
+
+    .warehouse .table-pagination .ant-pagination-item,
+    .warehouse .table-pagination .ant-pagination-prev,
+    .warehouse .table-pagination .ant-pagination-next {
+        margin: 0 2px;
+        min-width: 24px;
+        height: 24px;
+        line-height: 22px;
+    }
+
+    /* Reduce space between tab nav and content */
+    .warehouse .ant-tabs-nav {
+        margin-bottom: 4px;
+    }
+
+    /* Reduce page title size further */
+    .warehouse .page-title {
+        font-size: 16px !important;
+    }
+
+    .warehouse .title-divider {
+        margin: 6px 0 8px !important;
+    }
+}
+
+@media (max-width: 820px) {
+    .warehouse .ant-tabs-content {
+        max-height: 100vh;
+        overflow-y: auto;
+        transition: none !important;
+    }
+
+    .warehouse .ant-tabs-tabpane {
+        height: auto !important;
+        overflow-y: auto;
+    }
+
+    .warehouse .ant-tabs-tabpane-hidden {
+        display: none !important;
+    }
 }
