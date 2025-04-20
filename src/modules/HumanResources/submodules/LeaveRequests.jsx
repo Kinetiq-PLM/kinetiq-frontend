@@ -39,6 +39,9 @@ const LeaveRequests = () => {
     is_paid: false
   });
 
+  // Add this to your state declarations at the top
+  const [selectedLeaveRequests, setSelectedLeaveRequests] = useState([]);
+
   // Toast helper with longer timeout for errors
   const showToast = (message, success = true) => {
     setToast({ message, success });
@@ -342,6 +345,57 @@ const LeaveRequests = () => {
     }
   };
 
+  // Add these functions for handling checkbox selection
+  const handleCheckboxChange = (leaveId) => {
+    setSelectedLeaveRequests(prev => {
+      if (prev.includes(leaveId)) {
+        return prev.filter(id => id !== leaveId);
+      } else {
+        return [...prev, leaveId];
+      }
+    });
+  };
+
+  const handleSelectAllChange = (e) => {
+    if (e.target.checked) {
+      // Get all visible leave request IDs from the current page
+      const allIds = paginated.map(request => request.leave_id);
+      setSelectedLeaveRequests(allIds);
+    } else {
+      setSelectedLeaveRequests([]);
+    }
+  };
+
+  // Add this function to handle bulk unarchiving
+  const handleBulkUnarchive = async () => {
+    if (selectedLeaveRequests.length === 0) return;
+    
+    if (!window.confirm(`Are you sure you want to unarchive ${selectedLeaveRequests.length} selected leave request(s)?`)) return;
+    
+    setLoading(true);
+    let successCount = 0;
+    
+    try {
+      // Process each selected leave request
+      for (const leaveId of selectedLeaveRequests) {
+        try {
+          await axios.post(`http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/${leaveId}/unarchive/`);
+          successCount++;
+        } catch (err) {
+          console.error(`Failed to unarchive leave request ${leaveId}:`, err);
+        }
+      }
+      
+      showToast(`Successfully unarchived ${successCount} of ${selectedLeaveRequests.length} leave requests`);
+      setSelectedLeaveRequests([]);
+      fetchData(); // Refresh data
+    } catch (err) {
+      showToast("An error occurred during bulk unarchive operation", false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Display leave balance information in the form
   const renderLeaveBalanceInfo = () => {
     if (!currentEmployeeBalance) return null;
@@ -473,7 +527,15 @@ const LeaveRequests = () => {
             <table className="hr-leave-requests-table">
               <thead>
                 <tr>
-                  {isArchived && <th>Select</th>}
+                  {isArchived && (
+                    <th>
+                      <input 
+                        type="checkbox" 
+                        onChange={handleSelectAllChange}
+                        checked={selectedLeaveRequests.length > 0 && selectedLeaveRequests.length === paginated.length}
+                      />
+                    </th>
+                  )}
                   <th>Leave ID</th>
                   <th>Employee ID</th>
                   <th>Employee Name</th>
@@ -497,7 +559,11 @@ const LeaveRequests = () => {
                   <tr key={request.leave_id} className={isArchived ? "hr-leave-requests-archived-row" : ""}>
                     {isArchived && (
                       <td>
-                        <input type="checkbox" />
+                        <input 
+                          type="checkbox" 
+                          checked={selectedLeaveRequests.includes(request.leave_id)}
+                          onChange={() => handleCheckboxChange(request.leave_id)}
+                        />
                       </td>
                     )}
                     <td>{request.leave_id}</td>
@@ -570,6 +636,14 @@ const LeaveRequests = () => {
             </table>
           </div>
         </div>
+        {isArchived && selectedLeaveRequests.length > 0 && (
+          <button
+            className="bulk-unarchive-btn"
+            onClick={handleBulkUnarchive}
+          >
+            Bulk Unarchive
+          </button>
+        )}
         {renderPagination(totalPages)}
       </>
     );
@@ -906,10 +980,21 @@ const handleEditLeaveRequest = async (e) => {
                   </button>
                   <button
                     className="hr-leave-requests-add-btn"
-                    onClick={() => setShowArchived(!showArchived)}
+                    onClick={() => {
+                      setShowArchived(!showArchived);
+                      setSelectedLeaveRequests([]); // Clear selections when toggling view
+                    }}
                   >
                     {showArchived ? "View Active" : "View Archived"}
                   </button>
+                  {showArchived && selectedLeaveRequests.length > 0 && (
+                    <button
+                      className="hr-leave-requests-add-btn"
+                      onClick={handleBulkUnarchive}
+                    >
+                      Unarchive Selected ({selectedLeaveRequests.length})
+                    </button>
+                  )}
                 </>
               )}
             </div>

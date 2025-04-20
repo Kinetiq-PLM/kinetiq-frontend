@@ -17,6 +17,9 @@ const Employees = () => {
   const [showEditEmployeeModal, setShowEditEmployeeModal] = useState(false);
   const [showConfirmUnarchiveEmployee, setShowConfirmUnarchiveEmployee] = useState(null);
 
+  // Add this to your component's JavaScript
+  const [activeModalTab, setActiveModalTab] = useState(0);
+
   // The new employee to add
   const [newEmployee, setNewEmployee] = useState({
     user_id: "", // Auto-generated
@@ -81,6 +84,22 @@ const Employees = () => {
   const showToast = (message, success = true) => {
     setToast({ message, success });
     setTimeout(() => setToast(null), 3000);
+  };
+
+  const switchModalTab = (tabIndex) => {
+    setActiveModalTab(tabIndex);
+    
+    // Get all tab buttons and sections
+    const tabButtons = document.querySelectorAll('.hr-employee-modal-tabs button');
+    const tabSections = document.querySelectorAll('.hr-employee-modal-section');
+    
+    // Remove active class from all
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    tabSections.forEach(section => section.classList.remove('active'));
+    
+    // Add active class to selected tab and section
+    tabButtons[tabIndex].classList.add('active');
+    tabSections[tabIndex].classList.add('active');
   };
 
   // SALARY_GRADE_TABLE constant
@@ -797,6 +816,15 @@ const Employees = () => {
     try {
       await axios.post(`http://127.0.0.1:8000/api/employees/${id}/archive/`);
       showToast("Employee archived successfully");
+      
+      // Immediately update state to reflect changes
+      const archivedEmployee = employees.find(emp => emp.employee_id === id);
+      if (archivedEmployee) {
+        setEmployees(prev => prev.filter(emp => emp.employee_id !== id));
+        setArchivedEmployees(prev => [...prev, archivedEmployee]);
+      }
+      
+      // Still fetch fresh data from server
       fetchEmployees();
     } catch (err) {
       console.error("Archive employee error", err);
@@ -814,6 +842,15 @@ const Employees = () => {
       await axios.post(`http://127.0.0.1:8000/api/employees/${id}/unarchive/`);
       setShowConfirmUnarchiveEmployee(null);
       showToast("Employee unarchived successfully");
+      
+      // Immediately update state to reflect changes
+      const unarchiveEmployee = archivedEmployees.find(emp => emp.employee_id === id);
+      if (unarchiveEmployee) {
+        setArchivedEmployees(prev => prev.filter(emp => emp.employee_id !== id));
+        setEmployees(prev => [...prev, unarchiveEmployee]);
+      }
+      
+      // Still fetch fresh data from server
       fetchEmployees();
     } catch (err) {
       console.error("Unarchive employee error", err);
@@ -836,7 +873,19 @@ const Employees = () => {
         )
       );
       showToast("Employees unarchived successfully");
+      
+      // Immediately update state
+      const unarchiveEmployees = archivedEmployees.filter(emp => 
+        selectedArchivedEmployees.includes(emp.employee_id)
+      );
+      setArchivedEmployees(prev => 
+        prev.filter(emp => !selectedArchivedEmployees.includes(emp.employee_id))
+      );
+      setEmployees(prev => [...prev, ...unarchiveEmployees]);
+      
       setSelectedArchivedEmployees([]);
+      
+      // Fetch fresh data
       fetchEmployees();
     } catch (err) {
       console.error("Bulk unarchive employees error", err);
@@ -864,19 +913,20 @@ const Employees = () => {
 
   const handleAddPositionChange = (e) => {
     const { name, value } = e.target;
-
+  
     if (name === "employment_type") {
       setNewPosition((prev) => ({
         ...prev,
         employment_type: value,
         salary_grade: "", // Reset salary grade when employment type changes
-        min_salary: 0,
-        max_salary: 0,
-        typical_duration_days: value === "Regular" ? null : value === "Seasonal" ? 1 : 30,
+        min_salary: value === "Regular" ? 0 : 500, // Set minimum valid value based on type
+        max_salary: value === "Regular" ? 0 : 500,
+        typical_duration_days: value === "Regular" ? null : 
+                               value === "Seasonal" ? 1 : 30, // Set defaults based on type
       }));
       return;
     }
-
+  
     if (name === "salary_grade") {
       if (newPosition.employment_type === "Regular") {
         const salaryRange = SALARY_GRADE_TABLE[value] || [];
@@ -892,42 +942,68 @@ const Employees = () => {
         setNewPosition((prev) => ({
           ...prev,
           salary_grade: value,
-          min_salary: dailyRateRange[0] || 0,
-          max_salary: dailyRateRange[1] || 0,
+          min_salary: dailyRateRange[0] || 500,
+          max_salary: dailyRateRange[1] || 500,
         }));
       }
       return;
     }
-
-    if ((name === "min_salary" || name === "max_salary") && newPosition.employment_type !== "Regular") {
-      const numValue = parseFloat(value);
-      if (numValue >= 0) {
-        const updatedPosition = {
-          ...newPosition,
-          [name]: numValue
-        };
-        
-        // Update the other salary value if needed
-        let otherField = name === "min_salary" ? "max_salary" : "min_salary";
-        if (name === "min_salary" && numValue > newPosition.max_salary) {
-          updatedPosition.max_salary = numValue;
-        } else if (name === "max_salary" && numValue < newPosition.min_salary) {
-          updatedPosition.min_salary = numValue;
-        }
-        
-        // Calculate salary grade for contractual/seasonal positions
-        if (updatedPosition.min_salary > 0 && updatedPosition.max_salary > 0) {
-          updatedPosition.salary_grade = calculateContractualSalaryGrade(
-            updatedPosition.min_salary, 
-            updatedPosition.max_salary
-          );
-        }
-        
-        setNewPosition(updatedPosition);
+  
+    // Handle min/max salary validation for non-Regular positions
+    if (name === "min_salary" && newPosition.employment_type !== "Regular") {
+      const minVal = parseFloat(value);
+      const maxVal = parseFloat(newPosition.max_salary);
+      
+      // Ensure min salary is within valid range
+      if (minVal < 500) {
+        setNewPosition(prev => ({ ...prev, [name]: 500 }));
+      } else if (minVal > 10000) {
+        setNewPosition(prev => ({ ...prev, [name]: 10000 }));
+      } else if (minVal > maxVal) {
+        // If min exceeds max, adjust max up
+        setNewPosition(prev => ({ 
+          ...prev, 
+          [name]: minVal,
+          max_salary: minVal 
+        }));
+      } else {
+        setNewPosition(prev => ({ ...prev, [name]: value }));
       }
       return;
     }
-
+  
+    if (name === "max_salary" && newPosition.employment_type !== "Regular") {
+      const maxVal = parseFloat(value);
+      const minVal = parseFloat(newPosition.min_salary);
+      
+      if (maxVal < minVal) {
+        setNewPosition(prev => ({ ...prev, [name]: minVal }));
+      } else if (maxVal > 10000) {
+        setNewPosition(prev => ({ ...prev, [name]: 10000 }));
+      } else {
+        setNewPosition(prev => ({ ...prev, [name]: value }));
+      }
+      return;
+    }
+  
+    // Handle typical_duration_days based on employment type
+    if (name === "typical_duration_days") {
+      const daysValue = parseInt(value);
+      
+      if (newPosition.employment_type === "Contractual") {
+        if (daysValue < 30) setNewPosition(prev => ({ ...prev, [name]: 30 }));
+        else if (daysValue > 180) setNewPosition(prev => ({ ...prev, [name]: 180 }));
+        else setNewPosition(prev => ({ ...prev, [name]: daysValue }));
+      } 
+      else if (newPosition.employment_type === "Seasonal") {
+        if (daysValue < 1) setNewPosition(prev => ({ ...prev, [name]: 1 }));
+        else if (daysValue > 29) setNewPosition(prev => ({ ...prev, [name]: 29 }));
+        else setNewPosition(prev => ({ ...prev, [name]: daysValue }));
+      }
+      return;
+    }
+  
+    // Default handling for other fields
     setNewPosition((prev) => ({
       ...prev,
       [name]: value,
@@ -936,44 +1012,92 @@ const Employees = () => {
 
   const submitPositionModal = async (e) => {
     e.preventDefault();
-
+  
     // Enhanced validation for all required fields
     const validationErrors = [];
     
     // Always required fields
-    if (!newPosition.position_title) validationErrors.push("Position Title");
-    if (!newPosition.employment_type) validationErrors.push("Employment Type");
+    if (!newPosition.position_title.trim()) {
+      validationErrors.push("Position title is required");
+    }
+    
+    if (!newPosition.employment_type) {
+      validationErrors.push("Employment type is required");
+    }
     
     // Fields required based on employment type
     if (newPosition.employment_type === "Regular") {
-      if (!newPosition.salary_grade) validationErrors.push("Salary Grade");
+      if (!newPosition.salary_grade) {
+        validationErrors.push("Salary grade is required for Regular positions");
+      }
+      
+      if (parseFloat(newPosition.min_salary) < 0) {
+        validationErrors.push("Min salary cannot be negative for Regular positions");
+      }
+      
+      if (parseFloat(newPosition.max_salary) < parseFloat(newPosition.min_salary)) {
+        validationErrors.push("Max salary must be greater than or equal to min salary");
+      }
     } else {
-      // For Contractual and Seasonal
-      if (!newPosition.min_salary) validationErrors.push("Daily Rate (Min)");
-      if (!newPosition.max_salary) validationErrors.push("Daily Rate (Max)");
-      if (!newPosition.typical_duration_days) validationErrors.push("Typical Duration (Days)");
+      // For Contractual and Seasonal positions
+      const minSalary = parseFloat(newPosition.min_salary);
+      const maxSalary = parseFloat(newPosition.max_salary);
+      
+      if (minSalary < 500 || minSalary > 10000) {
+        validationErrors.push("Min salary must be between 500 and 10,000 for non-Regular positions");
+      }
+      
+      if (maxSalary < minSalary) {
+        validationErrors.push("Max salary must be greater than or equal to min salary");
+      }
+      
+      if (newPosition.employment_type === "Contractual") {
+        if (!newPosition.typical_duration_days) {
+          validationErrors.push("Duration days are required for Contractual positions");
+        } else if (newPosition.typical_duration_days < 30 || newPosition.typical_duration_days > 180) {
+          validationErrors.push("Duration for Contractual positions must be between 30 and 180 days");
+        }
+      } else if (newPosition.employment_type === "Seasonal") {
+        if (!newPosition.typical_duration_days) {
+          validationErrors.push("Duration days are required for Seasonal positions");
+        } else if (newPosition.typical_duration_days < 1 || newPosition.typical_duration_days > 29) {
+          validationErrors.push("Duration for Seasonal positions must be between 1 and 29 days");
+        }
+      }
     }
-
+    
     // Show validation errors if any
     if (validationErrors.length > 0) {
-      showToast(`Please fill these required fields: ${validationErrors.join(", ")}`, false);
+      alert(`Please correct the following errors:\n${validationErrors.join("\n")}`);
       return;
     }
-
-    // Validate salary range
-    if (Number(newPosition.min_salary) > Number(newPosition.max_salary)) {
-      showToast("Minimum salary cannot be greater than maximum salary", false);
-      return;
-    }
-
+    
+    // Form data to be sent to API
+    const formData = {
+      ...newPosition,
+      typical_duration_days: newPosition.employment_type === "Regular" ? null : newPosition.typical_duration_days
+    };
+    
     try {
-      await axios.post("http://127.0.0.1:8000/api/positions/positions/", newPosition);
+      const response = await fetch("http://127.0.0.1:8000/api/positions/positions/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to add position");
+      }
+      
+      // Handle successful response
+      await fetchPositions();
       setShowPositionModal(false);
       showToast("Position added successfully");
-      fetchPositions();
-    } catch (err) {
-      console.error("Add position error:", err);
-      showToast("Failed to add position", false);
+    } catch (error) {
+      showToast(error.message, false);
     }
   };
 
@@ -1135,6 +1259,15 @@ const Employees = () => {
     try {
       await axios.post(`http://127.0.0.1:8000/api/positions/positions/${id}/archive/`);
       showToast("Position archived successfully");
+      
+      // Immediately update state to reflect changes
+      const archivedPosition = positions.find(pos => pos.position_id === id);
+      if (archivedPosition) {
+        setPositions(prev => prev.filter(pos => pos.position_id !== id));
+        setArchivedPositions(prev => [...prev, archivedPosition]);
+      }
+      
+      // Still fetch fresh data from server
       fetchPositions();
     } catch (err) {
       console.error("Archive position error", err);
@@ -1149,11 +1282,19 @@ const Employees = () => {
 
   const handleUnarchivePosition = async (id) => {
     try {
-      // Make sure to encode the ID for URLs with special characters
       const encodedId = encodeURIComponent(id);
       await axios.post(`http://127.0.0.1:8000/api/positions/positions/${encodedId}/unarchive/`);
       setShowConfirmUnarchivePosition(null);
       showToast("Position unarchived successfully");
+      
+      // Immediately update state to reflect changes
+      const unarchivePosition = archivedPositions.find(pos => pos.position_id === id);
+      if (unarchivePosition) {
+        setArchivedPositions(prev => prev.filter(pos => pos.position_id !== id));
+        setPositions(prev => [...prev, unarchivePosition]);
+      }
+      
+      // Still fetch fresh data from server
       fetchPositions();
     } catch (err) {
       console.error("Unarchive position error", err);
@@ -1176,7 +1317,19 @@ const Employees = () => {
         )
       );
       showToast("Positions unarchived successfully");
+      
+      // Immediately update state
+      const unarchivePositions = archivedPositions.filter(pos => 
+        selectedArchivedPositions.includes(pos.position_id)
+      );
+      setArchivedPositions(prev => 
+        prev.filter(pos => !selectedArchivedPositions.includes(pos.position_id))
+      );
+      setPositions(prev => [...prev, ...unarchivePositions]);
+      
       setSelectedArchivedPositions([]);
+      
+      // Fetch fresh data
       fetchPositions();
     } catch (err) {
       console.error("Bulk unarchive positions error", err);
@@ -1991,122 +2144,254 @@ const Employees = () => {
       {/* ========== Employees: Edit Modal ========== */}
       {showEditEmployeeModal && editingEmployee && (
         <div className="hr-employee-modal-overlay">
-          <div className="hr-employee-modal">
-            <h3 style={{ marginBottom: "1rem" }}>Edit Employee</h3>
-            <form onSubmit={handleEditEmployeeSubmit} className="hr-department-modal-form hr-two-col">
-              <div className="form-group">
-                <label>Employee ID</label>
-                <input
-                  type="text"
-                  value={editingEmployee.employee_id}
-                  disabled
-                />
+          <div className="hr-employee-modal hr-employee-modal-improved">
+            <div className="hr-employee-modal-header">
+              <h3>Edit Employee</h3>
+              <button 
+                className="hr-employee-modal-close" 
+                onClick={() => setShowEditEmployeeModal(false)}
+              >
+                ×
+              </button>
+            </div>
+      
+            <div className="hr-employee-modal-tabs">
+              <button 
+                className={activeModalTab === 0 ? "active" : ""} 
+                onClick={() => switchModalTab(0)}
+                type="button"
+              >
+                Basic Info
+              </button>
+              <button 
+                className={activeModalTab === 1 ? "active" : ""} 
+                onClick={() => switchModalTab(1)}
+                type="button"
+              >
+                Employment Details
+              </button>
+              <button 
+                className={activeModalTab === 2 ? "active" : ""} 
+                onClick={() => switchModalTab(2)}
+                type="button"
+              >
+                System Info
+              </button>
+            </div>
+      
+            <form onSubmit={handleEditEmployeeSubmit} className="hr-employee-modal-form">
+              {/* Basic Info Section - Visible by default */}
+              <div className="hr-employee-modal-section active">
+                <div className="hr-section-heading">
+                  <h4>Personal Information</h4>
+                  <p>Update the employee's personal details</p>
+                </div>
+                
+                <div className="hr-two-col">
+                  <div className="form-group">
+                    <label>Employee ID</label>
+                    <div className="input-with-icon readonly">
+                      <i className="id-icon">ID</i>
+                      <input
+                        type="text"
+                        value={editingEmployee.employee_id}
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>User ID</label>
+                    <div className="input-with-icon readonly">
+                      <i className="user-icon">👤</i>
+                      <input
+                        type="text"
+                        value={editingEmployee.user_id}
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="first_name">First Name <span className="required">*</span></label>
+                    <div className="input-with-icon">
+                      <input
+                        id="first_name"
+                        type="text"
+                        name="first_name"
+                        value={editingEmployee.first_name}
+                        onChange={handleEditEmployeeChange}
+                        required
+                      />
+                    </div>
+                    <small>Legal first name as it appears on official documents</small>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="last_name">Last Name <span className="required">*</span></label>
+                    <div className="input-with-icon">
+                      <input
+                        id="last_name"
+                        type="text"
+                        name="last_name"
+                        value={editingEmployee.last_name}
+                        onChange={handleEditEmployeeChange}
+                        required
+                      />
+                    </div>
+                    <small>Legal last name as it appears on official documents</small>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="phone">Phone Number</label>
+                    <div className="input-with-icon">
+                      <i className="phone-icon">📞</i>
+                      <input
+                        id="phone"
+                        type="tel"
+                        name="phone"
+                        value={editingEmployee.phone}
+                        onChange={handleEditEmployeeChange}
+                        placeholder="0XXXXXXXXXX"
+                        maxLength="11"
+                      />
+                    </div>
+                    <small>Format: 0XXXXXXXXXX (11 digits)</small>
+                  </div>
+                </div>
               </div>
-              <div className="form-group">
-                <label>First Name</label>
-                <input
-                  type="text"
-                  name="first_name"
-                  value={editingEmployee.first_name}
-                  onChange={handleEditEmployeeChange}
-                  required
-                />
+              
+              {/* Employment Details Section - Initially hidden */}
+              <div className="hr-employee-modal-section">
+                <div className="hr-section-heading">
+                  <h4>Employment Status</h4>
+                  <p>Manage how this employee is classified and employed</p>
+                </div>
+                
+                <div className="hr-two-col">
+                  <div className="form-group">
+                    <label htmlFor="employment_type">Employment Type</label>
+                    <select
+                      id="employment_type"
+                      name="employment_type"
+                      value={editingEmployee.employment_type}
+                      onChange={handleEditEmployeeChange}
+                    >
+                      <option value="Regular">Regular</option>
+                      <option value="Contractual">Contractual</option>
+                      <option value="Seasonal">Seasonal</option>
+                    </select>
+                    <small>Determines benefits eligibility and contract terms</small>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="status">Employee Status</label>
+                    <select
+                      id="status"
+                      name="status"
+                      value={editingEmployee.status}
+                      onChange={handleEditEmployeeChange}
+                      className={`status-select ${editingEmployee.status.toLowerCase()}`}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                    <small>Active employees have system access</small>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="reports_to">Reports To</label>
+                    <select
+                      id="reports_to"
+                      name="reports_to"
+                      value={editingEmployee.reports_to || ""}
+                      onChange={handleEditEmployeeChange}
+                    >
+                      <option value="">-- No Direct Supervisor --</option>
+                      {departmentSuperiors.map(superior => (
+                        <option key={superior.dept_superior_id} value={superior.employee_id}>
+                          {superior.superior_name} - {superior.dept_name} ({superior.position_title})
+                        </option>
+                      ))}
+                    </select>
+                    <small>Employee's direct supervisor</small>
+                  </div>
+                  
+                  <div className="form-group checkbox-group">
+                    <label htmlFor="is_supervisor">Supervisor Role</label>
+                    <div className="checkbox-container">
+                      <input
+                        id="is_supervisor"
+                        type="checkbox"
+                        name="is_supervisor"
+                        checked={editingEmployee.is_supervisor}
+                        onChange={(e) => handleEditEmployeeChange({
+                          target: {
+                            name: 'is_supervisor',
+                            type: 'checkbox',
+                            checked: e.target.checked
+                          }
+                        })}
+                      />
+                      {/* <label htmlFor="is_supervisor" className="checkbox-label">
+                        This employee is a supervisor
+                      </label> */}
+                    </div>
+                    <small>Can manage other employees and approve requests</small>
+                  </div>
+                </div>
               </div>
-              <div className="form-group">
-                <label>Last Name</label>
-                <input
-                  type="text"
-                  name="last_name"
-                  value={editingEmployee.last_name}
-                  onChange={handleEditEmployeeChange}
-                  required
-                />
+              
+              {/* System Info Section - Initially hidden */}
+              <div className="hr-employee-modal-section">
+                <div className="hr-section-heading">
+                  <h4>System Information</h4>
+                  <p>View system-generated information</p>
+                </div>
+                
+                <div className="hr-two-col">
+                  <div className="form-group">
+                    <label>Department</label>
+                    <input
+                      type="text"
+                      value={departments.find(d => d.dept_id === editingEmployee.dept_id)?.dept_name || ""}
+                      disabled
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Position</label>
+                    <input
+                      type="text"
+                      value={positions.find(p => p.position_id === editingEmployee.position_id)?.position_title || ""}
+                      disabled
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Created At</label>
+                    <div className="input-with-icon readonly">
+                      <i className="calendar-icon">📅</i>
+                      <input type="text" value={editingEmployee.created_at || ""} disabled />
+                    </div>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Last Updated</label>
+                    <div className="input-with-icon readonly">
+                      <i className="calendar-icon">🕒</i>
+                      <input type="text" value={editingEmployee.updated_at || ""} disabled />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="form-group">
-                <label>Employment Type</label>
-                <select
-                  name="employment_type"
-                  value={editingEmployee.employment_type}
-                  onChange={handleEditEmployeeChange}
-                >
-                  <option value="Regular">Regular</option>
-                  <option value="Contractual">Contractual</option>
-                  <option value="Seasonal">Seasonal</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Status</label>
-                <select
-                  name="status"
-                  value={editingEmployee.status}
-                  onChange={handleEditEmployeeChange}
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-              </div>
-
-              {/* Commented out less frequently updated fields
-              <div className="form-group">
-                <label>User ID</label>
-                <input
-                  type="text"
-                  name="user_id"
-                  value={editingEmployee.user_id}
-                  onChange={handleEditEmployeeChange}
-                />
-              </div>
-              <div className="form-group">
-                <label>Phone</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={editingEmployee.phone}
-                  onChange={handleEditEmployeeChange}
-                />
-              </div>
-              <div className="form-group">
-                <label>Reports To</label>
-                <select
-                  name="reports_to"
-                  value={editingEmployee.reports_to || ""}
-                  onChange={handleEditEmployeeChange}
-                >
-                  <option value="">-- No Supervisor --</option>
-                  {departmentSuperiors.map(superior => (
-                    <option key={superior.dept_superior_id} value={superior.employee_id}>
-                      {superior.superior_name} - {superior.dept_name} ({superior.position_title})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Is Supervisor?</label>
-                <input
-                  type="checkbox"
-                  name="is_supervisor"
-                  checked={editingEmployee.is_supervisor}
-                  onChange={handleEditEmployeeChange}
-                />
-              </div>
-              <div className="form-group">
-                <label>Created At</label>
-                <input type="text" value={editingEmployee.created_at || ""} disabled />
-              </div>
-              <div className="form-group">
-                <label>Updated At</label>
-                <input type="text" value={editingEmployee.updated_at || ""} disabled />
-              </div>
-              */}
-
-              <div className="hr-employee-modal-buttons hr-two-col-buttons">
-                <button type="submit" className="submit-btn">Save</button>
-                <button
-                  type="button"
-                  className="hr-employee-cancel-btn"
-                  onClick={() => setShowEditEmployeeModal(false)}
-                >
+            
+              <div className="hr-employee-modal-buttons">
+                <button type="button" className="hr-employee-cancel-btn" onClick={() => setShowEditEmployeeModal(false)}>
                   Cancel
+                </button>
+                <button type="submit" className="submit-btn">
+                  Save Changes
                 </button>
               </div>
             </form>
