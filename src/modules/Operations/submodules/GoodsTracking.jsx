@@ -265,7 +265,8 @@ const GoodsTracking = ({employee_id}) => {
                   filteredData.map((row, index) => (
                     <tr key={row.document_id}>
                       <td>
-                        <input type="checkbox"  checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row)}/>
+                      <input type="checkbox" className="teal-checkbox" checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row)} />
+
                       </td>
                       <td>{index + 1}</td>
                       <td>{row.transaction_id}</td>

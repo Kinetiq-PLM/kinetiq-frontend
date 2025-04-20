@@ -97,21 +97,28 @@
     padding: 12px;
     text-align: left;
     font-size: 13px;
+
+    white-space: normal;     
+    overflow: visible;        
+    text-overflow: unset;     
 }
 
-/* Checkbox input (clean look) */
-.delivery-receipt-wrapper .checkbox-input {
+.checkbox-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     width: 16px;
     height: 16px;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    background-color: white;
     border: 2px solid #00A8A8;
     border-radius: 3px;
-    position: relative;
     outline: none;
-    transition: background-color 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+    vertical-align: middle;
+    background-color: white;
+
+    
 }
 
 /* When checkbox is checked */

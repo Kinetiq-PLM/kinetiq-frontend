@@ -144,7 +144,13 @@ const ItemRemoval = () => {
                     filteredData.map((row, index) => (
                     <tr key={row.external_id}>
                         <td>
-                        <input type="checkbox"  checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row)}/>
+                      
+                        <input
+  type="checkbox"
+  className="checkbox"
+  checked={selectedRow === index}
+  onChange={() => handleCheckboxChange(index, row)}
+/>
                         </td>
                         <td>{row.report_id}</td>
                         <td>{row.item_id}</td>

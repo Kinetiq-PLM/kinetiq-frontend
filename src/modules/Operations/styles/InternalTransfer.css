@@ -95,32 +95,62 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* PERFECTLY CENTERED CHECKBOX STYLING */
 .InternalTransfer input[type="checkbox"] {
     appearance: none;
-    width: 16px;
-    height: 16px;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
     border: 2px solid #008080;
     background-color: white;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
-    margin: 0 auto;
-    display: block;
+    margin: 0;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.2s ease;
 }
 
 .InternalTransfer input[type="checkbox"]:checked {
     background-color: #008080;
-    border-color: #006666;
-    position: relative;
+    border-color: #008080;
 }
 
 .InternalTransfer input[type="checkbox"]:checked::after {
-    content: "✔";
-    font-size: 12px;
-    color: white;
-    font-weight: bold;
+    content: "";
     position: absolute;
-    left: 3px;
-    top: 0px;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: translate(-50%, -60%) rotate(45deg);
+}
+
+/* FIXED TABLE CELL STYLING */
+.InternalTransfer table td:first-child {
+    width: 50px;
+    padding: 0;
+    position: relative;
+    height: 100%;
+}
+
+.InternalTransfer table td {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    color: #212529;
+    border-bottom: 1px solid #f1f1f1;
+    vertical-align: middle;
+}
+
+.InternalTransfer table td:first-child {
+    width: 50px;
+    padding: 0.5rem;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .InternalTransfer .input-group {
@@ -199,12 +229,6 @@
 
 .InternalTransfer .button-container {
     display: flex;
-    justify-content: center;
-    margin-top: 1rem;
-}
-
-.InternalTransfer .button-container {
-    display: flex;
     justify-content: flex-end;
     margin-top: 1rem;
     width: 100%;
@@ -241,7 +265,7 @@
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    pointer-events: down;
+    pointer-events: none;
 }
 
 .InternalTransfer .module-dropdown:hover {
@@ -299,9 +323,6 @@
     background: #008080;
 }
 
-.InternalTransfer table td:first-child,
-.InternalTransfer table th:first-child {
-    width: 50px;
-    padding: 0.5rem;
+.text-center {
     text-align: center;
 }
