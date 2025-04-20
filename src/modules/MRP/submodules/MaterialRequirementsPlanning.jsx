@@ -367,16 +367,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         
                 console.log("Payload:", payload);
         
-                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `BOM_Payload_${selectedRowData?.number || 'no-id'}.json`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-        
                 const response = await fetch(`${baseurl}/insertbom/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -386,6 +376,19 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 if (!response.ok) throw new Error('Failed to submit BOM data');
                 const data = await response.json();
                 console.log('Successfully submitted BOM:', data);
+
+                const updateResponse = await fetch('http://127.0.0.1:8000/update_tracking_status/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ order_id: selectedRowData.number })
+                });
+        
+                if (!updateResponse.ok) throw new Error('Failed to update tracking status');
+                const updateData = await updateResponse.json();
+                console.log('Tracking status updated:', updateData);
+
             } catch (error) {
                 console.error('Error sending BOM:', error);
             }
@@ -448,6 +451,19 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             if (!response.ok) throw new Error('Failed to submit Principal Item Data');
             const data = await response.json();
             console.log('Success:', data);
+
+            const updateResponse = await fetch('http://127.0.0.1:8000/update_tracking_status_principal/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ service_order_item_id: selectedRowData.number })
+            });
+    
+            if (!updateResponse.ok) throw new Error('Failed to update tracking status');
+            const updateData = await updateResponse.json();
+            console.log('Tracking status updated:', updateData);
+
         } catch (error) {
             console.error('Error sending Principal Item:', error);
         }
