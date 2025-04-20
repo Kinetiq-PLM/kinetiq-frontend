@@ -13,19 +13,29 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [pnpOrder, setPnpOrder] = useState([]);
     const [prinOrder, setPrincipalOrder] = useState([]);
     const [projectId, setProjectID] = useState([]);
+    const [selectedOrderNo, setSelectedOrderNo] = useState([]);
+    const [npProducts, setNPProducts] = useState([]);
+    const [principalItems, setPrincipalItems] = useState([]);
+    const prinOverallCost = principalItems.reduce((sum, item) => sum + parseFloat(item.prin_totalitemcost), 0).toFixed(2);
+    const npOverallProductCost = npProducts.reduce((sum, item) => sum + parseFloat(item.np_totalCost),0).toFixed(2);
+    const [costOfProduction, setCostOfProduction] = useState([]);
+    const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
+    const [totalLaborCost, setTotalLaborCost] = useState(0);
+    const [totalOrderCost, setTotalOrderCost] = useState(0);
 
     const baseurl = "http://127.0.0.1:8000";
     //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
     const [bomData, setBomData] = useState([]);
     const [bomDetails, setBomDetails] = useState([]);
-    const [bomCostDetails, setBomCostDetails] = useState({
-        rawMaterial: 0,
-        subtotal: 10000,
-        production: 40000.80,
-        labor: 40000.80,
-        total: 90001.60,
-    });
+    const totalCostPerRM = bomDetails.reduce((sum, item) => sum + (item.p_total_cost_per_rm || 0), 0).toFixed(2);
+    // const [bomCostDetails, setBomCostDetails] = useState({
+    //     rawMaterial: 0,
+    //     subtotal: 10000,
+    //     production: 40000.80,
+    //     labor: 40000.80,
+    //     total: 90001.60,
+    // });
 
     useEffect(() => {
         const fetchBomData = async () => {
@@ -75,40 +85,80 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             fetchServiceOrderItems();
     }, []);
 
-    useEffect(() => {
-        const fetchBomDetails = async () => {
+    const fetchOrderStatement = async (orderId, type) => {
+        try {
+            const response = await fetch(`${baseurl}/bills_of_material/orderstatements/by-order/${orderId}/`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch order statements");
+            }
+            const data = await response.json(); 
+            const statementIds = data.map((item) => item.statement_id);
+
+            console.log(statementIds);
+
+            if (statementIds.length > 0) {
+                if(type === "Project"){
+                    fetchProjectBom(statementIds[0]);
+                } else if (type === "Non Project"){
+                    fetchNonProjectBom(statementIds[0]);
+                }
+            } else {
+                console.warn("No statement IDs found.");
+            }
+
+            setSelectedOrderNo(statementIds);
+        } catch (error) {
+            console.error("Error fetching Order Statements", error);
+        }
+    };
+
+    const fetchProjectBom = async (statementId) => {
+        try {
+            const response = await fetch(`${baseurl}/bills_of_material/projectbomdetail/by-statement/${statementId}/`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch Products");
+            }
+            const data = await response.json();
+
+            const formattedData = data.map((item, index) => ({
+                number: index + 1,
+                p_product_name: item.product_name,
+                p_qtyProduct: item.qty_of_product,
+                p_raw_material_name: item.raw_material_name,
+                p_qty_of_raw_material: item.qty_of_raw_material,
+                p_units: item.units,
+                p_cost_per_rm: parseFloat(item.cost_per_rm),
+                p_total_cost_per_rm: parseFloat(item.total_cost_per_rm),
+            }));
+
+            setBomDetails(formattedData);
+        } catch (error) {
+            console.error("Error fetching Non Project Products:", error);
+        }
+    };
+
+        const fetchNonProjectBom = async (statementId) => {
             try {
-                const response = await fetch(`${baseurl}/bills_of_material/product-costs/`);
+                const response = await fetch(`${baseurl}/bills_of_material/nonprojectbomdetail/by-statement/${statementId}/`);
                 if (!response.ok) {
-                    throw new Error("Failed to fetch BOM details");
+                    throw new Error("Failed to fetch Products");
                 }
                 const data = await response.json();
-
+    
                 const formattedData = data.map((item, index) => ({
-                    no: index + 1,
-                    product: item.product || "N/A",
-                    qtyProduct: item.quantity_of_product || "N/A",
-                    rawMaterial: item.raw_material || "N/A",
-                    qtyRawMaterial: item.quantity_of_raw_material || "N/A",
-                    unit: item.unit_of_measure || "N/A",
-                    costPerUnit: parseFloat(item.cost_per_raw_material),
-                    totalCost: parseFloat(item.total_cost_of_raw_materials),
+                    number: index + 1,
+                    np_product_name: item.product_name,
+                    np_qtyProduct: item.quantity,
+                    np_units: item.unit_of_measure,
+                    np_cost_per_product: parseFloat(item.selling_price),
+                    np_totalCost: parseFloat(item.product_cost),
                 }));
-
-                setBomDetails(formattedData);
-                const totalRawMaterialCost = formattedData.reduce((sum, item) => sum + item.totalCost, 0);
-
-                setBomCostDetails((prevDetails) => ({
-                    ...prevDetails,
-                    rawMaterial: totalRawMaterialCost,
-                }));
+    
+                setNPProducts(formattedData);
             } catch (error) {
-                console.error("Error fetching BOM details:", error);
+                console.error("Error fetching Non Project Products:", error);
             }
         };
-
-        fetchBomDetails();
-    }, []);
 
     useEffect(() => {
         const fetchOrderPnp = async () => {
@@ -163,31 +213,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             console.error("Error fetching production costs:", error);
         }
     };
-
-    const fetchOrderStatement = async (orderId) => {
-        try {
-            const response = await fetch(`${baseurl}/bills_of_material/orderstatements/by-order/${orderId}/`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch order statements");
-            }
-            const data = await response.json(); 
-            const statementIds = data.map((item) => item.statement_id);
-
-            console.log(statementIds);
-
-            if (statementIds.length > 0) {
-                fetchBomDetails(statementIds[0]);
-                fetchNonProjectProduct(statementIds[0])
-                fetchProjectProductMats(statementIds[0])
-            } else {
-                console.warn("No statement IDs found.");
-            }
-
-            setSelectedOrderNo(statementIds);
-        } catch (error) {
-            console.error("Error fetching Order Statements", error);
-        }
-    };
     
     const fetchCostProduction = async (orderId) => {
     try {
@@ -234,9 +259,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     }
     };
 
-    const fetchPrincipalDetails = async (serviceorderID) => {
+    const fetchPrincipalBOM = async (serviceorderID) => {
         try {
-            const response = await fetch(`${baseurl}/bills_of_material/principalitemorder/by-serviceid/${serviceorderID}/`);
+            const response = await fetch(`${baseurl}/bills_of_material/principalbomdetail/by-serviceid/${serviceorderID}/`);
             if (!response.ok) {
                 throw new Error("Failed to fetch BOM details");
             }
@@ -244,11 +269,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
             const formattedData = data.map((item, index) => ({
                 no: index + 1,
-                prin_material_id: item.material_id,
-                prin_uom: item.unit_of_measure,
                 prin_item_name: item.item_name,
-                prin_item_id: item.item_id,
                 prin_quantity: item.item_quantity,
+                prin_uom: item.unit_of_measure,
                 prin_itemcost: parseFloat(item.item_price),
                 prin_totalitemcost: parseFloat(item.total_item_price)
             }));
@@ -259,6 +282,20 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         }
     };
 
+    useEffect(() => {
+        let total = 0;
+    
+        if (selectedRowData?.type === "Project") {
+            total = parseFloat(totalCostPerRM || 0);
+        } else if (selectedRowData?.type === "Non Project") {
+            total = parseFloat(npOverallProductCost || 0);
+        } else {
+            total = parseFloat(prinOverallCost * 1.2);
+        }
+    
+        total += totalCostOfProduction + totalLaborCost;
+        setTotalOrderCost(total.toFixed(2));
+    }, [selectedRowData?.type, totalCostPerRM, npOverallProductCost, prinOverallCost, totalCostOfProduction, totalLaborCost]);
 
     const cellStyle = (width) => ({
         width, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px 12px', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 400, textAlign: 'center', lineHeight: 1, wordWrap: 'break-word'
@@ -395,12 +432,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         className="table-row"
                         onClick={() => {
                             setSelectedRowData(item);
-                            if (item.type === "Project Based") {
+                            if (item.type === "Project") {
                             setPrintBOM(true);
-                            } else if (item.type === "Non-Project Based") {
+                                fetchOrderStatement(item.number, "Project");
+                                fetchCostProduction(item.number);
+                                fetchCostLabor(item.number);
+                            } else if (item.type === "Non Project") {
                             setPrintBOM2(true);
+                            fetchOrderStatement(item.number, "Non Project");
                             } else {
                             setPrintBOM3(true);
+                            fetchPrincipalBOM(item.number)
                             }
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
@@ -507,14 +549,14 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                     <div
                                                     className="print-row"
                                                     style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', display: 'inline-flex'}}>
-                                                    <div style={cellStyle(82)}>{item.no}</div>
-                                                    <div style={cellStyle(145)}>{item.product}</div>
-                                                    <div style={cellStyle(96)}>{item.qtyProduct}</div>
-                                                    <div style={cellStyle(140)}>{item.rawMaterial}</div>
-                                                    <div style={cellStyle(130)}>{item.qtyRawMaterial}</div>
-                                                    <div style={cellStyle(87)}>{item.unit}</div>
-                                                    <div style={cellStyle(183)}>₱{item.costPerUnit.toLocaleString()}</div>
-                                                    <div style={cellStyle(183)}>₱{item.totalCost.toLocaleString()}</div>
+                                                    <div style={cellStyle(82)}>{item.number}</div>
+                                                    <div style={cellStyle(145)}>{item.p_product_name}</div>
+                                                    <div style={cellStyle(96)}>{item.p_qtyProduct}</div>
+                                                    <div style={cellStyle(140)}>{item.p_raw_material_name}</div>
+                                                    <div style={cellStyle(130)}>{item.p_qty_of_raw_material}</div>
+                                                    <div style={cellStyle(87)}>{item.p_units}</div>
+                                                    <div style={cellStyle(183)}>₱{item.p_cost_per_rm.toLocaleString()}</div>
+                                                    <div style={cellStyle(183)}>₱{item.p_total_cost_per_rm.toLocaleString()}</div>
                                                     </div>
 
                                                     {(index + 1) % 3000 === 0 && (
@@ -528,11 +570,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div style={{ width: 391, marginTop: 30, alignSelf: 'flex-end', display: 'flex', flexDirection: 'column', paddingRight: 30}}>
                                         <div style={{ background: 'white', overflow: 'hidden', borderRadius: 4, outline: '1px white solid', outlineOffset: '-1px', flexDirection: 'column', display: 'flex' }}>
                                             {[
-                                            { label: 'Total Cost of Raw Materials', value: bomCostDetails.rawMaterial, strong: false },
-                                            { label: 'Subtotal:', value: bomCostDetails.subtotal, strong: true },
-                                            { label: 'Cost of Production', value: bomCostDetails.production, strong: false },
-                                            { label: 'Labor Cost', value: bomCostDetails.labor, strong: false },
-                                            { label: 'Total Cost:', value: bomCostDetails.total, strong: true }
+                                            { label: 'Total Cost of Raw Materials', value: totalCostPerRM, strong: false },
+                                            { label: 'Subtotal:', value: totalCostPerRM, strong: true },
+                                            { label: 'Cost of Production', value: totalCostOfProduction, strong: false },
+                                            { label: 'Labor Cost', value: totalLaborCost, strong: false },
+                                            { label: 'Total Cost:', value: totalOrderCost, strong: true }
                                             ].map((item, index) => (
                                                 <div key={index} style={{ display: 'flex', height: 36 }}>
                                                     <div style={{width: 223,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,color: item.strong ? '#1C1C1C' : '#111111',fontFamily: 'Inter',display: 'flex',alignItems: 'center'}}>
@@ -636,17 +678,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                {bomDetails.map((item, index) => (
+                                                {npProducts.map((item, index) => (
                                                 <React.Fragment key={index}>
                                                     <div
                                                     className="print-row"
                                                     style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', display: 'inline-flex'}}>
-                                                    <div style={cellStyle(82)}>{item.no}</div>
-                                                    <div style={cellStyle(240)}>{item.product}</div>
-                                                    <div style={cellStyle(96)}>{item.qtyProduct}</div>
-                                                    <div style={cellStyle(87)}>{item.unit}</div>
-                                                    <div style={cellStyle(271)}>₱{item.costPerUnit.toLocaleString()}</div>
-                                                    <div style={cellStyle(271)}>₱{item.totalCost.toLocaleString()}</div>
+                                                    <div style={cellStyle(82)}>{item.number}</div>
+                                                    <div style={cellStyle(240)}>{item.np_product_name}</div>
+                                                    <div style={cellStyle(96)}>{item.np_qtyProduct}</div>
+                                                    <div style={cellStyle(87)}>{item.np_units}</div>
+                                                    <div style={cellStyle(271)}>₱{item.np_cost_per_product.toLocaleString()}</div>
+                                                    <div style={cellStyle(271)}>₱{item.np_totalCost.toLocaleString()}</div>
                                                     </div>
 
                                                     {(index + 1) % 3000 === 0 && (
@@ -660,11 +702,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div style={{ width: 391, marginTop: 30, alignSelf: 'flex-end', display: 'flex', flexDirection: 'column', paddingRight: 30}}>
                                         <div style={{ background: 'white', overflow: 'hidden', borderRadius: 4, outline: '1px white solid', outlineOffset: '-1px', flexDirection: 'column', display: 'flex' }}>
                                             {[
-                                            { label: 'Total Cost of Raw Materials', value: bomCostDetails.rawMaterial, strong: false },
-                                            { label: 'Subtotal:', value: bomCostDetails.subtotal, strong: true },
-                                            { label: 'Cost of Production', value: bomCostDetails.production, strong: false },
-                                            { label: 'Labor Cost', value: bomCostDetails.labor, strong: false },
-                                            { label: 'Total Cost:', value: bomCostDetails.total, strong: true }
+                                            { label: 'Total Cost of Raw Materials', value: npOverallProductCost, strong: false },
+                                            { label: 'Subtotal:', value: npOverallProductCost, strong: true },
+                                            { label: 'Cost of Production', value: totalCostOfProduction, strong: false },
+                                            { label: 'Labor Cost', value: totalLaborCost, strong: false },
+                                            { label: 'Total Cost:', value: totalOrderCost, strong: true }
                                             ].map((item, index) => (
                                                 <div key={index} style={{ display: 'flex', height: 36 }}>
                                                     <div style={{width: 223,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,color: item.strong ? '#1C1C1C' : '#111111',fontFamily: 'Inter',display: 'flex',alignItems: 'center'}}>
@@ -768,17 +810,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                {bomDetails.map((item, index) => (
+                                                {principalItems.map((item, index) => (
                                                 <React.Fragment key={index}>
                                                     <div
                                                     className="print-row"
                                                     style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', display: 'inline-flex'}}>
                                                     <div style={cellStyle(82)}>{item.no}</div>
-                                                    <div style={cellStyle(240)}>{item.product}</div>
-                                                    <div style={cellStyle(96)}>{item.qtyProduct}</div>
-                                                    <div style={cellStyle(87)}>{item.unit}</div>
-                                                    <div style={cellStyle(271)}>₱{item.costPerUnit.toLocaleString()}</div>
-                                                    <div style={cellStyle(271)}>₱{item.totalCost.toLocaleString()}</div>
+                                                    <div style={cellStyle(240)}>{item.prin_item_name}</div>
+                                                    <div style={cellStyle(96)}>{item.prin_quantity}</div>
+                                                    <div style={cellStyle(87)}>{item.prin_uom}</div>
+                                                    <div style={cellStyle(271)}>₱{item.prin_itemcost.toLocaleString()}</div>
+                                                    <div style={cellStyle(271)}>₱{item.prin_totalitemcost.toLocaleString()}</div>
                                                     </div>
 
                                                     {(index + 1) % 3000 === 0 && (
@@ -792,11 +834,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div style={{ width: 391, marginTop: 30, alignSelf: 'flex-end', display: 'flex', flexDirection: 'column', paddingRight: 30}}>
                                         <div style={{ background: 'white', overflow: 'hidden', borderRadius: 4, outline: '1px white solid', outlineOffset: '-1px', flexDirection: 'column', display: 'flex' }}>
                                             {[
-                                            { label: 'Total Cost of Raw Materials', value: bomCostDetails.rawMaterial, strong: false },
-                                            { label: 'Subtotal:', value: bomCostDetails.subtotal, strong: true },
-                                            { label: 'Cost of Production', value: bomCostDetails.production, strong: false },
-                                            { label: 'Labor Cost', value: bomCostDetails.labor, strong: false },
-                                            { label: 'Total Cost:', value: bomCostDetails.total, strong: true }
+                                            { label: 'Total Cost of Raw Materials', value: prinOverallCost, strong: false },
+                                            { label: 'Subtotal:', value: prinOverallCost, strong: true },
+                                            { label: 'Cost of Production', value: totalCostOfProduction, strong: false },
+                                            { label: 'Labor Cost', value: totalLaborCost, strong: false },
+                                            { label: 'Total Cost:', value: totalOrderCost, strong: true }
                                             ].map((item, index) => (
                                                 <div key={index} style={{ display: 'flex', height: 36 }}>
                                                     <div style={{width: 223,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,color: item.strong ? '#1C1C1C' : '#111111',fontFamily: 'Inter',display: 'flex',alignItems: 'center'}}>
