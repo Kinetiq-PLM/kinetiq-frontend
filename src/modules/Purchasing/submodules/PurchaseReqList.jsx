@@ -104,10 +104,12 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
   // Filter requests
   const filteredRequests = purchaseRequests.filter((request) => {
     const searchLower = searchTerm.toLowerCase();
-    const employeeName = employeeMap[request.employee_id] || ""; // Get employee_name from the map
+    const employee = employeeMap[request.employee_id];
+    const employeeName = (employee && employee.name) || "";
+  
     return (
       (request.request_id || "").toLowerCase().includes(searchLower) ||
-      employeeName.toLowerCase().includes(searchLower) || // Search by employee_name
+      employeeName.toLowerCase().includes(searchLower) ||
       (request.department || "").toLowerCase().includes(searchLower) ||
       (request.document_date || "").toLowerCase().includes(searchLower) ||
       (request.valid_date || "").toLowerCase().includes(searchLower)
