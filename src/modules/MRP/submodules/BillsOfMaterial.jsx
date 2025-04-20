@@ -203,7 +203,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         fontSize: 16,
         color: "#585757",
     };
-
+    
     return (
         <div className="bom">
             <div style={{width: '100%', height: '100%', padding: '2rem', background: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)', overflow: 'hidden', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', rowGap: 25,}}>

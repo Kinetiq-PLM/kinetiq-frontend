@@ -280,35 +280,77 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         }
         };
 
-    const sendProjectData = async () => {
-        try {
-            const payload = rawMaterials.map(item => ({
-                project_id: projectId,
-                product_mats_id: item.materialId,
-                overall_quantity_of_material: item.np_qtyProduct,
-                cost_per_raw_material: item.rmunitCost,
-                total_cost_of_raw_materials: item.rmtotalCost,
-                production_order_detail_id: selectedRowData.production_order_detail_id,
-                labor_cost: null,
-                total_cost: totalOrderCost
-            }));
-
-            const response = await fetch('http://127.0.0.1:8000/bills_of_material/submit-bom/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) throw new Error('Failed to submit BOM data');
-            const data = await response.json();
-            console.log('Success:', data);
-        } catch (error) {
-            console.error('Error sending BOM:', error);
+    const fetchAllRawMaterials = async () => {
+        const allRawMats = [];
+    
+        for (const product of bomDetails) {
+            const res = await fetch(`${baseurl}/bills_of_material/costofrawmats/by-product/${product.product_id}/`);
+            if (res.ok) {
+                const data = await res.json();
+                const formatted = data.map(item => ({
+                    rawMaterial: item.raw_material,
+                    materialId: item.material_id,
+                    rmquantity: item.rm_quantity,
+                    rmunits: item.units,
+                    rmunitCost: parseFloat(item.unit_cost).toFixed(2),
+                    rmtotalCost: parseFloat(item.total_cost).toFixed(2),
+                }));
+                allRawMats.push(...formatted);
+            }
         }
+    
+        return allRawMats;
     };
+        
 
+        const sendProjectData = async () => {
+            try {
+
+                const allRawMats = await fetchAllRawMaterials(); // 🧠 fetch all mats here
+                if (allRawMats.length === 0) {
+                    console.warn("⚠️ No raw materials found for this BOM.");
+                    return;
+                }
+
+                const payload = rawMaterials.map(item => ({
+                    project_id: projectId[0]?.projectID || null,
+                    product_mats_id: null,
+                    overall_quantity_of_material: parseInt(item.rmquantity) || 1,
+                    cost_per_raw_material: parseFloat(item.rmunitCost) || 1.00,
+                    total_cost_of_raw_materials: parseFloat(item.rmtotalCost) || 1.00,
+                    production_order_detail_id: null,
+                    labor_cost_id: null,
+                    total_cost: parseFloat(totalOrderCost) || 1.00
+                }));
+        
+                console.log("📦 Payload:", payload);
+        
+                // 🔽 Save payload to file
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `BOM_Payload_${selectedRowData?.number || 'no-id'}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+        
+                // 🔼 After saving, you can still send to backend
+                const response = await fetch(`${baseurl}/insertbom/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+        
+                if (!response.ok) throw new Error('Failed to submit BOM data');
+                const data = await response.json();
+                console.log('✅ Successfully submitted BOM:', data);
+            } catch (error) {
+                console.error('❌ Error sending BOM:', error);
+            }
+        };
+        
     const sendNonProjectData = async () => {
         try {
 
@@ -512,7 +554,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         ))}
                     </div>
                     {mergedRows.map((item, index) => (
-                        <div key={index} className="table-row" onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchCostProduction(item.number); fetchCostLabor(item.number); fetchPrincipalDetails(item.number); setIsProjectType(item.type); setIsOpen(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")} style={{display: "flex", flexWrap: "wrap", cursor: "pointer", borderBottom: "1px solid #E8E8E8"}}>
+                        <div key={index} className="table-row" onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchProjectID(item.number); fetchCostProduction(item.number); fetchCostLabor(item.number); fetchPrincipalDetails(item.number); setIsProjectType(item.type); setIsOpen(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")} style={{display: "flex", flexWrap: "wrap", cursor: "pointer", borderBottom: "1px solid #E8E8E8"}}>
                             <div className="table-cell" style={rowCellStyle} data-label="Order No.">{item.number}</div>
                             <div className="table-cell" style={rowCellStyle} data-label="Type">{item.type}</div>
                             <div className="table-cell" style={rowCellStyle} data-label="Details">{item.details || '—'}</div>
@@ -940,7 +982,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
                         <span style={{color: '#969696'}}>Back</span>
                     </button>
-                    <button onClick={() => {sendNonProjectData(), sendPrincipalData(),setCreated(true), setChecker(false), setAdditionalCost(false), setAdditionalCost2(false), setIsOpen(false), setIsOpen2(false)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <button onClick={() => {isProjectType === "Project" ? sendProjectData() : isProjectType === "Non Project" ? sendNonProjectData() : sendPrincipalData(),setCreated(true), setChecker(false), setAdditionalCost(false), setAdditionalCost2(false), setIsOpen(false), setIsOpen2(false)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                         <span>Create BOM</span>
                         <div className="MRPIcon5" style={{width: 13, height: 21, marginLeft: 8}} />
                     </button>
