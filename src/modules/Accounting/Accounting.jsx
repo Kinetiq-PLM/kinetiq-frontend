@@ -17,6 +17,7 @@ import {
   Line,
   CartesianGrid,
 } from "recharts";
+import Button from "./components/Button";
 
 // Professional color palette
 const COLORS = [
@@ -184,7 +185,7 @@ const AccountingDashboard = () => {
         {/* Header */}
         <div className="bg-white shadow-sm">
           <div className="container mx-auto px-4 py-6">
-            <div className="flex items-center justify-between">
+            <div className="flex gap-10 items-center justify-between max-sm:flex-col">
               <div>
                 <h1 className="text-2xl font-bold text-gray-500">
                   Accounting Dashboard
@@ -194,29 +195,7 @@ const AccountingDashboard = () => {
                 </p>
               </div>
               <div>
-                <button
-                  onClick={fetchData}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition duration-300"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1z"
-                      clipRule="evenodd"
-                    />
-                    <path
-                      fillRule="evenodd"
-                      d="M10.146 8.146a.5.5 0 01.708 0L14 11.293l3.146-3.147a.5.5 0 01.708.708l-3.5 3.5a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 010-.708z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Refresh Data
-                </button>
+                <Button name="Refresh data" variant="standard2" onclick={fetchData} />
               </div>
             </div>
           </div>
@@ -226,6 +205,7 @@ const AccountingDashboard = () => {
         <div className="container mx-auto px-4 py-8">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            
             <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-500 text-sm font-medium">
@@ -350,7 +330,7 @@ const AccountingDashboard = () => {
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 max-sm:hidden">
             {/* Bar Chart */}
             <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
               <h2 className="text-xl font-semibold text-gray-800 mb-6">
@@ -436,7 +416,7 @@ const AccountingDashboard = () => {
           </div>
 
           {/* Trend Chart */}
-          <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300 mb-8">
+          <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300 mb-8 max-sm:hidden">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Revenue vs Expenses Trend
             </h2>
