@@ -10,6 +10,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [principalOrder, setPrincipalItemOrder] = useState([]);
+    const [pnpOrder, setPnpOrder] = useState([]);
+    const [prinOrder, setPrincipalOrder] = useState([]);
+    const [projectId, setProjectID] = useState([]);
 
     const baseurl = "http://127.0.0.1:8000";
     //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
@@ -27,7 +30,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     useEffect(() => {
         const fetchBomData = async () => {
             try {
-                const response = await fetch(`${baseurl}/bills_of_material/bomlist/`); // Replace with your API endpoint
+                const response = await fetch(`${baseurl}/bills_of_material/bomlist/`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch BOM data");
                 }
@@ -108,25 +111,155 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         fetchBomDetails();
     }, []);
 
-    // const bomData = [
-    //     { number: "000000001", type: "Project", status: "Pending", date: "July 3 2025" },
-    //     { number: "000000002", type: "Non Project", status: "Approved", date: "July 3 2025" },
+    useEffect(() => {
+        const fetchOrderPnp = async () => {
+            try {
+                const response = await fetch(`${baseurl}/bills_of_material/trackingnpop/`);
+                if (!response.ok) throw new Error("Failed to fetch Project/Non-Project statuses");
+                const data = await response.json();
+                const formattedData = data.map(item => ({
+                    pnp_orderID: item.order_id,
+                    pnp_status: item.status
+                }));
+                setPnpOrder(formattedData);
+            } catch (error) {
+                console.error("Error fetching Project/Non-Project statuses:", error);
+            }
+        };
+        fetchOrderPnp();
+    }, []);
+    
+    useEffect(() => {
+        const fetchPrincipalOrder = async () => {
+            try {
+                const response = await fetch(`${baseurl}/bills_of_material/trackingprincipal/`);
+                if (!response.ok) throw new Error("Failed to fetch Principal statuses");
+                const data = await response.json();
+                const formattedData = data.map(item => ({
+                    sr_orderID: item.service_order_item_id,
+                    sr_status: item.status
+                }));
+                setPrincipalOrder(formattedData);
+            } catch (error) {
+                console.error("Error fetching Principal statuses:", error);
+            }
+        };
+        fetchPrincipalOrder();
+    }, []);
 
-    // ];
-    // const bomDetails = [
-    //     { no: 1, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600, bomId: "BOM001", projectId: "PRJ001", productMatsId: "MAT001", productionOrderDetailId: "POD001", laborCostId: "LAB001"},
-    //     { no: 2, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", qtyRawMaterial: 80, unit: "kg", costPerUnit: 100, totalCost: 800, bomId: "BOM002", projectId: "PRJ002", productMatsId: "MAT002", productionOrderDetailId: "POD002",laborCostId: "LAB002"},
-    //     { no: 3, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", qtyRawMaterial: 50, unit: "kg", costPerUnit: 120, totalCost: 600, bomId: "BOM003", projectId: "PRJ001", productMatsId: "MAT003", productionOrderDetailId: "POD003", laborCostId: "LAB003"},
-    //     { no: 4, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", qtyRawMaterial: 80, unit: "kg", costPerUnit: 100, totalCost: 800, bomId: "BOM004", projectId: "PRJ002", productMatsId: "MAT004", productionOrderDetailId: "POD004", laborCostId: "LAB004"}
-    // ];
+    const fetchProjectID = async (orderId) => {
+        try {
+            const response = await fetch(`${baseurl}/bills_of_material/orderproductioncost/${orderId}/`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch project id");
+            }
+            const data = await response.json();
+            const formattedData = data.map((item) => ({
+                projectID: item.project_id,
+            }));
+    
+            setProjectID(formattedData);
+            
+        } catch (error) {
+            console.error("Error fetching production costs:", error);
+        }
+    };
 
-    // const bomCostDetails = {
-    //     rawMaterial: 40000.80,
-    //     subtotal: 10000,
-    //     production: 40000.80,
-    //     labor: 40000.80,
-    //     total: 90001.60
-    // };
+    const fetchOrderStatement = async (orderId) => {
+        try {
+            const response = await fetch(`${baseurl}/bills_of_material/orderstatements/by-order/${orderId}/`); // Replace with your API endpoint
+            if (!response.ok) {
+                throw new Error("Failed to fetch order statements");
+            }
+            const data = await response.json(); 
+            const statementIds = data.map((item) => item.statement_id);
+
+            console.log(statementIds);
+
+            if (statementIds.length > 0) {
+                fetchBomDetails(statementIds[0]);
+                fetchNonProjectProduct(statementIds[0])
+                fetchProjectProductMats(statementIds[0])
+            } else {
+                console.warn("No statement IDs found.");
+            }
+
+            setSelectedOrderNo(statementIds);
+        } catch (error) {
+            console.error("Error fetching Order Statements", error);
+        }
+    };
+    
+    const fetchCostProduction = async (orderId) => {
+    try {
+        const response = await fetch(`${baseurl}/bills_of_material/orderproductioncost/${orderId}/`);
+        if (!response.ok) {
+            throw new Error("Failed to fetch production costs");
+        }
+        const data = await response.json();
+        const formattedData = data.map((item) => ({
+            productioncost: parseFloat(item.cost_of_production),
+        }));
+
+        setCostOfProduction(formattedData);
+
+        const totalCost = formattedData.reduce((sum, item) => sum + item.productioncost, 0);
+        setTotalCostOfProduction(totalCost);
+        
+    } catch (error) {
+        console.error("Error fetching production costs:", error);
+    }
+    };
+
+    const fetchCostLabor = async (orderId) => {
+    try {
+        const response = await fetch(`${baseurl}/bills_of_material/employeeorder/${orderId}/`);
+        if (!response.ok) {
+            throw new Error("Failed to fetch employee order");
+        }
+        const data = await response.json();
+        const formattedData = data.map((item) => ({
+            days_worked: item.days_worked,
+            daily_rate: parseFloat(item.daily_rate)
+        }));
+
+        const totalCost = formattedData.reduce(
+            (sum, item) => sum + item.days_worked * item.daily_rate,
+            0
+        );
+
+        setTotalLaborCost(totalCost);
+        
+    } catch (error) {
+        console.error("Error fetching labor costs:", error);
+    }
+    };
+
+    const fetchPrincipalDetails = async (serviceorderID) => {
+        try {
+            const response = await fetch(`${baseurl}/bills_of_material/principalitemorder/by-serviceid/${serviceorderID}/`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch BOM details");
+            }
+            const data = await response.json();
+
+            const formattedData = data.map((item, index) => ({
+                no: index + 1,
+                prin_material_id: item.material_id,
+                prin_uom: item.unit_of_measure,
+                prin_item_name: item.item_name,
+                prin_item_id: item.item_id,
+                prin_quantity: item.item_quantity,
+                prin_itemcost: parseFloat(item.item_price),
+                prin_totalitemcost: parseFloat(item.total_item_price)
+            }));
+
+            setPrincipalItems(formattedData);
+        } catch (error) {
+            console.error("Error fetching BOM details:", error);
+        }
+    };
+
 
     const cellStyle = (width) => ({
         width, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px 12px', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 400, textAlign: 'center', lineHeight: 1, wordWrap: 'break-word'
@@ -181,18 +314,32 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         }, 200); // 200ms delay to let DOM reflow before printing
     }
     
-    const mergedRows = (
-        flag === 0 // All BOM
+    const mergedRows2 = (
+        flag === 0
             ? [...(filteredData || []), ...(principalOrder || [])]
-            : flag === 3 // Principal Items BOM
+            : flag === 3
             ? principalOrder
-            : filteredData // Project/Non-Project BOM
-    ).map((item) => ({
-        number: item.number || item.serviceOrderItemId,
-        type: item.type,
-        details: item.details || item.description,
-        date: item.date,
-    }));
+            : filteredData
+    ).map(item => {
+        const number = item.number || item.serviceOrderItemId;
+        const type = item.type;
+        const details = item.details || item.description;
+        const date = item.date;
+    
+        const pnpMatch = pnpOrder.find(p => p.pnp_orderID === number);
+        const prinMatch = prinOrder.find(p => p.sr_orderID === number);
+    
+        const status = pnpMatch?.pnp_status || prinMatch?.sr_status || "";
+    
+        return {
+            number,
+            type,
+            details,
+            date,
+            status
+        };
+    }).filter(item => (item.status || "").toLowerCase() !== "Complete");
+    
 
     const rowCellStyle = {
         flex: "1 1 25%",
@@ -203,7 +350,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         fontSize: 16,
         color: "#585757",
     };
-    
+
     return (
         <div className="bom">
             <div style={{width: '100%', height: '100%', padding: '2rem', background: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)', overflow: 'hidden', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', rowGap: 25,}}>
@@ -247,7 +394,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 </div>
 
                 {/* Rows */}
-                {mergedRows.map((item, index) => (
+                {mergedRows2.map((item, index) => (
                 <div
                     key={index}
                     className="table-row"

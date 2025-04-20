@@ -24,13 +24,13 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     //const costOfProduction = 15000.00;
     const laborCost = 8000.00;
 
-    const [selectedRowData, setSelectedRowData] = useState(null); // State to store selected row data
-    const [selectedOrderNo, setSelectedOrderNo] = useState([]); // State to store only the Order No. as a string
+    const [selectedRowData, setSelectedRowData] = useState(null); 
+    const [selectedOrderNo, setSelectedOrderNo] = useState([]);
     const [bomDetails, setBomDetails] = useState([]);
     const [projPro, setProjMats] = useState([]);
     const [principalItems, setPrincipalItems] = useState([]);
     const [npProducts, setNPProducts] = useState([]);
-    const [selectedProductId, setSelectedProductId] = useState(null); // New state to store selected product_id
+    const [selectedProductId, setSelectedProductId] = useState(null);
     const [rawMaterials, setRawMaterials] = useState([]);
     const [costOfProduction, setCostOfProduction] = useState([]);
     const totalCostofRawMaterial = rawMaterials.reduce((sum,item) => sum + parseFloat(item.rmtotalCost),0);
@@ -148,7 +148,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const fetchOrderStatement = async (orderId) => {
         try {
-            const response = await fetch(`${baseurl}/bills_of_material/orderstatements/by-order/${orderId}/`); // Replace with your API endpoint
+            const response = await fetch(`${baseurl}/bills_of_material/orderstatements/by-order/${orderId}/`);
             if (!response.ok) {
                 throw new Error("Failed to fetch order statements");
             }
@@ -328,7 +328,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         } catch (error) {
             console.error("Error fetching production costs:", error);
         }
-        };
+    };
         
     const fetchProjectProductMats = async (statementId) => {
         try {
@@ -365,9 +365,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     total_cost: parseFloat(totalOrderCost) || 1.00
                 }));
         
-                console.log("📦 Payload:", payload);
+                console.log("Payload:", payload);
         
-                // 🔽 Save payload to file
                 const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -378,7 +377,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
         
-                // 🔼 After saving, you can still send to backend
                 const response = await fetch(`${baseurl}/insertbom/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -387,9 +385,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         
                 if (!response.ok) throw new Error('Failed to submit BOM data');
                 const data = await response.json();
-                console.log('✅ Successfully submitted BOM:', data);
+                console.log('Successfully submitted BOM:', data);
             } catch (error) {
-                console.error('❌ Error sending BOM:', error);
+                console.error('Error sending BOM:', error);
             }
         };
         
@@ -470,20 +468,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         setTotalOrderCost(total.toFixed(2));
     }, [isProjectType, overallTotalCost, npOverallProductCost, prinOverallCost, totalCostOfProduction, totalLaborCost]);
 
-    // const mrpData = [
-    //     { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
-    //     { number: "000000002", type: "Non Project", details: "Tondo Hospital - Package.. ", date: "July 3 2025" },
-    //     { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
-    //     { number: "000000002", type: "Non Project", details: "Tondo Hospital - Package.. ", date: "July 3 2025" },
-    //     { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
-    // ];
-
-    // const bomDetails = [
-    //     { no: 1, bomId: "BOM001", projectId: "PRJ001", product_id: "ADMIN-PROD-2025-a6d292", productMatsId: "MAT001", qtyRawMaterial: 50, costPerUnit: 120, totalCostOfRawMaterials: 6000, productionOrderDetailId: "POD001", laborCostId: "LAB001", totalCost: 7000, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", unit: "kg" },
-    //     { no: 2, bomId: "BOM002", projectId: "PRJ002", product_id: "ADMIN-PROD-2025-a6a292", productMatsId: "MAT002", qtyRawMaterial: 80, costPerUnit: 100, totalCostOfRawMaterials: 8000, productionOrderDetailId: "POD002", laborCostId: "LAB002", totalCost: 9500, product: "Apple", qtyProduct: 200, rawMaterial: "Starch", unit: "kg" },
-    //     { no: 3, bomId: "BOM003", projectId: "PRJ001", product_id: "ADMIN-PROD-2025-a62ass", productMatsId: "MAT003", qtyRawMaterial: 50, costPerUnit: 120, totalCostOfRawMaterials: 6000, productionOrderDetailId: "POD003", laborCostId: "LAB003", totalCost: 7100, product: "Apple", qtyProduct: 100, rawMaterial: "Sugar", unit: "kg" },
-    // ];
-
     const rawMats = [
         { "product_id": "ADMIN-PROD-2025-a6d292", "raw_material": "Carbon Fiber", "material_id": "ADMIN-MATERIAL-2025-fa9377", "rm_quantity": "80.70", "units": "kg", "unit_cost": "2500.00", "total_cost": "201750.00"},
         { "product_id": "ADMIN-PROD-2025-a6d292", "raw_material": "Hydraulic Oil", "material_id": "ADMIN-MATERIAL-2025-b1aac1", "rm_quantity": "22.22", "units": "kg", "unit_cost": "190.00", "total_cost": "4221.80"},
@@ -499,8 +483,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             (flag === 2 && item.type === "Non Project") ||
             (flag === 3 && item.type === "Item Principal");
       
-          const term = (searchTerm || "").toLowerCase(); // prevent null error
-      
+          const term = (searchTerm || "").toLowerCase(); 
           const number = (item.number || "").toLowerCase();
           const date = (item.date || "").toLowerCase();
           const details = (item.details || "").toLowerCase();
@@ -516,18 +499,31 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const filteredData = getFilteredData();
 
-    const mergedRows = (
-        flag === 0 // All Orders
+    const mergedRows2 = (
+        flag === 0
           ? [...(filteredData || []), ...(principalOrder || [])]
-          : flag === 3 // Principal Items tab
+          : flag === 3
           ? principalOrder
-          : filteredData // Project or Non Project
-      ).map((item) => ({
-        number: item.number || item.serviceOrderItemId,
-        type: item.type,
-        details: item.details || item.description,
-        date: item.date,
-    }));
+          : filteredData 
+      ).map((item) => {
+        const number = item.number || item.serviceOrderItemId;
+        const type = item.type;
+        const details = item.details || item.description;
+        const date = item.date;
+      
+        const pnpMatch = pnpOrder.find(p => p.pnp_orderID === number);
+        const prinMatch = prinOrder.find(p => p.sr_orderID === number);
+      
+        const status = pnpMatch?.pnp_status || prinMatch?.sr_status || "";
+      
+        return {
+          number,
+          type,
+          details,
+          date,
+          status
+        };
+      }).filter(item => (item.status || "").toLowerCase() !== "complete");
     
     const buttonStyle = (bg, border, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer', });
     const buttonStyle2 = (bg, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, border: '0.5px solid #585757', color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer',});
@@ -566,23 +562,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     return sum + (unitCost * quantity);
     }, 0);
 
-    const renderOneValuePerItem = (products, index) => {
-        const half = products.length;
-      
-        // First half = product IDs
-        if (index < half) {
-          return products[index].np_product_id;
-        }
-      
-        // Second half = product names
-        const adjustedIndex = index - half;
-        return products[adjustedIndex].np_product_name;
-    };
 
     return (      
         <div className="reqplan">
             <div style={{width: '100%', height: '100%', padding: '2rem', background: 'white', boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.08)', overflow: 'hidden', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', rowGap: 25,}}>
-                <div className="title">MRP LIST</div>
+                <div className="title">MATERIAL REQUIREMENTS PLANNING</div>
                 <div style={{width: '100%', maxWidth: 1300, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', rowGap: 10,paddingLeft: 80, paddingRight: 80,}}>
                     <div className="tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 15,flex: '1 1 auto', minWidth: 200,}}>
                         {['All Orders', 'Project Orders', 'Non-Project Orders', 'Principal Items'].map((label, i) => (
@@ -608,7 +592,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             <div className="table-cell2" key={label} data-label={label} style={{flex: '1 1 25%', minWidth: 150, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 18}}>{label}</div>
                         ))}
                     </div>
-                    {mergedRows.map((item, index) => (
+                    {mergedRows2.map((item, index) => (
                         <div key={index} className="table-row" onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchProjectID(item.number); fetchCostProduction(item.number); fetchCostLabor(item.number); fetchPrincipalDetails(item.number); setIsProjectType(item.type); setIsOpen(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")} style={{display: "flex", flexWrap: "wrap", cursor: "pointer", borderBottom: "1px solid #E8E8E8"}}>
                             <div className="table-cell" style={rowCellStyle} data-label="Order No.">{item.number}</div>
                             <div className="table-cell" style={rowCellStyle} data-label="Type">{item.type}</div>
