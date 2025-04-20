@@ -2002,7 +2002,64 @@ const submitCandidateForm = async (e) => {
           <div className="recruitment-modal">
             <h3>Edit Resignation</h3>
             <form onSubmit={handleEditResignationSubmit} className="recruitment-form">
-              {/* Form content here */}
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Employee ID</label>
+                    <input 
+                      type="text"
+                      value={editingResignation.employee_id || ""}
+                      disabled
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Notice Period (Days)</label>
+                    <input 
+                      type="number"
+                      value={editingResignation.notice_period_days || ""}
+                      disabled
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Approval Status *</label>
+                    <select
+                      name="approval_status"
+                      value={editingResignation.approval_status || "Pending"}
+                      onChange={(e) => setEditingResignation({
+                        ...editingResignation,
+                        approval_status: e.target.value
+                      })}
+                      required
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Clearance Status *</label>
+                    <select
+                      name="clearance_status"
+                      value={editingResignation.clearance_status || "Not Started"}
+                      onChange={(e) => setEditingResignation({
+                        ...editingResignation,
+                        clearance_status: e.target.value
+                      })}
+                      required
+                    >
+                      <option value="Not Started">Not Started</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
               <div className="recruitment-modal-buttons">
                 <button type="submit" className="submit-btn">Save Changes</button>
                 <button 
