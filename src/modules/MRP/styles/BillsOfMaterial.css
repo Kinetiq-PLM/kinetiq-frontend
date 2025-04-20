@@ -1,5 +1,3 @@
-/* REMINDER! All of your elements must use your unique namespace '.bom' at the start to avoid leaking */
-
 .bom {
   display: flex;
   width: 100%;
@@ -69,11 +67,11 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.4);
   z-index: 1000;
-  overflow-y: auto; /* scroll the modal when needed */
-  padding: 2rem 1rem; /* top space */
+  overflow-y: auto;
+  padding: 2rem 1rem;
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* aligns modal to top */
+  align-items: flex-start; 
   overflow-x: hidden;
 }
 
@@ -155,6 +153,61 @@
 
 }
 
+@media (max-width: 860px) {
+  .bom-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .bom .tabs-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .bom .search-container {
+    width: 100% !important;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    padding-right: 0;
+  }
+
+  .bom .table-header {
+    display: none !important;
+  }
+
+  .bom .table-row {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 1px solid #E8E8E8;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .bom .table-cell {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 6px 0;
+  }
+
+  .bom .table-cell::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #444;
+  }
+
+  .bom .table-cell span {
+    text-align: right;
+    flex: 1;
+  }
+}
+
+
 @media print {
   .bom body * {
     visibility: hidden;
@@ -179,31 +232,30 @@
     page-break-inside: auto;
   }
 
-  .scroll-container {
+  .bom .scroll-container {
     overflow: visible !important;
     max-height: none !important;
   }
 
-  /* Add page breaks when necessary */
-  .page-break {
+  .bom .page-break {
     page-break-before: always;
     break-before: page;
   }
 
-  .print-button-container {
+  .bom .print-button-container {
     display: none !important;
   }
 
-  .print-button-container2 {
+  .bom .print-button-container2 {
     display: none !important;
   }
 
-  table {
+  .bom table {
     width: 100% !important;
     border-collapse: collapse;
   }
 
-  tr, td, th {
+  .bom tr, td, th {
     page-break-inside: avoid !important;
     break-inside: avoid;
   
@@ -213,12 +265,12 @@
     page-break-before: avoid;
   }
   
-  .print-page-break {
+  .bom .print-page-break {
     page-break-before: always;
     break-before: page;
   }
 
-  .print-row {
+  .bom .print-row {
     page-break-inside: avoid;
     break-inside: avoid;
   }
@@ -229,7 +281,7 @@
   margin-top: 30mm;
 }
 
-body::after {
+.bom body::after {
   display: none;
 }
 

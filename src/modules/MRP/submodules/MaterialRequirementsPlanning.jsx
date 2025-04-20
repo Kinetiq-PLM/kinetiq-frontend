@@ -20,10 +20,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [isProjectType, setIsProjectType] = useState(null);
     const [fetchMrpData, setFetchMrpData] = useState([]);
 
-    const costOfProducts = 40000.00;
-    //const costOfProduction = 15000.00;
-    const laborCost = 8000.00;
-
     const [selectedRowData, setSelectedRowData] = useState(null); 
     const [selectedOrderNo, setSelectedOrderNo] = useState([]);
     const [bomDetails, setBomDetails] = useState([]);

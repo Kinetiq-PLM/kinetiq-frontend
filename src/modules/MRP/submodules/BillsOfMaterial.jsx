@@ -166,7 +166,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const fetchOrderStatement = async (orderId) => {
         try {
-            const response = await fetch(`${baseurl}/bills_of_material/orderstatements/by-order/${orderId}/`); // Replace with your API endpoint
+            const response = await fetch(`${baseurl}/bills_of_material/orderstatements/by-order/${orderId}/`);
             if (!response.ok) {
                 throw new Error("Failed to fetch order statements");
             }
@@ -272,7 +272,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             (flag === 2 && item.type === "Non-Project Based") ||
             (flag === 3 && item.type === "Principal Items Based");
       
-          const term = (searchTerm || "").toLowerCase(); // prevent null error
+          const term = (searchTerm || "").toLowerCase();
       
           const number = (item.number || "").toLowerCase();
           const date = (item.date || "").toLowerCase();
@@ -292,25 +292,18 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         const printContents = document.getElementById("printable-bom").innerHTML;
         const originalContents = document.body.innerHTML;
         const originalScroll = window.scrollY;
-      
-        // Set body content to the printable section
+        
         document.body.innerHTML = printContents;
-      
-        // Optional: Set print-safe styles manually here if needed
         document.body.style.margin = "0";
         document.body.style.padding = "0";
         document.body.style.overflow = "visible";
         
-      
-        // Delay print to allow DOM re-render
         setTimeout(() => {
           window.print();
-      
-          // Restore the original document
           document.body.innerHTML = originalContents;
-          window.scrollTo(0, originalScroll); // Restore scroll position
+          window.scrollTo(0, originalScroll);
           window.location.reload()
-        }, 200); // 200ms delay to let DOM reflow before printing
+        }, 200);
     }
     
     const mergedRows2 = (
@@ -339,7 +332,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
       type,
       details,
       date,
-      status: isComplete ? "Complete" : "", // Use capital "C" for display
+      status: isComplete ? "Complete" : "", 
     };
   })
   .filter(item => item.status === "Complete");
@@ -377,9 +370,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     </div>
                 </div>
 
-                {/* Table Container */}
                 <div className="reqplan-table-scroll" style={{width: '100%', maxWidth: 1159, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflowY: 'auto', maxHeight: '450px', borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '1rem'}}>
-                {/* Header */}
                 <div className="table-header" style={{
                     display: 'flex',
                     flexWrap: 'wrap',
@@ -396,7 +387,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     ))}
                 </div>
 
-                {/* Rows */}
                 {mergedRows2
                     .filter(item => (item.status || "").toLowerCase().trim() === "complete")
                     .map((item, index) => (
@@ -415,13 +405,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
                         onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                        style={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            cursor: "pointer",
-                            borderBottom: "1px solid #E8E8E8",
-                        }}
-                        >
+                        style={{ display: "flex", flexWrap: "wrap", cursor: "pointer", borderBottom: "1px solid #E8E8E8"}}>
                         <div className="table-cell" style={rowCellStyle} data-label="Order No.">
                             {item.number}
                         </div>
@@ -458,19 +442,14 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{width: 324, left: 716, top: 345, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Email Address: </b>kinetiq@gmail.com</div>
                                 {selectedRowData && (
                                 <div>
-                                    {/* Left Labels */}
                                     <div style={{width: 135, left: 139, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
                                     <div style={{width: 135, left: 139, top: 516, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Date Created</div>
 
-                                    {/* Left Data */}
                                     <div style={{width: 250, height: 16, left: 280, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.number}</div>
                                     <div style={{width: 144, left: 385, top: 515, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.date}</div>
 
-                                    {/* Right Labels */}
                                     <div style={{width: 135, left: 700, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
 
-
-                                    {/* Right Data */}
                                     <div style={{width: 250, left: 740, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.type}</div>
                                    
                                 </div>
@@ -608,19 +587,14 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{width: 324, left: 716, top: 345, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Email Address: </b>kinetiq@gmail.com</div>
                                 {selectedRowData && (
                                 <div>
-                                    {/* Left Labels */}
                                     <div style={{width: 135, left: 139, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
                                     <div style={{width: 135, left: 139, top: 516, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Date Created</div>
 
-                                    {/* Left Data */}
                                     <div style={{width: 250, height: 16, left: 280, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.number}</div>
                                     <div style={{width: 144, left: 385, top: 515, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.date}</div>
 
-                                    {/* Right Labels */}
                                     <div style={{width: 135, left: 700, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
                                    
-
-                                    {/* Right Data */}
                                     <div style={{width: 250, left: 740, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.type}</div>
 
                                 </div>
@@ -745,19 +719,14 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{width: 324, left: 716, top: 345, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Email Address: </b>kinetiq@gmail.com</div>
                                 {selectedRowData && (
                                 <div>
-                                    {/* Left Labels */}
                                     <div style={{width: 135, left: 139, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
                                     <div style={{width: 135, left: 139, top: 516, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Date Created</div>
 
-                                    {/* Left Data */}
                                     <div style={{width: 250, height: 16, left: 280, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.number}</div>
                                     <div style={{width: 144, left: 385, top: 515, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.date}</div>
 
-                                    {/* Right Labels */}
                                     <div style={{width: 135, left: 700, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
 
-
-                                    {/* Right Data */}
                                     <div style={{width: 250, left: 740, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.type}</div>
                     
                                 </div>
