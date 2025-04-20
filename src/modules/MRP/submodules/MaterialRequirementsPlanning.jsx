@@ -40,6 +40,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [mrpData, setMrpData] = useState([]);
 
     const [principalOrder, setPrincipalItemOrder] = useState([]);
+    const [pnpOrder, setPnpOrder] = useState([]);
+    const [prinOrder, setPrincipalOrder] = useState([]);
     const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
     const [totalLaborCost, setTotalLaborCost] = useState(0);
     const [totalOrderCost, setTotalOrderCost] = useState(0);
@@ -95,6 +97,52 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             }
         };
         fetchServiceOrderItems();
+    }, []);
+
+    useEffect(() => {
+        const fetchOrderPnp = async () => {
+            try {
+                const response = await fetch(`${baseurl}/bills_of_material/trackingnpop/`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch Project Non Project Orders");
+                }
+                const data = await response.json();
+
+                const formattedData = data.map((item) => ({
+                    pnp_orderID: item.order_id,
+                    pnp_status: item.status,
+                }));
+
+                setPnpOrder(formattedData);
+            } catch (error) {
+                console.error("Error fetching Project Non Project Orders:", error);
+            }
+        };
+
+        fetchOrderPnp();
+    }, []);
+
+    useEffect(() => {
+        const fetchPrincipalOrder = async () => {
+            try {
+                const response = await fetch(`${baseurl}/bills_of_material/trackingprincipal/`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch Principal Orders");
+                }
+                const data = await response.json();
+
+                const formattedData = data.map((item) => ({
+                    sr_orderID: item.service_order_item_id,
+                    sr_status: item.status,
+                }));
+
+                setPrincipalOrder(formattedData);
+            } catch (error) {
+                console.error("Error fetching Principal Orders:", error);
+            }
+        };
+
+        fetchPrincipalOrder();
     }, []);
 
     const fetchOrderStatement = async (orderId) => {
