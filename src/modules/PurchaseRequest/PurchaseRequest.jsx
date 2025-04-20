@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react"
 import "./styles/PurchaseRequest.css"
+import { format } from "date-fns";
+import { TestTube } from "lucide-react";
+
+const currentDate = new Date();
+const formattedDate = format(currentDate, "yyyy-MM-dd HH:mm:ss");
+console.log(formattedDate); // Outputs the correct time in the local time zone
 
 const BodyContent = ({ onClose }) => {
   const [showPurchasePopup, setShowPurchasePopup] = useState(false)
@@ -15,9 +21,9 @@ const BodyContent = ({ onClose }) => {
     department: "",
     email: "",
     requestType: "Material", // Default to Material
-    dateRequested: new Date().toISOString().split("T")[0],
+    dateRequested: format(new Date(), "yyyy-MM-dd"), // Include time
     dateValid: "",
-    documentDate: new Date().toISOString().split("T")[0],
+    documentDate: format(new Date(), "yyyy-MM-dd HH:mm:ss"), // Include time
     employeeId: "",
     items: [],
   })
@@ -64,16 +70,14 @@ const BodyContent = ({ onClose }) => {
     fetchItems()
   }, [formData.requestType])
 
-  const handleInputChange = (e, index = null) => {
-    const { name, value } = e.target
-    if (index !== null) {
-      const updatedItems = [...formData.items]
-      updatedItems[index] = { ...updatedItems[index], [name]: value }
-      setFormData((prev) => ({ ...prev, items: updatedItems }))
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }))
-    }
-  }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "documentDate" ? value.replace("T", " ") : value, // Convert back to "YYYY-MM-DD HH:mm:ss"
+    }));
+  };
 
   const handleEmployeeChange = (e) => {
     const selected = employees.find((emp) => emp.employee_id === e.target.value)
@@ -294,22 +298,23 @@ const BodyContent = ({ onClose }) => {
             </div>
 
             <div className="form-section">
+            <div className="form-group">
+                <label>Document Date</label>
+                <input
+                  type="datetime-local"
+                  name="documentDate"
+                  value={formData.documentDate.replace(" ", "T")} // Convert to `datetime-local` format
+                  onChange={handleInputChange}
+                  disabled={true}
+                />
+              </div>
               <div className="form-group">
                 <label>
                   Date Requested<span className="required">*</span>
                 </label>
                 <input type="date" name="dateRequested" value={formData.dateRequested} onChange={handleInputChange} />
               </div>
-              <div className="form-group">
-                <label>Document Date</label>
-                <input
-                  type="date"
-                  name="documentDate"
-                  value={formData.documentDate}
-                  onChange={handleInputChange}
-                  readOnly
-                />
-              </div>
+              
               <div className="form-group">
                 <label>
                   Valid Date<span className="required">*</span>
