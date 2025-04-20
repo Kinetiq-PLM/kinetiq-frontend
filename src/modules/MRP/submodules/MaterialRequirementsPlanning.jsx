@@ -412,6 +412,19 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             if (!response.ok) throw new Error('Failed to submit Non Project Data');
             const data = await response.json();
             console.log('Success:', data);
+
+
+            const updateResponse = await fetch('http://127.0.0.1:8000/update_tracking_status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ order_id: selectedRowData.number })
+            });
+    
+            if (!updateResponse.ok) throw new Error('Failed to update tracking status');
+            const updateData = await updateResponse.json();
+            console.log('Tracking status updated:', updateData);
         } catch (error) {
             console.error('Error sending Non Project Data:', error);
         }
