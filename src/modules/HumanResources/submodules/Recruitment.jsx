@@ -232,6 +232,7 @@ const Recruitment = () => {
                         onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
                       >
                         ⋮
+
                         {dotsMenuOpen === index && (
                           <div className="recruitment-dropdown">
                             <div 
@@ -240,7 +241,10 @@ const Recruitment = () => {
                             >
                               Edit
                             </div>
-                            <div className="recruitment-dropdown-item">
+                            <div 
+                              className="recruitment-dropdown-item"
+                              onClick={() => isArchived ? handleRestoreJobPosting(posting) : handleArchiveJobPosting(posting)}
+                            >
                               {isArchived ? "Restore" : "Archive"}
                             </div>
                           </div>
@@ -840,6 +844,98 @@ const handleJobPostingSubmit = async (e) => {
     const errorMessage = err.response?.data?.detail || 
                        Object.values(err.response?.data || {}).flat().join(", ") || 
                        "Failed to create job posting";
+    showToast(errorMessage, false);
+  }
+};
+
+const handleArchiveJobPosting = async (jobPosting) => {
+  try {
+    console.log("Job posting to archive:", jobPosting);
+    
+    // Create a properly formatted update data object
+    const updateData = {
+      is_archived: true,
+      employment_type: jobPosting.employment_type || "Seasonal", // Provide fallback
+      dept_id: jobPosting.dept_id,
+      position_id: jobPosting.position_id || "", // Empty string instead of null
+      position_title: jobPosting.position_title || "", // Empty string instead of null
+      description: jobPosting.description || "",
+      requirements: jobPosting.requirements || "",
+      // Handle salary fields based on employment type
+      base_salary: jobPosting.employment_type === "Regular" ? 
+                   (jobPosting.base_salary || 0) : 0,
+      daily_rate: jobPosting.employment_type !== "Regular" ? 
+                  (jobPosting.daily_rate || 0) : 0,
+      duration_days: jobPosting.duration_days || 
+                    (jobPosting.employment_type === "Seasonal" ? 1 : 
+                     jobPosting.employment_type === "Contractual" ? 30 : null),
+      posting_status: jobPosting.posting_status || "Draft"
+    };
+    
+    console.log("Sending update data:", updateData);
+    
+    // Call API to archive the job posting with all the required data
+    await axios.patch(
+      `http://127.0.0.1:8000/api/job_posting/job_postings/${jobPosting.job_id}/`, 
+      updateData
+    );
+    
+    // Update UI state
+    showToast("Job posting archived successfully", true);
+    setJobPostings(prev => prev.filter(item => item.job_id !== jobPosting.job_id));
+    setArchivedJobPostings(prev => [...prev, {...jobPosting, is_archived: true}]);
+    setDotsMenuOpen(null);
+  } catch (err) {
+    console.error("Error archiving job posting:", err.response?.data || err);
+    const errorMessage = err.response?.data?.detail || 
+                        Object.values(err.response?.data || {}).flat().join(", ") || 
+                        "Failed to archive job posting";
+    showToast(errorMessage, false);
+  }
+};
+
+const handleRestoreJobPosting = async (jobPosting) => {
+  try {
+    console.log("Job posting to restore:", jobPosting);
+    
+    // Create a properly formatted update data object
+    const updateData = {
+      is_archived: false,
+      employment_type: jobPosting.employment_type || "Seasonal", // Provide fallback
+      dept_id: jobPosting.dept_id,
+      position_id: jobPosting.position_id || "", // Empty string instead of null
+      position_title: jobPosting.position_title || "", // Empty string instead of null
+      description: jobPosting.description || "",
+      requirements: jobPosting.requirements || "",
+      // Handle salary fields based on employment type
+      base_salary: jobPosting.employment_type === "Regular" ? 
+                   (jobPosting.base_salary || 0) : 0,
+      daily_rate: jobPosting.employment_type !== "Regular" ? 
+                  (jobPosting.daily_rate || 0) : 0,
+      duration_days: jobPosting.duration_days || 
+                    (jobPosting.employment_type === "Seasonal" ? 1 : 
+                     jobPosting.employment_type === "Contractual" ? 30 : null),
+      posting_status: jobPosting.posting_status || "Draft"
+    };
+    
+    console.log("Sending update data:", updateData);
+    
+    // Call API to restore the job posting with all the required data
+    await axios.patch(
+      `http://127.0.0.1:8000/api/job_posting/job_postings/${jobPosting.job_id}/`, 
+      updateData
+    );
+    
+    // Update UI state
+    showToast("Job posting restored successfully", true);
+    setArchivedJobPostings(prev => prev.filter(item => item.job_id !== jobPosting.job_id));
+    setJobPostings(prev => [...prev, {...jobPosting, is_archived: false}]);
+    setDotsMenuOpen(null);
+  } catch (err) {
+    console.error("Error restoring job posting:", err.response?.data || err);
+    const errorMessage = err.response?.data?.detail || 
+                        Object.values(err.response?.data || {}).flat().join(", ") || 
+                        "Failed to restore job posting";
     showToast(errorMessage, false);
   }
 };

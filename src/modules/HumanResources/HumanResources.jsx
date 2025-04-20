@@ -60,7 +60,7 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         setLoading(true);
         
         // Fetch all employees for total count
-        const employeesRes = await axios.get("http://127.0.0.1:8000/api/employees/employees/");
+        const employeesRes = await axios.get("http://127.0.0.1:8000/api/employees/");
         const totalEmployees = employeesRes.data.length;
         
         // Fetch attendance tracking data
