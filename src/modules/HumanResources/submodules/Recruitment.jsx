@@ -28,6 +28,7 @@ const Recruitment = () => {
   // Reference data
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
+  const [employees, setEmployees] = useState([]); // Add the employees state variable
   const [newJobPosting, setNewJobPosting] = useState({
     dept_id: null,
     position_id: null,
@@ -44,7 +45,9 @@ const Recruitment = () => {
   const [newResignation, setNewResignation] = useState({
     employee_id: "",
     notice_period_days: "",
-    hr_approver_id: ""
+    hr_approver_id: "",
+    approval_status: "Pending", // Default value
+    clearance_status: "Not Started" // Default value
   });
 
   const [editingResignation, setEditingResignation] = useState(null);
@@ -134,6 +137,7 @@ const Recruitment = () => {
         // Ensure we're working with arrays
         const departmentsData = ensureArray(deptsRes.data);
         const positionsData = ensureArray(positionsRes.data);
+        const employeesData = ensureArray(employeesRes.data);
         
         // Set all the state values with the fetched data
         setCandidates(candidatesRes.data);
@@ -143,6 +147,7 @@ const Recruitment = () => {
         setResignations(resignationsRes.data);
         setDepartments(departmentsData);
         setPositions(positionsData);
+        setEmployees(employeesData); // Add this line to save employees
       } catch (err) {
         console.error("Error fetching data:", err);
         showToast("Failed to fetch data", false);
@@ -1001,7 +1006,9 @@ const handleAddClick = () => {
     setNewResignation({
       employee_id: "",
       notice_period_days: "",
-      hr_approver_id: ""
+      hr_approver_id: "",
+      approval_status: "Pending",
+      clearance_status: "Not Started"
     });
     setShowAddResignationModal(true);
   } else if (activeTab === "Candidates") {
@@ -1273,7 +1280,6 @@ const handleJobPostingSubmit = async (e) => {
       // Ensure base_salary is a number
       jobPostingData.base_salary = parseFloat(jobPostingData.base_salary);
     } else if (jobPostingData.employment_type === "Contractual") {
-      // For Contractual positions
       if (!jobPostingData.daily_rate) {
         showToast("Daily rate is required for Contractual positions", false);
         return;
@@ -1945,6 +1951,32 @@ const submitCandidateForm = async (e) => {
                             {employee.first_name} {employee.last_name}
                           </option>
                       )) : <option value="">No HR employees available</option>}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Approval Status</label>
+                    <select
+                      name="approval_status"
+                      value={newResignation.approval_status || "Pending"}
+                      onChange={handleResignationChange}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Clearance Status</label>
+                    <select
+                      name="clearance_status"
+                      value={newResignation.clearance_status || "Not Started"}
+                      onChange={handleResignationChange}
+                    >
+                      <option value="Not Started">Not Started</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
                     </select>
                   </div>
                 </div>
