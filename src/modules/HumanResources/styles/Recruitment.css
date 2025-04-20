@@ -145,6 +145,75 @@
   background-color: #006666;
 }
 
+/* View button style */
+.recruitment-view-btn {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.recruitment-view-btn:hover {
+  background-color: #1890ff;
+  color: white;
+  border-color: #1890ff;
+}
+
+/* Download button style */
+.recruitment-download-btn {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.recruitment-download-btn:hover {
+  background-color: #52c41a;
+  color: white;
+  border-color: #52c41a;
+}
+
+/* Upload button style */
+.recruitment-upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: #e6fffb;
+  color: #006d75;
+  border: 1px solid #87e8de;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.recruitment-upload-btn:hover {
+  background-color: #006d75;
+  color: white;
+  border-color: #006d75;
+}
+
+/* ---------------------------------------------------------
+   DOCUMENT ACTIONS
+   --------------------------------------------------------- */
+.recruitment-document-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 /* ---------------------------------------------------------
    TABS HEADER
    --------------------------------------------------------- */
@@ -280,6 +349,39 @@
   color: #888;
 }
 
+/* Documents table style */
+.documents-section {
+  margin-bottom: 2rem;
+}
+
+.documents-section h4 {
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.recruitment-documents-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.recruitment-documents-table th,
+.recruitment-documents-table td {
+  padding: 0.75rem;
+  border: 1px solid #eee;
+}
+
+.recruitment-documents-table th {
+  background-color: #fafafa;
+  font-weight: 500;
+}
+
+.recruitment-documents-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
 /* ---------------------------------------------------------
    ACTION MENU (3-dot)
    --------------------------------------------------------- */
@@ -295,27 +397,36 @@
   cursor: pointer;
   user-select: none;
   position: relative;
+  z-index: 1000; /* Add z-index to ensure visibility */
 }
 
 .recruitment-dropdown {
   position: absolute;
   top: 1.5rem;
   right: 0;
-  width: 120px;
+  width: 180px;
   background-color: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   border-radius: 6px;
-  z-index: 900; /* Increase z-index to ensure it's above other elements */
+  z-index: 1001; /* Increased z-index value */
+  border: 1px solid #eaeaea;
 }
 
 .recruitment-dropdown-item {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   font-size: 0.9rem;
   cursor: pointer;
+  white-space: normal;
+  line-height: 1.2;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.recruitment-dropdown-item:last-child {
+  border-bottom: none;
 }
 
 .recruitment-dropdown-item:hover {
-  background-color: #f5f5f5;
+  background-color: #f8f8f8;
 }
 
 /* ---------------------------------------------------------
@@ -824,4 +935,46 @@
   font-size: 0.8rem;
   color: #666;
   margin-top: 4px;
+}
+
+/* ---------------------------------------------------------
+   LOADING OVERLAY
+   --------------------------------------------------------- */
+.recruitment-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.recruitment-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #00b0b5;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ---------------------------------------------------------
+   ACTION BUTTONS
+   --------------------------------------------------------- */
+.recruitment-action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
