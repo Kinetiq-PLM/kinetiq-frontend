@@ -598,10 +598,10 @@
   
   .jp-form {
     display: grid;
-    grid-template-columns: 380px 1fr;
-    gap: 1rem 2rem;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem 1.5rem;
     align-items: start;
-    min-height: 400px;
+    min-height: auto;
   }
   
   .jp-form-left-column {
@@ -647,13 +647,19 @@
     font-family: inherit;
   }
   
+  .jp-form-group.requirements,
+  .jp-form-group.description {
+    grid-column: span 3;
+  }
+  
   /* Form buttons styling */
   .jp-form-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     padding: 0.5rem 0;
+    grid-column: span 3;
   }
   
   .submit-btn,

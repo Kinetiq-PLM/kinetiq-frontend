@@ -23,6 +23,7 @@ const WorkforceRequest = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [sortField, setSortField] = useState("all");
   const [toast, setToast] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   // Toast notification helper
   const showToast = (message, success = true) => {
@@ -69,9 +70,17 @@ const WorkforceRequest = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    
+    // Validate dates
+    if (new Date(formData.end_date) < new Date(formData.start_date)) {
+      showToast("End date cannot be before start date", false);
+      setSubmitting(false);
+      return;
+    }
     
     try {
-      await axios.post("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/", formData);
+      await axios.post("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/request_workforce/", formData);
       showToast("Request submitted successfully");
       setFormData({
         requesting_dept_id: "",
@@ -83,7 +92,20 @@ const WorkforceRequest = () => {
       setActiveTab("list");
     } catch (err) {
       console.error("Submit error:", err);
-      showToast("Failed to submit request", false);
+      let errorMessage = "Failed to submit request";
+      
+      // Better error handling to show the specific backend error
+      if (err.response) {
+        if (err.response.data.detail) {
+          errorMessage = err.response.data.detail;
+        } else if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        }
+      }
+      
+      showToast(errorMessage, false);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -287,8 +309,8 @@ const WorkforceRequest = () => {
                     <button type="button" onClick={handleCancel} className="cancel-btn">
                       Cancel
                     </button>
-                    <button type="submit" className="submit-btn">
-                      Save
+                    <button type="submit" className="submit-btn" disabled={submitting}>
+                      {submitting ? "Submitting..." : "Save"}
                     </button>
                   </div>
                 </div>

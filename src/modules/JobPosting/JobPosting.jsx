@@ -28,7 +28,9 @@ const JobPostingReqs = () => {
     requirements: "",
     base_salary: null,
     daily_rate: null,
-    status: "Draft"
+    status: "Draft",
+    employment_type: "Regular",
+    duration_days: null
   });
 
   // Toast helper
@@ -64,9 +66,107 @@ const JobPostingReqs = () => {
   }, []);
 
   // Form handlers
-  const handleAddPosting = (e) => {
+  const handleAddPosting = async (e) => {
     e.preventDefault();
-    // Add form submission logic here
+    
+    try {
+      // Validate required fields
+      if (!newPosting.dept_id || !newPosting.position_id || 
+          !newPosting.description || !newPosting.requirements) {
+        showToast("Please fill all required fields", false);
+        return;
+      }
+
+      // Add validation for base salary and daily rate
+      if (newPosting.employment_type === "Regular" && 
+          (newPosting.base_salary === null || 
+           newPosting.base_salary === '' || 
+           isNaN(parseFloat(newPosting.base_salary)) ||
+           parseFloat(newPosting.base_salary) <= 0)) {
+        showToast("Base salary is required for Regular positions", false);
+        return;
+      }
+
+      if (newPosting.employment_type !== "Regular" && 
+          (newPosting.daily_rate === null || 
+           newPosting.daily_rate === '' || 
+           isNaN(parseFloat(newPosting.daily_rate)) ||
+           parseFloat(newPosting.daily_rate) <= 0)) {
+        showToast("Daily rate is required and must be greater than zero for non-Regular positions", false);
+        return;
+      }
+
+      // Validate duration_days for non-Regular employment types
+      if (newPosting.employment_type !== "Regular") {
+        if (!newPosting.duration_days) {
+          showToast("Duration days is required for non-Regular positions", false);
+          return;
+        }
+        
+        if (newPosting.employment_type === "Seasonal" && 
+            (newPosting.duration_days < 1 || newPosting.duration_days > 29)) {
+          showToast("Seasonal positions require duration between 1 and 29 days", false);
+          return;
+        }
+        
+        if (newPosting.employment_type === "Contractual" && 
+            (newPosting.duration_days < 30 || newPosting.duration_days > 180)) {
+          showToast("Contractual positions require duration between 30 and 180 days", false);
+          return;
+        }
+      }
+      
+      // Format data based on employment type
+      const selectedPosition = positions.find(p => p.position_id === newPosting.position_id);
+      const isRegular = newPosting.employment_type === "Regular"; // Use the form's employment type instead
+      
+      const jobPostingData = {
+        ...newPosting,
+        position_title: selectedPosition?.position_title || "",
+        base_salary: newPosting.employment_type === "Regular" ? 
+          (parseFloat(newPosting.base_salary) || null) : null,
+        daily_rate: !isRegular ? (parseFloat(newPosting.daily_rate) || 0) : null, 
+        duration_days: !isRegular ? parseInt(newPosting.duration_days) : null
+      };
+      
+      console.log("Form state before submission:", {
+        employment_type: newPosting.employment_type,
+        base_salary: newPosting.base_salary, // Check if truly null
+        daily_rate: newPosting.daily_rate,
+        formattedData: jobPostingData
+      });
+      
+      console.log("About to submit with:", {
+        employmentType: newPosting.employment_type,
+        baseSalary: newPosting.base_salary,
+        dailyRate: newPosting.daily_rate,
+        durationDays: newPosting.duration_days,
+        formattedData: jobPostingData
+      });
+      
+      // Send to API
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/job_posting/job_postings/", 
+        jobPostingData
+      );
+      
+      // Show success message
+      showToast("Job posting created successfully", true);
+      
+      // Reset form
+      handleCancel();
+      
+      // Refresh data
+      const postingsRes = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
+      setPostings(postingsRes.data);
+      
+    } catch (err) {
+      console.error("Error creating job posting:", err.response?.data || err);
+      const errorMessage = err.response?.data?.detail || 
+                          Object.values(err.response?.data || {}).flat().join(", ") || 
+                          "Failed to create job posting";
+      showToast(errorMessage, false);
+    }
   };
 
   const handleChange = (e) => {
@@ -80,15 +180,29 @@ const JobPostingReqs = () => {
       setNewPosting(prev => ({
         ...prev,
         [name]: value,
-        base_salary: isRegular ? 0 : null,
+        employment_type: selectedPosition?.employment_type || "Regular",
+        base_salary: isRegular ? (prev.base_salary || '') : null,
         daily_rate: !isRegular ? 0 : null
       }));
-    } else {
+    } 
+    // If changing employment type, update salary fields
+    else if (name === "employment_type") {
+      const isRegular = value === "Regular";
+      setNewPosting(prev => ({
+        ...prev,
+        [name]: value,
+        base_salary: isRegular ? (prev.base_salary || '') : null,
+        daily_rate: !isRegular ? '' : null, // Change from 0 to '' (empty string)
+        duration_days: !isRegular ? (value === "Seasonal" ? 1 : 30) : null
+      }));
+    }
+    else {
       setNewPosting(prev => ({
         ...prev,
         [name]: value
       }));
     }
+    console.log("Current base salary:", newPosting.base_salary, typeof newPosting.base_salary);
   };
 
   const handleCancel = () => {
@@ -99,7 +213,9 @@ const JobPostingReqs = () => {
       requirements: "",
       base_salary: null,
       daily_rate: null,
-      status: "Draft"
+      status: "Draft",
+      employment_type: "Regular",
+      duration_days: null
     });
   };
 
@@ -179,8 +295,8 @@ const JobPostingReqs = () => {
           {activeTab === "form" ? (
             <div className="jp-form-container">
               <form onSubmit={handleAddPosting} className="jp-form">
-                {/* Left Column */}
-                <div className="jp-form-left-column">
+                {/* First Column */}
+                <div>
                   <div className="jp-form-group">
                     <label>Department</label>
                     <select
@@ -228,14 +344,39 @@ const JobPostingReqs = () => {
                       <option value="Closed">Closed</option>
                     </select>
                   </div>
+                </div>
+
+                {/* Second Column */}
+                <div>
+                  <div className="jp-form-group">
+                    <label>Employment Type</label>
+                    <select
+                      name="employment_type"
+                      value={newPosting.employment_type}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="Regular">Regular</option>
+                      <option value="Contractual">Contractual</option>
+                      <option value="Seasonal">Seasonal</option>
+                    </select>
+                  </div>
 
                   <div className="jp-form-group">
                     <label>Base Salary</label>
                     <input
                       type="number"
                       name="base_salary"
-                      value={newPosting.base_salary || ''}
-                      onChange={handleChange}
+                      value={newPosting.base_salary === null ? '' : newPosting.base_salary}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = value === '' ? null : parseFloat(value);
+                        console.log("Setting base salary to:", numValue);
+                        setNewPosting(prev => ({
+                          ...prev,
+                          base_salary: numValue
+                        }));
+                      }}
                       min="0"
                       step="0.01"
                     />
@@ -246,44 +387,81 @@ const JobPostingReqs = () => {
                     <input
                       type="number"
                       name="daily_rate"
-                      value={newPosting.daily_rate || ''}
-                      onChange={handleChange}
+                      value={newPosting.daily_rate === null ? '' : newPosting.daily_rate}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = value === '' ? null : parseFloat(value);
+                        
+                        // Only reject the input if user entered an actual non-positive number
+                        if (value !== '' && numValue <= 0 && newPosting.employment_type !== "Regular") {
+                          // Don't accept negative values for non-regular positions
+                          return;
+                        }
+                        
+                        setNewPosting(prev => ({
+                          ...prev,
+                          daily_rate: numValue
+                        }));
+                      }}
                       min="0"
                       step="0.01"
                     />
                   </div>
                 </div>
 
-                {/* Right Column */}
-                <div className="jp-form-right-column">
-                  <div className="jp-form-group requirements">
-                    <label>Requirements</label>
-                    <textarea
-                      name="requirements"
-                      value={newPosting.requirements}
+                {/* Third Column */}
+                <div>
+                  <div className="jp-form-group">
+                    <label>Duration (Days)</label>
+                    <input
+                      type="number"
+                      name="duration_days"
+                      value={newPosting.duration_days || ''}
                       onChange={handleChange}
-                      required
+                      min={newPosting.employment_type === "Seasonal" ? 1 : 30}
+                      max={newPosting.employment_type === "Seasonal" ? 29 : 180}
+                      disabled={newPosting.employment_type === "Regular"}
+                      required={newPosting.employment_type !== "Regular"}
                     />
+                    {newPosting.employment_type === "Seasonal" && 
+                      <small>Must be between 1-29 days</small>
+                    }
+                    {newPosting.employment_type === "Contractual" && 
+                      <small>Must be between 30-180 days</small>
+                    }
                   </div>
+                </div>
 
-                  <div className="jp-form-group description">
-                    <label>Description</label>
-                    <textarea
-                      name="description"
-                      value={newPosting.description}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+                {/* Requirements - spans all columns */}
+                <div className="jp-form-group requirements">
+                  <label>Requirements</label>
+                  <textarea
+                    name="requirements"
+                    value={newPosting.requirements}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
 
-                  <div className="jp-form-buttons">
-                    <button type="button" onClick={handleCancel} className="cancel-btn">
-                      Cancel
-                    </button>
-                    <button type="submit" className="submit-btn">
-                      Save
-                    </button>
-                  </div>
+                {/* Description - spans all columns */}
+                <div className="jp-form-group description">
+                  <label>Description</label>
+                  <textarea
+                    name="description"
+                    value={newPosting.description}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                {/* Buttons - spans all columns */}
+                <div className="jp-form-buttons">
+                  <button type="button" onClick={handleCancel} className="cancel-btn">
+                    Cancel
+                  </button>
+                  <button type="submit" className="submit-btn">
+                    Save
+                  </button>
                 </div>
               </form>
             </div>
