@@ -5,7 +5,12 @@ import { useState, useEffect } from "react";
 const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [flag, setFlag] = useState(0);
     const [printBOM, setPrintBOM] = useState(false);
+    const [printBOM2, setPrintBOM2] = useState(false);
+    const [printBOM3, setPrintBOM3] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedRowData, setSelectedRowData] = useState(null);
+    const [principalOrder, setPrincipalItemOrder] = useState([]);
+
     const baseurl = "http://127.0.0.1:8000";
     //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
@@ -31,7 +36,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 const formattedData = data.map((item) => ({
                     number: item.bom_no,
                     type: item.type,
-                    status: item.status,
+                    details: item.status,
                     date: new Date(item.date_created).toLocaleDateString(),
                 }));
 
@@ -42,6 +47,30 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         };
 
         fetchBomData();
+    }, []);
+
+    useEffect(() => {
+            const fetchServiceOrderItems = async () => {
+                try {
+                    const response = await fetch(`${baseurl}/bills_of_material/principalorders/`);
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch service order items");
+                    }
+                    const data = await response.json();
+            
+                    const formattedData = data.map((item) => ({
+                        serviceOrderItemId: item.service_order_item_id,
+                        type: item.type,
+                        description: item.description,
+                        date: item.date.trim(),
+                    }));
+            
+                    setPrincipalItemOrder(formattedData);
+                } catch (error) {
+                    console.error("Error fetching service order items:", error);
+                }
+            };
+            fetchServiceOrderItems();
     }, []);
 
     useEffect(() => {
@@ -125,6 +154,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
           return matchesFlag && searchMatch;
         });
     };
+    const filteredData = getFilteredData();
 
     function printBOMContent() {
         const printContents = document.getElementById("printable-bom").innerHTML;
@@ -150,11 +180,29 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
           window.location.reload()
         }, 200); // 200ms delay to let DOM reflow before printing
     }
-      
-    const filteredData = getFilteredData();
     
-    
-    const dynamicHeight = 1191 + (bomDetails.length - 5) * 36;
+    const mergedRows = (
+        flag === 0 // All BOM
+            ? [...(filteredData || []), ...(principalOrder || [])]
+            : flag === 3 // Principal Items BOM
+            ? principalOrder
+            : filteredData // Project/Non-Project BOM
+    ).map((item) => ({
+        number: item.number || item.serviceOrderItemId,
+        type: item.type,
+        details: item.details || item.description,
+        date: item.date,
+    }));
+
+    const rowCellStyle = {
+        flex: "1 1 25%",
+        minWidth: 150,
+        padding: "12px",
+        textAlign: "center",
+        fontFamily: "Inter",
+        fontSize: 16,
+        color: "#585757",
+    };
 
     return (
         <div className="bom">
@@ -164,7 +212,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     <div className="tabs-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 15,flex: '1 1 auto', minWidth: 200,}}>
                         {['All BOM', 'Project BOM', 'Non-Project BOM', 'Principal Items BOM'].map((label, i) => (
                         <div key={label}
-                            onClick={() => {setFlag(i), setFlagType(i)}}
+                            onClick={() => setFlag(i)}
                             onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.1)")}
                             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                             style={{ minWidth: 120, padding: '10px 16px', background: 'white', boxShadow: flag === i ? '0px -2px 0px #00A8A8 inset' : '0px -1px 0px #E8E8E8 inset', justifyContent: 'center', alignItems: 'center', display: 'flex', cursor: 'pointer'
@@ -187,7 +235,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     flexWrap: 'wrap',
                     borderBottom: '1px solid #E8E8E8',
                 }}>
-                    {['Order No.', 'Type', 'Status', 'Created Date'].map((label, i) => (
+                    {['Order No.', 'Type', 'Created Date'].map((label, i) => (
                         <div
                             className="table-cell2"
                             key={label}
@@ -199,24 +247,31 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 </div>
 
                 {/* Rows */}
-                {filteredData.map((item, index) => (
-                    <div
-                    className="table-row"
+                {mergedRows.map((item, index) => (
+                <div
                     key={index}
-                    onClick={() => setPrintBOM(true)}
+                    className="table-row"
+                    onClick={() => { setSelectedRowData(item); if (item.type === "Project Based") { setPrintBOM(true); } else if (item.type === "Non-Project Based") { setPrintBOM2(true); } else { setPrintBOM3(true); } }}
+
                     onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    style={{display: 'flex', flexWrap: 'wrap', cursor: 'pointer', borderBottom: '1px solid #E8E8E8',}}>
-                    {[item.number, item.type, item.status, item.date].map((val, idx) => (
-                        <div
-                            className="table-cell"
-                            key={idx}
-                            data-label={['Order No.', 'Type', 'Status', 'Date'][idx]}
-                            style={{flex: '1 1 25%', minWidth: 150, padding: '12px', textAlign: 'center', fontFamily: 'Inter', fontSize: 16, color: '#585757'}}>
-                            {val}
-                        </div>
-                    ))}
+                    style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    cursor: "pointer",
+                    borderBottom: "1px solid #E8E8E8",
+                    }}
+                >
+                    <div className="table-cell" style={rowCellStyle} data-label="Order No.">
+                    {item.number}
                     </div>
+                    <div className="table-cell" style={rowCellStyle} data-label="Type">
+                    {item.type}
+                    </div>
+                    <div className="table-cell" style={rowCellStyle} data-label="Date">
+                    {item.date}
+                    </div>
+                </div>
                 ))}
                 </div>
             </div>
@@ -241,14 +296,26 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{width: 223, left: 316, top: 345, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Country: </b>Philippines</div>
                                 <div style={{width: 324, left: 716, top: 292, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Contact Number.: </b>09123456789</div>
                                 <div style={{width: 324, left: 716, top: 345, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Email Address: </b>kinetiq@gmail.com</div>
-                                <div style={{width: 135, left: 139, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>BOM No.</div>
-                                <div style={{width: 135, left: 139, top: 516, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Date Created</div>
-                                <div style={{width: 119, height: 16, left: 313, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>000000001</div>
-                                <div style={{width: 144, left: 288, top: 515, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>April 1, 2025</div>
-                                <div style={{width: 135, left: 728, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
-                                <div style={{width: 135, left: 728, top: 516, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Status</div>
-                                <div style={{width: 127, left: 861, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>Project</div>
-                                <div style={{width: 125, left: 863, top: 514, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>Pending</div>
+                                {selectedRowData && (
+                                <div>
+                                    {/* Left Labels */}
+                                    <div style={{width: 135, left: 139, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
+                                    <div style={{width: 135, left: 139, top: 516, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Date Created</div>
+
+                                    {/* Left Data */}
+                                    <div style={{width: 250, height: 16, left: 280, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.number}</div>
+                                    <div style={{width: 144, left: 385, top: 515, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.date}</div>
+
+                                    {/* Right Labels */}
+                                    <div style={{width: 135, left: 700, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
+
+
+                                    {/* Right Data */}
+                                    <div style={{width: 250, left: 740, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.type}</div>
+                                   
+                                </div>
+                                )}
+
                                 
                                 <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 580}}>
                                     <div style={{width: 1047, marginTop: 40, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
@@ -343,6 +410,280 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{width: '100%', marginTop: 30, display: 'flex', justifyContent: 'space-between', padding: '0 40px 40px 40px'}}>
                                     <div className="print-button-container2">    
                                     <button onClick={() => setPrintBOM(false)} style={{ background: '#fff', border: '1.5px solid #A4A4A4',borderRadius: 8, padding: '10px 24px', fontSize: 16, color: '#969696', fontWeight: '500', display: 'flex', alignItems: 'center', gap: 8}}>
+                                        <div className="MRPIcon3" style={{ width: 15, height: 21 }} />
+                                        Back
+                                    </button>
+                                    </div>
+                                    <div className="print-button-container">                
+                                    <button onClick={printBOMContent} style={{background: '#00A8A8', border: 'none', borderRadius: 10, padding: '10px 24px', fontSize: 16, color: 'white', fontWeight: '500'}}>
+                                        Download
+                                    </button>
+                                    </div>
+                                </div>
+                                <img style={{width: 132.34, height: 196, left: 91, top: 170, position: 'absolute'}} src="/icons/module-icons/MRP-icons/MRPBOMLogo.png" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {printBOM2 && (
+                <div id="printable-bom" className="bom-print-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="bom-print-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="scroll-container" style={{maxHeight: '90vh', overflowY: 'auto'}}>
+                            <div style={{width: 1128, position: 'relative', background: 'white'}}>
+                                <div style={{width: 1128, left: 0, top: 104, position: 'absolute'}} />
+                                <div style={{left: 663, top: 67, position: 'absolute', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                                    <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 387, display: 'flex'}}>
+                                        <div style={{width: 231, height: 28}} />
+                                    </div>
+                                </div>
+                                <div style={{left: 412, top: 39, position: 'absolute', color: '#1C1C1C', fontSize: 40, fontFamily: 'Inter', fontWeight: '600', lineHeight: 1, wordWrap: 'break-word'}}>Bill Of Materials</div>
+                                <div style={{left: 521, top: 184, position: 'absolute', color: '#1C1C1C', fontSize: 25, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: '16px', wordWrap: 'break-word'}}>Seller’s Information</div>
+                                <div style={{width: 329, left: 316, top: 238, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Company Name: </b>Kinetiq</div>
+                                <div style={{width: 344, left: 316, top: 293, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Address: </b>1975 Address of Company St.</div>
+                                <div style={{width: 220, left: 716, top: 239, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>City: </b>Metro Manila</div>
+                                <div style={{width: 223, left: 316, top: 345, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Country: </b>Philippines</div>
+                                <div style={{width: 324, left: 716, top: 292, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Contact Number.: </b>09123456789</div>
+                                <div style={{width: 324, left: 716, top: 345, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Email Address: </b>kinetiq@gmail.com</div>
+                                {selectedRowData && (
+                                <div>
+                                    {/* Left Labels */}
+                                    <div style={{width: 135, left: 139, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
+                                    <div style={{width: 135, left: 139, top: 516, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Date Created</div>
+
+                                    {/* Left Data */}
+                                    <div style={{width: 250, height: 16, left: 280, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.number}</div>
+                                    <div style={{width: 144, left: 385, top: 515, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.date}</div>
+
+                                    {/* Right Labels */}
+                                    <div style={{width: 135, left: 700, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
+                                   
+
+                                    {/* Right Data */}
+                                    <div style={{width: 250, left: 740, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.type}</div>
+
+                                </div>
+                                )}
+                                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 580}}>
+                                    <div style={{width: 1047, marginTop: 40, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                                        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+                                            <div style={{alignSelf: 'stretch', background: 'white', overflow: 'hidden', outline: '1px #E8E8E8 solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+                                                <div style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                    <div data-type="Header" style={{width: 82, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>No.</div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-type="Header" style={{width: 240, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Product</div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-type="Header" style={{width: 96, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Qty. Of Product</div>
+                                                        </div>
+                                                    </div>
+                                                
+                                                    <div data-type="Header" style={{width: 87, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Units</div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Cost Per Product</div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Total Cost Per Product</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {bomDetails.map((item, index) => (
+                                                <React.Fragment key={index}>
+                                                    <div
+                                                    className="print-row"
+                                                    style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', display: 'inline-flex'}}>
+                                                    <div style={cellStyle(82)}>{item.no}</div>
+                                                    <div style={cellStyle(240)}>{item.product}</div>
+                                                    <div style={cellStyle(96)}>{item.qtyProduct}</div>
+                                                    <div style={cellStyle(87)}>{item.unit}</div>
+                                                    <div style={cellStyle(271)}>₱{item.costPerUnit.toLocaleString()}</div>
+                                                    <div style={cellStyle(271)}>₱{item.totalCost.toLocaleString()}</div>
+                                                    </div>
+
+                                                    {(index + 1) % 3000 === 0 && (
+                                                    <div className="print-page-break" style={{ height: 1 }} />
+                                                    )}
+                                                </React.Fragment>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{ width: 391, marginTop: 30, alignSelf: 'flex-end', display: 'flex', flexDirection: 'column', paddingRight: 30}}>
+                                        <div style={{ background: 'white', overflow: 'hidden', borderRadius: 4, outline: '1px white solid', outlineOffset: '-1px', flexDirection: 'column', display: 'flex' }}>
+                                            {[
+                                            { label: 'Total Cost of Raw Materials', value: bomCostDetails.rawMaterial, strong: false },
+                                            { label: 'Subtotal:', value: bomCostDetails.subtotal, strong: true },
+                                            { label: 'Cost of Production', value: bomCostDetails.production, strong: false },
+                                            { label: 'Labor Cost', value: bomCostDetails.labor, strong: false },
+                                            { label: 'Total Cost:', value: bomCostDetails.total, strong: true }
+                                            ].map((item, index) => (
+                                                <div key={index} style={{ display: 'flex', height: 36 }}>
+                                                    <div style={{width: 223,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,color: item.strong ? '#1C1C1C' : '#111111',fontFamily: 'Inter',display: 'flex',alignItems: 'center'}}>
+                                                        {item.label}
+                                                    </div>
+                                                    <div style={{ width: 168,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,textAlign: 'right',color: item.strong ? '#1C1C1C' : '#585757',fontFamily: 'Inter',display: 'flex',justifyContent: 'flex-end', alignItems: 'center'}}>
+                                                        ₱{item.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{width: '100%', marginTop: 30, display: 'flex', justifyContent: 'space-between', padding: '0 40px 40px 40px'}}>
+                                    <div className="print-button-container2">    
+                                    <button onClick={() => setPrintBOM2(false)} style={{ background: '#fff', border: '1.5px solid #A4A4A4',borderRadius: 8, padding: '10px 24px', fontSize: 16, color: '#969696', fontWeight: '500', display: 'flex', alignItems: 'center', gap: 8}}>
+                                        <div className="MRPIcon3" style={{ width: 15, height: 21 }} />
+                                        Back
+                                    </button>
+                                    </div>
+                                    <div className="print-button-container">                
+                                    <button onClick={printBOMContent} style={{background: '#00A8A8', border: 'none', borderRadius: 10, padding: '10px 24px', fontSize: 16, color: 'white', fontWeight: '500'}}>
+                                        Download
+                                    </button>
+                                    </div>
+                                </div>
+                                <img style={{width: 132.34, height: 196, left: 91, top: 170, position: 'absolute'}} src="/icons/module-icons/MRP-icons/MRPBOMLogo.png" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {printBOM3 && (
+                <div id="printable-bom" className="bom-print-modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="bom-print-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="scroll-container" style={{maxHeight: '90vh', overflowY: 'auto'}}>
+                            <div style={{width: 1128, position: 'relative', background: 'white'}}>
+                                <div style={{width: 1128, left: 0, top: 104, position: 'absolute'}} />
+                                <div style={{left: 663, top: 67, position: 'absolute', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                                    <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 387, display: 'flex'}}>
+                                        <div style={{width: 231, height: 28}} />
+                                    </div>
+                                </div>
+                                <div style={{left: 412, top: 39, position: 'absolute', color: '#1C1C1C', fontSize: 40, fontFamily: 'Inter', fontWeight: '600', lineHeight: 1, wordWrap: 'break-word'}}>Bill Of Materials</div>
+                                <div style={{left: 521, top: 184, position: 'absolute', color: '#1C1C1C', fontSize: 25, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: '16px', wordWrap: 'break-word'}}>Seller’s Information</div>
+                                <div style={{width: 329, left: 316, top: 238, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Company Name: </b>Kinetiq</div>
+                                <div style={{width: 344, left: 316, top: 293, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Address: </b>1975 Address of Company St.</div>
+                                <div style={{width: 220, left: 716, top: 239, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>City: </b>Metro Manila</div>
+                                <div style={{width: 223, left: 316, top: 345, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Country: </b>Philippines</div>
+                                <div style={{width: 324, left: 716, top: 292, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Contact Number.: </b>09123456789</div>
+                                <div style={{width: 324, left: 716, top: 345, position: 'absolute', color: '#111111', fontSize: 18, fontFamily: 'Inter', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}><b>Email Address: </b>kinetiq@gmail.com</div>
+                                {selectedRowData && (
+                                <div>
+                                    {/* Left Labels */}
+                                    <div style={{width: 135, left: 139, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
+                                    <div style={{width: 135, left: 139, top: 516, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Date Created</div>
+
+                                    {/* Left Data */}
+                                    <div style={{width: 250, height: 16, left: 280, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.number}</div>
+                                    <div style={{width: 144, left: 385, top: 515, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.date}</div>
+
+                                    {/* Right Labels */}
+                                    <div style={{width: 135, left: 700, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
+
+
+                                    {/* Right Data */}
+                                    <div style={{width: 250, left: 740, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.type}</div>
+                    
+                                </div>
+                                )}
+                                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 580}}>
+                                    <div style={{width: 1047, marginTop: 40, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                                        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+                                            <div style={{alignSelf: 'stretch', background: 'white', overflow: 'hidden', outline: '1px #E8E8E8 solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+                                                <div style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                    <div data-type="Header" style={{width: 82, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>No.</div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-type="Header" style={{width: 240, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Material</div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-type="Header" style={{width: 96, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Qty. Of Material</div>
+                                                        </div>
+                                                    </div>
+                                                
+                                                    <div data-type="Header" style={{width: 87, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Units</div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Cost Per Material</div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-type="Header" style={{flex: '1 1 0', alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                            <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Total Cost Per Material</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {bomDetails.map((item, index) => (
+                                                <React.Fragment key={index}>
+                                                    <div
+                                                    className="print-row"
+                                                    style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', display: 'inline-flex'}}>
+                                                    <div style={cellStyle(82)}>{item.no}</div>
+                                                    <div style={cellStyle(240)}>{item.product}</div>
+                                                    <div style={cellStyle(96)}>{item.qtyProduct}</div>
+                                                    <div style={cellStyle(87)}>{item.unit}</div>
+                                                    <div style={cellStyle(271)}>₱{item.costPerUnit.toLocaleString()}</div>
+                                                    <div style={cellStyle(271)}>₱{item.totalCost.toLocaleString()}</div>
+                                                    </div>
+
+                                                    {(index + 1) % 3000 === 0 && (
+                                                    <div className="print-page-break" style={{ height: 1 }} />
+                                                    )}
+                                                </React.Fragment>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{ width: 391, marginTop: 30, alignSelf: 'flex-end', display: 'flex', flexDirection: 'column', paddingRight: 30}}>
+                                        <div style={{ background: 'white', overflow: 'hidden', borderRadius: 4, outline: '1px white solid', outlineOffset: '-1px', flexDirection: 'column', display: 'flex' }}>
+                                            {[
+                                            { label: 'Total Cost of Raw Materials', value: bomCostDetails.rawMaterial, strong: false },
+                                            { label: 'Subtotal:', value: bomCostDetails.subtotal, strong: true },
+                                            { label: 'Cost of Production', value: bomCostDetails.production, strong: false },
+                                            { label: 'Labor Cost', value: bomCostDetails.labor, strong: false },
+                                            { label: 'Total Cost:', value: bomCostDetails.total, strong: true }
+                                            ].map((item, index) => (
+                                                <div key={index} style={{ display: 'flex', height: 36 }}>
+                                                    <div style={{width: 223,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,color: item.strong ? '#1C1C1C' : '#111111',fontFamily: 'Inter',display: 'flex',alignItems: 'center'}}>
+                                                        {item.label}
+                                                    </div>
+                                                    <div style={{ width: 168,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,textAlign: 'right',color: item.strong ? '#1C1C1C' : '#585757',fontFamily: 'Inter',display: 'flex',justifyContent: 'flex-end', alignItems: 'center'}}>
+                                                        ₱{item.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{width: '100%', marginTop: 30, display: 'flex', justifyContent: 'space-between', padding: '0 40px 40px 40px'}}>
+                                    <div className="print-button-container2">    
+                                    <button onClick={() => setPrintBOM3(false)} style={{ background: '#fff', border: '1.5px solid #A4A4A4',borderRadius: 8, padding: '10px 24px', fontSize: 16, color: '#969696', fontWeight: '500', display: 'flex', alignItems: 'center', gap: 8}}>
                                         <div className="MRPIcon3" style={{ width: 15, height: 21 }} />
                                         Back
                                     </button>

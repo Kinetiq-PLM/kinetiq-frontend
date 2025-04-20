@@ -27,6 +27,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [selectedRowData, setSelectedRowData] = useState(null); // State to store selected row data
     const [selectedOrderNo, setSelectedOrderNo] = useState([]); // State to store only the Order No. as a string
     const [bomDetails, setBomDetails] = useState([]);
+    const [principalItems, setPrincipalItems] = useState([]);
     const [npProducts, setNPProducts] = useState([]);
     const [selectedProductId, setSelectedProductId] = useState(null); // New state to store selected product_id
     const [rawMaterials, setRawMaterials] = useState([]);
@@ -34,8 +35,10 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const totalCostofRawMaterial = rawMaterials.reduce((sum,item) => sum + parseFloat(item.rmtotalCost),0);
     const overallTotalCost = bomDetails.reduce((sum, item) => sum + parseFloat(item.totalCost),0).toFixed(2);
     const npOverallProductCost = npProducts.reduce((sum, item) => sum + parseFloat(item.np_totalCost),0).toFixed(2);
+    const prinOverallCost = principalItems.reduce((sum, item) => sum + parseFloat(item.prin_totalitemcost), 0).toFixed(2);
     const [selectedStatementId, setSelectedStatementId] = useState(null);
     const [mrpData, setMrpData] = useState([]);
+
     const [principalOrder, setPrincipalItemOrder] = useState([]);
     const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
     const [totalLaborCost, setTotalLaborCost] = useState(0);
@@ -232,11 +235,143 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     }
     };
 
+    const fetchPrincipalDetails = async (serviceorderID) => {
+        try {
+            const response = await fetch(`${baseurl}/bills_of_material/principalitemorder/by-serviceid/${serviceorderID}/`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch BOM details");
+            }
+            const data = await response.json();
+
+            const formattedData = data.map((item, index) => ({
+                no: index + 1,
+                prin_material_id: item.material_id,
+                prin_uom: item.unit_of_measure,
+                prin_item_name: item.item_name,
+                prin_item_id: item.item_id,
+                prin_quantity: item.item_quantity,
+                prin_itemcost: parseFloat(item.item_price),
+                prin_totalitemcost: parseFloat(item.total_item_price)
+            }));
+
+            setPrincipalItems(formattedData);
+        } catch (error) {
+            console.error("Error fetching BOM details:", error);
+        }
+    };
+
+    const [projectId, setProjectID] = useState([]);
+
+    const fetchProjectID = async (orderId) => {
+        try {
+            const response = await fetch(`${baseurl}/bills_of_material/orderproductioncost/${orderId}/`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch project id");
+            }
+            const data = await response.json();
+            const formattedData = data.map((item) => ({
+                projectID: item.project_id,
+            }));
+    
+            setProjectID(formattedData);
+            
+        } catch (error) {
+            console.error("Error fetching production costs:", error);
+        }
+        };
+
+    const sendProjectData = async () => {
+        try {
+            const payload = rawMaterials.map(item => ({
+                project_id: projectId,
+                product_mats_id: item.materialId,
+                overall_quantity_of_material: item.np_qtyProduct,
+                cost_per_raw_material: item.rmunitCost,
+                total_cost_of_raw_materials: item.rmtotalCost,
+                production_order_detail_id: selectedRowData.production_order_detail_id,
+                labor_cost: null,
+                total_cost: totalOrderCost
+            }));
+
+            const response = await fetch('http://127.0.0.1:8000/bills_of_material/submit-bom/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error('Failed to submit BOM data');
+            const data = await response.json();
+            console.log('Success:', data);
+        } catch (error) {
+            console.error('Error sending BOM:', error);
+        }
+    };
+
+    const sendNonProjectData = async () => {
+        try {
+
+            const payload = {
+                order_id: selectedRowData.number,
+                final_price: totalOrderCost
+            };
+            console.log('Payload:', payload);
+            const response = await fetch('http://127.0.0.1:8000/insert_nonproject/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+    
+            if (!response.ok) throw new Error('Failed to submit Non Project Data');
+            const data = await response.json();
+            console.log('Success:', data);
+        } catch (error) {
+            console.error('Error sending Non Project Data:', error);
+        }
+    };
+
+    const sendPrincipalData = async () => {
+        try {
+
+            const payload = {
+                service_order_item_id: selectedRowData.number,
+                item_id: principalItems.prin_item_id,
+                mark_up_price: totalOrderCost
+            };
+            console.log('Payload:', payload);
+            const response = await fetch('http://127.0.0.1:8000/insert_principal/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+    
+            if (!response.ok) throw new Error('Failed to submit Principal Item Data');
+            const data = await response.json();
+            console.log('Success:', data);
+        } catch (error) {
+            console.error('Error sending Principal Item:', error);
+        }
+    };
+
     useEffect(() => {
-        const total = isProjectType ? (parseFloat(overallTotalCost) + totalCostOfProduction + totalLaborCost).toFixed(2)
-                                    : (parseFloat(npOverallProductCost) + totalCostOfProduction + totalLaborCost).toFixed(2);
-        setTotalOrderCost(total);
-    }, [isProjectType, overallTotalCost, npOverallProductCost, totalCostOfProduction, totalLaborCost]);
+        let total = 0;
+
+        if (isProjectType === "Project") {
+            total = parseFloat(overallTotalCost || 0);
+        } else if (isProjectType === "Non Project") {
+            total = parseFloat(npOverallProductCost || 0);
+        } else if (isProjectType === "Principal Item") {
+            total = parseFloat(prinOverallCost * 1.2);
+        }
+
+        total += totalCostOfProduction + totalLaborCost;
+        setTotalOrderCost(total.toFixed(2));
+    }, [isProjectType, overallTotalCost, npOverallProductCost, prinOverallCost, totalCostOfProduction, totalLaborCost]);
 
     // const mrpData = [
     //     { number: "000000001", type: "Project", details: "Tondo Hospital - Package..", date: "July 3 2025" },
@@ -284,13 +419,18 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const filteredData = getFilteredData();
 
-    const mergedRows = [...(filteredData || []), ...(principalOrder || [])].map((item) => ({
+    const mergedRows = (
+        flag === 0 // All Orders
+          ? [...(filteredData || []), ...(principalOrder || [])]
+          : flag === 3 // Principal Items tab
+          ? principalOrder
+          : filteredData // Project or Non Project
+      ).map((item) => ({
         number: item.number || item.serviceOrderItemId,
         type: item.type,
         details: item.details || item.description,
         date: item.date,
     }));
-
     
     const buttonStyle = (bg, border, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer', });
     const buttonStyle2 = (bg, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, border: '0.5px solid #585757', color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer',});
@@ -366,34 +506,21 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 </div>
 
                 <div className="reqplan-table-scroll" style={{width: '100%', maxWidth: 1159, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', overflowY: 'auto', maxHeight: '450px', borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '1rem'}}>
-                    <div className="table-header" style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        borderBottom: '1px solid #E8E8E8',
-                    }}>
-                        {['Order No.', 'Type', 'Details', 'Date'].map((label, i) => (
-                        <div
-                            className="table-cell2"
-                            key={label}
-                            data-label={label} 
-                            style={{flex: '1 1 25%', minWidth: 150, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter',fontSize: 18}}>
-                            {label}
-                        </div>
+                    <div className="table-header" style={{display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8'}}>
+                        {['Order No.', 'Type', 'Details', 'Date'].map((label) => (
+                            <div className="table-cell2" key={label} data-label={label} style={{flex: '1 1 25%', minWidth: 150, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 18}}>{label}</div>
                         ))}
                     </div>
-
                     {mergedRows.map((item, index) => (
-                    <div
-                        key={index}
-                        className="table-row"
-                        onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchCostProduction(item.number); fetchCostLabor(item.number); setIsProjectType(item.type); setIsOpen(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) =>(e.currentTarget.style.background = "transparent")}style={{display: "flex", flexWrap: "wrap", cursor: "pointer", borderBottom: "1px solid #E8E8E8"}}>
-                        <div className="table-cell" style={rowCellStyle} data-label="Order No.">{item.number}</div>
-                        <div className="table-cell" style={rowCellStyle} data-label="Type">{item.type}</div>
-                        <div className="table-cell" style={rowCellStyle} data-label="Details">{item.details}</div>
-                        <div className="table-cell" style={rowCellStyle} data-label="Date">{item.date}</div>
-                    </div>
+                        <div key={index} className="table-row" onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchCostProduction(item.number); fetchCostLabor(item.number); fetchPrincipalDetails(item.number); setIsProjectType(item.type); setIsOpen(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")} style={{display: "flex", flexWrap: "wrap", cursor: "pointer", borderBottom: "1px solid #E8E8E8"}}>
+                            <div className="table-cell" style={rowCellStyle} data-label="Order No.">{item.number}</div>
+                            <div className="table-cell" style={rowCellStyle} data-label="Type">{item.type}</div>
+                            <div className="table-cell" style={rowCellStyle} data-label="Details">{item.details || '—'}</div>
+                            <div className="table-cell" style={rowCellStyle} data-label="Date">{item.date}</div>
+                        </div>
                     ))}
                 </div>
+
                 
                 <div className="reqplan-help-wrapper">
                     {showHelpOptions && (
@@ -439,7 +566,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     </button>
 
                     <button
-                        onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false)}}
+                        onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false); fetchPrincipalDetails(item.serviceorderID); setSelectedRowData(item);}}
                         style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                         <span>Next</span>
                         <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
@@ -599,7 +726,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <div className="reqplan-table-scroll2" style={{flex: 1, overflowY: 'auto', overflowX: 'auto', marginBottom: 30, borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.15)',padding: 0,}}>
                             <div style={{width: '100%', flex: 1, background: 'white',borderRadius: 20, display: 'flex', flexDirection: 'column', gap: 0, padding: '0.5rem',}}>
                                 <div className="table-header" style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #E8E8E8',}}>
-                                    {['No.', 'Item ID', 'Principal ID', 'Item Name', 'Item Quantity', 'Item Price'].map(
+                                    {['No.', 'Item ID', 'Unit Of Measure', 'Item Name', 'Item Quantity', 'Item Price', 'Total Item Price'].map(
                                     (label) => (
                                         <div
                                         key={label}
@@ -610,17 +737,18 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     )}
                                 </div>
 
-                                {npProducts.map((item, index) => (
+                                {principalItems.map((item, index) => (
                                     <div
                                     key={index}
                                     className="table-row"
                                     style={{display: 'flex', flexWrap: 'wrap',borderBottom: '1px solid #E8E8E8',}}>
-                                    <div style={rowCellStyle}>{item.number}</div>
-                                    <div style={rowCellStyle}>{item.np_product_id}</div>
-                                    <div style={rowCellStyle}>{item.np_product_name}</div>
-                                    <div style={rowCellStyle}>{item.np_product_description}</div>
-                                    <div style={rowCellStyle}>{item.np_qtyProduct} pcs</div>
-                                    <div style={rowCellStyle}>₱{item.np_totalCost.toLocaleString()}</div>
+                                    <div style={rowCellStyle}>{item.no}</div>
+                                    <div style={rowCellStyle}>{item.prin_material_id}</div>
+                                    <div style={rowCellStyle}>{item.prin_uom}</div>
+                                    <div style={rowCellStyle}>{item.prin_item_name}</div>
+                                    <div style={rowCellStyle}>{item.prin_quantity}</div>
+                                    <div style={rowCellStyle}>₱{item.prin_itemcost} </div>
+                                    <div style={rowCellStyle}>₱{item.prin_totalitemcost} </div>
                                     </div>
                                 ))}
                                 </div>
@@ -631,7 +759,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{npOverallProductCost}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{prinOverallCost}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -733,7 +861,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{isProjectType ? overallTotalCost : npOverallProductCost}</div>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{isProjectType === "Project" ? overallTotalCost : isProjectType === "Non Project" ? npOverallProductCost : prinOverallCost}</div>
                                 </div>
                                 </div>
                             </div>
@@ -812,7 +940,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
                         <span style={{color: '#969696'}}>Back</span>
                     </button>
-                    <button onClick={() => {setCreated(true), setChecker(false), setAdditionalCost(false), setAdditionalCost2(false), setIsOpen(false), setIsOpen2(false)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <button onClick={() => {sendNonProjectData(), sendPrincipalData(),setCreated(true), setChecker(false), setAdditionalCost(false), setAdditionalCost2(false), setIsOpen(false), setIsOpen2(false)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                         <span>Create BOM</span>
                         <div className="MRPIcon5" style={{width: 13, height: 21, marginLeft: 8}} />
                     </button>
