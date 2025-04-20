@@ -315,31 +315,35 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     }
     
     const mergedRows2 = (
-        flag === 0
-            ? [...(filteredData || []), ...(principalOrder || [])]
-            : flag === 3
-            ? principalOrder
-            : filteredData
-    ).map(item => {
-        const number = item.number || item.serviceOrderItemId;
-        const type = item.type;
-        const details = item.details || item.description;
-        const date = item.date;
-    
-        const pnpMatch = pnpOrder.find(p => p.pnp_orderID === number);
-        const prinMatch = prinOrder.find(p => p.sr_orderID === number);
-    
-        const status = pnpMatch?.pnp_status || prinMatch?.sr_status || "";
-    
-        return {
-            number,
-            type,
-            details,
-            date,
-            status
-        };
-    }).filter(item => (item.status || "").toLowerCase() !== "Complete");
-    
+  flag === 0
+    ? [...(filteredData || []), ...(principalOrder || [])]
+    : flag === 3
+    ? principalOrder
+    : filteredData
+)
+  .map(item => {
+    const number = item.number || item.serviceOrderItemId;
+    const type = item.type;
+    const details = item.details || item.description;
+    const date = item.date;
+
+    const pnpMatch = pnpOrder.find(p => p.pnp_orderID === number);
+    const prinMatch = prinOrder.find(p => p.sr_orderID === number);
+
+    const pnpStatus = pnpMatch?.pnp_status?.toLowerCase().trim();
+    const prinStatus = prinMatch?.sr_status?.toLowerCase().trim();
+
+    const isComplete = pnpStatus === "complete" || prinStatus === "complete";
+
+    return {
+      number,
+      type,
+      details,
+      date,
+      status: isComplete ? "Complete" : "", // Use capital "C" for display
+    };
+  })
+  .filter(item => item.status === "Complete");
 
     const rowCellStyle = {
         flex: "1 1 25%",
@@ -394,32 +398,42 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 </div>
 
                 {/* Rows */}
-                {mergedRows2.map((item, index) => (
-                <div
-                    key={index}
-                    className="table-row"
-                    onClick={() => { setSelectedRowData(item); if (item.type === "Project Based") { setPrintBOM(true); } else if (item.type === "Non-Project Based") { setPrintBOM2(true); } else { setPrintBOM3(true); } }}
-
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #E8E8E8",
-                    }}
-                >
-                    <div className="table-cell" style={rowCellStyle} data-label="Order No.">
-                    {item.number}
-                    </div>
-                    <div className="table-cell" style={rowCellStyle} data-label="Type">
-                    {item.type}
-                    </div>
-                    <div className="table-cell" style={rowCellStyle} data-label="Date">
-                    {item.date}
-                    </div>
-                </div>
-                ))}
+                {mergedRows2
+                    .filter(item => (item.status || "").toLowerCase().trim() === "complete")
+                    .map((item, index) => (
+                        <div
+                        key={index}
+                        className="table-row"
+                        onClick={() => {
+                            setSelectedRowData(item);
+                            if (item.type === "Project Based") {
+                            setPrintBOM(true);
+                            } else if (item.type === "Non-Project Based") {
+                            setPrintBOM2(true);
+                            } else {
+                            setPrintBOM3(true);
+                            }
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                        style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            cursor: "pointer",
+                            borderBottom: "1px solid #E8E8E8",
+                        }}
+                        >
+                        <div className="table-cell" style={rowCellStyle} data-label="Order No.">
+                            {item.number}
+                        </div>
+                        <div className="table-cell" style={rowCellStyle} data-label="Type">
+                            {item.type}
+                        </div>
+                        <div className="table-cell" style={rowCellStyle} data-label="Date">
+                            {item.date}
+                        </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 
