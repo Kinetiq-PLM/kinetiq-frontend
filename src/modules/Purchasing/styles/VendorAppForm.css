@@ -1,0 +1,416 @@
+.org-type-dropdown {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+}
+
+.org-type-toggle {
+    width: 100%;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-arrow {
+    float: right;
+}
+
+.org-type-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.org-type-option {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.org-type-option:hover,
+.org-type-option.selected {
+    background-color: #f0f0f0;
+}
+
+.vendorappform-scrollable-wrapper {
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #bdbdbd #f5f5f5;
+}
+
+.vendorappform-scrollable-wrapper .body-content-container {
+    height: auto !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+.vendorappform {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.vendorappform .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+}
+
+.vendorappform-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.vendorappform-title {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 500;
+    text-align: center;
+}
+
+.vendorappform-back {
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.vendorappform-back::before {
+    content: "←";
+    font-size: 1.1rem;
+}
+
+.vendorappform-copy {
+    padding: 0.5rem 1rem;
+    background-color: #00bcd4;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 0.85rem;
+}
+
+.vendorappform-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.vendorappform-company-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.vendorappform-company-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.vendorappform-company-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vendorappform-address {
+    color: #666;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.vendorappform-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 
+    Logo size control - Adjust these values to change logo size:
+    - width: controls the width of the logo
+    - height: controls the height of the logo
+*/
+.vendorappform-logo img {
+    width: 300px;  /* Adjust this value to make logo wider/narrower */
+    height: 300px; /* Adjust this value to make logo taller/shorter */
+    object-fit: contain;
+    margin-top: -2rem;
+    margin-bottom: -2rem;
+}
+
+.vendorappform-vendor-info {
+    width: 100%;
+    border: 1px solid #eee;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+}
+
+.vendorappform-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 1.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vendorappform-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.form-group input {
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    background-color: #f8f9fa;
+}
+
+.vendorappform-org-type {
+    width: 100%;
+    border: 1px solid #eee;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+}
+
+.vendorappform-org-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.org-type-btn {
+    padding: 0.75rem 1rem;
+    border: 1px solid #eee;
+    border-radius: 0.25rem;
+    background: white;
+    color: #333;
+    font-size: 0.85rem;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.org-type-btn::after {
+    content: "▼";
+    font-size: 0.7rem;
+    color: #666;
+}
+
+.org-type-btn:hover {
+    background-color: #f8f9fa;
+}
+
+.vendorappform-bottom {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.vendorappform-checks,
+.vendorappform-banking,
+.vendorappform-requester {
+    border: 1px solid #eee;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+}
+
+.check-group {
+    margin-bottom: 1rem;
+}
+
+.check-group h4 {
+    font-size: 0.75rem;
+    font-weight: normal;
+    color: #333;
+    margin: 0 0 0.75rem 0;
+}
+
+.radio-group {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.radio-group input[type="radio"] {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #00bcd4;
+    appearance: none;
+    border-radius: 50%;
+    margin: 0;
+    position: relative;
+}
+
+.radio-group input[type="radio"]:checked {
+    background-color: #00bcd4;
+    border-color: #00bcd4;
+}
+
+.radio-group input[type="radio"]:checked::after {
+    content: "";
+    position: absolute;
+    width: 0.4rem;
+    height: 0.4rem;
+    background: white;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.vendorappform-banking h4 {
+    font-size: 0.75rem;
+    font-weight: normal;
+    color: #333;
+    margin: 0 0 1rem 0;
+    text-transform: uppercase;
+}
+
+.banking-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.vendorappform-requester {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid #eee;
+    border-radius: 0.5rem;
+}
+
+.vendorappform-requester .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.vendorappform-requester h4 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+.vendorappform-requester input {
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    background-color: #f8f9fa;
+    width: 100%;
+}
+
+.vendorappform-requester div {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.vendorappform .button-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding: 0 1.5rem;
+}
+
+.vendorappform .cancel-btn {
+    padding: 0.5rem 1.5rem;
+    border: 1px solid #00bcd4;
+    border-radius: 0.25rem;
+    background: none;
+    color: #00bcd4;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.vendorappform .cancel-btn:hover {
+    border-color: #00A8A8;
+    color: #00A8A8;
+    background-color: rgba(0, 168, 168, 0.05);
+}
+
+.vendorappform .submit-btn {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #00bcd4;
+    color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.vendorappform .submit-btn:hover {
+    background-color: #00A8A8;
+}

@@ -92,7 +92,7 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, contract }) => {
       console.log("Fetching additional services for ID:", additionalServiceId);
       if (!additionalServiceId) return; 
 
-      const response = await GET(`contracts/${additionalServiceId}/`);
+      const response = await GET(`contract/contracts-add-services/${additionalServiceId}/`);
       console.log("Fetched additional services:", response);
       setAdditionalServices(response);
     } catch (error) {
@@ -115,7 +115,7 @@ const handleSelectStatus = (status) => {
 // fetches a list of renewals
 const fetchRenewals = async () => {
   try {
-    const response = await GET(`/renewals/${formData.contractId}/`); 
+    const response = await GET(`contract/contracts-renewals/${formData.contractId}/`); 
     console.log("renewals", response)
     setRenewals(response);
   } catch (error) {

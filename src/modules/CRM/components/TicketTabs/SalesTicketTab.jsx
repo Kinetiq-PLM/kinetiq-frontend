@@ -90,18 +90,8 @@ const SalesTicketTab = ({
 
       <div className="flex mb-2 mt-4 gap-4 items-center">
         <p className="">Employee ID:</p>
-        <div
-          className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded max-w-[300px]"
-          onClick={() => setIsEmployeeListOpen(true)}
-        >
-          <p className="text-sm">
-            {selectedEmployee ? selectedEmployee.employee_id : ""}
-          </p>
-          <img
-            src="/icons/information-icon.svg"
-            className="h-[15px]"
-            alt="info icon"
-          />
+        <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded max-w-[300px]">
+          <p className="text-sm">{ticketInfo.salesrep || ""}</p>
         </div>
       </div>
 
@@ -109,11 +99,7 @@ const SalesTicketTab = ({
         type="primary"
         onClick={handleSubmit}
         className={"mt-8"}
-        disabled={
-          subject && description && selectedEmployee && selectedCustomer
-            ? false
-            : true
-        }
+        disabled={subject && description && selectedCustomer ? false : true}
       >
         Submit Ticket
       </Button>

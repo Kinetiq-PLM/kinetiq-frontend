@@ -1,7 +1,7 @@
 // components/shipment/StatusFilter.jsx
 import React from 'react';
 
-const StatusFilter = ({ selectedStatus, onStatusChange }) => {
+const StatusFilter = ({ selectedStatus, onStatusChange, showDelivered = true }) => {
   return (
     <div className="filter-container">
       <span className="filter-label">Status:</span>
@@ -28,12 +28,15 @@ const StatusFilter = ({ selectedStatus, onStatusChange }) => {
           Shipped
         </button>
         
-        <button
-          className={`status-button delivered ${selectedStatus === 'Delivered' ? 'active' : ''}`}
-          onClick={() => onStatusChange('Delivered')}
-        >
-          Delivered
-        </button>
+        {/* Only show Delivered status if showDelivered is true */}
+        {showDelivered && (
+          <button
+            className={`status-button delivered ${selectedStatus === 'Delivered' ? 'active' : ''}`}
+            onClick={() => onStatusChange('Delivered')}
+          >
+            Delivered
+          </button>
+        )}
         
         <button
           className={`status-button failed ${selectedStatus === 'Failed' ? 'active' : ''}`}

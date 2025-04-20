@@ -11,7 +11,7 @@ import WarrantyRenewalIcon from "/icons/SupportServices/WarrantyRenewalIcon.svg"
 import { GET } from "../api/api"
 import { PATCH } from "../api/api"
 
-const WarrantyRenewal = () => {
+const WarrantyRenewal = ({employee_id}) => {
   // State for service calls
   const [renewals, setRenewals] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
@@ -24,8 +24,13 @@ const WarrantyRenewal = () => {
 
   // Fetch service calls from API (mock function)
   const fetchServiceRenewals = async () => {
-    try {
-      const data = await GET("warranty-renewals/");
+   try {
+      // this filters out renewals so that only the warranty renewals assigned to the one currently logged in will show:
+      // const data = await GET(`renewal/renewals/technician/HR-EMP-2025-a66f9c/`);
+      const data = await GET(`renewal/renewals/technician/${employee_id}/`);
+
+      // all renewals version:
+      // const data = await GET("renewal/");
       setRenewals(data);
     } catch (error) {
       console.error("Error fetching renewals:", error)
@@ -56,7 +61,7 @@ const WarrantyRenewal = () => {
     console.log("Updating renewal with:", updatedData);
 
     try {
-      await PATCH(`/renewal/${renewalId}/update/`, updatedData);
+      await PATCH(`renewal/${renewalId}/`, updatedData);
       setShowUpdateModal(false);
       fetchServiceRenewals();
   } catch (error) {

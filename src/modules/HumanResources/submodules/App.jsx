@@ -1,17 +1,11 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HRDashboard from './components/HumanResources';
-import Employees from './modules/HumanResources/submodules/Employees';
-import EditEmployee from './submodules/EditEmployee';
-import Departments from './modules/HumanResources/submodules/Departments';
-import EditDepartment from './submodules/EditDepartment';
-import AttendanceTracking from './modules/HumanResources/submodules/AttendanceTracking';
-import LeaveRequests from './modules/HumanResources/submodules/LeaveRequests';
-import EmployeePerformance from './modules/HumanResources/submodules/EmployeePerformance';
-import Recruitment from './modules/HumanResources/submodules/Recruitment';
-import Payroll from './modules/HumanResources/submodules/Payroll';
-import WorkforceAllocation from './modules/HumanResources/submodules/WorkforceAllocation';
-import './styles/App.css';
+import HRDashboard from '../HumanResources.jsx';
+import Employees from './Employees';
+import EditEmployee from '../pages/EditEmployee';
+import Departments from './Departments';
+import EditDepartment from '../pages/EditDepartment';
+import '../../../App.css';
 
 function App() {
   return (

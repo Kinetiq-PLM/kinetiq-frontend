@@ -1,10 +1,11 @@
-.deliveryrec {
+/* Main Wrapper */
+.delivery-receipt-wrapper {
     display: flex;
     width: 100%;
     height: 100%;
 }
- 
-.deliveryrec .body-content-container {
+
+.delivery-receipt-wrapper .body-content-container {
     width: 100%;
     height: 100%;
     border-radius: 0.5rem;
@@ -15,12 +16,20 @@
     flex-direction: column;
     min-width: 40rem;
     min-height: 30rem;
+    overflow: visible; /* Hide overflow for the main container */
 }
-
-
-
-
-.tab-container {
+.delivery-receipt-wrapper .table-wrapper tbody{
+    max-height: 420px; /* Or whatever height you prefer */
+    overflow-y: auto;
+}
+.delivery-receipt-wrapper .table-wrapper thead {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+}
+/* Tabs */
+.delivery-receipt-wrapper .tab-container {
     width: 100%;
     height: 100%;
     display: flex;
@@ -29,185 +38,69 @@
     background: white;
 }
 
-
-
-
-.tab-header {
+.delivery-receipt-wrapper .tab-header {
     display: flex;
     border-bottom: 2px solid #ddd;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
 }
 
-
-
-
-.tab-button {
-    background: none;
-    border: none;
-    padding: 12px 24px;
-    font-size: 14px;
-    color: #666;
-    cursor: pointer;
-    position: relative;
-    transition: color 0.3s;
+.delivery-receipt-wrapper .tab-button {
+    background: none !important;
+    border: none !important;
+    padding: 12px 24px !important;
+    font-size: 14px !important;
+    color: #666 !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: color 0.3s !important;
+    outline: none !important;
+    white-space: nowrap !important;
 }
 
-
-
-
-.tab-button.active {
-    color: #00A8A8;
-    font-weight: 500;
+.delivery-receipt-wrapper .tab-button.active {
+    color: #00A8A8 !important;
+    font-weight: 500 !important;
+    border-radius: 0.375rem 0.375rem 0 0;
 }
 
-
-
-
-.tab-button.active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #00A8A8;
+.delivery-receipt-wrapper .tab-button.active::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -2px !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 2px !important;
+    background-color: #00A8A8 !important;
 }
 
-
-
-
-.table-container {
+/* Table Layout */
+.delivery-receipt-wrapper .table-container {
     width: 100%;
     margin-bottom: 20px;
-    overflow-x: auto;
-    max-height: 400px; /* Fixed height for the table container */
-    overflow-y: auto; /* Enable vertical scrollbar */
+    overflow: hidden; /* Ensure no overflow from the container */
 }
 
-
-.table-container::-webkit-scrollbar {
-    width: 6px;
+.delivery-receipt-wrapper .table-wrapper {
+    max-height: 420px; /* Adjust height of table here */
+    overflow-y: auto;  /* Allow vertical scrolling */
+    overflow-x: auto;  /* Allow horizontal scrolling */
 }
 
-
-.table-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-
-.table-container::-webkit-scrollbar-thumb {
-    background: #00A8A8;
-    border-radius: 3px;
-}
-
-
-.table-container::-webkit-scrollbar-thumb:hover {
-    background: #008080;
-}
-
-
-
-
-.billing-table {
+.delivery-receipt-wrapper .table-container table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
 }
 
-
-
-
-.billing-table th,
-.billing-table td {
+.delivery-receipt-wrapper .table-container th,
+.delivery-receipt-wrapper .table-container td {
     padding: 12px;
     text-align: left;
-    border-bottom: 1px solid #eee;
-    height: 48px; /* Fixed height for all rows */
-    box-sizing: border-box;
+    font-size: 13px;
 }
 
-
-/* Checkbox column */
-.billing-table th:first-child,
-.billing-table td:first-child {
-    width: 50px;
-}
-
-
-/* Billing Receipt columns */
-.billing-table th:nth-child(2),
-.billing-table td:nth-child(2),
-.billing-table th:nth-child(3),
-.billing-table td:nth-child(3),
-.billing-table th:nth-child(4),
-.billing-table td:nth-child(4),
-.billing-table th:nth-child(5),
-.billing-table td:nth-child(5) {
-    width: calc((100% - 50px) / 4); /* Divide remaining space by 4 */
-}
-
-
-/* Delivery Receipt columns */
-[activeTab="Delivery Receipt"] .billing-table th:nth-child(2),
-[activeTab="Delivery Receipt"] .billing-table td:nth-child(2),
-[activeTab="Delivery Receipt"] .billing-table th:nth-child(3),
-[activeTab="Delivery Receipt"] .billing-table td:nth-child(3),
-[activeTab="Delivery Receipt"] .billing-table th:nth-child(4),
-[activeTab="Delivery Receipt"] .billing-table td:nth-child(4) {
-    width: calc((100% - 50px) / 3); /* Divide remaining space by 3 */
-}
-
-
-/* Rework Order columns */
-[activeTab="Rework Order"] .billing-table th:nth-child(2),
-[activeTab="Rework Order"] .billing-table td:nth-child(2),
-[activeTab="Rework Order"] .billing-table th:nth-child(3),
-[activeTab="Rework Order"] .billing-table td:nth-child(3),
-[activeTab="Rework Order"] .billing-table th:nth-child(4),
-[activeTab="Rework Order"] .billing-table td:nth-child(4),
-[activeTab="Rework Order"] .billing-table th:nth-child(5),
-[activeTab="Rework Order"] .billing-table td:nth-child(5) {
-    width: calc((100% - 50px) / 4); /* Divide remaining space by 4 */
-}
-
-
-/* Goods Issue columns */
-[activeTab="Goods Issue"] .billing-table th:nth-child(2),
-[activeTab="Goods Issue"] .billing-table td:nth-child(2),
-[activeTab="Goods Issue"] .billing-table th:nth-child(3),
-[activeTab="Goods Issue"] .billing-table td:nth-child(3),
-[activeTab="Goods Issue"] .billing-table th:nth-child(4),
-[activeTab="Goods Issue"] .billing-table td:nth-child(4),
-[activeTab="Goods Issue"] .billing-table th:nth-child(5),
-[activeTab="Goods Issue"] .billing-table td:nth-child(5) {
-    width: calc((100% - 50px) / 4); /* Divide remaining space by 4 */
-}
-
-
-.billing-table th {
-    font-weight: 500;
-    color: #333;
-    background-color: #f8f9fa;
-}
-
-
-
-
-.billing-table tr:hover {
-    background-color: #f5f5f5;
-}
-
-
- 
-.checkbox-cell {
-    width: 40px;
-    text-align: center;
-}
-
-
-
-
-.checkbox-cell input[type="checkbox"] {
+/* Checkbox input (clean look) */
+.delivery-receipt-wrapper .checkbox-input {
     width: 16px;
     height: 16px;
     cursor: pointer;
@@ -218,15 +111,16 @@
     border-radius: 3px;
     position: relative;
     outline: none;
+    transition: background-color 0.3s ease;
 }
 
-
-.checkbox-cell input[type="checkbox"]:checked {
+/* When checkbox is checked */
+.delivery-receipt-wrapper .checkbox-input:checked {
     background-color: #00A8A8;
 }
 
-
-.checkbox-cell input[type="checkbox"]:checked::after {
+/* Checkmark styling when checked */
+.delivery-receipt-wrapper .checkbox-input:checked::after {
     content: '';
     position: absolute;
     left: 4px;
@@ -238,98 +132,37 @@
     transform: rotate(45deg);
 }
 
-
-
-
-/* Goods Issue specific styles */
-.goods-issue-wrapper {
-    display: flex;
-    width: 100%;
-    gap: 8px;
+.delivery-receipt-wrapper .no-records {
+    text-align: center;
+    color: #888;
+    font-size: 1rem;
 }
 
-
-
-
-.vertical-table-container {
-    min-width: 250px;
-    margin-top: 41px; /* Align with main table content */
+.delivery-receipt-wrapper .checkbox-cell {
+    width: 40px;
+    text-align: center;
 }
 
-
-
-
-.vertical-table {
-    width: 100%;
-    border-collapse: collapse;
+/* Sticky Header */
+.delivery-receipt-wrapper .table-wrapper thead {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+    box-shadow: 0 2px 2px -2px gray;
 }
 
-
-
-
-.vertical-table th,
-.vertical-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-    height: 48px; /* Match main table row height */
-    box-sizing: border-box;
-    line-height: 24px; /* Center text vertically */
+/* ✅ Teal Scrollbar Styling */
+.delivery-receipt-wrapper .table-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-
-
-
-.vertical-table th {
-    font-weight: 500;
-    color: #333;
-    background-color: #f8f9fa;
+.delivery-receipt-wrapper .table-wrapper::-webkit-scrollbar-thumb {
+    background-color: #00A8A8;
+    border-radius: 4px;
 }
 
-
-
-
-.vertical-table tr:last-child td {
-    border-bottom: 1px solid #eee; /* Ensure last row has border */
+.delivery-receipt-wrapper .table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }
-
-
-
-
-.send-to-container {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: auto;
-    padding-top: 20px;
-}
-
-
-.send-to-button {
-    padding: 0.5rem 1rem;
-    background: #0d9488;
-    border: none;
-    border-radius: 0.375rem;
-    color: white;
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
- 
-  .send-to-button:hover {
-    background: #0f766e;
-  }
- 
-
-
-
-
-@media (max-width: 768px) {
-    .goods-issue-wrapper {
-        flex-wrap: wrap;
-    }
-}
-
-
-
-
-
-
