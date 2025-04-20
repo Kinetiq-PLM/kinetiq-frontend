@@ -2344,5 +2344,3 @@ const archivedProductColumns = [
 };
 
 export default ItemMasterManagement;
-
-

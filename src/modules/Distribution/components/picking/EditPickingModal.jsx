@@ -75,6 +75,21 @@ const EditPickingModal = ({
     }
   };
   
+  // Check if status update button should be disabled
+  const isStatusUpdateDisabled = () => {
+    // Always need an employee assigned
+    if (!selectedEmployee) {
+      return true;
+    }
+    
+    // For external deliveries, also need a warehouse
+    if (pickingList.is_external && !selectedWarehouse) {
+      return true;
+    }
+    
+    return false;
+  };
+  
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return 'Not picked yet';
@@ -201,12 +216,31 @@ const EditPickingModal = ({
             <h4>Status</h4>
             <div className="status-action">
               {!isCompleted ? (
-                <button 
-                  className={`status-update-button status-${getNextStatus(pickingList.picked_status)?.toLowerCase().replace(' ', '-')}`}
-                  onClick={() => onStatusUpdate(pickingList, getNextStatus(pickingList.picked_status))}
-                >
-                  {getStatusActionLabel(pickingList.picked_status)}
-                </button>
+                <>
+                  <button 
+                    className={`status-update-button status-${getNextStatus(pickingList.picked_status)?.toLowerCase().replace(' ', '-')}`}
+                    onClick={() => onStatusUpdate(
+                      pickingList, 
+                      getNextStatus(pickingList.picked_status), 
+                      selectedEmployee, 
+                      selectedWarehouse
+                    )}
+                    disabled={isStatusUpdateDisabled()}
+                  >
+                    {getStatusActionLabel(pickingList.picked_status)}
+                  </button>
+                  
+                  {isStatusUpdateDisabled() && (
+                    <div className="validation-message" style={{
+                      color: '#dc3545',
+                      fontSize: '0.8rem',
+                      marginTop: '0.5rem'
+                    }}>
+                      {!selectedEmployee ? 'Please assign an employee to start picking' : 
+                       (pickingList.is_external && !selectedWarehouse) ? 'Please select a warehouse for this external delivery' : ''}
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="completed-message">
                   This picking list is completed and cannot be modified.

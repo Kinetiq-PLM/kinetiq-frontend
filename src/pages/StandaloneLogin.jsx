@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./StandaloneLogin.css";
 import emailjs from '@emailjs/browser';
+
 
 export default function StandaloneLogin() {
   const [credentials, setCredentials] = useState({
@@ -32,6 +33,20 @@ export default function StandaloneLogin() {
     setCredentials(prev => ({ ...prev, [name]: value }));
     setLoginError("");
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    try {
+      if (storedUser && location.pathname === "/login") {
+        navigate("/", { replace: true });
+      }
+    } catch (e) {
+      console.error("ERROR FOR SOME REASON: ", e);
+    }
+
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();

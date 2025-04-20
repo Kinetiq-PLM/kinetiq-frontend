@@ -1,3 +1,4 @@
+
 import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
@@ -53,18 +54,18 @@ function App() {
       console.log("User data loaded from localStorage:");
       console.log(localStorage.getItem("user"));
 
-      const storedModule = localStorage.getItem("activeModule");
-      const storedSubModule = localStorage.getItem("activeSubModule");
-      const storedShowUserProfile = localStorage.getItem("showUserProfile");
+      // const storedModule = localStorage.getItem("activeModule");
+      // const storedSubModule = localStorage.getItem("activeSubModule");
+      // const storedShowUserProfile = localStorage.getItem("showUserProfile");
 
-      if (storedShowUserProfile === "true") {
-        setShowUserProfile(true);
-        setActiveModule(null);
-        setActiveSubModule(null);
-      } else if (storedModule) {
-        setActiveModule(storedModule);
-        if (storedSubModule && storedSubModule !== "null") setActiveSubModule(storedSubModule);
-      }
+      // if (storedShowUserProfile === "true") {
+      //   setShowUserProfile(true);
+      //   setActiveModule(null);
+      //   setActiveSubModule(null);
+      // } else if (storedModule) {
+      //   setActiveModule(storedModule);
+      //   if (storedSubModule && storedSubModule !== "null") setActiveSubModule(storedSubModule);
+      // }
     } else {
       setUser(null);
       navigate("/login", { replace: true }); // redirect to login if no user found
@@ -218,13 +219,59 @@ function App() {
     }
   };
 
+  // const loadMainModule = (moduleId) => {
+  //   if (moduleFileNames[moduleId] && !activeSubModule) {
+  //     const LazyComponent = lazy(() =>
+  //       import(
+  //         /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
+  //       )
+  //     );
+
+  //     const WrappedComponent = () => (
+  //       <LazyComponent
+  //         loadSubModule={loadSubModule}
+  //         setActiveSubModule={setActiveSubModule}
+  //         user_id={user?.user_id}
+  //         employee_id={user?.employee_id}
+  //       />
+  //     );
+
+  //     setModuleComponent(() => WrappedComponent);
+  //     setShowUserProfile(false);
+  //   }
+  // };
+
+  // const loadSubModule = (submoduleId, mainModule = activeModule) => {
+  //   if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
+  //     const LazyComponent = lazy(() =>
+  //       import(
+  //         /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
+  //       )
+  //     );
+
+  //     const WrappedComponent = () => (
+  //       <LazyComponent
+  //         loadSubModule={loadSubModule}
+  //         setActiveSubModule={setActiveSubModule}
+  //         user_id={user?.user_id}
+  //         employee_id={user?.employee_id}
+  //       />
+  //     );
+  //     setModuleComponent(() => WrappedComponent);
+
+  //     setShowUserProfile(false);
+  //   }
+  // };
+
+
+  const mainModules = import.meta.glob('./modules/*/*.jsx');
+  const subModules = import.meta.glob('./modules/*/submodules/*.jsx');
+  
   const loadMainModule = (moduleId) => {
-    if (moduleFileNames[moduleId] && !activeSubModule) {
-      const LazyComponent = lazy(() =>
-        import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
-        )
-      );
+    const moduleFile = `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`;
+
+    if (mainModules[moduleFile]) {
+      const LazyComponent = lazy(mainModules[moduleFile]);
 
       const WrappedComponent = () => (
         <LazyComponent
@@ -237,17 +284,18 @@ function App() {
 
       setModuleComponent(() => WrappedComponent);
       setShowUserProfile(false);
+    } else {
+      console.warn(`Module file not found: ${moduleFile}`);
     }
   };
 
-  const loadSubModule = (submoduleId, mainModule = activeModule) => {
-    if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
-      const LazyComponent = lazy(() =>
-        import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
-        )
-      );
 
+  const loadSubModule = (submoduleId, mainModule = activeModule) => {
+    const submoduleFile = `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`;
+  
+    if (subModules[submoduleFile]) {
+      const LazyComponent = lazy(subModules[submoduleFile]);
+  
       const WrappedComponent = () => (
         <LazyComponent
           loadSubModule={loadSubModule}
@@ -256,9 +304,11 @@ function App() {
           employee_id={user?.employee_id}
         />
       );
+  
       setModuleComponent(() => WrappedComponent);
-
       setShowUserProfile(false);
+    } else {
+      console.warn(`Submodule file not found: ${submoduleFile}`);
     }
   };
 
@@ -287,19 +337,12 @@ function App() {
   };
 
   const moduleSubmoduleFileNames = {
-    "Management": {
+    Management: {
       "Dashboard": "ManagementDashboard",
-      "Policy Compliance Oversight": "ManagementPolicyComplianceOversight",
-      "Salary Release Approval": "ManagementSalaryReleaseApproval",
-      "Budget Review Approval": "ManagementBudgetReviewApproval",
-      "Purchasing Approval": "ManagementPurchasingApproval",
-      "Project Approval": "ManagementProjectApproval",
-      "Project Monitoring": "ManagementProjectMonitoring",
-      "RecruitmentCandidates": "ManagementRecruitmentCandidates",
-      "AssetRemoval": "ManagementAssetRemoval",
+      "Project Approval": "ManagementApprovals",
       "User Roles": "UserRoles",
       "Access Control": "AccessControl",
-      "Settings": "Settings",
+      Settings: "Settings",
     },
     Administration: {
       "User": "User",
@@ -322,13 +365,18 @@ function App() {
       "Official Receipts": "OfficialReceipts",
     },
     "Financials": {
-      "Budgeting": "Budgeting",
-      "Cash Flow": "CashFlow",
-      "Financial Reports": "FinancialReports",
+      "Reports": "Reports",
+      "Validations" : "Validations",
+      "Approvals" : "Approvals",
+      "Forms" : "Forms"
     },
     "Purchasing": {
-      "Supplier Management": "SupplierManagement",
-      "Purchase Orders": "PurchaseOrders",
+      "Purchase Request List": "PurchaseReqList",
+      "Puchase Quotation List": "PurchaseQuot",
+      "Purchase Order Status": "PurchaseOrdStat",
+      "A/P Invoice": "PurchaseAPInvoice",
+      "Credit Memo": "PurchaseCredMemo",
+      "Vendor Application Form": "VendorAppForm",
     },
     Operations: {
       "Goods Tracking": "GoodsTracking",
@@ -379,7 +427,7 @@ function App() {
     },
     "Production": {
       "Equipment and Labor": "Equipment&Labor",
-      "Quality Control": "QualityControl",
+      //"Quality Control": "QualityControl",
       "Cost of Production": "CostOfProduction"
     },
     "MRP": {

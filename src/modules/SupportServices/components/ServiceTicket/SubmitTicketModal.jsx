@@ -7,7 +7,7 @@ import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 
 import { GET } from "../../api/api"
 
-const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
+const SubmitTicketModal = ({ isOpen, onClose, onSubmit, user_id, employee_id }) => {
   const [customers, setCustomers] = useState([]);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [technicians, setTechnicians] = useState([]);
@@ -26,10 +26,12 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
   });
   const [ticketType, setTicketType] = useState("")
 
+  
+
   // fetches a list of customers
   const fetchCustomers = async () => {
     try {
-      const response = await GET("/customers/");
+      const response = await GET("ticket/tickets/customers/");
       console.log("asdasd", response)
       setCustomers(response);
     } catch (error) {
@@ -54,7 +56,7 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
 // fetches a list of techs
 const fetchTechnicians = async () => {
   try {
-    const response = await GET("/technicians/");
+    const response = await GET("call/calls/help-desks/"); // filter out only help desk technicians
     console.log("techs", response)
     setTechnicians(response);
   } catch (error) {
@@ -101,6 +103,8 @@ const handleSelectType = (selectedType) => {
   const prioRef = useRef(null);
 
   useEffect(() => {
+    // setTechnicianId(employee_id); // set the technician id to the one currently logged in
+
     const handleClickOutside = (event) => {
       if (customerRef.current && !customerRef.current.contains(event.target)) {
         setDropdownOpen(false);
@@ -128,11 +132,11 @@ const handleSelectType = (selectedType) => {
       priority: priority,
       subject: subject,
       description: description,
-      type: ticketType
+      type: ticketType,
+      salesrep_id: technicianId
     })
     setCustomerId("");
     setName("");
-    setTechnicianId("");
     setPriority("");
     setSubject("");
     setDescription("");
@@ -244,6 +248,7 @@ const handleSelectType = (selectedType) => {
                   <input
                     type="text"
                     id="technicianId"
+                    // readOnly
                     value={technicianId}
                     onChange={(e) => {
                       setTechnicianId(e.target.value);
@@ -269,7 +274,7 @@ const handleSelectType = (selectedType) => {
                             <li>No technicians ID found</li>
                           )}
                         </ul>
-                      )}
+                      )}  
                 </div>
               </div>
             </div>

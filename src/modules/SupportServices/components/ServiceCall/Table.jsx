@@ -15,7 +15,8 @@ const Table = ({ serviceCalls, onRowClick, onViewDetails, selectedCall }) => {
           </tr>
         </thead>
         <tbody>
-          {serviceCalls.map((call, index) => (
+        {serviceCalls.length > 0 ? (
+          serviceCalls.map((call, index) => (
             <tr 
               key={call.service_call_id || `ticket-${index}`} 
               className={`${
@@ -35,7 +36,14 @@ const Table = ({ serviceCalls, onRowClick, onViewDetails, selectedCall }) => {
                   </button>
                 </td>
             </tr>
-          ))}
+          ))
+          ) : (
+            <tr>
+              <td colSpan="6" style={{ textAlign: "center", padding: "1rem" }}>
+                No calls available
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

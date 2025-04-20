@@ -11,7 +11,7 @@ import UpdateViewModal from "../components/ServiceRequest/UpdateViewModal"
 import { GET } from "../api/api"
 import { PATCH } from "../api/api"
 
-const ServiceRequest = () => {
+const ServiceRequest = ({employee_id}) => {
   const [requests, setRequests] = useState([])
   const [filterBy, setFilterBy] = useState("")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
@@ -23,7 +23,12 @@ const ServiceRequest = () => {
 
   const fetchRequests = async () => {
     try {
-      const data = await GET("service-requests/");
+      // this filters out requests so that only the service requests assigned to the one currently logged in will show:
+      const data = await GET(`request/requests/technician/${employee_id}/`);
+      // const data = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
+
+      // all calls version:
+      // const data = await GET("request/");
       setRequests(data);
     } catch (error) {
       console.error("Error fetching requests:", error)
@@ -64,7 +69,7 @@ const ServiceRequest = () => {
     console.log("Updating request:", updatedRequest)
 
     try {
-      await PATCH(`/service-requests/${requestId}/update/`, updatedRequest);
+      await PATCH(`request/${requestId}/`, updatedRequest);
       setShowUpdateModal(false);
       fetchRequests();
     } catch (error) {
