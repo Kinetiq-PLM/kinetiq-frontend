@@ -106,7 +106,12 @@ const TabSystem = () => {
                                             <tr>
                                                 <td>
                                              
-      <input type="checkbox"  checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row.external_id)}/>
+                                                <input 
+  type="checkbox" 
+  className="checkbox-input"  // Add this
+  checked={selectedRow === index} 
+  onChange={() => handleCheckboxChange(index, row.external_id)}
+/>
 
                                                 </td>
                                                 <td>{row.billing_receipt_id}</td>
@@ -151,7 +156,12 @@ const TabSystem = () => {
                                         tableData.map((row, index) => (
                                         <tr>
                                             <td>
-                                            <input type="checkbox"  checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row.external_id)}/>
+                                            <input 
+  type="checkbox" 
+  className="checkbox-input" 
+  checked={selectedRow === index} 
+  onChange={() => handleCheckboxChange(index, row.external_id)}
+/>
                                             </td>
                                             <td>{row.delivery_receipt_id}</td>
                                             <td>{row.delivery_date}</td>
@@ -195,7 +205,12 @@ const TabSystem = () => {
                                         tableData.map((row, index) => (
                                         <tr>
                                             <td>
-                                            <input type="checkbox"  checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row.external_id)}/>
+                                            <input 
+  type="checkbox" 
+  className="checkbox-input"  // Add this
+  checked={selectedRow === index} 
+  onChange={() => handleCheckboxChange(index, row.external_id)}
+/>
                                             </td>
                                             <td>{row.rework_id}</td>
                                             <td>{row.failed_shipment_id}</td>
@@ -240,7 +255,12 @@ const TabSystem = () => {
                                     {tableData.length > 0 ? (
                                         tableData.map((row, index) => (
                                         <tr key={index}>
-                                            <td className="checkbox-cell"><input type="checkbox" /></td>
+                                      <input 
+  type="checkbox" 
+  className="checkbox-input"  // Add this
+  checked={selectedRow === index} 
+  onChange={() => handleCheckboxChange(index, row.external_id)}
+/>
                                             <td>{row.goods_issue_id}</td>
                                             <td>{row.issue_date}</td>
                                             <td>{row.issued_by}</td>
