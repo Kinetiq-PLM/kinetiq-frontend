@@ -18,8 +18,7 @@
   box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
-  min-width: 40rem;
-  min-height: 30rem;
+  min-width: unset; /* Remove fixed min-width to prevent overflow */
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -129,6 +128,7 @@
 /* ---------------------------------------------------------
    BUTTONS
    --------------------------------------------------------- */
+/* Fix for the Add Candidate button alignment */
 .recruitment-add-btn {
   background-color: teal;
   color: white;
@@ -139,10 +139,13 @@
   cursor: pointer;
   white-space: nowrap;
   transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.recruitment-add-btn:hover {
-  background-color: #006666;
+.recruitment-add-btn .icon {
+  font-size: 1rem;
 }
 
 /* View button style */
@@ -295,7 +298,7 @@
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.95rem;
-  min-width: 1400px;
+  min-width: 100%; /* Default to 100% */
 }
 
 .recruitment-table thead {
@@ -977,4 +980,362 @@
   align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE DESIGN
+   --------------------------------------------------------- */
+
+/* Base responsive adjustments - Apply to all screens */
+.recruitment-body-content-container {
+  width: 100%;
+  max-width: 1600px;
+  padding: 1rem;
+}
+
+.recruitment-table {
+  min-width: 100%; /* Default to 100% */
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1200px) {
+  .recruitment-body-content-container {
+    padding: 1.5rem;
+  }
+  
+  .recruitment-scrollable {
+    padding: 1.75rem;
+  }
+  
+  /* Set min-width on tables for large screens only */
+  .recruitment-table {
+    min-width: 1400px;
+  }
+}
+
+/* Medium screens (tablets and small desktops) */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .recruitment-scrollable {
+    padding: 1.25rem;
+  }
+  
+  .recruitment-heading {
+    margin-bottom: 1.25rem;
+  }
+  
+  .recruitment-heading h2 {
+    font-size: 1.5rem;
+  }
+  
+  .recruitment-right-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .recruitment-search {
+    width: 200px;
+  }
+  
+  .recruitment-filter {
+    min-width: 150px;
+  }
+  
+  .recruitment-table-container {
+    max-height: calc(100vh - 200px);
+  }
+  
+  /* Adjust document actions */
+  .recruitment-document-actions {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  
+  /* Adjust modal for tablet */
+  .recruitment-modal {
+    width: 90vw;
+    padding: 1.5rem;
+  }
+  
+  .recruitment-two-col {
+    gap: 1.25rem 2rem;
+  }
+}
+
+/* Small screens (mobile) */
+@media (max-width: 767px) {
+  .recruitment-body-content-container {
+    padding: 0.75rem;
+    min-height: auto;
+  }
+  
+  .recruitment-scrollable {
+    padding: 1rem 0.75rem;
+  }
+  
+  /* Header and controls */
+  .recruitment-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .recruitment-heading h2 {
+    font-size: 1.4rem;
+  }
+  
+  .recruitment-right-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .recruitment-search-wrapper {
+    width: 100%;
+    margin-right: 0;
+  }
+  
+  .recruitment-search {
+    width: 100%;
+  }
+  
+  .recruitment-filter {
+    width: 100%;
+  }
+  
+  .recruitment-add-btn {
+    width: 100%;
+    padding: 0.75rem;
+  }
+  
+  /* Tabs header */
+  .recruitment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .recruitment-tabs {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .recruitment-tabs button {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.25rem;
+    white-space: nowrap;
+  }
+  
+  /* Tables */
+  .recruitment-table-container {
+    max-height: none; /* Remove fixed height on mobile */
+  }
+  
+  .recruitment-table-scrollable {
+    overflow-x: auto;
+  }
+  
+  .recruitment-table th,
+  .recruitment-table td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Document actions */
+  .recruitment-document-actions {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .recruitment-view-btn,
+  .recruitment-download-btn,
+  .recruitment-upload-btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Pagination */
+  .recruitment-pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .recruitment-pagination-numbers {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+  }
+  
+  .recruitment-pagination button {
+    min-width: 36px;
+    padding: 0.35rem 0.6rem;
+  }
+  
+  /* Modals */
+  .recruitment-modal {
+    width: 95vw;
+    max-width: 95vw;
+    padding: 1.25rem;
+  }
+  
+  .recruitment-modal-form {
+    padding-right: 0.5rem;
+    gap: 1rem;
+  }
+  
+  .recruitment-two-col {
+    grid-template-columns: 1fr; /* Single column on mobile */
+    gap: 1rem;
+  }
+  
+  .recruitment-modal-buttons,
+  .recruitment-two-col-buttons {
+    flex-direction: column-reverse; /* Place primary button on top */
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  /* Form elements */
+  .recruitment-form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .recruitment-form input,
+  .recruitment-form select,
+  .recruitment-form textarea {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Tags */
+  .recruitment-tag {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  /* Action buttons */
+  .recruitment-action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  
+  .recruitment-action-buttons button {
+    width: 100%;
+    margin-bottom: 0.25rem;
+    justify-content: center;
+  }
+  
+  /* Fix dropdown position on mobile */
+  .recruitment-dropdown {
+    right: 0px;
+    width: 170px;
+    max-width: 80vw;
+  }
+}
+
+/* Very small screens (smaller mobile devices) */
+@media (max-width: 480px) {
+  .recruitment-body-content-container {
+    padding: 0.5rem;
+  }
+  
+  .recruitment-scrollable {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .recruitment-heading h2 {
+    font-size: 1.25rem;
+  }
+  
+  .recruitment-modal {
+    padding: 1rem;
+  }
+  
+  .recruitment-table th,
+  .recruitment-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Further reduce dropdown width on very small screens */
+  .recruitment-dropdown {
+    width: 160px;
+    right: -40px; /* Shift slightly to the left so it's more visible */
+  }
+  
+  .recruitment-dropdown-item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Adjust document section margins */
+  .documents-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .documents-section h4 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Enhanced scrollbar behavior for all screen sizes */
+@media (hover: hover) {
+  .recruitment-table-scrollable::-webkit-scrollbar,
+  .recruitment-modal::-webkit-scrollbar,
+  .recruitment-scrollable::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Print media query for better printing */
+@media print {
+  .recruitment-add-btn,
+  .recruitment-filter,
+  .recruitment-search-wrapper,
+  .recruitment-actions,
+  .recruitment-pagination,
+  .recruitment-document-actions {
+    display: none;
+  }
+  
+  .recruitment-body-content-container {
+    box-shadow: none;
+  }
+  
+  .recruitment-table {
+    min-width: 100%;
+  }
+  
+  .recruitment-table-container,
+  .recruitment-table-scrollable {
+    max-height: none;
+    overflow: visible;
+  }
+  
+  .recruitment-modal-overlay {
+    display: none;
+  }
+  
+  .recruitment-tag {
+    border: 1px solid #ddd;
+    color: #333 !important;
+    background: none !important;
+  }
 }

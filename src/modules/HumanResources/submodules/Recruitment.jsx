@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FiSearch, FiUpload } from "react-icons/fi";
+import { FiSearch, FiUpload, FiPlus } from "react-icons/fi";
 import "../styles/Recruitment.css";
 
 // Add this constant at the top of your component (outside the function)
@@ -22,21 +22,22 @@ const Recruitment = () => {
   const [showContractDetailsModal, setShowContractDetailsModal] = useState(false);
   const [showUploadDocumentModal, setShowUploadDocumentModal] = useState(false);
   const [showEditCandidateModal, setShowEditCandidateModal] = useState(false);
+  const [showAddCandidateModal, setShowAddCandidateModal] = useState(false);
   
   // Reference data
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
   const [newJobPosting, setNewJobPosting] = useState({
-    dept_id: "",
-    position_id: "",
+    dept_id: null,
+    position_id: null,
     position_title: "",
     description: "",
     requirements: "",
-    employment_type: "Regular",
-    base_salary: "",
-    daily_rate: "",
-    duration_days: "",
-    posting_status: "Draft"
+    employment_type: null,
+    base_salary: null,
+    daily_rate: null,
+    duration_days: null,
+    posting_status: null
   });
 
   const [newResignation, setNewResignation] = useState({
@@ -45,6 +46,26 @@ const Recruitment = () => {
     hr_approver_id: ""
   });
 
+  const [editingResignation, setEditingResignation] = useState(null);
+
+  const [newCandidate, setNewCandidate] = useState({
+    job_id: "",
+    position_title: "",
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    resume_path: null,
+    application_status: "Applied", // Default status
+    documents: null,
+    interview_details: null,
+    offer_details: null,
+    contract_details: null,
+    resume_file: null // New field for storing the actual file
+  });
+
+  const [editingCandidate, setEditingCandidate] = useState(null);
+
   // UI States
   const [activeTab, setActiveTab] = useState("Candidates");
   const [showArchived, setShowArchived] = useState(false);
@@ -52,7 +73,7 @@ const Recruitment = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [sortField, setSortField] = useState("all");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // General loading state
   const [toast, setToast] = useState(null);
   const [dotsMenuOpen, setDotsMenuOpen] = useState(null);
   const [showEditJobModal, setShowEditJobModal] = useState(false);
@@ -65,7 +86,7 @@ const Recruitment = () => {
   const [uploadingDocumentType, setUploadingDocumentType] = useState('');
   const [uploadingDocumentCategory, setUploadingDocumentCategory] = useState('');
   const [uploadingFile, setUploadingFile] = useState(null);
-  const [uploadingStatus, setUploadingStatus] = useState('idle');
+  const [uploadingStatus, setUploadingStatus] = useState('idle'); // Upload-specific state
 
   // Fetch data on component mount
   useEffect(() => {
@@ -143,7 +164,7 @@ const Recruitment = () => {
         return data.results;
       }
       // Or it might be an object where values are what we want
-      return Object.values(data);
+      return data.values;
     }
     // Default to empty array
     return [];
@@ -239,9 +260,60 @@ const Recruitment = () => {
 
   // Function to handle editing a candidate
   const handleEditCandidate = (candidate) => {
-    setCurrentCandidate(candidate);
+    setEditingCandidate({
+      ...candidate,
+      // Ensure all required fields exist
+      job_id: candidate.job_id || "",
+      first_name: candidate.first_name || "",
+      last_name: candidate.last_name || "",
+      email: candidate.email || "",
+      phone: candidate.phone || "",
+      application_status: candidate.application_status || "Applied",
+      resume_file: null // For new file uploads
+    });
     setShowEditCandidateModal(true);
     setDotsMenuOpen(null);
+  };
+
+  // Function to handle adding a new candidate
+  const handleAddCandidate = () => {
+    // Reset the form values
+    setNewCandidate({
+      job_id: "",
+      position_title: "",
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone: "",
+      resume_path: null,
+      application_status: "Applied",
+      documents: null,
+      interview_details: null,
+      offer_details: null,
+      contract_details: null,
+      resume_file: null
+    });
+    setShowAddCandidateModal(true);
+  };
+
+  // Handle resume file upload
+  const handleResumeUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewCandidate(prev => ({
+        ...prev,
+        resume_file: file // Store the actual file
+      }));
+    }
+  };
+
+  const handleEditResumeUpload = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setEditingCandidate(prev => ({
+        ...prev,
+        resume_file: e.target.files[0]
+      }));
+    }
   };
 
   // Archive and restore functions
@@ -280,6 +352,96 @@ const Recruitment = () => {
     } catch (err) {
       console.error("Error restoring candidate:", err);
       showToast("Failed to restore candidate", false);
+    }
+  };
+
+  const handleEditResignation = (resignation) => {
+    // Create a copy of the resignation to edit
+    setEditingResignation({
+      ...resignation
+    });
+    setShowEditResignationModal(true);
+    setDotsMenuOpen(null);
+  };
+
+  const handleViewResignationDetails = (resignation) => {
+    // View resignation details logic
+    console.log("Viewing resignation details:", resignation);
+    setDotsMenuOpen(null);
+  };
+
+  const handleEditResignationSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Update resignation logic here
+      await axios.patch(
+        `http://127.0.0.1:8000/api/resignation/resignations/${editingResignation.resignation_id}/`, 
+        editingResignation
+      );
+      
+      showToast("Resignation updated successfully", true);
+      setShowEditResignationModal(false);
+      
+      // Refresh resignations
+      const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
+      setResignations(resignationsRes.data);
+    } catch (err) {
+      console.error("Error updating resignation:", err.response?.data || err);
+      const errorMessage = err.response?.data?.detail || 
+                         Object.values(err.response?.data || {}).flat().join(", ") || 
+                         "Failed to update resignation";
+      showToast(errorMessage, false);
+    }
+  };
+
+  const handleEditCandidateSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Create FormData for file uploads
+    const formData = new FormData();
+    
+    // Add all text fields
+    Object.keys(editingCandidate).forEach(key => {
+      if (key !== 'resume_file' && key !== 'resume_path' && editingCandidate[key] !== null) {
+        formData.append(key, editingCandidate[key]);
+      }
+    });
+    
+    // Add resume file if present
+    if (editingCandidate.resume_file) {
+      formData.append('resume', editingCandidate.resume_file);
+    }
+    
+    try {
+      setLoading(true);
+      
+      // Submit to API
+      const response = await axios.patch(
+        `http://127.0.0.1:8000/api/candidates/candidates/${editingCandidate.candidate_id || editingCandidate.id}/`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      
+      showToast("Candidate updated successfully", true);
+      setShowEditCandidateModal(false);
+      
+      // Refresh the candidates list
+      const candidatesRes = await axios.get("http://127.0.0.1:8000/api/candidates/candidates/");
+      setCandidates(candidatesRes.data.filter(c => !c.is_archived));
+      setArchivedCandidates(candidatesRes.data.filter(c => c.is_archived));
+      
+    } catch (err) {
+      console.error("Error updating candidate:", err);
+      const errorMessage = err.response?.data?.detail || 
+                         Object.values(err.response?.data || {}).flat().join(", ") || 
+                         "Failed to update candidate";
+      showToast(errorMessage, false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -435,6 +597,7 @@ const Recruitment = () => {
                 <tr>
                   {isArchived && <th>Select</th>}
                   <th>Candidate ID</th>
+                  <th>Job ID</th>
                   <th>Position Title</th>
                   <th>First Name</th>
                   <th>Last Name</th>
@@ -460,6 +623,7 @@ const Recruitment = () => {
                       </td>
                     )}
                     <td>{candidate.candidate_id || candidate.id}</td>
+                    <td>{candidate.job_id || '-'}</td>
                     <td>{candidate.position_title || candidate.applied_position || '-'}</td>
                     <td>{candidate.first_name}</td>
                     <td>{candidate.last_name}</td>
@@ -603,12 +767,9 @@ const Recruitment = () => {
 
   const renderResignationsTable = (data) => {
     const { paginated, totalPages } = filterAndPaginate(data);
-    if (loading) {
-      return <div className="recruitment-loading">Loading...</div>;
-    }
-    if (!paginated.length) {
-      return <div className="recruitment-no-results">No resignations found</div>;
-    }
+    if (loading) return <div className="recruitment-loading">Loading...</div>;
+    if (!paginated.length) return <div className="recruitment-no-results">No resignations found</div>;
+    
     return (
       <>
         <div className="recruitment-table-wrapper">
@@ -658,6 +819,12 @@ const Recruitment = () => {
                             >
                               Edit
                             </div>
+                            <div 
+                              className="recruitment-dropdown-item"
+                              onClick={() => handleViewResignationDetails(resignation)}
+                            >
+                              View Details
+                            </div>
                           </div>
                         )}
                       </div>
@@ -673,132 +840,134 @@ const Recruitment = () => {
     );
   };
 
-  const renderPagination = (totalPages) => (
-    <div className="recruitment-pagination">
-      <button 
-        className="recruitment-pagination-arrow" 
-        onClick={() => setCurrentPage(1)} 
-        disabled={currentPage === 1}
-      >
-        &#171; {/* Double left arrow */}
-      </button>
-      
-      <button 
-        className="recruitment-pagination-arrow" 
-        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-        disabled={currentPage === 1}
-      >
-        &#8249; {/* Single left arrow */}
-      </button>
-      
-      <div className="recruitment-pagination-numbers">
-        {(() => {
-          const pageNumbers = [];
-          const maxVisiblePages = 5;
-          
-          if (totalPages <= maxVisiblePages + 2) {
-            // Show all pages if there are few
-            for (let i = 1; i <= totalPages; i++) {
+  const renderPagination = (totalPages) => {
+    return (
+      <div className="recruitment-pagination">
+        <button 
+          className="recruitment-pagination-arrow" 
+          onClick={() => setCurrentPage(1)} 
+          disabled={currentPage === 1}
+        >
+          &#171; {/* Double left arrow */}
+        </button>
+        
+        <button 
+          className="recruitment-pagination-arrow" 
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+          disabled={currentPage === 1}
+        >
+          &#8249; {/* Single left arrow */}
+        </button>
+        
+        <div className="recruitment-pagination-numbers">
+          {(() => {
+            const pageNumbers = [];
+            const maxVisiblePages = 5;
+            
+            if (totalPages <= maxVisiblePages + 2) {
+              // Show all pages if there are few
+              for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+            } else {
+              // Always show first page
               pageNumbers.push(
                 <button
-                  key={i}
-                  className={i === currentPage ? "active" : ""}
-                  onClick={() => setCurrentPage(i)}
+                  key={1}
+                  className={1 === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(1)}
                 >
-                  {i}
+                  1
+                </button>
+              );
+              
+              // Calculate range around current page
+              let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+              let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+              
+              // Adjust if we're near the end
+              if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(2, endPage - maxVisiblePages + 1);
+              }
+              
+              // Add ellipsis after first page if needed
+              if (startPage > 2) {
+                pageNumbers.push(<span key="ellipsis1" className="recruitment-pagination-ellipsis">...</span>);
+              }
+              
+              // Add middle pages
+              for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              
+              // Add ellipsis before last page if needed
+              if (endPage < totalPages - 1) {
+                pageNumbers.push(<span key="ellipsis2" className="recruitment-pagination-ellipsis">...</span>);
+              }
+              
+              // Always show last page
+              pageNumbers.push(
+                <button
+                  key={totalPages}
+                  className={totalPages === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  {totalPages}
                 </button>
               );
             }
-          } else {
-            // Always show first page
-            pageNumbers.push(
-              <button
-                key={1}
-                className={1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(1)}
-              >
-                1
-              </button>
-            );
             
-            // Calculate range around current page
-            let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
-            
-            // Adjust if we're near the end
-            if (endPage - startPage < maxVisiblePages - 1) {
-              startPage = Math.max(2, endPage - maxVisiblePages + 1);
-            }
-            
-            // Add ellipsis after first page if needed
-            if (startPage > 2) {
-              pageNumbers.push(<span key="ellipsis1" className="recruitment-pagination-ellipsis">...</span>);
-            }
-            
-            // Add middle pages
-            for (let i = startPage; i <= endPage; i++) {
-              pageNumbers.push(
-                <button
-                  key={i}
-                  className={i === currentPage ? "active" : ""}
-                  onClick={() => setCurrentPage(i)}
-                >
-                  {i}
-                </button>
-              );
-            }
-            
-            // Add ellipsis before last page if needed
-            if (endPage < totalPages - 1) {
-              pageNumbers.push(<span key="ellipsis2" className="recruitment-pagination-ellipsis">...</span>);
-            }
-            
-            // Always show last page
-            pageNumbers.push(
-              <button
-                key={totalPages}
-                className={totalPages === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(totalPages)}
-              >
-                {totalPages}
-              </button>
-            );
-          }
-          
-          return pageNumbers;
-        })()}
+            return pageNumbers;
+          })()}
+        </div>
+        
+        <button 
+          className="recruitment-pagination-arrow" 
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+          disabled={currentPage === totalPages}
+        >
+          &#8250; {/* Single right arrow */}
+        </button>
+        
+        <button 
+          className="recruitment-pagination-arrow" 
+          onClick={() => setCurrentPage(totalPages)} 
+          disabled={currentPage === totalPages}
+        >
+          &#187; {/* Double right arrow */}
+        </button>
+        
+        <select
+          className="recruitment-pagination-size"
+          value={itemsPerPage}
+          onChange={(e) => {
+            setItemsPerPage(parseInt(e.target.value));
+            setCurrentPage(1);
+          }}
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+        </select>
       </div>
-      
-      <button 
-        className="recruitment-pagination-arrow" 
-        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
-        disabled={currentPage === totalPages}
-      >
-        &#8250; {/* Single right arrow */}
-      </button>
-      
-      <button 
-        className="recruitment-pagination-arrow" 
-        onClick={() => setCurrentPage(totalPages)} 
-        disabled={currentPage === totalPages}
-      >
-        &#187; {/* Double right arrow */}
-      </button>
-      
-      <select
-        className="recruitment-pagination-size"
-        value={itemsPerPage}
-        onChange={(e) => {
-          setItemsPerPage(parseInt(e.target.value));
-          setCurrentPage(1);
-        }}
-      >
-        <option value={5}>5</option>
-        <option value={10}>10</option>
-        <option value={20}>20</option>
-      </select>
-    </div>
-  );
+    );
+  };
 
   const handleEditJobPosting = (posting) => {
     // Create a copy of the posting to edit
@@ -813,30 +982,32 @@ const Recruitment = () => {
     setDotsMenuOpen(null);
   };
 
-  const handleAddClick = () => {
-    if (activeTab === "Job Postings") {
-      setNewJobPosting({
-        dept_id: "",
-        position_id: "",
-        position_title: "",
-        description: "",
-        requirements: "",
-        employment_type: "Regular",
-        base_salary: "",
-        daily_rate: "",
-        duration_days: "",
-        posting_status: "Draft"
-      });
-      setShowAddJobModal(true);
-    } else if (activeTab === "Resignations") {
-      setNewResignation({
-        employee_id: "",
-        notice_period_days: "",
-        hr_approver_id: ""
-      });
-      setShowAddResignationModal(true);
-    }
-  };
+const handleAddClick = () => {
+  if (activeTab === "Job Postings") {
+    setNewJobPosting({
+      dept_id: null,
+      position_id: null,
+      position_title: "",
+      description: "",
+      requirements: "",
+      employment_type: null,
+      base_salary: null,
+      daily_rate: null,
+      duration_days: null,
+      posting_status: null
+    });
+    setShowAddJobModal(true);
+  } else if (activeTab === "Resignations") {
+    setNewResignation({
+      employee_id: "",
+      notice_period_days: "",
+      hr_approver_id: ""
+    });
+    setShowAddResignationModal(true);
+  } else if (activeTab === "Candidates") {
+    handleAddCandidate();
+  }
+};
 
 const handleJobPostingChange = (e) => {
   const { name, value, type } = e.target;
@@ -899,6 +1070,46 @@ const handleResignationChange = (e) => {
     ...prev,
     [name]: value
   }));
+};
+
+const handleCandidateChange = (e) => {
+  const { name, value, type } = e.target;
+  
+  if (name === "job_id") {
+    // If changing job ID, update position_title automatically
+    const selectedJob = jobPostings.find(job => job.job_id === value);
+    setNewCandidate(prev => ({
+      ...prev,
+      [name]: value,
+      position_title: selectedJob?.position_title || ""
+    }));
+  } else {
+    // For all other fields
+    setNewCandidate(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+};
+
+const handleEditCandidateChange = (e) => {
+  const { name, value, type } = e.target;
+  
+  if (name === "job_id") {
+    // If changing job ID, update position_title automatically
+    const selectedJob = jobPostings.find(job => job.job_id === value);
+    setEditingCandidate(prev => ({
+      ...prev,
+      [name]: value,
+      position_title: selectedJob?.position_title || ""
+    }));
+  } else {
+    // For all other fields
+    setEditingCandidate(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
 };
 
 const handleEditJobPostingSubmit = async (e) => {
@@ -1253,6 +1464,53 @@ const handleRestoreJobPosting = async (jobPosting) => {
   }
 };
 
+const submitCandidateForm = async (e) => {
+  e.preventDefault();
+  
+  // Create FormData for file uploads
+  const formData = new FormData();
+  
+  // Add all text fields
+  Object.keys(newCandidate).forEach(key => {
+    if (key !== 'resume_file' && newCandidate[key] !== null) {
+      formData.append(key, newCandidate[key]);
+    }
+  });
+  
+  // Add resume file if present
+  if (newCandidate.resume_file) {
+    formData.append('resume', newCandidate.resume_file);
+  }
+  
+  try {
+    setLoading(true);
+    
+    // Submit to API
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/candidates/candidates/",
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    
+    showToast("Candidate added successfully", true);
+    setShowAddCandidateModal(false);
+    
+    // Refresh the candidates list
+    const candidatesRes = await axios.get("http://127.0.0.1:8000/api/candidates/candidates/");
+    setCandidates(candidatesRes.data);
+    
+  } catch (err) {
+    console.error("Error adding candidate:", err);
+    showToast("Failed to add candidate: " + (err.response?.data?.message || err.message), false);
+  } finally {
+    setLoading(false);
+  }
+};
+
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
     
@@ -1381,14 +1639,23 @@ const handleRestoreJobPosting = async (jobPosting) => {
                 <option value="id">Sort by ID</option>
                 <option value="status">Sort by Status</option>
               </select>
-              <button 
-                className="recruitment-add-btn" 
-                onClick={handleAddClick}
-              >
-                {activeTab === "Candidates" ? "+ Add Candidate" : 
-                 activeTab === "Job Postings" ? "+ Add Job Posting" : 
-                 "+ Add Resignation"}
-              </button>
+              {activeTab === "Candidates" && (
+                <button className="recruitment-add-btn" onClick={handleAddClick}>
+                  <FiPlus className="icon" /> Add Candidate
+                </button>
+              )}
+
+              {activeTab === "Job Postings" && (
+                <button className="recruitment-add-btn" onClick={handleAddClick}>
+                  <FiPlus className="icon" /> Add Job Posting
+                </button>
+              )}
+
+              {activeTab === "Resignations" && (
+                <button className="recruitment-add-btn" onClick={handleAddClick}>
+                  <FiPlus className="icon" /> Add Resignation
+                </button>
+              )}
               {activeTab !== "Resignations" && (
                 <button
                   className="recruitment-add-btn"
@@ -1452,7 +1719,7 @@ const handleRestoreJobPosting = async (jobPosting) => {
         </div>
       )}
 
-      {loading && (
+      {uploadingStatus === 'uploading' && (
         <div className="recruitment-loading-overlay">
           <div className="recruitment-spinner"></div>
           <p>Uploading document...</p>
@@ -1475,36 +1742,47 @@ const handleRestoreJobPosting = async (jobPosting) => {
                       required
                     >
                       <option value="">-- Select Department --</option>
-                      {Array.isArray(departments) ? departments.map(dept => (
+                      {departments.map(dept => (
                         <option key={dept.dept_id} value={dept.dept_id}>
                           {dept.dept_name}
                         </option>
-                      )) : <option value="">No departments available</option>}
+                      ))}
                     </select>
                   </div>
                   
                   <div className="form-group">
                     <label>Position *</label>
-                    <select 
-                      name="position_id" 
-                      value={newJobPosting.position_id} 
+                    <select
+                      name="position_id"
+                      value={newJobPosting.position_id}
                       onChange={handleJobPostingChange}
                       required
                     >
                       <option value="">-- Select Position --</option>
-                      {Array.isArray(positions) ? positions.map(pos => (
+                      {positions.map(pos => (
                         <option key={pos.position_id} value={pos.position_id}>
                           {pos.position_title}
                         </option>
-                      )) : <option value="">No positions available</option>}
+                      ))}
                     </select>
                   </div>
                   
                   <div className="form-group">
+                    <label>Position Title</label>
+                    <input
+                      type="text"
+                      name="position_title"
+                      value={newJobPosting.position_title}
+                      disabled
+                      placeholder="Auto-filled from position selection"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
                     <label>Employment Type *</label>
-                    <select 
-                      name="employment_type" 
-                      value={newJobPosting.employment_type} 
+                    <select
+                      name="employment_type"
+                      value={newJobPosting.employment_type}
                       onChange={handleJobPostingChange}
                       required
                     >
@@ -1514,7 +1792,6 @@ const handleRestoreJobPosting = async (jobPosting) => {
                     </select>
                   </div>
                   
-                  {/* Conditionally render salary field based on employment type */}
                   {newJobPosting.employment_type === "Regular" ? (
                     <div className="form-group">
                       <label>Base Salary *</label>
@@ -1545,6 +1822,16 @@ const handleRestoreJobPosting = async (jobPosting) => {
                 </div>
                 
                 <div className="form-column">
+                  <div className="form-group">
+                    <label>Description *</label>
+                    <textarea
+                      name="description"
+                      value={newJobPosting.description}
+                      onChange={handleJobPostingChange}
+                      required
+                    />
+                  </div>
+                  
                   {newJobPosting.employment_type !== "Regular" && (
                     <div className="form-group">
                       <label>Duration (Days){newJobPosting.employment_type !== "Regular" ? " *" : ""}</label>
@@ -1568,6 +1855,19 @@ const handleRestoreJobPosting = async (jobPosting) => {
                       onChange={handleJobPostingChange}
                       required
                     />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Posting Status</label>
+                    <select
+                      name="posting_status"
+                      value={newJobPosting.posting_status}
+                      onChange={handleJobPostingChange}
+                    >
+                      <option value="Draft">Draft</option>
+                      <option value="Open">Open</option>
+                      <option value="Closed">Closed</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -1905,15 +2205,286 @@ const handleRestoreJobPosting = async (jobPosting) => {
       )}
 
       {/* Edit Candidate Modal */}
-      {showEditCandidateModal && currentCandidate && (
+      {showEditCandidateModal && editingCandidate && (
         <div className="recruitment-modal-overlay" onClick={() => setShowEditCandidateModal(false)}>
-          <div className="recruitment-modal" onClick={e => e.stopPropagation()}>
+          <div className="recruitment-modal" style={{ width: "1200px", maxWidth: "95vw" }} onClick={e => e.stopPropagation()}>
             <h3>Edit Candidate Information</h3>
-            {/* Edit candidate form here */}
-            <div className="recruitment-modal-buttons">
-              <button className="cancel-btn" onClick={() => setShowEditCandidateModal(false)}>Cancel</button>
-              <button className="submit-btn">Save Changes</button>
-            </div>
+            
+            <form onSubmit={handleEditCandidateSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label htmlFor="edit-job-id">Job Posting *</label>
+                    <select 
+                      id="edit-job-id" 
+                      name="job_id" 
+                      value={editingCandidate?.job_id || ""} 
+                      onChange={handleEditCandidateChange}
+                      required
+                    >
+                      <option value="">-- Select Job Posting --</option>
+                      {jobPostings.map(job => (
+                        <option key={job.job_id} value={job.job_id}>
+                          {job.job_id} - {job.position_title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="edit-first-name">First Name *</label>
+                    <input 
+                      type="text" 
+                      id="edit-first-name" 
+                      name="first_name" 
+                      value={editingCandidate?.first_name || ""} 
+                      onChange={handleEditCandidateChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="edit-last-name">Last Name *</label>
+                    <input 
+                      type="text" 
+                      id="edit-last-name" 
+                      name="last_name" 
+                      value={editingCandidate?.last_name || ""} 
+                      onChange={handleEditCandidateChange}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <div className="form-group">
+                    <label htmlFor="edit-email">Email *</label>
+                    <input 
+                      type="email" 
+                      id="edit-email" 
+                      name="email" 
+                      value={editingCandidate?.email || ""} 
+                      onChange={handleEditCandidateChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="edit-phone">Phone *</label>
+                    <input 
+                      type="tel" 
+                      id="edit-phone" 
+                      name="phone" 
+                      value={editingCandidate?.phone || ""} 
+                      onChange={handleEditCandidateChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="edit-application-status">Application Status *</label>
+                    <select 
+                      id="edit-application-status" 
+                      name="application_status" 
+                      value={editingCandidate?.application_status || ""} 
+                      onChange={handleEditCandidateChange}
+                      required
+                    >
+                      <option value="Applied">Applied</option>
+                      <option value="Screening">Screening</option>
+                      <option value="Interviewing">Interviewing</option>
+                      <option value="Hired">Hired</option>
+                      <option value="Rejected">Rejected</option>
+                      <option value="Waitlisted">Waitlisted</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="edit-resume">Resume</label>
+                  <div className="resume-info">
+                    {editingCandidate?.resume_path ? (
+                      <div className="current-resume">
+                        <span>Current resume: {editingCandidate.resume_path.split('/').pop()}</span>
+                        <a 
+                          href={editingCandidate.resume_path} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="recruitment-view-btn"
+                          style={{ marginLeft: '10px' }}
+                        >
+                          View
+                        </a>
+                      </div>
+                    ) : (
+                      <span>No resume uploaded</span>
+                    )}
+                  </div>
+                  <input 
+                    type="file" 
+                    id="edit-resume" 
+                    name="resume" 
+                    onChange={handleEditResumeUpload}
+                    accept=".pdf,.doc,.docx"
+                  />
+                  <span className="input-help-text">Accepted formats: PDF, DOC, DOCX</span>
+                  <span className="input-help-text">
+                    Leave empty to keep the current resume. Upload a new file to replace it.
+                  </span>
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowEditCandidateModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="submit-btn"
+                  disabled={loading}
+                >
+                  {loading ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Candidate Modal */}
+      {showAddCandidateModal && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal" style={{ width: "1200px", maxWidth: "95vw" }}>
+            <h3>Add New Candidate</h3>
+            
+            <form onSubmit={submitCandidateForm} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label htmlFor="job_id">Job Posting *</label>
+                    <select 
+                      id="job_id" 
+                      name="job_id" 
+                      value={newCandidate.job_id} 
+                      onChange={handleCandidateChange}
+                      required
+                    >
+                      <option value="">-- Select Job Posting --</option>
+                      {jobPostings.map(job => (
+                        <option key={job.job_id} value={job.job_id}>
+                          {job.job_id} - {job.position_title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="first_name">First Name *</label>
+                    <input 
+                      type="text" 
+                      id="first_name" 
+                      name="first_name" 
+                      value={newCandidate.first_name} 
+                      onChange={handleCandidateChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="last_name">Last Name *</label>
+                    <input 
+                      type="text" 
+                      id="last_name" 
+                      name="last_name" 
+                      value={newCandidate.last_name} 
+                      onChange={handleCandidateChange}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <div className="form-group">
+                    <label htmlFor="email">Email *</label>
+                    <input 
+                      type="email" 
+                      id="email" 
+                      name="email" 
+                      value={newCandidate.email} 
+                      onChange={handleCandidateChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="phone">Phone *</label>
+                    <input 
+                      type="tel" 
+                      id="phone" 
+                      name="phone" 
+                      value={newCandidate.phone} 
+                      onChange={handleCandidateChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="application_status">Application Status *</label>
+                    <select 
+                      id="application_status" 
+                      name="application_status" 
+                      value={newCandidate.application_status} 
+                      onChange={handleCandidateChange}
+                      required
+                    >
+                      <option value="Applied">Applied</option>
+                      <option value="Screening">Screening</option>
+                      <option value="Interviewing">Interviewing</option>
+                      <option value="Hired">Hired</option>
+                      <option value="Rejected">Rejected</option>
+                      <option value="Waitlisted">Waitlisted</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="resume">Resume</label>
+                  <input 
+                    type="file" 
+                    id="resume" 
+                    name="resume" 
+                    onChange={handleResumeUpload}
+                    accept=".pdf,.doc,.docx"
+                  />
+                  <span className="input-help-text">Accepted formats: PDF, DOC, DOCX</span>
+                  <span className="input-help-text">
+                    Additional details like Documents, Interview Details, Offer Details, and Contract Details 
+                    can be added after creating the candidate.
+                  </span>
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowAddCandidateModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="submit-btn"
+                  disabled={loading}
+                >
+                  {loading ? "Saving..." : "Add Candidate"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -21,7 +21,7 @@
   box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
-  min-width: 40rem;
+  min-width: unset; /* Remove fixed min-width to prevent overflow */
   min-height: 30rem;
   box-sizing: border-box;
   overflow: hidden; /* scrolled inside .hr-employee-salary-scrollable */
@@ -405,6 +405,249 @@
 
 .cancel-btn:hover {
   background-color: #999; /* Match Performance hover */
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE DESIGN
+   --------------------------------------------------------- */
+
+/* Base responsive adjustments */
+.hr-employee-salary-body-content-container {
+  min-width: unset; /* Remove fixed min-width to prevent overflow */
+  width: 100%;
+  max-width: 1600px;
+  padding: 1rem;
+}
+
+.hr-employee-salary-table {
+  width: 100%;
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1200px) {
+  .hr-employee-salary-body-content-container {
+    padding: 1.5rem;
+  }
+  
+  .hr-employee-salary-scrollable {
+    padding: 1.75rem;
+  }
+  
+  .hr-employee-salary-table {
+    min-width: 1400px; /* Only force min-width on large screens */
+  }
+}
+
+/* Medium screens (tablets and small desktops) */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .hr-employee-salary-scrollable {
+    padding: 1.25rem;
+  }
+  
+  .hr-employee-salary-heading {
+    margin-bottom: 1.25rem;
+  }
+  
+  .hr-employee-salary-heading h2 {
+    font-size: 1.5rem;
+  }
+  
+  .hr-employee-salary-right-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .hr-employee-salary-search {
+    width: 200px;
+  }
+  
+  .hr-employee-salary-filter {
+    min-width: 150px;
+  }
+  
+  .hr-employee-salary-table-container {
+    max-height: calc(100vh - 200px);
+  }
+  
+  /* Modal adjustments for tablets */
+  .hr-employee-salary-modal {
+    width: 90vw;
+    max-width: 90vw;
+  }
+}
+
+/* Small screens (mobile) */
+@media (max-width: 767px) {
+  .hr-employee-salary-body-content-container {
+    padding: 0.75rem;
+    min-height: auto;
+  }
+  
+  .hr-employee-salary-scrollable {
+    padding: 1rem 0.75rem;
+    max-height: none; /* Remove fixed height constraint */
+  }
+  
+  /* Header and controls */
+  .hr-employee-salary-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .hr-employee-salary-heading h2 {
+    font-size: 1.4rem;
+  }
+  
+  .hr-employee-salary-right-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .hr-employee-salary-search-wrapper {
+    width: 100%;
+    margin-right: 0;
+  }
+  
+  .hr-employee-salary-search {
+    width: 100%;
+  }
+  
+  .hr-employee-salary-filter {
+    width: 100%;
+  }
+  
+  /* Tables */
+  .hr-employee-salary-table-container {
+    max-height: none; /* Remove fixed height constraint on mobile */
+  }
+  
+  .hr-employee-salary-table-scrollable {
+    overflow-x: auto;
+  }
+  
+  .hr-employee-salary-table th,
+  .hr-employee-salary-table td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Pagination */
+  .hr-employee-salary-pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .hr-employee-salary-pagination-numbers {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+  }
+  
+  .hr-employee-salary-pagination button {
+    min-width: 36px;
+    padding: 0.35rem 0.6rem;
+  }
+  
+  /* Modals */
+  .hr-employee-salary-modal {
+    width: 95vw;
+    max-width: 95vw;
+    padding: 1.25rem;
+  }
+  
+  .hr-employee-salary-modal-form {
+    padding-right: 0.5rem;
+    gap: 1rem;
+  }
+  
+  .hr-employee-salary-modal-buttons {
+    flex-direction: column-reverse; /* Place primary button on top */
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  /* Three-dot menu dropdown positioning fix */
+  .hr-employee-salary-dropdown {
+    right: 0;
+    width: 160px;
+  }
+}
+
+/* Very small screens (smaller mobile devices) */
+@media (max-width: 480px) {
+  .hr-employee-salary-body-content-container {
+    padding: 0.5rem;
+  }
+  
+  .hr-employee-salary-scrollable {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .hr-employee-salary-heading h2 {
+    font-size: 1.25rem;
+  }
+  
+  .hr-employee-salary-modal {
+    padding: 1rem;
+  }
+  
+  .hr-employee-salary-table th,
+  .hr-employee-salary-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .hr-employee-salary-toast {
+    max-width: 90%;
+    font-size: 0.85rem;
+    padding: 10px 16px;
+  }
+}
+
+/* Enhanced scrollbar behavior for all screen sizes */
+@media (hover: hover) {
+  .hr-employee-salary-table-scrollable::-webkit-scrollbar,
+  .hr-employee-salary-modal::-webkit-scrollbar,
+  .hr-employee-salary-scrollable::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Print media query for better printing */
+@media print {
+  .hr-employee-salary-filter,
+  .hr-employee-salary-search-wrapper,
+  .hr-employee-salary-dots,
+  .hr-employee-salary-dropdown,
+  .hr-employee-salary-pagination {
+    display: none;
+  }
+  
+  .hr-employee-salary-body-content-container {
+    box-shadow: none;
+  }
+  
+  .hr-employee-salary-table {
+    min-width: 100%;
+  }
+  
+  .hr-employee-salary-table-container,
+  .hr-employee-salary-table-scrollable {
+    max-height: none;
+    overflow: visible;
+  }
 }
 
 
