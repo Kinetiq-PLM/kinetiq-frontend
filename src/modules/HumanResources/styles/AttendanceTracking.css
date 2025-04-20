@@ -361,3 +361,53 @@
   background-color: #fff3cd;
   color: #664d03; /* Yellow - Special */
 }
+
+/* Holiday-specific styling */
+.hr-attendance-tag.holiday-yes {
+  background-color: #ff9e80;
+  color: #7f0000;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.holiday-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* More specific calendar field type combinations */
+
+/* Workday specific */
+.hr-attendance-tag.workday-yes {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.workday-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* Holiday specific */
+.hr-attendance-tag.holiday-yes {
+  background-color: #ff9e80;
+  color: #7f0000;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.holiday-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* Special day specific */
+.hr-attendance-tag.special-yes {
+  background-color: #ffe082;
+  color: #886a08;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.special-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}

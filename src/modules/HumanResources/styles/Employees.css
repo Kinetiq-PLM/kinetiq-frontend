@@ -358,7 +358,7 @@
   }
   
   /* ---------------------------------------------------------
-     PAGINATION
+     PAGINATION - ENHANCED VERSION
      --------------------------------------------------------- */
   .hr-employee-pagination {
     display: flex;
@@ -368,17 +368,16 @@
     gap: 0.5rem;
     background-color: white;
     border-radius: 8px;
-    flex-wrap: wrap; /* Allow wrapping */
-    max-width: 100%; /* Ensure it stays within container */
+    flex-wrap: wrap;
+    max-width: 100%;
   }
-
-  /* Add container specifically for the numbered buttons */
+  
   .hr-employee-pagination-numbers {
     display: flex;
-    flex-wrap: wrap; /* Allow numbers to wrap */
+    flex-wrap: wrap;
     gap: 0.5rem;
     justify-content: center;
-    max-width: calc(100% - 100px); /* Leave space for the select */
+    max-width: calc(100% - 100px);
     margin-right: 0.5rem;
   }
   
@@ -388,12 +387,36 @@
     padding: 0.4rem 0.8rem;
     border-radius: 4px;
     cursor: pointer;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+  
   .hr-employee-pagination button.active {
     background-color: #00b0b5;
     color: white;
     border-color: #00b0b5;
   }
+  
+  .hr-employee-pagination button:hover:not(.active) {
+    background-color: #f0f0f0;
+  }
+  
+  .hr-employee-pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .hr-employee-pagination-ellipsis {
+    padding: 0.4rem;
+    color: #666;
+  }
+  
+  .hr-employee-pagination-arrow {
+    font-weight: bold;
+  }
+  
   .hr-employee-pagination-size {
     padding: 0.4rem;
     font-size: 0.9rem;

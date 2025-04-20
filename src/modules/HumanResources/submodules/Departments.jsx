@@ -492,17 +492,118 @@ const renderDeptTable = (rawData, isArchived = false) => {
         </div>
       </div>
       
-      {/* Pagination moved outside */}
+      {/* Enhanced Pagination */}
       <div className="hr-pagination">
-        {[...Array(totalPages)].map((_, i) => (
-          <button
-            key={i}
-            className={i + 1 === currentPage ? "active" : ""}
-            onClick={() => setCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(1)} 
+          disabled={currentPage === 1}
+        >
+          &#171; {/* Double left arrow */}
+        </button>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+          disabled={currentPage === 1}
+        >
+          &#8249; {/* Single left arrow */}
+        </button>
+        
+        <div className="hr-pagination-numbers">
+          {(() => {
+            const pageNumbers = [];
+            const maxVisiblePages = 5;
+            
+            if (totalPages <= maxVisiblePages + 2) {
+              // Show all pages if there are few
+              for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+            } else {
+              // Always show first page
+              pageNumbers.push(
+                <button
+                  key={1}
+                  className={1 === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(1)}
+                >
+                  1
+                </button>
+              );
+              
+              // Calculate range around current page
+              let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+              let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+              
+              // Adjust if we're near the end
+              if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(2, endPage - maxVisiblePages + 1);
+              }
+              
+              // Add ellipsis after first page if needed
+              if (startPage > 2) {
+                pageNumbers.push(<span key="ellipsis1" className="hr-pagination-ellipsis">...</span>);
+              }
+              
+              // Add middle pages
+              for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              
+              // Add ellipsis before last page if needed
+              if (endPage < totalPages - 1) {
+                pageNumbers.push(<span key="ellipsis2" className="hr-pagination-ellipsis">...</span>);
+              }
+              
+              // Always show last page
+              pageNumbers.push(
+                <button
+                  key={totalPages}
+                  className={totalPages === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  {totalPages}
+                </button>
+              );
+            }
+            
+            return pageNumbers;
+          })()}
+        </div>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+          disabled={currentPage === totalPages}
+        >
+          &#8250; {/* Single right arrow */}
+        </button>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(totalPages)} 
+          disabled={currentPage === totalPages}
+        >
+          &#187; {/* Double right arrow */}
+        </button>
+        
         <select
           className="hr-pagination-size"
           value={itemsPerPage}
@@ -527,104 +628,205 @@ const renderSuperiorTable = (rawData, isArchived = false) => {
 
   return (
     <>
-      <div className="hr-department-table-wrapper">
+      <div className="hr-superior-table-wrapper">
         <div className="hr-department-table-scrollable">
-        <table className="hr-department-table">
-          <thead>
-            <tr>
-              {isArchived && <th>Select</th>}
-              <th>Dept Superior ID</th>
-              <th>Department ID</th>
-              <th>Department Name</th>
-              <th>Position ID</th>
-              <th>Position Title</th>
-              <th>Employee ID</th>
-              <th>Superior Name</th>
-              <th>Phone</th>
-              <th>Employee Status</th>
-              <th>Hierarchy Level</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((sup, index) => (
-              <tr key={sup.dept_superior_id} className={isArchived ? "hr-archived-row" : ""}>
-                {isArchived && (
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedSuperiorArchived.includes(sup.dept_superior_id)}
-                      onChange={() => toggleSelectSuperiorArchived(sup.dept_superior_id)}
-                    />
-                  </td>
-                )}
-                <td>{sup.dept_superior_id}</td>
-                <td>{sup.dept_id}</td>
-                <td>{sup.dept_name}</td>
-                <td>{sup.position_id}</td>
-                <td>{sup.position_title}</td>
-                <td>{sup.employee_id}</td>
-                <td>{sup.superior_name}</td>
-                <td>{sup.phone}</td>
-                <td>{sup.employee_status}</td>
-                <td>
-                  <span className={`hr-tag level-${sup.hierarchy_level}`}>
-                    {sup.hierarchy_level}
-                  </span>
-                </td>
-                <td className="hr-department-actions">
-                  <div
-                    className="hr-department-dots"
-                    onClick={() =>
-                      setSuperDropdownOpen(superDropdownOpen === index ? null : index)
-                    }
-                  >
-                    ⋮
-                    {superDropdownOpen === index && (
-                      <div className="hr-department-dropdown">
-                        <div
-                          className="hr-department-dropdown-item"
-                          onClick={() => openEditSuperiorModal(sup)}
-                        >
-                          Edit
-                        </div>
-                        {!isArchived ? (
-                          <div
-                            className="hr-department-dropdown-item"
-                            onClick={() => handleSuperiorArchive(sup.dept_superior_id)}
-                          >
-                            Archive
-                          </div>
-                        ) : (
-                          <div
-                            className="hr-department-dropdown-item"
-                            onClick={() => confirmUnarchiveSuperior(sup.dept_superior_id)}
-                          >
-                            Unarchive
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </td>
+          <table className="hr-department-table superiors-table">
+            <thead>
+              <tr>
+                {isArchived && <th>Select</th>}
+                <th>Dept Superior ID</th>
+                <th>Department ID</th>
+                <th>Department Name</th>
+                <th>Position ID</th>
+                <th>Position Title</th>
+                <th>Employee ID</th>
+                <th>Superior Name</th>
+                <th>Phone</th>
+                <th>Employee Status</th>
+                <th>Hierarchy Level</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.map((sup, index) => (
+                <tr key={sup.dept_superior_id} className={isArchived ? "hr-archived-row" : ""}>
+                  {isArchived && (
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedSuperiorArchived.includes(sup.dept_superior_id)}
+                        onChange={() => toggleSelectSuperiorArchived(sup.dept_superior_id)}
+                      />
+                    </td>
+                  )}
+                  <td>{sup.dept_superior_id}</td>
+                  <td>{sup.dept_id}</td>
+                  <td>{sup.dept_name}</td>
+                  <td>{sup.position_id}</td>
+                  <td>{sup.position_title}</td>
+                  <td>{sup.employee_id}</td>
+                  <td>{sup.superior_name}</td>
+                  <td>{sup.phone}</td>
+                  <td>{sup.employee_status}</td>
+                  <td>
+                    <span className={`hr-tag level-${sup.hierarchy_level}`}>
+                      {sup.hierarchy_level}
+                    </span>
+                  </td>
+                  <td className="hr-department-actions">
+                    <div
+                      className="hr-department-dots"
+                      onClick={() =>
+                        setSuperDropdownOpen(superDropdownOpen === index ? null : index)
+                      }
+                    >
+                      ⋮
+                      {superDropdownOpen === index && (
+                        <div className="hr-department-dropdown">
+                          <div
+                            className="hr-department-dropdown-item"
+                            onClick={() => openEditSuperiorModal(sup)}
+                          >
+                            Edit
+                          </div>
+                          {!isArchived ? (
+                            <div
+                              className="hr-department-dropdown-item"
+                              onClick={() => handleSuperiorArchive(sup.dept_superior_id)}
+                            >
+                              Archive
+                            </div>
+                          ) : (
+                            <div
+                              className="hr-department-dropdown-item"
+                              onClick={() => confirmUnarchiveSuperior(sup.dept_superior_id)}
+                            >
+                              Unarchive
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Pagination moved outside */}
+      {/* Enhanced Pagination */}
       <div className="hr-pagination">
-        {[...Array(totalPages)].map((_, i) => (
-          <button
-            key={i}
-            className={i + 1 === currentPage ? "active" : ""}
-            onClick={() => setCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(1)} 
+          disabled={currentPage === 1}
+        >
+          &#171; {/* Double left arrow */}
+        </button>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+          disabled={currentPage === 1}
+        >
+          &#8249; {/* Single left arrow */}
+        </button>
+        
+        <div className="hr-pagination-numbers">
+          {(() => {
+            const pageNumbers = [];
+            const maxVisiblePages = 5;
+            
+            if (totalPages <= maxVisiblePages + 2) {
+              // Show all pages if there are few
+              for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+            } else {
+              // Always show first page
+              pageNumbers.push(
+                <button
+                  key={1}
+                  className={1 === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(1)}
+                >
+                  1
+                </button>
+              );
+              
+              // Calculate range around current page
+              let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+              let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+              
+              // Adjust if we're near the end
+              if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(2, endPage - maxVisiblePages + 1);
+              }
+              
+              // Add ellipsis after first page if needed
+              if (startPage > 2) {
+                pageNumbers.push(<span key="ellipsis1" className="hr-pagination-ellipsis">...</span>);
+              }
+              
+              // Add middle pages
+              for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              
+              // Add ellipsis before last page if needed
+              if (endPage < totalPages - 1) {
+                pageNumbers.push(<span key="ellipsis2" className="hr-pagination-ellipsis">...</span>);
+              }
+              
+              // Always show last page
+              pageNumbers.push(
+                <button
+                  key={totalPages}
+                  className={totalPages === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  {totalPages}
+                </button>
+              );
+            }
+            
+            return pageNumbers;
+          })()}
+        </div>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+          disabled={currentPage === totalPages}
+        >
+          &#8250; {/* Single right arrow */}
+        </button>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(totalPages)} 
+          disabled={currentPage === totalPages}
+        >
+          &#187; {/* Double right arrow */}
+        </button>
+        
         <select
           className="hr-pagination-size"
           value={itemsPerPage}
@@ -723,7 +925,7 @@ const renderSuperiorTable = (rawData, isArchived = false) => {
                     setCurrentPage(1);
                   }}
                 >
-                  Departments
+                  Departments <span className="hr-department-count">{departments.length}</span>
                 </button>
                 <button
                   className={activeTab === "Superiors" ? "active" : ""}
@@ -734,7 +936,7 @@ const renderSuperiorTable = (rawData, isArchived = false) => {
                     setCurrentPage(1);
                   }}
                 >
-                  Department Superiors
+                  Department Superiors <span className="hr-department-count">{superiors.length}</span>
                 </button>
               </div>
             </div>

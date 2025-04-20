@@ -49,18 +49,25 @@ const LeaveRequests = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [requestsRes, archivedRes, balancesRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/"),
-        axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/archived/"),
-        axios.get("http://127.0.0.1:8000/api/employee_leave_balances/employee_leave_balances/")
-      ]);
-
-      setLeaveRequests(requestsRes.data);
-      setArchivedLeaveRequests(archivedRes.data);
-      setLeaveBalances(balancesRes.data);
-    } catch (err) {
-      console.error("Error fetching data:", err);
-      showToast("Failed to fetch data", false);
+      // Fetch all leave requests
+      const leaveResponse = await axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/");
+      
+      // Explicitly filter active requests - make sure is_archived exists before using it
+      const activeLeaveRequests = leaveResponse.data.filter(request => {
+        return request.is_archived === false || request.is_archived === undefined;
+      });
+      setLeaveRequests(activeLeaveRequests);
+  
+      // Fetch archived leave requests separately
+      const archivedResponse = await axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/archived/");
+      setArchivedLeaveRequests(archivedResponse.data);
+  
+      // Fetch leave balances
+      const balancesResponse = await axios.get("http://127.0.0.1:8000/api/employee_leave_balances/employee_leave_balances/");
+      setLeaveBalances(balancesResponse.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      showToast("Failed to load data", false);
     } finally {
       setLoading(false);
     }
@@ -68,7 +75,7 @@ const LeaveRequests = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/employees/employees/");
+      const res = await axios.get("http://127.0.0.1:8000/api/employees/");
       setEmployees(res.data);
     } catch (err) {
       console.error("Failed to fetch employees:", err);
@@ -313,12 +320,25 @@ const LeaveRequests = () => {
     if (!window.confirm("Are you sure you want to archive this leave request?")) return;
     
     try {
-      await axios.post(`http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/archived/`);
+      await axios.post(`http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/${leaveId}/archive/`);
       showToast("Leave request archived successfully");
       fetchData(); // Refresh data after archiving
     } catch (err) {
       console.error("Archive leave request error:", err);
       showToast("Failed to archive leave request", false);
+    }
+  };
+
+  const handleUnarchiveLeaveRequest = async (leaveId) => {
+    if (!window.confirm("Are you sure you want to unarchive this leave request?")) return;
+    
+    try {
+      await axios.post(`http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/${leaveId}/unarchive/`);
+      showToast("Leave request unarchived successfully");
+      fetchData(); // Refresh data after unarchiving
+    } catch (err) {
+      console.error("Unarchive leave request error:", err);
+      showToast("Failed to unarchive leave request", false);
     }
   };
 
@@ -520,14 +540,20 @@ const LeaveRequests = () => {
                           <div 
                             className="leave-requests-dropdown-item"
                             onClick={() => {
-                              setEditingRequest(request);
-                              setShowEditModal(true);
+                              initializeEditForm(request);
                               setDotsMenuOpen(null);
                             }}
                           >
                             Edit
                           </div>
-                          {!isArchived && (
+                          {isArchived ? (
+                            <div
+                              className="leave-requests-dropdown-item"
+                              onClick={() => handleUnarchiveLeaveRequest(request.leave_id)}
+                            >
+                              Unarchive
+                            </div>
+                          ) : (
                             <div
                               className="leave-requests-dropdown-item"
                               onClick={() => handleArchiveLeaveRequest(request.leave_id)}
@@ -626,17 +652,116 @@ const LeaveRequests = () => {
   // Render pagination controls
   const renderPagination = (totalPages) => (
     <div className="hr-leave-requests-pagination">
+      <button 
+        className="hr-leave-requests-pagination-arrow" 
+        onClick={() => setCurrentPage(1)} 
+        disabled={currentPage === 1}
+      >
+        &#171; {/* Double left arrow */}
+      </button>
+      
+      <button 
+        className="hr-leave-requests-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+        disabled={currentPage === 1}
+      >
+        &#8249; {/* Single left arrow */}
+      </button>
+      
       <div className="hr-leave-requests-pagination-numbers">
-        {[...Array(totalPages)].map((_, i) => (
-          <button
-            key={i}
-            className={i + 1 === currentPage ? "active" : ""}
-            onClick={() => setCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
+        {(() => {
+          const pageNumbers = [];
+          const maxVisiblePages = 5;
+          
+          if (totalPages <= maxVisiblePages + 2) {
+            // Show all pages if there are few
+            for (let i = 1; i <= totalPages; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+          } else {
+            // Always show first page
+            pageNumbers.push(
+              <button
+                key={1}
+                className={1 === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(1)}
+              >
+                1
+              </button>
+            );
+            
+            // Calculate range around current page
+            let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+            
+            // Adjust if we're near the end
+            if (endPage - startPage < maxVisiblePages - 1) {
+              startPage = Math.max(2, endPage - maxVisiblePages + 1);
+            }
+            
+            // Add ellipsis after first page if needed
+            if (startPage > 2) {
+              pageNumbers.push(<span key="ellipsis1" className="hr-leave-requests-pagination-ellipsis">...</span>);
+            }
+            
+            // Add middle pages
+            for (let i = startPage; i <= endPage; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+            
+            // Add ellipsis before last page if needed
+            if (endPage < totalPages - 1) {
+              pageNumbers.push(<span key="ellipsis2" className="hr-leave-requests-pagination-ellipsis">...</span>);
+            }
+            
+            // Always show last page
+            pageNumbers.push(
+              <button
+                key={totalPages}
+                className={totalPages === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(totalPages)}
+              >
+                {totalPages}
+              </button>
+            );
+          }
+          
+          return pageNumbers;
+        })()}
       </div>
+      
+      <button 
+        className="hr-leave-requests-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+        disabled={currentPage === totalPages}
+      >
+        &#8250; {/* Single right arrow */}
+      </button>
+      
+      <button 
+        className="hr-leave-requests-pagination-arrow" 
+        onClick={() => setCurrentPage(totalPages)} 
+        disabled={currentPage === totalPages}
+      >
+        &#187; {/* Double right arrow */}
+      </button>
+      
       <select
         className="hr-leave-requests-pagination-size"
         value={itemsPerPage}
@@ -651,6 +776,82 @@ const LeaveRequests = () => {
       </select>
     </div>
   );
+
+// Add this state to store edited leave request data
+const [editedLeaveRequest, setEditedLeaveRequest] = useState({
+  leave_type: "",
+  start_date: "",
+  end_date: "",
+  is_paid: false,
+  status: ""
+});
+
+const initializeEditForm = (request) => {
+  setEditingRequest(request);
+  setEditedLeaveRequest({
+    employee_id: request.employee_id,  
+    leave_type: request.leave_type,
+    start_date: request.start_date,
+    end_date: request.end_date,
+    is_paid: request.is_paid,
+    status: request.status
+  });
+  setShowEditModal(true);
+};
+
+// Add this function to handle edit form changes
+const handleEditLeaveRequestChange = (e) => {
+  const { name, value, type, checked } = e.target;
+  setEditedLeaveRequest(prev => ({
+    ...prev,
+    [name]: type === "checkbox" ? checked : value
+  }));
+};
+
+const handleEditLeaveRequest = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  try {
+    // Only send fields that we want to update
+    const requestData = {
+      leave_type: editedLeaveRequest.leave_type,
+      start_date: editedLeaveRequest.start_date,
+      end_date: editedLeaveRequest.end_date,
+      is_paid: editedLeaveRequest.is_paid,
+      status: editedLeaveRequest.status
+    };
+    
+    // Do not include employee_id in the PATCH request
+    
+    // Make API call with only the fields we want to update
+    await axios.patch(
+      `http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/${editingRequest.leave_id}/`,
+      requestData
+    );
+    
+    setShowEditModal(false);
+    showToast("Leave request updated successfully");
+    fetchData(); // Refresh data after update
+  } catch (err) {
+    console.error("Update leave request error:", err);
+    
+    let errorMessage = "Failed to update leave request";
+    if (err.response?.data) {
+      if (err.response.data.detail) {
+        errorMessage = err.response.data.detail;
+      } else if (err.response.data.errors) {
+        errorMessage = Object.entries(err.response.data.errors)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join('\n');
+      }
+    }
+    
+    showToast(errorMessage, false);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="hr-leave-requests">
@@ -863,13 +1064,7 @@ const LeaveRequests = () => {
         <div className="leave-requests-modal-overlay">
           <div className="leave-requests-modal">
             <h3>Edit Leave Request</h3>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              // Add edit form submission logic here
-              console.log("Edit form submitted");
-              setShowEditModal(false);
-              showToast("Leave request updated successfully");
-            }} className="leave-requests-modal-form">
+            <form onSubmit={handleEditLeaveRequest} className="leave-requests-modal-form">
               <div className="leave-requests-form-two-columns">
                 <div className="form-column">
                   <div className="form-group">
@@ -884,10 +1079,15 @@ const LeaveRequests = () => {
                   
                   <div className="form-group">
                     <label>Leave Type</label>
-                    <select name="leave_type" defaultValue={editingRequest.leave_type} required>
+                    <select 
+                      name="leave_type" 
+                      value={editedLeaveRequest.leave_type} 
+                      onChange={handleEditLeaveRequestChange}
+                      required
+                    >
                       <option value="Sick">Sick</option>
                       <option value="Vacation">Vacation</option>
-                      <option value="Personal">Personal</option>
+                      <option value="Emergency">Emergency</option>
                       <option value="Maternity">Maternity</option>
                       <option value="Paternity">Paternity</option>
                       <option value="Solo Parent">Solo Parent</option>
@@ -899,22 +1099,44 @@ const LeaveRequests = () => {
                 <div className="form-column">
                   <div className="form-group">
                     <label>Start Date</label>
-                    <input type="date" name="start_date" defaultValue={editingRequest.start_date} required />
+                    <input 
+                      type="date" 
+                      name="start_date" 
+                      value={editedLeaveRequest.start_date} 
+                      onChange={handleEditLeaveRequestChange} 
+                      required 
+                    />
                   </div>
                   
                   <div className="form-group">
                     <label>End Date</label>
-                    <input type="date" name="end_date" defaultValue={editingRequest.end_date} required />
+                    <input 
+                      type="date" 
+                      name="end_date" 
+                      value={editedLeaveRequest.end_date} 
+                      onChange={handleEditLeaveRequestChange} 
+                      required 
+                    />
                   </div>
                   
                   <div className="form-group">
                     <label>Is Paid</label>
-                    <input type="checkbox" name="is_paid" defaultChecked={editingRequest.is_paid} />
+                    <input 
+                      type="checkbox" 
+                      name="is_paid" 
+                      checked={editedLeaveRequest.is_paid} 
+                      onChange={handleEditLeaveRequestChange} 
+                    />
                   </div>
                   
                   <div className="form-group">
                     <label>Status</label>
-                    <select name="status" defaultValue={editingRequest.status} required>
+                    <select 
+                      name="status" 
+                      value={editedLeaveRequest.status} 
+                      onChange={handleEditLeaveRequestChange}
+                      required
+                    >
                       <option value="Pending">Pending</option>
                       <option value="Approved by Superior">Approved by Superior</option>
                       <option value="Rejected by Superior">Rejected by Superior</option>

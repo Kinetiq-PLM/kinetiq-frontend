@@ -50,6 +50,19 @@ const Recruitment = () => {
           axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
         ]);
   
+        console.log('Candidates data:', candidatesRes.data);
+        if (candidatesRes.data && candidatesRes.data.length > 0) {
+          console.log('Sample candidate:', candidatesRes.data[0]);
+        }
+  
+        // Add this debugging code
+        console.log('CANDIDATE DATA STRUCTURE:');
+        if (candidatesRes.data && candidatesRes.data.length > 0) {
+          const sampleCandidate = candidatesRes.data[0];
+          console.log('Sample candidate object keys:', Object.keys(sampleCandidate));
+          console.log('Full sample candidate:', sampleCandidate);
+        }
+  
         const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
           axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/"),
           axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/archived/")
@@ -191,14 +204,24 @@ const Recruitment = () => {
                     <td>{posting.position_title}</td>
                     <td>{posting.description}</td>
                     <td>{posting.requirements}</td>
-                    <td>{posting.employment_type}</td>
+                    <td>
+                      <span className={`recruitment-tag ${posting.employment_type?.toLowerCase() || 'unknown'}`}>
+                        {posting.employment_type || 'Unknown'}
+                      </span>
+                    </td>
                     <td>{posting.base_salary}</td>
                     <td>{posting.daily_rate}</td>
                     <td>{posting.duration_days}</td>
-                    <td>{posting.finance_approval_status}</td>
                     <td>
-                      <span className={`recruitment-tag ${posting.status ? posting.status.toLowerCase() : 'unknown'}`}>
-                        {posting.status || 'Unknown'}
+                      <span className={`recruitment-tag ${posting.finance_approval_status ? 
+                        `${posting.finance_approval_status.toLowerCase()}-finance` : 'pending-finance'}`}>
+                        {posting.finance_approval_status || 'Pending'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`recruitment-tag ${posting.posting_status ? 
+                        posting.posting_status.toLowerCase() : 'unknown'}`}>
+                        {posting.posting_status || 'Unknown'}
                       </span>
                     </td>
                     <td>{posting.created_at}</td>
@@ -209,6 +232,7 @@ const Recruitment = () => {
                         onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
                       >
                         ⋮
+
                         {dotsMenuOpen === index && (
                           <div className="recruitment-dropdown">
                             <div 
@@ -217,7 +241,10 @@ const Recruitment = () => {
                             >
                               Edit
                             </div>
-                            <div className="recruitment-dropdown-item">
+                            <div 
+                              className="recruitment-dropdown-item"
+                              onClick={() => isArchived ? handleRestoreJobPosting(posting) : handleArchiveJobPosting(posting)}
+                            >
                               {isArchived ? "Restore" : "Archive"}
                             </div>
                           </div>
@@ -247,14 +274,15 @@ const Recruitment = () => {
               <thead>
                 <tr>
                   {isArchived && <th>Select</th>}
-                  <th>ID</th>
+                  <th>Candidate ID</th>
+                  <th>Job ID</th>
+                  <th>Position</th>
                   <th>First Name</th>
                   <th>Last Name</th>
                   <th>Email</th>
                   <th>Phone</th>
-                  <th>Status</th>
-                  <th>Applied Position</th>
-                  <th>Applied Date</th>
+                  <th>Application Status</th>
+                  <th>Created At</th>
                   <th></th>
                 </tr>
               </thead>
@@ -266,18 +294,25 @@ const Recruitment = () => {
                         <input type="checkbox" />
                       </td>
                     )}
-                    <td>{candidate.id}</td>
+                    <td>{candidate.candidate_id || candidate.id}</td>
+                    <td>{candidate.job?.job_id || candidate.job_posting_id || candidate.job_id || candidate.jobId || candidate.posting_id || candidate.jobPostingId || "-"}</td>
+                    <td>{candidate.position_title || candidate.applied_position}</td>
                     <td>{candidate.first_name}</td>
                     <td>{candidate.last_name}</td>
                     <td>{candidate.email}</td>
                     <td>{candidate.phone}</td>
                     <td>
-                      <span className={`recruitment-tag ${candidate.status ? candidate.status.toLowerCase() : 'unknown'}`}>
-                        {candidate.status || 'Unknown'}
+                      <span className={`recruitment-tag ${
+                        candidate.application_status 
+                          ? candidate.application_status.toLowerCase().replace(/\s+/g, '-')
+                          : candidate.status
+                            ? candidate.status.toLowerCase().replace(/\s+/g, '-')
+                            : 'unknown'
+                      }`}>
+                        {candidate.application_status || candidate.status || 'Unknown'}
                       </span>
                     </td>
-                    <td>{candidate.applied_position}</td>
-                    <td>{candidate.applied_date}</td>
+                    <td>{candidate.created_at}</td>
                     <td className="recruitment-actions">
                       <div
                         className="recruitment-dots"
@@ -369,15 +404,116 @@ const Recruitment = () => {
 
   const renderPagination = (totalPages) => (
     <div className="recruitment-pagination">
-      {[...Array(totalPages)].map((_, i) => (
-        <button
-          key={i}
-          className={i + 1 === currentPage ? "active" : ""}
-          onClick={() => setCurrentPage(i + 1)}
-        >
-          {i + 1}
-        </button>
-      ))}
+      <button 
+        className="recruitment-pagination-arrow" 
+        onClick={() => setCurrentPage(1)} 
+        disabled={currentPage === 1}
+      >
+        &#171; {/* Double left arrow */}
+      </button>
+      
+      <button 
+        className="recruitment-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+        disabled={currentPage === 1}
+      >
+        &#8249; {/* Single left arrow */}
+      </button>
+      
+      <div className="recruitment-pagination-numbers">
+        {(() => {
+          const pageNumbers = [];
+          const maxVisiblePages = 5;
+          
+          if (totalPages <= maxVisiblePages + 2) {
+            // Show all pages if there are few
+            for (let i = 1; i <= totalPages; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+          } else {
+            // Always show first page
+            pageNumbers.push(
+              <button
+                key={1}
+                className={1 === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(1)}
+              >
+                1
+              </button>
+            );
+            
+            // Calculate range around current page
+            let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+            
+            // Adjust if we're near the end
+            if (endPage - startPage < maxVisiblePages - 1) {
+              startPage = Math.max(2, endPage - maxVisiblePages + 1);
+            }
+            
+            // Add ellipsis after first page if needed
+            if (startPage > 2) {
+              pageNumbers.push(<span key="ellipsis1" className="recruitment-pagination-ellipsis">...</span>);
+            }
+            
+            // Add middle pages
+            for (let i = startPage; i <= endPage; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+            
+            // Add ellipsis before last page if needed
+            if (endPage < totalPages - 1) {
+              pageNumbers.push(<span key="ellipsis2" className="recruitment-pagination-ellipsis">...</span>);
+            }
+            
+            // Always show last page
+            pageNumbers.push(
+              <button
+                key={totalPages}
+                className={totalPages === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(totalPages)}
+              >
+                {totalPages}
+              </button>
+            );
+          }
+          
+          return pageNumbers;
+        })()}
+      </div>
+      
+      <button 
+        className="recruitment-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+        disabled={currentPage === totalPages}
+      >
+        &#8250; {/* Single right arrow */}
+      </button>
+      
+      <button 
+        className="recruitment-pagination-arrow" 
+        onClick={() => setCurrentPage(totalPages)} 
+        disabled={currentPage === totalPages}
+      >
+        &#187; {/* Double right arrow */}
+      </button>
+      
       <select
         className="recruitment-pagination-size"
         value={itemsPerPage}
@@ -392,7 +528,6 @@ const Recruitment = () => {
       </select>
     </div>
   );
-
 
   const handleEditJobPosting = (posting) => {
     // Create a copy of the posting to edit
@@ -713,6 +848,98 @@ const handleJobPostingSubmit = async (e) => {
   }
 };
 
+const handleArchiveJobPosting = async (jobPosting) => {
+  try {
+    console.log("Job posting to archive:", jobPosting);
+    
+    // Create a properly formatted update data object
+    const updateData = {
+      is_archived: true,
+      employment_type: jobPosting.employment_type || "Seasonal", // Provide fallback
+      dept_id: jobPosting.dept_id,
+      position_id: jobPosting.position_id || "", // Empty string instead of null
+      position_title: jobPosting.position_title || "", // Empty string instead of null
+      description: jobPosting.description || "",
+      requirements: jobPosting.requirements || "",
+      // Handle salary fields based on employment type
+      base_salary: jobPosting.employment_type === "Regular" ? 
+                   (jobPosting.base_salary || 0) : 0,
+      daily_rate: jobPosting.employment_type !== "Regular" ? 
+                  (jobPosting.daily_rate || 0) : 0,
+      duration_days: jobPosting.duration_days || 
+                    (jobPosting.employment_type === "Seasonal" ? 1 : 
+                     jobPosting.employment_type === "Contractual" ? 30 : null),
+      posting_status: jobPosting.posting_status || "Draft"
+    };
+    
+    console.log("Sending update data:", updateData);
+    
+    // Call API to archive the job posting with all the required data
+    await axios.patch(
+      `http://127.0.0.1:8000/api/job_posting/job_postings/${jobPosting.job_id}/`, 
+      updateData
+    );
+    
+    // Update UI state
+    showToast("Job posting archived successfully", true);
+    setJobPostings(prev => prev.filter(item => item.job_id !== jobPosting.job_id));
+    setArchivedJobPostings(prev => [...prev, {...jobPosting, is_archived: true}]);
+    setDotsMenuOpen(null);
+  } catch (err) {
+    console.error("Error archiving job posting:", err.response?.data || err);
+    const errorMessage = err.response?.data?.detail || 
+                        Object.values(err.response?.data || {}).flat().join(", ") || 
+                        "Failed to archive job posting";
+    showToast(errorMessage, false);
+  }
+};
+
+const handleRestoreJobPosting = async (jobPosting) => {
+  try {
+    console.log("Job posting to restore:", jobPosting);
+    
+    // Create a properly formatted update data object
+    const updateData = {
+      is_archived: false,
+      employment_type: jobPosting.employment_type || "Seasonal", // Provide fallback
+      dept_id: jobPosting.dept_id,
+      position_id: jobPosting.position_id || "", // Empty string instead of null
+      position_title: jobPosting.position_title || "", // Empty string instead of null
+      description: jobPosting.description || "",
+      requirements: jobPosting.requirements || "",
+      // Handle salary fields based on employment type
+      base_salary: jobPosting.employment_type === "Regular" ? 
+                   (jobPosting.base_salary || 0) : 0,
+      daily_rate: jobPosting.employment_type !== "Regular" ? 
+                  (jobPosting.daily_rate || 0) : 0,
+      duration_days: jobPosting.duration_days || 
+                    (jobPosting.employment_type === "Seasonal" ? 1 : 
+                     jobPosting.employment_type === "Contractual" ? 30 : null),
+      posting_status: jobPosting.posting_status || "Draft"
+    };
+    
+    console.log("Sending update data:", updateData);
+    
+    // Call API to restore the job posting with all the required data
+    await axios.patch(
+      `http://127.0.0.1:8000/api/job_posting/job_postings/${jobPosting.job_id}/`, 
+      updateData
+    );
+    
+    // Update UI state
+    showToast("Job posting restored successfully", true);
+    setArchivedJobPostings(prev => prev.filter(item => item.job_id !== jobPosting.job_id));
+    setJobPostings(prev => [...prev, {...jobPosting, is_archived: false}]);
+    setDotsMenuOpen(null);
+  } catch (err) {
+    console.error("Error restoring job posting:", err.response?.data || err);
+    const errorMessage = err.response?.data?.detail || 
+                        Object.values(err.response?.data || {}).flat().join(", ") || 
+                        "Failed to restore job posting";
+    showToast(errorMessage, false);
+  }
+};
+
   return (
     <div className="recruitment">
       <div className="recruitment-body-content-container">
@@ -738,7 +965,14 @@ const handleJobPostingSubmit = async (e) => {
                 <option value="id">Sort by ID</option>
                 <option value="status">Sort by Status</option>
               </select>
-              <button className="recruitment-add-btn" onClick={handleAddClick}>+ Add</button>
+              <button 
+                className="recruitment-add-btn" 
+                onClick={handleAddClick}
+              >
+                {activeTab === "Candidates" ? "+ Add Candidate" : 
+                 activeTab === "Job Postings" ? "+ Add Job Posting" : 
+                 "+ Add Resignation"}
+              </button>
               <button
                 className="recruitment-add-btn"
                 onClick={() => setShowArchived(!showArchived)}
