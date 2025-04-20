@@ -355,8 +355,20 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                                             <span>{purchaseQuotationData?.[0]?.total_before_discount || fetchedData.total_before_discount || "N/A"}</span>
                                         </div>
                                         <div className="total-row">
-                                            <span>Discount (20%):</span>
-                                            <span>{purchaseQuotationData?.[0]?.discount_percent || fetchedData.discount_percent || "N/A"}</span>
+                                            <span>Discount ({purchaseQuotationData?.[0]?.discount_percent || fetchedData.discount_percent || "N/A"}%):</span>
+                                            <span>{purchaseQuotationData?.[0]?.total_before_discount && purchaseQuotationData?.[0]?.discount_percent
+                                            ? (
+                                                (parseFloat(purchaseQuotationData?.[0]?.total_before_discount || 0) *
+                                                    parseFloat(purchaseQuotationData?.[0]?.discount_percent || 0)) /
+                                                100
+                                            ).toFixed(2)
+                                            : fetchedData.total_before_discount && fetchedData.discount_percent
+                                            ? (
+                                                (parseFloat(fetchedData.total_before_discount || 0) *
+                                                    parseFloat(fetchedData.discount_percent || 0)) /
+                                                100
+                                            ).toFixed(2)
+                                            : "N/A"}</span>
                                         </div>
                                         <div className="total-row">
                                             <span>Downpayment Rate:</span>
@@ -387,9 +399,16 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                                             <span>{fetchedData.credit_balance || "N/A"}</span>
                                         </div>
                                         <div className="total-row balance-due">
-                                            <span>Balance Due:</span>
-                                            <span>{balanceDue >= 0 ? balanceDue : "Invalid Amount"}</span>
-                                        </div>
+                                        <span>Balance Due:</span>
+                                        <span>
+                                            {purchaseQuotationData?.[0]?.total_payment && fetchedData?.applied_amount
+                                                ? (
+                                                    parseFloat(purchaseQuotationData?.[0]?.total_payment || fetchedData.total_payment || 0) -
+                                                    parseFloat(fetchedData.applied_amount || 0)
+                                                ).toFixed(2)
+                                                : "N/A"}
+                                        </span>
+                                    </div>
                                     </div>
                                 </div>
 

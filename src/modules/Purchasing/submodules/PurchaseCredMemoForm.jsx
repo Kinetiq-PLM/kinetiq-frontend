@@ -26,124 +26,129 @@ const PurchaseCredMemoForm = ({ memoData, onClose }) => {
         try {
             setLoading(true);
             setError("");
-
+    
             console.log("Fetching data for credit_memo_id:", credit_memo_id);
-
-            // Step 1: Fetch the credit memo to get the associated inspection ID
-            const creditMemoResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/credit-memo/list/");
+    
+            // Step 1: Fetch the credit memo to get the associated invoice_id
+            const creditMemoResponse = await axios.get(
+                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/credit-memo/list/"
+            );
             const matchedCreditMemo = creditMemoResponse.data.find(
                 (memo) => memo.credit_memo_id === credit_memo_id
             );
-
+    
             if (!matchedCreditMemo) {
                 throw new Error("No credit memo found matching the given credit_memo_id");
             }
-
-            const { inspection: inspection_id } = matchedCreditMemo;
-
-            // Step 2: Fetch batch inspections and match inspection_id
-            const batchInspectionResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/batch-inspection/list/");
-            const matchedInspection = batchInspectionResponse.data.find(
-                (inspection) => inspection.inspection_id === inspection_id
+    
+            const { invoice_id } = matchedCreditMemo;
+    
+            // Step 2: Fetch the invoice to get the content_id
+            const invoiceResponse = await axios.get(
+                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/list/"
             );
-
-            if (!matchedInspection) {
-                throw new Error("No inspection found matching the given inspection_id");
-            }
-
-            const { shipment_id } = matchedInspection;
-
-            // Step 3: Fetch received shipments and match shipment_id to get purchase_id
-            const receivedShipmentResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/list/");
-            const matchedShipment = receivedShipmentResponse.data.find(
-                (shipment) => shipment.shipment_id === shipment_id
+            const matchedInvoice = invoiceResponse.data.find(
+                (invoice) => invoice.invoice_id === invoice_id
             );
-
-            if (!matchedShipment) {
-                throw new Error("No shipment found matching the given shipment_id");
+    
+            if (!matchedInvoice) {
+                throw new Error("No invoice found matching the given invoice_id");
             }
-
-            const { purchase_id } = matchedShipment;
-
-            // Step 4: Fetch external-module to get content_id and request_id using purchase_id
-            const externalModulesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/external-modules/");
+    
+            const { content_id } = matchedInvoice;
+    
+            console.log("Content ID:", content_id);
+    
+            // Step 3: Fetch the external module to get the purchase_id and request_id
+            const externalModulesResponse = await axios.get(
+                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/external-modules/"
+            );
             const matchedExternalModule = externalModulesResponse.data.find(
-                (module) => module.purchase_id === purchase_id
+                (module) => module.content_id === content_id
             );
-
+    
             if (!matchedExternalModule) {
-                throw new Error("No external module found matching the given purchase_id");
+                throw new Error("No external module found matching the given content_id");
             }
-
-            const { content_id, request_id } = matchedExternalModule;
-
-            // Step 5: Fetch employees using request_id
-            const prfResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
+    
+            const { purchase_id, request_id } = matchedExternalModule;
+    
+            console.log("Purchase ID:", purchase_id);
+    
+            // Step 4: Fetch employees using request_id
+            const prfResponse = await axios.get(
+                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/"
+            );
             const matchedPRF = prfResponse.data.find((prf) => prf.request_id === request_id);
-
+    
             let employeeName = "N/A";
             if (matchedPRF) {
                 const { employee_id } = matchedPRF;
-                const employeesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
-                const matchedEmployee = employeesResponse.data.find((employee) => employee.employee_id === employee_id);
-                employeeName = matchedEmployee ? `${matchedEmployee.first_name} ${matchedEmployee.last_name}` : "N/A";
+                const employeesResponse = await axios.get(
+                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/"
+                );
+                const matchedEmployee = employeesResponse.data.find(
+                    (employee) => employee.employee_id === employee_id
+                );
+                employeeName = matchedEmployee
+                    ? `${matchedEmployee.first_name} ${matchedEmployee.last_name}`
+                    : "N/A";
             }
-
-            // Step 6: Fetch purchase_quotation data using request_id
-            const purchaseQuotationResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
+    
+            // Step 5: Fetch purchase_quotation data using request_id
+            const purchaseQuotationResponse = await axios.get(
+                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/"
+            );
             const matchedPurchaseQuotation = purchaseQuotationResponse.data.find(
                 (quotation) => quotation.request_id === request_id
             );
-           
+    
             let subtotal = "N/A";
             let discountPercent = "N/A";
             let tax = "N/A";
-
             let vendorCode = "N/A";
-             let deliveryLoc = "N/A";
-        if (matchedPurchaseQuotation) {
-            subtotal = matchedPurchaseQuotation.total_before_discount || "N/A";
-            discountPercent = matchedPurchaseQuotation.discount_percent || "N/A";
-            tax = matchedPurchaseQuotation.tax || "N/A";
-            vendorCode = matchedPurchaseQuotation.vendor_code || "N/A";
-            deliveryLoc = matchedPurchaseQuotation.delivery_loc || "N/A";
-        }
-
-        // Step 6: Fetch vendor_name using vendor_code
-        let vendorName = "N/A";
-        if (vendorCode !== "N/A") {
-            const vendorResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/");
-            const matchedVendor = vendorResponse.data.find((vendor) => vendor.vendor_code === vendorCode);
-            vendorName = matchedVendor ? matchedVendor.vendor_name : "N/A";
-            console.log("Vendor Name:", vendorName);
-        }
-
-            // Step 7: Fetch AP Invoice data using content_id
-            const invoiceResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/list/");
-            console.log("Invoice API Response:", invoiceResponse.data); // Debugging
-
-            const matchedInvoice = invoiceResponse.data.find(
-                (invoice) => invoice.content_id === content_id
-            );
-            console.log("Matched Invoice:", matchedInvoice); // Debugging
-
-            if (!matchedInvoice) {
-                throw new Error("No invoice found matching the given content_id");
+            let deliveryLoc = "N/A";
+    
+            if (matchedPurchaseQuotation) {
+                subtotal = matchedPurchaseQuotation.total_before_discount || "N/A";
+                discountPercent = matchedPurchaseQuotation.discount_percent || "N/A";
+                tax = matchedPurchaseQuotation.tax || "N/A";
+                vendorCode = matchedPurchaseQuotation.vendor_code || "N/A";
+                deliveryLoc = matchedPurchaseQuotation.delivery_loc || "N/A";
             }
-
-            // Step 8: Fetch materials and assets
-            const materialsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/materials/list/");
-            const assetsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/");
+    
+            // Step 6: Fetch vendor_name using vendor_code
+            let vendorName = "N/A";
+            if (vendorCode !== "N/A") {
+                const vendorResponse = await axios.get(
+                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/"
+                );
+                const matchedVendor = vendorResponse.data.find(
+                    (vendor) => vendor.vendor_code === vendorCode
+                );
+                vendorName = matchedVendor ? matchedVendor.vendor_name : "N/A";
+                console.log("Vendor Name:", vendorName);
+            }
+    
+            // Step 7: Fetch materials and assets
+            const materialsResponse = await axios.get(
+                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/materials/list/"
+            );
+            const assetsResponse = await axios.get(
+                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/"
+            );
             const materials = materialsResponse.data;
             const assets = assetsResponse.data;
-
-            // Step 9: Fetch quotation content data using request_id
-            const quotationContentResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/list/");
+    
+            // Step 8: Fetch quotation content data using request_id
+            const quotationContentResponse = await axios.get(
+                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/list/"
+            );
             const matchedQuotationContent = quotationContentResponse.data.filter(
                 (content) => content.request_id === request_id
             );
-
-            // Step 10: Enrich quotation content with material/asset info
+    
+            // Step 9: Enrich quotation content with material/asset info
             const enrichedItems = matchedQuotationContent.map((item) => {
                 if (item.material_id) {
                     const matchedMaterial = materials.find(
@@ -166,13 +171,12 @@ const PurchaseCredMemoForm = ({ memoData, onClose }) => {
                 }
                 return item;
             });
-
+    
             setQuotationContentData(enrichedItems);
-
+    
+            // Step 10: Set fetched data
             setFetchedData({
                 creditMemo: matchedCreditMemo,
-                inspection: matchedInspection,
-                shipment: matchedShipment,
                 invoice: matchedInvoice,
                 externalModule: matchedExternalModule,
                 employeeName,
@@ -255,12 +259,12 @@ const PurchaseCredMemoForm = ({ memoData, onClose }) => {
                     {/* Credit Memo Total */}
                     <div className="total-section">
                         <h2>Credit Memo Total</h2>
-                        <h2>{total_credit}</h2>
+                        <h2>{fetchedData?.invoice?.total_credit || 0}</h2>
                     </div>
 
                    {/* Items Table */}
 <div className="table-container">
-    <table className="items-table">
+    <table className="items-table"> 
         <thead>
             <tr>
                 <th>Item No.</th>
@@ -319,12 +323,18 @@ const PurchaseCredMemoForm = ({ memoData, onClose }) => {
                         <span>{fetchedData.subtotal || "N/A"}</span>
                     </div>
                     <div className="detail-row">
-                        <span>DownPayment Rate:</span>
+                        <span>DownPayment Rate:({dpm_rate}%)</span>
                         <span>{dpm_rate || "N/A"}</span>
                     </div>
                     <div className="total-row">
-                        <span>Discount (20%):</span>
-                        <span>{fetchedData.discountPercent || "N/A"}</span>
+                        <span>Discount ({fetchedData.discountPercent || "N/A"}%):</span>
+                        <span>{fetchedData && fetchedData.subtotal && fetchedData.discountPercent
+                            ? (
+                                (parseFloat(fetchedData.subtotal) *
+                                    parseFloat(fetchedData.discountPercent || 0)) /
+                                100
+                            ).toFixed(2)
+                            : "N/A"}</span>
                     </div>
                     <div className="detail-row">
                         <span>Tax Amount:</span>
@@ -336,7 +346,19 @@ const PurchaseCredMemoForm = ({ memoData, onClose }) => {
                     </div>
                     <div className="total-row">
                         <span>Balance Due:</span>
-                        <span>{balance_due}</span>
+                        <span>{fetchedData && fetchedData.subtotal
+            ? (
+                  parseFloat(fetchedData.subtotal || 0) -
+                  (parseFloat(fetchedData.subtotal || 0) *
+                      parseFloat(fetchedData.discountPercent || 0)) /
+                      100 +
+                  parseFloat(fetchedData.tax || 0) -
+                  parseFloat(fetchedData.invoice?.total_credit || 0) -
+                  (parseFloat(fetchedData.subtotal || 0) *
+                      parseFloat(dpm_rate || 0)) /
+                      100
+              ).toFixed(2)
+            : "N/A"}</span>
                     </div>
                 </>
                     ) : (
