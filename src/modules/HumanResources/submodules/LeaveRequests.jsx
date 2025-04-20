@@ -49,18 +49,25 @@ const LeaveRequests = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [requestsRes, archivedRes, balancesRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/"),
-        axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/archived/"),
-        axios.get("http://127.0.0.1:8000/api/employee_leave_balances/employee_leave_balances/")
-      ]);
-
-      setLeaveRequests(requestsRes.data);
-      setArchivedLeaveRequests(archivedRes.data);
-      setLeaveBalances(balancesRes.data);
-    } catch (err) {
-      console.error("Error fetching data:", err);
-      showToast("Failed to fetch data", false);
+      // Fetch all leave requests
+      const leaveResponse = await axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/");
+      
+      // Explicitly filter active requests - make sure is_archived exists before using it
+      const activeLeaveRequests = leaveResponse.data.filter(request => {
+        return request.is_archived === false || request.is_archived === undefined;
+      });
+      setLeaveRequests(activeLeaveRequests);
+  
+      // Fetch archived leave requests separately
+      const archivedResponse = await axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/archived/");
+      setArchivedLeaveRequests(archivedResponse.data);
+  
+      // Fetch leave balances
+      const balancesResponse = await axios.get("http://127.0.0.1:8000/api/employee_leave_balances/employee_leave_balances/");
+      setLeaveBalances(balancesResponse.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      showToast("Failed to load data", false);
     } finally {
       setLoading(false);
     }
@@ -313,12 +320,25 @@ const LeaveRequests = () => {
     if (!window.confirm("Are you sure you want to archive this leave request?")) return;
     
     try {
-      await axios.post(`http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/archived/`);
+      await axios.post(`http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/${leaveId}/archive/`);
       showToast("Leave request archived successfully");
       fetchData(); // Refresh data after archiving
     } catch (err) {
       console.error("Archive leave request error:", err);
       showToast("Failed to archive leave request", false);
+    }
+  };
+
+  const handleUnarchiveLeaveRequest = async (leaveId) => {
+    if (!window.confirm("Are you sure you want to unarchive this leave request?")) return;
+    
+    try {
+      await axios.post(`http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/${leaveId}/unarchive/`);
+      showToast("Leave request unarchived successfully");
+      fetchData(); // Refresh data after unarchiving
+    } catch (err) {
+      console.error("Unarchive leave request error:", err);
+      showToast("Failed to unarchive leave request", false);
     }
   };
 
@@ -520,14 +540,20 @@ const LeaveRequests = () => {
                           <div 
                             className="leave-requests-dropdown-item"
                             onClick={() => {
-                              setEditingRequest(request);
-                              setShowEditModal(true);
+                              initializeEditForm(request);
                               setDotsMenuOpen(null);
                             }}
                           >
                             Edit
                           </div>
-                          {!isArchived && (
+                          {isArchived ? (
+                            <div
+                              className="leave-requests-dropdown-item"
+                              onClick={() => handleUnarchiveLeaveRequest(request.leave_id)}
+                            >
+                              Unarchive
+                            </div>
+                          ) : (
                             <div
                               className="leave-requests-dropdown-item"
                               onClick={() => handleArchiveLeaveRequest(request.leave_id)}
@@ -751,6 +777,86 @@ const LeaveRequests = () => {
     </div>
   );
 
+// Add this state to store edited leave request data
+const [editedLeaveRequest, setEditedLeaveRequest] = useState({
+  leave_type: "",
+  start_date: "",
+  end_date: "",
+  is_paid: false,
+  status: ""
+});
+
+const initializeEditForm = (request) => {
+  setEditingRequest(request);
+  setEditedLeaveRequest({
+    employee_id: request.employee_id,  
+    leave_type: request.leave_type,
+    start_date: request.start_date,
+    end_date: request.end_date,
+    is_paid: request.is_paid,
+    status: request.status
+  });
+  setShowEditModal(true);
+};
+
+// Add this function to handle edit form changes
+const handleEditLeaveRequestChange = (e) => {
+  const { name, value, type, checked } = e.target;
+  setEditedLeaveRequest(prev => ({
+    ...prev,
+    [name]: type === "checkbox" ? checked : value
+  }));
+};
+
+const handleEditLeaveRequest = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  try {
+    // Create payload with only the fields that are acceptable to the backend
+    const payloadToSend = {
+      employee_id: editingRequest.employee_id,
+      leave_type: editedLeaveRequest.leave_type,
+      start_date: editedLeaveRequest.start_date,
+      end_date: editedLeaveRequest.end_date,
+      is_paid: editedLeaveRequest.is_paid
+    };
+    
+    // If status exists in your backend API, add it separately
+    // This is the conditional approach that will work whether status is accepted or not
+    if (editedLeaveRequest.status) {
+      payloadToSend.status = editedLeaveRequest.status;
+    }
+    
+    // Make API call with filtered payload
+    await axios.patch(
+      `http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/${editingRequest.leave_id}/`,
+      payloadToSend
+    );
+    
+    setShowEditModal(false);
+    showToast("Leave request updated successfully");
+    fetchData(); // Refresh data after update
+  } catch (err) {
+    console.error("Update leave request error:", err);
+    
+    let errorMessage = "Failed to update leave request";
+    if (err.response?.data) {
+      if (err.response.data.detail) {
+        errorMessage = err.response.data.detail;
+      } else if (err.response.data.errors) {
+        errorMessage = Object.entries(err.response.data.errors)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join('\n');
+      }
+    }
+    
+    showToast(errorMessage, false);
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
     <div className="hr-leave-requests">
       <div className="hr-leave-requests-body-content-container">
@@ -962,13 +1068,7 @@ const LeaveRequests = () => {
         <div className="leave-requests-modal-overlay">
           <div className="leave-requests-modal">
             <h3>Edit Leave Request</h3>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              // Add edit form submission logic here
-              console.log("Edit form submitted");
-              setShowEditModal(false);
-              showToast("Leave request updated successfully");
-            }} className="leave-requests-modal-form">
+            <form onSubmit={handleEditLeaveRequest} className="leave-requests-modal-form">
               <div className="leave-requests-form-two-columns">
                 <div className="form-column">
                   <div className="form-group">
@@ -983,10 +1083,15 @@ const LeaveRequests = () => {
                   
                   <div className="form-group">
                     <label>Leave Type</label>
-                    <select name="leave_type" defaultValue={editingRequest.leave_type} required>
+                    <select 
+                      name="leave_type" 
+                      value={editedLeaveRequest.leave_type} 
+                      onChange={handleEditLeaveRequestChange}
+                      required
+                    >
                       <option value="Sick">Sick</option>
                       <option value="Vacation">Vacation</option>
-                      <option value="Personal">Personal</option>
+                      <option value="Emergency">Emergency</option>
                       <option value="Maternity">Maternity</option>
                       <option value="Paternity">Paternity</option>
                       <option value="Solo Parent">Solo Parent</option>
@@ -998,22 +1103,44 @@ const LeaveRequests = () => {
                 <div className="form-column">
                   <div className="form-group">
                     <label>Start Date</label>
-                    <input type="date" name="start_date" defaultValue={editingRequest.start_date} required />
+                    <input 
+                      type="date" 
+                      name="start_date" 
+                      value={editedLeaveRequest.start_date} 
+                      onChange={handleEditLeaveRequestChange} 
+                      required 
+                    />
                   </div>
                   
                   <div className="form-group">
                     <label>End Date</label>
-                    <input type="date" name="end_date" defaultValue={editingRequest.end_date} required />
+                    <input 
+                      type="date" 
+                      name="end_date" 
+                      value={editedLeaveRequest.end_date} 
+                      onChange={handleEditLeaveRequestChange} 
+                      required 
+                    />
                   </div>
                   
                   <div className="form-group">
                     <label>Is Paid</label>
-                    <input type="checkbox" name="is_paid" defaultChecked={editingRequest.is_paid} />
+                    <input 
+                      type="checkbox" 
+                      name="is_paid" 
+                      checked={editedLeaveRequest.is_paid} 
+                      onChange={handleEditLeaveRequestChange} 
+                    />
                   </div>
                   
                   <div className="form-group">
                     <label>Status</label>
-                    <select name="status" defaultValue={editingRequest.status} required>
+                    <select 
+                      name="status" 
+                      value={editedLeaveRequest.status} 
+                      onChange={handleEditLeaveRequestChange}
+                      required
+                    >
                       <option value="Pending">Pending</option>
                       <option value="Approved by Superior">Approved by Superior</option>
                       <option value="Rejected by Superior">Rejected by Superior</option>
