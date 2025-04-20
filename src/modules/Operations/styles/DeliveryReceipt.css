@@ -16,18 +16,21 @@
     flex-direction: column;
     min-width: 40rem;
     min-height: 30rem;
-    overflow: visible; /* Hide overflow for the main container */
+    overflow: visible;
 }
-.delivery-receipt-wrapper .table-wrapper tbody{
-    max-height: 420px; /* Or whatever height you prefer */
+
+.delivery-receipt-wrapper .table-wrapper tbody {
+    max-height: 420px;
     overflow-y: auto;
 }
+
 .delivery-receipt-wrapper .table-wrapper thead {
     position: sticky;
     top: 0;
     background-color: white;
     z-index: 1;
 }
+
 /* Tabs */
 .delivery-receipt-wrapper .tab-container {
     width: 100%;
@@ -78,13 +81,13 @@
 .delivery-receipt-wrapper .table-container {
     width: 100%;
     margin-bottom: 20px;
-    overflow: hidden; /* Ensure no overflow from the container */
+    overflow: hidden;
 }
 
 .delivery-receipt-wrapper .table-wrapper {
-    max-height: 420px; /* Adjust height of table here */
-    overflow-y: auto;  /* Allow vertical scrolling */
-    overflow-x: auto;  /* Allow horizontal scrolling */
+    max-height: 420px;
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 .delivery-receipt-wrapper .table-container table {
@@ -97,13 +100,13 @@
     padding: 12px;
     text-align: left;
     font-size: 13px;
-
-    white-space: normal;     
-    overflow: visible;        
-    text-overflow: unset;     
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
 }
 
-.checkbox-input {
+/* Checkbox Styling */
+.delivery-receipt-wrapper input[type="checkbox"] {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -117,17 +120,13 @@
     margin: 0;
     vertical-align: middle;
     background-color: white;
-
-    
 }
 
-/* When checkbox is checked */
-.delivery-receipt-wrapper .checkbox-input:checked {
+.delivery-receipt-wrapper input[type="checkbox"]:checked {
     background-color: #00A8A8;
 }
 
-/* Checkmark styling when checked */
-.delivery-receipt-wrapper .checkbox-input:checked::after {
+.delivery-receipt-wrapper input[type="checkbox"]:checked::after {
     content: '';
     position: absolute;
     left: 4px;
@@ -159,7 +158,7 @@
     box-shadow: 0 2px 2px -2px gray;
 }
 
-/* ✅ Teal Scrollbar Styling */
+/* Scrollbar Styling */
 .delivery-receipt-wrapper .table-wrapper::-webkit-scrollbar {
     width: 8px;
     height: 8px;
