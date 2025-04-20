@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HRDashboard from './components/HumanResources';
-import Employees from './submodules/Employees';
-import EditEmployee from './submodules/EditEmployee';
-import Departments from './submodules/Departments';
-import EditDepartment from './submodules/EditDepartment';
-import './styles/App.css';
+import HRDashboard from '../HumanResources.jsx';
+import Employees from './Employees';
+import EditEmployee from '../pages/EditEmployee';
+import Departments from './Departments';
+import EditDepartment from '../pages/EditDepartment';
+import '../../../App.css';
 
 function App() {
   return (

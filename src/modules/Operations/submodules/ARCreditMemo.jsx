@@ -198,14 +198,11 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           if (!response.ok) throw new Error('Failed to fetch next document IDs');
          
           const data = await response.json();
-          const lastCreditMemoId = data.last_credit_memo_id || "AR-1000";
-          const nextNumber = parseInt(lastCreditMemoId.split('-')[1]) + 1;
-          const nextCreditMemoId = `AR-${nextNumber}`;
           setDocumentDetails(prev => ({
             ...prev,
             document_no: data.next_document_no,
             transaction_id: data.next_transaction_id,
-            ar_credit_memo: nextCreditMemoId
+            ar_credit_memo: data.next_credit_memo_id || "AR-1000"
           }));
          
         } catch (error) {
@@ -682,8 +679,13 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       if (!selectedOwner || !vendorID){
         if(!selectedOwner){
           toast.error("Owner is required")
+          return
         }else if(!documentDetails.buyer){
           toast.error("Buyer Required")
+          return
+        }else if(!(documentDetails.invoice_id)){
+          toast.error("Invoice ID required")
+          return
         }
         return
       }
@@ -703,6 +705,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         document_no: documentDetails?.document_no || null,
         transaction_id: documentDetails.transaction_id,
         ar_credit_memo: documentDetails.ar_credit_memo,
+        invoice_id: documentDetails.invoice_id,
         initial_amount: documentDetails.initialAmount,
         tax_rate: documentDetails.tax_rate,
         tax_amount: documentDetails.tax_amount,
@@ -722,6 +725,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           ...(item.item_id.startsWith("ADMIN-MATERIAL") && { material_id: item.item_id }),
         }))
       };
+      console.log(payload)
       // Call the create API
       const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
         method: 'POST',
@@ -781,6 +785,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
     if (!vendorID){
       toast.error("Customer Required")
+      return
+    }
+    if(!(documentDetails.invoice_id)){
+      toast.error("Invoice ID required")
       return
     }
     try {
@@ -844,10 +852,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         const productDocuItemResult = await productDocuItemResponse.json();
         console.log('`document item update successful:', productDocuItemResult);
       }
-      // Step 2: Update GoodsTrackingData last
-      //vendor code name CP buyer owner
-      //details TransactionID Status DocumentNo DeliveryDate posting date document date
-      //initial amount discount rate discount amount freight tax rate tax amount total
       const updatedData = {
         status: selectedStatus,
         vendor_code: null,
@@ -1086,7 +1090,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                 <label>Credit Memo ID</label>
                 <input
                   type="text"
-                  value={documentDetails.ar_credit_memo || selectedData?.ar_credit_memo || ""}
+                  value={documentDetails?.ar_credit_memo || selectedData?.ar_credit_memo || ""}
                   readOnly
                   style={{ cursor: 'not-allowed' }}
                 />              

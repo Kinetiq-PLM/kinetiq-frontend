@@ -106,11 +106,16 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
   const [documentItems, setDocumentItems] = useState(
-    isCreateMode ? [{}] : [...selectedData.document_items, {}]
+    isCreateMode 
+      ? [{ product_details: {} }] 
+      : [
+          ...selectedData.document_items.map(item => ({
+            ...item,
+            product_details: item.product_details || {}
+          })), 
+          { product_details: {} }
+        ]
   );
-
-
-
 
  
   const today = new Date().toISOString().slice(0, 10);
@@ -163,9 +168,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
  
     fetchNextDocumentIds();
   }, [isCreateMode]);
-
-
-
 
   const handleInputChange = async (e, index, field) => {
     const updatedItems = [...documentItems];
@@ -251,7 +253,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
             unit_of_measure: '',
             quantity: '',
             cost: '',
-            warehouse_id: ''
+            warehouse_id: '',
+            product_details: {}
           });
  
           setDocumentItems(updatedItems);
@@ -337,7 +340,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           unit_of_measure: '',
           quantity: '',
           cost: '',
-          warehouse_id: ''
+          warehouse_id: '',
+          product_details: {}
         });
  
         setDocumentItems(updatedItems);
@@ -377,8 +381,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       row.item_id &&
       row.item_name &&
       row.unit_of_measure &&
-      (row.product_details.manuf_date || !row.item_id.startsWith('ADMIN-PROD')) &&
-      (row.product_details.expiry_date || !row.item_id.startsWith('ADMIN-PROD')) &&
+      (row.item_id.startsWith('ADMIN-PROD') 
+      ? (row.product_details?.manuf_date && row.product_details?.expiry_date)
+      : true) &&
       row.quantity &&
       row.cost &&
       row.warehouse_id
@@ -545,13 +550,13 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = parseFloat(initialAmount) + tax_amount - discount_amount + parseFloat(documentDetails.freight || 0).toFixed(2);
+    const total = (parseFloat(initialAmount) + parseFloat(tax_amount) - parseFloat(discount_amount) + parseFloat(documentDetails.freight || 0)).toFixed(2);
  
     setDocumentDetails(prev => ({
       ...prev,
       tax_amount: tax_amount,
       discount_amount: discount_amount,
-      total: total,
+      transaction_cost: total
     }));
   }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
  
@@ -575,8 +580,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       if (!selectedOwner || !documentDetails.buyer){
         if(!selectedOwner){
           toast.error("Owner is required")
+          return
         }else if(!documentDetails.buyer){
           toast.error("Buyer Required")
+          return
         }
         return
       }
