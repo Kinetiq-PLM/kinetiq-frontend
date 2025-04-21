@@ -1,10 +1,10 @@
 export const accountCodeMapping = {
     "Assets": { prefix: "CA", baseNumber: 1100 },
-    "Non-Current Assets": { prefix: "NA", baseNumber: 1160 },
-    "Current Liabilities": { prefix: "CL", baseNumber: 2060 },
-    "Non-Current Liabilities": { prefix: "NL", baseNumber: 2120 },
+    "Non-Current Assets": { prefix: "NA", baseNumber: 1170 },
+    "Current Liabilities": { prefix: "CL", baseNumber: 2070 },
+    "Non-Current Liabilities": { prefix: "NL", baseNumber: 2130 },
     "Equity": { prefix: "EE", baseNumber: 3040 },
-    "Revenue": { prefix: "RR", baseNumber: 4030 },
+    "Revenue": { prefix: "RR", baseNumber: 4050 },
     "Cost of Goods Sold": { prefix: "CG", baseNumber: 5060 },
     "Administrative Expenses": { prefix: "AE", baseNumber: 6070 },
     "Selling and Distribution Expenses": { prefix: "SD", baseNumber: 6140 },
@@ -32,7 +32,7 @@ export const accountCodeMapping = {
       "Office Furniture & Fixtures": { prefix: "NA", baseNumber: 1130 },
       "Computers & IT Equipment": { prefix: "NA", baseNumber: 1140 },
       "Intangible Assets (Patents, Trademarks, Software)": { prefix: "NA", baseNumber: 1150 },
-      "Accumulated Depreciation (Contra-Asset)": { prefix: "NA", baseNumber: 1160 },
+      "Accumulated Depreciation (Contra-Asset)": { prefix: "NA", baseNumber: 1170 },
     },
     "Current Liabilities": {
       "Accounts Payable (Supplier Balances)": { prefix: "CL", baseNumber: 2010 },
