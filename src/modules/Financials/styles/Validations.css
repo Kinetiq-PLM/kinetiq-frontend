@@ -30,6 +30,7 @@
   z-index: 50;
   align-self: start;
   margin-left: 15px;
+  margin-top: 50px;
 }
 
 .valid .tabs button {
@@ -278,6 +279,12 @@
     margin-top: auto;
 }
 
+.modal-review-button{
+background-color: #da7b7b;
+border-radius: 6px;
+margin-right: 10px;
+color: white;
+}
 
 .valid table {
   width: 100%;
@@ -677,9 +684,14 @@ font-size: 12.5px;
   padding: 5px 15px;
 }
 
-.valid .status-label.toreview {
-  background-color: #c65e5e;
-  padding: 5px 15px;
+.valid .status-label.status-toreview {
+  background-color: #fdcac1; 
+  color: #575656;
+  padding: 5px 8px;
+  border-radius: 8px;
+  font-size: clamp(11px, 2vw, 12px);
+  font-weight: 600;
+  display: inline-block;
 }
 
 @media (max-width: 768px) {
@@ -814,4 +826,3 @@ font-size: 12.5px;
 .valid .validation-table-2.no-grid td {
   border: none !important;
 }
-
