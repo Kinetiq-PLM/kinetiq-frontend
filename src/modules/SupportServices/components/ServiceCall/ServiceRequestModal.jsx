@@ -21,6 +21,7 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
   const [isTechDropdown, setOpenTechDD] = useState(false);
   const [isOpenTypeDD, setOpenTypeDD] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [userId, setUserId] = useState("")
 
   // Update form when callData changes
   useEffect(() => {
@@ -51,6 +52,7 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
       request_status: "Pending",
       request_date: today,
       request_description: requestDescription,
+      userId: userId
     })
   }
 
@@ -67,6 +69,16 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
         console.error("Error fetching technicians:", error);
       }
     };
+
+    const fetchUserId = async (techId) => {
+      try {
+        const response = await GET(`call/calls/user/${techId}`); 
+        setUserId(response.user_id);
+        console.log("user id", response.user_id)
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
   
   const handleToggleDropdownTech = () => {
     if (!isTechDropdown) {
@@ -77,6 +89,7 @@ const ServiceRequestModal = ({ isOpen, onClose, onSubmit, callData }) => {
   };
   
   const handleSelectTechnician = (technician) => {
+    fetchUserId(technician.employee_id)
     setTechnicianId(technician.employee_id); 
     setTechnicianName(technician.first_name + " " + technician.last_name);
     setOpenTechDD(false); 
