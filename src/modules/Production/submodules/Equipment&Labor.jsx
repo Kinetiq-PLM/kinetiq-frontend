@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Equipment&Labor.css";
 
-// Equipment table with backend logic
 const EquipmentTable = ({ searchTerm }) => {
   const [equipmentData, setEquipmentData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +10,7 @@ const EquipmentTable = ({ searchTerm }) => {
   useEffect(() => {
     const fetchEquipmentData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/equipment/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/");
         setEquipmentData(response.data);
         setLoading(false);
       } catch (err) {
@@ -22,7 +21,10 @@ const EquipmentTable = ({ searchTerm }) => {
     fetchEquipmentData();
   }, []);
 
-  const handleStatusChange = async (index, value) => {
+  const handleStatusChange = async (equipmentId, value) => {
+    const index = equipmentData.findIndex(item => item.equipment_id === equipmentId);
+    if (index === -1) return;
+
     const updatedData = equipmentData.map((item, i) =>
       i === index ? { ...item, availability_status: value } : item
     );
@@ -31,7 +33,7 @@ const EquipmentTable = ({ searchTerm }) => {
 
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/equipment/${equipmentToUpdate.equipment_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/${equipmentToUpdate.equipment_id}/`,
         equipmentToUpdate
       );
       console.log("Availability status updated successfully");
@@ -40,7 +42,10 @@ const EquipmentTable = ({ searchTerm }) => {
     }
   };
 
-  const handleMaintenanceDateChange = async (index, value) => {
+  const handleMaintenanceDateChange = async (equipmentId, value) => {
+    const index = equipmentData.findIndex(item => item.equipment_id === equipmentId);
+    if (index === -1) return;
+
     const updatedData = equipmentData.map((item, i) =>
       i === index ? { ...item, last_maintenance_date: value } : item
     );
@@ -49,7 +54,7 @@ const EquipmentTable = ({ searchTerm }) => {
 
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/equipment/${equipmentToUpdate.equipment_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/${equipmentToUpdate.equipment_id}/`,
         equipmentToUpdate
       );
     } catch (error) {
@@ -57,7 +62,10 @@ const EquipmentTable = ({ searchTerm }) => {
     }
   };
 
-  const handleCostChange = async (index, value) => {
+  const handleCostChange = async (equipmentId, value) => {
+    const index = equipmentData.findIndex(item => item.equipment_id === equipmentId);
+    if (index === -1) return;
+
     const updatedData = equipmentData.map((item, i) =>
       i === index ? { ...item, equipment_cost: value } : item
     );
@@ -66,7 +74,7 @@ const EquipmentTable = ({ searchTerm }) => {
 
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/equipment/${equipmentToUpdate.equipment_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/equipment/${equipmentToUpdate.equipment_id}/`,
         equipmentToUpdate
       );
     } catch (error) {
@@ -106,8 +114,8 @@ const EquipmentTable = ({ searchTerm }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredData.map((equipment, index) => (
-            <tr key={equipment.equipment_id || index}>
+          {filteredData.map((equipment) => (
+            <tr key={equipment.equipment_id}>
               <td><h1>{equipment.equipment_id || "E001"}</h1></td>
               <td><h2>{equipment.equipment_name || "CNC Milling Machine"}</h2></td>
               <td>
@@ -118,14 +126,14 @@ const EquipmentTable = ({ searchTerm }) => {
                 <input
                   type="date"
                   value={equipment.last_maintenance_date || ""}
-                  onChange={(e) => handleMaintenanceDateChange(index, e.target.value)}
+                  onChange={(e) => handleMaintenanceDateChange(equipment.equipment_id, e.target.value)}
                 />
               </td>
               <td>
                 <input
                   type="text"
                   value={equipment.equipment_cost || ""}
-                  onChange={(e) => handleCostChange(index, e.target.value)}
+                  onChange={(e) => handleCostChange(equipment.equipment_id, e.target.value)}
                   style={{ width: "100px" }}
                 />
               </td>
@@ -135,7 +143,7 @@ const EquipmentTable = ({ searchTerm }) => {
                     .replace(/\s+/g, "-")
                     .toLowerCase()}`}
                   value={equipment.availability_status}
-                  onChange={(e) => handleStatusChange(index, e.target.value)}
+                  onChange={(e) => handleStatusChange(equipment.equipment_id, e.target.value)}
                 >
                   <option value="Available">Available</option>
                   <option value="Out of Order">Out of Order</option>
@@ -159,7 +167,7 @@ const LaborTable = ({ searchTerm }) => {
   useEffect(() => {
     const fetchLaborData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/labor/");
+        const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/labor/");
         setLaborData(response.data);
         setLoading(false);
       } catch (err) {
@@ -170,7 +178,10 @@ const LaborTable = ({ searchTerm }) => {
     fetchLaborData();
   }, []);
 
-  const handleDatesWorkedChange = async (index, value) => {
+  const handleDatesWorkedChange = async (laborId, value) => {
+    const index = laborData.findIndex(item => item.labor_id === laborId);
+    if (index === -1) return;
+
     const updatedData = laborData.map((item, i) =>
       i === index ? { ...item, date_worked: value } : item
     );
@@ -179,7 +190,7 @@ const LaborTable = ({ searchTerm }) => {
 
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/labor/${laborToUpdate.labor_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/labor/${laborToUpdate.labor_id}/`,
         { date_worked: value },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -189,7 +200,10 @@ const LaborTable = ({ searchTerm }) => {
     }
   };
 
-  const handleDaysWorkedChange = async (index, value) => {
+  const handleDaysWorkedChange = async (laborId, value) => {
+    const index = laborData.findIndex(item => item.labor_id === laborId);
+    if (index === -1) return;
+
     const updatedData = laborData.map((item, i) =>
       i === index ? { ...item, days_worked: value } : item
     );
@@ -198,7 +212,7 @@ const LaborTable = ({ searchTerm }) => {
 
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/labor/${laborToUpdate.labor_id}/`,
+        `https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/labor/${laborToUpdate.labor_id}/`,
         { days_worked: value },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -240,8 +254,8 @@ const LaborTable = ({ searchTerm }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredData.map((labor, index) => (
-            <tr key={labor.labor_id || index} className="labor-row">
+          {filteredData.map((labor) => (
+            <tr key={labor.labor_id || labor.labor_id}>
               <td className="labor-cell labor-id">
                 <h1>{labor.labor_id || "L001"}</h1>
               </td>
@@ -259,14 +273,14 @@ const LaborTable = ({ searchTerm }) => {
                       ? new Date(labor.date_worked).toISOString().split("T")[0]
                       : ""
                   }
-                  onChange={(e) => handleDatesWorkedChange(index, e.target.value)}
+                  onChange={(e) => handleDatesWorkedChange(labor.labor_id, e.target.value)}
                 />
               </td>
               <td className="labor-cell days-worked">
                 <input
                   type="text"
-                  value={labor.days_worked}
-                  onChange={(e) => handleDaysWorkedChange(index, e.target.value)}
+                  value={labor.days_worked || ""}
+                  onChange={(e) => handleDaysWorkedChange(labor.labor_id, e.target.value)}
                 />
               </td>
             </tr>
@@ -293,8 +307,8 @@ const Modal = ({ show, onClose, children }) => {
 
 const BodyContent = () => {
   const [activeTab, setActiveTab] = useState("equipment");
-  const [searchQuery, setSearchQuery] = useState(""); // For Equipment & Labor tables
-  const [modalSearchQuery, setModalSearchQuery] = useState(""); // For the modal search
+  const [searchQuery, setSearchQuery] = useState("");
+  const [modalSearchQuery, setModalSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [projectEquipmentData, setProjectEquipmentData] = useState([]);
   const [peLoading, setPeLoading] = useState(false);
@@ -304,7 +318,6 @@ const BodyContent = () => {
     setSearchQuery(event.target.value);
   };
 
-  // New handler for modal search
   const handleModalSearchChange = (event) => {
     setModalSearchQuery(event.target.value);
   };
@@ -322,7 +335,7 @@ const BodyContent = () => {
 
   const fetchProjectEquipment = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/project-equipment/");
+      const response = await axios.get("https://rhxktvfc29.execute-api.ap-southeast-1.amazonaws.com/dev/api/project-equipment/");
       setProjectEquipmentData(response.data);
       setPeLoading(false);
     } catch (error) {
@@ -336,11 +349,9 @@ const BodyContent = () => {
     setPeLoading(true);
     setPeError(null);
     fetchProjectEquipment();
-    // Also clear modal search query on open
     setModalSearchQuery("");
   };
 
-  // Filter project equipment by modal's search query
   const filteredProjectEquipment = projectEquipmentData.filter((pe) => {
     const search = modalSearchQuery.toLowerCase();
     return (
