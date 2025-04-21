@@ -91,26 +91,43 @@ const BodyContent = ({ onClose }) => {
       setError("Please fill all required fields before adding items.");
       return;
     }
-
+  
     try {
-      const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/null/");
-      const data = await res.json();
-      const latest = data[data.length - 1]?.request_id;
-      setLatestRequestId(latest);
-
-      const newItem = {
-        material_id: formData.requestType === "Material" ? "" : null,
-        asset_id: formData.requestType === "Assets" ? "" : null,
-        purchase_quantity: 1,
-        request_id: latest,
-      };
-
-      setFormData((prev) => ({
-        ...prev,
-        items: [...prev.items, newItem],
-      }));
-    } catch {
-      setError("Failed to fetch latest request_id");
+      const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
+      const data = await response.json();
+  
+      // Filter the list to find the matching request
+      const matchingRequest = data.find((request) => {
+        return (
+          request.employee_id === formData.employeeId &&
+          request.document_date === formData.documentDate &&
+          request.valid_date === formData.dateValid &&
+          request.required_date === formData.dateRequested
+        );
+      });
+  
+      if (matchingRequest) {
+        console.log("Matching Request:", matchingRequest);
+        setLatestRequestId(matchingRequest.request_id); // Set the matched request_id
+  
+        const newItem = {
+          material_id: formData.requestType === "Material" ? "" : null,
+          asset_id: formData.requestType === "Assets" ? "" : null,
+          purchase_quantity: 1,
+          request_id: matchingRequest.request_id, // Use the matched request_id
+        };
+  
+        setFormData((prev) => ({
+          ...prev,
+          items: [...prev.items, newItem],
+        }));
+      } else {
+        setError("No matching request found for the given criteria.");
+        setTimeout(() => setError(""), 3000);
+      }
+    } catch (error) {
+      console.error("Error fetching requests:", error);
+      setError("Failed to fetch requests.");
     }
   };
 
