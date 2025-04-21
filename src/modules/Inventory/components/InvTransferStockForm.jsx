@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/TransferStockForm.css";
 
-const TransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
+const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
   const [inventoryItemID, setInventoryItemID] = useState("");
   const [inventoryItemName, setInventoryItemName] = useState("");
   const [inputQuantity, setinputQuantity] = useState("");
@@ -202,4 +202,4 @@ const TransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
   );
 };
 
-export default TransferStockForm;
+export default InvTransferStockForm;

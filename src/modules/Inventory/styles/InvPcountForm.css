@@ -1,5 +1,5 @@
 
-.inv .modal-overlay {
+.pcounts .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -13,7 +13,7 @@
   }
   
 
-  .inv .modal-content {
+  .pcounts .modal-content {
     background: white;
     padding: 2rem;
     border-radius: 12px;
@@ -23,28 +23,28 @@
   }
   
   @media screen and (min-width: 768px) {
-    .inv .modal-content {
+    .pcounts .modal-content {
       width: 500px;
     }
   }
   
 
-  .inv .modal-content form {
+  .pcounts .modal-content form {
     display: flex;
     flex-direction: column;
   }
   
 
-  .inv .modal-content label {
+  .pcounts .modal-content label {
     display: block;
     margin: 10px 0 5px;
     font-weight: 500;
   }
   
 
-  .inv .modal-content input,
-  .inv .modal-content textarea,
-  .inv .modal-content select {
+  .pcounts .modal-content input,
+  .pcounts .modal-content textarea,
+  .pcounts .modal-content select {
     width: 100%;
     padding: 8px;
     margin-bottom: 15px;
@@ -54,26 +54,26 @@
     /* color: #555; */
   }
   
-  .inv .modal-content textarea {
+  .pcounts .modal-content textarea {
     resize: vertical;
     min-height: 3.2rem; 
   }
   
 
-  .inv .modal-content .form-section {
+  .pcounts .modal-content .form-section {
     display: flex;
     justify-content: space-between;
   }
   
 
-  .inv .modal-content .form-actions {
+  .pcounts .modal-content .form-actions {
     display: flex;
     align-items: flex-start;
     margin-top: 1rem;
   }
   
 
-  .inv .modal-content .close-btn {
+  .pcounts .modal-content .close-btn {
     background: none;
     border: none;
     font-size: 1.5rem;
@@ -81,39 +81,39 @@
   }
   
 
-  .inv .modal-content .clear-btn,
-  .inv .modal-content .submit-btn {
+  .pcounts .modal-content .clear-btn,
+  .pcounts .modal-content .submit-btn {
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
   }
   
 
-  .inv .modal-content .clear-btn {
+  .pcounts .modal-content .clear-btn {
     border: 1px solid teal;
     color: teal;
     background: none;
   }
   
 
-  .inv .modal-content .submit-btn {
+  .pcounts .modal-content .submit-btn {
     background: teal;
     color: white;
     border: none;
   }
   
-  .inv .blurred {
+  .pcounts .blurred {
     filter: blur(5px);
   }
   
-  .inv .modal-content .form-section label {
+  .pcounts .modal-content .form-section label {
     display: flex;
     align-items: center;
     gap: 8px; 
     margin-bottom: 8px;
   }
   
-  .inv .modal-content .form-section input[type="checkbox"] {
+  .pcounts .modal-content .form-section input[type="checkbox"] {
     margin: 0;
     flex-shrink: 0; 
   }

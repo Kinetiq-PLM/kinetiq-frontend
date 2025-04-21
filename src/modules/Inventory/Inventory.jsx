@@ -387,7 +387,7 @@ const BodyContent = () => {
 
   return (
     <div className={`inv ${showModal ? "blurred" : ""}`}>
-      <div className="body-content-container flex">
+      <div className="body-content-container ">
         <InvNav
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -410,7 +410,10 @@ const BodyContent = () => {
           onSelectProduct={setSelectedItem}
         />
 
-        <div className="w-full hidden md:block">
+        <div className="w-full flex-wrap">
+
+
+          {/* Deprecated Buttons */}
           {/* <div className="flex justify-between items-center p-3 h-15">
             <h2 className="text-lg font-semibold mt-6">
               Selected Item Details
@@ -427,8 +430,9 @@ const BodyContent = () => {
             )}
           </div> */}
 
-          <div className="min-h-[150px] border border-gray-300 rounded-lg p-6 mt-2">
-            <div className="grid grid-cols-5 gap-4">
+          {/* selected item details for medium screens  & up */}
+          <div className="hidden md:grid md:grid-cols-6 gap-3 min-h-[150px] border border-gray-300 rounded-lg p-4 mt-2 text-sm">
+            
               {selectedItem ? (
                 <>
                   {activeTab === "Products" && (
@@ -495,25 +499,99 @@ const BodyContent = () => {
                     .filter(([key]) => !["product_id", "asset_id", "material_id", "item_id", "Minimum Threshold", "Maximum Threshold", "Last Updated"].includes(key))
                     .map(([label, value]) => (
                       <div key={label}>
-                        <p className="text-cyan-600 font-medium">{label}</p>
-                        <p>{value}</p>
+                        <p className="text-cyan-600 font-medium text-sm">{label}</p>
+                        <p className="text-[1rem]">{value}</p>
                       </div>
                     ))}
                 </>
               ) : (
                 <p>No item selected</p>
               )}
-            </div>
           </div>
+
+          {/* selected item details for BELOW medium screens */}
+          <div className="md:hidden grid grid-cols-2 gap-3 min-h-[150px] border border-gray-300 rounded-lg p-4 mt-2 text-sm">
+            
+            {selectedItem ? (
+              <>
+                {activeTab === "Products" && (
+                  <>
+                    <div>
+                      <p className="text-cyan-600 font-small">Product Name</p>
+                      <p>{selectedItem["Name"] || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cyan-600 font-small">Item ID</p>
+                      <p>{selectedItem["Item ID"] || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cyan-600 font-small">Available Stock</p>
+                      <p>{selectedItem["Available Stock"] || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cyan-600 font-small">Committed Stock</p>
+                      <p>{selectedItem["Committed Stock"] || "N/A"}</p>
+                    </div>
+                  </>
+                )}
+                {activeTab === "Assets" && (
+                  <>
+                    <div>
+                      <p className="text-cyan-600 font-small">Asset Name</p>
+                      <p>{selectedItem["Name"] || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cyan-600 font-small">Item ID</p>
+                      <p>{selectedItem["Item ID"] || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cyan-600 font-medium">Serial No</p>
+                      <p>{selectedItem["Serial No"] || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cyan-600 font-medium">Total Stock</p>
+                      <p>{selectedItem["Total Stock"] || "N/A"}</p>
+                    </div>
+                  </>
+                )}
+                {activeTab === "Raw Materials" && (
+                  <>
+                    <div>
+                      <p className="text-cyan-600 font-small">Material Name</p>
+                      <p>{selectedItem["Name"] || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cyan-600 font-small">Total Stock</p>
+                      <p>{selectedItem["Total Stock"] || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cyan-600 font-small">Minimum Threshold</p>
+                      <p>{selectedItem["Minimum Threshold"] || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-cyan-600 font-small">Maximum Threshold</p>
+                      <p>{selectedItem["Maximum Threshold"] || "N/A"}</p>
+                    </div>
+                    
+                  </>
+                )}
+                {/* {Object.entries(selectedItem)
+                  .filter(([key]) => !["product_id", "asset_id", "material_id", "item_id", "Minimum Threshold", "Maximum Threshold", "Last Updated"].includes(key))
+                  .map(([label, value]) => (
+                    <div key={label}>
+                      <p className="text-cyan-600 font-medium text-sm">{label}</p>
+                      <p className="text-[1rem]">{value}</p>
+                    </div>
+                  ))} */}
+              </>
+            ) : (
+              <p>No item selected</p>
+            )}
+        </div>
+         
         </div>
 
-        <div className="inventory-cards-container w-full overflow-y-auto max-h-[80vh]">
-          <InvItemCards
-            items={filteredData}
-            onSelectItem={setSelectedItem}
-            openModal={toggleModal}
-          />
-        </div>
+      
       </div>
 
       {showModal && (
