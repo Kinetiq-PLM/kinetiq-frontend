@@ -609,42 +609,42 @@ const handleSendTo = async () => {
                   />
                 </div>
                 <div className="form-group">
-  <label className="downpayment-label" >
-    <input
-    className="input-with-symbol"
-      type="checkbox"
-      checked={formData.downpayment_request.enabled}
-      onChange={(e) =>
-        setFormData((prev) => ({
-          ...prev,
-          downpayment_request: {
-            ...prev.downpayment_request,
-            enabled: e.target.checked, // Toggle the enabled state
-            value: e.target.checked ? prev.downpayment_request.value : "", // Reset value if unchecked
-          },
-        }))
-      }
-    />
-    Downpayment&nbsp;Request
-  </label>
-  <div className="input-with-symbol">
-  <input
-    type="text"
-    name="downpayment_request"
-    value={formData.downpayment_request.value}
-    onChange={(e) =>
-      setFormData((prev) => ({
-        ...prev,
-        downpayment_request: {
-          ...prev.downpayment_request,
-          value: e.target.value, // Update the value
-        },
-      }))
-    }
-    disabled={!formData.downpayment_request.enabled} // Disable the input if the toggle is off
-  />
-  <span>%</span>
-</div>
+                  <label className="downpayment-label" >
+                    <input
+                    className="input-with-symbol"
+                      type="checkbox"
+                      checked={formData.downpayment_request.enabled}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          downpayment_request: {
+                            ...prev.downpayment_request,
+                            enabled: e.target.checked, // Toggle the enabled state
+                            value: e.target.checked ? prev.downpayment_request.value : "", // Reset value if unchecked
+                          },
+                        }))
+                      }
+                    />
+                    Downpayment&nbsp;Request
+                  </label>
+                  <div className="input-with-symbol">
+                  <input
+                    type="text"
+                    name="downpayment_request"
+                    value={formData.downpayment_request.value}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        downpayment_request: {
+                          ...prev.downpayment_request,
+                          value: e.target.value, // Update the value
+                        },
+                      }))
+                    }
+                    disabled={!formData.downpayment_request.enabled} // Disable the input if the toggle is off
+                  />
+                  <span>%</span>
+                </div>
                 </div>
                 <div className="form-group">
                   <label>Discount Percentage</label>
@@ -687,7 +687,7 @@ const handleSendTo = async () => {
                   />
                 </div>
                 
-                </div>
+              </div>
             </div>
           </div>
 

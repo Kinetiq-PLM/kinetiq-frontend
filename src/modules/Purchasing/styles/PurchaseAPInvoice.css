@@ -19,7 +19,7 @@
     min-height: 30rem;
 }
 
-.apinvoice-table-scrollable {
+.apinvoice .apinvoice-table-scrollable {
     width: 100%;
   max-height: 50vh;
   overflow-x: auto;
@@ -28,7 +28,7 @@
   scrollbar-color: #bdbdbd #f5f5f5;
 }
 
-.apinvoice-table-header {
+.apinvoice .apinvoice-table-header {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
@@ -42,7 +42,7 @@
     align-items: center;
 }
 
-.apinvoice-table-header > div {
+.apinvoice .apinvoice-table-header > div {
     text-align: center;
     display: flex;
     align-items: center;
@@ -50,12 +50,12 @@
     white-space: nowrap;
 }
 
-.apinvoice-table-rows {
+.apinvoice .apinvoice-table-rows {
     display: flex;
     flex-direction: column;
 }
 
-.apinvoice-row {
+.apinvoice .apinvoice-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
@@ -64,16 +64,16 @@
     align-items: center;
 }
 
-.apinvoice-row > div {
+.apinvoice .apinvoice-row > div {
     text-align: center;
 }
 
-.apinvoice-actions {
+.apinvoice .apinvoice-actions {
   display: flex;
   justify-content: center;
 }
 
-.apinvoice-edit-button {
+.apinvoice .apinvoice-edit-button {
   padding: 4px 8px;
   background-color: #f0f0f0;
   border: 1px solid #ccc;
@@ -83,11 +83,11 @@
   margin: 0 2px;
 }
 
-.apinvoice-edit-button:hover {
+.apinvoice .apinvoice-edit-button:hover {
   background-color: #e0e0e0;
 }
 
-.apinvoice-header {
+.apinvoice .apinvoice-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -96,13 +96,13 @@
     width: 100%;
 }
 
-.apinvoice-header-left {
+.apinvoice .apinvoice-header-left {
     display: flex;
     gap: 1rem;
     align-items: center;
 }
 
-.apinvoice-back {
+.apinvoice .apinvoice-back {
     padding: 0.5rem 1rem;
     border: none;
     background: none;
@@ -115,17 +115,17 @@
     transition: color 0.2s ease;
 }
 
-.apinvoice-back:hover {
+.apinvoice .apinvoice-back:hover {
     color: #00A8A8;
 }
 
-.apinvoice-filters {
+.apinvoice .apinvoice-filters {
     display: flex;
     gap: 1rem;
     align-items: center;
 }
 
-.apinvoice-date-filter {
+.apinvoice .apinvoice-date-filter {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -139,13 +139,13 @@
     min-width: 210px;
 }
 
-.date-display {
+.apinvoice .date-display {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.date-options-dropdown {
+.apinvoice .date-options-dropdown {
     position: absolute;
     top: 100%;
     left: 0;
@@ -158,21 +158,21 @@
     min-width: 170px;
 }
 
-.date-option {
+.apinvoice .date-option {
     padding: 0.75rem 1rem;
     transition: background-color 0.2s ease;
 }
 
-.date-option:hover {
+.apinvoice .date-option:hover {
     background-color: rgba(0, 168, 168, 0.05);
     color: #00A8A8;
 }
 
-.date-option:not(:last-child) {
+.apinvoice .date-option:not(:last-child) {
     border-bottom: 1px solid #eee;
 }
 
-.apinvoice-filter-btn {
+.apinvoice .apinvoice-filter-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -186,18 +186,18 @@
     min-width: 210px;
 }
 
-.apinvoice-filter-btn:hover {
+.apinvoice .apinvoice-filter-btn:hover {
     background-color: rgba(0, 168, 168, 0.05);
 }
 
-.apinvoice-search input {
+.apinvoice .apinvoice-search input {
     padding: 0.5rem 1rem;
     border: 1px solid #ddd;
     border-radius: 0.25rem;
     width: 300px;
 }
 
-.apinvoice-content {
+.apinvoice .apinvoice-content {
     flex: 1;
   background: white;
   border: 1px solid #D2D2D2;
@@ -209,57 +209,57 @@
   width: 100%;
 }
 
-.apinvoice-table {
+.apinvoice .apinvoice-table {
     flex: 1;
     border-radius: 0.25rem;
     overflow: hidden;
 }
 
-.apinvoice-row:hover {
+.apinvoice .apinvoice-row:hover {
     background-color: rgba(0, 168, 168, 0.05);
     cursor: pointer;
 }
 
-.status-closed,
-.status-open,
-.status-cancelled,
-.status-draft,
-.status-complete {
+.apinvoice .status-closed,
+.apinvoice .status-open,
+.apinvoice .status-cancelled,
+.apinvoice .status-draft,
+.apinvoice .status-complete {
     padding: 0.25rem 0.75rem;
     border-radius: 1rem;
     font-size: 0.9rem;
     display: inline-block;
 }
 
-.status-closed {
+.apinvoice .status-closed {
     background-color: #e3f2fd;
     color: #1976d2;
 }
 
-.status-open {
+.apinvoice .status-open {
     background-color: #e8f5e9;
     color: #2e7d32;
 }
 
-.status-cancelled {
+.apinvoice .status-cancelled {
     background-color: #ffebee;
     color: #c62828;
 }
 
-.status-draft {
+.apinvoice .status-draft {
     background-color: #fff3e0;
     color: #f57c00;
 }
 
-.status-complete {
+.apinvoice .status-complete {
     background-color: #c8e6c9;
     color: #388e3c;
 }
 
-.status-approved,
-.status-pending,
-.status-rejected,
-.status-completed {
+.apinvoice .status-approved,
+.apinvoice .status-pending,
+.apinvoice .status-rejected,
+.apinvoice .status-completed {
   border-radius: 12px;
   padding: 2px 10px;
   font-size: 0.85em;
@@ -267,31 +267,31 @@
   display: inline-block;
 }
 
-.status-approved {
+.apinvoice .status-approved {
   color: #155724;
   background-color: #d4edda;
   border: 1px solid #c3e6cb;
 }
 
-.status-pending {
+.apinvoice .status-pending {
   color: #856404;
   background-color: #fff3cd;
   border: 1px solid #ffeeba;
 }
 
-.status-rejected {
+.apinvoice .status-rejected {
   color: #721c24;
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
 }
 
-.status-completed {
+.apinvoice .status-completed {
   color: #0c5460;
   background-color: #d1ecf1;
   border: 1px solid #bee5eb;
 }
 
-.apinvoice-status-filter {
+.apinvoice .apinvoice-status-filter {
     position: relative;
     display: flex;
     align-items: center;
@@ -302,7 +302,7 @@
     cursor: pointer;
 }
 
-.status-options-dropdown {
+.apinvoice .status-options-dropdown {
     position: absolute;
     top: 100%;
     left: 0;
@@ -315,17 +315,17 @@
     min-width: 210px;
 }
 
-.status-option {
+.apinvoice .status-option {
     padding: 0.75rem 1rem;
     transition: background-color 0.2s ease;
 }
 
-.status-option:hover {
+.apinvoice .status-option:hover {
     background-color: rgba(0, 168, 168, 0.05);
     color: #00A8A8;
 }
 
-.status-option:not(:last-child) {
+.apinvoice .status-option:not(:last-child) {
     border-bottom: 1px solid #eee;
 }
 
