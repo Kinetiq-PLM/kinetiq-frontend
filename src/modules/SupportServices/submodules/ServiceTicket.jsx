@@ -104,7 +104,7 @@ const ServiceTicket = ({ user_id, employee_id }) => {
         const data = await POST("ticket/", ticketPayload);
         console.log("Ticket created successfully:", data);
 
-        const notif_data = await POST_NOTIF(notifData);
+        const notif_data = await POST_NOTIF("send-notif/", notifData);
         console.log("Notification sent successfully:", notif_data);
 
         setShowSubmitModal(false);
@@ -186,7 +186,7 @@ const ServiceTicket = ({ user_id, employee_id }) => {
       const data = await POST("call/", queuePayload);
       console.log("Service call created successfully:", data);
 
-      const notif_data = await POST_NOTIF(notifData);
+      const notif_data = await POST_NOTIF("send-notif/", notifData);
       console.log("Notification sent successfully:", notif_data);
 
       inProgTix(ticketId);
@@ -295,7 +295,7 @@ const ServiceTicket = ({ user_id, employee_id }) => {
                     className="search-input"
                   />
                 </div>
-                <div className="filter-dropdown">
+                <div className="filter-dropdown" >
                   <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
                   {filterOptions.find(opt => opt.value === filterBy)?.label || "Filter by"}
                     <span className="arrow">▼</span>

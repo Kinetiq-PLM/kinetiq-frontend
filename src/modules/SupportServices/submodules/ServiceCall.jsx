@@ -31,6 +31,7 @@ const ServiceCall = ({user_id, employee_id}) => {
   const [selectedCall, setSelectedCall] = useState(null)
   const [showErrorModal, setShowErrorModal] = useState(false)
   const [errorModalMessage, setErrorModalMessage] = useState("")
+  const [management, setManagement] = useState([])
 
   // Fetch service calls from API (mock function)
   const fetchServiceCalls = async () => {
@@ -49,6 +50,7 @@ const ServiceCall = ({user_id, employee_id}) => {
 
   useEffect(() => {
     fetchServiceCalls();
+    fetchManagement();
   }, []);
 
   // table row clicking func
@@ -172,6 +174,16 @@ const ServiceCall = ({user_id, employee_id}) => {
   }
   }
 
+  const fetchManagement = async () => {
+    try {
+      const data = await GET("call/calls/management-employees/");
+      const userIds = data.map(user => user.user_id);
+      setManagement(userIds);
+    } catch (error) {
+      console.error("Error fetching management employees:", error)
+    }
+  }
+
   const handleSubmitReq = async (reqData) => {
     // submit req
     console.log("Submitting request:", reqData)
@@ -182,6 +194,14 @@ const ServiceCall = ({user_id, employee_id}) => {
       recipient_id: reqData.userId,
       msg: "New service request submitted for you to review."
     }
+    
+    const notifDataManagement = {
+      module: "Support & Services",
+      submodule: "Service Request",
+      recipient_ids: management,
+      msg: "New service request submitted for you to review."
+    }
+    console.log(notifDataManagement)
 
     const { userId, ...reqPayload } = reqData;
     console.log("Sending notif:", notifData)
@@ -189,8 +209,11 @@ const ServiceCall = ({user_id, employee_id}) => {
       const data = await POST("request/", reqPayload);
       console.log("Service request created successfully:", data);
 
-      const notif_data = await POST_NOTIF(notifData);
+      const notif_data = await POST_NOTIF("send-notif/", notifData);
       console.log("Notification sent successfully:", notif_data);
+
+      const notif_data_batch = await POST_NOTIF("send-notif-batch/", notifDataManagement);
+      console.log("Notification sent successfully:", notif_data_batch);
 
       updateCallStatus(data.service_call?.service_call_id);
       setShowRequestModal(false);
