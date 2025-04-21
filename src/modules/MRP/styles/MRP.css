@@ -26,7 +26,8 @@
   text-transform: capitalize;
   letter-spacing: 1.4px;
   margin-bottom: 20px;
-  padding-top: 1rem;
+  padding-top: 2rem;
+  padding-bottom: 1rem;
 }
 
 .mrp .card-container {
@@ -38,7 +39,7 @@
 
 .mrp .card {
   width: 100%;
-  max-width: 450px;
+  max-width: 400px;
   aspect-ratio: 1 / 1;
   background: white;
   box-shadow: 0px 4px 7.5px 1px rgba(0, 0, 0, 0.25);
@@ -78,7 +79,9 @@
   transform: scale(1.1);
 }
 
-@media (max-width: 768px) {
+
+
+@media (max-width: 1140px) {
   .mrp .body-content-container {
     padding: 2rem;
   }
@@ -87,6 +90,7 @@
   .mrp .card-container {
     flex-direction: column;
     align-items: center;
+    padding: 2rem;
   }
 
   .mrp .card {
@@ -97,7 +101,13 @@
     font-size: 30px;
   }
 
-
+  
+  .mrp .mrp-table-scroll {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+  }
+  
 }
 
 @media (max-width: 480px) {
@@ -113,3 +123,17 @@
     font-size: 18px;
   }
 }
+
+.mrp .mrp-table-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mrp .mrp-table-scroll::-webkit-scrollbar-thumb {
+  background-color: #00A8A8;
+  border-radius: 4px;
+}
+
+.mrp .mrp-table-scroll::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+

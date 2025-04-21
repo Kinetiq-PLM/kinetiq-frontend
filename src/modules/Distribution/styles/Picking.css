@@ -776,8 +776,6 @@
   border-color: #00a8a8;
 }
 
-/* Add these new styles at the end of your Picking.css file */
-
 .picking .icon-spacing {
   margin-right: 8px;
   vertical-align: middle;
@@ -865,8 +863,6 @@
   min-width: 150px;
   justify-content: center;
 }
-
-/* Add these styles to your existing Picking.css file */
 
 /* Improved Modal Styles */
 .picking .edit-picking-modal.improved {
@@ -1616,4 +1612,91 @@
 
 .picking .completion-modal.improved {
   animation: modalFadeIn 0.2s ease-out forwards;
+}
+
+@media (max-width: 1440px) {
+  /* Remove dots but keep color-coded statuses */
+  .picking .status-cell {
+    padding-left: 0.75rem; /* Reset the padding since we're removing the dot */
+  }
+
+  .picking .status-cell::before {
+    display: none; /* Hide the status dot */
+  }
+  
+  /* Add background color to status cells instead */
+  .picking .status-not-started {
+    background-color: rgba(108, 117, 125, 0.1);
+  }
+  
+  .picking .status-in-progress {
+    background-color: rgba(0, 168, 168, 0.1);
+  }
+  
+  .picking .status-completed {
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Make the table horizontally scrollable on small screens */
+  .picking .picking-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust row padding for better touch targets */
+  .picking .picking-table td,
+  .picking .picking-table th {
+    padding: 0.85rem 0.75rem;
+  }
+  
+  /* Handle pagination better on small screens */
+  .picking .page-numbers {
+    display: none; /* Hide page numbers, keep only prev/next */
+  }
+  
+  .picking .pagination-info {
+    display: inline-block;
+    margin: 0 0.5rem;
+  }
+  
+  .picking .pagination-button {
+    min-width: 80px; /* Make buttons bigger for touch */
+  }
+}
+
+@media (max-width: 576px) {
+  /* Hide less important columns on very small screens */
+  .picking .picking-table th:nth-child(3),
+  .picking .picking-table td:nth-child(3),
+  .picking .picking-table th:nth-child(4),
+  .picking .picking-table td:nth-child(4),
+  .picking .picking-table th:nth-child(9),
+  .picking .picking-table td:nth-child(9) {
+    display: none;
+  }
+  
+  /* Make sure no-data message spans fewer columns */
+  .picking .no-data {
+    font-size: 0.8rem;
+    padding: 1.5rem 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .picking .picking-table tbody tr {
+    cursor: pointer;
+  }
+
+  .picking .picking-table tbody tr:active {
+    background-color: rgba(0, 168, 168, 0.1);
+  }
+}
+
+@media (max-width: 576px) {
+  .picking .sort-icon {
+    display: block;
+    margin: 2px auto 0;
+  }
 }

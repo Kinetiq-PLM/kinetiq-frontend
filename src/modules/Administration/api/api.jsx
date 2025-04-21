@@ -1,7 +1,7 @@
 // src/modules/Administration/api/api.jsx
 import axios from 'axios';
-const API_BASE_URL = 'http://localhost:8000/api';
-//const API_BASE_URL = 'https://7lthyploub.execute-api.ap-southeast-1.amazonaws.com/dev';
+// const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'https://7lthyploub.execute-api.ap-southeast-1.amazonaws.com/dev/api';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -442,6 +442,16 @@ export const rawMaterialsAPI = {
     }
   },
 
+  getVendors: async () => {
+    try {
+      const response = await api.get('/item-master/raw-materials/vendor_code/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching content IDs:', error);
+      throw error;
+    }
+  },
+
   // Create a new raw material
   createRawMaterial: async (materialData) => {
     try {
@@ -673,6 +683,20 @@ export const auditLogAPI = {
       throw error;
     }
   }
+};
+
+// Notifications API endpoints
+export const notificationsAPI = {
+  // Get audit logs with optional search and ordering
+  getNotifications: async (params = {}) => {
+    try {
+      const response = await api.get('/notifications/', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      throw error;
+    }
+  },
 };
 
 // Currency API endpoints
