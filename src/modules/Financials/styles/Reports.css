@@ -16,6 +16,7 @@
   align-items: center;
   justify-content: flex-start;
   min-width: 40rem;
+  overflow-y: auto;
 }
 
 .reports .tabs {
