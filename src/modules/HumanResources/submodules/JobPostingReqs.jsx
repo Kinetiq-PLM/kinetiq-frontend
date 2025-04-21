@@ -42,10 +42,10 @@ const JobPostingReqs = () => {
     const fetchData = async () => {
       try {
         const [postingsRes, archivedRes, deptsRes, posRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/api/job_postings/"),
-          axios.get("http://127.0.0.1:8000/api/job_postings/archived/"),
-          axios.get("http://127.0.0.1:8000/api/departments/"),
-          axios.get("http://127.0.0.1:8000/api/positions/")
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_postings/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_postings/archived/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/")
         ]);
 
         setPostings(postingsRes.data);

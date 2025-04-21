@@ -55,8 +55,8 @@ const WorkforceAllocation = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/"),
-        axios.get("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/archived/")
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/archived/")
       ]);
       setAllocations(activeRes.data);
       setArchivedAllocations(archivedRes.data);
@@ -72,8 +72,8 @@ const WorkforceAllocation = () => {
     const fetchDropdownData = async () => {
       try {
         const [employeesRes, deptsRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/api/employees/"),
-          axios.get("http://127.0.0.1:8000/api/departments/department/")
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/")
         ]);
         setEmployees(employeesRes.data);
         setDepartments(deptsRes.data);
@@ -134,7 +134,7 @@ const WorkforceAllocation = () => {
   // CRUD operations
   const handleArchive = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${id}/archive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${id}/archive/`);
       showToast("Allocation archived successfully");
       fetchAllocations();
     } catch (err) {
@@ -146,7 +146,7 @@ const WorkforceAllocation = () => {
   const handleUnarchive = async (id) => {
     try {
       await axios.post(
-        `http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
         {}, // Empty payload
         {
           headers: {
@@ -175,7 +175,7 @@ const WorkforceAllocation = () => {
       await Promise.all(
         selectedArchivedAllocations.map(id => 
           axios.post(
-            `http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
+            `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
             {},
             {
               headers: {
@@ -241,7 +241,7 @@ const WorkforceAllocation = () => {
         console.log("Sending payload:", payload);
         
         const response = await axios.post(
-          "http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/", 
+          "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/", 
           payload,
           {
             headers: {
@@ -313,7 +313,7 @@ const WorkforceAllocation = () => {
     
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${editingAllocation.allocation_id}/`, 
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/${editingAllocation.allocation_id}/`, 
         {
           employee: editingAllocation.employee_id, // This is correct, keep as is
           hr_approver: editingAllocation.hr_approver,

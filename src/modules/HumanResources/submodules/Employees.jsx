@@ -485,8 +485,8 @@ const Employees = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/employees"),
-        axios.get("http://127.0.0.1:8000/api/employees/archived/")
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/archived/")
       ]);
       setEmployees(activeRes.data);
       setArchivedEmployees(archivedRes.data);
@@ -502,7 +502,7 @@ const Employees = () => {
 
   const fetchDepartmentSuperiors = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/department_superiors/department-superiors/");
+      const response = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/");
       setDepartmentSuperiors(response.data.filter(sup => !sup.is_archived && sup.status === "Active"));
     } catch (err) {
       console.error("Fetch department superiors error:", err);
@@ -517,8 +517,8 @@ const Employees = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/positions/positions/"),
-        axios.get("http://127.0.0.1:8000/api/positions/positions/archived/")
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/archived/")
       ]);
       setPositions(activeRes.data);
       setArchivedPositions(archivedRes.data);
@@ -532,7 +532,7 @@ const Employees = () => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/departments/department/");
+      const response = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/");
       
       // Handle both array and object responses
       const departmentsData = response.data;
@@ -714,7 +714,7 @@ const Employees = () => {
       // Add logging to debug
       console.log("Sending employee data:", JSON.stringify(employeeData));
   
-      const response = await axios.post("http://127.0.0.1:8000/api/employees/", employeeData);
+      const response = await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/", employeeData);
       setShowEmployeeModal(false);
       showToast("Employee added successfully");
       fetchEmployees();
@@ -797,7 +797,7 @@ const Employees = () => {
       };
 
       await axios.patch(
-        `http://127.0.0.1:8000/api/employees/${editingEmployee.employee_id}/`,
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${editingEmployee.employee_id}/`,
         employeeData
       );
       setShowEditEmployeeModal(false);
@@ -814,7 +814,7 @@ const Employees = () => {
   const handleArchiveEmployee = async (id) => {
     if (!window.confirm("Archive this employee?")) return;
     try {
-      await axios.post(`http://127.0.0.1:8000/api/employees/${id}/archive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/archive/`);
       showToast("Employee archived successfully");
       
       // Immediately update state to reflect changes
@@ -839,7 +839,7 @@ const Employees = () => {
 
   const handleUnarchiveEmployee = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/employees/${id}/unarchive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/unarchive/`);
       setShowConfirmUnarchiveEmployee(null);
       showToast("Employee unarchived successfully");
       
@@ -869,7 +869,7 @@ const Employees = () => {
     try {
       await Promise.all(
         selectedArchivedEmployees.map((id) =>
-          axios.post(`http://127.0.0.1:8000/api/employees/${id}/unarchive/`)
+          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/unarchive/`)
         )
       );
       showToast("Employees unarchived successfully");
@@ -1079,7 +1079,7 @@ const Employees = () => {
     };
     
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/positions/positions/", {
+      const response = await fetch("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1240,7 +1240,7 @@ const Employees = () => {
       };
 
       await axios.patch(
-        `http://127.0.0.1:8000/api/positions/positions/${editingPosition.position_id}/`,
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/${editingPosition.position_id}/`,
         formattedData
       );
       setShowEditPositionModal(false);
@@ -1257,7 +1257,7 @@ const Employees = () => {
   const handleArchivePosition = async (id) => {
     if (!window.confirm("Archive this position?")) return;
     try {
-      await axios.post(`http://127.0.0.1:8000/api/positions/positions/${id}/archive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/${id}/archive/`);
       showToast("Position archived successfully");
       
       // Immediately update state to reflect changes
@@ -1283,7 +1283,7 @@ const Employees = () => {
   const handleUnarchivePosition = async (id) => {
     try {
       const encodedId = encodeURIComponent(id);
-      await axios.post(`http://127.0.0.1:8000/api/positions/positions/${encodedId}/unarchive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/${encodedId}/unarchive/`);
       setShowConfirmUnarchivePosition(null);
       showToast("Position unarchived successfully");
       
@@ -1313,7 +1313,7 @@ const Employees = () => {
     try {
       await Promise.all(
         selectedArchivedPositions.map((id) =>
-          axios.post(`http://127.0.0.1:8000/api/positions/positions/${id}/unarchive/`)
+          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/${id}/unarchive/`)
         )
       );
       showToast("Positions unarchived successfully");
