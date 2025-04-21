@@ -48,11 +48,7 @@
 .InternalTransfer .table-container table {
     position: relative; /* For sticky header */
 }
-.InternalTransfer .table-container thead {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-}
+
 .InternalTransfer .table-container thead {
     /*position: sticky;*/
     top: 0;
@@ -73,9 +69,9 @@
     table-layout: fixed;
 }
 
+
 .InternalTransfer .table-container tbody tr {
     display: table;
-    width: 100%;
     table-layout: fixed;
 }
 
@@ -147,7 +143,6 @@
 }
 .InternalTransfer table td:first-child {
     width: 50px;
-    padding: 0;
     position: relative;
     height: 100%;
      
