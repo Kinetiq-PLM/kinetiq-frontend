@@ -251,6 +251,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         transferOperation: "quotation",
       });
       setCanEditTable(false);
+      setIsQuotation(true);
     } else if (
       copyFromModal === "Blanket Agreement" &&
       selectedBlanketAgreement
@@ -436,6 +437,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             updateData={setProducts}
             onSelect={setSelectedProduct}
             minWidth={true}
+            isQuotation={canEditTable}
           />
         </section>
 

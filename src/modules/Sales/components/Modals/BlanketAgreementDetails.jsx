@@ -19,7 +19,6 @@ const BlanketAgreementDetailsModal = ({
   employee_id,
 }) => {
   const { showAlert } = useAlert();
-  console.log(quotationInfo);
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
   const queryClient = useQueryClient();

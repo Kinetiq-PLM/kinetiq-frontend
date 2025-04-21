@@ -205,7 +205,7 @@ const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Ty
                 )}
 
                 {/* Form Fields */}
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="text-sm">
                     <label>
                         Inventory Item <span className="text-red-500">*</span>
                     </label>
@@ -270,32 +270,41 @@ const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Ty
                         <option value="Expiry Issues">Expiry Issues</option>
                         <option value="Other">Other</option>
                     </select>
+                    <span className="grid grid-cols-2 gap-2">
+                        <span>
+                            <label>
+                                Severity <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={severity}
+                                onChange={(e) => setSeverity(e.target.value)}
+                                required
+                            >
+                                <option value="">Select Severity</option>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>                            
+                        </span>
 
-                    <label>
-                        Severity <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                        value={severity}
-                        onChange={(e) => setSeverity(e.target.value)}
-                        required
-                    >
-                        <option value="">Select Severity</option>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                        <option value="Critical">Critical</option>
-                    </select>
+                        <span>
+                            <label>
+                                Employee ID <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Enter Employee ID"
+                                value={employeeId}
+                                onChange={(e) => setEmployeeId(e.target.value)}
+                                required
+                            />                            
+                        </span>
 
-                    <label>
-                        Employee ID <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        placeholder="Enter Employee ID"
-                        value={employeeId}
-                        onChange={(e) => setEmployeeId(e.target.value)}
-                        required
-                    />
+
+
+                    </span>
+
 
                     <label>
                         Description <span className="text-red-500">*</span>
@@ -305,11 +314,11 @@ const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Ty
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         required
-                        rows="4"
+                        rows="1"
                     />
 
                     {/* Buttons */}
-                    <div className="form-actions">
+                    <div className="form-actions justify-between">
                         <button type="button" onClick={handleClear} className="clear-btn">
                             Clear
                         </button>

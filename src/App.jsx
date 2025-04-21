@@ -219,13 +219,59 @@ function App() {
     }
   };
 
+  // const loadMainModule = (moduleId) => {
+  //   if (moduleFileNames[moduleId] && !activeSubModule) {
+  //     const LazyComponent = lazy(() =>
+  //       import(
+  //         /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
+  //       )
+  //     );
+
+  //     const WrappedComponent = () => (
+  //       <LazyComponent
+  //         loadSubModule={loadSubModule}
+  //         setActiveSubModule={setActiveSubModule}
+  //         user_id={user?.user_id}
+  //         employee_id={user?.employee_id}
+  //       />
+  //     );
+
+  //     setModuleComponent(() => WrappedComponent);
+  //     setShowUserProfile(false);
+  //   }
+  // };
+
+  // const loadSubModule = (submoduleId, mainModule = activeModule) => {
+  //   if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
+  //     const LazyComponent = lazy(() =>
+  //       import(
+  //         /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
+  //       )
+  //     );
+
+  //     const WrappedComponent = () => (
+  //       <LazyComponent
+  //         loadSubModule={loadSubModule}
+  //         setActiveSubModule={setActiveSubModule}
+  //         user_id={user?.user_id}
+  //         employee_id={user?.employee_id}
+  //       />
+  //     );
+  //     setModuleComponent(() => WrappedComponent);
+
+  //     setShowUserProfile(false);
+  //   }
+  // };
+
+
+  const mainModules = import.meta.glob('./modules/*/*.jsx');
+  const subModules = import.meta.glob('./modules/*/submodules/*.jsx');
+  
   const loadMainModule = (moduleId) => {
-    if (moduleFileNames[moduleId] && !activeSubModule) {
-      const LazyComponent = lazy(() =>
-        import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
-        )
-      );
+    const moduleFile = `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`;
+
+    if (mainModules[moduleFile]) {
+      const LazyComponent = lazy(mainModules[moduleFile]);
 
       const WrappedComponent = () => (
         <LazyComponent
@@ -238,17 +284,18 @@ function App() {
 
       setModuleComponent(() => WrappedComponent);
       setShowUserProfile(false);
+    } else {
+      console.warn(`Module file not found: ${moduleFile}`);
     }
   };
 
-  const loadSubModule = (submoduleId, mainModule = activeModule) => {
-    if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
-      const LazyComponent = lazy(() =>
-        import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
-        )
-      );
 
+  const loadSubModule = (submoduleId, mainModule = activeModule) => {
+    const submoduleFile = `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`;
+  
+    if (subModules[submoduleFile]) {
+      const LazyComponent = lazy(subModules[submoduleFile]);
+  
       const WrappedComponent = () => (
         <LazyComponent
           loadSubModule={loadSubModule}
@@ -257,9 +304,11 @@ function App() {
           employee_id={user?.employee_id}
         />
       );
+  
       setModuleComponent(() => WrappedComponent);
-
       setShowUserProfile(false);
+    } else {
+      console.warn(`Submodule file not found: ${submoduleFile}`);
     }
   };
 
@@ -364,7 +413,7 @@ function App() {
       "Service Contract": "ServiceContract",
     },
     "Inventory": {
-      "Stock Levels": "StockLevels",
+      "Shelf Life": "ShelfLife",
       "P-Counts": "PCounts",
       "Stock Flow": "StockFlow",
     },

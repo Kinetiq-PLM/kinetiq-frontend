@@ -50,7 +50,7 @@ const FailureReportModal = ({ shipment, onSubmit, onCancel }) => {
               />
             </div>
             
-            <div className="info-section" style={{ marginTop: '1rem' }}>
+            <div className="info-section">
               <h4>What happens next?</h4>
               <ul>
                 <li>The shipment status will be updated to "Failed"</li>
