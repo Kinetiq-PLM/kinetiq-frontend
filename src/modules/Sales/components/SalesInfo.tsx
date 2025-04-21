@@ -148,7 +148,7 @@ const SalesInfo = ({
   }
 
   return (
-    <section className="flex flex-col md:flex-row gap-6">
+    <section className="flex flex-col md:flex-row md:gap-6">
       {/* Left Column */}
       <div className="flex flex-1 flex-col items-center space-y-2">
         {type === "Delivery" ? (
@@ -165,6 +165,8 @@ const SalesInfo = ({
         <Information label="Country" value={customer.country} />
         <Information label="Number" value={customer.phone_number} />
       </div>
+
+      <div className="lg:max-w-[100px] xl:max-w-none flex-1 hidden lg:block"></div>
 
       {/* Right Column */}
       <div className="flex flex-1 flex-col items-center space-y-2">
