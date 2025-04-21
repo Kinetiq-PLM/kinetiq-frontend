@@ -29,9 +29,8 @@
     position: relative;
     background: white;
     border-radius: 8px;
-    padding: 1.1rem;
+    padding: 0 1.1rem 0.5rem 1.1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    margin-top: 0.5rem;
     font-size: 0.875rem;
     max-width: 100%;
     overflow: hidden;
@@ -131,6 +130,12 @@
 }
 
 /* FIXED TABLE CELL STYLING */
+.InternalTransfer table th:first-child {
+    width: 50px;
+    padding: 0;
+    position: relative;
+    height: 100%;
+}
 .InternalTransfer table td:first-child {
     width: 50px;
     padding: 0;
@@ -277,7 +282,6 @@
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    margin-bottom: 0.5rem;
     padding: 1.1em;
 }
 
