@@ -535,7 +535,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
           date,
           status
         };
-      }).filter(item => (item.status || "").toLowerCase() !== "complete");
+    }).filter(item => (item.status || "").toLowerCase() !== "complete");
     
     const buttonStyle = (bg, border, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer', });
     const buttonStyle2 = (bg, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, border: '0.5px solid #585757', color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer',});
@@ -612,18 +612,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             <div className="table-cell" style={rowCellStyle} data-label="Date">{item.date}</div>
                         </div>
                     ))}
-                </div>
-
-                
-                <div className="reqplan-help-wrapper">
-                    {showHelpOptions && (
-                        <div className="reqplan-help-options">
-                        <button onClick={() => alert('Purchase Request')} className="reqplan-help-option">📦 Purchase Request</button>
-                        <button onClick={() => alert('Project Request')} className="reqplan-help-option">🏗️ Project Request</button>
-                        <button onClick={() => alert('Workforce Request')} className="reqplan-help-option">👷 Workforce Request</button>
-                        </div>
-                    )}
-                    <button className="reqplan-help-button"onClick={() => setShowHelpOptions(prev => !prev)} aria-label="Help">?</button>
                 </div>
             </div>
 
