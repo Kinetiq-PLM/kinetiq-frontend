@@ -438,12 +438,9 @@ function App() {
       "Project List": "Project List",
       "Project Planning": "ProjectPlanning",
       "Project Request": "Projectrequest",
-      "Task Assignments": "TaskAssignments",
       "Tasks": "TaskMonitoring",
-      "Gantt Charts": "GanttCharts",
       "Report Monitoring": "Reports",
-      "Warranty Monitoring":"Warranties"
-
+      "Warranty Monitoring":"Warranties",
     },
     "Human Resources": {
       "Employees": "Employees",
