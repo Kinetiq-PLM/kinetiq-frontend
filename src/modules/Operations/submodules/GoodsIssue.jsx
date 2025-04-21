@@ -187,7 +187,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
           }));
          
         } catch (error) {
-          toast.error('Error fetching next document IDs:', error);
+          toast.error('Error fetching next document IDs. Please try again');
+          console.log('Error fetching next document IDs:', error)
           return
         }
       }
@@ -235,7 +236,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
           }),
         });
       } catch (error) {
-        toast.error('Error deleting row from database:', error);
+        console.log('Error deleting row from database:', error);
+        toast.error('Error deleting row from database. Please try again.');
       }
  
       // Remove the item from local state
@@ -256,7 +258,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       const updatedData = await response.json();
       return updatedData.document_items;
     } catch (error) {
-      toast.error('Reload error:', error);
+      toast.error('Reload error. Please try again.');
+      console.log('Reload error. ', error)
       return [];
     }
   };
@@ -546,7 +549,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
             setDocumentItems(updatedItems);
             return;
           }
-          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -694,7 +697,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       onSuccess(result);
      
     } catch (error) {
-      toast.error(`Failed to create document: ${error.message}`);
+      toast.error(`Failed to create document.`);
+      console.log(error)
     }
   };
 
@@ -833,7 +837,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
         onBack();  // Navigate back to GoodsTracking
       }
     } catch (error) {
-      toast.error(`Failed to update data. Details: ${error.message}`);
+      toast.error(`Failed to update data.`);
+      console.log(error)
     }
   };
  
@@ -916,7 +921,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       setDocumentItems([...poItems, {}]);
  
     } catch (error) {
-      toast.error(`Failed to load PO data: ${error.message}`);
+      toast.error(`Failed to load PO data.`);
+      console.log(error.message)
     }
   };
  

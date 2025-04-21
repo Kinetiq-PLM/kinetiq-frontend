@@ -199,7 +199,7 @@ const ApprovalTable = ({employee_id}) => {
         fetchDeliveryRequest()
         return;
       }
-      const response = await fetch('http://127.0.0.1:8000/operation/external-modules/update-rework/', {
+      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/update-rework/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

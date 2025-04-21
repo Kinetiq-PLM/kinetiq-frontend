@@ -52,10 +52,10 @@
     min-width: 600px;
   }
 .InternalTransfer .table-container thead {
-    position: sticky;
+ 
     top: 0;
     background: white;
-    z-index: 2;
+
   }
 
   .InternalTransfer .table-container tbody {

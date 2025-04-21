@@ -153,7 +153,8 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           }));
          
         } catch (error) {
-          toast.error('Error fetching next document IDs:', error);
+          toast.error('Error fetching next document IDs. Please try again later');
+          console.log(error)
           return
         }
       }
@@ -190,7 +191,8 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           }),
         });
       } catch (error) {
-        toast.error('Error deleting row from database:', error);
+        toast.error('Error deleting row from database. Please try again later');
+        console.log(error)
       }
  
       updatedItems.splice(index, 1);
@@ -252,7 +254,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         } else if (lastRow.item_id.startsWith("ADMIN-ASSET")) {
           payload.asset_id = lastRow.item_id;
         } else if (lastRow.item_id.startsWith("ADMIN-PROD")) {
-          const productDocuResponse = await fetch('http://127.0.0.1:8000/operation/create-items/create-product-docu-item/', {
+          const productDocuResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-product-docu-item/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -733,7 +735,8 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         onBack();  // Navigate back to GoodsTracking
       }
     } catch (error) {
-      toast.error(`Failed to update data. Details: ${error.message}`);
+      toast.error(`Failed to update data. Please try again later`);
+      console.log(error)
     }
   };
 

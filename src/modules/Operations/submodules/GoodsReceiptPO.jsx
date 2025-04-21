@@ -674,7 +674,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       onSuccess(result);
      
     } catch (error) {
-      toast.error(`Failed to create document: ${error.message}`);
+      toast.error(`Failed to create document. Please try again later`);
+      console.log(error)
     }
   };
 
@@ -812,7 +813,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         onBack();  // Navigate back to GoodsTracking
       }
     } catch (error) {
-      toast.error(`Failed to update data. Details: ${error.message}`);
+      toast.error(`Failed to update data. Please try again later`);
+      console.log(error.message)
     }
   };
  
