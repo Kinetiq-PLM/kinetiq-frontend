@@ -68,12 +68,13 @@
   /* ========== Table Layout ========== */
   .delivery-receipt-wrapper .table-container {
     width: 100%;
+    height: 100%;
     margin-bottom: 20px;
     overflow: hidden;
   }
   
   .delivery-receipt-wrapper .table-wrapper {
-    max-height: 420px;
+    height: 100%;
     overflow-y: auto;
     overflow-x: auto;
   }

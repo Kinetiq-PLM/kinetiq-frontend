@@ -471,7 +471,50 @@
 }
 
 
-
+/* Media query for smaller tablets */
+@media (max-width: 768px) {
+  .ar-cred .body-content-container {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+  }
+  .ar-cred .details-grid {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+    overflow-x: auto;
+  }
+  .ar-cred .detail-row input{
+    min-width: 7rem;
+  }
+  .ar-cred .header-container h2 {
+    font-size: 1.25rem; /* Smaller heading */
+  }
+  
+  .ar-cred .operations-gt-table table {
+    min-width: 100px; /* Smaller minimum width */
+  }
+  .ar-cred .operations-gt-table th,
+  .ar-cred .operations-gt-table td {
+    padding: 0.5rem; /* Even smaller padding */
+  }
+  
+  .ar-cred .action-buttons {
+    justify-content: center; /* Center buttons on small screens */
+  }
+  .ar-cred .table-wrapper {
+    overflow-x: auto;
+  }
+  .ar-cred .dropdown-scrollbar tr td select{
+    font-size: 0.9rem !important;
+    position: relative;
+  }
+  .ar-cred .dropdown-scrollbar tr td select option{
+    font-size: 0.7rem !important;
+    position: relative;
+    width: 10px;
+  }
+}
 
 
 

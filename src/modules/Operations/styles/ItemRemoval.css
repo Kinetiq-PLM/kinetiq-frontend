@@ -36,7 +36,7 @@
   width: 100%;
   margin-bottom: 20px;
   overflow-x: auto;
-  max-height: 390px;
+  height: 100%;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #0d9488 #f1f1f1;
@@ -207,7 +207,7 @@
   }
 
   .ItemRemoval .table-itemremoval-container {
-    max-height: 300px;
+    height: 100%;
   }
 
   .ItemRemoval .table th,
@@ -218,11 +218,11 @@
 
   .ItemRemoval .send-to {
     align-self: stretch;
-    text-align: center;
-    margin-top: 1rem;
+    text-align: right;
+    margin-top: auto;
   }
 
   .ItemRemoval .send-to button {
-    width: 100%;
+    /*width: 100%;*/
   }
 }

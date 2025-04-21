@@ -883,7 +883,50 @@
   width: 0.1;
 }
 
-
+/* Media query for smaller tablets */
+@media (max-width: 768px) {
+  .goods-r-po .body-content-container {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+  }
+  .goods-r-po .details-grid {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+    overflow-x: auto;
+  }
+  .goods-r-po .detail-row input{
+    min-width: 7rem;
+  }
+  .goods-r-po .header-container h2 {
+    font-size: 1.25rem; /* Smaller heading */
+  }
+  
+  .goods-r-po .operations-gt-table table {
+    min-width: 100px; /* Smaller minimum width */
+  }
+  .goods-r-po .operations-gt-table th,
+  .goods-r-po .operations-gt-table td {
+    padding: 0.5rem; /* Even smaller padding */
+  }
+  
+  .goods-r-po .action-buttons {
+    justify-content: center; /* Center buttons on small screens */
+  }
+  .goods-r-po .table-wrapper {
+    overflow-x: auto;
+  }
+  .goods-r-po .dropdown-scrollbar tr td select{
+    font-size: 0.9rem !important;
+    position: relative;
+  }
+  .goods-r-po .dropdown-scrollbar tr td select option{
+    font-size: 0.7rem !important;
+    position: relative;
+    width: 10px;
+  }
+}
 
 
 

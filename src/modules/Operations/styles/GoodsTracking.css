@@ -68,6 +68,7 @@
   flex: 1;
   min-height: 0;
   position: relative;
+  overflow-x: auto;
 }
 
 .gr .operations-gt-table {
@@ -100,9 +101,7 @@
 }
 
 .gr .operations-gt-table thead {
-  position: sticky;
   top: 0;
-  z-index: 1;
   background-color: #f8fafc;
 }
 
@@ -209,4 +208,53 @@
 
 .gr .view-btn:hover, .gr .create-btn:hover {
   background-color: #0f766e;
+}
+
+/* Media query for tablet devices */
+@media (max-width: 1024px) {
+  .gr .body-content-container {
+    padding: 0.75rem; /* Reduced padding */
+  }
+  
+  .gr .header-container h2 {
+    font-size: 1.25rem; /* Smaller heading */
+  }
+  
+  .gr .operations-gt-table table {
+    min-width: 500px; /* Smaller minimum width */
+  }
+  .gr .table-wrapper {
+    overflow-x: auto;
+  }
+}
+
+/* Media query for smaller tablets */
+@media (max-width: 768px) {
+  .gr .body-content-container {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .gr .header-container h2 {
+    font-size: 1.25rem; /* Smaller heading */
+  }
+  
+  .gr .operations-gt-table table {
+    min-width: 100px; /* Smaller minimum width */
+  }
+  .gr .operations-gt-table th,
+  .gr .operations-gt-table td {
+    padding: 0.5rem; /* Even smaller padding */
+  }
+  
+  .gr .action-buttons {
+    justify-content: center; /* Center buttons on small screens */
+  }
+  .gr .table-wrapper {
+    overflow-x: auto;
+  }
+  .gr .goods-dropdown option{
+    font-size: 0.7rem;
+  }
 }

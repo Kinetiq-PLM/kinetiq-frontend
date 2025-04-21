@@ -244,6 +244,7 @@ const GoodsTracking = ({employee_id}) => {
 
         <div className="operation_table_container">
           <div className="operations-gt-table">
+            
             <table>
               <thead>
                 <tr>

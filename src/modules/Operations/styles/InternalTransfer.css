@@ -52,6 +52,7 @@
 .InternalTransfer .table-container tbody {
     display: block;
     overflow-y: auto;
+    overflow-x: auto;
     height: calc(100% - 40px);
     width: 100%;
 }
@@ -106,9 +107,7 @@
     cursor: pointer;
     margin: 0;
     position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+
     transition: all 0.2s ease;
 }
 
@@ -141,6 +140,20 @@
     padding: 0;
     position: relative;
     height: 100%;
+     
+}
+.InternalTransfer table th:nth-child(2) {
+    width: 15em;
+    padding: 0.75rem;
+    position: relative;
+    height: 100%;
+}
+
+.InternalTransfer table td:nth-child(2) {
+    width: 15em;
+    padding: 0.75rem;
+    position: relative;
+    height: 100%;
 }
 
 .InternalTransfer table td {
@@ -149,6 +162,7 @@
     color: #212529;
     border-bottom: 1px solid #f1f1f1;
     vertical-align: middle;
+    width: 10em;
 }
 
 .InternalTransfer table td:first-child {
@@ -156,6 +170,7 @@
     padding: 0.5rem;
     text-align: center;
     vertical-align: middle;
+
 }
 
 .InternalTransfer .input-group {
@@ -185,34 +200,12 @@
     width: 100%;
 }
 
-@media only screen and (max-width: 600px) {
-    .InternalTransfer .input-container {
-        grid-template-columns: repeat(6, 1fr);
-    }
-    .InternalTransfer .send-to-button {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-@media only screen and (min-width: 600px) {
-    .InternalTransfer .input-container {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
-
-@media only screen and (min-width: 768px) {
-    .InternalTransfer .input-container {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
-
 .InternalTransfer .first-row {
     justify-content: flex-start;
 }
 
 .InternalTransfer .short-input {
-    width: 14rem !important;
+    width: 14rem ;
 }
 
 .InternalTransfer .input-group input {
@@ -340,3 +333,86 @@
     height: auto;
   }
 
+/*
+@media only screen and (max-width: 600px) {
+    .InternalTransfer .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .InternalTransfer .send-to-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    .InternalTransfer .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media only screen and (min-width: 768px) {
+    .InternalTransfer .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}*/
+
+/* Media query for smaller tablets */
+@media (max-width: 768px) {
+    .InternalTransfer .body-content-container {
+      padding: 0.75rem; /* Reduced padding */
+      width: 100%;
+      min-width: auto;
+    }
+    .InternalTransfer .details-grid {
+      padding: 0.75rem; /* Reduced padding */
+      width: 100%;
+      min-width: auto;
+      overflow-x: auto;
+    }
+    .InternalTransfer .detail-row input{
+      min-width: 7rem;
+    }
+    .InternalTransfer .header-container h2 {
+      font-size: 1.25rem; /* Smaller heading */
+    }
+    .InternalTransfer .table-container{
+      overflow-x: auto;
+      overflow-y: auto;
+    }
+    .InternalTransfer.rework .table-container {
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+    .InternalTransfer .form-group span{
+      font-size: 0.9rem;
+      white-space: nowrap;      
+      overflow-x: auto;   
+      overflow-y: hidden;      
+      overflow-wrap: normal;     
+      display: inline-block;  
+    }
+    .InternalTransfer .input-container{
+        overflow-x: auto;
+    }
+    .InternalTransfer .input-group .short-input{
+        font-size: 0.9rem;
+        width: 10rem;
+        white-space: nowrap;      
+        overflow-x: auto;   
+        overflow-y: hidden;      
+        overflow-wrap: normal;     
+        display: inline-block;  
+    }
+    .InternalTransfer .input-group label{
+        font-size: 0.9rem;
+        width: 10rem;
+        white-space: nowrap;      
+        overflow-x: auto;   
+        overflow-y: hidden;      
+        overflow-wrap: normal;     
+        display: inline-block;  
+    }
+    .InternalTransfer .module-dropdown option{
+        font-size: 0.7rem;
+    }
+  }

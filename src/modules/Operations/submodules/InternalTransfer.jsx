@@ -419,7 +419,7 @@ const ApprovalTable = ({employee_id}) => {
                 <label>Actual Quantity</label>
                 <input 
                   type="text" 
-                  className="short-input" 
+                  className="short-input req-input" 
                   max="10000000"
                   value={selectedData?.production_order?.actual_quantity || ''} 
                   style={{ cursor: 'not-alowed' }}

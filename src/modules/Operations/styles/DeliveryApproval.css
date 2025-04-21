@@ -113,8 +113,8 @@
 
 .deliveryApproval .table-container th:first-child,
 .deliveryApproval .table-container td:first-child {
-  width: 40px;
-  padding-right: 0;
+  width: 2.5rem;
+  padding-right: 0.5rem;
 }
 
 
@@ -311,3 +311,38 @@
 
 
 
+/* Media query for smaller tablets */
+@media (max-width: 768px) {
+  .deliveryApproval .body-content-container {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+  }
+  .deliveryApproval .details-grid {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+    overflow-x: auto;
+  }
+  .deliveryApproval .detail-row input{
+    min-width: 7rem;
+  }
+  .deliveryApproval .header-container h2 {
+    font-size: 1.25rem; /* Smaller heading */
+  }
+  .deliveryApproval .table-container{
+    overflow-x: auto;
+    overflow-y: auto;
+  }
+  .deliveryApproval .form-group span{
+    font-size: 0.9rem;
+    white-space: nowrap;      
+    overflow-x: auto;   
+    overflow-y: hidden;      
+    overflow-wrap: normal;     
+    display: inline-block;  
+  }
+  .deliveryApproval .form-group select option{
+    font-size: 0.7rem;
+  }
+}
