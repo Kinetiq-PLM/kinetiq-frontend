@@ -92,45 +92,30 @@ const JournalEntry = () => {
       );
 
       const isTargetDebit =
-        accountData.glAccountId === "ACC-GLA-2025-ae6010" &&
-        prevState.transactions[selectedIndex].type === "debit";
+  accountData.glAccountId?.toUpperCase() === "ACC-COA-2025-AE6010" &&
+  prevState.transactions[selectedIndex].type === "debit";
 
-      if (isTargetDebit) {
-        const creditEntries = [
-          {
-            glAccountId: "ACC-GLA-2025-cl2060",
-            accountName: "SSS Contribution",
-          },
-          {
-            glAccountId: "ACC-GLA-2025-cl2060",
-            accountName: "Philhealth Contribution",
-          },
-          {
-            glAccountId: "ACC-GLA-2025-cl2060",
-            accountName: "Pagibig Contribution",
-          },
-          { glAccountId: "ACC-GLA-2025-cl2030", accountName: "Tax" },
-          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Late Deduction" },
-          {
-            glAccountId: "ACC-GLA-2025-cl2060",
-            accountName: "Absent Deduction",
-          },
-          {
-            glAccountId: "ACC-GLA-2025-cl2060",
-            accountName: "Undertime Deduction",
-          },
-          { glAccountId: "", accountName: "" },
-        ];
 
-        creditEntries.forEach((credit) => {
-          updatedTransactions.push({
-            type: "credit",
-            glAccountId: credit.glAccountId,
-            amount: "",
-            accountName: credit.accountName,
-          });
-        });
-      }
+  if (isTargetDebit) {
+    const creditEntries = [
+      { accountName: "SSS Contribution" },
+      { accountName: "Philhealth Contribution" },
+      { accountName: "Pagibig Contribution" },
+      { accountName: "Late Deduction", glAccountId: "ACC-GLA-2025-cl2060" },
+      { accountName: "Absent Deduction" },
+      { accountName: "Undertime Deduction" },
+    ];
+  
+    creditEntries.forEach((credit) => {
+      updatedTransactions.push({
+        type: "credit",
+        glAccountId: credit.glAccountId || "", // leave blank if not provided
+        amount: "",
+        accountName: credit.accountName,
+      });
+    });
+  }
+  
 
       return { ...prevState, transactions: updatedTransactions };
     });
