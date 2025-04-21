@@ -143,7 +143,16 @@ const WorkforceAllocation = () => {
 
   const handleUnarchive = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${id}/unarchive/`);
+      await axios.post(
+        `http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
+        {}, // Empty payload
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
       showToast("Allocation unarchived successfully");
       fetchAllocations();
     } catch (err) {
@@ -166,7 +175,7 @@ const WorkforceAllocation = () => {
       
       // Prevent duplicate submissions
       if (submitting) {
-          console.log("Submission already in progress, ignoring click");
+          console.log("Submission already in progress");
           return;
       }
       
@@ -180,13 +189,35 @@ const WorkforceAllocation = () => {
       try {
         setSubmitting(true); // Start submission
         
+        // Format payload with explicit field mapping
         const payload = {
-          ...newAllocation,
-          employee: newAllocation.employee_id
+          required_skills: newAllocation.required_skills,
+          task_description: newAllocation.task_description,
+          requesting_dept_id: newAllocation.requesting_dept_id,
+          current_dept_id: newAllocation.current_dept_id,
+          hr_approver: newAllocation.hr_approver || null,
+          employee: newAllocation.employee_id || null,
+          status: newAllocation.status,
+          start_date: newAllocation.start_date,
+          end_date: newAllocation.end_date,
+          approval_status: newAllocation.approval_status,
+          rejection_reason: newAllocation.rejection_reason || ""
         };
-        delete payload.employee_id;
         
-        await axios.post("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/", payload);
+        console.log("Sending payload:", payload);
+        
+        const response = await axios.post(
+          "http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/", 
+          payload,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          }
+        );
+        
+        console.log("Response:", response);
         showToast("Allocation added successfully");
         setShowAddModal(false);
         fetchAllocations();
@@ -208,15 +239,16 @@ const WorkforceAllocation = () => {
         setFormErrors({});
       } catch (err) {
         console.error("Add allocation error:", err);
-        if (err.response && err.response.data) {
-          setFormErrors(err.response.data);
+        
+        if (err.response) {
+          console.error("Error details:", err.response.data);
+          setFormErrors(err.response.data || {});
+          showToast(`Failed to add allocation: ${JSON.stringify(err.response.data)}`, false);
+        } else {
+          showToast(`Failed to add allocation: ${err.message}`, false);
         }
-        showToast("Failed to add allocation", false);
       } finally {
-        // Small delay before allowing another submission
-        setTimeout(() => {
-          setSubmitting(false);
-        }, 500);
+        setSubmitting(false);
       }
   };
 
