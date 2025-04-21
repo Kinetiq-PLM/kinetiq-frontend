@@ -136,7 +136,7 @@
 }
 
 .servanal .analyses-table tbody tr {
-  background-color: #eff8f9;
+  background-color: #ffffff;
   transition: background-color 0.3s ease;
 }
 
@@ -232,7 +232,7 @@
 }
 
 .servanal .service-order-table tbody tr {
-  background-color: #eff8f9;
+  background-color: #ffffff;
   transition: background-color 0.3s ease;
 }
 
@@ -341,7 +341,7 @@
 }
 
 .servanal .inventory-table  tbody tr {
-  background-color: #eff8f9;
+  background-color: #ffffff;
   transition: background-color 0.3s ease;
 }
 
