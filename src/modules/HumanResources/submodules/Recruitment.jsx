@@ -766,6 +766,7 @@ const Recruitment = () => {
                     <td>{candidate.first_name}</td>
                     <td>{candidate.last_name}</td>
                     <td>{candidate.email}</td>
+                    <td>{candidate.phone || '-'}</td>
                     <td>
                       {candidate.resume_path ? (
                         <a href={candidate.resume_path} target="_blank" rel="noopener noreferrer">
