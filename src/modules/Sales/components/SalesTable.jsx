@@ -145,9 +145,6 @@ const SalesTable = ({
     };
 
     const updatedData = newData.map((item) => {
-      console.log("asdfasdf");
-      console.log(!item.special_requests);
-
       if (item.special_requests && isQuotation) {
         return {
           ...item,

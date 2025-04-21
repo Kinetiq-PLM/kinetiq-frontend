@@ -850,7 +850,9 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                           <th className="border border-black text-white font-light text-start  p-2 text-sm">
                             Payment Terms
                           </th>
-
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Order Fulfillment
+                          </th>
                           <th className="border border-black text-white font-light text-start  p-2 text-sm">
                             Payment Status
                           </th>
@@ -871,11 +873,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                           30% Downpayment, 70% After Delivery
                         </th>
                         <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                          {data.remaining_balance == 0
-                            ? "Fully Paid"
-                            : data.remaining_balance > 0
-                            ? "Partially Paid"
-                            : "Unpaid"}
+                          {data.order_fulfillment}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.payment_status}
                         </th>
                       </tr>
                     </table>
