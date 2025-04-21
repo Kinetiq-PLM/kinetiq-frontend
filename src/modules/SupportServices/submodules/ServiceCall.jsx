@@ -14,6 +14,7 @@ import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 import { GET } from "../api/api"
 import { PATCH } from "../api/api"
 import { POST } from "../api/api"
+import { POST_NOTIF } from "../api/api"
 
 const ServiceCall = ({user_id, employee_id}) => {
   // State for service calls
@@ -175,9 +176,22 @@ const ServiceCall = ({user_id, employee_id}) => {
     // submit req
     console.log("Submitting request:", reqData)
 
+    const notifData = {
+      module: "Support & Services",
+      submodule: "Service Request",
+      recipient_id: reqData.userId,
+      msg: "New service request submitted for you to review."
+    }
+
+    const { userId, ...reqPayload } = reqData;
+    console.log("Sending notif:", notifData)
     try {
-      const data = await POST("request/", reqData);
+      const data = await POST("request/", reqPayload);
       console.log("Service request created successfully:", data);
+
+      const notif_data = await POST_NOTIF(notifData);
+      console.log("Notification sent successfully:", notif_data);
+
       updateCallStatus(data.service_call?.service_call_id);
       setShowRequestModal(false);
       setShowResolutionModal(true);
