@@ -1,55 +1,644 @@
 /* Mimics the style/logic from Employees.css */
 
 .hr-attendance {
-  composes: hr-employee-performance;
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
 
 .hr-attendance-body-content-container {
-  composes: hr-employee-performance-body-content-container;
+  width: 100%;
+  height: 100%; /* or auto if you prefer */
+  max-width: 1600px;
+  margin: 0 auto;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .hr-attendance-scrollable {
-  composes: hr-employee-performance-scrollable;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 1.5rem;
+  box-sizing: border-box;
 }
 
 .hr-attendance-heading {
-  composes: hr-department-heading;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.hr-attendance-heading h2 {
+  margin: 0;
+  font-size: 1.75rem;
 }
 
 .hr-attendance-right-controls {
-  composes: hr-department-right-controls;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .hr-attendance-search-wrapper {
-  composes: hr-department-search-wrapper;
+  position: relative;
+  margin-right: 0.5rem;
 }
 
+.hr-attendance-search-wrapper {
+  position: relative;
+  margin-right: 0.5rem;
+}
+.hr-attendance-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 1rem;
+}
 .hr-attendance-search {
-  composes: hr-department-search;
+  width: 250px;
+  height: 36px;
+  padding-left: 32px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.hr-attendance-search:hover {
+  border-color: #00b0b5;
+}
+
+.hr-attendance-search:focus {
+  outline: none;
+  border-color: #00b0b5;
+  box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.1);
 }
 
 .hr-attendance-filter {
-  composes: hr-department-filter;
+  height: 36px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  padding: 0 0.75rem;
+}
+
+.hr-attendance-filter:hover {
+  border-color: #00b0b5;
+}
+
+.hr-attendance-filter:focus {
+  outline: none;
+  border-color: #00b0b5;
+  box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.1);
 }
 
 .hr-attendance-table-container {
-  composes: hr-department-table-container;
+  background-color: white;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  max-height: calc(100vh - 250px); /* Match Employees */
 }
 
+.hr-attendance-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px; /* Add height for horizontal scrollbar */
+}
+
+.hr-attendance-table-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-attendance-table-container::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Scrollbar styles */
 .hr-attendance-table-scrollable {
-  composes: hr-department-table-scrollable;
+  width: 100%;
+  overflow: auto; /* Enable both horizontal and vertical scrolling */
+  flex: 1;
+  min-height: 0;
+}
+
+.hr-attendance-table-scrollable::-webkit-scrollbar {
+  width: 8px;  /* Vertical scrollbar width */
+  height: 8px; /* Horizontal scrollbar height - matches width */
+}
+
+.hr-attendance-table-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-attendance-table-scrollable::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .hr-attendance-table {
-  composes: hr-department-table;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  min-width: 1400px; /* Force minimum width to ensure horizontal scroll */
 }
 
 .hr-attendance-table thead {
-  composes: hr-department-table thead;
+  position: sticky;
+  top: 0;
+  background-color: #f3f9fa;
+  /* z-index: 5; */
 }
 
 .hr-attendance-table th,
 .hr-attendance-table td {
-  composes: hr-department-table th, hr-department-table td;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  white-space: nowrap;
 }
 
+.hr-attendance-no-results {
+  text-align: center;
+  font-style: italic;
+  padding: 2rem;
+  color: #888;
+}
+
+.hr-attendance-no-scroll-wrapper {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 400px); /* Match positions table fixed height */
+}
+
+.hr-attendance-no-scroll-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+/* Pagination controls */
+.hr-attendance-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  gap: 0.5rem;
+  background-color: white;
+  border-radius: 8px;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+/* Add container for the numbered buttons */
+.hr-attendance-pagination-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: calc(100% - 100px);
+  margin-right: 0.5rem;
+}
+
+.hr-attendance-pagination button {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.hr-attendance-pagination button.active {
+  background-color: #00b0b5;
+  color: white;
+  border-color: #00b0b5;
+}
+
+.hr-attendance-pagination-size {
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Toast Notification */
+.hr-attendance-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 4px;
+  z-index: 1000;
+  animation: slideIn 0.5s, fadeOut 0.5s 2.5s forwards;
+}
+
+/* Add these styles to support tabs and counts */
+
+/* Tab navigation */
+.hr-attendance-header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  margin: 1rem 0;
+  border-top: 1px solid #e4e4e4;
+  border-bottom: 1px solid #e4e4e4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hr-attendance-tabs {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.hr-attendance-tabs button {
+  background: none;
+  border: none;
+  padding: 0.5rem 0;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 1rem;
+  border-bottom: 2px solid transparent;
+}
+
+.hr-attendance-tabs button.active {
+  color: #00b0b5;
+  border-bottom: 2px solid #00b0b5;
+}
+
+/* Count label on tab */
+.hr-attendance-count {
+  background-color: #00b0b5;
+  color: white;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  margin-left: 6px;
+}
+
+/* Add these styles at the end of the file */
+
+/* Status Tag Styling */
+.hr-attendance-tag {
+  padding: 0.3rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Attendance Status Pills */
+.hr-attendance-tag.present {
+  background-color: #d1e7dd;
+  color: #0f5132; /* Green - Present */
+}
+
+.hr-attendance-tag.absent {
+  background-color: #f8d7da;
+  color: #842029; /* Red - Absent */
+}
+
+.hr-attendance-tag.late {
+  background-color: #fff3cd;
+  color: #664d03; /* Yellow - Late */
+}
+
+.hr-attendance-tag.half-day {
+  background-color: #cfe2ff;
+  color: #084298; /* Blue - Half-day */
+}
+
+/* Calendar Date Boolean Fields */
+.hr-attendance-tag.yes {
+  background-color: #e6ffe6;
+  color: #008000; /* Green - Yes */
+}
+
+.hr-attendance-tag.no {
+  background-color: #ffe6e6;
+  color: #cc0000; /* Red - No */
+}
+
+/* Special styling for different calendar field types */
+.hr-attendance-tag.workday {
+  background-color: #d1e7dd;
+  color: #0f5132; /* Green - Workday */
+}
+
+.hr-attendance-tag.holiday {
+  background-color: #cfe2ff;
+  color: #084298; /* Blue - Holiday */
+}
+
+.hr-attendance-tag.special {
+  background-color: #fff3cd;
+  color: #664d03; /* Yellow - Special */
+}
+
+/* Holiday-specific styling */
+.hr-attendance-tag.holiday-yes {
+  background-color: #ff9e80;
+  color: #7f0000;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.holiday-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* More specific calendar field type combinations */
+
+/* Workday specific */
+.hr-attendance-tag.workday-yes {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.workday-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* Holiday specific */
+.hr-attendance-tag.holiday-yes {
+  background-color: #ff9e80;
+  color: #7f0000;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.holiday-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* Special day specific */
+.hr-attendance-tag.special-yes {
+  background-color: #ffe082;
+  color: #886a08;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.special-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE DESIGN
+   --------------------------------------------------------- */
+
+/* Base responsive adjustments */
+.hr-attendance-body-content-container {
+  min-width: unset; /* Remove fixed min-width to prevent overflow */
+  width: 100%;
+  max-width: 1600px;
+  padding: 1rem;
+}
+
+.hr-attendance-table {
+  width: 100%;
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1200px) {
+  .hr-attendance-body-content-container {
+    padding: 1.5rem;
+  }
+  
+  .hr-attendance-scrollable {
+    padding: 1.75rem;
+  }
+  
+  .hr-attendance-table {
+    min-width: 1400px; /* Force minimum width on large screens only */
+  }
+}
+
+/* Medium screens (tablets and small desktops) */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .hr-attendance-scrollable {
+    padding: 1.25rem;
+  }
+  
+  .hr-attendance-heading {
+    margin-bottom: 1.25rem;
+  }
+  
+  .hr-attendance-heading h2 {
+    font-size: 1.5rem;
+  }
+  
+  .hr-attendance-right-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .hr-attendance-search {
+    width: 200px;
+  }
+  
+  .hr-attendance-filter {
+    min-width: 150px;
+  }
+  
+  .hr-attendance-table-container {
+    max-height: calc(100vh - 200px);
+  }
+}
+
+/* Small screens (mobile) */
+@media (max-width: 767px) {
+  .hr-attendance-body-content-container {
+    padding: 0.75rem;
+    min-height: auto;
+  }
+  
+  .hr-attendance-scrollable {
+    padding: 1rem 0.75rem;
+  }
+  
+  /* Header and controls */
+  .hr-attendance-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .hr-attendance-heading h2 {
+    font-size: 1.4rem;
+  }
+  
+  .hr-attendance-right-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .hr-attendance-search-wrapper {
+    width: 100%;
+    margin-right: 0;
+  }
+  
+  .hr-attendance-search {
+    width: 100%;
+  }
+  
+  .hr-attendance-filter {
+    width: 100%;
+  }
+  
+  /* Tabs header */
+  .hr-attendance-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .hr-attendance-tabs {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .hr-attendance-tabs button {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.25rem;
+    white-space: nowrap;
+  }
+  
+  /* Tables */
+  .hr-attendance-table-container {
+    max-height: none; /* Remove fixed height constraint on mobile */
+  }
+  
+  .hr-attendance-table-scrollable {
+    overflow-x: auto;
+  }
+  
+  .hr-attendance-table th,
+  .hr-attendance-table td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Pagination */
+  .hr-attendance-pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .hr-attendance-pagination-numbers {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+  }
+  
+  .hr-attendance-pagination button {
+    min-width: 36px;
+    padding: 0.35rem 0.6rem;
+  }
+  
+  /* Tags */
+  .hr-attendance-tag {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  /* No scroll wrapper adjustment */
+  .hr-attendance-no-scroll-wrapper {
+    height: auto; /* Remove fixed height */
+    max-height: 400px; /* Add reasonable max height */
+  }
+}
+
+/* Very small screens (smaller mobile devices) */
+@media (max-width: 480px) {
+  .hr-attendance-body-content-container {
+    padding: 0.5rem;
+  }
+  
+  .hr-attendance-scrollable {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .hr-attendance-heading h2 {
+    font-size: 1.25rem;
+  }
+  
+  .hr-attendance-table th,
+  .hr-attendance-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Enhanced scrollbar behavior for all screen sizes */
+@media (hover: hover) {
+  .hr-attendance-table-scrollable::-webkit-scrollbar,
+  .hr-attendance-scrollable::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Print media query for better printing */
+@media print {
+  .hr-attendance-filter,
+  .hr-attendance-search-wrapper,
+  .hr-attendance-pagination {
+    display: none;
+  }
+  
+  .hr-attendance-body-content-container {
+    box-shadow: none;
+  }
+  
+  .hr-attendance-table {
+    min-width: 100%;
+  }
+  
+  .hr-attendance-table-container,
+  .hr-attendance-table-scrollable {
+    max-height: none;
+    overflow: visible;
+  }
+  
+  /* Ensure tag colors print well */
+  .hr-attendance-tag {
+    border: 1px solid #ddd;
+    background-color: transparent !important;
+    color: #333 !important;
+  }
+}

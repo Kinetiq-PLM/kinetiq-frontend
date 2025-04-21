@@ -151,7 +151,7 @@ const TicketResolve = ({ isOpen, onClose, ticket, setIsTicketDetailOpen }) => {
                 isDisabled={true}
               />
               <InputField
-                label={"Status"}
+                label={"Customer ID"}
                 value={ticket.customer_id}
                 isDisabled={true}
               />

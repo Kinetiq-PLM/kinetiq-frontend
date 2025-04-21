@@ -108,8 +108,8 @@
 }
 
 .picking .status-button.in-progress.active {
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: #00a8a8;
+  border-color: #00a8a8;
 }
 
 .picking .status-button.completed.active {
@@ -281,7 +281,7 @@
 }
 
 .picking .status-in-progress::before {
-  background-color: #007bff;
+  background-color: #00a8a8;
 }
 
 .picking .status-completed::before {
@@ -343,7 +343,7 @@
 }
 
 .picking .detail-value.status-in-progress {
-  color: #007bff;
+  color: #00a8a8;
   font-weight: 500;
 }
 
@@ -489,12 +489,12 @@
 }
 
 .picking .status-update-button.status-in-progress {
-  background-color: #007bff;
+  background-color: #00a8a8;
 }
 
-.picking .status-update-button.status-in-progress:hover {
+/* .picking .status-update-button.status-in-progress:hover {
   background-color: #0069d9;
-}
+} */
 
 .picking .status-update-button.status-completed {
   background-color: #28a745;
@@ -668,8 +668,8 @@
 }
 
 .picking .edit-section {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
+  /* margin-top: 1.5rem;
+  padding-top: 1rem; */
   border-top: 1px solid #eee;
 }
 
@@ -709,6 +709,11 @@
 }
 
 .picking .save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.picking .status-update-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }
@@ -769,4 +774,929 @@
   background-color: #00a8a8;
   color: white;
   border-color: #00a8a8;
+}
+
+.picking .icon-spacing {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.picking .button-icon {
+  margin-right: 8px;
+}
+
+.picking .icon-message {
+  display: flex;
+  align-items: flex-start;
+}
+
+.picking .info-icon {
+  color: #00a8a8;
+  font-size: 20px;
+  margin-right: 10px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.picking .confirmation-message {
+  font-weight: 500;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.picking .info-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.picking .section-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.picking .section-header.status-completed {
+  color: #28a745;
+}
+
+.picking .next-steps-list {
+  margin: 8px 0 0;
+  padding-left: 25px;
+  font-size: .9rem;
+}
+
+.picking .next-steps-list li {
+  margin-bottom: 4px;
+}
+
+.picking .picking-details.enhanced {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.picking .picking-details.enhanced .detail-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.picking .picking-details.enhanced .detail-item:last-child {
+  border-bottom: none;
+}
+
+.picking .detail-value.highlight {
+  font-weight: 600;
+  color: #00a8a8;
+}
+
+.picking .confirm-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 150px;
+  justify-content: center;
+}
+
+/* Improved Modal Styles */
+.picking .edit-picking-modal.improved {
+  width: 600px;
+  max-width: 95%;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.picking .modal-title-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.picking .modal-subtitle {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: 0.2rem;
+}
+
+/* Status Indicator */
+.picking .status-indicator {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  background-color: #f8f9fa;
+  border-left: 4px solid #ddd;
+}
+
+.picking .status-indicator.status-not-started {
+  background-color: #f8f9fa;
+  border-left-color: #6c757d;
+}
+
+.picking .status-indicator.status-in-progress {
+  background-color: #e8f4ff;
+  border-left-color: #00a8a8;
+}
+
+.picking .status-indicator.status-completed {
+  background-color: #e8f8ee;
+  border-left-color: #28a745;
+}
+
+.picking .status-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.picking .status-text {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.picking .status-not-started .status-text {
+  color: #6c757d;
+}
+
+.picking .status-in-progress .status-text {
+  color: #00a8a8;
+}
+
+.picking .status-completed .status-text {
+  color: #28a745;
+}
+
+/* Info Panel */
+.picking .info-panel {
+  /* margin-bottom: 20px; */
+}
+
+.picking .section-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #495057;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+.picking .section-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.picking .required-indicator {
+  color: #dc3545;
+  margin-left: 4px;
+}
+
+.picking .picking-details.enhanced {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fcfcfc;
+  overflow: hidden;
+}
+
+.picking .detail-row {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.picking .detail-row:last-child {
+  border-bottom: none;
+}
+
+.picking .detail-item {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.picking .detail-item:not(:last-child) {
+  border-right: 1px solid #e9ecef;
+}
+
+.picking .detail-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.picking .detail-value {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+.picking .detail-value .icon {
+  margin-right: 6px;
+}
+
+.picking .detail-value.highlight {
+  color: #00a8a8;
+  font-weight: 500;
+}
+
+.picking .count-badge {
+  display: inline-block;
+  background-color: #e9ecef;
+  color: #495057;
+  border-radius: 16px;
+  padding: 2px 10px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* Assignment Sections */
+.picking .assignment-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* margin-bottom: 20px; */
+}
+
+.picking .edit-section {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.picking .employee-selection.improved,
+.picking .warehouse-selection.improved {
+  display: flex;
+  flex-direction: column;
+}
+
+.picking .employee-dropdown,
+.picking .warehouse-dropdown {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.picking .employee-dropdown:focus,
+.picking .warehouse-dropdown:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.picking .field-hint {
+  font-size: 0.75rem;
+  color: #dc3545;
+  margin-top: 4px;
+}
+
+.picking .employee-display,
+.picking .warehouse-display {
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.picking .employee-value,
+.picking .warehouse-value {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+/* Status Workflow Section */
+.picking .status-workflow-section {
+  /* margin-top: 20px; */
+}
+
+.picking .status-workflow {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.picking .workflow-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.picking .workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.picking .step-indicator {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #f8f9fa;
+  border: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+
+.picking .step-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.picking .workflow-step.current .step-indicator {
+  background-color: #00a8a8;
+  border-color: #00a8a8;
+  color: white;
+}
+
+.picking .workflow-step.current .step-label {
+  color: #00a8a8;
+  font-weight: 500;
+}
+
+.picking .workflow-step.complete .step-indicator {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+.picking .workflow-connector {
+  flex: 1;
+  height: 2px;
+  background-color: #e0e0e0;
+  margin: 0 8px;
+  position: relative;
+  top: -14px;
+}
+
+.picking .status-update-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.picking .button-icon {
+  margin-right: 8px;
+}
+
+.picking .validation-message {
+  margin-top: 8px;
+  color: #dc3545;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.picking .validation-message::before {
+  content: "⚠️";
+  margin-right: 6px;
+}
+
+/* Completed Section */
+.picking .completed-section {
+  margin-top: 20px;
+}
+
+.picking .completed-message {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: #e8f8ee;
+  border: 1px solid #d4edda;
+  border-radius: 6px;
+  color: #28a745;
+  font-weight: 500;
+}
+
+.picking .completed-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+/* Modal Footer */
+.picking .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.picking .cancel-button,
+.picking .save-button {
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.picking .cancel-button {
+  background-color: white;
+  border: 1px solid #ddd;
+  color: #495057;
+}
+
+.picking .cancel-button:hover {
+  background-color: #f8f9fa;
+  border-color: #c8cfd6;
+}
+
+.picking .save-button {
+  background-color: #00a8a8;
+  border: none;
+  color: white;
+}
+
+.picking .save-button:hover:not(:disabled) {
+  background-color: #008f8f;
+}
+
+.picking .save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .picking .edit-picking-modal.improved {
+    width: 95%;
+  }
+  
+  .picking .detail-row {
+    flex-direction: column;
+  }
+  
+  .picking .detail-item:not(:last-child) {
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .picking .workflow-steps {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .picking .workflow-step {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  
+  .picking .workflow-connector {
+    width: 2px;
+    height: 20px;
+    margin: 0 0 0 18px;
+    top: 0;
+  }
+  
+  .picking .step-indicator {
+    margin-bottom: 0;
+  }
+}
+
+/* Improved Completion Modal */
+.picking .completion-modal.improved {
+  width: 550px;
+  max-width: 95%;
+  max-height: 90vh;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Important for containing the scrollable area */
+}
+
+/* Modal Header */
+.picking .modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+}
+
+.picking .modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.picking .title-icon {
+  margin-right: 10px;
+  color: #00a8a8;
+  font-size: 18px;
+}
+
+/* Modal Body */
+.picking .modal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* min-height: 0;  */
+}
+
+/* Confirmation Banner */
+.picking .confirmation-banner {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 20px;
+  background-color: #e8f4ff;
+  border-bottom: 1px solid #d1e6ff;
+}
+
+.picking .confirmation-icon {
+  color: #0066cc;
+  font-size: 22px;
+  margin-right: 14px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.picking .confirmation-text {
+  flex: 1;
+}
+
+.picking .confirmation-message {
+  margin: 0 0 4px 0;
+  font-weight: 500;
+  color: #0066cc;
+  font-size: 1rem;
+}
+
+.picking .confirmation-submessage {
+  margin: 0;
+  color: #4d4d4d;
+  font-size: 0.9rem;
+}
+
+/* Scrollable Content Area */
+.picking .modal-content-scroll {
+  padding: 16px 20px;
+  overflow-y: auto;
+  max-height: 50vh; /* Limit the height to ensure the modal fits on screen */
+}
+
+/* Info Sections */
+.picking .info-section {
+  margin-bottom: 20px;
+}
+
+.picking .info-section:last-child {
+  margin-bottom: 0;
+}
+
+.picking .section-header {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.picking .section-header.status-completed {
+  color: #28a745;
+}
+
+.picking .icon-spacing {
+  margin-right: 8px;
+}
+
+/* Enhanced Picking Details */
+.picking .picking-details.enhanced {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fcfcfc;
+  overflow: hidden;
+}
+
+.picking .detail-row {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.picking .detail-row:last-child {
+  border-bottom: none;
+}
+
+.picking .detail-item {
+  flex: 1;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.picking .detail-item:first-child {
+  border-right: 1px solid #e9ecef;
+}
+
+.picking .detail-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.picking .detail-value {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+.picking .detail-value.highlight {
+  color: #00a8a8;
+  font-weight: 500;
+}
+
+.picking .detail-value-with-icon {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+.picking .detail-icon {
+  margin-right: 8px;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.picking .count-badge {
+  display: inline-block;
+  background-color: #e9ecef;
+  color: #495057;
+  border-radius: 16px;
+  padding: 2px 10px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* Next Steps Container */
+.picking .next-steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.picking .next-step-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 0;
+}
+
+.picking .step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #28a745;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.picking .step-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.picking .step-icon {
+  color: #28a745;
+  margin-right: 10px;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.picking .step-text {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.picking .step-connector {
+  width: 2px;
+  height: 16px;
+  background-color: #ddd;
+  margin-left: 11px; /* Center with the step number */
+}
+
+/* Modal Footer */
+.picking .modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: #f8f9fa;
+}
+
+.picking .cancel-button {
+  padding: 10px 16px;
+  background-color: white;
+  color: #495057;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.picking .cancel-button:hover {
+  background-color: #f1f3f5;
+  border-color: #c8cfd6;
+}
+
+.picking .confirm-button {
+  padding: 10px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.picking .confirm-button:hover {
+  background-color: #218838;
+}
+
+.picking .button-icon {
+  margin-right: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .picking .detail-row {
+    flex-direction: column;
+  }
+  
+  .picking .detail-item:first-child {
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .picking .modal-content-scroll {
+    max-height: 60vh;
+  }
+}
+
+/* Hover effects for interactive elements */
+.picking .close-button {
+  transition: color 0.2s ease;
+}
+
+.picking .close-button:hover {
+  color: #dc3545;
+}
+
+/* Focus states for accessibility */
+.picking .close-button:focus,
+.picking .cancel-button:focus,
+.picking .confirm-button:focus {
+  outline: 2px solid #80bdff;
+  outline-offset: 2px;
+}
+
+/* Add a subtle animation to the modal */
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.picking .completion-modal.improved {
+  animation: modalFadeIn 0.2s ease-out forwards;
+}
+
+@media (max-width: 1440px) {
+  /* Remove dots but keep color-coded statuses */
+  .picking .status-cell {
+    padding-left: 0.75rem; /* Reset the padding since we're removing the dot */
+  }
+
+  .picking .status-cell::before {
+    display: none; /* Hide the status dot */
+  }
+  
+  /* Add background color to status cells instead */
+  .picking .status-not-started {
+    background-color: rgba(108, 117, 125, 0.1);
+  }
+  
+  .picking .status-in-progress {
+    background-color: rgba(0, 168, 168, 0.1);
+  }
+  
+  .picking .status-completed {
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Make the table horizontally scrollable on small screens */
+  .picking .picking-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust row padding for better touch targets */
+  .picking .picking-table td,
+  .picking .picking-table th {
+    padding: 0.85rem 0.75rem;
+  }
+  
+  /* Handle pagination better on small screens */
+  .picking .page-numbers {
+    display: none; /* Hide page numbers, keep only prev/next */
+  }
+  
+  .picking .pagination-info {
+    display: inline-block;
+    margin: 0 0.5rem;
+  }
+  
+  .picking .pagination-button {
+    min-width: 80px; /* Make buttons bigger for touch */
+  }
+}
+
+@media (max-width: 576px) {
+  /* Hide less important columns on very small screens */
+  .picking .picking-table th:nth-child(3),
+  .picking .picking-table td:nth-child(3),
+  .picking .picking-table th:nth-child(4),
+  .picking .picking-table td:nth-child(4),
+  .picking .picking-table th:nth-child(9),
+  .picking .picking-table td:nth-child(9) {
+    display: none;
+  }
+  
+  /* Make sure no-data message spans fewer columns */
+  .picking .no-data {
+    font-size: 0.8rem;
+    padding: 1.5rem 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .picking .picking-table tbody tr {
+    cursor: pointer;
+  }
+
+  .picking .picking-table tbody tr:active {
+    background-color: rgba(0, 168, 168, 0.1);
+  }
+}
+
+@media (max-width: 576px) {
+  .picking .sort-icon {
+    display: block;
+    margin: 2px auto 0;
+  }
 }

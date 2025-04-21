@@ -74,8 +74,8 @@ const Departments = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/departments/"),
-        axios.get("http://127.0.0.1:8000/api/departments/archived/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/archived/"),
       ]);
       setDepartments(activeRes.data);
       setArchivedDepartments(archivedRes.data);
@@ -94,8 +94,8 @@ const Departments = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/department_superiors/"),
-        axios.get("http://127.0.0.1:8000/api/department_superiors/archived/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/archived/"),
       ]);
       setSuperiors(activeRes.data);
       setArchivedSuperiors(archivedRes.data);
@@ -112,11 +112,13 @@ const Departments = () => {
    **************************************/
   const fetchPositions = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/positions/");
-      setPositions(res.data);
+      // const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/admin/positions/position/");
+      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/");
+      setPositions(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Fetch positions error:", err);
       showToast("Failed to fetch positions for autofill", false);
+      setPositions([]); // Set to empty array on error
     }
   };
 
@@ -137,32 +139,50 @@ const Departments = () => {
     };
   };
   const handleSearch = debounce((value) => {
-    setSearchTerm(value.toLowerCase());
+    setSearchTerm((value || '').toLowerCase());
     setCurrentPage(1);
   }, 300);
 
   /**************************************
    * 4) Filter + Sort + Paginate
    **************************************/
+  // Update the filterAndPaginate function to handle undefined values
   const filterAndPaginate = (data, sortField) => {
-    const term = searchTerm.toLowerCase();
-    let filtered = data.filter((item) =>
-      Object.values(item).some((val) => val?.toString().toLowerCase().includes(term))
-    );
-
-    // Sorting example
+    // Handle undefined or null data
+    if (!data || !Array.isArray(data)) {
+      return { data: [], totalPages: 0, totalFiltered: 0 };
+    }
+    
+    // Handle undefined searchTerm
+    const term = (searchTerm || '').toLowerCase();
+    
+    let filtered = data.filter(item => {
+      if (!item) return false;
+      return Object.values(item).some(val => {
+        if (val == null) return false;
+        try {
+          return val.toString().toLowerCase().includes(term);
+        } catch (err) {
+          return false;
+        }
+      });
+    });
+  
+    // Sorting
     if (sortField !== "all") {
       filtered.sort((a, b) => {
-        const valA = a[sortField]?.toString().toLowerCase() || "";
-        const valB = b[sortField]?.toString().toLowerCase() || "";
+        if (!a || !b) return 0;
+        const valA = a[sortField] != null ? a[sortField].toString().toLowerCase() : '';
+        const valB = b[sortField] != null ? b[sortField].toString().toLowerCase() : '';
         return valA.localeCompare(valB);
       });
     }
-
+    
     // Pagination
     const start = (currentPage - 1) * itemsPerPage;
     const paginated = filtered.slice(start, start + itemsPerPage);
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+    
     return {
       data: paginated,
       totalPages,
@@ -186,7 +206,8 @@ const Departments = () => {
     // if you need to handle newDeptId, do so here
     try {
       // If your backend auto-generates dept_id, you can just pass dept_name
-      await axios.post("http://127.0.0.1:8000/api/departments/", { dept_name: newDeptName });
+      // await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/admin/departments/department/", { dept_name: newDeptName });
+      await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/", { dept_name: newDeptName });
       setShowDeptModal(false);
       showToast("Department added successfully");
       fetchDepartments();
@@ -207,7 +228,7 @@ const Departments = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.patch(`http://127.0.0.1:8000/api/departments/${editingDept.dept_id}/`, {
+      await axios.patch(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/${editingDept.dept_id}/`, {
         dept_name: editingDept.dept_name,
       });
       setShowEditModal(false);
@@ -223,7 +244,7 @@ const Departments = () => {
   const handleDeptArchive = async (id) => {
     if (!window.confirm("Archive this department?")) return;
     try {
-      await axios.post(`http://127.0.0.1:8000/api/departments/${id}/archive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/${id}/archive/`);
       showToast("Department archived successfully");
       fetchDepartments();
     } catch (err) {
@@ -238,7 +259,7 @@ const Departments = () => {
   };
   const handleDeptUnarchive = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/departments/${id}/unarchive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/${id}/unarchive/`);
       setShowConfirmUnarchive(null);
       showToast("Department unarchived successfully");
       fetchDepartments();
@@ -257,7 +278,7 @@ const Departments = () => {
   const bulkUnarchive = async () => {
     try {
       await Promise.all(
-        selectedArchived.map((id) => axios.post(`http://127.0.0.1:8000/api/departments/${id}/unarchive/`))
+        selectedArchived.map((id) => axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/${id}/unarchive/`))
       );
       showToast("Departments unarchived successfully");
       setSelectedArchived([]);
@@ -284,13 +305,22 @@ const Departments = () => {
   const submitSuperiorModal = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://127.0.0.1:8000/api/department_superiors/", newSuperior);
+      const formData = {
+        dept_name: newSuperior.dept_name,
+        position_title: newSuperior.position_title,
+        hierarchy_level: parseInt(newSuperior.hierarchy_level),
+        is_archived: false
+      };
+
+      await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/", formData);
+      
       setShowSuperiorModal(false);
       showToast("Department superior added successfully");
       fetchDepartmentSuperiors();
     } catch (err) {
       console.error("Add superior error:", err);
-      showToast("Failed to add department superior", false);
+      const errorMsg = err.response?.data?.detail || "Failed to add department superior";
+      showToast(errorMsg, false);
     }
   };
 
@@ -308,20 +338,21 @@ const Departments = () => {
   const handleSuperiorEditSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formData = {
+        hierarchy_level: parseInt(editingSuperior.hierarchy_level) // Only update hierarchy_level
+      };
+
       await axios.patch(
-        `http://127.0.0.1:8000/api/department_superiors/${editingSuperior.dept_superior_id}/`,
-        {
-          dept_name: editingSuperior.dept_name,
-          position_title: editingSuperior.position_title,
-          hierarchy_level: parseInt(editingSuperior.hierarchy_level),
-        }
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/${editingSuperior.dept_superior_id}/`,
+        formData
       );
       setShowEditSuperiorModal(false);
       showToast("Department superior updated successfully");
       fetchDepartmentSuperiors();
     } catch (err) {
       console.error("Update superior error:", err);
-      showToast("Failed to update department superior", false);
+      const errorMsg = err.response?.data?.detail || "Failed to update department superior";
+      showToast(errorMsg, false);
     }
   };
 
@@ -334,7 +365,7 @@ const Departments = () => {
 
     if (!window.confirm("Archive this department superior?")) return;
     try {
-      await axios.post(`http://127.0.0.1:8000/api/department_superiors/${id}/archive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/${id}/archive/`);
       showToast("Department superior archived successfully");
       fetchDepartmentSuperiors();
     } catch (err) {
@@ -349,7 +380,7 @@ const Departments = () => {
   };
   const handleSuperiorUnarchive = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/department_superiors/${id}/unarchive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/${id}/unarchive/`);
       setShowConfirmUnarchiveSuperior(null);
       showToast("Department superior unarchived successfully");
       fetchDepartmentSuperiors();
@@ -369,7 +400,7 @@ const Departments = () => {
     try {
       await Promise.all(
         selectedSuperiorArchived.map((id) =>
-          axios.post(`http://127.0.0.1:8000/api/department_superiors/${id}/unarchive/`)
+          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/${id}/unarchive/`)
         )
       );
       showToast("Department superiors unarchived successfully");
@@ -388,12 +419,14 @@ const Departments = () => {
   /**************************************
    * RENDER TABLES
    **************************************/
-  const renderDeptTable = (rawData, isArchived = false) => {
-    const { data, totalPages, totalFiltered } = filterAndPaginate(rawData, sortField);
-    if (loading) return <div className="hr-no-results">Loading departments...</div>;
-    if (totalFiltered === 0) return <div className="hr-no-results">No departments found.</div>;
+// Update renderDeptTable function
+const renderDeptTable = (rawData, isArchived = false) => {
+  const { data, totalPages, totalFiltered } = filterAndPaginate(rawData, sortField);
+  if (loading) return <div className="hr-no-results">Loading departments...</div>;
+  if (totalFiltered === 0) return <div className="hr-no-results">No departments found.</div>;
 
-    return (
+  return (
+    <>
       <div className="hr-department-no-scroll-wrapper">
         <div className="hr-department-table-scrollable">
           <table className="hr-department-table hr-department-no-scroll-table">
@@ -456,45 +489,148 @@ const Departments = () => {
               ))}
             </tbody>
           </table>
-
-          {/* Pagination */}
-          <div className="hr-pagination">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={i + 1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <select
-              className="hr-pagination-size"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(parseInt(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
-          </div>
         </div>
       </div>
-    );
-  };
+      
+      {/* Enhanced Pagination */}
+      <div className="hr-pagination">
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(1)} 
+          disabled={currentPage === 1}
+        >
+          &#171; {/* Double left arrow */}
+        </button>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+          disabled={currentPage === 1}
+        >
+          &#8249; {/* Single left arrow */}
+        </button>
+        
+        <div className="hr-pagination-numbers">
+          {(() => {
+            const pageNumbers = [];
+            const maxVisiblePages = 5;
+            
+            if (totalPages <= maxVisiblePages + 2) {
+              // Show all pages if there are few
+              for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+            } else {
+              // Always show first page
+              pageNumbers.push(
+                <button
+                  key={1}
+                  className={1 === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(1)}
+                >
+                  1
+                </button>
+              );
+              
+              // Calculate range around current page
+              let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+              let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+              
+              // Adjust if we're near the end
+              if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(2, endPage - maxVisiblePages + 1);
+              }
+              
+              // Add ellipsis after first page if needed
+              if (startPage > 2) {
+                pageNumbers.push(<span key="ellipsis1" className="hr-pagination-ellipsis">...</span>);
+              }
+              
+              // Add middle pages
+              for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              
+              // Add ellipsis before last page if needed
+              if (endPage < totalPages - 1) {
+                pageNumbers.push(<span key="ellipsis2" className="hr-pagination-ellipsis">...</span>);
+              }
+              
+              // Always show last page
+              pageNumbers.push(
+                <button
+                  key={totalPages}
+                  className={totalPages === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  {totalPages}
+                </button>
+              );
+            }
+            
+            return pageNumbers;
+          })()}
+        </div>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+          disabled={currentPage === totalPages}
+        >
+          &#8250; {/* Single right arrow */}
+        </button>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(totalPages)} 
+          disabled={currentPage === totalPages}
+        >
+          &#187; {/* Double right arrow */}
+        </button>
+        
+        <select
+          className="hr-pagination-size"
+          value={itemsPerPage}
+          onChange={(e) => {
+            setItemsPerPage(parseInt(e.target.value));
+            setCurrentPage(1);
+          }}
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+        </select>
+      </div>
+    </>
+  );
+};
 
-  const renderSuperiorTable = (rawData, isArchived = false) => {
-    const { data, totalPages, totalFiltered } = filterAndPaginate(rawData, sortField);
-    if (loading) return <div className="hr-no-results">Loading department superiors...</div>;
-    if (totalFiltered === 0) return <div className="hr-no-results">No department superiors found.</div>;
+const renderSuperiorTable = (rawData, isArchived = false) => {
+  const { data, totalPages, totalFiltered } = filterAndPaginate(rawData, sortField);
+  if (loading) return <div className="hr-no-results">Loading department superiors...</div>;
+  if (totalFiltered === 0) return <div className="hr-no-results">No department superiors found.</div>;
 
-    return (
-      <div className="hr-department-table-wrapper">
+  return (
+    <>
+      <div className="hr-superior-table-wrapper">
         <div className="hr-department-table-scrollable">
-          <table className="hr-department-table">
+          <table className="hr-department-table superiors-table">
             <thead>
               <tr>
                 {isArchived && <th>Select</th>}
@@ -576,34 +712,137 @@ const Departments = () => {
               ))}
             </tbody>
           </table>
-          {/* Pagination */}
-          <div className="hr-pagination">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={i + 1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <select
-              className="hr-pagination-size"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(parseInt(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
-          </div>
         </div>
       </div>
-    );
-  };
+
+      {/* Enhanced Pagination */}
+      <div className="hr-pagination">
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(1)} 
+          disabled={currentPage === 1}
+        >
+          &#171; {/* Double left arrow */}
+        </button>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+          disabled={currentPage === 1}
+        >
+          &#8249; {/* Single left arrow */}
+        </button>
+        
+        <div className="hr-pagination-numbers">
+          {(() => {
+            const pageNumbers = [];
+            const maxVisiblePages = 5;
+            
+            if (totalPages <= maxVisiblePages + 2) {
+              // Show all pages if there are few
+              for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+            } else {
+              // Always show first page
+              pageNumbers.push(
+                <button
+                  key={1}
+                  className={1 === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(1)}
+                >
+                  1
+                </button>
+              );
+              
+              // Calculate range around current page
+              let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+              let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+              
+              // Adjust if we're near the end
+              if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(2, endPage - maxVisiblePages + 1);
+              }
+              
+              // Add ellipsis after first page if needed
+              if (startPage > 2) {
+                pageNumbers.push(<span key="ellipsis1" className="hr-pagination-ellipsis">...</span>);
+              }
+              
+              // Add middle pages
+              for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              
+              // Add ellipsis before last page if needed
+              if (endPage < totalPages - 1) {
+                pageNumbers.push(<span key="ellipsis2" className="hr-pagination-ellipsis">...</span>);
+              }
+              
+              // Always show last page
+              pageNumbers.push(
+                <button
+                  key={totalPages}
+                  className={totalPages === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  {totalPages}
+                </button>
+              );
+            }
+            
+            return pageNumbers;
+          })()}
+        </div>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+          disabled={currentPage === totalPages}
+        >
+          &#8250; {/* Single right arrow */}
+        </button>
+        
+        <button 
+          className="hr-pagination-arrow" 
+          onClick={() => setCurrentPage(totalPages)} 
+          disabled={currentPage === totalPages}
+        >
+          &#187; {/* Double right arrow */}
+        </button>
+        
+        <select
+          className="hr-pagination-size"
+          value={itemsPerPage}
+          onChange={(e) => {
+            setItemsPerPage(parseInt(e.target.value));
+            setCurrentPage(1);
+          }}
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+        </select>
+      </div>
+    </>
+  );
+};
 
   /**************************************
    * RENDER
@@ -686,7 +925,7 @@ const Departments = () => {
                     setCurrentPage(1);
                   }}
                 >
-                  Departments
+                  Departments <span className="hr-department-count">{departments.length}</span>
                 </button>
                 <button
                   className={activeTab === "Superiors" ? "active" : ""}
@@ -697,7 +936,7 @@ const Departments = () => {
                     setCurrentPage(1);
                   }}
                 >
-                  Department Superiors
+                  Department Superiors <span className="hr-department-count">{superiors.length}</span>
                 </button>
               </div>
             </div>
@@ -833,11 +1072,11 @@ const Departments = () => {
                     required
                   >
                     <option value="">-- Select --</option>
-                    {positions.map((pos) => (
+                    {Array.isArray(positions) ? positions.map((pos) => (
                       <option key={pos.position_id} value={pos.position_title}>
                         {pos.position_title}
                       </option>
-                    ))}
+                    )) : <option value="">Loading positions...</option>}
                   </select>
                 </div>
 

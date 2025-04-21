@@ -10,8 +10,8 @@
 /* Main white container with drop shadow */
 .hr-department-body-content-container {
   width: 100%;
-  height: 38.1rem;
-  max-width: 1222px;
+  height: 100%;
+  max-width: 1600px;
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
@@ -19,13 +19,12 @@
   box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
-  min-width: 40rem;
-  min-height: 30rem;
+  min-width: unset; /* Remove fixed min-width */
   box-sizing: border-box;
   overflow: hidden; /* scrolled inside .hr-department-scrollable */
 }
 
-/* Scroll area that holds the entire content */
+/* Make this the only container with vertical scroll */
 .hr-department-scrollable {
   flex: 1;
   display: flex;
@@ -33,6 +32,7 @@
   overflow-y: auto;
   padding: 1.5rem;
   box-sizing: border-box;
+  padding-bottom: 1.5rem;
 }
 .hr-department-scrollable::-webkit-scrollbar {
   width: 8px;
@@ -101,7 +101,6 @@
 .hr-department-header {
   position: sticky;
   top: 0;
-  z-index: 10;
   background-color: white;
   margin: 1rem 0;
   border-top: 1px solid #e4e4e4;
@@ -130,21 +129,45 @@
   border-bottom: 2px solid #00b0b5;
 }
 
+/* Count label on tab */
+.hr-department-count {
+  background-color: #00b0b5;
+  color: white;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  margin-left: 6px;
+}
+
 /* The main content area that holds the tables */
 .hr-department-table-content {
   flex: 1;
-  overflow-y: auto;
+  /* overflow-y: auto; */
 }
 
 /* Table wrapper for Department Superiors (horizontal scroll) */
 .hr-department-table-wrapper {
   border: 1px solid #eee;
   border-radius: 8px;
-  margin-bottom: 1rem;
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Prevent double scrollbars */
+  position: relative; /* For positioning context */
+  margin-bottom: 1.5rem !important; /* Enforce consistent margin */
+}
+
+/* Superior table wrapper - ensure consistent bottom spacing */
+.hr-superior-table-wrapper {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 1.5rem !important; /* Match departments table margin */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* For Department table: remove horizontal scroll */
@@ -156,15 +179,28 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 400px); /* Match positions table fixed height */
+  overflow: hidden;
 }
 
 /* The table itself */
 .hr-department-table {
-  width: 100%;
+  width: 100%; /* Make tables responsive by default */
   border-collapse: collapse;
   font-size: 0.95rem;
   min-width: 1400px; /* Force minimum width to ensure horizontal scroll */
+  margin-bottom: 1.5rem !important; /* Enforce consistent margin */
+}
+.hr-department-table tbody {
+  padding-bottom: 1.5rem !important;
+}
+
+/* Also ensure superiors table has consistent bottom margin */
+.hr-department-table.superiors-table {
+  margin-bottom: 1.5rem !important;
+}
+
+.hr-department-table.superiors-table tbody {
+  padding-bottom: 1.5rem !important;
 }
 
 /* For Departments specifically, no forced wide min-width */
@@ -179,14 +215,14 @@
   position: sticky;
   top: 0;
   background-color: #f3f9fa;
-  z-index: 5;
+  z-index: 2; /* Keep the z-index as is */
 }
 
 .hr-department-table thead th {
   position: sticky;
   top: 0;
   background-color: #f3f9fa;
-  z-index: 10;
+  z-index: 2;
   border-bottom: 1px solid #eee;
 }
 
@@ -201,13 +237,15 @@
 /* Scrollbar styles */
 .hr-department-table-scrollable {
   width: 100%;
-  overflow-y: auto; /* Only enable vertical scrolling */
+  overflow-x: auto;      /* Keep horizontal scroll */
+  overflow-y: visible;   /* Remove vertical scroll */
   flex: 1;
   min-height: 0;
 }
 
 .hr-department-table-scrollable::-webkit-scrollbar {
   width: 8px;
+  height: 8px; /* Add horizontal scrollbar height to match Employees */
 }
 
 .hr-department-table-scrollable::-webkit-scrollbar-thumb {
@@ -259,10 +297,15 @@
 .hr-pagination {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  margin: 1rem 0;
+  justify-content: center; /* Changed from flex-end to center */
+  padding: 1rem;
   gap: 0.5rem;
+  background-color: white;
+  border-radius: 8px;
+  flex-wrap: wrap; /* Add to handle smaller screens */
+  max-width: 100%; /* Add to ensure it stays within container */
 }
+
 .hr-pagination button {
   background: white;
   border: 1px solid #ccc;
@@ -280,6 +323,39 @@
   font-size: 0.9rem;
   border-radius: 4px;
   border: 1px solid #ccc;
+}
+
+/* Add container for pagination numbers to match Employees */
+.hr-pagination-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: calc(100% - 100px);
+  margin-right: 0.5rem;
+}
+
+/* Pagination arrow styles */
+.hr-pagination-arrow {
+  font-weight: bold;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hr-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hr-pagination button:hover:not(.active):not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.hr-pagination-ellipsis {
+  padding: 0.4rem;
+  color: #666;
 }
 
 /* "No results" text */
@@ -318,12 +394,28 @@
   border-radius: 6px;
   font-size: 0.95rem;
 }
+.hr-department-search:hover {
+  border-color: #00b0b5;
+}
+.hr-department-search:focus {
+  outline: none;
+  border-color: #00b0b5;
+  box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.1);
+}
 .hr-department-filter {
   height: 36px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 0.95rem;
   padding: 0 0.75rem;
+}
+.hr-department-filter:hover {
+  border-color: #00b0b5;
+}
+.hr-department-filter:focus {
+  outline: none;
+  border-color: #00b0b5;
+  box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.1);
 }
 
 /* Toast Notification */
@@ -363,7 +455,7 @@
   background-color: white;
   padding: 2rem;
   border-radius: 8px;
-  width: 440px; /* slightly bigger for a more professional look */
+  width: 1000px; /* slightly bigger for a more professional look */
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   text-align: left; /* left align for a form style */
 }
@@ -455,4 +547,284 @@
 .hr-tag.level-5 {
   background-color: #ffebee;
   color: #c62828;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE DESIGN
+   --------------------------------------------------------- */
+
+/* Base responsive adjustments */
+.hr-department-body-content-container {
+  min-width: unset; /* Remove fixed min-width */
+  width: 100%;
+  max-width: 1600px;
+  padding: 1rem;
+}
+
+.hr-department-table {
+  width: 100%; /* Make tables responsive by default */
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1200px) {
+  .hr-department-body-content-container {
+    padding: 1.5rem;
+  }
+  
+  .hr-department-scrollable {
+    padding: 1.75rem;
+  }
+  
+  /* Set min-width only on large screens */
+  .hr-department-table {
+    min-width: 1400px;
+  }
+}
+
+/* Medium screens (tablets and small desktops) */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .hr-department-scrollable {
+    padding: 1.25rem;
+  }
+  
+  .hr-department-heading {
+    margin-bottom: 1.25rem;
+  }
+  
+  .hr-department-heading h2 {
+    font-size: 1.5rem;
+  }
+  
+  .hr-department-right-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .hr-department-search {
+    width: 200px;
+  }
+  
+  .hr-department-filter {
+    min-width: 150px;
+  }
+  
+  .hr-department-table-container {
+    max-height: calc(100vh - 200px);
+  }
+  
+  .hr-department-two-column-form {
+    gap: 1.25rem;
+  }
+  
+  .hr-department-modal {
+    width: 90vw;
+    max-width: 90vw;
+  }
+}
+
+/* Small screens (mobile) */
+@media (max-width: 767px) {
+  .hr-department-body-content-container {
+    padding: 0.75rem;
+    min-height: auto;
+  }
+  
+  .hr-department-scrollable {
+    padding: 1rem 0.75rem;
+  }
+  
+  /* Header and controls */
+  .hr-department-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .hr-department-heading h2 {
+    font-size: 1.4rem;
+  }
+  
+  .hr-department-right-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .hr-department-search-wrapper {
+    width: 100%;
+    margin-right: 0;
+  }
+  
+  .hr-department-search {
+    width: 100%;
+  }
+  
+  .hr-department-filter {
+    width: 100%;
+  }
+  
+  .hr-department-add-btn {
+    width: 100%;
+    padding: 0.75rem;
+  }
+  
+  /* Tabs header */
+  .hr-department-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .hr-department-tabs {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .hr-department-tabs button {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.25rem;
+    white-space: nowrap;
+  }
+  
+  /* Tables */
+  .hr-department-table-container {
+    max-height: none;
+  }
+  
+  .hr-department-table-scrollable {
+    overflow-x: auto;
+  }
+  
+  .hr-department-table th,
+  .hr-department-table td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Pagination */
+  .hr-pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .hr-pagination-numbers {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+  }
+  
+  .hr-pagination button {
+    min-width: 36px;
+    padding: 0.35rem 0.6rem;
+  }
+  
+  /* Modals */
+  .hr-department-modal {
+    width: 95vw;
+    padding: 1.25rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .hr-department-modal-form .form-group {
+    margin-bottom: 0.75rem;
+  }
+  
+  .hr-department-two-column-form {
+    grid-template-columns: 1fr; /* Single column on mobile */
+    gap: 0.75rem;
+  }
+  
+  .hr-department-modal-buttons {
+    flex-direction: column-reverse; /* Primary button on top */
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  /* Level tags */
+  .hr-tag {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  /* Action dropdown positioning fix */
+  .hr-department-dropdown {
+    right: 0;
+    width: 160px;
+  }
+}
+
+/* Very small screens (smaller mobile devices) */
+@media (max-width: 480px) {
+  .hr-department-body-content-container {
+    padding: 0.5rem;
+  }
+  
+  .hr-department-scrollable {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .hr-department-heading h2 {
+    font-size: 1.25rem;
+  }
+  
+  .hr-department-modal {
+    padding: 1rem;
+  }
+  
+  .hr-department-table th,
+  .hr-department-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .hr-department-dropdown {
+    width: 150px;
+  }
+}
+
+/* Enhanced scrollbar behavior for all screen sizes */
+@media (hover: hover) {
+  .hr-department-table-scrollable::-webkit-scrollbar,
+  .hr-department-modal::-webkit-scrollbar,
+  .hr-department-scrollable::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Print media query for better printing */
+@media print {
+  .hr-department-add-btn,
+  .hr-department-filter,
+  .hr-department-search-wrapper,
+  .hr-department-actions,
+  .hr-pagination {
+    display: none;
+  }
+  
+  .hr-department-body-content-container {
+    box-shadow: none;
+  }
+  
+  .hr-department-table {
+    min-width: 100%;
+  }
+  
+  .hr-department-table-container,
+  .hr-department-table-scrollable {
+    max-height: none;
+    overflow: visible;
+  }
 }

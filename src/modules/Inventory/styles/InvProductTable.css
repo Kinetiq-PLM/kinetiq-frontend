@@ -1,18 +1,16 @@
 /* White Scrollbar Styling */
 .inv .scroll-container::-webkit-scrollbar {
-  width: 12px; /* Scrollbar width */
+  width: 6px; /* Scrollbar width */
+  height: 6px;
   background: rgb(239, 239, 239);
 }
 
-.inv .scroll-container::-webkit-scrollbar-track {
-  background: #aba9a9; /* Dark background (optional) */
-}
+
 
 .inv ::-webkit-scrollbar-thumb {
-  background: rgb(168, 168, 168); /* Scrollbar color */
+  background: #00A8A8; /* Scrollbar color */
+  height: 5rem;
+  width: 5rem;
   border-radius: 6px; /* Rounded edges */
 }
 
-.inv ::-webkit-scrollbar-thumb:hover {
-  background: #e5e7eb; /* Light gray on hover */
-}

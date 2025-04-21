@@ -6,11 +6,20 @@ import BLANKET_AGREEMENT_LIST_DATA from "../../temp_data/ba_list_data";
 import { GET, BASE_API_URL } from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "../Context/AlertContext";
+
+import loading from "../Assets/kinetiq-loading.gif";
+
 export default function BlanketAgreementsTab({
   loadSubModule,
   setActiveSubModule,
+  setIsQuotationListOpen,
+  setIsDocumentModalOpen,
+  setDocument,
+  employee_id,
 }) {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -18,11 +27,11 @@ export default function BlanketAgreementsTab({
 
   const agreementQuery = useQuery({
     queryKey: ["agreements"],
-    queryFn: async () => await GET("sales/agreement"),
+    queryFn: async () => await GET(`sales/agreement?salesrep=${employee_id}`),
     retry: 2,
   });
   const columns = [
-    { key: "agreement_id", label: "Agreement ID" },
+    { key: "id", label: "Agreement ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
     { key: "address", label: "Address" },
@@ -70,30 +79,31 @@ export default function BlanketAgreementsTab({
   });
 
   const handleRedirect = () => {
-    loadSubModule("Blanket Agreement");
-    setActiveSubModule("Blanket Agreement");
+    setIsQuotationListOpen(true);
   };
   useEffect(() => {
     if (agreementQuery.status === "success") {
       const data = agreementQuery.data.map((agreement) => ({
-        agreement_id: agreement.agreement_id,
-        customer_id: agreement.statement.customer.customer_id,
-        customer_name: agreement.statement.customer.name,
-        address: `${agreement.statement.customer.address_line1} ${agreement.statement.customer.address_line2}`,
-        type: agreement.statement.type,
-        total_price: Number(agreement.statement.total_amount).toLocaleString(
+        id: agreement.agreement_id,
+        customer_id: agreement.statement?.customer?.customer_id,
+        customer_name: agreement.statement?.customer?.name,
+        address: `${agreement.statement?.customer?.address_line1} ${agreement.statement?.customer?.address_line2}`,
+        type: agreement.statement?.type,
+        total_price: Number(agreement.statement?.total_amount).toLocaleString(
           "en-US",
           { minimumFractionDigits: 2, maximumFractionDigits: 2 }
         ),
-        salesrep: `${agreement.statement.salesrep.first_name} ${agreement.statement.salesrep.last_name}`,
+        salesrep: `${agreement.statement?.salesrep?.first_name} ${agreement.statement?.salesrep?.last_name}`,
         agreement_method: agreement.agreement_method,
         date_issued: new Date(agreement.signed_date).toLocaleDateString(),
         start_date: new Date(agreement.start_date).toLocaleDateString(),
         end_date: new Date(agreement.end_date).toLocaleDateString(),
         status: agreement.status,
-        document: `${BASE_API_URL}sales/agreement/${agreement.agreement_id}/document`,
+        document: true,
+        endpoint: `agreement/${agreement.agreement_id}`,
       }));
       setAgreementList(data);
+      setIsLoading(false);
     } else if (agreementQuery.status === "error") {
       showAlert({
         type: "error",
@@ -104,54 +114,71 @@ export default function BlanketAgreementsTab({
   return (
     <section className="h-full">
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-        {/* Filters */}
-        <div className="flex flex-1/2 items-center space-x-2 gap-2 w-fit flex-wrap">
-          {/* Date Filter Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={dateFilters}
-              onChange={setDateFilter}
-              value={dateFilter}
-            />
+      <div className="mb-4">
+        {/* Filters & Action */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start w-full">
+          <div className="flex flex-col md:flex-row sm:flex-wrap gap-3 flex-1">
+            {/* Date Filter Dropdown */}
+            <div className="w-full sm:w-[200px]">
+              <Dropdown
+                options={dateFilters}
+                onChange={setDateFilter}
+                value={dateFilter}
+              />
+            </div>
+
+            {/* Search By Dropdown */}
+            <div className="w-full sm:w-[200px]">
+              <Dropdown
+                options={searchFields.map((field) => field.label)}
+                onChange={(selected) => {
+                  const field = searchFields.find((f) => f.label === selected);
+                  if (field) setSearchBy(field.key);
+                }}
+                value={searchFields.find((f) => f.key === searchBy)?.label}
+              />
+            </div>
+
+            {/* Search Input */}
+            <div className="w-full sm:flex-1 min-w-[250px]">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full h-[40px]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
           </div>
 
-          {/* Search By Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={searchFields.map((field) => field.label)}
-              onChange={(selected) => {
-                const field = searchFields.find((f) => f.label === selected);
-                if (field) setSearchBy(field.key);
-              }}
-              value={searchFields.find((f) => f.key === searchBy)?.label}
-            />
+          {/* Right Side Button */}
+          <div className="w-full sm:w-auto">
+            <Button
+              onClick={handleRedirect}
+              type="primary"
+              className="w-full sm:w-[200px] py-2"
+            >
+              New Agreement
+            </Button>
           </div>
-
-          {/* Search Input */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
         </div>
-
-        {/* New Quotation Button (No onClick) */}
-        <Button
-          onClick={handleRedirect}
-          type="primary"
-          className={"w-[200px] py-2"}
-        >
-          New Agreement
-        </Button>
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredQuotations} columns={columns} />
-      </div>
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table
+            data={filteredQuotations}
+            columns={columns}
+            setIsDocumentModalOpen={setIsDocumentModalOpen}
+            setDocument={setDocument}
+          />
+        </div>
+      )}
     </section>
   );
 }

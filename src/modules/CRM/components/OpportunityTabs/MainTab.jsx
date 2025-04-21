@@ -14,7 +14,7 @@ import OpportunityModal from "../OpportunityModal.jsx";
 import ConfirmDelete from "./../ConfirmDelete";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { InputCustomer } from "./../OpportunityInfo";
-export default function MainTab() {
+export default function MainTab({ employee_id }) {
   const { showAlert } = useAlert();
 
   const [canSave, setCanSave] = useState(false); // Save button state
@@ -37,7 +37,9 @@ export default function MainTab() {
   const customerOppQuery = useQuery({
     queryKey: ["customerOpps"],
     queryFn: async () =>
-      await GET(`crm/opportunities?customer=${selectedCustomer.customer_id}`),
+      await GET(
+        `crm/opportunities?customer=${selectedCustomer.customer_id}?salesrep=${employee_id}`
+      ),
     retry: 2,
   });
 
@@ -99,7 +101,6 @@ export default function MainTab() {
         interest_level: opp.interest_level,
         reason_lost: opp.reason_lost || "-",
       }));
-      console.log(data);
       setOpportunityList(data);
     } else if (customerOppQuery.status === "error") {
       showAlert({
@@ -157,11 +158,11 @@ export default function MainTab() {
           onClose={() => setIsNewCustomerModalOpen(false)}
         ></NewCustomerModal>
 
-        <EmployeeListModal
+        {/* <EmployeeListModal
           isOpen={isEmployeeListOpen}
           onClose={() => setIsEmployeeListOpen(false)}
           setEmployee={setSelectedEmployee}
-        ></EmployeeListModal>
+        ></EmployeeListModal> */}
 
         {/** Opportunity edit */}
         <OpportunityModal
@@ -178,7 +179,7 @@ export default function MainTab() {
           onClose={() => setIsNewOpportunityModalOpen(false)}
           setCanSave={setCanSave}
           selectedCustomer={selectedCustomer}
-          selectedEmployee={selectedEmployee}
+          employee_id={employee_id}
         ></NewOpportunityModal>
 
         <ConfirmDelete
@@ -209,18 +210,8 @@ export default function MainTab() {
               <div className="flex flex-col">
                 <div className="flex mb-8 w-xs gap-4 items-center">
                   <p className="">Employee ID</p>
-                  <div
-                    className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
-                    onClick={() => setIsEmployeeListOpen(true)}
-                  >
-                    <p className="text-sm">
-                      {selectedEmployee ? selectedEmployee.employee_id : ""}
-                    </p>
-                    <img
-                      src="/icons/information-icon.svg"
-                      className="h-[15px]"
-                      alt="info icon"
-                    />
+                  <div className="border border-[#9a9a9a] flex-1  p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded">
+                    <p className="text-sm">{employee_id || ""}</p>
                   </div>
                 </div>
                 <div className="flex gap-2 flex-wrap ">

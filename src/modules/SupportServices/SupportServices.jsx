@@ -14,7 +14,7 @@ import DashboardBillingIcon from "/icons/SupportServices/Dashboard/DashboardBill
 
 import { GET } from "./api/api"
 
-const SupportServices = ({ loadSubModule, setActiveSubModule }) => {
+const SupportServices = ({ loadSubModule, setActiveSubModule, user_id, employee_id }) => {
   // State for service metrics
   const [serviceMetrics, setServiceMetrics] = useState({
     tickets: { total: 0, open: 0, inProgress: 0, closed: 0 },
@@ -27,17 +27,17 @@ const SupportServices = ({ loadSubModule, setActiveSubModule }) => {
     reports: { total: 0, draft: 0, submitted: 0, reviewed: 0 },
   })
 
-  const fetchDataAndUpdateMetrics = async (endpoint, statusField, metricType, statusValues = []) => {
+  const fetchDataAndUpdateMetrics = async (endpoint, statusField, metricType, statusMap = {}) => {
     try {
       const data = await GET(endpoint);
-      
-      // Initialize an object to count the different statuses
-      const statusCounts = statusValues.reduce((acc, status) => {
-        acc[status] = data.filter(item => item[statusField].toLowerCase() === status).length;
+  
+      const statusCounts = Object.entries(statusMap).reduce((acc, [rawStatus, key]) => {
+        acc[key] = data.filter(item =>
+          item[statusField]?.toLowerCase().trim() === rawStatus
+        ).length;
         return acc;
       }, {});
   
-      // Update service metrics
       setServiceMetrics(prev => ({
         ...prev,
         [metricType]: {
@@ -50,16 +50,17 @@ const SupportServices = ({ loadSubModule, setActiveSubModule }) => {
       console.error(`Error fetching ${metricType}:`, error);
     }
   };
-  
   const fetchServiceRenewals = async () => {
     try {
-      const data = await GET("warranty-renewals/");
+      const data = await GET("renewal/");
       setServiceMetrics(prev => ({
         ...prev,
         renewals: {
           ...prev.renewals,
           total: data.length,
         }
+
+      
       }));
     } catch (error) {
       console.error("Error fetching renewals:", error)
@@ -67,13 +68,52 @@ const SupportServices = ({ loadSubModule, setActiveSubModule }) => {
   }
 
   useEffect(() => {
-    fetchDataAndUpdateMetrics("tickets/", "status", "tickets", ["open", "in progress", "closed"]);
-    fetchDataAndUpdateMetrics("service-calls/", "call_status", "calls", ["open", "in progress", "closed"]);
-    fetchDataAndUpdateMetrics("service-requests/", "request_status", "requests", ["approved", "in progress", "pending", "rejected"]);
-    fetchDataAndUpdateMetrics("service-analyses/", "analysis_status", "analyses", ["scheduled", "done"]);
-    fetchDataAndUpdateMetrics("service-billings/", "billing_status", "billings", ["paid", "unpaid"]);
-    fetchDataAndUpdateMetrics("service-reports/", "report_status", "reports", ["draft", "submitted", "reviewed"]);
-    fetchDataAndUpdateMetrics("service-contracts/", "contract_status", "contracts", ["active", "expired", "terminated"]);
+    fetchDataAndUpdateMetrics("ticket/", "status", "tickets", ["open", "in progress", "closed"]);
+    fetchDataAndUpdateMetrics("call/", "call_status", "calls", ["open", "in progress", "closed"]);
+    fetchDataAndUpdateMetrics("request/", "request_status", "requests", ["approved", "in progress", "pending", "rejected"]);
+    fetchDataAndUpdateMetrics("analysis/", "analysis_status", "analyses", ["scheduled", "done"]);
+    fetchDataAndUpdateMetrics("billing/", "billing_status", "billings", ["paid", "unpaid"]);
+    fetchDataAndUpdateMetrics("report/", "report_status", "reports", ["draft", "submitted", "reviewed"]);
+    fetchDataAndUpdateMetrics("contract/", "contract_status", "contracts", ["active", "expired", "terminated"]);
+    fetchServiceRenewals();
+  }, []);
+
+  useEffect(() => {
+    fetchDataAndUpdateMetrics("ticket/", "status", "tickets", {
+      "open": "open",
+      "in progress": "inProgress",
+      "closed": "closed"
+    });
+    fetchDataAndUpdateMetrics("call/", "call_status", "calls", {
+      "open": "open",
+      "in progress": "inProgress",
+      "closed": "closed"
+    });
+    fetchDataAndUpdateMetrics("request/", "request_status", "requests", {
+      "approved": "approved",
+      "in progress": "inProgress",
+      "pending": "pending",
+      "rejected": "rejected"
+    });
+    fetchDataAndUpdateMetrics("analysis/", "analysis_status", "analyses", {
+      "scheduled": "scheduled",
+      "done": "done"
+    });
+    fetchDataAndUpdateMetrics("billing/", "billing_status", "billings", {
+      "paid": "paid",
+      "unpaid": "unpaid"
+    });
+    fetchDataAndUpdateMetrics("report/", "report_status", "reports", {
+      "draft": "draft",
+      "submitted": "submitted",
+      "reviewed": "reviewed"
+    });
+    fetchDataAndUpdateMetrics("contract/", "contract_status", "contracts", {
+      "active": "active",
+      "expired": "expired",
+      "terminated": "terminated"
+    });
+  
     fetchServiceRenewals();
   }, []);
 
@@ -85,8 +125,8 @@ const SupportServices = ({ loadSubModule, setActiveSubModule }) => {
   }
 
   return (
-    <div className="servdash">
-      <div className="body-content-container fixed">
+    <div className="serv servdash">
+      <div className="body-content-container">
         <div className="header">
           <div className="icon-container">
             <img

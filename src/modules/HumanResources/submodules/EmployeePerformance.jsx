@@ -48,7 +48,7 @@ const EmployeePerformance = () => {
   const fetchPerformanceData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/employee_performance/");
+      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_performance/employee_performance/");
       setPerformanceData(res.data);
     } catch (err) {
       console.error("Failed to fetch performance data:", err);
@@ -105,17 +105,31 @@ const EmployeePerformance = () => {
 
   const handleRatingSubmit = async (e) => {
     e.preventDefault();
+    
     try {
+      // Make sure rating is a valid number
+      const ratingValue = parseInt(selectedPerformance.rating);
+      
+      if (isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5) {
+        showToast("Please select a valid rating", false);
+        return;
+      }
+      
+      // Send the request with the correct data format
       await axios.patch(
-        `http://127.0.0.1:8000/api/employee_performance/${selectedPerformance.performance_id}/`,
-        { rating: parseInt(selectedPerformance.rating) }
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_performance/employee_performance/${selectedPerformance.performance_id}/`,
+        { rating: ratingValue }
       );
+      
       setShowRatingModal(false);
       showToast("Rating updated successfully");
       fetchPerformanceData();
     } catch (err) {
       console.error("Update rating error:", err);
-      showToast("Failed to update rating", false);
+      // More detailed error message for better debugging
+      const errorMessage = err.response?.data?.detail || 
+                          "Failed to update rating. Please try again.";
+      showToast(errorMessage, false);
     }
   };
 /*******************************************************
@@ -128,18 +142,19 @@ const EmployeePerformance = () => {
    ******************************************/
   const renderPerformanceTable = () => {
     if (loading) {
-      return <div className="hr-no-results">Loading performance data...</div>;
+      return <div className="hr-employee-performance-no-results">Loading performance data...</div>;
     }
-
+  
     const { paginated, totalPages, totalCount } = filterAndPaginate(performanceData);
     if (!paginated.length) {
-      return <div className="hr-no-results">No performance records found.</div>;
+      return <div className="hr-employee-performance-no-results">No performance records found.</div>;
     }
-
+  
     return (
-      <div className="hr-department-no-scroll-wrapper">
-        <div className="hr-department-table-scrollable">
-          <table className="hr-department-table hr-department-no-scroll-table">
+      <>
+        <div className="hr-employee-performance-no-scroll-wrapper">
+          <div className="hr-employee-performance-table-scrollable">
+          <table className="hr-employee-performance-table hr-employee-performance-no-scroll-table">
             <thead>
               <tr>
                 <th>Performance ID</th>
@@ -163,21 +178,25 @@ const EmployeePerformance = () => {
                   <td>{perf.employee_name}</td>
                   <td>{perf.immediate_superior_id}</td>
                   <td>{perf.immediate_superior_name}</td>
-                  <td>{RATING_LABELS[perf.rating] || perf.rating}</td>
+                  <td>
+                    <span className={`hr-rating-tag rating-${perf.rating}`}>
+                      {RATING_LABELS[perf.rating] || perf.rating}
+                    </span>
+                  </td>
                   <td>{perf.bonus_amount}</td>
                   <td>{perf.review_date}</td>
                   <td>{perf.bonus_payment_month}</td>
                   <td>{perf.updated_at}</td>
-                  <td className="hr-department-actions">
+                  <td className="hr-employee-performance-actions">
                     <div
-                      className="hr-department-dots"
+                      className="hr-employee-performance-dots"
                       onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
                     >
                       ⋮
                       {dotsMenuOpen === index && (
-                        <div className="hr-department-dropdown">
+                        <div className="hr-employee-performance-dropdown">
                           <div
-                            className="hr-department-dropdown-item"
+                            className="hr-employee-performance-dropdown-item"
                             onClick={() => {
                               setSelectedPerformance(perf);
                               setShowRatingModal(true);
@@ -194,33 +213,135 @@ const EmployeePerformance = () => {
               ))}
             </tbody>
           </table>
-
-          {/* Pagination Controls */}
-          <div className="hr-pagination">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                className={i + 1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <select
-              className="hr-pagination-size"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(parseInt(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
           </div>
         </div>
-      </div>
+  
+        {/* Pagination moved outside */}
+        <div className="hr-employee-performance-pagination">
+          <button 
+            className="hr-employee-performance-pagination-arrow" 
+            onClick={() => setCurrentPage(1)} 
+            disabled={currentPage === 1}
+          >
+            &#171; {/* Double left arrow */}
+          </button>
+          
+          <button 
+            className="hr-employee-performance-pagination-arrow" 
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+            disabled={currentPage === 1}
+          >
+            &#8249; {/* Single left arrow */}
+          </button>
+          
+          <div className="hr-employee-performance-pagination-numbers">
+            {(() => {
+              const pageNumbers = [];
+              const maxVisiblePages = 5;
+              
+              if (totalPages <= maxVisiblePages + 2) {
+                // Show all pages if there are few
+                for (let i = 1; i <= totalPages; i++) {
+                  pageNumbers.push(
+                    <button
+                      key={i}
+                      className={i === currentPage ? "active" : ""}
+                      onClick={() => setCurrentPage(i)}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+              } else {
+                // Always show first page
+                pageNumbers.push(
+                  <button
+                    key={1}
+                    className={1 === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(1)}
+                  >
+                    1
+                  </button>
+                );
+                
+                // Calculate range around current page
+                let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+                
+                // Adjust if we're near the end
+                if (endPage - startPage < maxVisiblePages - 1) {
+                  startPage = Math.max(2, endPage - maxVisiblePages + 1);
+                }
+                
+                // Add ellipsis after first page if needed
+                if (startPage > 2) {
+                  pageNumbers.push(<span key="ellipsis1" className="hr-employee-performance-pagination-ellipsis">...</span>);
+                }
+                
+                // Add middle pages
+                for (let i = startPage; i <= endPage; i++) {
+                  pageNumbers.push(
+                    <button
+                      key={i}
+                      className={i === currentPage ? "active" : ""}
+                      onClick={() => setCurrentPage(i)}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+                
+                // Add ellipsis before last page if needed
+                if (endPage < totalPages - 1) {
+                  pageNumbers.push(<span key="ellipsis2" className="hr-employee-performance-pagination-ellipsis">...</span>);
+                }
+                
+                // Always show last page
+                pageNumbers.push(
+                  <button
+                    key={totalPages}
+                    className={totalPages === currentPage ? "active" : ""}
+                    onClick={() => setCurrentPage(totalPages)}
+                  >
+                    {totalPages}
+                  </button>
+                );
+              }
+              
+              return pageNumbers;
+            })()}
+          </div>
+          
+          <button 
+            className="hr-employee-performance-pagination-arrow" 
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+            disabled={currentPage === totalPages}
+          >
+            &#8250; {/* Single right arrow */}
+          </button>
+          
+          <button 
+            className="hr-employee-performance-pagination-arrow" 
+            onClick={() => setCurrentPage(totalPages)} 
+            disabled={currentPage === totalPages}
+          >
+            &#187; {/* Double right arrow */}
+          </button>
+          
+          <select
+            className="hr-employee-performance-pagination-size"
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(parseInt(e.target.value));
+              setCurrentPage(1);
+            }}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
+        </div>
+      </>
     );
   };
 
@@ -232,15 +353,15 @@ const EmployeePerformance = () => {
       <div className="hr-employee-performance-body-content-container">
         <div className="hr-employee-performance-scrollable">
           {/* Page Heading */}
-          <div className="hr-department-heading">
+          <div className="hr-employee-performance-heading">
             <h2><strong>Employee Performance</strong></h2>
-            <div className="hr-department-right-controls">
+            <div className="hr-employee-performance-right-controls">
               {/* Search Field */}
-              <div className="hr-department-search-wrapper">
-                <FiSearch className="hr-department-search-icon" />
+              <div className="hr-employee-performance-search-wrapper">
+                <FiSearch className="hr-employee-performance-search-icon" />
                 <input
                   type="text"
-                  className="hr-department-search"
+                  className="hr-employee-performance-search"
                   placeholder="Search..."
                   onChange={(e) => handleSearch(e.target.value)}
                 />
@@ -248,14 +369,16 @@ const EmployeePerformance = () => {
 
               {/* Sort Dropdown */}
               <select
-                className="hr-department-filter"
+                className="hr-employee-performance-filter"
                 value={sortField}
                 onChange={(e) => setSortField(e.target.value)}
               >
                 <option value="all">No Sorting</option>
+                <option value="performance_id">Sort by Performance ID</option> 
                 <option value="employee_id">Sort by Employee ID</option>
                 <option value="employee_name">Sort by Employee Name</option>
                 <option value="review_date">Sort by Review Date</option>
+                <option value="rating">Sort by Rating</option>
               </select>
 
               {/* No Add Button, No Archive Button */}
@@ -263,7 +386,7 @@ const EmployeePerformance = () => {
           </div>
 
           {/* Table Content */}
-          <div className="hr-department-table-container">
+          <div className="hr-employee-performance-table-container">
             {renderPerformanceTable()}
           </div>
         </div>
@@ -272,7 +395,7 @@ const EmployeePerformance = () => {
       {/* Optional Toast Notification */}
       {toast && (
         <div
-          className="hr-department-toast"
+          className="hr-employee-performance-toast"
           style={{ backgroundColor: toast.success ? "#4CAF50" : "#F44336" }}
         >
           {toast.message}
@@ -281,10 +404,10 @@ const EmployeePerformance = () => {
 
       {/* Rating Modal */}
       {showRatingModal && selectedPerformance && (
-        <div className="hr-department-modal-overlay">
-          <div className="hr-department-modal">
+        <div className="hr-employee-performance-modal-overlay">
+          <div className="hr-employee-performance-modal">
             <h3 style={{ marginBottom: "1rem" }}>Update Rating</h3>
-            <form onSubmit={handleRatingSubmit} className="hr-department-modal-form">
+            <form onSubmit={handleRatingSubmit} className="hr-employee-performance-modal-form">
               <div className="form-group">
                 <label>Performance ID</label>
                 <input type="text" value={selectedPerformance.performance_id} disabled />
@@ -315,11 +438,11 @@ const EmployeePerformance = () => {
                 <label>Review Date</label>
                 <input type="text" value={selectedPerformance.review_date} disabled />
               </div>
-              <div className="hr-department-modal-buttons">
-                <button type="submit" className="submit-btn">Save</button>
+              <div className="hr-employee-performance-modal-buttons">
+                <button type="submit" className="hr-employee-performance-submit-btn">Save</button>
                 <button
                   type="button"
-                  className="cancel-btn"
+                  className="hr-employee-performance-cancel-btn"
                   onClick={() => setShowRatingModal(false)}
                 >
                   Cancel

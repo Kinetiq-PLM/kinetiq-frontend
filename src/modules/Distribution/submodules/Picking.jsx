@@ -34,7 +34,8 @@ const Picking = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('http://127.0.0.1:8000/api/picking-lists/');
+        // const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/');
         
         if (!response.ok) {
           if (response.status === 401) {
@@ -57,7 +58,7 @@ const Picking = () => {
   
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/employees/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -73,7 +74,7 @@ const Picking = () => {
   
     const fetchWarehouses = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/warehouses/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouses/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -151,7 +152,7 @@ const Picking = () => {
     }
     
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -175,35 +176,61 @@ const Picking = () => {
   };
   
   // Handle status update
-  const handleStatusUpdate = async (list, newStatus) => {
+  const handleStatusUpdate = async (list, newStatus, employeeId, warehouseId) => {
     try {
-      // If trying to mark as Completed, show the confirmation modal first
-      if (newStatus === 'Completed') {
-        setShowEditModal(false);
-        setShowCompletionModal(true);
-        return;
+      // Build the update object
+      const updateData = {
+        picked_status: newStatus === 'Completed' ? 'In Progress' : newStatus // Don't set Completed yet
+      };
+      
+      // Add employee and warehouse if they changed
+      if (employeeId && employeeId !== list.picked_by) {
+        updateData.picked_by = employeeId;
       }
       
-      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
+      // Always update warehouse if this is an external delivery and the warehouse changed
+      if (list.is_external && warehouseId && warehouseId !== list.warehouse_id) {
+        updateData.warehouse_id = warehouseId;
+      }
+  
+      // Always make the API call when status changes (or when completing)
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          picked_status: newStatus
-        }),
+        body: JSON.stringify(updateData),
       });
       
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to update picking list status');
       }
+  
+      // Find the warehouse name for the updated warehouse ID
+      const warehouseName = warehouses.find(w => w.id === (warehouseId || list.warehouse_id))?.name || list.warehouse_name;
+  
+      // Update the selectedList with the new values so completion modal has the latest data
+      setSelectedList(prev => ({
+        ...prev,
+        picked_by: employeeId || prev.picked_by,
+        warehouse_id: warehouseId || prev.warehouse_id,
+        warehouse_name: warehouseName,
+        picked_status: updateData.picked_status
+      }));
       
-      // Refresh the list after successful update
-      setRefreshTrigger(prev => prev + 1);
-      setShowEditModal(false);
-      toast.info(`Status updated to ${newStatus}`);
+      // Refresh the list after successful update (only if not going to completion)
+      if (newStatus !== 'Completed') {
+        setRefreshTrigger(prev => prev + 1);
+        setShowEditModal(false);
+        toast.info(`Status updated to ${newStatus}`);
+      }
       
+      // If trying to mark as Completed, show the completion modal
+      if (newStatus === 'Completed') {
+        setShowEditModal(false);
+        setShowCompletionModal(true);
+      }
     } catch (err) {
       toast.error(`Error: ${err.message}`);
     }
@@ -211,16 +238,20 @@ const Picking = () => {
   
   // Handle completion confirmation
   const handleConfirmCompletion = async () => {
-    if (!selectedList) return;
+    if (!selectedList || !showCompletionModal) return;
     
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${selectedList.picking_list_id}/update/`, {
+      // Get the current employee and warehouse selections from the modal
+      // Since the modal is closed at this point, we'll use the selectedList data
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${selectedList.picking_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           picked_status: 'Completed'
+          // We don't include employee/warehouse here because the completion modal
+          // is shown after the edit modal is closed, so any changes were already saved
         }),
       });
       
@@ -340,6 +371,8 @@ const Picking = () => {
         {showCompletionModal && selectedList && (
           <CompletionModal 
             pickingList={selectedList}
+            employees={employees}
+            warehouses={warehouses}
             onConfirm={handleConfirmCompletion}
             onCancel={() => setShowCompletionModal(false)}
           />

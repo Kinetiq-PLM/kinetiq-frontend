@@ -13,16 +13,18 @@ import CustomerListModal from "./../../Sales/components/Modals/Lists/CustomerLis
 import OpportunityTab from "./../components/OpportunityTabs/OpportunityTab";
 import MainTab from "../components/OpportunityTabs/MainTab";
 
-const Opportunity = ({ loadSubModule, setActiveSubModule }) => {
+const Opportunity = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [activeTab, setActiveTab] = useState("Opportunity");
   const tabs = [
     {
       name: "Opportunity",
-      component: <OpportunityTab setActiveTab={setActiveTab} />,
+      component: (
+        <OpportunityTab setActiveTab={setActiveTab} employee_id={employee_id} />
+      ),
     },
     {
       name: "Main Page",
-      component: <MainTab />,
+      component: <MainTab employee_id={employee_id} />,
     },
   ];
 
@@ -74,12 +76,13 @@ const Opportunity = ({ loadSubModule, setActiveSubModule }) => {
   );
 };
 
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   return (
     <AlertProvider>
       <Opportunity
         loadSubModule={loadSubModule}
         setActiveSubModule={setActiveSubModule}
+        employee_id={employee_id}
       />
     </AlertProvider>
   );

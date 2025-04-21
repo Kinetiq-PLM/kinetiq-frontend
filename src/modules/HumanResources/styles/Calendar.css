@@ -1,0 +1,456 @@
+/* =================================================================== */
+/*  Palette & resets                                                   */
+/* =================================================================== */
+:root{
+  --primary:#00b0b5;
+  --primary-dark:#009097;
+  --surface:#ffffff;
+  --surface-2:#f7f9fa;
+  --text-main:#333;
+  --text-soft:#666;
+  --holiday:#d32f2f;
+  --special:#e67700;
+  --today-border:#009097;
+  --radius:10px;
+  --shadow:0 2px 8px rgba(0,0,0,.06);
+  font-family:'Inter',sans-serif;
+}
+
+*{box-sizing:border-box}
+
+/* status (loading / error) */
+.hr-calendar-status{
+  padding:2.5rem;
+  text-align:center;
+  color:var(--text-soft);
+  border:1px solid #eee;
+  border-radius:var(--radius);
+  background:var(--surface-2);
+}
+.hr-calendar-status.error{
+  color:var(--holiday);
+  background:#fff5f5;
+}
+
+/* =================================================================== */
+/*  Calendar container                                                 */
+/* =================================================================== */
+.hr-calendar{
+  width:100%;
+  height:100%; /* Make it fill the parent container */
+  background:var(--surface);
+  border:1px solid #e0e0e0;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  padding-bottom:1rem;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ------------------------------------------------------------------- */
+/*  Header                                                             */
+/* ------------------------------------------------------------------- */
+.hr-calendar-header{
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:.9rem 1.3rem;
+}
+.hr-calendar-header h3{
+  margin:0;
+  font-size:1.2rem;
+  font-weight:600;
+  letter-spacing:.3px;
+}
+.hr-calendar-header button{
+  background:rgba(255,255,255,.18);
+  border:none;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  font-size:1.25rem;
+  color:#fff;
+  cursor:pointer;
+  transition:.2s;
+}
+.hr-calendar-header button:hover{
+  background:rgba(255,255,255,.35);
+}
+
+/* Today button and header adjustments */
+.hr-calendar-header-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.hr-calendar-today-btn {
+  background: rgba(255,255,255,.18);
+  border: none;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.hr-calendar-today-btn:hover {
+  background: rgba(255,255,255,.35);
+}
+
+/* Update the Today button to override the general button styles */
+.hr-calendar-header .hr-calendar-today-btn {
+  width: auto;
+  height: auto;
+  background: rgba(255,255,255,.18);
+  border: none;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.hr-calendar-header .hr-calendar-today-btn:hover {
+  background: rgba(255,255,255,.35);
+}
+
+/* ------------------------------------------------------------------- */
+/*  Grids                                                              */
+/* ------------------------------------------------------------------- */
+.hr-calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+}
+.hr-calendar-grid.names{
+  background:var(--surface-2);
+  border-bottom:1px solid #eee;
+}
+.hr-calendar-grid.names div{
+  text-align:center;
+  padding:.6rem 0;
+  font-weight:600;
+  color:var(--text-soft);
+  font-size:.87rem;
+}
+
+/* fade‑in when month changes */
+.fade{animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+
+/* ------------------------------------------------------------------- */
+/*  Day cells                                                          */
+/* ------------------------------------------------------------------- */
+.hr-calendar-cell{
+  aspect-ratio:1/1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  background:var(--surface);
+  border:1px solid #f0f0f0;
+  font-size:.95rem;
+  transition:.15s;
+}
+.hr-calendar-cell:hover{
+  z-index:2;
+  transform:scale(1.03);
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
+}
+
+/* Make the calendar cells more obviously clickable */
+.hr-calendar-cell:not(.empty) {
+  cursor: pointer;
+}
+
+/* Leave indicator on calendar */
+.hr-calendar-cell.has-leaves {
+  box-shadow: inset 0 -3px 0 rgba(0, 176, 181, 0.5);
+}
+
+.hr-calendar-cell.has-leaves:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.12), inset 0 -3px 0 rgba(0, 176, 181, 0.5);
+}
+
+/* empty cells (prev/next month) */
+.hr-calendar-cell.empty{
+  background:#fafafa;
+  border:none;
+}
+
+/* today outline */
+.hr-calendar-cell.today{
+  outline:3px solid var(--today-border);
+  outline-offset:-3px;
+  font-weight:700;
+}
+
+/* work / non‑work */
+.workday{color:var(--text-main)}
+.nonwork{color:var(--text-soft);background:#fafafa}
+
+/* holiday & special overlays */
+.holiday{background:#ffecec;color:var(--holiday);font-weight:600}
+.special{background:#fff6e6;color:var(--special);font-weight:600}
+
+/* date number + badge */
+.date-number{pointer-events:none}
+.badge{
+  font-size:1rem;
+  margin-top:2px;
+  pointer-events:none;
+}
+
+.badge.leaves {
+  color: var(--primary);
+  font-size: 0.85rem;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+/* ------------------------------------------------------------------- */
+/*  Holidays list                                                      */
+/* ------------------------------------------------------------------- */
+.hr-calendar-holidays{
+  padding:0 1.3rem;
+  margin-top:1rem;
+}
+.hr-calendar-holidays h4{
+  margin:.2rem 0 1rem;
+  font-size:1rem;
+  color:var(--primary-dark);
+  border-bottom:1px solid #e3e3e3;
+  padding-bottom:.5rem;
+}
+.no-holidays{
+  font-style:italic;
+  color:var(--text-soft);
+  background:var(--surface-2);
+  padding:.6rem .9rem;
+  border-radius:var(--radius);
+  text-align:center;
+  margin:0;
+}
+
+.hr-calendar-holidays ul{
+  list-style:none;
+  padding:0;
+  margin:0;
+  max-height:160px;
+  overflow:auto;
+  border:1px solid #eee;
+  border-radius:var(--radius);
+}
+.hr-calendar-holidays li{
+  display:flex;
+  gap:.6rem;
+  align-items:center;
+  padding:.55rem .9rem;
+  font-size:.93rem;
+  border-bottom:1px solid #f2f2f2;
+  transition:.18s background;
+}
+.hr-calendar-holidays li:hover{background:#f7f7f7}
+.hr-calendar-holidays li:last-child{border-bottom:none}
+
+.day{
+  min-width:115px;
+  font-weight:600;
+  color:var(--holiday);
+}
+.name{color:var(--text-main)}
+
+/* ------------------------------------------------------------------- */
+/*  Modal styles                                                       */
+/* ------------------------------------------------------------------- */
+.hr-calendar-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.hr-calendar-modal {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  width: 400px;
+  max-width: 90%;
+  cursor: default;
+  overflow: hidden;
+}
+
+.hr-calendar-modal-header {
+  background: linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color: white;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hr-calendar-modal-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.hr-calendar-modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.hr-calendar-modal-content {
+  padding: 1.5rem;
+}
+
+.hr-calendar-modal-holiday, 
+.hr-calendar-modal-special {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.hr-calendar-modal-holiday {
+  background: #ffecec;
+}
+
+.hr-calendar-modal-special {
+  background: #fff6e6;
+}
+
+.hr-calendar-modal-badge {
+  font-size: 1.5rem;
+  margin-right: 0.75rem;
+}
+
+.hr-calendar-modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.hr-calendar-modal-btn {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  flex: 1;
+  transition: 0.2s;
+}
+
+.hr-calendar-modal-btn.attendance {
+  background: var(--primary);
+  color: white;
+}
+
+.hr-calendar-modal-btn.attendance:hover {
+  background: var(--primary-dark);
+}
+
+.hr-calendar-modal-btn.leaves {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.hr-calendar-modal-btn.leaves:hover {
+  background: #e0e0e0;
+}
+
+/* Leave details in modal */
+.hr-calendar-modal-leaves {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.hr-calendar-modal-leaves h5 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.hr-calendar-modal-leaves ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.hr-calendar-modal-leaves li {
+  padding: 0.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.9rem;
+}
+
+.hr-calendar-modal-leaves li:last-child {
+  border-bottom: none;
+}
+
+.hr-calendar-modal-leaves .leave-type {
+  font-weight: 500;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* Match the leave type colors from the HumanResources.css */
+.leave-type.sick {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.leave-type.vacation {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.leave-type.personal {
+  background-color: #e2e3e5;
+  color: #343a40;
+}
+
+.leave-type.maternity,
+.leave-type.paternity {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.leave-type.unpaid {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.leave-emoji {
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+/* ------------------------------------------------------------------- */
+/*  Responsive tweaks                                                  */
+/* ------------------------------------------------------------------- */
+@media(max-width:600px){
+  .hr-calendar-header h3{font-size:1rem}
+  .hr-calendar-cell{font-size:.8rem}
+  .day{min-width:90px}
+}

@@ -1,5 +1,6 @@
 // components/shipment/CarrierManagementModal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 const CarrierManagementModal = ({ onClose, carriers, employees, refreshCarriers }) => {
   const [selectedCarrier, setSelectedCarrier] = useState(null);
@@ -45,14 +46,12 @@ const CarrierManagementModal = ({ onClose, carriers, employees, refreshCarriers 
   const handleCancel = () => {
     setIsEditing(false);
     if (selectedCarrier) {
-      // Reset form data to selected carrier data
       setFormData({
         carrier_name: selectedCarrier.carrier_name,
         service_type: selectedCarrier.service_type || 'Standard',
         carrier_count: selectedCarrier.carrier_count || 0
       });
     } else {
-      // Reset form data to empty
       setFormData({
         carrier_name: employees.length > 0 ? employees[0].employee_id : '',
         service_type: 'Standard',
@@ -66,14 +65,14 @@ const CarrierManagementModal = ({ onClose, carriers, employees, refreshCarriers 
     e.preventDefault();
     
     if (!formData.carrier_name) {
-      alert("Employee selection is required");
+      toast.error("Employee selection is required");
       return;
     }
     
     try {
       if (selectedCarrier) {
         // Update existing carrier
-        const response = await fetch(`http://127.0.0.1:8000/api/carriers/${selectedCarrier.carrier_id}/`, {
+        const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/carriers/${selectedCarrier.carrier_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -85,9 +84,12 @@ const CarrierManagementModal = ({ onClose, carriers, employees, refreshCarriers 
           const errorData = await response.json();
           throw new Error(errorData.error || 'Failed to update carrier');
         }
+        
+        // Show success notification
+        toast.success(`Carrier ${getEmployeeFullName(formData.carrier_name)} updated successfully!`);
       } else {
         // Create new carrier
-        const response = await fetch('http://127.0.0.1:8000/api/carriers/', {
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/carriers/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -99,6 +101,9 @@ const CarrierManagementModal = ({ onClose, carriers, employees, refreshCarriers 
           const errorData = await response.json();
           throw new Error(errorData.error || 'Failed to create carrier');
         }
+        
+        // Show success notification
+        toast.success(`New carrier ${getEmployeeFullName(formData.carrier_name)} added successfully!`);
       }
       
       // Refresh carrier list and reset form
@@ -112,7 +117,8 @@ const CarrierManagementModal = ({ onClose, carriers, employees, refreshCarriers 
       });
       
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      // Show error notification
+      toast.error(`Error: ${err.message}`);
     }
   };
   

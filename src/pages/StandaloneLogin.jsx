@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./StandaloneLogin.css";
 import emailjs from '@emailjs/browser';
+
 
 export default function StandaloneLogin() {
   const [credentials, setCredentials] = useState({
@@ -33,6 +34,20 @@ export default function StandaloneLogin() {
     setLoginError("");
   };
 
+  const location = useLocation();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    try {
+      if (storedUser && location.pathname === "/login") {
+        navigate("/", { replace: true });
+      }
+    } catch (e) {
+      console.error("ERROR FOR SOME REASON: ", e);
+    }
+
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     console.log("Logging in:", credentials);
@@ -46,7 +61,7 @@ export default function StandaloneLogin() {
         return;
       }
 
-      const response = await axios.post("http://127.0.0.1:8000/login/", {
+      const response = await axios.post("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/login/", {
         email: credentials.email,
         password: credentials.password,
       });
@@ -109,7 +124,7 @@ export default function StandaloneLogin() {
   };
 
   const checkEmail = async (email) => {
-    const response = await fetch("http://127.0.0.1:8000/check-email/", {
+    const response = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/check-email/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
@@ -154,14 +169,12 @@ export default function StandaloneLogin() {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/reset-password/", {
+      const res = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/reset-password/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: resetData.kinetiq_email,
           newPassword: resetData.newPassword,
-          oldPassword: '',
-          passreq: false
         }),
       });
 

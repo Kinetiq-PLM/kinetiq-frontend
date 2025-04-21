@@ -1,16 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
 
-.service-report  {
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
-
 .service-report .body-content-container {
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
-  padding: 1rem;
+  background-color: white;
+  padding: 1.5rem;
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
@@ -238,7 +233,7 @@
   border: 1px solid #e8e8e8;
   border-radius: 0.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  z-index: 4;
   margin-top: 0.25rem;
 }
 
@@ -283,7 +278,7 @@
 }
 
 .service-report tbody tr {
-  background-color: #eff8f9;
+  background-color: #ffffff;
   transition: background-color 0.3s ease;
 }
 
@@ -388,7 +383,9 @@
 .service-report .modal-content {
   padding: 1.5rem;
   flex: 1;
+  max-height: 70vh;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .service-report .modal-form {
@@ -450,7 +447,7 @@
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
-  .service-report .report-container {
+  .service-report .body-content-container  {
     min-width: auto;
     max-height: none;
     padding: 1.25rem;
@@ -464,6 +461,11 @@
     max-width: 90%;
     max-height: 70%;
   }
+  .service-report .search-filter-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
 }
 
 @media (max-width: 768px) {
@@ -471,23 +473,12 @@
     flex-direction: column;
     gap: 1.5rem;
   }
-
-  .service-report .filter-container {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-
   .service-report .search-box {
     max-width: none;
   }
 
   .service-report .table-container {
     overflow-x: auto;
-  }
-
-  .service-report .reports-table {
-    min-width: 600px;
   }
 
   .service-report .modal-form .form-row {
@@ -503,6 +494,11 @@
 
   .service-report .right-buttons {
     justify-content: space-between;
+  }
+  .service-report .right-filters {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
   }
 }
 

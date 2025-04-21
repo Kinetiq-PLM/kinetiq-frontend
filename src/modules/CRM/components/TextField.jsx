@@ -24,7 +24,7 @@ const TextField = ({
       </p>
       <div className="mt-2">
         <textarea
-          className={`bg-[#F7F7F7] w-full py-2 px-3 rounded resize-none borde focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm  ${
+          className={`bg-[#F7F7F7] w-full py-2 px-3 rounded resize-none border border-[#ccc] text-sm !focus:outline-none ${
             isDisabled
               ? "outline-none focus:outline-none focus:ring-0 focus:border-transparent"
               : "focus:outline focus:ring-2 focus:ring-blue-500"

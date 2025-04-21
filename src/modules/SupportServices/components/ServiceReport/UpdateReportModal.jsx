@@ -6,7 +6,7 @@ import ServiceReportIcon from "/icons/SupportServices/ServiceReportIcon.png"
 
 import { GET } from "../../api/api"
 
-const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
+const UpdateReportModal = ({ isOpen, onClose, onUpdate, report, technician }) => {
   const [tickets, setTickets] = useState([]);
   const [isTixDropdown, setOpenTixDD] = useState(false);
   const [calls, setCalls] = useState([]);
@@ -30,7 +30,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
     billingId: "",
     description: "",
     reportStatus: "",
-    technicianId: "",
+    technicianId: technician,
   })
 
   // Update form when report changes
@@ -47,14 +47,14 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
         billingId: report.service_billing?.service_billing_id || "",
         description: report.description || "",
         reportStatus: report.report_status  || "",
-        technicianId: report.technician?.employee_id || ""
+        technicianId: technician
       })
     }
   }, [report])
 
   const fetchTickets = async () => {
     try {
-      const data = await GET("tickets/");
+      const data = await GET("ticket/");
       setTickets(data);
     } catch (error) {
       console.error("Error fetching tickets:", error)
@@ -78,7 +78,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
 
   const fetchCalls = async () => {
     try {
-      const data = await GET(`service-calls/${formData.ticketId}/ticket`);
+      const data = await GET(`call/ticket/${formData.ticketId}/`);
       setCalls(data);
     } catch (error) {
       console.error("Error fetching calls:", error)
@@ -102,7 +102,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
 
   const fetchRequests = async () => {
   try {
-    const data = await GET(`service-requests/${formData.callId}/call`);
+    const data = await GET(`request/call/${formData.callId}/`);
     setRequests(data);
   } catch (error) {
     console.error("Error fetching requests:", error);
@@ -127,7 +127,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
 
   const fetchRenewals = async () => {
     try {
-      const data = await GET(`renewals-calls/${formData.callId}`);
+      const data = await GET(`renewal/calls/${formData.callId}`);
       setRenewals(data);
     } catch (error) {
       console.error("Error fetching renewals:", error)
@@ -151,11 +151,11 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
 
   const fetchBillings = async () => {
     try {
-      let data = await GET("service-billings/");
+      let data = await GET("billing/");
       if (formData.renewalId !== "") {
-        data = await GET(`renewals-billings/${formData.renewalId}`);
+        data = await GET(`billing/billing-renewals/${formData.renewalId}/`);
       }  else if (formData.requestId !== "") {
-        data = await GET(`requests-billings/${formData.requestId}`);
+        data = await GET(`billing/billing-requests/${formData.requestId}/`);
       }
       setBillings(data);
     } catch (error) {
@@ -192,7 +192,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
 
   const fetchTechnicians = async () => {
     try {
-      const response = await GET("/technicians/");;
+      const response = await GET("call/calls/technicians/");
       setTechnicians(response);
     } catch (error) {
       console.error("Error fetching technicians:", error);
@@ -343,7 +343,6 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
                       type="text"
                       id="callId"
                       value={formData.callId}
-                      readOnly
                       onChange={handleChange}
                       placeholder="Enter Call ID"
                     />
@@ -370,7 +369,6 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
                   <input
                     type="text"
                     id="requestId"
-                    readOnly
                     value={formData.requestId}
                     onChange={handleChange}
                     placeholder="Enter request ID"
@@ -534,15 +532,16 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
                   <input
                     type="text"
                     id="technicianId"
+                    readOnly
                     value={formData.technicianId}
-                    onChange={(e) => {
-                      handleChange(e); 
-                      setOpenTechDD(true);
-                    }}
-                    onClick={handleToggleDropdownTech}
+                    // onChange={(e) => {
+                    //   handleChange(e); 
+                    //   setOpenTechDD(true);
+                    // }}
+                    // onClick={handleToggleDropdownTech}
                     placeholder="Select technician ID"
                   />
-                  <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
+                  {/* <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
                   {isTechDropdown && (
                       <ul className="technician-dropdown-list dropdown-list">
                         {technicians.length > 0 ? (
@@ -559,7 +558,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report }) => {
                           <li>No technicians found</li>
                         )}
                       </ul>
-                    )}
+                    )} */}
                 </div>
               </div>
               </div>

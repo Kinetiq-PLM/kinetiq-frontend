@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
 import '../styles/ItemRemoval.css';
 
 
@@ -6,74 +8,70 @@ const ItemRemoval = () => {
   const [activeTab, setActiveTab] = useState("All");
     const tabs = ["All", "Approved", "Pending", "Rejected"];
     const [tabIndicatorStyle, setTabIndicatorStyle] = useState({});
-    
+   
     const [asset_removal_data, setTableData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedRow, setSelectedRow] = useState(null);
     const [selectedData, setSelectedData] = useState(null);
     const tableHeaders = ["", "Deprecation ID", "Item No", "Item Name", "Date", "Status"];
-    const tableData = [
-      { id: "D001", itemNo: "IT1001", itemName: "Laptop", date: "03/20/25", status: "Approved" },
-      { id: "D002", itemNo: "IT1002", itemName: "Printer", date: "03/21/25", status: "Pending" },
-      { id: "D003", itemNo: "IT1003", itemName: "Monitor", date: "03/22/25", status: "Approved" },
+
+    const items = [
+      { id: 'D001', itemNo: 'IT1001', itemName: 'Laptop', date: '03/20/25', status: 'Approved' },
+      { id: 'D002', itemNo: 'IT1002', itemName: 'Printer', date: '03/21/25', status: 'Pending' },
+      { id: 'D003', itemNo: 'IT1003', itemName: 'Monitor', date: '03/22/25', status: 'Approved' },
     ];
   
-
     const handleCheckboxChange = (index, row) => {
         setSelectedRow(index);
         setSelectedData(row);
     };
 
     const handleSentButton = async () => {
-        console.log("External ID:", selectedData.external_id);
 
-
-        if (!selectedData) {
-            alert("Please select a record to update.");
-            return;
-        }
-        if (selectedData.deprecation_status !== 'Pending') {
-          alert("Only records with status 'Pending' can be sent to management.");
+      if (!selectedData) {
+          toast.error("Please select a record to update.");
           return;
-        }
-        const updatePayload = {
-            external_id: selectedData.external_id
-        }
+      }
+      if (selectedData.deprecation_status !== 'Pending') {
+        toast.error("Only records with status 'Pending' can be sent to Management.");
+        return;
+      }
+      const updatePayload = {
+          external_id: selectedData.external_id
+      }
 
-        console.log("Sending payload:", updatePayload);
 
-        try {
-            const response = await fetch(`http://127.0.0.1:8000/operation/send-to-management/`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(updatePayload)
-            });
-   
-            if (!response.ok) throw new Error("Failed to update record.");
-            fetchData();
-        } catch (error) {
-            console.error("Update error:", error);
-            alert("Error updating approval status.");
-        }
+      try {
+          const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/send-to-management/`, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify(updatePayload)
+          });
+  
+          if (!response.ok) throw new Error("Failed to update record.");
+          fetchData();
+          toast.success("Record sent to management."); 
+      } catch (error) {
+          toast.error("Error updating approval status.", error);
+      }
     };
 
     useEffect(() => {
-        const filteredData = activeTab === "All" 
-            ? asset_removal_data 
+        const filteredData = activeTab === "All"
+            ? asset_removal_data
             : asset_removal_data.filter(row => row.status === activeTab);
-        console.log("Filtered Data after tab change:", filteredData);
-        // Update state if needed, or apply further logic.
     }, [activeTab, asset_removal_data]);
+
 
     const fetchData = async () => {
       try {
           setLoading(true);
           setError(null); // Reset error state
  
-          const response = await fetch("http://127.0.0.1:8000/operation/item-removal/");
+          const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item-removal/");
           if (!response.ok) throw new Error("Connection to database failed");
  
           const data = await response.json();
@@ -84,7 +82,6 @@ const ItemRemoval = () => {
               setSelectedRow(0);
               setSelectedData(data[0]);
           }
-          console.log(data)
       } catch (error) {
           if (error.name !== "AbortError") setError(error.message);
       } finally {
@@ -96,60 +93,84 @@ const ItemRemoval = () => {
       fetchData();
   }, []);
 
+
   const filteredData = activeTab === "All" ? asset_removal_data : asset_removal_data.filter(row => row.deprecation_status === activeTab);
 
   return (
     <div className="ItemRemoval">
+     <ToastContainer />
       <div className="body-content-container">
-      <div className="tabs">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            className={`tab ${activeTab === tab ? "active" : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+        
+          <div className="tabs">
+            <button
+              className={`tab ${activeTab === 'All' ? 'active' : ''}`}
+              onClick={() => setActiveTab('All')}
+            >
+              All
+            </button>
+            <button
+              className={`tab ${activeTab === 'Approved' ? 'active' : ''}`}
+              onClick={() => setActiveTab('Approved')}
+            >
+              Approved
+            </button>
+            <button
+              className={`tab ${activeTab === 'Pending' ? 'active' : ''}`}
+              onClick={() => setActiveTab('Pending')}
+            >
+              Pending
+            </button>
+          </div>
 
-
-        <table className="table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Deprecation ID</th>
-              <th>Item No.</th>
-              <th>Item Name</th>
-              <th>Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.length > 0 ? (
-                filteredData.map((row, index) => (
-                <tr key={row.external_id}>
-                    <td>
-                    <input type="checkbox"  checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row)}/>
-                    </td>
-                    <td>{row.deprecation_report_id}</td>
-                    <td>{row.item_id}</td>
-                    <td>{row.item_name}</td>
-                    <td>{row.reported_date}</td>
-                    <td>{row.deprecation_status}</td>
-                </tr>
-                ))
-            ) : (
+          <div className="table-itemremoval-container">
+            
+            <table className="table">
+              <thead>
                 <tr>
-                <td>No records found.</td>
+                  <th></th>
+                  <th>Deprecation ID</th>
+                  <th>Item No.</th>
+                  <th>Item Name</th>
+                  <th>Date</th>
+                  <th>Status</th>
                 </tr>
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center">Loading...</td>
+                  </tr>
+                ) : filteredData.length > 0 ? (
+                    filteredData.map((row, index) => (
+                    <tr key={row.external_id}>
+                        <td>
+                      
+                        <input
+  type="checkbox"
+  className="checkbox"
+  checked={selectedRow === index}
+  onChange={() => handleCheckboxChange(index, row)}
+/>
+                        </td>
+                        <td>{row.report_id}</td>
+                        <td>{row.item_id}</td>
+                        <td>{row.item_name}</td>
+                        <td>{row.reported_date}</td>
+                        <td>{row.deprecation_status}</td>
+                    </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center text-gray-500">No records found.</td>
+                  </tr>
+                )}
+              </tbody>
 
-
+            </table>
+          
+        </div>
         <div className="send-to">
-          <button onClick={handleSentButton}>Send To</button>
+          <button onClick={handleSentButton}>Send</button>
         </div>
       </div>
     </div>

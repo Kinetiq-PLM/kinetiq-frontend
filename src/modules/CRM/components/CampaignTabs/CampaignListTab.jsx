@@ -8,7 +8,11 @@ import { useQuery } from "@tanstack/react-query";
 import CAMPAIGN_LIST_DATA from "./../../../Sales/temp_data/campaign_list_data";
 import NewCampaignModal from "../NewCampaignModal";
 
+import loading from "../../../Sales/components/Assets/kinetiq-loading.gif";
+
 export default function CampaignListTab() {
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
@@ -19,8 +23,6 @@ export default function CampaignListTab() {
   });
 
   const [isNewCampaignOpen, setIsNewCampaignOpen] = useState(false);
-
-  const campaign_list = CAMPAIGN_LIST_DATA;
 
   const columns = [
     { key: "campaign_id", label: "Campaign ID" },
@@ -75,64 +77,77 @@ export default function CampaignListTab() {
         status: campaign.status,
       }));
       setCampaignList(data);
+      setIsLoading(false);
     }
   }, [campaignQuery.data]);
 
   return (
     <section className="h-full">
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-        <NewCampaignModal
-          isOpen={isNewCampaignOpen}
-          onClose={() => setIsNewCampaignOpen(false)}
-        ></NewCampaignModal>
+      <NewCampaignModal
+        isOpen={isNewCampaignOpen}
+        onClose={() => setIsNewCampaignOpen(false)}
+      ></NewCampaignModal>
+      {/* Header Section */}
+      <div className="mb-4">
+        {/* Filters & Action */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start w-full">
+          <div className="flex flex-col md:flex-row sm:flex-wrap gap-3 flex-1">
+            {/* Date Filter Dropdown */}
+            <div className="w-full sm:w-[200px]">
+              <Dropdown
+                options={dateFilters}
+                onChange={setDateFilter}
+                value={dateFilter}
+              />
+            </div>
 
-        {/* Filters */}
-        <div className="flex flex-1/2 items-center space-x-2 gap-2 w-fit flex-wrap">
-          {/* Date Filter Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={dateFilters}
-              onChange={setDateFilter}
-              value={dateFilter}
-            />
+            {/* Search By Dropdown */}
+            <div className="w-full sm:w-[200px]">
+              <Dropdown
+                options={searchFields.map((field) => field.label)}
+                onChange={(selected) => {
+                  const field = searchFields.find((f) => f.label === selected);
+                  if (field) setSearchBy(field.key);
+                }}
+                value={searchFields.find((f) => f.key === searchBy)?.label}
+              />
+            </div>
+
+            {/* Search Input */}
+            <div className="w-full sm:flex-1 min-w-[250px]">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full h-[40px]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
           </div>
 
-          {/* Search By Dropdown */}
-          <div className="w-full max-w-[200px]">
-            <Dropdown
-              options={searchFields.map((field) => field.label)}
-              onChange={(selected) => {
-                const field = searchFields.find((f) => f.label === selected);
-                if (field) setSearchBy(field.key);
-              }}
-              value={searchFields.find((f) => f.key === searchBy)?.label}
-            />
+          {/* Right Side Button */}
+          <div className="w-full sm:w-auto">
+            <Button
+              onClick={() => setIsNewCampaignOpen(true)}
+              type="primary"
+              className="w-full sm:w-[200px] py-2"
+            >
+              New Campaign
+            </Button>
           </div>
-
-          {/* Search Input */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
         </div>
-
-        {/* Campaign Button */}
-        <Button
-          type="primary"
-          onClick={() => setIsNewCampaignOpen(true)}
-          className={"w-[200px] py-2"}
-        >
-          New Campaign
-        </Button>
       </div>
 
       {/* Table Section */}
-      <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-        <Table data={filteredCampaigns} columns={columns} />
-      </div>
+      {isLoading ? (
+        <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+          <img src={loading} alt="loading" className="h-[100px]" />
+        </div>
+      ) : (
+        <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+          <Table data={filteredCampaigns} columns={columns} />
+        </div>
+      )}
     </section>
   );
 }

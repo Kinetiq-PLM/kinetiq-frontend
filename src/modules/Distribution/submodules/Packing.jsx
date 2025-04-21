@@ -34,7 +34,7 @@ const Packing = () => {
       try {
         setLoading(true);
         setError(null); // Reset error state
-        const response = await fetch('http://127.0.0.1:8000/api/packing-lists/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/');
         
         if (!response.ok) {
           if (response.status === 401) {
@@ -57,7 +57,7 @@ const Packing = () => {
 
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/employees/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -73,7 +73,7 @@ const Packing = () => {
 
     const fetchPackingTypes = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/packing-types/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-types/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -147,7 +147,7 @@ const Packing = () => {
     }
     
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${list.packing_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -171,16 +171,45 @@ const Packing = () => {
   };
   
   // Handle status update
-  const handleStatusUpdate = async (list, newStatus) => {
+  const handleStatusUpdate = async (list, newStatus, updatedValues = {}) => {
     try {
-      // If trying to mark as Packed, show the confirmation modal first
+      // If trying to mark as Packed, first save any changes
       if (newStatus === 'Packed') {
+        // Prepare all the data to save first
+        const updateData = {
+          ...updatedValues
+        };
+        
+        // Only send non-empty updates to backend
+        if (Object.keys(updateData).length > 0) {
+          const updateResponse = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${list.packing_list_id}/update/`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateData),
+          });
+          
+          if (!updateResponse.ok) {
+            const errorData = await updateResponse.json();
+            throw new Error(errorData.error || 'Failed to update packing list details');
+          }
+          
+          // Update selectedList with the new values for completion modal
+          setSelectedList(prev => ({
+            ...prev,
+            ...updateData
+          }));
+        }
+        
+        // Now show the completion modal
         setShowEditModal(false);
         setShowCompletionModal(true);
         return;
       }
       
-      const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
+      // For other status changes, just update the status
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${list.packing_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -210,7 +239,7 @@ const Packing = () => {
     if (!selectedList) return;
     
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${selectedList.packing_list_id}/update/`, {
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${selectedList.packing_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -336,6 +365,8 @@ const Packing = () => {
         {showCompletionModal && selectedList && (
           <CompletionModal 
             packingList={selectedList}
+            employees={employees}
+            packingTypes={packingTypes}
             onConfirm={handleConfirmCompletion}
             onCancel={() => setShowCompletionModal(false)}
           />

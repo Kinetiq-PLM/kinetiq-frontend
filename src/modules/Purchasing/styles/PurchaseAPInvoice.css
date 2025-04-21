@@ -1,0 +1,399 @@
+.apinvoice {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.apinvoice .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+}
+
+.apinvoice-table-scrollable {
+    width: 100%;
+  max-height: 50vh;
+  overflow-x: auto;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd #f5f5f5;
+}
+
+.apinvoice-table-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-weight: 400;
+    color: #666;
+    position: sticky;
+    top: 0;
+    align-items: center;
+}
+
+.apinvoice-table-header > div {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.apinvoice-table-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.apinvoice-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.apinvoice-row > div {
+    text-align: center;
+}
+
+.apinvoice-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.apinvoice-edit-button {
+  padding: 4px 8px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  margin: 0 2px;
+}
+
+.apinvoice-edit-button:hover {
+  background-color: #e0e0e0;
+}
+
+.apinvoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    width: 100%;
+}
+
+.apinvoice-header-left {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.apinvoice-back {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease;
+}
+
+.apinvoice-back:hover {
+    color: #00A8A8;
+}
+
+.apinvoice-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.apinvoice-date-filter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    color: black;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    min-width: 210px;
+}
+
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-options-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 170px;
+}
+
+.date-option {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.date-option:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    color: #00A8A8;
+}
+
+.date-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.apinvoice-filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    color: black;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    min-width: 210px;
+}
+
+.apinvoice-filter-btn:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+}
+
+.apinvoice-search input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    width: 300px;
+}
+
+.apinvoice-content {
+    flex: 1;
+  background: white;
+  border: 1px solid #D2D2D2;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.apinvoice-table {
+    flex: 1;
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.apinvoice-row:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    cursor: pointer;
+}
+
+.status-closed,
+.status-open,
+.status-cancelled,
+.status-draft,
+.status-complete {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.status-closed {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-open {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-cancelled {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.status-draft {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.status-complete {
+    background-color: #c8e6c9;
+    color: #388e3c;
+}
+
+.status-approved,
+.status-pending,
+.status-rejected,
+.status-completed {
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 0.85em;
+  font-weight: normal;
+  display: inline-block;
+}
+
+.status-approved {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.status-pending {
+  color: #856404;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+}
+
+.status-rejected {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.status-completed {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+}
+
+.apinvoice-status-filter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.status-options-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 210px;
+}
+
+.status-option {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.status-option:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    color: #00A8A8;
+}
+
+.status-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.apinvoice .apinvoice-footer {
+    position: relative;
+    width: 100%;
+    height: 3.5rem;
+    margin-top: 1rem;
+    padding: 0 1rem;
+}
+
+.apinvoice .apinvoice-new-form {
+    position: absolute;
+    left: 1rem;
+    bottom: 0;
+    background-color: #00A8A8;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.apinvoice .apinvoice-new-form:hover {
+    background-color: #008080;
+}
+
+.apinvoice .apinvoice-compare {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.apinvoice .apinvoice-compare:hover {
+    background-color: #d0d0d0;
+}
+
+.apinvoice .apinvoice-send-to {
+    position: absolute;
+    right: 1rem;
+    bottom: 0;
+    background-color: #00A8A8;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.apinvoice .apinvoice-send-to:hover {
+    background-color: #008080;
+}
+
+.apinvoice .apinvoice-footer-right {
+    display: flex;
+    gap: 1rem;
+    justify-self: end;
+}

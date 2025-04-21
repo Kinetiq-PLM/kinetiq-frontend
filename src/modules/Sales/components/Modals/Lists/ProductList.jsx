@@ -8,9 +8,13 @@ import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../../api/api";
+import { TAX_RATE } from "../../../temp_data/sales_data.jsx";
+
+import loading from "../../Assets/kinetiq-loading.gif";
 
 const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -41,7 +45,8 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
   const handleConfirm = () => {
     if (selectedProduct) {
       selectedProduct.quantity = 1;
-      selectedProduct.tax = 0;
+      selectedProduct.tax =
+        selectedProduct.quantity * selectedProduct.selling_price * TAX_RATE;
       selectedProduct.discount = 0;
       selectedProduct.total_price = selectedProduct.selling_price;
       addProduct([...products, selectedProduct]); // Properly update the array
@@ -56,10 +61,17 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
 
   useEffect(() => {
     if (productsQuery.status === "success") {
-      setProductList(productsQuery.data);
+      const prods = productsQuery.data.map((prod) => ({
+        ...prod,
+        backup_price: prod.selling_price,
+        special_requests: null,
+      }));
+
+      setProductList(prods);
       if (!hasLoaded) {
-        setFilteredData(productsQuery.data);
+        setFilteredData(prods);
         setHasLoaded(true);
+        setIsLoading(false);
       }
     } else if (productsQuery.status === "error") {
       showAlert({
@@ -123,7 +135,7 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Items
+            List of Items
           </h2>
         </div>
 
@@ -154,13 +166,19 @@ const ProductListModal = ({ isOpen, onClose, products, addProduct }) => {
               }}
             />
           </div>
-          <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
-            <Table
-              columns={columns}
-              data={filteredData}
-              onSelect={setSelectedProduct}
-            />
-          </div>
+          {isLoading ? (
+            <div className="h-[300px] rounded-md flex justify-center items-center">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
+              <Table
+                columns={columns}
+                data={filteredData}
+                onSelect={setSelectedProduct}
+              />
+            </div>
+          )}
           <div className="mt-4 flex justify-between">
             <div>
               <Button

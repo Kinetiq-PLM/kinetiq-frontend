@@ -6,7 +6,7 @@ import ServiceReportIcon from "/icons/SupportServices/ServiceReportIcon.png"
 
 import { GET } from "../../api/api"
 
-const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
+const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
   const today = new Date().toISOString().split("T")[0];
   const [tickets, setTickets] = useState([]);
   const [isTixDropdown, setOpenTixDD] = useState(false);
@@ -31,12 +31,13 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
     billingId: "",
     description: "",
     reportStatus: "",
-    technicianId: "",
+    technicianId: technician,
+    // technicianId: 'HR-EMP-2025-8d9f9b'
   })
 
   const fetchTickets = async () => {
     try {
-      const data = await GET("tickets/");
+      const data = await GET("ticket/");
       setTickets(data);
     } catch (error) {
       console.error("Error fetching tickets:", error)
@@ -60,7 +61,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
   const fetchCalls = async () => {
     try {
-      const data = await GET(`service-calls/${formData.ticketId}/ticket`);
+      const data = await GET(`call/ticket/${formData.ticketId}/`);
       setCalls(data);
     } catch (error) {
       console.error("Error fetching calls:", error)
@@ -84,7 +85,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
   const fetchRequests = async () => {
   try {
-    const data = await GET(`service-requests/${formData.callId}/call`);
+    const data = await GET(`request/call/${formData.callId}/`);
     setRequests(data);
   } catch (error) {
     console.error("Error fetching requests:", error);
@@ -109,7 +110,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
   const fetchRenewals = async () => {
     try {
-      const data = await GET(`renewals-calls/${formData.callId}`);
+      const data = await GET(`renewal/call/${formData.callId}/`);
       setRenewals(data);
     } catch (error) {
       console.error("Error fetching renewals:", error)
@@ -133,11 +134,11 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
   const fetchBillings = async () => {
     try {
-      let data = await GET("service-billings/");
+      let data = await GET("billing/");
       if (formData.renewalId !== "") {
-        data = await GET(`renewals-billings/${formData.renewalId}`);
+        data = await GET(`billing/billing-renewals/${formData.renewalId}/`);
       }  else if (formData.requestId !== "") {
-        data = await GET(`requests-billings/${formData.requestId}`);
+        data = await GET(`billing/billing-requests/${formData.requestId}/`);
       }
       setBillings(data);
     } catch (error) {
@@ -174,7 +175,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
 
   const fetchTechnicians = async () => {
     try {
-      const response = await GET("/technicians/");;
+      const response = await GET("call/calls/technicians/");
       setTechnicians(response);
     } catch (error) {
       console.error("Error fetching technicians:", error);
@@ -326,7 +327,6 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                       type="text"
                       id="callId"
                       value={formData.callId}
-                      readOnly
                       onChange={handleChange}
                       placeholder="Enter Call ID"
                     />
@@ -353,7 +353,6 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                   <input
                     type="text"
                     id="requestId"
-                    readOnly
                     value={formData.requestId}
                     onChange={handleChange}
                     placeholder="Enter request ID"
@@ -517,15 +516,16 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                   <input
                     type="text"
                     id="technicianId"
+                    readOnly
                     value={formData.technicianId}
-                    onChange={(e) => {
-                      handleChange(e); 
-                      setOpenTechDD(true);
-                    }}
-                    onClick={handleToggleDropdownTech}
+                    // onChange={(e) => {
+                    //   handleChange(e); 
+                    //   setOpenTechDD(true);
+                    // }}
+                    // onClick={handleToggleDropdownTech}
                     placeholder="Select technician ID"
                   />
-                  <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
+                  {/* <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
                   {isTechDropdown && (
                       <ul className="technician-dropdown-list dropdown-list">
                         {technicians.length > 0 ? (
@@ -542,7 +542,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit}) => {
                           <li>No technicians found</li>
                         )}
                       </ul>
-                    )}
+                    )} */}
                 </div>
               </div>
               </div>

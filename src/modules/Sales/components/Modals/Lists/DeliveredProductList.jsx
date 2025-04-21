@@ -54,8 +54,8 @@ const DeliveredProductList = ({
   useEffect(() => {
     if (delivery.statement) {
       const res = delivery.statement.items.map((item) => ({
-        product_id: item.product.product_id,
-        product_name: item.product.product_name,
+        product_id: item.product?.product_id,
+        product_name: item.product?.product_name,
         quantity: Number(item.quantity),
         selling_price: Number(item.unit_price),
         discount: Number(item.discount),
@@ -117,7 +117,7 @@ const DeliveredProductList = ({
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Items
+            List of Items
           </h2>
         </div>
 
