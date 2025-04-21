@@ -35,77 +35,158 @@ const Policy = () => {
     };
 
     return (
-        <div className="policy-container">
-            <div className="policy-header">
-                <h2>Policies</h2>
-                <div className="policy-controls">
-                    <button onClick={() => setShowForm(true)}>Policy</button>
-                    <input type="text" placeholder="Search..." />
+        <div className="p-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Policies</h2>
+
+            <div className="flex justify-between items-center mb-4">
+                <div></div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setShowForm(true)}
+                        className="bg-teal-500 text-white px-4 py-2 rounded-md text-sm"
+                    >
+                        Policy
+                    </button>
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="border border-gray-300 px-3 py-2 rounded-md text-sm"
+                    />
                 </div>
             </div>
 
-            <table className="policy-table">
-                <thead>
-                    <tr>
-                        <th>Policy ID</th>
-                        <th>Policy Name</th>
-                        <th>Description</th>
-                        <th>Effective Date</th>
-                        <th>Status</th>
-                        <th>View</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {policies.map((policy, index) => (
-                        <tr key={index}>
-                            <td>{policy.policyId}</td>
-                            <td>{policy.policyName}</td>
-                            <td>{policy.description}</td>
-                            <td>{policy.effectiveDate}</td>
-                            <td>
-                                <select defaultValue={policy.status}>
-                                    <option>Active</option>
-                                    <option>Inactive</option>
-                                </select>
-                            </td>
-                            <td>
-                                <button onClick={() => handleToggle(index)}>View</button>
-                            </td>
+            <div className="bg-white shadow-md rounded-xl p-4 overflow-x-auto">
+                <table className="w-full border-collapse border border-gray-200 rounded-xl">
+                    <thead>
+                        <tr className="bg-gray-100">
+                            <th className="px-4 py-3 border border-gray-200 text-left">Policy ID</th>
+                            <th className="px-4 py-3 border border-gray-200 text-left">Policy Name</th>
+                            <th className="px-4 py-3 border border-gray-200 text-left">Description</th>
+                            <th className="px-4 py-3 border border-gray-200 text-left">Effective Date</th>
+                            <th className="px-4 py-3 border border-gray-200 text-left">Status</th>
+                            <th className="px-4 py-3 border border-gray-200 text-left">Action</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {policies.map((policy, index) => (
+                            <tr
+                                key={index}
+                                className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100"
+                            >
+                                <td className="px-4 py-3 border border-gray-200">{policy.policyId}</td>
+                                <td className="px-4 py-3 border border-gray-200">{policy.policyName}</td>
+                                <td className="px-4 py-3 border border-gray-200">{policy.description}</td>
+                                <td className="px-4 py-3 border border-gray-200">{policy.effectiveDate}</td>
+                                <td className="px-4 py-3 border border-gray-200">
+                                    <select
+                                        defaultValue={policy.status}
+                                        className="w-full border px-2 py-1 rounded-md"
+                                    >
+                                        <option>Active</option>
+                                        <option>Inactive</option>
+                                    </select>
+                                </td>
+                                <td className="px-4 py-3 border border-gray-200">
+                                    <button
+                                        onClick={() => handleToggle(index)}
+                                        className="text-teal-600 hover:underline text-sm"
+                                    >
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
-            {/* Upload/Entry Form */}
+            {/* Policy Modal */}
             {showForm && (
-                <div className="policy-modal">
-                    <h3>Policy</h3>
-                    <label>Policy ID</label>
-                    <input type="text" placeholder="Enter policy ID" />
-                    <label>Policy Name</label>
-                    <input type="text" placeholder="Enter policy name" />
-                    <label>Effective Date</label>
-                    <input type="date" />
-                    <label>Status</label>
-                    <input type="text" placeholder="Enter status" />
-                    <label>Description</label>
-                    <textarea placeholder="Enter description"></textarea>
-                    <div className="policy-btns">
-                        <button className="btn-submit">Submit</button>
-                        <button onClick={() => setShowForm(false)}>Cancel</button>
+                <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl p-8 w-[600px] shadow-lg relative">
+                        <h3 className="text-2xl font-bold mb-6 text-gray-800">Policy</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                                    Policy ID
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter policy ID"
+                                    className="w-full border px-3 py-2 rounded-md text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                                    Policy Name
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter policy name"
+                                    className="w-full border px-3 py-2 rounded-md text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                                    Effective Date
+                                </label>
+                                <input
+                                    type="date"
+                                    className="w-full border px-3 py-2 rounded-md text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                                    Status
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter status"
+                                    className="w-full border px-3 py-2 rounded-md text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                                    Description
+                                </label>
+                                <textarea
+                                    placeholder="Enter description"
+                                    className="w-full border px-3 py-2 rounded-md text-sm"
+                                    rows={4}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">
+                                Submit
+                            </button>
+                            <button
+                                onClick={() => setShowForm(false)}
+                                className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm"
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
 
-            {/* Content Preview */}
+            {/* Preview */}
             {previewIndex !== null && (
-                <div className="policy-preview">
-                    <div className="preview-header">
-                        <span>Download ⬇</span>
-                        <button onClick={() => setPreviewIndex(null)}>X</button>
-                    </div>
-                    <div className="preview-body">
-                        <p>KINETIQ POLICY AND PROCEDURAL MANUAL</p>
+                <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-40">
+                    <div className="bg-white rounded-xl p-6 w-[500px] shadow-lg relative">
+                        <div className="flex justify-between items-center mb-4">
+                            <span className="text-teal-700 font-medium">Download ⬇</span>
+                            <button
+                                onClick={() => setPreviewIndex(null)}
+                                className="text-gray-500 hover:text-black"
+                            >
+                                ✖
+                            </button>
+                        </div>
+                        <div className="text-center text-gray-800 font-semibold">
+                            KINETIQ POLICY AND PROCEDURAL MANUAL
+                        </div>
                     </div>
                 </div>
             )}

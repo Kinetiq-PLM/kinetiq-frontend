@@ -237,7 +237,7 @@ const ServiceCall = ({user_id, employee_id}) => {
     { value: "all", label: "All" },
     { value: "open", label: "Open" },
     { value: "closed", label: "Closed" },
-    { value: "pending", label: "Pending" },
+    { value: "in progress", label: "In Progress" },
     { value: "low", label: "Low" },
     { value: "medium", label: "Medium" },
     { value: "high", label: "High" },
@@ -250,7 +250,7 @@ const ServiceCall = ({user_id, employee_id}) => {
     let matchesFilter = true
     if (filterBy === "open" && call.call_status !== "Open") matchesFilter = false
     if (filterBy === "closed" && call.call_status !== "Closed") matchesFilter = false
-    if (filterBy === "pending" && call.call_status !== "Pending") matchesFilter = false
+    if (filterBy === "in progress" && call.call_status !== "In Progress") matchesFilter = false
     if (filterBy === "low" && call.priority_level !== "Low") matchesFilter = false
     if (filterBy === "medium" && call.priority_level !== "Medium") matchesFilter = false
     if (filterBy === "high" && call.priority_level !== "High") matchesFilter = false

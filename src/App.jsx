@@ -1,3 +1,4 @@
+
 import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
@@ -35,18 +36,13 @@ function App() {
   const [showLanding, setShowLanding] = useState(true);
 
   useEffect(() => {
-    if (!localStorage.getItem('landingSeen')) {
-      setShowLanding(true);
-      localStorage.setItem('landingSeen', 'true');
-    }
-  }, []);
-
-  useEffect(() => {
-    if (activeModule && showLanding) {
+    if (activeModule || activeSubModule || showUserProfile) {
       setShowLanding(false);
+      localStorage.setItem("activeModule", activeModule);
+      localStorage.setItem("activeSubModule", activeSubModule);
+      localStorage.setItem("showUserProfile", JSON.stringify(showUserProfile));
     }
-  }, [activeModule, showLanding]);
-
+  }, [activeModule, activeSubModule, showUserProfile]);
 
   const navigate = useNavigate();
 
@@ -57,6 +53,19 @@ function App() {
       setUser(JSON.parse(storedUser));
       console.log("User data loaded from localStorage:");
       console.log(localStorage.getItem("user"));
+
+      // const storedModule = localStorage.getItem("activeModule");
+      // const storedSubModule = localStorage.getItem("activeSubModule");
+      // const storedShowUserProfile = localStorage.getItem("showUserProfile");
+
+      // if (storedShowUserProfile === "true") {
+      //   setShowUserProfile(true);
+      //   setActiveModule(null);
+      //   setActiveSubModule(null);
+      // } else if (storedModule) {
+      //   setActiveModule(storedModule);
+      //   if (storedSubModule && storedSubModule !== "null") setActiveSubModule(storedSubModule);
+      // }
     } else {
       setUser(null);
       navigate("/login", { replace: true }); // redirect to login if no user found
@@ -64,8 +73,12 @@ function App() {
 
   }, []);
 
+
   const handleLogout = () => {
     localStorage.removeItem("user");   // clear saved session
+    localStorage.removeItem("activeModule");
+    localStorage.removeItem("activeSubModule");
+    localStorage.removeItem("showUserProfile");
     setUser(null);   // clear local user state 
     navigate("/login");  // redirect to login
   };
@@ -115,7 +128,7 @@ function App() {
   //fetch notifs
   const fetchNotifs = async (user) => {
     console.log("Fetching notifs...")
-    const resp = await fetch(`http://127.0.0.1:8000/api/notifications/?user_id=${user?.user_id}`, { method: 'GET' })
+    const resp = await fetch(`https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/?user_id=${user?.user_id}`, { method: 'GET' })
     // const resp_text = await resp.text()
     // console.log("resp text")
     // console.log(resp_text)
@@ -155,7 +168,7 @@ function App() {
 
   //func for marking notifs as read
   const readNotif = async (notif_id) => {
-    const resp = await fetch(`http://127.0.0.1:8000/api/notifications/`, {
+    const resp = await fetch(`https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/`, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json"
@@ -172,75 +185,6 @@ function App() {
       fetchNotifs(user)
     }
   }, [user]);
-
-
-  //dummy notifs
-  // const notifs = [
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "Ur phone ringing!!!",
-  //     orig_module: "Administration",
-  //     orig_submodule: null,
-  //     read: false
-  //   },
-  //   {
-  //     time: "9:00 PM",
-  //     msg: "keep urself safe!!!",
-  //     orig_module: "Sales",
-  //     orig_submodule: null,
-  //     read: false
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "bibidi bobidi boo wah",
-  //     orig_module: "Management",
-  //     orig_submodule: "Access Control",
-  //     read: false
-
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Manufacturing Process",
-  //     read: false
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "wowee!",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Accounts Receivable",
-  //     read: false
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "Non incididunt commodo consequat occaecat proident consequat non.",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Accounts Receivable",
-  //     read: true
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "Elit aliqua laborum laboris ex sint consectetur. Consequat dolor irure ullamco dolore adipisicing est labore velit. Amet cupidatat magna laboris commodo minim.",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Manufacturing Process",
-  //     read: true
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "yippee!",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Accounts Receivable",
-  //     read: true
-  //   },
-  //   {
-  //     time: "8:00 PM",
-  //     msg: "Minim amet et non irure quis ea Lorem et dolor et tempor excepteur est.",
-  //     orig_module: "Accounting",
-  //     orig_submodule: "Accounts Receivable",
-  //     read: true
-  //   }
-  // ];
 
   // hooks for loading modules
   useEffect(() => {
@@ -275,13 +219,59 @@ function App() {
     }
   };
 
+  // const loadMainModule = (moduleId) => {
+  //   if (moduleFileNames[moduleId] && !activeSubModule) {
+  //     const LazyComponent = lazy(() =>
+  //       import(
+  //         /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
+  //       )
+  //     );
+
+  //     const WrappedComponent = () => (
+  //       <LazyComponent
+  //         loadSubModule={loadSubModule}
+  //         setActiveSubModule={setActiveSubModule}
+  //         user_id={user?.user_id}
+  //         employee_id={user?.employee_id}
+  //       />
+  //     );
+
+  //     setModuleComponent(() => WrappedComponent);
+  //     setShowUserProfile(false);
+  //   }
+  // };
+
+  // const loadSubModule = (submoduleId, mainModule = activeModule) => {
+  //   if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
+  //     const LazyComponent = lazy(() =>
+  //       import(
+  //         /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
+  //       )
+  //     );
+
+  //     const WrappedComponent = () => (
+  //       <LazyComponent
+  //         loadSubModule={loadSubModule}
+  //         setActiveSubModule={setActiveSubModule}
+  //         user_id={user?.user_id}
+  //         employee_id={user?.employee_id}
+  //       />
+  //     );
+  //     setModuleComponent(() => WrappedComponent);
+
+  //     setShowUserProfile(false);
+  //   }
+  // };
+
+
+  const mainModules = import.meta.glob('./modules/*/*.jsx');
+  const subModules = import.meta.glob('./modules/*/submodules/*.jsx');
+  
   const loadMainModule = (moduleId) => {
-    if (moduleFileNames[moduleId] && !activeSubModule) {
-      const LazyComponent = lazy(() =>
-        import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`
-        )
-      );
+    const moduleFile = `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`;
+
+    if (mainModules[moduleFile]) {
+      const LazyComponent = lazy(mainModules[moduleFile]);
 
       const WrappedComponent = () => (
         <LazyComponent
@@ -294,17 +284,18 @@ function App() {
 
       setModuleComponent(() => WrappedComponent);
       setShowUserProfile(false);
+    } else {
+      console.warn(`Module file not found: ${moduleFile}`);
     }
   };
 
-  const loadSubModule = (submoduleId, mainModule = activeModule) => {
-    if (moduleSubmoduleFileNames[mainModule][submoduleId]) {
-      const LazyComponent = lazy(() =>
-        import(
-          /* @vite-ignore */ `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`
-        )
-      );
 
+  const loadSubModule = (submoduleId, mainModule = activeModule) => {
+    const submoduleFile = `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`;
+  
+    if (subModules[submoduleFile]) {
+      const LazyComponent = lazy(subModules[submoduleFile]);
+  
       const WrappedComponent = () => (
         <LazyComponent
           loadSubModule={loadSubModule}
@@ -313,9 +304,11 @@ function App() {
           employee_id={user?.employee_id}
         />
       );
+  
       setModuleComponent(() => WrappedComponent);
-
       setShowUserProfile(false);
+    } else {
+      console.warn(`Submodule file not found: ${submoduleFile}`);
     }
   };
 
@@ -337,26 +330,19 @@ function App() {
     "Project Management": "ProjectManagement",
     "Human Resources": "HumanResources",
     "Report Generator": "ReportGenerator",
-    // "Purchase Request": "PurchaseRequest",
-    // "Project Request": "ProjectRequest",
-    // "Workforce Request": "WorkforceRequest",
-    // "Job Posting": "JobPosting"
+    "Purchase Request": "PurchaseRequest",
+    "Project Request": "ProjectRequest",
+    "Workforce Request": "WorkforceRequest",
+    "Job Posting": "JobPosting"
   };
 
   const moduleSubmoduleFileNames = {
-    "Management": {
+    Management: {
       "Dashboard": "ManagementDashboard",
-      "Policy Compliance Oversight": "ManagementPolicyComplianceOversight",
-      "Salary Release Approval": "ManagementSalaryReleaseApproval",
-      "Budget Review Approval": "ManagementBudgetReviewApproval",
-      "Purchasing Approval": "ManagementPurchasingApproval",
-      "Project Approval": "ManagementProjectApproval",
-      "Project Monitoring": "ManagementProjectMonitoring",
-      "RecruitmentCandidates": "ManagementRecruitmentCandidates",
-      "AssetRemoval": "ManagementAssetRemoval",
+      "Project Approval": "ManagementApprovals",
       "User Roles": "UserRoles",
       "Access Control": "AccessControl",
-      "Settings": "Settings",
+      Settings: "Settings",
     },
     Administration: {
       "User": "User",
@@ -365,6 +351,7 @@ function App() {
       "Audit Logs": "AuditLogs",
       "Policy": "Policy",
       "Currency": "Currency",
+      "Warehouse": "Warehouse",
       "Notification": "Notification",
     },
     "Accounting": {
@@ -378,13 +365,18 @@ function App() {
       "Official Receipts": "OfficialReceipts",
     },
     "Financials": {
-      "Budgeting": "Budgeting",
-      "Cash Flow": "CashFlow",
-      "Financial Reports": "FinancialReports",
+      "Reports": "Reports",
+      "Validations" : "Validations",
+      "Approvals" : "Approvals",
+      "Forms" : "Forms"
     },
     "Purchasing": {
-      "Supplier Management": "SupplierManagement",
-      "Purchase Orders": "PurchaseOrders",
+      "Purchase Request List": "PurchaseReqList",
+      "Puchase Quotation List": "PurchaseQuot",
+      "Purchase Order Status": "PurchaseOrdStat",
+      "A/P Invoice": "PurchaseAPInvoice",
+      "Credit Memo": "PurchaseCredMemo",
+      "Vendor Application Form": "VendorAppForm",
     },
     Operations: {
       "Goods Tracking": "GoodsTracking",
@@ -435,7 +427,7 @@ function App() {
     },
     "Production": {
       "Equipment and Labor": "Equipment&Labor",
-      "Quality Control": "QualityControl",
+      //"Quality Control": "QualityControl",
       "Cost of Production": "CostOfProduction"
     },
     "MRP": {
@@ -483,7 +475,6 @@ function App() {
 
   return (
     <div className="shell">
-      {showLanding && <LandingPage />}
       <div className="shell-container">
         {/* collapsible menu */}
 
@@ -662,7 +653,7 @@ function App() {
 
           <div className={`header-navi ${isSidebarOpen ? "squished" : ""}`}>
             <div
-              className={`header-tabs-container ${activeModule ? "visible" : "hidden"
+              className={`header-tabs-container ${!showUserProfile && activeModule ? "visible" : "hidden"
                 }`}
             >
               <img
@@ -749,6 +740,8 @@ function App() {
                       onClick={() => {
                         setShowUserProfile(true);
                         setIsProfileMenuOpen(false);
+                        setActiveModule(null);
+                        setActiveSubModule(null);
                       }}
                     >
                       <img src="/icons/settings.png" />User Profile
@@ -773,6 +766,7 @@ function App() {
           </div>
           <QueryClientProvider client={queryClient}>
             <div className="body-container">
+              {showLanding && <LandingPage />}
               {showUserProfile ? (
                 <UserProfile
                   user_id={user?.user_id}
@@ -793,7 +787,6 @@ function App() {
               )}
             </div>
           </QueryClientProvider>
-
         </div>
       </div>
     </div >

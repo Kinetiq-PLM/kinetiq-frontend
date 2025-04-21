@@ -1,190 +1,156 @@
 import React from "react";
+import "../Administration/styles/Administration.css";
+
+import {
+    AppstoreOutlined,
+    ToolOutlined,
+    ShoppingOutlined,
+    ExperimentOutlined,
+    UserOutlined,
+    ShopOutlined,
+    HomeOutlined,
+    FileTextOutlined,
+    FileSearchOutlined
+} from "@ant-design/icons";
+
 
 const Administration = ({ setActiveSubModule, loadSubModule }) => {
+    const handleClick = (module, tab = null) => {
+        setActiveSubModule(module);
+        loadSubModule(module);
+        if (tab) {
+            setTimeout(() => {
+                const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
+                if (tabBtn) tabBtn.click();
+            }, 100);
+        }
+    };
+
     return (
-        <div className="admin">
-            <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Admin</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="admin p-6 space-y-8 overflow-y-auto">
+            {/* Dashboard Title */}
+            <div>
+                <h1 className="text-2xl font-bold text-gray-800 mb-1">Administration Dashboard</h1>
+                <p className="text-sm text-gray-500">Real-Time Admin Management Overview</p>
+            </div>
 
-                    {/* USER */}
-                    <Card title="User" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("User");
-                                loadSubModule("User");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["User Id", "Email", "Date", "Category"]}
-                                data={[
-                                    ["User_01", "user01@mail.com", "2025-04-12", "Admin"],
-                                    ["User_02", "user02@mail.com", "2025-04-10", "Employee Benefits"],
-                                    ["User_03", "user03@mail.com", "2025-04-08", "HR"],
-                                ]}
-                                withCheckbox={true}
-                                highlightDisabledRow={true}
-                                badge={true}
-                            />
+            {/* Top Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* User & Roles */}
+                <div onClick={() => handleClick("User")} className="module-card group">
+                    <UserOutlined className="text-2xl text-[#00A8A8] group-hover:text-white" />
+                    <div>
+                        <p className="text-label group-hover:text-white">User & Roles</p>
+                        <p className="text-value group-hover:text-white">101</p>
+                        <p className="text-sub group-hover:text-white">Employees</p>
+                    </div>
+                </div>
+
+                {/* Exchange Rate */}
+                <div className="module-card">
+                    <img src="/icons/us.png" alt="US Dollar" className="w-10 h-10" />
+                    <div>
+                        <p className="text-label">Exchange Rate (PH to USD)</p>
+                        <p className="text-value">₱ 61.04</p>
+                        <p className="text-sub">Latest Rate</p>
+                    </div>
+                </div>
+
+                <div onClick={() => handleClick("Warehouse")} className="module-card group">
+                    <HomeOutlined className="text-2xl text-[#00A8A8] group-hover:text-white" />
+                    <div>
+                        <p className="text-label group-hover:text-white">Warehouse</p>
+                        <p className="text-value group-hover:text-white">14</p>
+                        <p className="text-sub group-hover:text-white">Locations</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Middle Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Left: Item Masterlist */}
+                <div onClick={() => handleClick("Item Masterlist")} className="module-card group">
+                    <AppstoreOutlined className="text-2xl text-[#00A8A8] group-hover:text-white" />
+                    <div>
+                        <p className="text-label group-hover:text-white">Item Masterlist</p>
+                        <p className="text-value group-hover:text-white">57</p>
+                        <p className="text-sub group-hover:text-white">Records</p>
+                    </div>
+                </div>
+
+                {/* Center: Vertical stack for Assets, Products, Raw Materials */}
+                <div className="flex flex-col gap-2">
+                    <div onClick={() => handleClick("Item Masterlist", "Assets")} className="module-card group">
+                        <ToolOutlined className="text-xl text-[#00A8A8] group-hover:text-white" />
+                        <div>
+                            <p className="text-label group-hover:text-white">Assets</p>
+                            <p className="text-value group-hover:text-white">32</p>
+                            <p className="text-sub group-hover:text-white">Records</p>
                         </div>
-                    </Card>
-
-                    {/* ITEM MASTERLIST */}
-                    <Card title="Item Masterlist" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("Item Masterlist");
-                                loadSubModule("Item Masterlist");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["Item ID", "Item Name", "Item Type", "Status"]}
-                                data={[
-                                    ["Item001", "Screw", "Assets", "Active"],
-                                    ["Item002", "Glue", "Product", "Inactive"],
-                                    ["Item003", "Wires", "Raw Materials", "Pending"],
-                                ]}
-                            />
+                    </div>
+                    <div onClick={() => handleClick("Item Masterlist", "Product")} className="module-card group">
+                        <ShoppingOutlined className="text-xl text-[#00A8A8] group-hover:text-white" />
+                        <div>
+                            <p className="text-label group-hover:text-white">Products</p>
+                            <p className="text-value group-hover:text-white">19</p>
+                            <p className="text-sub group-hover:text-white">Records</p>
                         </div>
-                    </Card>
-
-                    {/* BUSINESS PARTNER MASTERLIST */}
-                    <Card title="Business Partner Masterlist" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("Business Partner Masterlist");
-                                loadSubModule("Business Partner Masterlist");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["Partner ID", "Vendor Code", "Partner Name", "Category"]}
-                                data={[
-                                    ["BP_01", "V001", "Acme Corp", "Vendor"],
-                                    ["BP_02", "V002", "Beta Ltd", "Customer"],
-                                    ["BP_03", "V003", "Gamma Inc", "Employee"],
-                                ]}
-                            />
+                    </div>
+                    <div onClick={() => handleClick("Item Masterlist", "Raw Materials")} className="module-card group">
+                        <ExperimentOutlined className="text-xl text-[#00A8A8] group-hover:text-white" />
+                        <div>
+                            <p className="text-label group-hover:text-white">Raw Materials</p>
+                            <p className="text-value group-hover:text-white">44</p>
+                            <p className="text-sub group-hover:text-white">Records</p>
                         </div>
-                    </Card>
+                    </div>
+                </div>
 
-                    {/* AUDIT LOGS */}
-                    <Card title="Audit Logs" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("Audit Logs");
-                                loadSubModule("Audit Logs");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["Log ID", "User ID", "Action", "Timestamp"]}
-                                data={[
-                                    ["LOG-20250412", "User01", "Login", "2025-04-12 09:00"],
-                                    ["LOG-20250411", "User02", "Edit", "2025-04-11 14:30"],
-                                    ["LOG-20250410", "User03", "Delete", "2025-04-10 18:15"],
-                                ]}
-                                withCheckbox={true}
-                                badge={true}
-                            />
+                {/* Right: Business Partner + Vendors */}
+                <div className="flex flex-col gap-2">
+                    <div onClick={() => handleClick("Business Partner Masterlist")} className="module-card group">
+                        <UserOutlined className="text-xl text-[#00A8A8] group-hover:text-white" />
+                        <div>
+                            <p className="text-label group-hover:text-white">Business Partner Masterlist</p>
+                            <p className="text-value group-hover:text-white">23</p>
+                            <p className="text-sub group-hover:text-white">Partners</p>
                         </div>
-                    </Card>
-
-                    {/* POLICY */}
-                    <Card title="Policy" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("Policy");
-                                loadSubModule("Policy");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["Policy ID", "Policy Name", "Description"]}
-                                data={[
-                                    ["POL001", "Code of Conduct", "Workplace behavior standards."],
-                                    ["POL002", "Leave Policy", "Annual leave regulations."],
-                                    ["POL003", "IT Usage", "Acceptable use of systems."],
-                                ]}
-                            />
+                    </div>
+                    <div onClick={() => handleClick("Business Partner Masterlist", "Vendor")} className="module-card group">
+                        <ShopOutlined className="text-xl text-[#00A8A8] group-hover:text-white" />
+                        <div>
+                            <p className="text-label group-hover:text-white">Vendors</p>
+                            <p className="text-value group-hover:text-white">18</p>
+                            <p className="text-sub group-hover:text-white">Partners</p>
                         </div>
-                    </Card>
+                    </div>
+                </div>
+            </div>
 
-                    {/* CURRENCY */}
-                    <Card title="Currency" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("Currency");
-                                loadSubModule("Currency");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["Country", "Apr 10", "Apr 11"]}
-                                data={[
-                                    ["UNITED STATES", "0.915", "0.916"],
-                                    ["JAPAN", "0.915", "0.915"],
-                                    ["UNITED KINGDOM", "0.915", "0.915"],
-                                ]}
-                            />
-                        </div>
-                    </Card>
+            {/* Bottom Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Policy */}
+                <div onClick={() => handleClick("Policy")} className="module-card group">
+                    <FileTextOutlined className="text-2xl text-[#00A8A8] group-hover:text-white" />
+                    <div>
+                        <p className="text-label group-hover:text-white">Policy</p>
+                        <p className="text-value group-hover:text-white">26</p>
+                        <p className="text-sub group-hover:text-white">Documents</p>
+                    </div>
+                </div>
 
+                {/* Audit Logs */}
+                <div onClick={() => handleClick("Audit Logs")} className="module-card group">
+                    <FileSearchOutlined className="text-2xl text-[#00A8A8] group-hover:text-white" />
+                    <div>
+                        <p className="text-label group-hover:text-white">Audit Logs</p>
+                        <p className="text-value group-hover:text-white">54</p>
+                        <p className="text-sub group-hover:text-white">System Records</p>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
-
-const Card = ({ title, children, onClick, clickable = false }) => (
-    <div
-        className={`bg-white shadow-md rounded-lg p-6 relative overflow-hidden ${clickable ? "cursor-pointer hover:shadow-lg transition" : ""
-            }`}
-        onClick={clickable ? onClick : undefined}
-    >
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">{title}</h3>
-        <div>{children}</div>
-    </div>
-);
-
-const Table = ({ headers, data, withCheckbox = false, highlightDisabledRow = false, badge = false }) => (
-    <table className="w-full border-collapse border border-gray-200 rounded-lg">
-        <thead>
-            <tr className="bg-gray-100 text-gray-700">
-                {headers.map((header, index) => (
-                    <th key={index} className="p-3 border border-gray-200 text-left font-medium text-sm">
-                        {header}
-                    </th>
-                ))}
-            </tr>
-        </thead>
-        <tbody>
-            {data.map((row, rowIndex) => (
-                <tr key={rowIndex} className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100">
-                    {withCheckbox && (
-                        <td className="p-3 border border-gray-200 flex items-center">
-                            <input type="checkbox" className="h-4 w-4" onClick={(e) => e.stopPropagation()} />
-                        </td>
-                    )}
-                    {row.map((cell, cellIndex) => (
-                        <td key={cellIndex} className={`p-3 border border-gray-200 text-sm ${highlightDisabledRow && rowIndex === 2 ? 'text-gray-400 border-gray-300' : 'text-gray-700'
-                            }`}>
-                            {badge && cellIndex === 0 ? (
-                                <span className={`px-2 py-1 border rounded-lg ${rowIndex === 2 ? 'text-gray-400 border-gray-300' : 'text-teal-600 border-teal-400'
-                                    }`}>
-                                    {cell}
-                                </span>
-                            ) : (
-                                cell
-                            )}
-                        </td>
-                    ))}
-                </tr>
-            ))}
-        </tbody>
-    </table>
-);
 
 export default Administration;

@@ -56,6 +56,12 @@
   cursor: pointer;
 }
 
+.JournalEntry label {
+  font-size: 12px;
+  color: #646464; 
+  margin-bottom: 5px;
+}
+
 /* ─────────── Responsive Design ─────────── */
 
 /* Mobile (small) ≤ 480px */

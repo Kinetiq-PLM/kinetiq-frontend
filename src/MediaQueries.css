@@ -13,23 +13,25 @@
   animation: fadeInModule 0.4s ease-in-out;
 }
 
-@media (max-width: 55rem) {
-  .header-module-name.inactive {
+@media (max-width: 55rem){
+  .header-navi.squished .header-module-name.inactive{
     display: none;
   }
 }
 
-@media (max-width: 46rem) {
+@media (max-width: 50rem){
   .header-navi.squished .header-module-names {
     display: none;
   }
 }
 
-@media (max-width: 40rem) {
-  .header-body-container {
-    max-height: calc(100vh - var(--header-navi-height));
+@media (max-width: 46rem) {
+  .header-module-name.inactive {
+    display: none;
   }
+}
 
+@media (max-width: 40rem) {
   .notif-menu {
     width: 20rem;
     height: fit-content;
@@ -42,13 +44,10 @@
     display: none;
   }
 
-  .header-submodule-name{
-    width: 4.5rem;
-    overflow: hidden;
-  }
-
-  .header-submodule-name p{
-    width: 4.5rem;
+  #header-submodule-name {
+    width: 12rem;
+    overflow: hidden;         
+    white-space: nowrap;       
     text-overflow: ellipsis;
   }
 }

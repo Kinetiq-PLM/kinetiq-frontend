@@ -97,7 +97,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
       setApproving(delOrderId);
       
       // Send approval request to backend
-      await axios.post('http://127.0.0.1:8000/api/approve-order/', { del_order_id: delOrderId });
+      await axios.post('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/approve-order/', { del_order_id: delOrderId });
       
       // Update the order status in the local state (optimistic update)
       const updatedDeliveries = filteredDeliveries.map(order => {
@@ -134,12 +134,12 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
         <table className="delivery-table">
           <thead>
             <tr>
-              <th onClick={() => handleSort("del_order_id")} className="sortable">
-                Delivery Order ID
-                {sortField === "del_order_id" && (
-                  <span className="sort-icon">{sortDirection === "asc" ? "↑" : "↓"}</span>
-                )}
-              </th>
+              <th>
+                  {deliveryType === 'sales' ? 'Sales Order ID' : 
+                  deliveryType === 'service' ? 'Service Order ID' : 
+                  deliveryType === 'content' ? 'Content ID' : 
+                  'Stock Transfer ID'}
+                </th>
               <th onClick={() => handleSort("order_status")} className="sortable">
                 Status
                 {sortField === "order_status" && (
@@ -148,11 +148,11 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
               </th>
               <th>Is Project-Based?</th>
               <th>Is Partial Delivery?</th>
-              <th>
-                {deliveryType === 'sales' ? 'Sales Order ID' : 
-                 deliveryType === 'service' ? 'Service Order ID' : 
-                 deliveryType === 'content' ? 'Content ID' : 
-                 'Stock Transfer ID'}
+              <th onClick={() => handleSort("del_order_id")} className="sortable">
+                Delivery Order ID
+                {sortField === "del_order_id" && (
+                  <span className="sort-icon">{sortDirection === "asc" ? "↑" : "↓"}</span>
+                )}
               </th>
               {/* TEMPORARY: Approval column - Comment this line to hide the column */}
               <th>Actions</th>
@@ -162,12 +162,6 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
             {currentItems.length > 0 ? (
               currentItems.map((order, index) => (
                 <tr key={order.del_order_id} className={index % 2 === 0 ? "even-row" : "odd-row"}>
-                  <td>{formatID(order.del_order_id, "delivery")}</td>
-                  <td className={`status-cell status-${order.order_status?.toLowerCase() || 'created'}`}>
-                    {order.order_status || "Created"}
-                  </td>
-                  <td className="centered-cell">{order.is_project_based ? "Yes" : "No"}</td>
-                  <td className="centered-cell">{order.is_partial_delivery ? "Yes" : "No"}</td>
                   <td>
                     {deliveryType === 'sales' 
                       ? formatID(order.sales_order_id, "sales") : 
@@ -177,7 +171,12 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
                       ? formatID(order.content_id, "content") : 
                       formatID(order.stock_transfer_id, "stock")}
                   </td>
-                  
+                  <td className={`status-cell status-${order.order_status?.toLowerCase() || 'created'}`}>
+                    {order.order_status || "Created"}
+                  </td>
+                  <td className="centered-cell">{order.is_project_based ? "Yes" : "No"}</td>
+                  <td className="centered-cell">{order.is_partial_delivery ? "Yes" : "No"}</td>
+                  <td>{formatID(order.del_order_id, "delivery")}</td>
                   {/* TEMPORARY: Approval button - Comment these lines to remove the button */}
                   <td>
                     {order.order_status !== 'Approved' ? (

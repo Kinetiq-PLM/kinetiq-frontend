@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./StandaloneLogin.css";
 import emailjs from '@emailjs/browser';
+
 
 export default function StandaloneLogin() {
   const [credentials, setCredentials] = useState({
@@ -22,6 +23,8 @@ export default function StandaloneLogin() {
   const [resetData, setResetData] = useState(initialResetData);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState("");
   // localStorage.setItem('login_attemtps', '1')
@@ -30,6 +33,20 @@ export default function StandaloneLogin() {
     setCredentials(prev => ({ ...prev, [name]: value }));
     setLoginError("");
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    try {
+      if (storedUser && location.pathname === "/login") {
+        navigate("/", { replace: true });
+      }
+    } catch (e) {
+      console.error("ERROR FOR SOME REASON: ", e);
+    }
+
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -44,7 +61,7 @@ export default function StandaloneLogin() {
         return;
       }
 
-      const response = await axios.post("http://127.0.0.1:8000/login/", {
+      const response = await axios.post("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/login/", {
         email: credentials.email,
         password: credentials.password,
       });
@@ -107,7 +124,7 @@ export default function StandaloneLogin() {
   };
 
   const checkEmail = async (email) => {
-    const response = await fetch("http://127.0.0.1:8000/check-email/", {
+    const response = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/check-email/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
@@ -127,41 +144,37 @@ export default function StandaloneLogin() {
     const savedCode = localStorage.getItem("reset_code");
     const savedEmail = localStorage.getItem("reset_email");
 
-    // Check if the reset code matches
+    // reset code match
     if (resetData.code !== savedCode) {
       setLoginError("* Invalid code. Please try again.* ");
       return;
     }
 
-    // Check if the reset email matches (optional but good to verify)
+    // reset email match
     if (resetData.valid_email !== savedEmail) {
       setLoginError("* Email does not match the code. Please check and try again. *");
       return;
     }
 
-    // Check password length
+    // check password length
     if (resetData.newPassword.length < 8) {
       setLoginError("* Password must be at least 8 characters long. *");
       return;
     }
 
-    // Check if the new password and confirm password match
+    // check if the new password and confirm password match
     if (resetData.newPassword !== resetData.confirmNewPassword) {
       setLoginError("* Passwords do not match! *");
       return;
     }
 
-    // Here, you would call an API to update the password.
-    // For now, just simulate the password update
     try {
-      const res = await fetch("http://127.0.0.1:8000/reset-password/", {
+      const res = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/reset-password/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: resetData.kinetiq_email,
           newPassword: resetData.newPassword,
-          oldPassword: '',
-          passreq: false
         }),
       });
 
@@ -283,6 +296,7 @@ export default function StandaloneLogin() {
                         setLoginError("");
                       }}
                       required
+                      style={{ color: 'gray' }}
                     />
                     <h4>Kinetiq Email: </h4>
                     <input
@@ -321,6 +335,7 @@ export default function StandaloneLogin() {
               {view === "reset" && (
                 <div>
                   <div className="email-form">
+
                     <p className="login-pass-details">We’ve sent a code to <strong>{resetData.valid_email}</strong>. Enter it below with your new password.</p>
                     <h4>Email Code: </h4>
                     <input
@@ -332,23 +347,58 @@ export default function StandaloneLogin() {
                       required
                     />
                     <h4>New Password: </h4>
-                    <input
-                      type="password"
-                      name="newPassword"
-                      placeholder="Enter new password"
-                      value={resetData.newPassword}
-                      onChange={(e) => setResetData({ ...resetData, newPassword: e.target.value })}
-                      required
-                    />
+                    <div className="password-wrapper">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        name="newPassword"
+                        placeholder="Enter new password"
+                        value={resetData.newPassword}
+                        onChange={(e) => setResetData({ ...resetData, newPassword: e.target.value })}
+                        required
+                        style={{ color: 'gray', marginBottom: '1rem' }}
+                      />
+                      <span className="eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
+                        {showNewPassword ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="none" stroke="currentColor" strokeWidth="2" d="M3 3l18 18M10.5 10.5a3 3 0 004.5 4.5M12 5c-4.418 0-8.209 2.865-10 6.5a10.05 10.05 0 002.015 2.881M12 19c4.418 0 8.209-2.865 10-6.5a10.05 10.05 0 00-2.015-2.881" />
+                          </svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="none" stroke="currentColor" strokeWidth="2" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                            <circle fill="none" stroke="currentColor" strokeWidth="2" cx="12" cy="12" r="3" />
+                          </svg>
+                        )}
+                      </span>
+
+                    </div>
+
                     <h4>Confirm New Password: </h4>
-                    <input
-                      type="password"
-                      name="confirmNewPassword"
-                      placeholder="Confirm new password"
-                      value={resetData.confirmNewPassword}
-                      onChange={(e) => setResetData({ ...resetData, confirmNewPassword: e.target.value })}
-                      required
-                    />
+
+                    <div className="password-wrapper">
+
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="confirmNewPassword"
+                        placeholder="Confirm new password"
+                        value={resetData.confirmNewPassword}
+                        onChange={(e) => setResetData({ ...resetData, confirmNewPassword: e.target.value })}
+                        required
+                        style={{ color: 'gray' }}
+                      />
+                      <span className="eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                        {showConfirmPassword ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="none" stroke="currentColor" strokeWidth="2" d="M3 3l18 18M10.5 10.5a3 3 0 004.5 4.5M12 5c-4.418 0-8.209 2.865-10 6.5a10.05 10.05 0 002.015 2.881M12 19c4.418 0 8.209-2.865 10-6.5a10.05 10.05 0 00-2.015-2.881" />
+                          </svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="none" stroke="currentColor" strokeWidth="2" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                            <circle fill="none" stroke="currentColor" strokeWidth="2" cx="12" cy="12" r="3" />
+                          </svg>
+                        )}
+                      </span>
+
+                    </div>
                     <p className="login-error">{loginError}</p>
                   </div>
 

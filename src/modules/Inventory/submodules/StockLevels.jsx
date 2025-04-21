@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import "../styles/PCounts.css";
+import "../styles/StockLevels.css";
 
 const BodyContent = () => {
-    const [productsData, setProductsData] = useState([]);
+    const [expiringItemsData, setExpiringItemsData] = useState([]);
     const [assetsData, setAssetsData] = useState([]);
-    const [rawMaterialsData, setRawMaterialsData] = useState([]);
+    const [warehouseList, setWarehouseList] = useState([]);
 
 
     const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ const BodyContent = () => {
     const [selectedRow, setSelectedRow] = useState(null); 
 
     // Tab Management
-    const tabs = ["Products", "Assets", "Raw Materials"];
+    const tabs = ["Expiring Items"];
     const [activeTab, setActiveTab] = useState(tabs[0]);    
     const onTabChange = (tab) => {
         setActiveTab(tab);
@@ -29,15 +29,15 @@ const BodyContent = () => {
     
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/product-depreciation-report/")
+        fetch("http://127.0.0.1:8000/api/expiry-report/")
             .then((res) => res.json())
             .then((data) => {
-                setProductsData(data);
+                setExpiringItemsData(data);
                 setLoading(false);
-                console.log("Fetched products depreication reports:", data);
+                console.log("Fetched Expiring Reports Data:", data);
             })
             .catch((err) => {
-                console.error("Error products depreication reports:", err);
+                console.error("Error Expiring Reports Data:", err);
                 setLoading(false);
             });
     }, []);
@@ -58,17 +58,17 @@ const BodyContent = () => {
     }, []);
 
 
-    // raw materials fetching
+    // warehouse list fetching
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/raw-material-depreciation-report/")
+        fetch("http://127.0.0.1:8000/api/warehouse-list/")
             .then((res) => res.json())
             .then((data) => {
-                setRawMaterialsData(data);
+                setWarehouseList(data);
                 setLoading(false);
-                console.log("Fetched raw materials depreication reports:", data);
+                console.log("Fetched rwarehouse list", data);
             })
             .catch((err) => {
-                console.error("Error raw materials depreication reports:", err);
+                console.error("Error fetching warehouse list:", err);
                 setLoading(false);
             });
     }, []);
@@ -76,38 +76,29 @@ const BodyContent = () => {
 
     // Filtered Tab Config
     const tableConfig = {
-        Products: {
-            columns: ["Product Name", "Inventory Item ID", "Expiry Date", "Quantity", "Status"],
-            data: productsData.map((item) => ({
-                "Product Name": item?.product_name || "---",
-                "Inventory Item ID": item?.inventory_item_id || "---",
+        "Expiring Items": {
+            columns: ["Item Name", "Item Type", "Item Management ID", "Expiry Date", "Quantity", "Status"],
+            data: expiringItemsData.map((item) => ({
+                "Item Name": item?.item_name || "---",
+                "Item Type": item?.item_type || "---",
+                "Item Management ID": item?.item_management_id || "---",
                 "Expiry Date": item?.expiry,
-                "Quantity": item?.quantity,
-                "Status": item?.status,
+                "Quantity": item?.current_quantity,
+                "Status": item?.expiry_report_status,
             })),
         },
 
-        Assets: {
-            columns: ["Asset Name", "Inventory Item ID", "Expiry Date", "Quantity", "Status"],
+        "Deprecating Assets": {
+            columns: ["Asset Name", "Serial No", "Valid Until", "Quantity", "Status"],
             data: assetsData.map((item) => ({
                 "Asset Name": item?.asset_name || "---",
-                "Inventory Item ID": item?.inventory_item_id || "---",
-                "Expiry Date": item?.expiry,
+                "Serial No": item?.inventory_item_id || "---",
+                "Valid Until": item?.expiry,
                 "Quantity": item?.quantity,
                 "Status": item?.status,
             })),
         },
         
-        "Raw Materials": {
-            columns: ["Material Name", "Inventory Item ID", "Expiry Date", "Quantity", "Status"],
-            data: rawMaterialsData.map((item) => ({
-                "Material Name": item?.material_name || "---",
-                "Inventory Item ID": item?.inventory_item_id || "---",
-                "Expiry Date": item?.expiry,
-                "Quantity": item?.quantity,
-                "Status": item?.status,
-            })),
-        },
     }
 
     // Current Config
@@ -150,18 +141,45 @@ const BodyContent = () => {
         return statusMatch && dateMatch;
     });
 
+
+        // Format time for Philippine Time Zone (UTC+8)
+        const formatPhilippineTime = (date) => {
+            // Adjust for Philippine time (UTC+8)
+            const philippineDate = new Date(Date.UTC(
+              date.getUTCFullYear(),
+              date.getUTCMonth(),
+              date.getUTCDate(),
+              date.getUTCHours() + 8,
+              date.getUTCMinutes(),
+              date.getUTCSeconds()
+            ));
+          
+            const hours24 = philippineDate.getUTCHours();
+            const hours12 = hours24 % 12 || 12; // Convert to 12-hour format
+            const minutes = philippineDate.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = philippineDate.getUTCSeconds().toString().padStart(2, '0');
+            const amPm = hours24 < 12 ? 'AM' : 'PM';
+          
+            const year = philippineDate.getUTCFullYear();
+            const month = (philippineDate.getUTCMonth() + 1).toString().padStart(2, '0');
+            const day = philippineDate.getUTCDate().toString().padStart(2, '0');
+          
+            return `${day}/${month}/${year}, ${hours12}:${minutes} ${amPm} PHT`;
+          };
+    const currentTime = new Date();
+
     // current config
     console.log("Selected Row:", selectedRow);
 
     return (
-        <div className="pcounts">
+        <div className="stocklvl">
             <div className="body-content-container">
 
                 {/* Flex container seperating nav and main content */}
-                <div className="flex w-full h-full flex-col min-h-screen p-10">
+                <div className="flex w-full  flex-col min-h-screen px-3 py-12">
                     
                     <nav className="md:flex md:flex-wrap justify-between items-center p-2">
-                        <div className="invNav flex border-b border-gray-300 mt-1 space-x-8 mt-3 md:order-1">
+                        <div className="invNav flex border-b border-gray-300 mt-1 space-x-8 md:order-1">
                             {tabs.map((tab) => (
                             <span
                                 key={tab}
@@ -176,18 +194,49 @@ const BodyContent = () => {
                             </span>
                             ))}
                         </div>
+                        
+                        <div className="text-sm text-gray-500 order-2">
+                        {formatPhilippineTime(currentTime)}
+                        </div>
                     </nav>
+                    
+                    {/* FILTER SECTION */}
+                    <div className="flex h-8 space-x-3 mt-1">
+                        <select className="border border-gray-300 rounded-md p-1 text-gray-500   cursor-pointer" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+                            <option value="">Filter Status</option>
+                                {["Pending", "Approved"].map((s) => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                        </select>
+
+                        <select  className="border border-gray-300 rounded-md p-1 text-gray-500 cursor-pointer" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
+                            <option value="">Filter Period</option>
+                                {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
+                                    <option key={d} value={d}>{d}</option>
+                                ))}
+                        </select>
+
+                        <select  className="warehouse-filter border border-gray-300 rounded-md p-1 text-gray-500 cursor-pointer"> 
+                            <option value="">Filter Warehouse</option>
+                                {warehouseList.map((d) => (
+                                    <option key={d} value={d}>{d.warehouse_location}</option>
+                                ))}
+                        </select>
+                        {/* value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} */}
+
+
+                    </div>
 
                     {/* main content */}
-                    <main className="flex w-full h-full space-x-4 py-2">
+                    <main className="flex flex-row w-full h-full space-x-4 py-2">
 
                         {/* Main Table */}
-                        <div className="pcounts-table-container flex-2 border border-gray-300 rounded-lg scroll-container overflow-y-auto min-h-40 p-3">
+                        <div className="pcounts-table-container flex-2 border border-gray-300 rounded-lg scroll-container overflow-y-auto min-h-40 w-full p-1">
                             <table className="w-full table-layout:fixed text-center cursor-pointer">
                                 <thead>
                                     <tr className="border-b border-gray-300">
                                         {tableConfig[activeTab].columns.map((header) => (
-                                            <th key={header} className="p-2 text-gray-600">{header}</th>
+                                            <th key={header} className=" p-2 text-gray-600">{header}</th>
                                         ))}
                                     </tr>
                                 </thead>
@@ -202,7 +251,7 @@ const BodyContent = () => {
                                             <tr
                                                 key={index}
                                                 className="border-b border-gray-300 hover:bg-gray-100"
-                                                onClick={() => setSelectedRow(item)} // ← Set selected row
+                                                onClick={() => setSelectedRow(filteredData[index])} // ← Set selected row
                                             >
                                                 {currentConfig.columns.map((col) => (
                                                     <td key={col} className="p-2">{item[col] || "---"}</td>
@@ -215,61 +264,24 @@ const BodyContent = () => {
                             </table>
                         </div>
 
-                        {/* Filters + Details Panel */}
-                        <div className="flex flex-col justify-between h-full">
-                            <div className="self-center text-sm text-gray-500">00 - 00 - 0000 / 00:00 UTC</div>
+
+                        {/* Selected Item details Details */}
+                        <div className="">
                             
-                            <div className="flex flex-col  space-y-4 mt-2 w-60">
-
-                                {/* Status Filter */}
-                                <select
-                                    className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
-                                    value={selectedStatus}
-                                    onChange={(e) => setSelectedStatus(e.target.value)}
-                                >
-                                    <option value="">Filter Status Status</option>
-                                    {["Pending", "Approved"].map((s) => (
-                                        <option key={s} value={s}>{s}</option>
-                                    ))}
-                                </select>
-
-                                {/* Date Filter */}
-                                <select
-                                    className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
-                                    value={selectedDate}
-                                    onChange={(e) => setSelectedDate(e.target.value)}
-                                >
-                                    <option value="">Filter Deprecation Date</option>
-                                    {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
-                                        <option key={d} value={d}>{d}</option>
-                                    ))}
-                                </select>
-
-                            </div>
+                            <div className="w-full min-w-[180px] border border-gray-300 rounded-lg p-3 flex-row flex-wrap justify-between">
+                                <p className="text-center text-gray-600 font-bold mb-2">ITEM DETAILS</p>
+                                {selectedRow && (
+                                    Object.keys(selectedRow).map((col) => (
+                                        <div key={col} className="mb-2">
+                                            <h4 className="text-cyan-600 text-sm font-semibold">{col}</h4>
+                                            <p className="text-gray-500 text-xs">{selectedRow[col] || "---"}</p>
+                                        </div>
+                                    ))
+                                )}
 
 
 
-                            {/* Selected Item details Details */}
-                            <div className="">
-                                <p className="text-gray-600 font-bold text-center"> Item Details</p>
-                                <div className="w-60 border border-gray-300 rounded-lg p-3 h-80">
-
-                                    {selectedRow && (
-                                        Object.keys(selectedRow).map((col) => (
-                                            <div key={col} className="mb-2">
-                                                <h4 className="text-cyan-600 text-sm font-semibold">{col}</h4>
-                                                <p className="text-gray-500 text-sm">{selectedRow[col] || "---"}</p>
-                                            </div>
-                                        ))
-                                    )}
-
-
-
-                                </div>  
-                            </div>
-                            
-
-                           
+                            </div>  
                         </div>
 
                     </main>

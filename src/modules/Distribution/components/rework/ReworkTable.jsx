@@ -1,5 +1,5 @@
 // components/rework/ReworkTable.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
 const ReworkTable = ({ 
@@ -10,6 +10,15 @@ const ReworkTable = ({
   onStatusUpdate,
   showCompleted 
 }) => {
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+
+  // Reset to first page when reworks data changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [reworks.length]);
+
   // Function to get employee name from ID
   const getEmployeeName = (employeeId) => {
     if (!employeeId) return 'Unassigned';
@@ -26,11 +35,24 @@ const ReworkTable = ({
       return dateString;
     }
   };
+
+  // Get current reworks for pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentReworks = reworks.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(reworks.length / itemsPerPage);
+
+  // Change page handler
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
   
   return (
     <div className="rework-table-container">
       <div className="table-metadata">
-        <span>Showing {reworks.length} rework orders</span>
+        <span>
+          Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, reworks.length)} of {reworks.length} rework orders
+        </span>
       </div>
       
       <div className="table-wrapper">
@@ -44,18 +66,18 @@ const ReworkTable = ({
               <th>Rework Date</th>
               <th>Expected Completion</th>
               {/* <th>Original Order</th> */}
-              <th>Actions</th>
+              {/* <th>Actions</th> */}
             </tr>
           </thead>
           <tbody>
-            {reworks.length === 0 ? (
+            {currentReworks.length === 0 ? (
               <tr>
                 <td colSpan="8" className="no-data">
                   No rework orders found.
                 </td>
               </tr>
             ) : (
-              reworks.map((rework, index) => (
+              currentReworks.map((rework, index) => (
                 <tr 
                   key={rework.rework_id}
                   className={`
@@ -80,16 +102,7 @@ const ReworkTable = ({
                   <td>{getEmployeeName(rework.assigned_to)}</td>
                   <td>{formatDate(rework.rework_date)}</td>
                   <td>{formatDate(rework.expected_completion)}</td>
-                  {/* <td>
-                    {rework.original_order_info ? (
-                      <span className="order-link" title={`Customer: ${rework.original_order_info.customer_name || 'N/A'}`}>
-                        {rework.original_order_info.order_id}
-                      </span>
-                    ) : (
-                      <span className="no-order">No Order</span>
-                    )}
-                  </td> */}
-                  <td className="actions-cell">
+                  {/* <td className="actions-cell">
                     {!showCompleted && (
                       <>
                         {rework.rework_status === 'Pending' && (
@@ -125,13 +138,46 @@ const ReworkTable = ({
                     >
                       View
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {reworks.length > 0 && (
+        <div className="pagination-controls">
+          <button 
+            onClick={prevPage} 
+            disabled={currentPage === 1}
+            className="pagination-button"
+          >
+            &laquo; Prev
+          </button>
+          
+          <div className="page-numbers">
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`page-number ${currentPage === index + 1 ? 'active' : ''}`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+          
+          <button 
+            onClick={nextPage} 
+            disabled={currentPage === totalPages}
+            className="pagination-button"
+          >
+            Next &raquo;
+          </button>
+        </div>
+      )}
     </div>
   );
 };

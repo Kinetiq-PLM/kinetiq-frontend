@@ -1,4 +1,6 @@
-export const BASE_API_URL = "http://localhost:8000/api/";
+// export const BASE_API_URL = "http://localhost:8000/api/";
+export const BASE_API_URL =
+  "https://ls9h09elei.execute-api.ap-southeast-1.amazonaws.com/dev/api/";
 
 export async function GET(endpoint) {
   try {
@@ -64,7 +66,7 @@ export async function DELETE(endpoint) {
       throw new Error(errorText);
     }
 
-    return await res.json();
+    return res.ok;
   } catch (err) {
     console.error("Fetch error:", err);
     throw err; // rethrow so React Query knows it's an error

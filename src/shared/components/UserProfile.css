@@ -6,33 +6,64 @@
   background-color: white;
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 40rem;
-  min-height: 30rem;
-  overflow: auto;
-}
-
-.usrprofile .user-details-container, .usrprofile .password-kinetiq-container{
-  display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
+  overflow: auto;
+  flex-wrap: wrap;
+  scrollbar-width: 1.5rem;
+  scrollbar-color: rgb(39, 164, 164) white; 
+}
+  /* Webkit (Chrome, Edge, Safari) */
+  .usrprofile::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  .usrprofile::-webkit-scrollbar-track {
+    background: white;
+    border-radius: 1rem;
+  }
+
+  .usrprofile::-webkit-scrollbar-thumb {
+    background-color: rgb(39, 164, 164);
+    border-radius: 1rem;
+    border: 0.1rem solid white;
+  }
+    
+
+.usrprofile .user-details-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
   gap: 2rem;
+  height: auto;
+  flex-wrap: wrap;
   width: 100%;
-  height: 100%;
-  margin-bottom: 2rem;
+  margin: 2rem;
+  position: relative;
+}
+
+.usrprofile .password-kinetiq-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-self: center;
+  margin-bottom: 2.5rem;
+  padding: 0rem 2rem;
 }
 
 .usrprofile .user-details-container{
   border-bottom: 0.05rem solid rgb(207, 207, 207);
+  padding: 1rem;
 }
 
 .usrprofile .user-details-container img{
   height: 10rem;
   width: auto;
+  position: absolute;
+  z-index: 0;
 }
+
 .usrprofile .user-image{
   aspect-ratio: 1 / 1;
   width: 10rem;
@@ -50,14 +81,15 @@
 
 .usrprofile .user-details{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   width: fit-content;
   font-size: 0.8rem;
   color: #7d7d7d;
   gap: 1rem;
-  margin-left: 2rem ;
+  margin-left: 1rem;
+  
 }
 
 .usrprofile .user-details strong, .usrprofile .role-details strong{
@@ -65,16 +97,26 @@
   color: #4eb5b5;
 }
 
+.usrprofile .user-name-pos{
+  display: flex;
+  flex-direction: row;
+  margin-right: 2rem;
+}
+
 .usrprofile .user-name{
   font-size: 2rem;
   color: #008b8b;
-  margin-bottom: 0rem;
+  margin-right: 0.75rem;
   line-height: 2rem;
+  text-align: right;
+  width: fit-content;
 }
 
 .usrprofile .user-email{
   color: rgb(155, 160, 162);
   font-size: 0.85rem;
+  text-align: right;
+  margin-right: 0.75rem;
 }
 
 .usrprofile .user-position{
@@ -83,6 +125,7 @@
   font-style: italic;
   font-size: 1.35rem;
   color: #7ca2a2;
+  width: fit-content;
 }
 
 .usrprofile .role-details{
@@ -90,111 +133,253 @@
   flex-direction: column;
   justify-content: center;
   gap: 0.5rem;
-  width: 100%;
-  height: 100%;
+  width: 95%;
+  height: auto;
   font-size: 0.8rem;
   color: #7d7d7d;
-  margin-left: 2rem;
+  margin-left: 3rem;
   font-size: 0.85rem;
-  padding: 0rem 3rem;
 }
 
 .usrprofile .role-details h3{
   font-size: 0.85rem;
+  width: 85%;
   color: #a2a2a2;
   margin-bottom: 0.2rem;
   letter-spacing: 0.25rem;
-  border-bottom: 1px solid #b4c0c0;
-  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #c0b4b4;
+  padding-bottom: 0.5rem;
 }
 
 .usrprofile .password-section{
   display: flex;
   flex-direction: column;
-  width: 40rem;
-  margin-left: 3rem;
+  width: 30rem;
   align-items: center;
-  border: 1px solid red;
 }
-
-.usrprofile .reset-pass {
-  color: teal;
-  font-size: 1.1rem;
+.usrprofile .password-section h3{
+  color: rgb(24, 172, 172);
+  font-size: 1rem;
   font-weight: 700;
   text-align: center;
 }
 
-/* .usrprofile input[type="password"] {
-  height: 2.3rem;
-  width: 80%;
-  font-size: 0.9rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-} */
-
 .usrprofile .change-password-btn {
   background-color: #00a7a7;
-  width: 90%;
+  width: 100%;
   color: white;
   border: none;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
+  padding: 0.25rem 1rem;
+  border-radius: 0.3rem;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 500;
   margin-top: 1.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-.usrprofile .pass-wrapper{
+.password-input-wrapper-item{
+  width: 100%;
+}
+
+.usrprofile .password-input-wrapper{
     position: relative;
-    width: 90%;
-    height: 1.5rem;
-    border-radius: 8px;
-    margin: 0.8rem;
-    font-size: 0.9rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
 }
 
 .usrprofile input[type="password"], 
 .usrprofile input[type="text"]{
-  font-size: 0.9rem;
+  color: #7d7d7d;
+  font-size: 0.85rem;
+  width: 100%;
+  padding: 0.2rem 2.5rem 0.2rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.3rem;
 }
 
-.eye-icon {
+.usrprofile input[type="text"]:focus,
+.usrprofile input[type="password"]:focus {
+  border: none;
+  box-shadow: 0 0 0.1rem 0.1rem rgba(0, 128, 128, 0.25); 
+  outline: none;
+}
+
+.usrprofile input:-webkit-autofill {
+  background-color: white !important; 
+  color: #7d7d7d !important;          
+  -webkit-text-fill-color: #7d7d7d !important; 
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+
+.usrprofile .eye-icon {
   position: absolute;
-  right: 12px;
-  top: 12px;
+  right: 0.65rem;
   cursor: pointer;
   color: #888;
+}
+
+.password-input-error-container {
+  margin-top: 0.75rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.75rem;
+}
+
+.usrprofile .login-error{
+  color: rgb(255, 128, 0);  
+  font-size: 0.7rem;
+  font-style: italic;
+  width: 100%;
+  min-height: 0.7rem;
 }
 
 .usrprofile .user-info{
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
+  margin-left: auto;
+  position: relative;
 }
 
-@media (max-width: 69rem) {
+
+.usrprofile-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial;
+  padding: 2rem;
+  border-radius: 1rem;
+  gap: 1rem;
+  font: 'Inter', sans-serif;
+}
+
+.usrprofile-modal .header {
+  font-size: 1.1rem;
+  color: #008b8b;
+  font-weight: bold;
+}
+.usrprofile-modal .actions{
+  display: flex;
+  gap: 1rem;
+}
+.usrprofile-modal .actions button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.usrprofile-modal .confirm-btn {
+  background-color: #008b8b;
+  color: white;
+}
+.usrprofile-modal .confirm-btn:hover {
+  background-color: #007b7b;
+}
+
+.usrprofile-modal .cancel-btn, .usrprofile-modal .ok-btn {
+  background-color: #dedede;
+}
+
+.usrprofile-modal .cancel-btn:hover, .usrprofile-modal .ok-btn:hover {
+  background-color: #c5c5c5;
+}
+
+
+
+@media (max-width: 1100px) {
   .usrprofile .user-details-container {
-    flex-direction: row-reverse;
+    align-items: center;
   }
 
+  .usrprofile .user-name-pos{
+    flex-direction: column !important;
+    
+  }
+
+  .usrprofile .user-email, .usrprofile .user-name{
+    text-align: left;
+  }
+
+  .usrprofile .role-details{
+    margin-left: 0rem;
+  }
+
+  .usrprofile .user-position{
+    border-left:  none; 
+    padding-left: 0rem;
+    padding-top: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  .usrprofile .user-name-pos{
+    margin-left: 2rem;
+  }
+  .usrprofile .role-details{
+    width: 100% !important;
+  }
+
+  .usrprofile .password-kinetiq-container {
+    align-items: center!important;
+    flex-direction: column !important;
+    gap: 2rem;
+  }
+
+}
+
+@media (max-width: 880px) {
+  .usrprofile .user-email, 
+  .usrprofile .user-name,
+  .usrprofile .user-position{
+    text-align: center;
+  }
+
+  .usrprofile .user-email{
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+  }
+
+  .usrprofile .user-name{
+    margin-top: 1rem;
+  }
+  .usrprofile .user-name-pos{
+    align-items: center;
+    justify-content: center;
+    margin: 0rem;
+  }
+  .usrprofile .user-details-container{
+    width: 100% !important;
+    flex-wrap: nowrap !important;
+    padding: 1rem !important;
+    margin: 0rem !important;
+  }
+  .usrprofile .role-details{
+    margin: 0;
+    padding-bottom: 1rem;
+  }
   .usrprofile .user-info{
-    position: relative;
-    right: 25%;
+    flex-direction: column !important;
+    width: 100% !important;
+    margin: 0;
   }
-
+  
+  .usrprofile .password-section{
+    width: 100% !important;
+    margin-top: 1.5rem !important;
+  }
   .usrprofile .user-details-container img{
-    position: absolute;
-    opacity: 70%;
+    display: none!important;
+  }
+
+  .usrprofile .password-kinetiq-container {
+    width: 100% !important;
+    margin: 0rem !important;
   }
 }
 
-.usrprofile .login-error{
-  color: rgb(255, 128, 0);
-  font-size: 0.75rem;
-  font-style: italic;
-  margin-bottom: 0.5rem;
-  width: 100%;
-  text-align: center;
-}

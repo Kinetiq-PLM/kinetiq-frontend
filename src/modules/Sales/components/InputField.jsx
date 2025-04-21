@@ -4,6 +4,7 @@ const InputField = ({
   label,
   value = "",
   setValue = () => {},
+  onChange = () => {},
   validation = () => {
     return "";
   },
@@ -24,7 +25,7 @@ const InputField = ({
       </p>
       <div className="mt-2">
         <input
-          className={`w-full py-2 px-3 rounded text-sm bg-[#F7F7F7] ${
+          className={`w-full py-2 px-3 rounded text-sm bg-[#F7F7F7] !mb-0 ${
             isDisabled
               ? "outline-none focus:outline-none focus:ring-0 focus:border-transparent"
               : "focus:outline focus:ring-2 focus:ring-blue-500"

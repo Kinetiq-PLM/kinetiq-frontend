@@ -175,10 +175,24 @@ const Distribution = ({ loadSubModule, setActiveSubModule }) => {
 
   // Toggle expanded sections
   const toggleSection = (section) => {
+    const newExpandedState = !expandedSections[section];
+    
     setExpandedSections({
       ...expandedSections,
-      [section]: !expandedSections[section]
+      [section]: newExpandedState
     });
+    
+    // Reinitialize charts when expanding relevant sections
+    if (newExpandedState) {
+      // Only reinitialize if expanding (not collapsing)
+      setTimeout(() => {
+        if (section === 'performanceOverview' || section === 'deliveryAnalysis' || 
+            section === 'carrierAnalysis' || section === 'customerSatisfaction' || 
+            section === 'processingTime' || section === 'costAnalysis') {
+          initializeCharts(dashboardData);
+        }
+      }, 50); // Small timeout to ensure DOM elements are rendered
+    }
   };
 
   // Handle navigation to submodule
@@ -1117,11 +1131,11 @@ const Distribution = ({ loadSubModule, setActiveSubModule }) => {
           pickingListsResponse,
           reworksResponse
         ] = await Promise.all([
-          fetch('http://127.0.0.1:8000/api/shipments/'),
-          fetch('http://127.0.0.1:8000/api/delivery-orders/'),
-          fetch('http://127.0.0.1:8000/api/packing-lists/'),
-          fetch('http://127.0.0.1:8000/api/picking-lists/'),
-          fetch('http://127.0.0.1:8000/api/reworks/')
+          fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/shipments/'),
+          fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/delivery-orders/'),
+          fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/'),
+          fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/'),
+          fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/reworks/')
         ]);
         
         if (!shipmentsResponse.ok) throw new Error('Failed to fetch shipments');

@@ -10,14 +10,18 @@ import Dropdown from "../Dropdown.jsx";
 import InputField from "../InputField.jsx";
 import TextField from "../../../CRM/components/TextField.jsx";
 import { POST } from "../../api/api.jsx";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const BlanketAgreementDetailsModal = ({ isOpen, onClose, quotationInfo }) => {
+const BlanketAgreementDetailsModal = ({
+  isOpen,
+  onClose,
+  quotationInfo,
+  employee_id,
+}) => {
   const { showAlert } = useAlert();
-
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
-
+  const queryClient = useQueryClient();
   // ========== DATA ==========
   const agreementTypes = ["Written", "Oral", "Electronic"];
 
@@ -37,6 +41,7 @@ const BlanketAgreementDetailsModal = ({ isOpen, onClose, quotationInfo }) => {
         type: "success",
         title: "New Agreement Created",
       });
+      queryClient.refetchQueries(["agreements"]);
       onClose();
     },
     onError: (error) => {
@@ -68,7 +73,21 @@ const BlanketAgreementDetailsModal = ({ isOpen, onClose, quotationInfo }) => {
       // w agreementID and quotationInfo
 
       const request = {
-        statement_data: quotationInfo.statement_data,
+        statement_data: {
+          customer: quotationInfo?.statement?.customer?.customer_id,
+          salesrep: employee_id,
+          total_amount: quotationInfo?.statement?.total_amount,
+          discount: quotationInfo?.statement?.discount,
+          total_tax: quotationInfo?.statement?.total_tax,
+          items: quotationInfo?.statement?.items.map((item) => ({
+            product: item.product.product_id,
+            quantity: item.quantity,
+            unit_price: item.total_price,
+            discount: item.discount,
+            tax_amount: item.tax_amount,
+            special_requests: item.special_requests,
+          })),
+        },
         agreement_data: {
           start_date: startDate,
           end_date: endDate,
@@ -83,6 +102,7 @@ const BlanketAgreementDetailsModal = ({ isOpen, onClose, quotationInfo }) => {
       // Reset Fields
       setStartDate("");
       setEndDate("");
+      onClose();
       setIsValidationVisible(false);
     }
   };
@@ -238,7 +258,7 @@ const BlanketAgreementDetailsModal = ({ isOpen, onClose, quotationInfo }) => {
           <form action="" className="space-y-4">
             <InputField
               label={"Company Name"}
-              value={quotationInfo?.name || "INSERT COMPANY NAME"}
+              value={quotationInfo?.customer_name || "INSERT COMPANY NAME"}
               isDisabled={true}
             />
             <div className="flex gap-2">
