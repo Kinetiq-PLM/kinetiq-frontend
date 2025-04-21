@@ -614,17 +614,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     ))}
                 </div>
 
-                
-                <div className="reqplan-help-wrapper">
-                    {showHelpOptions && (
-                        <div className="reqplan-help-options">
-                        <button onClick={() => alert('Purchase Request')} className="reqplan-help-option">📦 Purchase Request</button>
-                        <button onClick={() => alert('Project Request')} className="reqplan-help-option">🏗️ Project Request</button>
-                        <button onClick={() => alert('Workforce Request')} className="reqplan-help-option">👷 Workforce Request</button>
-                        </div>
-                    )}
-                    <button className="reqplan-help-button"onClick={() => setShowHelpOptions(prev => !prev)} aria-label="Help">?</button>
-                </div>
+
             </div>
 
             {isOpen && selectedRowData &&(

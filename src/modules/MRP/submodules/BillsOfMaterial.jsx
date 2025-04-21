@@ -365,35 +365,35 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     }
     
     const mergedRows2 = (
-  flag === 0
-    ? [...(filteredData || []), ...(principalOrder || [])]
-    : flag === 3
-    ? principalOrder
-    : filteredData
-)
-  .map(item => {
-    const number = item.number || item.serviceOrderItemId;
-    const type = item.type;
-    const details = item.details || item.description;
-    const date = item.date;
+    flag === 0
+        ? [...(filteredData || []), ...(principalOrder || [])]
+        : flag === 3
+        ? principalOrder
+        : filteredData
+    )
+    .map(item => {
+        const number = item.number || item.serviceOrderItemId;
+        const type = item.type;
+        const details = item.details || item.description;
+        const date = item.date;
 
-    const pnpMatch = pnpOrder.find(p => p.pnp_orderID === number);
-    const prinMatch = prinOrder.find(p => p.sr_orderID === number);
+        const pnpMatch = pnpOrder.find(p => p.pnp_orderID === number);
+        const prinMatch = prinOrder.find(p => p.sr_orderID === number);
 
-    const pnpStatus = pnpMatch?.pnp_status?.toLowerCase().trim();
-    const prinStatus = prinMatch?.sr_status?.toLowerCase().trim();
+        const pnpStatus = pnpMatch?.pnp_status?.toLowerCase().trim();
+        const prinStatus = prinMatch?.sr_status?.toLowerCase().trim();
 
-    const isComplete = pnpStatus === "complete" || prinStatus === "complete";
+        const isComplete = pnpStatus === "complete" || prinStatus === "complete";
 
-    return {
-      number,
-      type,
-      details,
-      date,
-      status: isComplete ? "Complete" : "", 
-    };
-  })
-  .filter(item => item.status === "Complete");
+        return {
+        number,
+        type,
+        details,
+        date,
+        status: isComplete ? "Complete" : "", 
+        };
+    })
+    .filter(item => item.status === "Complete");
 
     const rowCellStyle = {
         flex: "1 1 25%",
