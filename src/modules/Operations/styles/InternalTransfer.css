@@ -40,8 +40,19 @@
     width: 100%;
     height: 100%;
     border-collapse: collapse;
+    display: table;
 }
-
+.InternalTransfer .table-container {
+    overflow: auto; /* Scroll on the container */
+}
+.InternalTransfer .table-container table {
+    position: relative; /* For sticky header */
+}
+.InternalTransfer .table-container thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
 .InternalTransfer .table-container thead {
     /*position: sticky;*/
     top: 0;
@@ -50,7 +61,6 @@
 }
 
 .InternalTransfer .table-container tbody {
-    display: block;
     overflow-y: auto;
     overflow-x: auto;
     height: calc(100% - 40px);
@@ -303,20 +313,39 @@
     background-color: #00A8A8;
 }
 
-.InternalTransfer .table-container tbody::-webkit-scrollbar {
+.InternalTransfer .table-container::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
 
-.InternalTransfer .table-container tbody::-webkit-scrollbar-track {
+.InternalTransfer .table-container::-webkit-scrollbar-track {
     background: #f1f1f1;
 }
 
-.InternalTransfer .table-container tbody::-webkit-scrollbar-thumb {
+.InternalTransfer .table-container::-webkit-scrollbar-thumb {
     background: #00A8A8;
     border-radius: 3px;
 }
 
-.InternalTransfer .table-container tbody::-webkit-scrollbar-thumb:hover {
+.InternalTransfer .table-container::-webkit-scrollbar-thumb:hover {
+    background: #008080;
+}
+
+.InternalTransfer .input-container::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.InternalTransfer .input-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.InternalTransfer .input-container::-webkit-scrollbar-thumb {
+    background: #00A8A8;
+    border-radius: 3px;
+}
+
+.InternalTransfer .input-container::-webkit-scrollbar-thumb:hover {
     background: #008080;
 }
 
