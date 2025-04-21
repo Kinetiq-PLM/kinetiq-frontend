@@ -1,0 +1,326 @@
+.purchquote {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.purchquote .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 40rem;
+    min-height: 30rem;
+    margin-top: 0.5rem;
+}
+
+.purchquote .purchquote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    margin-top: 0;
+    gap: 1rem;
+    width: 100%;
+}
+
+.purchquote .purchquote-header-left {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.purchquote .purchquote-back {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease;
+}
+
+.purchquote .purchquote-back:hover {
+    color: #00A8A8;
+}
+
+.purchquote .purchquote-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.purchquote .purchquote-date-filter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    color: black;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    min-width: 210px;
+}
+
+.purchquote .date-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.purchquote .date-options-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 210px;
+}
+
+.purchquote .date-option {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.purchquote .date-option:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    color: #00A8A8;
+}
+
+.purchquote .date-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.purchquote .purchquote-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #00bcd4;
+    border-radius: 0.25rem;
+    color: #00bcd4;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.purchquote .purchquote-filter-btn:hover {
+    border-color: #00A8A8;
+    color: #00A8A8;
+    background-color: rgba(0, 168, 168, 0.05);
+}
+
+.purchquote .purchquote-search input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    width: 300px;
+}
+
+.purchquote .purchquote-content {
+    flex: 1;
+    background: white;
+    border: 1px solid #D2D2D2;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 0.5rem 0 0 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+    max-height: calc(100vh - 20rem);
+}
+
+.purchquote .purchquote-table-header {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    align-items: center;
+    text-align: center;
+}
+
+.purchquote .purchquote-table-scrollable {
+    width: 100%;
+    max-height: 50vh;
+    overflow-x: auto;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #bdbdbd #f5f5f5;
+}
+
+.purchquote .purchquote-table-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.purchquote .purchquote-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.purchquote .purchquote-row > div {
+    text-align: center;
+}
+
+.purchquote .purchquote-row:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    cursor: pointer;
+}
+
+.purchquote .purchquote-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Consistent status badge styling for PurchaseQuot */
+.status-approved,
+.status-pending,
+.status-rejected,
+.status-completed,
+.status-open,
+.status-cancelled,
+.status-draft {
+  border-radius: 12px !important;
+  padding: 2px 10px !important;
+  font-size: 0.85em;
+  font-weight: normal;
+  display: inline-block;
+}
+
+.status-approved {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.status-pending {
+  color: #856404;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+}
+
+.status-rejected {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.status-completed {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+}
+
+.status-open {
+  color: #2e7d32;
+  background-color: #e8f5e9;
+  border: 1px solid #c3e6cb;
+}
+
+.status-cancelled {
+  color: #c62828;
+  background-color: #ffebee;
+  border: 1px solid #f5c6cb;
+}
+
+.status-draft {
+  color: #f57c00;
+  background-color: #fff3e0;
+  border: 1px solid #ffeeba;
+}
+
+.purchquote .purchquote-new-form,
+.purchquote .purchquote-compare,
+.purchquote .purchquote-send-to {
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.purchquote .purchquote-new-form {
+    background-color: #00A8A8;
+    color: white;
+}
+
+.purchquote .purchquote-new-form:hover {
+    background-color: #008080;
+}
+
+.purchquote .purchquote-compare {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.purchquote .purchquote-compare:hover {
+    background-color: #d0d0d0;
+}
+
+.purchquote .purchquote-send-to {
+    background-color: #00A8A8;
+    color: white;
+}
+
+.purchquote .purchquote-send-to:hover {
+    background-color: #008080;
+}
+
+.purchquote .purchquote-footer {
+    position: relative;
+    width: 100%;
+    height: 3.5rem;
+    margin-top: 1rem;
+    padding: 0 1rem;
+}
+
+.purchquote .purchquote-new-form {
+    position: absolute;
+    left: 1rem;
+    bottom: 0;
+}
+
+.purchquote .purchquote-compare {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+}
+
+.purchquote .purchquote-send-to {
+    position: absolute;
+    right: 1rem;
+    bottom: 0;
+}
+
+.purchquote .purchquote-footer-right {
+    display: flex;
+    gap: 1rem;
+    justify-self: end;
+}

@@ -1,0 +1,476 @@
+.goods-r {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+
+.goods-r .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0 1px 2px  rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+  gap: 1rem;
+}
+
+
+
+
+.goods-r .content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+}
+
+
+
+
+.goods-r .back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #374151;
+  font-size: 0.875rem;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  align-self: flex-start;
+}
+
+
+
+
+.goods-r .details-grid {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 0.75rem;
+  max-width: 100%;
+  margin-bottom: 1rem;
+}
+
+
+
+
+.goods-r .details-section {
+  background: white;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+
+
+
+.goods-r .detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 0.4rem;
+}
+
+
+
+
+.goods-r .detail-row:last-child {
+  margin-bottom: 0;
+}
+
+
+
+
+.goods-r .detail-row label {
+  color: #4B5563;
+  font-size: 0.813rem;
+}
+
+
+
+
+.goods-r .detail-row input,
+.goods-r .detail-row select,
+.goods-r .date-input input {
+  width: 100%;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.25rem;
+  background: #F9FAFB;
+  color: #374151;
+  font-size: 0.813rem;
+  height: 1.5rem;
+}
+
+
+
+
+.goods-r .tabbed-section {
+  padding: 0 !important;
+}
+
+
+
+
+.goods-r .section-tabs {
+  display: flex;
+  border-bottom: 1px solid #E5E7EB;
+  background: #F9FAFB;
+}
+
+
+
+
+.goods-r .tab-button {
+  flex: 1;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  color: #6B7280;
+  cursor: pointer;
+  font-size: 0.813rem;
+  position: relative;
+}
+
+
+
+
+.goods-r .tab-button.active {
+  color: #0d9488;
+  background: white;
+}
+
+
+
+
+.goods-r .tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #0d9488;
+}
+
+
+
+
+.goods-r .tab-content {
+  padding: 0.5rem;
+  background: white;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  flex: 1;
+}
+
+
+
+
+.goods-r .tab-content.cost-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem 1rem;
+  padding: 0.5rem;
+}
+
+
+
+
+.goods-r .tab-content.cost-details .detail-row {
+  margin-bottom: 0.25rem;
+}
+
+
+
+
+.goods-r .operation_table_container {
+  margin-top: 1rem;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+
+
+
+.goods-r .gr-table {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+
+
+
+.goods-r .gr-table::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+
+
+
+.goods-r .gr-table::-webkit-scrollbar-thumb {
+  background: #0d9488;
+  border-radius: 3px;
+}
+
+
+
+
+.goods-r .gr-table::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+
+
+
+.goods-r .gr-table::-webkit-scrollbar-corner {
+  background: #f1f5f9;
+}
+
+
+
+
+.goods-r .materials-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: max-content;
+  font-size: 0.9rem;
+}
+
+
+
+
+.goods-r .materials-table th {
+  position: sticky;
+  top: -1;
+  background: white;
+  z-index: 2;
+  padding: 0rem 0.5rem;
+  text-align: left;
+  font-weight: 500;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+  line-height: 1.7;
+}
+
+
+
+
+.goods-r .materials-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+  white-space: nowrap;
+  line-height: 1.7;
+}
+
+
+
+
+.goods-r .button-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+
+
+.goods-r .right-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+
+
+
+.goods-r .copy-from-button,
+.goods-r .cancel-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #E5E7EB;
+  background: white;
+  border-radius: 0.375rem;
+  color: #374151;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+
+
+
+.goods-r .copy-from-button:hover,
+.goods-r .cancel-button:hover {
+  background: #F9FAFB;
+}
+
+
+
+
+.goods-r .send-to-button {
+  padding: 0.5rem 1rem;
+  background: #0d9488;
+  border: none;
+  border-radius: 0.375rem;
+  color: white;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+
+
+
+.goods-r .send-to-button:hover {
+  background: #0f766e;
+}
+
+
+
+
+.goods-r .date-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+
+
+
+.goods-r .date-input.clickable {
+  cursor: pointer;
+}
+
+
+
+
+.goods-r .date-input.clickable input {
+  cursor: pointer;
+  color: #374151;
+}
+
+
+
+
+.goods-r .date-input input[type="date"] {
+  padding-right: 2.5rem;
+  width: 100%;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  background: white;
+}
+
+
+
+
+.goods-r .date-input input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+
+
+
+
+.goods-r .calendar-icon {
+  position: absolute;
+  right: 0.75rem;
+  color: #6B7280;
+  pointer-events: none;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+
+
+
+.goods-r .form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+
+
+
+.goods-r .table-container {
+  flex: 1;
+  overflow: auto;
+  max-height: calc(100vh - 400px);
+  min-height: 200px;
+  margin-top: 1rem;
+}
+
+
+
+
+.goods-r .table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+
+
+
+.goods-r .table-container th,
+.goods-r .table-container td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+
+
+
+.goods-r .table-container thead {
+  position: sticky;
+  top: 0;
+  background-color: #F9FAFB;
+  z-index: 1;
+}
+
+
+
+
+
+
+
+
+
+
+

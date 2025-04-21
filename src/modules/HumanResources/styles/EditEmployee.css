@@ -1,0 +1,109 @@
+
+.hr-edit-employee {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Main container (copied and renamed from Employees.css) */
+.hr-edit-employee .hr-edit-body-content-container {
+  width: 100%;
+  height: 100%;
+  max-width: 1222px;
+  margin: 0 auto;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Scrollable form area */
+.hr-edit-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background-color: #f7fbfc;
+  box-sizing: border-box;
+}
+
+.hr-edit-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+.hr-edit-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+/* Heading */
+.hr-edit-heading h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+}
+
+/* Two-column form */
+.hr-edit-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2rem;
+}
+
+.hr-edit-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.95rem;
+
+  color: #374151;
+}
+
+.hr-edit-form input,
+.hr-edit-form select {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  background-color: white;
+  transition: border 0.2s ease;
+}
+
+.hr-edit-form input:focus,
+.hr-edit-form select:focus {
+  border-color: #0d9488;
+  outline: none;
+}
+
+/* Buttons section */
+.hr-edit-buttons {
+  grid-column: span 2;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.hr-edit-buttons button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.hr-edit-buttons .save-btn {
+  background-color: #0d9488;
+  color: white;
+}
+
+.hr-edit-buttons button:not(.save-btn) {
+  background-color: #e5e7eb;
+  color: #374151;
+}

@@ -1,0 +1,437 @@
+/* ========== Base Styles ========== */
+.notification {
+    width: 100%;
+    padding: 10px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.notification .notif-container {
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    max-height: calc(100vh - 140px);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    isolation: isolate;
+    /* Creates a new stacking context */
+    position: relative;
+    overflow: hidden;
+    /* Prevent content from overflowing */
+}
+
+/* ========== Typography & Headers ========== */
+.notification .page-title {
+    margin-bottom: 0 !important;
+    color: #00a8a8;
+}
+
+.notification .title-divider {
+    margin: 12px 0 16px !important;
+}
+
+.notification .record-count {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ========== Control and Header Styles ========== */
+.notification .header-right-content {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: nowrap;
+    /* Prevent wrapping by default */
+}
+
+.notification .search-container {
+    flex: 1;
+    min-width: 0;
+    /* Allow container to shrink below content size */
+}
+
+.notification .search-container .ant-input-search {
+    width: 100%;
+}
+
+/* Icon-only buttons for small screens */
+.notification .icon-only-btn {
+    padding: 0 8px;
+    min-width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========== Table Styles ========== */
+.notification .table-container {
+    flex: 1;
+    min-height: 0;
+    padding-bottom: 10px;
+    border: 0px solid #90d7d33d;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.notification .ant-table {
+    border-radius: 8px;
+    overflow: auto;
+}
+
+.notification .ant-table-thead>tr>th {
+    background-color: #267979c4;
+    font-weight: 600;
+    color: #ffffff;
+    border-right: 1px solid #267979c4 !important;
+    border-bottom: 0px !important;
+}
+
+.notification .ant-table-thead>tr>th:hover {
+    background-color: #6b9b9bc4 !important;
+    color: #ffffff !important;
+}
+
+.notification .ant-table-column-has-sorter>th {
+    cursor: pointer;
+}
+
+.notification .ant-table-column-sort>th {
+    background-color: #6b9b9bc4 !important;
+}
+
+.notification .ant-table-thead>tr>th.ant-table-column-sort {
+    background-color: #7fb2b2 !important;
+    color: #ffffff !important;
+}
+
+.notification .ant-table-thead>tr>th .ant-table-column-sorter-up.active,
+.notification .ant-table-thead>tr>th .ant-table-column-sorter-down.active {
+    color: #6f9090c4 !important;
+}
+
+.notification .ant-table-thead>tr>th .ant-table-column-sorter-up,
+.notification .ant-table-thead>tr>th .ant-table-column-sorter-down {
+    color: #4a6e6ec4;
+    /* dim inactive arrow */
+}
+
+.notification .ant-table-tbody>tr>td {
+    border-right: 1px solid #cce3e3 !important;
+    border-bottom: 1px solid #cce3e3 !important;
+}
+
+.notification .ant-table-thead>tr>th:last-child,
+.notification.ant-table-tbody>tr>td:last-child {
+    border-right: none !important;
+}
+
+.notification .ant-table-tbody>tr:nth-child(odd)>td {
+    background-color: #ffffffe8;
+}
+
+.notification .ant-table-tbody>tr:nth-child(even)>td {
+    background-color: #f3f9f9;
+}
+
+.notification .ant-table-tbody>tr:hover>td {
+    background-color: #d5e5e5 !important;
+}
+
+.notification .ant-table-tbody>tr.ant-table-row-selected>td {
+    background-color: #d9f0f0 !important;
+}
+
+.notification .table-meta-info {
+    padding: 4px 0;
+    color: #666;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ========== Search & Filter Controls ========== */
+.notification .table-search-container {
+    min-width: 200px;
+    flex-grow: 1;
+}
+
+.notification .table-search-container .ant-input-search {
+    max-width: 300px;
+}
+
+/* ========== Pagination Styles ========== */
+.ant-pagination-item-active {
+    border-color: #00a8a8 !important;
+}
+
+.ant-pagination-item-active a {
+    color: #00a8a8 !important;
+}
+
+.ant-pagination-item:hover:not(.ant-pagination-item-active) {
+    border-color: #00a8a8;
+}
+
+.ant-pagination-item:hover:not(.ant-pagination-item-active) a {
+    color: #00a8a8;
+}
+
+.ant-pagination-item-active:hover {
+    border-color: #00a8a8 !important;
+}
+
+.ant-pagination-item-active:hover a {
+    color: #00a8a8 !important;
+}
+
+.ant-pagination-prev:hover .ant-pagination-item-link,
+.ant-pagination-next:hover .ant-pagination-item-link {
+    border-color: #00a8a8;
+    color: #00a8a8;
+}
+
+.ant-pagination-jump-prev:hover .ant-pagination-item-link-icon,
+.ant-pagination-jump-next:hover .ant-pagination-item-link-icon,
+.ant-pagination-jump-prev:hover .ant-pagination-item-ellipsis,
+.ant-pagination-jump-next:hover .ant-pagination-item-ellipsis {
+    color: #00a8a8;
+}
+
+.ant-pagination-options-quick-jumper input:hover,
+.ant-pagination-options-quick-jumper input:focus {
+    border-color: #00a8a8;
+}
+
+/* ========== Button Styles ========== */
+.notification .ant-btn-primary,
+.custom-modal .ant-btn-primary {
+    background-color: #00a8a8;
+    border-color: #00a8a8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus,
+.custom-modal .ant-btn-primary:hover,
+.custom-modal .ant-btn-primary:focus {
+    background-color: #55cfcf !important;
+    border-color: #55cfcf !important;
+    color: #fff !important;
+}
+
+/* ========== Scroll Bar Styles ========== */
+.notif-container::-webkit-scrollbar,
+.scrollable-table .ant-table-body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.notif-container::-webkit-scrollbar-track,
+.scrollable-table .ant-table-body::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+.notif-container::-webkit-scrollbar-thumb,
+.scrollable-table .ant-table-body::-webkit-scrollbar-thumb {
+    background: #00a8a8;
+    border-radius: 4px;
+}
+
+.notif-container::-webkit-scrollbar-thumb:hover,
+.scrollable-table .ant-table-body::-webkit-scrollbar-thumb:hover {
+    background: #008080;
+}
+
+/* Firefox scrollbar */
+.notif-container,
+.scrollable-table .ant-table-body {
+    scrollbar-width: thin;
+    scrollbar-color: #00a8a8 #f0f0f0;
+}
+
+/* ========== Responsive Styles ========== */
+@media (max-width: 992px) {
+    .notification .notif-container {
+        padding: 12px;
+    }
+
+    .notification .ant-tabs-tab {
+        padding: 8px 12px !important;
+    }
+
+    .notification .header-right-content {
+        gap: 8px;
+    }
+
+    .notification .search-container {
+        max-width: 220px;
+    }
+}
+
+@media (max-width: 820px) {
+    .notification {
+        padding: 8px;
+    }
+
+    .notification .notif-container {
+        padding: 8px;
+        border-radius: 4px;
+        overflow-x: hidden;
+    }
+
+    /* Compact header to save space */
+    .notification .page-title {
+        font-size: 18px !important;
+    }
+
+    .notification .title-divider {
+        margin: 8px 0 12px !important;
+    }
+
+    /* Make the search and buttons more compact */
+    .notification .header-right-content {
+        flex-wrap: nowrap;
+        width: auto;
+        align-items: center;
+    }
+
+    .notification .search-container {
+        max-width: 150px;
+        min-width: 100px;
+    }
+
+    /* Make table meta info more compact */
+    .notification .table-meta-info {
+        padding: 4px 0;
+        margin-bottom: 4px;
+    }
+
+    .notification .record-count {
+        font-size: 12px;
+    }
+
+    /* Make tabs more touch-friendly but compact */
+    .notification .ant-tabs-nav {
+        margin-bottom: 8px;
+    }
+
+    .notification .ant-tabs-tab {
+        padding: 6px 4px !important;
+        min-height: 36px;
+    }
+
+    /* Make icons more prominent on mobile when text is hidden */
+    .notification .ant-tabs-tab .anticon {
+        font-size: 16px;
+        margin-right: 0;
+    }
+
+    /* Special mobile layout for tab navigation area */
+    .notification .ant-tabs-nav-wrap {
+        flex: 1;
+    }
+
+    .notification .ant-tabs-extra-content {
+        flex: 2;
+    }
+}
+
+@media (max-width: 576px) {
+    .notification .notif-container {
+        max-height: calc(100vh - 120px);
+        padding: 8px 4px;
+    }
+
+    .notification .ant-table-cell {
+        padding: 6px 4px !important;
+        white-space: nowrap;
+    }
+
+    /* Stack search and buttons for very small screens */
+    .notification .header-right-content {
+        flex-direction: row;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .notification .search-container {
+        max-width: 120px;
+        min-width: 80px;
+    }
+
+    .notification .ant-input-search .ant-input {
+        padding-right: 4px !important;
+    }
+
+    .notification .ant-input-search .ant-input-suffix {
+        right: 4px !important;
+    }
+
+    /* Shrink buttons to icon-only */
+    .notification .ant-btn {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 8px;
+    }
+
+    .notification .ant-btn .anticon {
+        font-size: 14px;
+    }
+
+    /* Compact pagination */
+    .notification .table-pagination .ant-pagination {
+        display: flex;
+        justify-content: center;
+    }
+
+    .notification .table-pagination .ant-pagination-item,
+    .notification .table-pagination .ant-pagination-prev,
+    .notification .table-pagination .ant-pagination-next {
+        margin: 0 2px;
+        min-width: 24px;
+        height: 24px;
+        line-height: 22px;
+    }
+
+    /* Reduce space between tab nav and content */
+    .notification .ant-tabs-nav {
+        margin-bottom: 4px;
+    }
+
+    /* Reduce page title size further */
+    .notification .page-title {
+        font-size: 16px !important;
+    }
+
+    .notification .title-divider {
+        margin: 6px 0 8px !important;
+    }
+}
+
+@media (max-width: 820px) {
+    .notification .ant-tabs-content {
+        max-height: 100vh;
+        overflow-y: auto;
+        transition: none !important;
+    }
+
+    .notification .ant-tabs-tabpane {
+        height: auto !important;
+        overflow-y: auto;
+    }
+
+    .notification .ant-tabs-tabpane-hidden {
+        display: none !important;
+    }
+}

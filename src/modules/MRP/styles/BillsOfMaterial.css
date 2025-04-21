@@ -1,0 +1,140 @@
+/* REMINDER! All of your elements must use your unique namespace '.bom' at the start to avoid leaking */
+
+.bom {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.bom .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 40rem;
+  min-height: 30rem;
+  row-gap: 25px;
+}
+
+.bom .MRPSearch{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPsearch.png);
+  width: 20;
+  height: 20;
+}
+
+.bom .MRPIcon1{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon1.png);
+  width: 20;
+  height: 20;
+}
+
+.bom .MRPIcon2{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon2.png);
+  width: 20;
+  height: 20;
+}
+
+.bom .MRPIcon3{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon3.png);
+  width: 30;
+  height: 30;
+  background-repeat: no-repeat;
+}
+
+.bom .MRPIcon4{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon5.png);
+  width: 20;
+  height: 20;
+  background-repeat: no-repeat;
+}
+
+.bom .MRPIcon5{
+  background-image: url(/public/icons/module-icons/MRP-icons/MRPIcon5.png);
+  width: 20;
+  height: 20;
+  background-repeat: no-repeat;
+}
+
+.bom .bom-print-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  overflow-y: auto; /* scroll the modal when needed */
+  padding: 2rem 1rem; /* top space */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* aligns modal to top */
+  overflow-x: hidden;
+}
+
+.bom .bom-print-wrapper {
+  min-width: 1128px;
+  background: white;
+  max-height: 90vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+}
+
+.bom .scroll-container {
+  overflow-y: auto;
+  max-height: 85vh;
+  padding: 1rem;
+  overflow-x: hidden;
+}
+
+.bom .title {
+  font-size: clamp(24px, 5vw, 35px);
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 1.4px;
+}
+
+
+.bom .scroll-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.bom .scroll-container::-webkit-scrollbar-track {
+  background-color: #c3c3c3;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #00A8A8;
+  border-radius: 8px;
+}
+
+@media print {
+  .bom body * {
+    visibility: hidden;
+  }
+
+  .bom .bom-print-modal,.bom .bom-print-modal * {
+    visibility: visible;
+  }
+
+  .bom .bom-print-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+  }
+
+  .bom button {
+    display: none !important;
+  }
+}
+

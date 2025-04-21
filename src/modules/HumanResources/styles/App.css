@@ -1,0 +1,59 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.hr-app-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.hr-sidebar {
+  width: 240px;
+  background-color: #1a1a1a;
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  padding: 1rem;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.hr-main-content {
+  margin-left: 240px;
+  width: calc(100% - 240px);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.hr-navbar {
+  height: 60px;
+  background: white;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.hr-dashboard-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+.hr-dashboard-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+.hr-dashboard-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
