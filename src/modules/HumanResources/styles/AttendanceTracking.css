@@ -261,7 +261,6 @@
 .hr-attendance-header {
   position: sticky;
   top: 0;
-  z-index: 10;
   background-color: white;
   margin: 1rem 0;
   border-top: 1px solid #e4e4e4;
@@ -360,4 +359,286 @@
 .hr-attendance-tag.special {
   background-color: #fff3cd;
   color: #664d03; /* Yellow - Special */
+}
+
+/* Holiday-specific styling */
+.hr-attendance-tag.holiday-yes {
+  background-color: #ff9e80;
+  color: #7f0000;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.holiday-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* More specific calendar field type combinations */
+
+/* Workday specific */
+.hr-attendance-tag.workday-yes {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.workday-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* Holiday specific */
+.hr-attendance-tag.holiday-yes {
+  background-color: #ff9e80;
+  color: #7f0000;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.holiday-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* Special day specific */
+.hr-attendance-tag.special-yes {
+  background-color: #ffe082;
+  color: #886a08;
+  font-weight: bold;
+}
+
+.hr-attendance-tag.special-no {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE DESIGN
+   --------------------------------------------------------- */
+
+/* Base responsive adjustments */
+.hr-attendance-body-content-container {
+  min-width: unset; /* Remove fixed min-width to prevent overflow */
+  width: 100%;
+  max-width: 1600px;
+  padding: 1rem;
+}
+
+.hr-attendance-table {
+  width: 100%;
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1200px) {
+  .hr-attendance-body-content-container {
+    padding: 1.5rem;
+  }
+  
+  .hr-attendance-scrollable {
+    padding: 1.75rem;
+  }
+  
+  .hr-attendance-table {
+    min-width: 1400px; /* Force minimum width on large screens only */
+  }
+}
+
+/* Medium screens (tablets and small desktops) */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .hr-attendance-scrollable {
+    padding: 1.25rem;
+  }
+  
+  .hr-attendance-heading {
+    margin-bottom: 1.25rem;
+  }
+  
+  .hr-attendance-heading h2 {
+    font-size: 1.5rem;
+  }
+  
+  .hr-attendance-right-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .hr-attendance-search {
+    width: 200px;
+  }
+  
+  .hr-attendance-filter {
+    min-width: 150px;
+  }
+  
+  .hr-attendance-table-container {
+    max-height: calc(100vh - 200px);
+  }
+}
+
+/* Small screens (mobile) */
+@media (max-width: 767px) {
+  .hr-attendance-body-content-container {
+    padding: 0.75rem;
+    min-height: auto;
+  }
+  
+  .hr-attendance-scrollable {
+    padding: 1rem 0.75rem;
+  }
+  
+  /* Header and controls */
+  .hr-attendance-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .hr-attendance-heading h2 {
+    font-size: 1.4rem;
+  }
+  
+  .hr-attendance-right-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .hr-attendance-search-wrapper {
+    width: 100%;
+    margin-right: 0;
+  }
+  
+  .hr-attendance-search {
+    width: 100%;
+  }
+  
+  .hr-attendance-filter {
+    width: 100%;
+  }
+  
+  /* Tabs header */
+  .hr-attendance-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .hr-attendance-tabs {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .hr-attendance-tabs button {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.25rem;
+    white-space: nowrap;
+  }
+  
+  /* Tables */
+  .hr-attendance-table-container {
+    max-height: none; /* Remove fixed height constraint on mobile */
+  }
+  
+  .hr-attendance-table-scrollable {
+    overflow-x: auto;
+  }
+  
+  .hr-attendance-table th,
+  .hr-attendance-table td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Pagination */
+  .hr-attendance-pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .hr-attendance-pagination-numbers {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+  }
+  
+  .hr-attendance-pagination button {
+    min-width: 36px;
+    padding: 0.35rem 0.6rem;
+  }
+  
+  /* Tags */
+  .hr-attendance-tag {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  /* No scroll wrapper adjustment */
+  .hr-attendance-no-scroll-wrapper {
+    height: auto; /* Remove fixed height */
+    max-height: 400px; /* Add reasonable max height */
+  }
+}
+
+/* Very small screens (smaller mobile devices) */
+@media (max-width: 480px) {
+  .hr-attendance-body-content-container {
+    padding: 0.5rem;
+  }
+  
+  .hr-attendance-scrollable {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .hr-attendance-heading h2 {
+    font-size: 1.25rem;
+  }
+  
+  .hr-attendance-table th,
+  .hr-attendance-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Enhanced scrollbar behavior for all screen sizes */
+@media (hover: hover) {
+  .hr-attendance-table-scrollable::-webkit-scrollbar,
+  .hr-attendance-scrollable::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Print media query for better printing */
+@media print {
+  .hr-attendance-filter,
+  .hr-attendance-search-wrapper,
+  .hr-attendance-pagination {
+    display: none;
+  }
+  
+  .hr-attendance-body-content-container {
+    box-shadow: none;
+  }
+  
+  .hr-attendance-table {
+    min-width: 100%;
+  }
+  
+  .hr-attendance-table-container,
+  .hr-attendance-table-scrollable {
+    max-height: none;
+    overflow: visible;
+  }
+  
+  /* Ensure tag colors print well */
+  .hr-attendance-tag {
+    border: 1px solid #ddd;
+    background-color: transparent !important;
+    color: #333 !important;
+  }
 }
