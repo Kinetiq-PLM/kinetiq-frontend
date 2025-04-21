@@ -127,7 +127,7 @@
   letter-spacing: 1.4px;
 }
 
-@media (max-width: 1400px) {
+@media (max-width: 1330px) {
   .reqplan .title {
     text-align: center;
   }
@@ -232,7 +232,8 @@
     padding: 6px 8px;
   }
 
-  .reqplan .table-header .table-cell {
+  .reqplan .table-header,
+  .reqplan .table-cell {
     font-size: 13px;
   }
 
@@ -247,60 +248,60 @@
 }
 
 @media (max-width: 860px) {
-  .reqplan .table-cell2 {
-    display: none; /* Hide header on mobile */
+  .reqplan-container {
+    padding: 1.5rem 1rem;
   }
 
-  .reqplan .table-header{
-    border-bottom: '0px solid #E8E8E8';
-    display: none;
+  .reqplan .tabs-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .reqplan .search-container {
+    width: 100% !important;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    padding-right: 0;
+  }
+
+  .reqplan .table-header {
+    display: none !important;
   }
 
   .reqplan .table-row {
     display: flex;
     flex-direction: column;
-    border-bottom: 1px solid #ddd;
-    padding: 10px;
+    background: white;
+    border: 1px solid #E8E8E8;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.05);
   }
 
   .reqplan .table-cell {
     display: flex;
-    font-size: 13px;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 6px 0;
   }
 
   .reqplan .table-cell::before {
     content: attr(data-label);
     font-weight: 600;
     color: #444;
-    flex: 1;
-    text-align: left;
   }
 
   .reqplan .table-cell span {
-    flex: 2;
     text-align: right;
+    flex: 1;
   }
-
-  .reqplan .reqplan-table-scroll {
-    margin-right: 10rem !important;
-    margin-left: 10rem !important;
-    max-width: 2000px;
-    width: 100%;
-    overflow-y: auto;
-    max-height: 350px;
-    flex-direction: column;
-  }
-
-  .reqplan .containing{
-    padding: 0rem;
-  }
-
-  .reqplan .search-container{
-    align-items: stretch ;
-    width: 100%;
-  }
-
 }
+
+
 
 @media (max-width: 645px) {
   .reqplan .reqplan-table-scroll {
@@ -529,18 +530,18 @@
 }
 
 @media (max-width: 640px) {
-  .reqplan-help-wrapper {
+  .reqplan .reqplan-help-wrapper {
     bottom: 1.5rem;
     right: 1.5rem;
   }
 
-  .reqplan-help-button {
+  .reqplan .reqplan-help-button {
     width: 48px;
     height: 48px;
     font-size: 24px;
   }
 
-  .reqplan-help-option {
+  .reqplan .reqplan-help-option {
     font-size: 13px;
     padding: 0.4rem 0.8rem;
   }
