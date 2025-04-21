@@ -170,101 +170,105 @@ const CreateReceiptModal = ({
               value={reportForm.amountPaid}
               onChange={(e) => handleInputChange("amountPaid", e.target.value)}
             />
-            <div className="flex flex-col gap-y-2">
-              <label className="block text-sm font-medium">
-                Select Payment Method*
-              </label>
-              <Dropdown
-                style="selection"
-                defaultOption="Select payment method..."
-                options={["Cash", "Bank Transfer"]}
-                value={reportForm.paymentMethod}
-                onChange={(value) => {
-                  handleInputChange("paymentMethod", value);
-                  if (value !== "Bank Transfer") {
-                    handleInputChange("bankAccount", "");
-                  }
-                  if (value !== "Check") {
-                    handleInputChange("checkNumber", "");
-                  }
-                  if (value !== "Mobile Payment") {
-                    handleInputChange("transactionId", "");
-                  }
-                }}
-              />
-            </div>
 
-            {reportForm.paymentMethod === "Bank Transfer" && (
-              <div className="md:w-2/3 border border-gray-300 rounded-lg p-4 bg-gray-100 space-y-4">
-                <div className="flex flex-col sm:flex-row gap-y-2 sm:gap-x-6 text-sm">
-                  <label className="flex items-center gap-x-2">
-                    <input
-                      type="radio"
-                      checked={!showBankInput}
-                      onChange={() => setShowBankInput(false)}
-                    />
-                    <span>Bank accounts</span>
-                  </label>
-                  <label className="flex items-center gap-x-2">
-                    <input
-                      type="radio"
-                      checked={showBankInput}
-                      onChange={() => setShowBankInput(true)}
-                    />
-                    <span>Add new bank account</span>
-                  </label>
-                </div>
-
-                {!showBankInput ? (
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Select Bank Account*
-                    </label>
-                    <Dropdown
-                      style="selection"
-                      defaultOption="Select bank account..."
-                      options={bankAccounts.map((account) => account.account_name)}
-                      value={reportForm.bankAccount}
-                      onChange={(value) => {
-                        handleInputChange("bankAccount", value);
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <Forms
-                      type="text"
-                      formName="Account Name*"
-                      placeholder="Enter account name"
-                      value={newBankAccount.accountName}
-                      onChange={(e) =>
-                        setNewBankAccount({
-                          ...newBankAccount,
-                          accountName: e.target.value,
-                        })
-                      }
-                    />
-                    <Forms
-                      type="text"
-                      formName="Account Code*"
-                      placeholder="Enter account code"
-                      value={newBankAccount.accountCode}
-                      onChange={(e) =>
-                        setNewBankAccount({
-                          ...newBankAccount,
-                          accountCode: e.target.value,
-                        })
-                      }
-                    />
-                    <Button
-                      name="Save Bank Account"
-                      variant="standard2"
-                      onclick={saveBankAccount}
-                    />
-                  </div>
-                )}
+            <div className="flex gap-x-4">
+              <div className="flex flex-col gap-y-2">
+                <label className="block text-sm font-medium">
+                  Select Payment Method*
+                </label>
+                <Dropdown
+                  style="selection"
+                  defaultOption="Select payment method..."
+                  options={["Cash", "Bank Transfer"]}
+                  value={reportForm.paymentMethod}
+                  onChange={(value) => {
+                    handleInputChange("paymentMethod", value);
+                    if (value !== "Bank Transfer") {
+                      handleInputChange("bankAccount", "");
+                    }
+                    if (value !== "Check") {
+                      handleInputChange("checkNumber", "");
+                    }
+                    if (value !== "Mobile Payment") {
+                      handleInputChange("transactionId", "");
+                    }
+                  }}
+                />
               </div>
-            )}
+
+              {reportForm.paymentMethod === "Bank Transfer" && (
+                <div className="md:w-2/3 border border-gray-300 rounded-lg p-4 bg-gray-100 space-y-4">
+                  <div className="flex flex-col sm:flex-row gap-y-2 sm:gap-x-6 text-sm">
+
+                    <label className="flex items-center gap-x-2">
+                      <input
+                        type="radio"
+                        checked={!showBankInput}
+                        onChange={() => setShowBankInput(false)}
+                      />
+                      <span>Bank accounts</span>
+                    </label>
+                    <label className="flex items-center gap-x-2">
+                      <input
+                        type="radio"
+                        checked={showBankInput}
+                        onChange={() => setShowBankInput(true)}
+                      />
+                      <span>Add new bank account</span>
+                    </label>
+                  </div>
+
+                  {!showBankInput ? (
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Select Bank Account*
+                      </label>
+                      <Dropdown
+                        style="selection"
+                        defaultOption="Select bank account..."
+                        options={bankAccounts.map((account) => account.account_name)}
+                        value={reportForm.bankAccount}
+                        onChange={(value) => {
+                          handleInputChange("bankAccount", value);
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <Forms
+                        type="text"
+                        formName="Account Name*"
+                        placeholder="Enter account name"
+                        value={newBankAccount.accountName}
+                        onChange={(e) =>
+                          setNewBankAccount({
+                            ...newBankAccount,
+                            accountName: e.target.value,
+                          })
+                        }
+                      />
+                      <Forms
+                        type="text"
+                        formName="Account Code*"
+                        placeholder="Enter account code"
+                        value={newBankAccount.accountCode}
+                        onChange={(e) =>
+                          setNewBankAccount({
+                            ...newBankAccount,
+                            accountCode: e.target.value,
+                          })
+                        }
+                      />
+                      <Button
+                        name="Save Bank Account"
+                        variant="standard2"
+                        onclick={saveBankAccount}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {reportForm.paymentMethod === "Check" && (
               <Forms
