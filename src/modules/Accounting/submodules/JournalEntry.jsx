@@ -6,6 +6,7 @@ import Forms from "../components/Forms";
 import NotifModal from "../components/modalNotif/NotifModal";
 import Dropdown from "../components/Dropdown";
 import AddAccountModal from "../components/AddAccountModal";
+import axios from "axios";
 
 const JournalEntry = () => {
   const [totalDebit, setTotalDebit] = useState(0);
@@ -13,17 +14,27 @@ const JournalEntry = () => {
   const [journalOptions, setJournalOptions] = useState([]);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
+
+  // Initialize journalForm without localStorage
   const [journalForm, setJournalForm] = useState({
     journalId: "",
-    transactions: [{ type: "debit", glAccountId: "", amount: "", accountName: "" }],
+    transactions: [
+      { type: "debit", glAccountId: "", amount: "", accountName: "" },
+    ],
     description: "",
   });
+
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
     title: "",
     message: "",
   });
+
+  // API endpoint
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+  const JOURNAL_ENTRIES_ENDPOINT = `${API_URL}/api/journal-entries/`;
 
   const handleInputChange = (index, field, value) => {
     const sanitizedValue = value.replace(/[^0-9.]/g, "");
@@ -49,7 +60,9 @@ const JournalEntry = () => {
 
   const removeEntry = (index) => {
     setJournalForm((prevState) => {
-      const updatedTransactions = prevState.transactions.filter((_, i) => i !== index);
+      const updatedTransactions = prevState.transactions.filter(
+        (_, i) => i !== index
+      );
       updateTotals(updatedTransactions);
       return { ...prevState, transactions: updatedTransactions };
     });
@@ -79,18 +92,33 @@ const JournalEntry = () => {
       );
 
       const isTargetDebit =
-        accountData.glAccountId === "ACC-GLA-2025-ae6010" && // Update to valid gl_account_id
+        accountData.glAccountId === "ACC-GLA-2025-ae6010" &&
         prevState.transactions[selectedIndex].type === "debit";
 
       if (isTargetDebit) {
         const creditEntries = [
-          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "SSS Contribution" },
-          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Philhealth Contribution" },
-          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Pagibig Contribution" },
+          {
+            glAccountId: "ACC-GLA-2025-cl2060",
+            accountName: "SSS Contribution",
+          },
+          {
+            glAccountId: "ACC-GLA-2025-cl2060",
+            accountName: "Philhealth Contribution",
+          },
+          {
+            glAccountId: "ACC-GLA-2025-cl2060",
+            accountName: "Pagibig Contribution",
+          },
           { glAccountId: "ACC-GLA-2025-cl2030", accountName: "Tax" },
           { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Late Deduction" },
-          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Absent Deduction" },
-          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Undertime Deduction" },
+          {
+            glAccountId: "ACC-GLA-2025-cl2060",
+            accountName: "Absent Deduction",
+          },
+          {
+            glAccountId: "ACC-GLA-2025-cl2060",
+            accountName: "Undertime Deduction",
+          },
           { glAccountId: "", accountName: "" },
         ];
 
@@ -112,6 +140,7 @@ const JournalEntry = () => {
   };
 
   const handleSubmit = async () => {
+    // Validation checks
     if (!journalForm.journalId || !journalForm.description) {
       setValidation({
         isOpen: true,
@@ -169,37 +198,35 @@ const JournalEntry = () => {
     };
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/journal-entries/${journalForm.journalId}/`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await axios.patch(
+        `${JOURNAL_ENTRIES_ENDPOINT}${journalForm.journalId}/`,
+        payload
+      );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update journal: ${response.status} - ${errorText}`);
+      if (response.status === 200 || response.status === 201) {
+        setValidation({
+          isOpen: true,
+          type: "success",
+          title: "Journal Entry Updated",
+          message: "Journal entry updated successfully!",
+        });
+        setJournalForm({
+          journalId: "",
+          transactions: [{ type: "debit", glAccountId: "", amount: "", accountName: "" }],
+          description: "",
+        });
+        setTotalDebit(0);
+        setTotalCredit(0);
+      } else {
+        throw new Error("Unexpected response status");
       }
-
-      const data = await response.json();
-      setValidation({
-        isOpen: true,
-        type: "success",
-        title: "Journal Entry Updated",
-        message: "Journal entry updated successfully!",
-      });
-      setJournalForm({
-        journalId: "",
-        transactions: [{ type: "debit", glAccountId: "", amount: "", accountName: "" }],
-        description: "",
-      });
-      setTotalDebit(0);
-      setTotalCredit(0);
     } catch (error) {
+      console.error("Error updating journal entry:", error.response ? error.response.data : error);
       setValidation({
         isOpen: true,
         type: "error",
-        title: "Error Updating Journal Entry",
-        message: error.message,
+        title: "Check Connection!",
+        message: error.response?.data?.detail || "Failed to connect to the server.",
       });
     }
   };
@@ -207,14 +234,19 @@ const JournalEntry = () => {
   useEffect(() => {
     const fetchJournalIDs = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/journal-entries/");
-        const result = await response.json();
-        const zeroBalanceJournals = result
+        const response = await axios.get(JOURNAL_ENTRIES_ENDPOINT);
+        const zeroBalanceJournals = response.data
           .filter((entry) => parseFloat(entry.total_debit) === 0 && parseFloat(entry.total_credit) === 0)
           .map((entry) => entry.journal_id || entry.id);
         setJournalOptions(zeroBalanceJournals);
       } catch (error) {
-        console.error("Error fetching journal IDs:", error);
+        console.error("Error fetching journal IDs:", error.response ? error.response.data : error);
+        setValidation({
+          isOpen: true,
+          type: "error",
+          title: "Fetch Error",
+          message: "Failed to load journal IDs. Please check your connection.",
+        });
       }
     };
     fetchJournalIDs();
@@ -237,7 +269,9 @@ const JournalEntry = () => {
                   style="selection"
                   defaultOption="Select Journal ID"
                   value={journalForm.journalId}
-                  onChange={(value) => setJournalForm({ ...journalForm, journalId: value })}
+                  onChange={(value) =>
+                    setJournalForm({ ...journalForm, journalId: value })
+                  }
                 />
               </div>
               <Forms
@@ -245,13 +279,26 @@ const JournalEntry = () => {
                 formName="Description*"
                 placeholder="Enter Description"
                 value={journalForm.description}
-                onChange={(e) => setJournalForm({ ...journalForm, description: e.target.value })}
+                onChange={(e) =>
+                  setJournalForm({
+                    ...journalForm,
+                    description: e.target.value,
+                  })
+                }
               />
             </div>
 
             <div className="component-container">
-              <Button name="+ Add debit" variant="standard2" onclick={() => addEntry("debit")} />
-              <Button name="+ Add credit" variant="standard2" onclick={() => addEntry("credit")} />
+              <Button
+                name="+ Add debit"
+                variant="standard2"
+                onclick={() => addEntry("debit")}
+              />
+              <Button
+                name="+ Add credit"
+                variant="standard2"
+                onclick={() => addEntry("credit")}
+              />
             </div>
           </div>
 
@@ -263,7 +310,14 @@ const JournalEntry = () => {
               onclick={() =>
                 setJournalForm({
                   journalId: "",
-                  transactions: [{ type: "debit", glAccountId: "", amount: "", accountName: "" }],
+                  transactions: [
+                    {
+                      type: "debit",
+                      glAccountId: "",
+                      amount: "",
+                      accountName: "",
+                    },
+                  ],
                   description: "",
                 })
               }
@@ -279,10 +333,21 @@ const JournalEntry = () => {
           </div>
 
           {journalForm.transactions.map((entry, index) => (
-            <div key={index} className={`table-row ${entry.type === "credit" ? "credit-row" : ""}`}>
-              <div className={`column account-column ${entry.type === "credit" ? "ml-6" : ""}`}>
+            <div
+              key={index}
+              className={`table-row ${
+                entry.type === "credit" ? "credit-row" : ""
+              }`}
+            >
+              <div
+                className={`column account-column ${
+                  entry.type === "credit" ? "ml-6" : ""
+                }`}
+              >
                 <Button
-                  name={entry.glAccountId ? entry.accountName : "Select Account"}
+                  name={
+                    entry.glAccountId ? entry.accountName : "Select Account"
+                  }
                   variant="standard2"
                   onclick={() => {
                     setSelectedIndex(index);
@@ -298,7 +363,9 @@ const JournalEntry = () => {
                     inputMode="decimal"
                     placeholder="Enter Debit"
                     value={entry.amount}
-                    onChange={(e) => handleInputChange(index, "amount", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(index, "amount", e.target.value)
+                    }
                     step="any"
                   />
                 )}
@@ -311,7 +378,9 @@ const JournalEntry = () => {
                     inputMode="decimal"
                     placeholder="Enter Credit"
                     value={entry.amount}
-                    onChange={(e) => handleInputChange(index, "amount", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(index, "amount", e.target.value)
+                    }
                     step="any"
                   />
                 )}

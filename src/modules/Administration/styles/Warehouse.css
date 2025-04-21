@@ -38,6 +38,122 @@
     color: #666;
 }
 
+/* ========== Tab Styles ========== */
+.warehouse .tabs-wrapper {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Important for proper flex child sizing */
+  }
+  
+  .warehouse .warehouse-tabs {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Important for proper flex child sizing */
+  }
+  
+  .warehouse .tabs-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .warehouse .warehouse-tabs .ant-tabs-nav {
+    margin-bottom: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #fff;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    flex-wrap: wrap;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  .warehouse .warehouse-tabs .ant-tabs-nav::-webkit-scrollbar {
+    display: none; /* Optional: hide scrollbar on WebKit browsers */
+  }
+  
+  .warehouse .warehouse-tabs .ant-tabs-nav-list {
+    display: flex;
+    width: auto;
+    flex-wrap: nowrap; /* Prevent wrapping to a new line */
+  }
+  
+  /* Improve tab selection area for better click targets */
+  .warehouse .warehouse-tabs .ant-tabs-tab {
+    flex: 0 0 auto;
+    margin: 0 4px;
+    padding: 8px 16px;
+    /* Increase the height for better tap targets on mobile */
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: none;
+  }
+  
+  /* Enhanced active tab styles */
+  .warehouse .warehouse-tabs .ant-tabs-tab.ant-tabs-tab-active {
+    background-color: rgba(0, 168, 168, 0.1);
+    border-radius: 4px;
+    transition: none;
+  }
+  
+  .warehouse .warehouse-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #00a8a8;
+  }
+  
+  .warehouse .warehouse-tabs .ant-tabs-ink-bar {
+    background: #00a8a8;
+  }
+  
+  /* Make content area take remaining space */
+  .warehouse .ant-tabs-content-holder {
+    flex: 1;
+    min-height: 0; /* Allow it to shrink */
+    overflow: hidden;
+  }
+  
+  .warehouse .ant-tabs-content {
+    height: 100%;
+  }
+  
+  .ant-tabs-tabpane {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* For card style tabs on mobile */
+  .warehouse .warehouse-tabs.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab {
+    border: 1px solid #f0f0f0;
+    background: #fafafa;
+    border-radius: 4px;
+    margin: 0 2px;
+  }
+  
+  .warehouse
+    .warehouse-tabs.ant-tabs-card
+    > .ant-tabs-nav
+    .ant-tabs-tab.ant-tabs-tab-active {
+    background-color: #e6f7f7;
+    border-color: #00a8a8;
+  }
+
 /* ========== Control and Header Styles ========== */
 .warehouse .header-right-content {
     display: flex;

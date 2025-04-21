@@ -4,9 +4,11 @@
   display: flex;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
 }
 
 .pcounts .body-content-container {
+    box-sizing: border-box;
     width: 100%;
     height: 100%;
     border-radius: 0.5rem;
@@ -20,20 +22,47 @@
     justify-content: center;
     min-width: 40rem;
     min-height: 30rem;
+    overflow-y: auto;
+  }
+
+
+
+  .pcounts .body-content-container::-webkit-scrollbar {
+    width: 8px; /* Scrollbar width */
+    background: #e5e7eb;
   }
   
+  .pcounts .body-content-container::-webkit-scrollbar-thumb {
+    background: rgb(168, 168, 168); /* Scrollbar color */
+    border-radius: 6px; 
+  }
+  
+  .pcounts .body-content-container::-webkit-scrollbar-thumb:hover {
+    background: #c1c3c6;
+  }
 
-  /* Hide scrollbar for Webkit (Chrome, Safari) */
-.pcounts .pcounts-table-container::-webkit-scrollbar {
-  display: none;
-}
+
 
 /* Hide scrollbar for Firefox */
-.pcounts .pcounts-table-container {
+/* .pcounts .pcounts-table-container {
   scrollbar-width: none;
-}
+} */
 
 /* Hide scrollbar for Edge */
-.pcounts .pcounts-table-container {
+/* .pcounts .pcounts-table-container {
   -ms-overflow-style: none;
+} */
+
+.pcounts .pcounts-table-container::-webkit-scrollbar {
+  width: 6px; /* Scrollbar width */
+  height: 6px;
+  background: rgb(239, 239, 239);
+}
+
+
+.pcounts .pcounts-table-container::-webkit-scrollbar-thumb {
+  background: #00A8A8; /* Scrollbar color */
+  height: 5rem;
+  width: 5rem;
+  border-radius: 6px; /* Rounded edges */
 }

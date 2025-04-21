@@ -177,8 +177,8 @@ const [isRequestDropdown, setRequestDropdown] = useState(false);
 
 const fetchRequests = async () => {
   try {
-    const response = await GET(`request/requests/technician/${technician}/`);
-    // const response = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
+    // const response = await GET(`request/requests/technician/${technician}/`);
+    const response = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
     //const response = await GET(`request/`); 
     console.log("requests", response)
     setRequests(response);
@@ -290,18 +290,19 @@ const handleSelectOpCost = (operationalCost) => {
   setOpenOpCost(false);
 };
 
-  const handleCreate = () => {
-    console.log(formData)
-    onCreate({
-      service_request_id: formData.requestId,
-      analysis_id: formData.analysisId,
-      renewal_id: formData.renewalId,
-      service_order_id: formData.orderId,
-      operational_cost_id: formData.operationalCostId,
-      outsource_fee: formData.outsourceFee,
-      billing_status: formData.billingStatus
-    })
-  }
+const handleCreate = () => {
+  console.log(formData);
+  onCreate({
+    service_request_id: formData.requestId,
+    analysis_id: formData.analysisId,
+    renewal_id: formData.renewalId,
+    service_order_id: formData.orderId,
+    operational_cost_id: formData.operationalCostId,
+    outsource_fee: formData.outsourceFee,
+    billing_status: formData.billingStatus,
+    date_paid: formData.billingStatus === 'Paid' ? new Date().toISOString().split('T')[0] : null
+  });
+};
 
   if (!isOpen) return null
 

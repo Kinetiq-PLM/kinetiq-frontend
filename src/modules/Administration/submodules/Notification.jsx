@@ -1,45 +1,43 @@
 import React, { useState, useEffect } from "react";
-// import { notificationAPI } from "../api/api";
-import "../styles/Notification.css";
+import { notificationsAPI } from "../api/api";
+import "../styles/Notifications.css";
 import {
     Table,
-    Button,
-    Form,
     Input,
     Tabs,
-    Tag,
-    Space,
-    Popconfirm,
     message,
     Typography,
     Divider,
-    Pagination
+    Pagination,
+    Badge,
+    Tag
 } from "antd";
 import {
-    UserOutlined,
-    SearchOutlined
+    BellOutlined,
+    SearchOutlined,
+    FilterOutlined,
 } from "@ant-design/icons";
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
 
-const Notification = () => {
+const Notifications = () => {
     // State variables
-    const [notification, setNotification] = useState([]);
+    const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchValue, setSearchValue] = useState("");
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     // Pagination states
-    const [activeTab] = useState("notification");
-    const [notificationPagination, setNotificationPagination] = useState({
+    const [activeTab] = useState("notifications");
+    const [notificationsPagination, setNotificationsPagination] = useState({
         current: 1,
         pageSize: 10,
         total: 0
     });
 
     useEffect(() => {
-        fetchNotification();  // idk ano papalit 
+        fetchNotifications();
     }, []);  // Empty dependency array ensures it runs once on mount
 
     useEffect(() => {
@@ -52,20 +50,20 @@ const Notification = () => {
     }, []);
 
     // Data fetching functions
-    const fetchNotification = async (searchTerm = "", orderField = "", orderDirection = "") => {
+    const fetchNotifications = async (searchTerm = "", orderField = "", orderDirection = "") => {
         setLoading(true);
         try {
-            const data = await notificationAPI.getNotification({
+            const data = await notificationsAPI.getNotifications({
                 search: searchTerm,
                 ordering: orderDirection === "descend" ? `-${orderField}` : orderField
             });
-            setNotification(data.results || data);
-            setNotificationPagination(prev => ({
+            setNotifications(data.results || data);
+            setNotificationsPagination(prev => ({
                 ...prev,
                 total: (data.results || data).length
             }));
         } catch (error) {
-            message.error("Failed to fetch notification");
+            message.error("Failed to fetch notifications");
             console.error(error);
         } finally {
             setLoading(false);
@@ -73,8 +71,8 @@ const Notification = () => {
     };
 
     // Handle pagination changes
-    const handleNotificationPaginationChange = (page, pageSize) => {
-        setNotificationPagination(prev => ({
+    const handleNotificationsPaginationChange = (page, pageSize) => {
+        setNotificationsPagination(prev => ({
             ...prev,
             current: page,
             pageSize
@@ -84,78 +82,122 @@ const Notification = () => {
     // Handle search with debounce
     const handleSearch = (value) => {
         setSearchValue(value);
-        if (activeTab === "notification") {
-            fetchNotification(value);
+        if (activeTab === "notifications") {
+            fetchNotifications(value);
         }
     };
 
+    const handleTableChange = (pagination, filters, sorter, extra) => {
+        if (sorter && sorter.field) {
+            const orderField = sorter.field;
+            const orderDirection = sorter.order;
+
+            fetchNotifications(searchValue, orderField, orderDirection);
+        }
+    };
+
+    // Get status tag with appropriate color
+    const getStatusTag = (status) => {
+        let color = '';
+        switch(status) {
+            case 'Read':
+                color = 'green';
+                break;
+            case 'Unread':
+                color = 'blue';
+                break;
+            case 'Archived':
+                color = 'red';
+                break;
+            default:
+                color = 'default';
+        }
+        return <Tag color={color}>{status.toUpperCase()}</Tag>;
+    };
 
     // Table columns definitions with sorting added
-    const notificationColumns = [
+    const notificationsColumns = [
         {
-            title: "Notification ID",
-            dataIndex: "notification_id",
-            key: "notification_id",
+            title: "ID",
+            dataIndex: "notifications_id",
+            key: "notifications_id",
             sorter: true,
-            width: 100,
+            width: 150,
         },
         {
             title: "Module",
             dataIndex: "module",
             key: "module",
             sorter: true,
-            width: 100,
+            width: 120,
         },
         {
-            title: "To",
+            title: "User ID",
             dataIndex: "to_user_id",
             key: "to_user_id",
             sorter: true,
-            width: 100,
+            width: 120,
         },
         {
             title: "Message",
             dataIndex: "message",
             key: "message",
             sorter: true,
-            width: 180,
-        },        
+            width: 250,
+        },
         {
             title: "Status",
-            dataIndex: "notification_status",
-            key: "notification_status",
+            dataIndex: "notifications_status",
+            key: "notifications_status",
             sorter: true,
-            width: 80,
-            render: (status) => (
-              <Tag color={status === "Read" ? "green" : "red"}>
-                {status}
-              </Tag>
-            ),
+            width: 60,
+            render: (status) => getStatusTag(status),
         },
         {
             title: "Created At",
             dataIndex: "created_at",
             key: "created_at",
             sorter: true,
-            width: 100,
-            render: (text) => text ? new Date(text).toLocaleDateString() : '-',
-        },     
+            width: 160,
+            render: (text) => {
+                if (!text) return "-";
+                const date = new Date(text);
+                const options = {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                };
+                const timeOptions = {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: true,
+                };
+        
+                const datePart = date.toLocaleDateString(undefined, options);
+                const timePart = date.toLocaleTimeString(undefined, timeOptions);
+                return `${datePart}, ${timePart}`;
+            },
+        },
     ];
 
     // Calculate table data for pagination
-    const getNotificationTableData = () => {
-        const { current, pageSize } = notificationPagination;
+    const getNotificationsTableData = () => {
+        const { current, pageSize } = notificationsPagination;
         const start = (current - 1) * pageSize;
         const end = start + pageSize;
-        return notification.slice(start, end);
+        return notifications.slice(start, end);
     };
+
+    // Count unread notifications
+    const unreadCount = notifications.filter(n => n.notifications_status === 'unread').length;
 
     // Render main component
     return (
-        <div className="notification">
-            <div className="notif-container">
+        <div className="notifications">
+            <div className="notifications-container">
                 <Title level={4} className="page-title">
-                    {activeTab === "notification" ? "Notification" : ""}
+                    {activeTab === "notifications" ? "Notifications" : ""}
                 </Title>
                 <Divider className="title-divider" />
 
@@ -164,7 +206,7 @@ const Notification = () => {
                         activeKey={activeTab}
                         size="middle"
                         tabBarGutter={8}
-                        className="notif-tabs"
+                        className="notifications-tabs"
                         type={windowWidth <= 768 ? "card" : "line"}
                         tabPosition="top"
                         destroyInactiveTabPane={false}
@@ -172,32 +214,42 @@ const Notification = () => {
                             right: (
                                 <div className="header-right-content">
                                     <div className="search-container">
-                                            <Input.Search
-                                                placeholder="Search notifications..."
-                                                allowClear
-                                                onSearch={handleSearch}
-                                                value={searchValue}
-                                                onChange={(e) => setSearchValue(e.target.value)}
-                                                prefix={<SearchOutlined />}
-                                            />
+                                        <Input.Search
+                                            placeholder="Search notifications..."
+                                            allowClear
+                                            onSearch={handleSearch}
+                                            value={searchValue}
+                                            onChange={(e) => setSearchValue(e.target.value)}
+                                            prefix={<SearchOutlined />}
+                                        />
                                     </div>
                                 </div>
                             )
                         }}
                     >
                         <TabPane
-                            tab={<span><UserOutlined /> {windowWidth > 576 ? "Notification" : ""}</span>}
-                            key="notification"
+                            tab={
+                                <span>
+                                    <Badge count={unreadCount} size="small" offset={[5, -3]}>
+                                        <BellOutlined />
+                                    </Badge>
+                                    {windowWidth > 576 ? " Notifications" : ""}
+                                </span>
+                            }
+                            key="notifications"
                         >
-                            {/* Notif tab content */}
+                            {/* Notifications tab content */}
                             <div className="table-meta-info">
-                                <span className="record-count">Total Notifications: {notification.length}</span>
+                                <span className="record-count">
+                                    Total Notifications: {notifications.length} 
+                                    {unreadCount > 0 && ` (${unreadCount} unread)`}
+                                </span>
                                 <div className="table-pagination">
                                     <Pagination
-                                        current={notificationPagination.current}
-                                        pageSize={notificationPagination.pageSize}
-                                        total={notification.length}
-                                        onChange={handleNotificationPaginationChange}
+                                        current={notificationsPagination.current}
+                                        pageSize={notificationsPagination.pageSize}
+                                        total={notifications.length}
+                                        onChange={handleNotificationsPaginationChange}
                                         showSizeChanger={false}
                                         size="small"
                                     />
@@ -206,9 +258,9 @@ const Notification = () => {
 
                             <div className="table-container">
                                 <Table
-                                    dataSource={getNotificationTableData()}
-                                    columns={notificationColumns}
-                                    rowKey="notification_id"
+                                    dataSource={getNotificationsTableData()}
+                                    columns={notificationsColumns}
+                                    rowKey="notifications_id"
                                     loading={loading}
                                     scroll={{ x: true, y: 400 }}
                                     pagination={false}
@@ -216,7 +268,9 @@ const Notification = () => {
                                     size="middle"
                                     showSorterTooltip={false}
                                     sortDirections={['ascend', 'descend']}
+                                    onChange={handleTableChange}
                                     className="scrollable-table"
+                                    rowClassName={(record) => record.notifications_status === 'unread' ? 'unread-row' : ''}
                                 />
                             </div>
                         </TabPane>
@@ -227,4 +281,4 @@ const Notification = () => {
     );
 };
 
-export default Notification;
+export default Notifications;

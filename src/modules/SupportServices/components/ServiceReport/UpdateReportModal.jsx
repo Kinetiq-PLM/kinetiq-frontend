@@ -47,7 +47,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report, technician }) =>
         billingId: report.service_billing?.service_billing_id || "",
         description: report.description || "",
         reportStatus: report.report_status  || "",
-        technicianId: report.technician?.employee_id || ""
+        technicianId: technician
       })
     }
   }, [report])

@@ -413,7 +413,7 @@ function App() {
       "Service Contract": "ServiceContract",
     },
     "Inventory": {
-      "Stock Levels": "StockLevels",
+      "Shelf Life": "ShelfLife",
       "P-Counts": "PCounts",
       "Stock Flow": "StockFlow",
     },

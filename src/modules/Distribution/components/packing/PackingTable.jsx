@@ -168,7 +168,7 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
             </thead>
             <tbody>
               <tr>
-                <td colSpan="8" className="no-data">No packing lists found</td>
+                <td colSpan={window.innerWidth <= 576 ? 4 : 8} className="no-data">No packing lists found</td>
               </tr>
             </tbody>
           </table>

@@ -196,7 +196,7 @@ const DeliveredShipmentsTable = ({ shipments, onShipmentSelect, selectedShipment
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="no-data">
+                <td colSpan={window.innerWidth <= 576 ? 3 : 7} className="no-data">
                   No delivered shipments found. Try adjusting your filters.
                 </td>
               </tr>

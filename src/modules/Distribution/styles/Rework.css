@@ -1314,3 +1314,147 @@
     width: 100%;
   }
 }
+
+/* Fix status cell class naming issue - lowercase with dashes for CSS classes */
+.rework .status-cell.status-In.Progress::before,
+.rework .status-cell.status-In-Progress::before {
+  background-color: #007bff; /* Use the same color as .status-in-progress::before */
+}
+
+/* Ensure all statuses have proper dots */
+.rework .status-cell.status-Pending::before {
+  background-color: #6c757d;
+}
+
+.rework .status-cell.status-Completed::before {
+  background-color: #28a745;
+}
+
+/* Fix table alignment */
+.rework .rework-table th,
+.rework .rework-table td {
+  text-align: center;
+}
+
+.rework .rework-table th:first-child,
+.rework .rework-table td:first-child {
+  padding-left: 1.25rem;
+}
+
+.rework .rework-table th:last-child,
+.rework .rework-table td:last-child {
+  padding-right: 1.25rem;
+}
+
+/* Responsive styles */
+@media (max-width: 1440px) {
+  /* Remove dots but keep color-coded statuses */
+  .rework .status-cell {
+    padding-left: 0.75rem; /* Reset the padding since we're removing the dot */
+  }
+
+  .rework .status-cell::before {
+    display: none; /* Hide the status dot */
+  }
+  
+  /* Add background color to status cells instead */
+  .rework .status-cell.status-Pending {
+    background-color: rgba(108, 117, 125, 0.1);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .rework .status-cell.status-In.Progress,
+  .rework .status-cell.status-In-Progress {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .rework .status-cell.status-Completed {
+    background-color: rgba(40, 167, 69, 0.1);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Make the table horizontally scrollable on small screens */
+  .rework .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust row padding for better touch targets */
+  .rework .rework-table td,
+  .rework .rework-table th {
+    padding: 0.85rem 0.75rem;
+  }
+  
+  /* Handle pagination better on small screens */
+  .rework .page-numbers {
+    display: none; /* Hide page numbers, keep only prev/next */
+  }
+  
+  .rework .pagination-controls {
+    justify-content: space-between;
+  }
+  
+  .rework .pagination-button {
+    min-width: 100px; /* Make buttons bigger for touch */
+  }
+  
+  /* Make filters better on small screens */
+  .rework .filters-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .rework .search-container {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+  
+  .rework .filter-container {
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Hide less important columns on very small screens */
+  .rework .rework-table th:nth-child(5),
+  .rework .rework-table td:nth-child(5),
+  .rework .rework-table th:nth-child(6),
+  .rework .rework-table td:nth-child(6) {
+    display: none;
+  }
+  
+  /* Make sure no-data message spans fewer columns */
+  .rework .no-data {
+    font-size: 0.8rem;
+    padding: 1.5rem 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Add touch-friendly rows */
+  .rework .rework-table tbody tr {
+    cursor: pointer;
+  }
+
+  .rework .rework-table tbody tr:active {
+    background-color: rgba(0, 168, 168, 0.05);
+  }
+  
+  /* Make status more visible */
+  .rework .status-cell {
+    font-weight: 500;
+  }
+  
+  /* Stats row responsive */
+  .rework .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+  }
+}
