@@ -731,8 +731,6 @@
   border-color: #00a8a8;
 }
 
-/* Add these new styles at the end of your Packing.css file */
-
 .packing .icon-spacing {
   margin-right: 8px;
   vertical-align: middle;
@@ -822,8 +820,6 @@
   min-width: 120px;
   justify-content: center;
 }
-
-/* Add these styles to your Packing.css file */
 
 /* Improved Modal Styles - General */
 .packing .modal-overlay {
@@ -1927,5 +1923,100 @@
   .packing .info-grid-2col {
     flex-direction: column;
     gap: 12px;
+  }
+}
+
+@media (max-width: 1440px) {
+  /* Remove dots but keep color-coded statuses */
+  .packing .status-cell {
+    padding-left: 0.75rem; /* Reset the padding since we're removing the dot */
+  }
+
+  .packing .status-cell::before {
+    display: none; /* Hide the status dot */
+  }
+  
+  /* Add background color to status cells instead */
+  .packing .status-pending {
+    background-color: rgba(108, 117, 125, 0.1);
+  }
+  
+  .packing .status-packed {
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+  
+  .packing .status-shipped {
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Make the table horizontally scrollable on small screens */
+  .packing .packing-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust row padding for better touch targets */
+  .packing .packing-table td,
+  .packing .packing-table th {
+    padding: 0.85rem 0.75rem;
+  }
+  
+  /* Handle pagination better on small screens */
+  .packing .page-numbers {
+    display: none; /* Hide page numbers, keep only prev/next */
+  }
+  
+  .packing .pagination-info {
+    display: inline-block;
+    margin: 0 0.5rem;
+  }
+  
+  .packing .pagination-button {
+    min-width: 80px; /* Make buttons bigger for touch */
+  }
+}
+
+@media (max-width: 576px) {
+  /* Hide less important columns on very small screens */
+  .packing .packing-table th:nth-child(3),
+  .packing .packing-table td:nth-child(3),
+  .packing .packing-table th:nth-child(5),
+  .packing .packing-table td:nth-child(5),
+  .packing .packing-table th:nth-child(6),
+  .packing .packing-table td:nth-child(6),
+  .packing .packing-table th:nth-child(7),
+  .packing .packing-table td:nth-child(7) {
+    display: none;
+  }
+  
+  /* Make sure no-data message spans fewer columns */
+  .packing .no-data {
+    font-size: 0.8rem;
+    padding: 1.5rem 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Add touch friendly rows */
+  .packing .packing-table tbody tr {
+    cursor: pointer;
+  }
+
+  .packing .packing-table tbody tr:active {
+    background-color: rgba(0, 168, 168, 0.1);
+  }
+  
+  /* Optimize the sort icons for mobile */
+  .packing .sort-icon {
+    display: block;
+    margin: 2px auto 0;
+  }
+  
+  /* Make status more visible */
+  .packing .status-cell {
+    font-weight: 500;
+    border-radius: 4px;
   }
 }

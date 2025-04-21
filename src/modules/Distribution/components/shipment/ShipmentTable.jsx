@@ -144,7 +144,7 @@ const ShipmentTable = ({ shipments, onShipmentSelect, selectedShipment, carriers
       </div>
       
       <div className="table-wrapper">
-        <table className="shipment-table">
+        <table className="shipment-table delivered-shipments-table">
           <thead>
             <tr>
               <th 
@@ -212,7 +212,7 @@ const ShipmentTable = ({ shipments, onShipmentSelect, selectedShipment, carriers
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="no-data">
+                <td colSpan={window.innerWidth <= 576 ? 3 : 7} className="no-data">
                   No shipments found. Try adjusting your filters.
                 </td>
               </tr>
