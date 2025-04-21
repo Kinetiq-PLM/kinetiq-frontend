@@ -557,7 +557,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         document_type: "Goods Receipt",
         status: selectedStatus,
         vendor_code: vendorID || null,
-        buyer: documentDetails.buyer,
+        buyer: null,
         employee_id: employee_id,
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
@@ -611,12 +611,9 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
-    if (!selectedOwner || !documentDetails.buyer){
+    if (!selectedOwner){
       if(!selectedOwner){
         toast.error("Owner is required")
-        return
-      }else if(!documentDetails.buyer){
-        toast.error("Buyer Required")
         return
       }
       return
@@ -696,7 +693,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       const updatedData = {
         status: selectedStatus,
         vendor_code: vendorID,
-        buyer: documentDetails.buyer,
+        buyer: "null",
         employee_id: isCreateMode ? employee_id : selectedData?.employee_id || employee_id,
         transaction_id: documentDetails.transaction_id,
         document_no: documentDetails.document_no,
@@ -775,7 +772,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         vendor_code: quotation.vendor_code || null,
         vendor_name: quotation.vendor_name || null,
         contact_person: quotation.contact_person || null,
-        buyer: null,
+        buyer: "null",
         owner: quotation.request_id?.employee_name || null,
         delivery_date: selectedPO.delivery_date || null,
         status: "Draft",
@@ -893,18 +890,9 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                 <label>Buyer</label>
                 <input
                   type="text"
-                  value={documentDetails.buyer}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    const regex = /^[A-Za-z\s]*$/;
-                    const maxLength = 50;
-                    if ((regex.test(value) || value === '') && value.length <= maxLength) {
-                      handleDocumentDetailChange(e, "buyer");
-                    }else{
-                      toast.dismiss()
-                      toast.info(" Please enter a valid name. Only alphabetic characters (A–Z, a–z) and only 50 characters are allowed.")
-                    }
-                  }}
+                  value={"---"}
+                  style={{ cursor: 'not-allowed' }}
+                  readOnly
                 />
               </div>
               <div className="detail-row">

@@ -480,7 +480,21 @@
   z-index: 1;
 }
 
+.goods-r .dropdown-scrollbar select::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
+
+.goods-r .dropdown-scrollbar select::-webkit-scrollbar-thumb {
+  background: #0d9488;
+  border-radius: 3px;
+}
+
+
+.goods-r .dropdown-scrollbar select::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
 /* Media query for smaller tablets */
 @media (max-width: 768px) {
   .goods-r .body-content-container {
