@@ -455,6 +455,7 @@ const OpportunityModal = ({
                 setValue={setWeightedAmount}
                 validation={validateWeightedAmount}
                 isValidationVisible={isValidationVisible}
+                disabled={true}
               />
               <div className="flex-1"></div>
             </div>

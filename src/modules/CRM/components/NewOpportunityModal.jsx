@@ -429,7 +429,7 @@ const NewOpportunityModal = ({
             </div>
             <div className="flex gap-2">
               <NumberInputField
-                label={"Weighted Amouaaant"}
+                label={"Weighted Amount"}
                 value={weightedAmount}
                 setValue={setWeightedAmount}
                 validation={validateWeightedAmount}
