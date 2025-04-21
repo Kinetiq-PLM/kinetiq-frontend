@@ -195,7 +195,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="no-data"> {/* Update colspan to match column count */}
+                <td colSpan={window.innerWidth <= 576 ? 3 : 6} className="no-data">
                   No {deliveryType} delivery orders found
                 </td>
               </tr>

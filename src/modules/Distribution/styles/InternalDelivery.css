@@ -348,3 +348,106 @@
   border-radius: 4px;
   background-color: #f8d7da;
 }
+
+
+@media (max-width: 1440px) {
+  /* Remove dots but keep color-coded statuses */
+  .external-delivery .status-cell,
+  .internal-delivery .status-cell {
+    padding-left: 0.75rem; /* Reset the padding since we're removing the dot */
+  }
+
+  .external-delivery .status-cell::before,
+  .internal-delivery .status-cell::before {
+    display: none; /* Hide the status dot */
+  }
+  
+  /* Add background color to status cells instead */
+  .external-delivery .status-created,
+  .internal-delivery .status-created {
+    background-color: rgba(108, 117, 125, 0.1);
+  }
+  
+  .external-delivery .status-approved,
+  .internal-delivery .status-approved {
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+  
+  .external-delivery .status-processing,
+  .internal-delivery .status-processing {
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+  
+  .external-delivery .status-delivered,
+  .internal-delivery .status-delivered {
+    background-color: rgba(23, 162, 184, 0.1);
+  }
+  
+  .external-delivery .status-cancelled,
+  .internal-delivery .status-cancelled,
+  .internal-delivery .status-rejected {
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Make the table horizontally scrollable on small screens */
+  .external-delivery .delivery-table-container,
+  .internal-delivery .delivery-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust row padding for better touch targets */
+  .external-delivery .delivery-table td,
+  .external-delivery .delivery-table th,
+  .internal-delivery .delivery-table td,
+  .internal-delivery .delivery-table th {
+    padding: 0.85rem 0.75rem;
+  }
+  
+  /* Adjust button size for better touch targets */
+  .external-delivery .approve-button,
+  .internal-delivery .approve-button {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  /* Handle pagination better on small screens */
+  .external-delivery .page-numbers,
+  .internal-delivery .page-numbers {
+    display: none; /* Hide page numbers, keep only prev/next */
+  }
+  
+  .external-delivery .pagination-info,
+  .internal-delivery .pagination-info {
+    display: inline-block;
+    margin: 0 0.5rem;
+  }
+  
+  .external-delivery .pagination-button,
+  .internal-delivery .pagination-button {
+    min-width: 80px; /* Make buttons bigger for touch */
+  }
+}
+
+@media (max-width: 576px) {
+  /* Hide less important columns on very small screens */
+  .external-delivery .delivery-table th:nth-child(3),
+  .external-delivery .delivery-table td:nth-child(3),
+  .external-delivery .delivery-table th:nth-child(4),
+  .external-delivery .delivery-table td:nth-child(4),
+  .internal-delivery .delivery-table th:nth-child(3),
+  .internal-delivery .delivery-table td:nth-child(3),
+  .internal-delivery .delivery-table th:nth-child(4),
+  .internal-delivery .delivery-table td:nth-child(4) {
+    display: none;
+  }
+  
+  /* Make sure no-data message spans fewer columns */
+  .external-delivery .no-data,
+  .internal-delivery .no-data {
+    /* Update colspan in your JSX from 6 to 3 for very small screens */
+    font-size: 0.8rem;
+    padding: 1.5rem 0.5rem;
+  }
+}

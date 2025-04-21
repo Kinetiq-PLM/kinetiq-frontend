@@ -72,7 +72,7 @@ const ReworkTable = ({
           <tbody>
             {currentReworks.length === 0 ? (
               <tr>
-                <td colSpan="8" className="no-data">
+                <td colSpan={window.innerWidth <= 576 ? 4 : 6} className="no-data">
                   No rework orders found.
                 </td>
               </tr>
@@ -95,7 +95,7 @@ const ReworkTable = ({
                     )}
                   </td>
                   <td>
-                    <span className={`status-cell status-${rework.rework_status}`}>
+                    <span className={`status-cell status-${rework.rework_status.replace(' ', '-')}`}>
                       {rework.rework_status}
                     </span>
                   </td>
