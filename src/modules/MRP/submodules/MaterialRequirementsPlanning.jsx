@@ -373,7 +373,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 const data = await response.json();
                 console.log('Successfully submitted BOM:', data);
 
-                const updateResponse = await fetch('http://127.0.0.1:8000/update_tracking_status/', {
+                const updateResponse = await fetch(`${baseurl}/update_tracking_status/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -398,7 +398,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 final_price: totalOrderCost
             };
             console.log('Payload:', payload);
-            const response = await fetch('http://127.0.0.1:8000/insert_nonproject/', {
+            const response = await fetch(`${baseurl}/insert_nonproject/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -411,7 +411,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             console.log('Success:', data);
 
 
-            const updateResponse = await fetch('http://127.0.0.1:8000/update_tracking_status/', {
+            const updateResponse = await fetch(`${baseurl}/update_tracking_status/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -436,7 +436,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 mark_up_price: totalOrderCost
             };
             console.log('Payload:', payload);
-            const response = await fetch('http://127.0.0.1:8000/insert_principal/', {
+            const response = await fetch(`${baseurl}/insert_principal/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -448,7 +448,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             const data = await response.json();
             console.log('Success:', data);
 
-            const updateResponse = await fetch('http://127.0.0.1:8000/update_tracking_status_principal/', {
+            const updateResponse = await fetch(`${baseurl}/update_tracking_status_principal/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
