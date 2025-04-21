@@ -399,8 +399,24 @@
   left: 0;
   cursor: pointer;
 }
+.goods-r .item-date-input {
+  position: relative;
+}
 
-
+.goods-r .item-date-input input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+.goods-r .item-number input[type="number"]::-webkit-inner-spin-button {
+  background-color: #0d9488; /* Adds background to the arrows */
+  filter: invert(1); /* Hack to invert the arrow color (works in some cases) */
+  width: 0.1;
+}
 
 
 .goods-r .calendar-icon {
@@ -463,7 +479,6 @@
   background-color: #F9FAFB;
   z-index: 1;
 }
-
 
 
 

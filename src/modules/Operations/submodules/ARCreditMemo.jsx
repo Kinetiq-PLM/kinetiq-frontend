@@ -45,18 +45,18 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const fetchVendors = async () => {
     try {
       setLoading(true);
-      const responseEmployee = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
+      const responseEmployee = await fetch("http://127.0.0.1:8000/operation/supplier/");
       if (!responseEmployee.ok) throw new Error("Connection to database failed");
       const dataE = await responseEmployee.json();
       if (!Array.isArray(dataE.employees)) throw new Error("Invalid employee format");
       setEmployeeList(dataE.employees)
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/customer/");
+      const response = await fetch("http://127.0.0.1:8000/operation/customer/");
       if (!response.ok) throw new Error("Connection to database failed");
       const data = await response.json();
       if (!Array.isArray(data)) throw new Error("Invalid customer format");
       setVendorList(data);
       setLoadingInvoices(true);
-      const responseSalesInvoice = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/sales-invoice/");
+      const responseSalesInvoice = await fetch("http://127.0.0.1:8000/operation/sales-invoice/");
       if (!responseSalesInvoice.ok) throw new Error("Failed to fetch invoices");
       const dataInvoice = await responseSalesInvoice.json();
       setInvoices(dataInvoice);
@@ -122,7 +122,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const customerName = e.target.value;
     setSelectedVendor(customerName);
     const selectedVendorData = vendorList.find(v => v.name === customerName);
-    setVendorID(selectedVendorData ? selectedVendorData.customer_id : null);
+    setVendorID(selectedVendorData ? selectedVendorData.customer_id : "");
     setContactPerson(selectedVendorData ? selectedVendorData.contact_person : "");
   };
 
@@ -194,7 +194,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const fetchNextDocumentIds = async () => {
       if (isCreateMode) {
         try {
-          const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/get-next-doc-ids/');
+          const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/get-next-doc-ids/');
           if (!response.ok) throw new Error('Failed to fetch next document IDs');
          
           const data = await response.json();
@@ -226,9 +226,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
 
-
-
-
     // Handle date fields
     if (field === 'manuf_date' || field === 'expiry_date') {
       updatedItems[index] = {
@@ -238,7 +235,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           [field]: e.target.value // This will be in YYYY-MM-DD format from the date input
         }
       };
-    } else {
+    }
+    else {
       updatedItems[index][field] = e.target.value;
     }
     setDocumentItems(updatedItems);
@@ -254,7 +252,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
       // If this item exists in the database, delete it
       try {
-        await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
+        await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -280,7 +278,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   const reloadDocumentItems = async () => {
     try {
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
+      const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
       if (!response.ok) throw new Error('Failed to reload document');
       const updatedData = await response.json();
       return updatedData.document_items;
@@ -311,8 +309,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             item_name: '',
             unit_of_measure: '',
             quantity: '',
-            cost: '',
-            warehouse_id: ''
+            cost: ''
           });
  
           setDocumentItems(updatedItems);
@@ -322,8 +319,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         const payload = {
           document_id: selectedData.document_id,
           quantity: parseInt(lastRow.quantity),
-          cost: parseFloat(lastRow.cost),
-          warehouse_id: lastRow.warehouse_id,
+          cost: parseFloat(lastRow.cost)
         };
  
         // Set the appropriate item type field
@@ -333,7 +329,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           payload.asset_id = lastRow.item_id;
         } else if (lastRow.item_id.startsWith("ADMIN-PROD")) {
           // First create product docu item
-          const productDocuResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-product-docu-item/', {
+          const productDocuResponse = await fetch('http://127.0.0.1:8000/operation/create-items/create-product-docu-item/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -353,7 +349,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         }
  
         // Create the document item
-        const createResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-document-item/', {
+        const createResponse = await fetch('http://127.0.0.1:8000/operation/create-items/create-document-item/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -405,12 +401,11 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           item_name: '',
           unit_of_measure: '',
           quantity: '',
-          cost: '',
-          warehouse_id: ''
+          cost: ''
         });
  
         setDocumentItems(updatedItems);
-        const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
+        const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
 
 
 
@@ -428,8 +423,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           item_name: '',
           unit_of_measure: '',
           quantity: '',
-          cost: '',
-          warehouse_id: ''
+          cost: ''
         });
 
 
@@ -469,7 +463,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
+    fetch('http://127.0.0.1:8000/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
         // Sort A–Z by location
@@ -489,7 +483,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item-data/')
+    fetch('http://127.0.0.1:8000/operation/item-data/')
       .then(res => res.json())
       .then(data => {
         const options = [];
@@ -588,7 +582,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
-          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -676,19 +670,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   // Add a new function to handle create operation
   const handleCreateDocument = async () => {
     try {
-      if (!selectedOwner || !vendorID){
-        if(!selectedOwner){
-          toast.error("Owner is required")
-          return
-        }else if(!documentDetails.buyer){
-          toast.error("Buyer Required")
-          return
-        }else if(!(documentDetails.invoice_id)){
-          toast.error("Invoice ID required")
-          return
-        }
-        return
-      }
+      
       // Prepare the document items for creation
       const itemsToCreate = documentItems.slice(0, -1); // Exclude the last empty row
      
@@ -718,7 +700,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           item_name: item.item_name,
           quantity: item.quantity,
           cost: item.cost,
-          warehouse_id: item.warehouse_id,
           batch: item.batch_no || null,
           ...(item.item_id.startsWith("ADMIN-PROD") && { product_id: item.item_id }),
           ...(item.item_id.startsWith("ADMIN-ASSET") && { asset_id: item.item_id }),
@@ -727,7 +708,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       };
       console.log(payload)
       // Call the create API
-      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
+      const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -783,13 +764,25 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
-    if (!vendorID){
-      toast.error("Customer Required")
+    if(!selectedOwner){
+      toast.error("Owner is required")
       return
-    }
-    if(!(documentDetails.invoice_id)){
+    }else if(!(documentDetails.invoice_id)){
+      toast.dismiss()
       toast.error("Invoice ID required")
       return
+    }else if(!vendorID){
+      toast.dismiss()
+      toast.error("Customer is required")
+      return
+    }else if (updatedDocumentItems.length === 0) {
+      toast.dismiss()
+      toast.error("At least one item is required. Please fill all necessary data");
+      return;
+    }else if (documentDetails.transaction_cost > 1000000000) {
+      toast.dismiss()
+      toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
+      return;
     }
     try {
       if (isCreateMode) {
@@ -801,7 +794,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         const updatedDocumentItemData = {
           product_id: item.item_id,
         };
-        const documentItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/product-docu-item/${item.productdocu_id}/`, {
+        const documentItemResponse = await fetch(`http://127.0.0.1:8000/operation/product-docu-item/${item.productdocu_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -826,8 +819,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         const updateDocomentItems = {
           quantity: parseInt(item.quantity) || 0,
           cost: parseFloat(item.cost) || 0,
-          total: parseFloat(item.quantity * item.cost).toFixed(2) || 0,
-          warehouse_id: item.warehouse_id || "",
+          total: parseFloat(item.quantity * item.cost).toFixed(2) || 0
         };
         if (item.item_id?.startsWith("ADMIN-MATERIAL")) {
           updateDocomentItems.material_id = item.item_id;
@@ -836,7 +828,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         } else if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
           updateDocomentItems.productdocu_id = item.productdocu_id;
         }
-        const productDocuItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
+        const productDocuItemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/${item.content_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -870,9 +862,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         tax_rate: parseFloat(documentDetails.tax_rate) || 0,
         tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
         freight: parseFloat(documentDetails.freight) || 0,
-        transaction_cost: parseFloat(documentDetails.total).toFixed(2) || 0,
+        transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0,
       };
-      const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
+      const goodsTrackingResponse = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -922,7 +914,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
+      const response = await fetch("http://127.0.0.1:8000/operation/purchase_order/");
       if (!response.ok) throw new Error("Failed to fetch purchase orders");
      
       const data = await response.json();
@@ -946,7 +938,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
     try {
       // Fetch the selected purchase order details
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
+      const response = await fetch(`http://127.0.0.1:8000/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
       const selectedPO = await response.json();
@@ -1191,6 +1183,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         defaultValue="2025-01-31"
                         value={documentDetails.posting_date}
                         onChange={(e) => handleDocumentDetailChange(e, "posting_date")}
+                        min={date_today}
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
@@ -1205,6 +1198,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         defaultValue="2025-01-31"
                         value={documentDetails.document_date}
                         onChange={(e) => handleDocumentDetailChange(e, "document_date")}
+                        max={date_today}
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
@@ -1233,11 +1227,26 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     />
                   </div>
                   <div className="detail-row">
-                    <label>Sales Tax</label>
+                    <label>Tax Rate</label>
                     <input
-                      type="text"
+                      type="number"
                       value={documentDetails.tax_rate}
-                      onChange={(e) => handleDocumentDetailChange(e, "tax_rate")}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const regex = /^\d{0,2}(\.\d{0,2})?$/;
+                        if (value === '' || (regex.test(value) && parseFloat(value) <= 100)) {
+                          setDocumentDetails(prev => ({
+                            ...prev,
+                            tax_rate: value
+                          }));
+                        }else{
+                          toast.dismiss()
+                          toast.info("Please enter a valid percentage. Maximum is 100 and up to 2 decimal places.")
+                        }
+                      }}
+                      step="1"
+                      min="0"
+                      max="100"
                     />
                   </div>
                   <div className="detail-row">
@@ -1245,7 +1254,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Total</label>
                     <input type="text" value={
                       documentDetails.transaction_cost
-                    }  />
+                      }  
+                      readOnly style={{ cursor: 'not-allowed' }}
+                    />
                   </div>
                   </div>
                   <div className="detail-row">
@@ -1308,12 +1319,30 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         ))}
                       </select>
                       </td>
-                      <td>
+                      <td className="item-number">
                         <input
                           type="number"
-                          value={item.quantity || ''}
-                          onChange={(e) => handleInputChange(e, index, 'quantity')}
                           min="0"
+                          max="1000000000"
+                          step = "1"
+                          value={item.quantity || ''}
+                          onKeyDown={(e) => {
+                            if (e.key === '.') {
+                              e.preventDefault();
+                            }
+                          }}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (
+                              /^\d*$/.test(value) &&      
+                              parseInt(value, 10) <= 10000000  
+                            ) {
+                              handleInputChange(e, index, 'quantity');
+                            }else{
+                              toast.dismiss();
+                              toast.info("Maximum quantity is 10 millions")
+                            }
+                          }}
                         />
                       </td>
                       <td>
@@ -1321,9 +1350,19 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                           type="number"
                           value={item.cost || ''}
                           onChange={(e) => handleInputChange(e, index, 'cost')}
+                          readOnly style={{ cursor: 'not-allowed' }}
                         />
                       </td>
-                      <td>{(item.quantity * item.cost || 0).toFixed(2)}</td>
+                      <td readOnly style={{ cursor: 'not-allowed' }}>
+                        {(() => {
+                          const total = (item.quantity * item.cost) || 0;
+                          if (total > 1000000000) {
+                            toast.dismiss();
+                            toast.error("Total cost must not exceed 1 billion");
+                          }
+                          return total.toFixed(2);
+                        })()}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

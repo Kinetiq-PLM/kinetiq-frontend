@@ -133,10 +133,10 @@
   
   /* ========== Sticky Table Head ========== */
   .delivery-receipt-wrapper .table-wrapper thead {
-    position: sticky;
+    /*position: sticky;*/
     top: 0;
     background-color: white;
-    z-index: 1;
+    /*z-index: 1;*/
     box-shadow: 0 2px 2px -2px gray;
   }
   

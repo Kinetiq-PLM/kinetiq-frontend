@@ -35,7 +35,7 @@ const ApprovalTable = ({employee_id}) => {
   const fetchWarehouse = async () => {
     try {
       setLoading(true);
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/");
+      const response = await fetch("http://127.0.0.1:8000/operation/get-warehouseID/");
       if (!response.ok) throw new Error("Connection to database failed");
 
 
@@ -69,9 +69,9 @@ const ApprovalTable = ({employee_id}) => {
       try {
           setLoading(true);
           setError(null); // Reset error state
-          const syncDataResponse = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/sync-production/");
-          const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/internal-transfer-delivery-request/");
-          const reworkResponse = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/rework-order/");
+          const syncDataResponse = await fetch("http://127.0.0.1:8000/operation/external-modules/sync-production/");
+          const response = await fetch("http://127.0.0.1:8000/operation/internal-transfer-delivery-request/");
+          const reworkResponse = await fetch("http://127.0.0.1:8000/operation/external-modules/rework-order/");
           if (!response.ok || !syncDataResponse || !reworkResponse) throw new Error("Connection to database failed");
  
           const data = await response.json();
@@ -132,7 +132,7 @@ const ApprovalTable = ({employee_id}) => {
     }
  
     try {
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/update-delivery-request/${selectedData.content_id}/`, {
+      const response = await fetch(`http://127.0.0.1:8000/operation/update-delivery-request/${selectedData.content_id}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -165,8 +165,9 @@ const ApprovalTable = ({employee_id}) => {
     if (field === 'rework_quantity') {
       const actualQuantity = newSelectedData.production_order.actual_quantity;
       const reworkQuantity = parseInt(e.target.value);
- 
+      
       if (reworkQuantity > actualQuantity) {
+        toast.dismiss()
         toast.error('Error: Rework quantity must not be greater than actual quantity.');
         return;
       }
@@ -181,11 +182,21 @@ const ApprovalTable = ({employee_id}) => {
     try {
   
       if (reworkQuantity > actualQuantity) {
+        toast.dismiss()
         toast.error('Error: Rework quantity must not be greater than actual quantity.');
         return;
       }
-      
-      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/update-rework/', {
+      if (data.external_module.reason_rework && (!data.external_module.rework_quantity || data.external_module.rework_quantity <= 0)) {
+        toast.dismiss();
+        toast.error("Rework quantity is required when a rework reason is provided.");
+        return;
+      }
+      if (!data.external_module.reason_rework && (data.external_module.rework_quantity < 0)) {
+        toast.dismiss();
+        toast.error("Rework reason is required when a rework quantity is provided.");
+        return;
+      }
+      const response = await fetch('http://127.0.0.1:8000/operation/external-modules/update-rework/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -390,13 +401,9 @@ const ApprovalTable = ({employee_id}) => {
                 <label>Product ID</label>
                 <input 
                   type="text" 
-                  className="short-input" 
+                  className="short-input req-input" 
                   value={selectedData.production_order_detail_id} 
-                  readOnly
-                  style={{
-                    backgroundColor: '#f8f8f8',
-                    cursor: 'not-allowed'
-                  }}
+                  style={{ cursor: 'default' }} readOnly
                 />
               </div>
               <div className="input-group">
@@ -406,7 +413,6 @@ const ApprovalTable = ({employee_id}) => {
                   className="short-input"
                   value={selectedData?.external_module?.reason_rework || ''}
                   onChange={(e) => handleChange(e, 'reason_rework')}
- 
                 />
               </div>
               <div className="input-group">
@@ -414,17 +420,19 @@ const ApprovalTable = ({employee_id}) => {
                 <input 
                   type="text" 
                   className="short-input" 
+                  max="10000000"
                   value={selectedData?.production_order?.actual_quantity || ''} 
-                  style={{ cursor: 'not-allowed' }}
+                  style={{ cursor: 'not-alowed' }}
                   readOnly
                 />
               </div>
-              <div className="input-group">
+              <div className="input-group item-number">
                 <label>Rework Quantity</label>
                 <input
                   type="number"
                   className="short-input"
                   min="0"
+                  max="10000000"
                   value={selectedData?.external_module?.rework_quantity || ''}
                   onChange={(e) => handleChange(e, 'rework_quantity')}
                 />

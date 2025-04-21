@@ -20,15 +20,16 @@ const TabSystem = () => {
             setLoading(true);
             setError(null);
 
-            const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/`);
+
+            const response = await fetch(`http://127.0.0.1:8000/operation/${endpoint}/`);
             if (endpoint === "DeliveryReworkOrder"){
-                const syncDataResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/sync-deliveryreworkorder/`);
-            } else if (endpoint === "DeliveryReceipt"){
-                const syncDataResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/sync-deliveryreceipt/`);
-            } else if (endpoint === "BillingReceipt"){
-                const syncDataResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/sync-billingreceipt/`);
-            } else if (endpoint === "GoodsIssue"){
-                const syncDataResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/sync-deliverygoodsissue/`);
+                const syncDataResponse = await fetch(`http://127.0.0.1:8000/operation/${endpoint}/sync-deliveryreworkorder/`);
+            }else if (endpoint === "DeliveryReceipt"){
+                const syncDataResponse = await fetch(`http://127.0.0.1:8000/operation/${endpoint}/sync-deliveryreceipt/`);
+            }else if (endpoint === "BillingReceipt"){
+                const syncDataResponse = await fetch(`http://127.0.0.1:8000/operation/${endpoint}/sync-billingreceipt/`);
+            }else if (endpoint === "GoodsIssue"){
+                const syncDataResponse = await fetch(`http://127.0.0.1:8000/operation/${endpoint}/sync-deliverygoodsissue/`);
             }
             
             if (!response.ok) throw new Error("Connection to database failed");
@@ -78,7 +79,6 @@ const TabSystem = () => {
                                 <table className="billing-table">
                                     <thead>
                                         <tr>
-                                            <th></th>
                                             <th>Billing ID</th>
                                             <th>Delivery ID</th>
                                             <th>Delivery Date</th>
@@ -93,14 +93,6 @@ const TabSystem = () => {
                                         ) : tableData.length > 0 ? (
                                             tableData.map((row, index) => (
                                                 <tr key={index}>
-                                                    <td>
-                                                        <input 
-                                                            type="checkbox" 
-                                                            className="checkbox-input"
-                                                            checked={selectedRow === index} 
-                                                            onChange={() => handleCheckboxChange(index, row.external_id)}
-                                                        />
-                                                    </td>
                                                     <td>{row.billing_receipt_id}</td>
                                                     <td>{row.delivery_receipt_id}</td>
                                                     <td>{row.delivery_date}</td>
@@ -125,7 +117,6 @@ const TabSystem = () => {
                                 <table className="billing-table">
                                     <thead>
                                         <tr>
-                                            <th></th>
                                             <th>Delivery ID</th>
                                             <th>Delivery Date</th>
                                             <th>Total Amount</th>
@@ -139,14 +130,6 @@ const TabSystem = () => {
                                         ) : tableData.length > 0 ? (
                                             tableData.map((row, index) => (
                                                 <tr key={index}>
-                                                    <td>
-                                                        <input 
-                                                            type="checkbox" 
-                                                            className="checkbox-input"
-                                                            checked={selectedRow === index} 
-                                                            onChange={() => handleCheckboxChange(index, row.external_id)}
-                                                        />
-                                                    </td>
                                                     <td>{row.delivery_receipt_id}</td>
                                                     <td>{row.delivery_date}</td>
                                                     <td>{row.total_amount}</td>
@@ -154,7 +137,7 @@ const TabSystem = () => {
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="4" className="no-records">No records found.</td>
+                                                <td colSpan="3" className="no-records">No records found.</td>
                                             </tr>
                                         )}
                                     </tbody>
@@ -170,7 +153,6 @@ const TabSystem = () => {
                                 <table className="billing-table">
                                     <thead>
                                         <tr>
-                                            <th></th>
                                             <th>Rework ID</th>
                                             <th>Delivery ID</th>
                                             <th>Rework Date</th>
@@ -185,14 +167,6 @@ const TabSystem = () => {
                                         ) : tableData.length > 0 ? (
                                             tableData.map((row, index) => (
                                                 <tr key={index}>
-                                                    <td>
-                                                        <input 
-                                                            type="checkbox" 
-                                                            className="checkbox-input"
-                                                            checked={selectedRow === index} 
-                                                            onChange={() => handleCheckboxChange(index, row.external_id)}
-                                                        />
-                                                    </td>
                                                     <td>{row.rework_id}</td>
                                                     <td>{row.failed_shipment_id}</td>
                                                     <td>{row.rework_date}</td>
@@ -201,7 +175,7 @@ const TabSystem = () => {
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="5" className="no-records">No records found.</td>
+                                                <td colSpan="4" className="no-records">No records found.</td>
                                             </tr>
                                         )}
                                     </tbody>
@@ -217,7 +191,6 @@ const TabSystem = () => {
                                 <table className="billing-table">
                                     <thead>
                                         <tr>
-                                            <th></th>
                                             <th>Goods ID</th>
                                             <th>Issued Date</th>
                                             <th>Issued By</th>
@@ -233,14 +206,6 @@ const TabSystem = () => {
                                         ) : tableData.length > 0 ? (
                                             tableData.map((row, index) => (
                                                 <tr key={index}>
-                                                    <td>
-                                                        <input 
-                                                            type="checkbox" 
-                                                            className="checkbox-input"
-                                                            checked={selectedRow === index} 
-                                                            onChange={() => handleCheckboxChange(index, row.external_id)}
-                                                        />
-                                                    </td>
                                                     <td>{row.goods_issue_id}</td>
                                                     <td>{row.issue_date}</td>
                                                     <td>{row.issued_by}</td>
@@ -250,7 +215,7 @@ const TabSystem = () => {
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="6" className="no-records">No records found.</td>
+                                                <td colSpan="5" className="no-records">No records found.</td>
                                             </tr>
                                         )}
                                     </tbody>

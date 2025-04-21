@@ -7,21 +7,11 @@ import { Slide } from 'react-toastify';
 
 const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
-
-
-
-
   const isCreateMode = selectedButton === "Create";
-
-
-
-
- 
   const [selectedStatus, setSelectedStatus] = useState("Open");
   const [activeTab, setActiveTab] = useState("document");
   const [showSerialModal, setShowSerialModal] = useState(false);
   const [selectedSerialNumbers, setSelectedSerialNumbers] = useState([]);
- 
   const calculateInitialAmount = () => {
     if (isCreateMode) return 0;
     return selectedData.document_items.reduce((sum, item) => {
@@ -29,15 +19,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }, 0).toFixed(2);
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
-
-
-
-
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
-
-
-
-
   const [selectedVendor, setSelectedVendor] = useState("");
   const [selectedOwner, setSelectedOwner] = useState(
     isCreateMode ? employee_id : selectedData.employee_name || employee_id
@@ -49,84 +31,47 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
-
-
-
-
-
-
+  const validateManufDate = (date, expiryDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+    const manufDate = new Date(date);
+    if (manufDate > today) {
+      toast.error("Manufacturing date cannot be in the future");
+      return false;
+    }
+    if (expiryDate && new Date(date) > new Date(expiryDate)) {
+      toast.error("Manufacturing date cannot be after expiry date");
+      return false;
+    }
+    return true;
+  };
+  
+  const validateExpiryDate = (date, manufDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+    const expiryDate = new Date(date);
+    if (manufDate && new Date(date) < new Date(manufDate)) {
+      toast.error("Expiry date cannot be before manufacturing date");
+      return false;
+    }
+    return true;
+  };
   useEffect(() => {
     if (selectedData?.status) {
       setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
     }
   }, [selectedData]);
 
-
-
-
-
-
-
-
   const fetchVendors = async () => {
     try {
       setLoading(true);
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
+      const response = await fetch("http://127.0.0.1:8000/operation/supplier/");
       if (!response.ok) throw new Error("Connection to database failed");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       const data = await response.json();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       if (!Array.isArray(data.vendors)) throw new Error("Invalid goods data format");
       setVendorList(data.vendors);
       if (!Array.isArray(data.employees)) throw new Error("Invalid goods data format");
       setEmployeeList(data.employees)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     } catch (error) {
       setError(error.message);
     } finally {
@@ -135,16 +80,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   };
   useEffect(() => {
     fetchVendors();
-   
   }, []);
-
-
-
-
-
-
-
-
   const handleVendorChange = (e) => {
     const vendorName = e.target.value;
     setSelectedVendor(vendorName);
@@ -152,14 +88,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     setVendorID(selectedVendorData ? selectedVendorData.vendor_code : null);
     setContactPerson(selectedVendorData ? selectedVendorData.contact_person : "");
   };
-
-
-
-
-
-
-
-
   useEffect(() => {
     if (vendorList.length > 0) {
       const matchedVendor = vendorList.find(v => v.vendor_code === selectedData.vendor_code);
@@ -175,13 +103,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }
   }, [vendorList, selectedData.vendor_code, employeeList, selectedData.employee_id]);
 
-
-
-
-
-
-
-
   const [documentItems, setDocumentItems] = useState(
     isCreateMode 
       ? [{ product_details: {} }] 
@@ -193,23 +114,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           { product_details: {} }
         ]
   );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
   const today = new Date().toISOString().slice(0, 10);
   // Initialize document details differently for create mode
   const [documentDetails, setDocumentDetails] = useState({
@@ -233,26 +137,11 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     transaction_cost: isCreateMode ? 0 : selectedData.transaction_cost || 0,
   });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   useEffect(() => {
     const fetchNextDocumentIds = async () => {
       if (isCreateMode) {
         try {
-          const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/get-next-doc-ids/');
+          const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/get-next-doc-ids/');
           if (!response.ok) throw new Error('Failed to fetch next document IDs');
          
           const data = await response.json();
@@ -273,32 +162,9 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     fetchNextDocumentIds();
   }, [isCreateMode]);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   const handleInputChange = async (e, index, field) => {
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
-
-
-
-
-
-
-
-
     // Handle date fields
     if (field === 'manuf_date' || field === 'expiry_date') {
       updatedItems[index] = {
@@ -312,45 +178,25 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       updatedItems[index][field] = e.target.value;
     }
     setDocumentItems(updatedItems);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // Check if the row is NOT the last row and the item_name was cleared
     if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
-      // If this item exists in the database, delete it
       try {
-        await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
+        await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            document_id: "",  // or null, depending on the backend expectations
+            document_id: "",  
           }),
         });
       } catch (error) {
         toast.error('Error deleting row from database:', error);
       }
  
-      // Remove the item from local state
       updatedItems.splice(index, 1);
       setDocumentItems(updatedItems);
     }
  
-    // If you're editing the last row and it was just filled, add a new row
     if (index === documentItems.length - 1) {
       handleAddRow();
     }
@@ -358,7 +204,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   const reloadDocumentItems = async () => {
     try {
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
+      const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
       if (!response.ok) throw new Error('Failed to reload document');
       const updatedData = await response.json();
       return updatedData.document_items;
@@ -375,16 +221,12 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       try {
         setIsAddingRow(true);
         if (isCreateMode) {
-          // In create mode, just add the item to state without API calls
           const updatedItems = [...documentItems];
           updatedItems[updatedItems.length - 1] = {
             ...lastRow,
-            // Calculate total for display
             total: (parseFloat(lastRow.quantity) * (parseFloat(lastRow.cost))).toFixed(2)
           };
          
-          // Add new empty row
-          // In handleAddRow, when adding new empty rows:
           updatedItems.push({
             item_id: '',
             item_name: '',
@@ -398,7 +240,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           setDocumentItems(updatedItems);
           return
         }else{
-        // Prepare the payload
         const payload = {
           document_id: selectedData.document_id,
           quantity: parseInt(lastRow.quantity),
@@ -406,14 +247,12 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           warehouse_id: lastRow.warehouse_id,
         };
  
-        // Set the appropriate item type field
         if (lastRow.item_id.startsWith("ADMIN-MATERIAL")) {
           payload.material_id = lastRow.item_id;
         } else if (lastRow.item_id.startsWith("ADMIN-ASSET")) {
           payload.asset_id = lastRow.item_id;
         } else if (lastRow.item_id.startsWith("ADMIN-PROD")) {
-          // First create product docu item
-          const productDocuResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-product-docu-item/', {
+          const productDocuResponse = await fetch('http://127.0.0.1:8000/operation/create-items/create-product-docu-item/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -433,7 +272,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         }
  
         // Create the document item
-        const createResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-document-item/', {
+        const createResponse = await fetch('http://127.0.0.1:8000/operation/create-items/create-document-item/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -454,39 +293,9 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           item.quantity === parseInt(lastRow.quantity)
         );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         if (!newItem) {
           throw new Error('Newly created item not found in reloaded data');
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         // Update state with the fresh data
         const updatedItems = [...documentItems];
@@ -507,25 +316,11 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         });
  
         setDocumentItems(updatedItems);
-        const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
-
-
-
-
-
-
-
+        const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-
-
-
-
-
-
-
 
         const updatedDoc = await response.json();  
         updatedDoc.document_items.push({          
@@ -536,13 +331,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           cost: '',
           warehouse_id: ''
         });
-
-
-
-
-
-
-
 
         setDocumentItems(updatedDoc.document_items);  
       }
@@ -570,32 +358,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     );
   };
 
-
-
-
-
-
-
-
   const [warehouseOptions, setWarehouseOptions] = useState([]);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
+    fetch('http://127.0.0.1:8000/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
         // Sort A–Z by location
@@ -607,41 +373,11 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   const [itemOptions, setItemOptions] = useState([]);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item-data/')
+    fetch('http://127.0.0.1:8000/operation/item-data/')
       .then(res => res.json())
       .then(data => {
         const options = [];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         data.products.forEach(prod => {
           options.push({
@@ -652,21 +388,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
             type: 'product',
           });
         });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         data.material.forEach(mat => {
           options.push({
@@ -679,20 +400,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         data.asset?.forEach(asset => {
           options.push({
             id: asset.asset_id,
@@ -703,39 +410,9 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           });
         });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         setItemOptions(options);
       });
   }, []);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   const handleItemSelection = async (index, selectedName) => {
     const updatedItems = [...documentItems];
@@ -747,8 +424,43 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       if (index !== updatedItems.length - 1) {
         // If this item exists in the database, delete it
         try {
-          const confirmDelete = window.confirm('Are you sure you want to archive this row?');
-          if (!confirmDelete) {
+          const userConfirmed = await new Promise((resolve) => {
+            toast.info(
+              <div>
+                <p style={{fontSize:"1em"}}>Do you want to archive this row?</p>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+                  <button
+                    onClick={() => {
+                      toast.dismiss();
+                      resolve(true);
+                    }}
+                    style={{ padding: '5px 15px', cursor: 'pointer', fontSize: "1em" }}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={() => {
+                      toast.dismiss();
+                      resolve(false);
+                    }}
+                    style={{ padding: '5px 15px', cursor: 'pointer', fontSize: "1em" }}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>,
+              {
+                position: "top-right",
+                autoClose: false,
+                closeButton: false,
+                draggable: false,
+                closeOnClick: false,
+                toastId: 'archive-confirmation'
+              }
+            );
+          });
+ 
+          if (!userConfirmed) {
             // Reset the select value to the previous item name
             updatedItems[index] = {
               ...currentItem,
@@ -757,16 +469,9 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
             setDocumentItems(updatedItems);
             return;
           }
- 
 
 
-
-
-
-
-
-
-          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -775,14 +480,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
               document_id: "",  // or null, depending on the backend expectations
             }),
           });
-         
-
-
-
-
-
-
-
 
         } catch (error) {
           toast.error('Error deleting row from database:', error);
@@ -826,21 +523,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
@@ -862,37 +544,9 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }));
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
- 
- 
   // Add a new function to handle create operation
   const handleCreateDocument = async () => {
     try {
-      if (!selectedOwner || !documentDetails.buyer){
-        if(!selectedOwner){
-          toast.error("Owner is required")
-          return
-        }else if(!documentDetails.buyer){
-          toast.error("Buyer Required")
-          return
-        }
-        return
-      }
       // Prepare the document items for creation
       const itemsToCreate = documentItems.slice(0, -1); // Exclude the last empty row
      
@@ -928,7 +582,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         }))
       };
       // Call the create API
-      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
+      const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -936,40 +590,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         body: JSON.stringify(payload),
       });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Create failed: ${JSON.stringify(errorData)}`);
       }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       const result = await response.json();
       toast.success('Create successful:', result);
@@ -982,52 +606,37 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
- 
+    if (!selectedOwner || !documentDetails.buyer){
+      if(!selectedOwner){
+        toast.error("Owner is required")
+        return
+      }else if(!documentDetails.buyer){
+        toast.error("Buyer Required")
+        return
+      }
+      return
+    }else if (updatedDocumentItems.length === 0) {
+      toast.error("At least one item is required. Please fill all necessary data");
+      return;
+    }else if (documentDetails.transaction_cost > 1000000000) {
+      toast.dismiss()
+      toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
+      return;
+    }
     try {
       if (isCreateMode) {
         await handleCreateDocument();
       } else {
       // Step 1: Update Product Document Items
       for (let item of updatedDocumentItems) {
-        if (item.item_id?.startsWith("PRD") && item.productdocu_id) {
+        if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
         const updatedDocumentItemData = {
           product_id: item.item_id,
         };
-        const documentItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/product-docu-item/${item.productdocu_id}/`, {
+        const documentItemResponse = await fetch(`http://127.0.0.1:8000/operation/product-docu-item/${item.productdocu_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -1062,7 +671,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         } else if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
           updateDocomentItems.productdocu_id = item.productdocu_id;
         }
-        const productDocuItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
+        const productDocuItemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/${item.content_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -1098,9 +707,9 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         tax_rate: parseFloat(documentDetails.tax_rate) || 0,
         tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
         freight: parseFloat(documentDetails.freight) || 0,
-        transaction_cost: parseFloat(documentDetails.total).toFixed(2) || 0,
+        transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0,
       };
-      const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
+      const goodsTrackingResponse = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1127,45 +736,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       toast.error(`Failed to update data. Details: ${error.message}`);
     }
   };
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedPO, setSelectedPO] = useState("");
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
+      const response = await fetch("http://127.0.0.1:8000/operation/purchase_order/");
       if (!response.ok) throw new Error("Failed to fetch purchase orders");
      
       const data = await response.json();
@@ -1176,28 +754,13 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   const handlePOSelect = async (poId) => {
     if (!poId) return;
     setSelectedPO(""); // Update the selected PO state
  
     try {
       // Fetch the selected purchase order details
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
+      const response = await fetch(`http://127.0.0.1:8000/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
       const selectedPO = await response.json();
@@ -1246,22 +809,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       toast.error(`Failed to load PO data: ${error.message}`);
     }
   };
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   useEffect(() => {
     if (isCreateMode) {
@@ -1274,12 +821,18 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
     const total = (parseFloat(initialAmount) + parseFloat(tax_amount) - parseFloat(discount_amount) + parseFloat(documentDetails.freight || 0)).toFixed(2);
  
-    setDocumentDetails(prev => ({
-      ...prev,
-      tax_amount: tax_amount,
-      discount_amount: discount_amount,
-      transaction_cost: total,
-    }));
+    if (total.length <= 10) {
+      setDocumentDetails(prev => ({
+        ...prev,
+        tax_amount: tax_amount,
+        discount_amount: discount_amount,
+        transaction_cost: total,
+      }));
+    }else{
+      toast.dismiss()
+      toast.error("Item rejected")
+      toast.warning("Transaction cost must not exceed 10 digits (1 billion)")
+    }
   }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
   useEffect(() => {
       const newInitialAmount = documentItems
@@ -1300,6 +853,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       <div className="body-content-container">
         <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
         <div className="content-wrapper">
+          <ToastContainer transition={Slide} />
           <div className="details-grid">
             <div className="details-section">
               {/* Vendor Code (ID) */}
@@ -1332,32 +886,24 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                 <label>Contact Person</label>
                 <input type="text" value={contactPerson} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
               <div className="detail-row">
                 <label>Buyer</label>
                 <input
                   type="text"
                   value={documentDetails.buyer}
-                  onChange={(e) => handleDocumentDetailChange(e, "buyer")}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const regex = /^[A-Za-z\s]*$/;
+                    const maxLength = 50;
+                    if ((regex.test(value) || value === '') && value.length <= maxLength) {
+                      handleDocumentDetailChange(e, "buyer");
+                    }else{
+                      toast.dismiss()
+                      toast.info(" Please enter a valid name. Only alphabetic characters (A–Z, a–z) and only 50 characters are allowed.")
+                    }
+                  }}
                 />
               </div>
-
-
               <div className="detail-row">
                 <label>Owner</label>
                 <input
@@ -1368,7 +914,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                       ? employeeList.find(e => e.employee_id === selectedData.employee_id)?.employee_name || selectedData.employee_id
                       : employeeList.find(e => e.employee_id === employee_id)?.employee_name || employee_id
                   }
-                 
                   style={{
                     cursor: 'not-allowed',
                     backgroundColor: '#f8f8f8'
@@ -1376,8 +921,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                 />
               </div>
             </div>
-
-
             {/* Details Document */}
             <div className="details-section tabbed-section">
               <div className="section-tabs">
@@ -1394,7 +937,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                   Cost Details
                 </button>
               </div>
-             
               {activeTab === 'document' ? (
                 <div className="tab-content">
                   <div className="detail-row">
@@ -1441,6 +983,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         defaultValue="2025-01-31"
                         value={documentDetails.posting_date}
                         onChange={(e) => handleDocumentDetailChange(e, "posting_date")}
+                        min={date_today}
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
@@ -1463,6 +1006,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         defaultValue="2025-01-31"
                         value={documentDetails.document_date}
                         onChange={(e) => handleDocumentDetailChange(e, "document_date")}
+                        min={date_today}
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
@@ -1487,7 +1031,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Tax Rate</label>
                     <input
                       type="text"
-                      value={documentDetails?.tax_rate || "---"}
+                      value={"---"}
                       readOnly
                       style={{
                         backgroundColor: '#f8f8f8',
@@ -1499,7 +1043,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Discount Rate</label>
                     <input
                       type="text"
-                      value={documentDetails?.discount_rate || "---"}
+                      value={"---"}
                       readOnly
                       style={{
                         backgroundColor: '#f8f8f8',
@@ -1534,7 +1078,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                   <div className="detail-row">
                     <label>Total</label>
                     <input type="text" value={
-                      documentDetails.total
+                      documentDetails.transaction_cost
                     }  
                     style={{ cursor: 'not-allowed' }}
                     readOnly
@@ -1544,7 +1088,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Freight</label>
                     <input
                       type="text"
-                      value={documentDetails?.freight  || "---"}
+                      value={"---"}
                       style={{
                         backgroundColor: '#f8f8f8',
                         cursor: 'not-allowed'
@@ -1556,14 +1100,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
               )}
             </div>
           </div>
-
-
-
-
-
-
-
-
           {/* Item Document */}
           <div className="operation_table_container">
             <div className="gr-table">
@@ -1619,56 +1155,100 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                           readOnly
                         />
                       </td>
-                      <td>
+                      <td className="item-number">
                         <input
                           type="number"
                           min="0"
+                          max="1000000000"
+                          step = "1"
                           value={item.quantity || ''}
-                          onChange={(e) => handleInputChange(e, index, 'quantity')}
+                          onKeyDown={(e) => {
+                            if (e.key === '.') {
+                              e.preventDefault();
+                            }
+                          }}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (
+                              /^\d*$/.test(value) &&      
+                              parseInt(value, 10) <= 100000  
+                            ) {
+                              handleInputChange(e, index, 'quantity');
+                            }else{
+                              toast.dismiss();
+                              toast.info("Maximum quantity is 10 millions")
+                            }
+                          }}
                         />
                       </td>
                       <td>
                         <input
                           type="number"
                           value={item.cost || ''}
+                          readOnly style={{ cursor: 'not-allowed' }}
                           onChange={(e) => handleInputChange(e, index, 'cost')}
                         />
                       </td>
-                      <td>{(item.quantity * item.cost || 0).toFixed(2)}</td>
-                      <td>
-                      {!item.item_id?.startsWith('ADMIN-PROD') ? (
-                        <input
-                          type="text"
-                          value="N/A"
-                          readOnly
-                          style={{ cursor: 'not-allowed' }}
-                        />
-                      ) : (
-                        <input
-                          type="date"
-                          value={item.product_details?.manuf_date || ''}
-                          onChange={(e) => {
-                            handleInputChange(e, index, 'manuf_date');
-                          }}
-                        />
-                      )}
-                    </td>
-                    <td>
-                      {!item.item_id?.startsWith('ADMIN-PROD') ? (
-                        <input
-                          type="text"
-                          value="N/A"
-                          readOnly
-                          style={{ cursor: 'not-allowed' }}
-                        />
-                      ) : (
-                        <input
-                          type="date"
-                          value={item.product_details?.expiry_date || ''}
-                          onChange={(e) => handleInputChange(e, index, 'expiry_date')}
-                        />
-                      )}
-                    </td>
+                      <td readOnly style={{ cursor: 'not-allowed' }}>
+                        {(() => {
+                          const total = (item.quantity * item.cost) || 0;
+                          if (total > 1000000000) {
+                            toast.dismiss();
+                            toast.error("Total cost must not exceed 1 billion");
+                          }
+                          return total.toFixed(2);
+                        })()}
+                      </td>
+                      <td className="item-date-input">
+                        {!item.item_id?.startsWith('ADMIN-PROD') ? (
+                          <input
+                            type="text"
+                            value="N/A"
+                            readOnly
+                            style={{ cursor: 'not-allowed' }}
+                          />
+                        ) : (
+                          <input
+                            type="date"
+                            value={item.product_details?.manuf_date || ''}
+                            onChange={(e) => {
+                              const isValid = validateManufDate(
+                                e.target.value, 
+                                item.product_details?.expiry_date
+                              );
+                              if (isValid) {
+                                handleInputChange(e, index, 'manuf_date');
+                              }
+                            }}
+                            max={new Date().toISOString().split('T')[0] && item.product_details?.expiry_date || ''}
+                          />
+                        )}
+                      </td>
+                      <td className="item-date-input">
+                        {!item.item_id?.startsWith('ADMIN-PROD') ? (
+                          <input
+                            type="text"
+                            value="N/A"
+                            readOnly
+                            style={{ cursor: 'not-allowed' }}
+                          />
+                        ) : (
+                          <input
+                            type="date"
+                            value={item.product_details?.expiry_date || ''}
+                            onChange={(e) => {
+                              const isValid = validateExpiryDate(
+                                e.target.value,
+                                item.product_details?.manuf_date
+                              );
+                              if (isValid) {
+                                handleInputChange(e, index, 'expiry_date');
+                              }
+                            }}
+                            min={item.product_details?.manuf_date || ''} 
+                          />
+                        )}
+                      </td>
                       <td>
                         <select
                           value={item.warehouse_id || ''}
@@ -1682,15 +1262,14 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                           ))}
                         </select>
                       </td>
-                      <td>{item?.batch_no || "N/A"}</td>
-                      <td>{item?.serial_no || "N/A"}</td>
+                      <td style={{ cursor: 'not-allowed' }} readOnly>{item?.batch_no || "N/A"}</td>
+                      <td style={{ cursor: 'not-allowed' }} readOnly>{item?.serial_no || "N/A"}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-
 
           <div className="button-section">
             <button
@@ -1705,14 +1284,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           </div>
         </div>
       </div>
-
-
-
-
-
-
-
-
     </div>
   );
 };

@@ -40,7 +40,7 @@ const BodyContent = ({employee_id}) => {
         }
         const approval_status = selectedData.approval_status;
         const approval_date = current_date;
-        const approved_by = selectedData.approved_by;
+        const approved_by = employee_id
 
 
         if (
@@ -48,7 +48,7 @@ const BodyContent = ({employee_id}) => {
             approved_by === "" ||
             approved_by === null
         ) {
-            toast.error("All fields must have a value.");
+            toast.error("All fields must have a value." + approval_date + approved_by + approved_by);
             return;
         }
 
@@ -59,7 +59,7 @@ const BodyContent = ({employee_id}) => {
             approved_by
         };
         try {
-            const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/update-delivery-approval/${selectedData.approval_request_id}/`, {
+            const response = await fetch(`http://127.0.0.1:8000/operation/update-delivery-approval/${selectedData.approval_request_id}/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
@@ -84,7 +84,7 @@ const BodyContent = ({employee_id}) => {
             setLoading(true);
             setError(null); // Reset error state
    
-            const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/delivery-approval/");
+            const response = await fetch("http://127.0.0.1:8000/operation/delivery-approval/");
             if (!response.ok) throw new Error("Connection to database failed");
    
             const data = await response.json();
@@ -110,7 +110,7 @@ const BodyContent = ({employee_id}) => {
     const fetchEmployee = async () => {
         try {
           setLoading(true);
-          const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
+          const response = await fetch("http://127.0.0.1:8000/operation/supplier/");
           if (!response.ok) throw new Error("Connection to database failed");
    
           const data = await response.json();
@@ -183,11 +183,11 @@ const BodyContent = ({employee_id}) => {
                     <div className="form-row">
                         <div className="form-group">
                             <label>Request ID</label>
-                            <span>{selectedData?.approval_request_id || ""}</span>
+                            <span style={{ cursor: 'default' }} readOnly>{selectedData?.approval_request_id || ""}</span>
                         </div>
                         <div className="form-group date-requested">
                             <label>Delivery Request</label>
-                            <span>{selectedData?.request_date || ""}</span>
+                            <span style={{ cursor: 'default' }} readOnly>{selectedData?.request_date || ""}</span>
                         </div>
                         <div className="form-group spacer"></div> {/* Empty space for alignment */}
                     </div>
@@ -206,15 +206,16 @@ const BodyContent = ({employee_id}) => {
                         <div className="form-group approval-date">
                             <label>Approval Date</label>
                             <input
+                                className="req-input"
                                 type="date"
                                 value={selectedData?.approval_date || current_date}
                                 onChange={(e) => setSelectedData({ ...selectedData, approval_date: e.target.value })}
-                                readOnly
+                                style={{ cursor: 'default' }} readOnly
                             />
                         </div>
                         <div className="form-group">
                             <label>Approved By</label>
-                            <span>
+                            <span style={{ cursor: 'default' }} readOnly>
                                 {employeeList.find(emp => emp.employee_id === (selectedData?.approved_by ?? employee_id))
                                     ?.employee_name || "-----"}
                             </span>

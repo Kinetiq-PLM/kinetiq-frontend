@@ -29,7 +29,7 @@
     position: relative;
     background: white;
     border-radius: 8px;
-    padding: 0.5rem;
+    padding: 1.1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     margin-top: 0.5rem;
     font-size: 0.875rem;
@@ -44,10 +44,10 @@
 }
 
 .InternalTransfer .table-container thead {
-    position: sticky;
+    /*position: sticky;*/
     top: 0;
-    background: #f8f9fa;
-    z-index: 2;
+    background: white;
+    /*z-index: 2;*/
 }
 
 .InternalTransfer .table-container tbody {
@@ -70,7 +70,7 @@
 }
 
 .InternalTransfer table th {
-    background: #f8f9fa;
+    background: white;
     padding: 0.75rem;
     font-size: 0.875rem;
     color: #495057;
@@ -276,9 +276,9 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    border-bottom: 1px solid #ddd;
     width: 100%;
     margin-bottom: 0.5rem;
+    padding: 1.1em;
 }
 
 .InternalTransfer .tab {
@@ -326,3 +326,13 @@
 .text-center {
     text-align: center;
 }
+
+.InternalTransfer .req-input{
+    background-color: #F8F8F8;
+}
+.InternalTransfer .item-number input[type="number"]::-webkit-inner-spin-button {
+    background-color: #0d9488; 
+    filter: invert(1); 
+    height: auto;
+  }
+
