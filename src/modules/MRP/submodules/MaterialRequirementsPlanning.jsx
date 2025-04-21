@@ -511,27 +511,31 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const filteredData = getFilteredData();
 
-    const mergedRows2 = getFilteredData()
-    .map((item) => {
+    const mergedRows2 = (
+        flag === 0
+          ? [...(filteredData || []), ...(principalOrder || [])]
+          : flag === 3
+          ? principalOrder
+          : filteredData 
+      ).map((item) => {
         const number = item.number || item.serviceOrderItemId;
-        const type = item.type || "Unknown";
-        const details = item.details || item.description || "—";
-        const date = item.date || "";
-
-        const pnpMatch = pnpOrder.find((p) => p.pnp_orderID === number);
-        const prinMatch = prinOrder.find((p) => p.sr_orderID === number);
-
+        const type = item.type;
+        const details = item.details || item.description;
+        const date = item.date;
+      
+        const pnpMatch = pnpOrder.find(p => p.pnp_orderID === number);
+        const prinMatch = prinOrder.find(p => p.sr_orderID === number);
+      
         const status = pnpMatch?.pnp_status || prinMatch?.sr_status || "";
-
+      
         return {
-        number,
-        type,
-        details,
-        date,
-        status,
+          number,
+          type,
+          details,
+          date,
+          status
         };
-    })
-    .filter((item) => (item.status || "").toLowerCase() !== "complete");
+      }).filter(item => (item.status || "").toLowerCase() !== "complete");
     
     const buttonStyle = (bg, border, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer', });
     const buttonStyle2 = (bg, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, border: '0.5px solid #585757', color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer',});
@@ -609,6 +613,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </div>
                     ))}
                 </div>
+
+
             </div>
 
             {isOpen && selectedRowData &&(
