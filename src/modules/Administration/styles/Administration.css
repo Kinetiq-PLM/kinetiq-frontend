@@ -10,72 +10,138 @@
   background-color: #f9fafa;
 }
 
-/* Typography */
 .admin h1 {
   font-size: 1.75rem;
   font-weight: 700;
   color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.admin p {
-  margin: 0;
-}
-
-/* Module Card Base Style */
 .admin .module-card {
-  background: #fffcfc;
-  background: linear-gradient(90deg, rgba(255, 252, 252, 1) 0%, rgba(213, 232, 232, 1) 100%, rgba(255, 255, 255, 1) 53%);
-  border-radius: 0.5rem;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
   padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   gap: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s;
+  position: relative;
+
 }
 
-/* Hover effect */
+/* Primary Teal Color for special cards */
+.admin .module-card.bg-teal {
+  background-color: #a1d9d9;
+}
+
+/* Finance: Exchange Rate */
+.admin .module-card.bg-blue-50 {
+  background-color: #aad0ea;
+}
+
+/* Inventory: Item Masterlist */
+.admin .module-card.bg-sky-50 {
+  background-color: #e0f2fe;
+}
+
+/* Tangible Assets */
+.admin .module-card.bg-amber-50 {
+  background-color: #fff8e1;
+}
+
+/* Products (Revenue-generating) */
+.admin .module-card.bg-green-50 {
+  background-color: #f0fdf4;
+}
+
+/* Raw Materials (Base resources) */
+.admin .module-card.bg-yellow-50 {
+  background-color: #fffbeb;
+}
+
+/* Business Partners */
+.admin .module-card.bg-indigo-50 {
+  background-color: #eef2ff;
+}
+
+/* Vendors (Network relations) */
+.admin .module-card.bg-purple-50 {
+  background-color: #f5f3ff;
+}
+
+/* Legal / Governance Documents */
+.admin .module-card.bg-gray-100 {
+  background-color: #f3f4f6;
+}
+
+/* System Logs / Traces */
+.admin .module-card.bg-red-50 {
+  background-color: #fef2f2;
+}
+
 .admin .module-card:hover {
-  background-color: #00a8a8;
-  background-image: none;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Icons */
-.admin .module-card img {
-  width: 2.5rem;
-  height: 2.5rem;
-  object-fit: contain;
-  transition: filter 0.2s;
+.admin .module-card.bg-teal:hover .text-label,
+.admin .module-card.bg-teal:hover .text-value,
+.admin .module-card.bg-teal:hover .text-sub,
+.admin .module-card.bg-teal:hover .anticon {
+  color: white !important;
 }
 
-/* Text Styling */
-.admin .text-label {
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.admin .text-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #111827;
-}
-
-.admin .text-sub {
-  font-size: 0.75rem;
-  color: #9ca3af;
+.admin .module-card:hover img {
+  filter: brightness(0) invert(1);
 }
 
 /* Hover Text + Icon */
 .admin .module-card:hover .text-label,
 .admin .module-card:hover .text-value,
 .admin .module-card:hover .text-sub {
-  color: white;
+  color: #00a8a8;
 }
 
-.admin .module-card:hover img {
-  filter: brightness(0) invert(1);
+/* Icon styling */
+.admin .module-card img,
+.admin .module-card .anticon {
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.75rem;
+  object-fit: contain;
+}
+
+/* Typography */
+.text-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.text-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.text-sub {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.text-badge {
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  background: #eef6f6;
+  color: #00a8a8;
+  border-radius: 9999px;
+  display: inline-block;
+  margin-left: 0.25rem;
 }
 
 /* Scrollbar customization */
@@ -93,18 +159,14 @@
   scrollbar-width: thin;
 }
 
-/* Responsive Grid Spacing */
+/* Responsive */
 @media (max-width: 768px) {
-  .admin {
-    padding: 1rem;
-  }
-
   .admin .module-card {
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .admin .text-value {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
   }
 }
