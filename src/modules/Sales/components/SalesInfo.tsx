@@ -9,7 +9,7 @@ const InputCustomer = ({
 }) => {
   return (
     <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
-      <p className="flex-1">{label}</p>
+      <p className="w-[150px]">{label}</p>
       <div
         className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded overflow-hidden"
         onClick={() => {
@@ -32,8 +32,8 @@ const InputCustomer = ({
 };
 const Information = ({ label, value = "" }) => {
   return (
-    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
-      <p className="flex-1">{label}</p>
+    <div className="flex justify-end mb-2 w-full flex-col sm:flex-row">
+      <p className="w-[150px]">{label}</p>
       <div
         className={`border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded overflow-x-auto whitespace-nowrap ${
           value === "" ? "bg-[#f7f7f7]" : ""
@@ -67,7 +67,7 @@ const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
 
   return (
     <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
-      <p className="flex-1">{label}</p>
+      <p className="w-[150px]">{label}</p>
       {customer ? (
         <select
           className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white rounded cursor-pointer text-sm truncate"
@@ -113,7 +113,7 @@ const DateSelector = ({ label, customer, setDeliveryDate, disabled }) => {
 
   return (
     <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
-      <p className="flex-1">{label}</p>
+      <p className="w-[150px]">{label}</p>
       <input
         type="date"
         className="border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded cursor-pointer  text-sm disabled:cursor-default disabled:bg-[#f7f7f7]"
