@@ -17,8 +17,8 @@ const BodyContent = ({employee_id}) => {
     const [userName, setUserName] = useState(employee_id || '');
     const textareaRef = useRef(null);
 
-    const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
-    // const API_BASE_URL = "http://127.0.0.1:8000/";
+    // const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
+    const API_BASE_URL = "http://127.0.0.1:8000/";
 
     useEffect(() => {
         if (employee_id) { // Only fetch if user_id is available
@@ -353,14 +353,17 @@ const BodyContent = ({employee_id}) => {
         }
 
         try {
-            // --- Update URL to include conversation ID ---
-            const response = await fetch(`${API_BASE_URL}chatbot/conversations/${currentConversationId}/respond/`, {
+            const response = await fetch(`${API_BASE_URL}chatbot/respond/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     // Add other headers like Authorization if needed
                 },
-                body: JSON.stringify({ message: userMessageText })
+                body: JSON.stringify({ 
+                    message: userMessageText,
+                    conversation_id: currentConversationId
+                 })
+                
             });
 
             if (!response.ok) {
