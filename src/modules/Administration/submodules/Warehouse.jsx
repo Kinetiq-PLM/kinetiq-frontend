@@ -1,149 +1,475 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { warehouseAPI } from "../api/api";
 import "../styles/Warehouse.css";
+import {
+    Table,
+    Button,
+    Modal,
+    Form,
+    Input,
+    Tabs,
+    Space,
+    Popconfirm,
+    message,
+    Typography,
+    Divider,
+    Pagination
+} from "antd";
+import {
+    UserOutlined,
+    PlusOutlined,
+    EyeOutlined,
+    EditOutlined,
+    UndoOutlined,
+    SearchOutlined
+} from "@ant-design/icons";
 
-const initialWarehouses = [
-    { warehouseId: "Maria", location: "Mari123", materials: "Qwdw" },
-    { warehouseId: "Maria", location: "Mari123", materials: "Qwdw" },
-    { warehouseId: "Maria", location: "Mari123", materials: "Qwdw" },
-];
+const { TabPane } = Tabs;
+const { Title } = Typography;
+const { TextArea } = Input;
 
 const Warehouse = () => {
-    const [warehouses, setWarehouses] = useState(initialWarehouses);
-    const [showForm, setShowForm] = useState(false);
-    const [previewIndex, setPreviewIndex] = useState(null);
+    // State variables
+    const [warehouse, setWarehouse] = useState([]);
+    const [archivedWarehouse, setArchivedWarehouse] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState(null);
+    const [searchValue, setSearchValue] = useState("");
+    const [archivedSearchValue, setArchivedSearchValue] = useState("");
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-    const handleTogglePreview = (index) => {
-        setPreviewIndex(previewIndex === index ? null : index);
+    // Pagination states
+    const [activeTab] = useState("warehouse");
+    const [warehousePagination, setWarehousePagination] = useState({
+        current: 1,
+        pageSize: 10,
+        total: 0
+    });
+
+    // Modal states
+    const [warehouseModalVisible, setWarehouseModalVisible] = useState(false);
+    const [archiveModalVisible, setArchiveModalVisible] = useState(false);
+    const [modalMode, setModalMode] = useState("add"); // "add" or "edit"
+
+    // Form states
+    const [warehouseForm] = Form.useForm();
+
+    useEffect(() => {
+        fetchWarehouse();  // Fetch the warehouse data when the component mounts
+    }, []);  // Empty dependency array ensures it runs once on mount
+
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Data fetching functions
+    const fetchWarehouse = async (searchTerm = "", orderField = "", orderDirection = "") => {
+        setLoading(true);
+        try {
+            const data = await warehouseAPI.getWarehouses({
+                search: searchTerm,
+                ordering: orderDirection === "descend" ? `-${orderField}` : orderField
+            });
+            setWarehouse(data.results || data);
+            setWarehousePagination(prev => ({
+                ...prev,
+                total: (data.results || data).length
+            }));
+        } catch (error) {
+            message.error("Failed to fetch warehouse");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
     };
 
+    const fetchArchivedWarehouse = async (searchTerm = "", orderField = "", orderDirection = "") => {
+        setLoading(true);
+        try {
+            // Create params object with search term
+            const params = {
+                search: searchTerm || "",
+            };
+
+            // Add ordering if provided
+            if (orderField) {
+                params.ordering = orderDirection === "descend" ? `-${orderField}` : orderField;
+            }
+
+            const data = await warehouseAPI.getArchivedWarehouses(params);
+            setArchivedWarehouse(data.results || data);
+            setArchiveModalVisible(true);
+        } catch (error) {
+            message.error("Failed to fetch archived warehouses");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Update the handleArchivedSearch function
+    const handleArchivedSearch = (value) => {
+        setArchivedSearchValue(value);
+        fetchArchivedWarehouse(value);
+    };
+
+    // Handle pagination changes
+    const handleWarehousePaginationChange = (page, pageSize) => {
+        setWarehousePagination(prev => ({
+            ...prev,
+            current: page,
+            pageSize
+        }));
+    };
+
+    // User form handlers
+    const handleAddWarehouse = () => {
+        setModalMode("add");
+        warehouseForm.resetFields();
+        setWarehouseModalVisible(true);
+    };
+
+    const handleEditWarehouse = (record) => {
+        setModalMode("edit");
+        setSelectedRecord(record);
+        warehouseForm.setFieldsValue({
+            warehouse_location: record.warehouse_location,
+            stored_materials: record.stored_materials,
+        });
+        setWarehouseModalVisible(true);
+    };
+
+    const handleWarehouseFormSubmit = async (values) => {
+        try {
+            if (modalMode === "add") {
+                await warehouseAPI.createWarehouse(values);
+                message.success("Warehouse created successfully");
+            } else {
+                await warehouseAPI.updateWarehouse(selectedRecord.warehouse_id, values);
+                message.success("Warehouse updated successfully");
+            }
+            setWarehouseModalVisible(false);
+            fetchWarehouse();
+        } catch (error) {
+            message.error(`Failed to ${modalMode} warehouse: ${error.response?.data?.message || error.message}`);
+        }
+    };
+
+    const handleArchiveWarehouse = async (warehouseId) => {
+        try {
+            await warehouseAPI.archiveWarehouse(warehouseId);
+            message.success("Warehouse archived successfully");
+            fetchWarehouse();
+        } catch (error) {
+            message.error("Failed to archive warehouse");
+        }
+    };
+
+    const handleRestoreWarehouse = async (roleId) => {
+        try {
+            await warehouseAPI.restoreWarehouse(roleId);
+            message.success("Warehouse restored successfully");
+            fetchArchivedWarehouse(archivedSearchValue); // Keep current search term
+            fetchWarehouse(); // Refresh active roles list
+        } catch (error) {
+            message.error("Failed to restore warehouse");
+        }
+    };
+
+    // Handle search with debounce
+    const handleSearch = (value) => {
+        setSearchValue(value);
+        if (activeTab === "warehouse") {
+            fetchWarehouse(value);
+        }
+    };
+
+
+    // Table columns definitions with sorting added
+    const warehouseColumns = [
+        {
+            title: "Warehouse ID",
+            dataIndex: "warehouse_id",
+            key: "warehouse_id",
+            sorter: true,
+            width: 100,
+        },
+        {
+            title: "Warehouse Location",
+            dataIndex: "warehouse_location",
+            key: "warehouse_location",
+            sorter: true,
+            width: 120,
+        },
+        {
+            title: "Stored Materials",
+            dataIndex: "stored_materials",
+            key: "stored_materials",
+            sorter: true,
+            width: 250,
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            width: 60, // Fixed width for actions column
+            align: "center",
+            render: (_, record) => (
+                <Space size="small">
+                    <Button
+                        type="primary"
+                        icon={<EditOutlined />}
+                        size="small"
+                        onClick={() => handleEditWarehouse(record)}
+                    />
+                </Space>
+            ),
+        },
+    ];
+
+
+    const archivedWarehouseColumns = [
+        {
+            title: "Warehouse ID",
+            dataIndex: "warehouse_id",
+            key: "warehouse_id",
+            sorter: true,
+            sortDirections: ['ascend', 'descend'],
+            width: 200,
+        },
+        {
+            title: "Warehouse Location",
+            dataIndex: "warehouse_location",
+            key: "warehouse_location",
+            sorter: true,
+            sortDirections: ['ascend', 'descend'],
+            render: (text) => text.replace("ARCHIVED_", ""),
+        },
+        {
+            title: "Stored Materials",
+            dataIndex: "stored_materials",
+            key: "stored_materials",
+            sorter: true,
+            sortDirections: ['ascend', 'descend'],
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            width: 10, // Fixed width for actions column
+            align: "center",
+            render: (_, record) => (
+                <Space size="small">
+                    <Popconfirm
+                        title="Are you sure you want to restore this warehouse?"
+                        onConfirm={() => handleRestoreWarehouse(record.warehouse_id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                            type="primary"
+                            icon={<UndoOutlined />}
+                            size="small"
+                        />
+                    </Popconfirm>
+                </Space>
+            ),
+        },
+    ];
+
+    // Calculate table data for pagination
+    const getWarehouseTableData = () => {
+        const { current, pageSize } = warehousePagination;
+        const start = (current - 1) * pageSize;
+        const end = start + pageSize;
+        return warehouse.slice(start, end);
+    };
+
+
+    // Render main component
     return (
-        <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Warehouse</h2>
+        <div className="warehouse">
+            <div className="warehouse-container">
+                <Title level={4} className="page-title">
+                    {activeTab === "warehouse" ? "Warehouse Management" : ""}
+                </Title>
+                <Divider className="title-divider" />
 
-            {/* Toolbar */}
-            <div className="flex items-center gap-4 mb-4 border-b pb-2">
-                <input
-                    type="text"
-                    placeholder="Search..."
-                    className="border border-gray-300 px-3 py-2 rounded-md text-sm"
-                />
-                <button
-                    onClick={() => setShowForm(true)}
-                    className="bg-teal-500 text-white px-4 py-2 rounded-md text-sm"
-                >
-                    Add
-                </button>
-                <select className="border border-gray-300 px-3 py-2 rounded-md text-sm">
-                    <option>Vendor Info</option>
-                    <option>Warehouse Type</option>
-                </select>
-            </div>
-
-            {/* Table */}
-            <div className="bg-white shadow-md rounded-xl p-4 overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-200 rounded-xl">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            {["Warehouse ID", "Warehouse Location", "Stored Materials", ""].map((header, i) => (
-                                <th key={i} className="px-4 py-3 border border-gray-200 text-left">{header}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {warehouses.map((w, index) => (
-                            <tr key={index} className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100">
-                                <td className="px-4 py-3 border border-gray-200">{w.warehouseId}</td>
-                                <td className="px-4 py-3 border border-gray-200">{w.location}</td>
-                                <td className="px-4 py-3 border border-gray-200">{w.materials}</td>
-                                <td className="px-4 py-3 border border-gray-200 text-right">
-                                    <button
-                                        onClick={() => handleTogglePreview(index)}
-                                        className="text-sm text-teal-600 underline hover:text-teal-800"
-                                    >
-                                        View
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Add/Edit Modal */}
-            {showForm && (
-                <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl p-6 shadow-xl w-[450px]">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-semibold text-gray-800">Warehouse</h3>
-                            <button
-                                onClick={() => setShowForm(false)}
-                                className="text-gray-500 hover:text-gray-700 text-lg"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        <div className="space-y-4">
-                            {[
-                                { label: "Warehouse ID*", placeholder: "OABC00WE" },
-                                { label: "Warehouse Location", placeholder: "Vaccshauts Dept." },
-                                { label: "Stored Materials", placeholder: "XYZ Materials" }
-                            ].map((field, i) => (
-                                <div key={i}>
-                                    <label className="block text-sm text-teal-700 mb-1">{field.label}</label>
-                                    <input
-                                        type="text"
-                                        placeholder={field.placeholder}
-                                        className="w-full border px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                <div className="tabs-wrapper">
+                    <Tabs
+                        activeKey={activeTab}
+                        size="middle"
+                        tabBarGutter={8}
+                        className="user-tabs"
+                        type={windowWidth <= 768 ? "card" : "line"}
+                        tabPosition="top"
+                        destroyInactiveTabPane={false}
+                        tabBarExtraContent={{
+                            right: (
+                                <div className="header-right-content">
+                                    <div className="search-container">
+                                        <Space style={{ float: "right" }} size="middle">
+                                            <Input.Search
+                                                placeholder={activeTab === "warehouse" ? "Search warehouses..." : ""}
+                                                allowClear
+                                                onSearch={handleSearch}
+                                                value={searchValue}
+                                                onChange={(e) => setSearchValue(e.target.value)}
+                                                prefix={<SearchOutlined />}
+                                            />
+                                            <Button
+                                                icon={<EyeOutlined />}
+                                                onClick={() => {
+                                                    setArchivedSearchValue("");
+                                                    fetchArchivedWarehouse("");
+                                                }}
+                                                className={`archive-btn ${windowWidth <= 576 ? "icon-only-btn" : ""}`}
+                                            >
+                                                {windowWidth > 576 ? "View Archived" : ""}
+                                            </Button>
+                                        </Space>
+                                    </div>
+                                    <div className="action-buttons">
+                                        {activeTab === "warehouse" && (
+                                            <Button
+                                                type="primary"
+                                                icon={<PlusOutlined />}
+                                                onClick={handleAddWarehouse}
+                                                className={windowWidth <= 576 ? "icon-only-btn" : ""}
+                                            >
+                                                {windowWidth > 576 ? "Add Warehouse" : ""}
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            )
+                        }}
+                    >
+                        <TabPane
+                            tab={<span><UserOutlined /> {windowWidth > 576 ? "Warehouses" : ""}</span>}
+                            key="warehouse"
+                        >
+                            {/* Warehouse tab content */}
+                            <div className="table-meta-info">
+                                <span className="record-count">Total Warehouses: {warehouse.length}</span>
+                                <div className="table-pagination">
+                                    <Pagination
+                                        current={warehousePagination.current}
+                                        pageSize={warehousePagination.pageSize}
+                                        total={warehouse.length}
+                                        onChange={handleWarehousePaginationChange}
+                                        showSizeChanger={false}
+                                        size="small"
                                     />
                                 </div>
-                            ))}
-                        </div>
+                            </div>
 
-                        <div className="flex justify-end gap-2 mt-6">
-                            <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
-                            <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">Edit</button>
-                            <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Archive</button>
-                        </div>
-                    </div>
+                            <div className="table-container">
+                                <Table
+                                    dataSource={getWarehouseTableData()}
+                                    columns={warehouseColumns}
+                                    rowKey="warehouse_id"
+                                    loading={loading}
+                                    scroll={{ x: true, y: 400 }}
+                                    pagination={false}
+                                    bordered
+                                    size="middle"
+                                    showSorterTooltip={false}
+                                    sortDirections={['ascend', 'descend']}
+                                    className="scrollable-table"
+                                />
+                            </div>
+                        </TabPane>
+                    </Tabs>
                 </div>
-            )}
 
-            {/* View Modal */}
-            {previewIndex !== null && (
-                <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-40">
-                    <div className="bg-white rounded-2xl p-6 shadow-xl w-[450px]">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-semibold text-gray-800">Warehouse</h3>
-                            <button
-                                onClick={() => setPreviewIndex(null)}
-                                className="text-gray-500 hover:text-gray-700 text-lg"
-                            >
-                                ✕
-                            </button>
-                        </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm text-teal-700 mb-1">Warehouse ID*</label>
-                                <p className="text-gray-800">OABC00WE</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm text-teal-700 mb-1">Warehouse Location</label>
-                                <p className="text-gray-800">Vaccshauts Dept.</p>
-                            </div>
-                            <div>
-                                <label className="block text-sm text-teal-700 mb-1">Stored Materials</label>
-                                <p className="text-gray-800">XYZ Materials</p>
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-2 mt-6">
-                            <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
-                            <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">Edit</button>
-                            <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Archive</button>
-                        </div>
+                {/* Warehouse Modal */}
+                <Modal
+                    title={modalMode === "add" ? "Add New Warehouse" : "Edit Warehouse"}
+                    visible={warehouseModalVisible}
+                    onCancel={() => setWarehouseModalVisible(false)}
+                    footer={null}
+                    width={700}
+                    className="custom-modal"
+                >
+                    <Form
+                        form={warehouseForm}
+                        layout="vertical"
+                        onFinish={handleWarehouseFormSubmit}
+                    >
+                        <Form.Item
+                            name="warehouse_location"
+                            label="Warehouse Location"
+                            rules={[{ required: true, message: "Please enter warehouse location" }]}
+                        >
+                            <Input />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="stored_materials"
+                            label="Stored Materials"
+                        >
+                            <TextArea rows={4} />
+                        </Form.Item>
+
+                        <Form.Item className="form-actions">
+                            <Space>
+                                <Button type="primary" htmlType="submit">
+                                    {modalMode === "add" ? "Create" : "Update"}
+                                </Button>
+                                <Button onClick={() => setWarehouseModalVisible(false)}>
+                                    Cancel
+                                </Button>
+                            </Space>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+
+                {/* Archived Roles Modal */}
+                <Modal
+                    title="Archived Warehouse"
+                    visible={archiveModalVisible}
+                    onCancel={() => setArchiveModalVisible(false)}
+                    footer={[
+                        <Button key="close" onClick={() => setArchiveModalVisible(false)}>
+                            Close
+                        </Button>
+                    ]}
+                    width={900}
+                    className="custom-modal"
+                >
+                    <div className="archived-search-container" style={{ marginBottom: '16px' }}>
+                        <Input.Search
+                            placeholder="Search archived warehouses..."
+                            allowClear
+                            onSearch={handleArchivedSearch}
+                            value={archivedSearchValue}
+                            onChange={(e) => setArchivedSearchValue(e.target.value)}
+                            prefix={<SearchOutlined />}
+                        />
                     </div>
-                </div>
-            )}
+                    <Table
+                        dataSource={archivedWarehouse}
+                        columns={archivedWarehouseColumns}
+                        rowKey="warehouse_id"
+                        loading={loading}
+                        scroll={{ x: 'max-content' }}
+                        pagination={{
+                            pageSize: 7,
+                            responsive: true,
+                            size: 'small',
+                            position: ['bottomCenter']
+                        }}
+                        bordered
+                        size="middle"
+                        showSorterTooltip={false}
+                        sortDirections={['ascend', 'descend']}
+                    />
+                </Modal>
+            </div>
         </div>
     );
 };
