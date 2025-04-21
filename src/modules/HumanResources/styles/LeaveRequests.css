@@ -69,7 +69,6 @@
 .hr-leave-requests-header {
   position: sticky;
   top: 0;
-  z-index: 10;
   background-color: white;
   margin: 1rem 0;
   border-top: 1px solid #e4e4e4;
