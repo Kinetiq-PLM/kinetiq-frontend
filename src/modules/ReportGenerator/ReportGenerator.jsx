@@ -1,7 +1,81 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, memo } from "react";
 import "./styles/ReportGenerator.css";
 
-const BodyContent = (user_id) => {
+const ChatMessage = memo(({ msg, index, messagesLength, downloadCSV }) => {
+    // Function to safely render cell content, handling potential objects/arrays
+    const renderCellContent = (cell) => {
+        if (typeof cell === 'object' && cell !== null) {
+            return JSON.stringify(cell); // Or handle specific object types differently
+        }
+        return cell;
+    };
+
+    return (
+        <div key={msg.id || index} className={`chat-message ${msg.sender}`}>
+            {msg.type === "text" ? (
+                <div className="message-text">
+                    {/* Render loading indicator if applicable */}
+                    {msg.isLoading ? (
+                        <span className="loading-dots">...</span> // Or a spinner component
+                    ) : (
+                        msg.text.split("\n").map((line, i) => (
+                            <React.Fragment key={i}>
+                                {line}
+                                <br />
+                            </React.Fragment>
+                        ))
+                    )}
+                </div>
+            ) : (
+                // When type is 'table'
+                <div className="chat-table-response">
+                    {/* Render the main text response (summary/intro) */}
+                    <p className="res-head">{msg.text}</p>
+
+                    {/* Map through the tables */}
+                    {msg.tables && msg.tables.map((table, i) => (
+                        // --- 3. Add a wrapper div for horizontal scrolling ---
+                        <div key={i} className="table-scroll-wrapper">
+                            <table className="chat-table">
+                                <thead>
+                                    <tr>
+                                        {table.headers.map((header, j) => (
+                                            <th key={j}>{header}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {table.rows.map((row, k) => (
+                                        <tr key={k}>
+                                            {/* Ensure row is an array before mapping */}
+                                            {Array.isArray(row) ? row.map((cell, l) => (
+                                                <td key={l}>{renderCellContent(cell)}</td>
+                                            )) : (
+                                                // Handle cases where row might not be an array (e.g., error)
+                                                <td colSpan={table.headers.length}>Invalid row data</td>
+                                            )}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ))}
+                    <div className="action-buttons">
+                        {msg.tables && msg.tables.length > 0 && (
+                            <div className="dl-icon-wrapper" onClick={() => downloadCSV(msg.tables[0], 'report-data.csv')}>
+                                <img src="../../icons/repgen-icons/download.png" alt="Download" className="download-icon"/>
+                                {/* Adjust tooltip alignment based on index */}
+                                <span className={`tooltip ${index === messagesLength - 1 ? 'right-aligned' : ''}`}>Download CSV</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+});
+
+const BodyContent = ({employee_id}) => {
     const [isSidebarVisible, setIsSidebarVisible] = useState(false);
     const [messages, setMessages] = useState([]); 
     const [inputText, setInputText] = useState("");
@@ -12,25 +86,51 @@ const BodyContent = (user_id) => {
     const [error, setError] = useState(null);
     const [activeConversationId, setActiveConversationId] = useState(null);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+    const [isCreatingConversation, setIsCreatingConversation] = useState(false);
     const [isBotResponding, setIsBotResponding] = useState(false);
-    const authToken = "dummy-token";
+    const [userName, setUserName] = useState(employee_id || '');
     const textareaRef = useRef(null);
-    const currentUserId = user_id;
 
-    // API base URL - would typically come from environment variables
-    const API_BASE_URL = "http://127.0.0.1:8000/";
+    const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
+    // const API_BASE_URL = "http://127.0.0.1:8000/";
 
     useEffect(() => {
-        fetchConversations();
-    }, []);
+        if (employee_id) { // Only fetch if user_id is available
+            fetchUserName();
+            fetchConversations();
+        }
+    }, [employee_id]); 
+    
+    const fetchUserName = async () => {
+        if (!employee_id) return; // Guard clause
+        try {
+            // Use the new backend endpoint
+            const response = await fetch(`${API_BASE_URL}chatbot/load_user_details/${employee_id}/`);
+            if (!response.ok) {
+                // Handle potential errors like 404 Not Found
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`HTTP error! status: ${response.status} - ${errorData.error || 'User details not found'}`);
+            }
+            const userData = await response.json();
+            // Set the user name, fallback to employee_id or 'User' if first_name is missing
+            setUserName(userData.first_name || employee_id || 'User');
+        } catch (err) {
+            console.error("Failed to fetch user name:", err);
+            // Fallback to employee_id if fetching fails
+            setUserName(employee_id || 'User');
+            // Optionally set an error state specific to user name fetching if needed
+            // setError(prev => ({ ...prev, userNameError: `Could not load user name: ${err.message}` }));
+        }
+    };
 
     const fetchConversations = async () => {
+        if (!employee_id) return;
         setLoading(true);
         setError(null);
         try {
             // Construct the API URL using the base URL and the user ID
             // Assuming your Django URL pattern is something like 'api/conversations/user/<int:user_id>/'
-            const response = await fetch(`${API_BASE_URL}chatbot/load_conversations/${currentUserId}/`, {
+            const response = await fetch(`${API_BASE_URL}chatbot/load_conversations/${employee_id}/`, {
                 method: 'GET', // Explicitly set method, though GET is default
                 headers: {
                     // Include authentication headers if required by your backend
@@ -46,17 +146,25 @@ const BodyContent = (user_id) => {
 
             const data = await response.json();
 
-            // Map the backend response fields to the frontend state structure
-            const formattedConversations = data.map(conv => ({
-                convo_id: conv.conversation_id, // Map conversation_id to id
-                user_id: conv.user_id,
-                created_at: conv.started_at, // Map started_at to created_at
-                updated_at: conv.updated_at,
-                // Generate a title if not provided by the backend
-                title: `Conversation ${conv.conversation_id.substring(0, 15)}` 
-            }));
+            // Map the backend response fields
+            const formattedConversations = data.map(conv => {
+                // Use conversation_title from backend if available, otherwise generate
+                let title = conv.conversation_title;
+                if (!title) {
+                    // Generate title based on ID (e.g., last parts)
+                    const parts = conv.conversation_id.split('_'); // Assuming "convo_..." format
+                    title = `Convo ${parts[1] ? parts[1].substring(0, 8) : conv.conversation_id.substring(0, 8)}`;
+                }
+                return {
+                    convo_id: conv.conversation_id,
+                    employee_id: conv.employee_id, // Store employee_id
+                    created_at: conv.started_at,
+                    updated_at: conv.updated_at,
+                    title: title // Use the determined title
+                };
+            });
 
-            setConversations(formattedConversations);
+            setConversations(formattedConversations);       
 
         } catch (err) {
             console.error('Error fetching conversations:', err);
@@ -68,76 +176,99 @@ const BodyContent = (user_id) => {
 
     const fetchMessages = async (conversationId) => {
         setIsLoadingMessages(true);
-        setError(null); // Clear previous errors
-        setMessages([]); // Clear previous messages immediately
-        setActiveConversationId(conversationId); // Set active conversation right away
+        setError(null);
+        setMessages([]);
+        setActiveConversationId(conversationId);
         console.log("Fetching messages for conversation ID:", conversationId);
+
+        const TABLE_DATA_MARKER = "[TABLE_DATA]:"; // Use the same marker
+
         try {
-            // Construct the API URL for fetching messages
-            // Ensure this matches your Django urls.py pattern for load_messages
             const response = await fetch(`${API_BASE_URL}chatbot/load_messages/${conversationId}/`, {
                 method: 'GET',
                 headers: {
-                    // Include authentication headers if required by your backend
-                    // 'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json',
                 }
             });
-            
+
             if (!response.ok) {
-                // Handle HTTP errors (e.g., 404 Not Found, 500 Internal Server Error)
-                const errorData = await response.json().catch(() => ({})); // Try to get error details
+                const errorData = await response.json().catch(() => ({}));
                 throw new Error(`HTTP error! status: ${response.status} - ${errorData.error || 'Failed to fetch'}`);
             }
 
             const data = await response.json();
 
             // Map the backend message format to the frontend format
-            const formattedMessages = data.map(msg => ({
-                // Assuming your frontend expects 'text' and 'sender'
-                // You might need more complex mapping if your frontend
-                // needs to handle different message types (like tables)
-                // based on backend fields (e.g., msg.intent, msg.sql_query)
-                id: msg.message_id, // Keep track of message ID if needed
-                sender: msg.sender, // 'user' or 'bot'
-                text: msg.message, // The actual message content
-                type: "text", // Default to 'text'. Add logic here to determine type if needed.
-                // Add other fields if your frontend components use them
-                // e.g., created_at: msg.created_at
-            }));
+            const formattedMessages = data.map(msg => {
+                let messageType = "text";
+                let tablesData = null;
+                let originalSqlQuery = msg.sql_query; // Store original query
+
+                // *** Check if sql_query contains encoded table data ***
+                if (msg.sql_query && msg.sql_query.startsWith(TABLE_DATA_MARKER)) {
+                    try {
+                        const tableJsonString = msg.sql_query.substring(TABLE_DATA_MARKER.length);
+                        tablesData = JSON.parse(tableJsonString);
+                        messageType = "table";
+                        // Clear sql_query for frontend state as it held table data
+                        originalSqlQuery = null;
+                    } catch (parseError) {
+                        console.error("Failed to parse table data from fetched sql_query:", parseError, "for message:", msg.message_id);
+                        // Fallback to text if parsing fails
+                        messageType = "text";
+                        tablesData = null;
+                        // Keep the original (malformed) sql_query string? Or set to null?
+                        // Let's keep it for debugging, but maybe set to null in production
+                        // originalSqlQuery = msg.sql_query;
+                    }
+                }
+                // *** End of table decoding logic ***
+
+                return {
+                    id: msg.message_id,
+                    sender: msg.sender,
+                    text: msg.message,
+                    type: messageType, // Determined type
+                    tables: tablesData, // Decoded tables or null
+                    sql_query: originalSqlQuery // Original SQL or null if used for tables
+                    // created_at: msg.created_at
+                };
+            });
 
             setMessages(formattedMessages);
 
         } catch (err) {
             console.error('Error fetching messages:', err);
-            // Display a user-friendly error message
             setError(`Failed to load conversation: ${err.message}. Please select another or try again.`);
-            // Optionally clear messages if the fetch failed completely
-            // setMessages([]);
         } finally {
             setIsLoadingMessages(false);
         }
     };
 
     const createNewConversation = async () => {
+        if (!employee_id) {
+            setError("Employee ID is missing, cannot create conversation.");
+            throw new Error("Employee ID is missing.");
+        }
         setError(null); // Clear previous errors
+        setIsCreatingConversation(true);
         // Optionally set a loading state specific to creating a conversation
         // setLoading(true); // Or a more specific state like setIsCreatingConversation(true);
-        
+        console.log("Creating new conversation for employee ID:", employee_id);
         try {
             // API call to create a new conversation
             const response = await fetch(`${API_BASE_URL}chatbot/create_conversation/`, {
-              method: 'POST',
-              headers: { 
-                // Include authentication headers if required by your backend
-                // 'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-              },
-              // Send the required user_id in the body
-              body: JSON.stringify({ 
-                  user_id: currentUserId 
-                  // Add role_id here if needed: role_id: someRoleId 
-              }) 
+                method: 'POST',
+                headers: { 
+                    // Include authentication headers if required by your backend
+                    // 'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                // Send the required employee_id in the body
+                body: JSON.stringify({ 
+                    employee_id: employee_id
+                    // Add role_id here if needed: role_id: someRoleId 
+                }) 
             });
 
             if (!response.ok) {
@@ -148,11 +279,16 @@ const BodyContent = (user_id) => {
             
             // Parse the response which contains the new conversation object
             const newConversationData = await response.json();
-
+            // Use title from response if available
+            let title = newConversationData.conversation_title;
+            if (!title) {
+                 const parts = newConversationData.conversation_id.split('_');
+                 title = `Convo ${parts[1] ? parts[1].substring(0, 8) : newConversationData.conversation_id.substring(0, 8)}`;
+            }
             // Format the new conversation data to match the frontend state structure
             const formattedNewConversation = {
                 convo_id: newConversationData.conversation_id,
-                user_id: newConversationData.user_id,
+                employee_id: newConversationData.employee_id,
                 created_at: newConversationData.started_at,
                 updated_at: newConversationData.updated_at,
                 title: `Conversation ${newConversationData.conversation_id.substring(0, 15)}` // Generate title
@@ -176,60 +312,93 @@ const BodyContent = (user_id) => {
             // Re-throw the error if the calling function needs to know about the failure
             throw err; 
         } finally {
-             // Reset loading state if you set one
-             // setLoading(false); // Or setIsCreatingConversation(false);
+            setIsCreatingConversation(false);
         }
     };
 
     const saveMessage = async (conversationId, messageData) => {
-        // messageData should be an object like { sender: 'user'/'bot', message: 'text content' }
+        // messageData now includes: { sender, text, type, sql_query?, tables? }
         if (!conversationId) {
             console.error("Cannot save message without an active conversation ID.");
             throw new Error("No active conversation selected.");
         }
-        
+
+        const TABLE_DATA_MARKER = "[TABLE_DATA]:";
+
         try {
-            // Construct the API URL for creating a message
-            // Ensure this matches your Django urls.py pattern for create_message
+            // Construct the payload based on message type
+            const payload = {
+                sender: messageData.sender,
+                message: messageData.text,
+                // Default sql_query to null or the provided one
+                sql_query: messageData.sql_query || null
+            };
+
+            // *** If type is 'table', encode tables into sql_query field ***
+            if (messageData.type === 'table' && messageData.tables) {
+                try {
+                    const tableJsonString = JSON.stringify(messageData.tables);
+                    // Store encoded table data in the sql_query field
+                    payload.sql_query = TABLE_DATA_MARKER + tableJsonString;
+                } catch (jsonError) {
+                    console.error("Failed to stringify table data:", jsonError);
+                    // Decide how to handle: save without table? throw error?
+                    // For now, let's save with null sql_query
+                    payload.sql_query = null;
+                }
+            }
+            // *** End of table encoding logic ***
+
             const response = await fetch(`${API_BASE_URL}chatbot/create_message/${conversationId}/`, {
               method: 'POST',
-              headers: { 
-                // Include authentication headers if required by your backend
-                // 'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json' 
+              headers: {
+                'Content-Type': 'application/json'
               },
-              // Send the message data in the request body
-              body: JSON.stringify({
-                  sender: messageData.sender, // 'user' or 'bot'
-                  message: messageData.text // The actual text content
-                  // Add other fields like intent, sql_query if needed for the backend
-              }) 
+              body: JSON.stringify(payload) // Send the modified payload
             });
 
             if (!response.ok) {
-                // Handle HTTP errors (e.g., 400 Bad Request, 404 Not Found, 500)
-                const errorData = await response.json().catch(() => ({})); // Try to get error details
+                const errorData = await response.json().catch(() => ({}));
                 console.error("API Error Response:", errorData);
                 throw new Error(`HTTP error! status: ${response.status} - ${errorData.error || 'Failed to save message'}`);
             }
 
-            // Parse the response which should contain the newly created message object from the backend
             const savedMessage = await response.json();
-            
-            // Map the backend response to the frontend format if necessary
-            // (Assuming backend returns fields compatible with frontend state for now)
+
+            // Map the backend response back to the frontend format
+            // We need to decode the table data if it was stored in sql_query
+            let messageType = "text";
+            let tablesData = null;
+            let originalSqlQuery = savedMessage.sql_query; // Keep original for potential use
+
+            if (savedMessage.sql_query && savedMessage.sql_query.startsWith(TABLE_DATA_MARKER)) {
+                try {
+                    const tableJsonString = savedMessage.sql_query.substring(TABLE_DATA_MARKER.length);
+                    tablesData = JSON.parse(tableJsonString);
+                    messageType = "table";
+                    // Since sql_query was used for tables, clear it for the frontend state
+                    originalSqlQuery = null;
+                } catch (parseError) {
+                    console.error("Failed to parse table data from sql_query:", parseError);
+                    // Fallback to text type if parsing fails
+                    messageType = "text";
+                    tablesData = null;
+                }
+            }
+
             return {
                 id: savedMessage.message_id,
                 sender: savedMessage.sender,
                 text: savedMessage.message,
-                type: "text", // Adjust if backend provides type info
-                // created_at: savedMessage.created_at // Include if needed
+                type: messageType, // Determined type
+                tables: tablesData, // Decoded tables or null
+                sql_query: originalSqlQuery, // Original SQL or null if used for tables
+                conversation_title: savedMessage.conversation_title // Keep title update logic
             };
 
         } catch (err) {
             console.error('Error saving message via API:', err);
-            // Re-throw the error so handleSendMessage can catch it
-            throw err; 
+            throw err;
         }
     };
 
@@ -252,7 +421,6 @@ const BodyContent = (user_id) => {
         };
         
         conversations.forEach(conversation => {
-            // Use updated_at for grouping instead of created_at
             const convDate = new Date(conversation.updated_at); 
             
             if (convDate >= today) {
@@ -303,17 +471,25 @@ const BodyContent = (user_id) => {
     };
 
     // Function to call the chatbot backend API
-    const getBotResponse = async (userMessageText) => {
+    const getBotResponse = async (userMessageText, currentConversationId) => { // Added currentConversationId
+        // --- Ensure conversation ID is present ---
+        if (!currentConversationId) {
+            console.error("Cannot get bot response without a conversation ID.");
+            throw new Error("Conversation ID is missing.");
+        }
+
         try {
-            // Encode the user message to be safely included in the URL
-            const encodedMessage = encodeURIComponent(userMessageText);
-            const response = await fetch(`${API_BASE_URL}chatbot/chatbot/?message=${encodedMessage}`, {
-                method: 'GET',
+            const response = await fetch(`${API_BASE_URL}chatbot/respond/`, {
+                method: 'POST',
                 headers: {
-                    // Include authentication headers if required by your backend
-                    // 'Authorization': `Bearer ${authToken}`,
-                    'Content-Type': 'application/json', 
-                }
+                    'Content-Type': 'application/json',
+                    // Add other headers like Authorization if needed
+                },
+                body: JSON.stringify({ 
+                    message: userMessageText,
+                    conversation_id: currentConversationId
+                 })
+                
             });
 
             if (!response.ok) {
@@ -322,19 +498,17 @@ const BodyContent = (user_id) => {
             }
 
             const botData = await response.json();
-            // The backend returns { response: "text", data: {...}, sql_error: "..." }
-            return botData; 
+            return botData;
 
         } catch (err) {
             console.error('Error fetching bot response:', err);
-            // Re-throw the error to be handled in handleSendMessage
-            throw err; 
+            throw err;
         }
     };
 
     const handleSendMessage = async () => {
         const trimmedInput = inputText.trim();
-        if (trimmedInput === "" || isBotResponding) return; // Don't send empty messages
+        if (trimmedInput === "" || isBotResponding || !activeConversationId) return; // Don't send empty messages
 
         let currentConversationId = activeConversationId;
 
@@ -425,7 +599,7 @@ const BodyContent = (user_id) => {
             };
             setMessages(prev => [...prev, thinkingMessage]);
 
-            const botApiResponse = await getBotResponse(trimmedInput);
+            const botApiResponse = await getBotResponse(trimmedInput, activeConversationId);
 
             // Remove the "thinking" message
             setMessages(prev => prev.filter(msg => msg.id !== thinkingMessage.id));
@@ -434,51 +608,62 @@ const BodyContent = (user_id) => {
             let botText = botApiResponse.response || "Sorry, I couldn't generate a response.";
             let botMessageType = "text"; // Default type
             let botTableData = null; // To store table data if present
+            let botSqlQuery = botApiResponse.sql_query || null; // Get the query
 
             if (botApiResponse.sql_error) {
                 botText += `\n\n[Error executing SQL: ${botApiResponse.sql_error}]`;
             }
-            
-            // --- Handle Table Data (Example) ---
-            // Adjust this logic based on the actual structure of botApiResponse.data
+
             if (botApiResponse.data && botApiResponse.data.headers && botApiResponse.data.rows) {
-                 botMessageType = "table"; // Change type if data looks like a table
-                 botTableData = botApiResponse.data; 
-                 // You might want to keep the text response as a title or intro for the table
-                 // botText = botApiResponse.response; // Keep the original text response as well
+                 botMessageType = "table";
+                 botTableData = botApiResponse.data;
             }
-            // --- End Table Data Handling ---
 
-
-            const botMessageDataForSaving = { 
-                sender: "bot", 
-                text: botText // Save the primary text response
-                // Optionally include intent, sql_query from botApiResponse if needed by backend
-                // intent: botApiResponse.intent, 
-                // sql_query: botApiResponse.sql_query 
+            // --- Include sql_query when preparing data for saving ---
+            const botMessageDataForSaving = {
+                sender: "bot",
+                text: botText,
+                type: botMessageType, // 'text' or 'table'
+                sql_query: botSqlQuery, // Pass the *actual* SQL query here (can be null)
+                // Pass the actual table data if type is 'table'
+                // saveMessage will handle encoding this into the sql_query field if type is 'table'
+                tables: botMessageType === 'table' ? [{
+                    headers: botTableData.headers,
+                    rows: botTableData.rows
+                }] : null
+                // Optionally include intent if needed by backend:
+                // intent: botApiResponse.intent
             };
 
             // 3. Save bot response to backend
-            const savedBotMessage = await saveMessage(currentConversationId, botMessageDataForSaving);
+            const savedBotMessageResult = await saveMessage(currentConversationId, botMessageDataForSaving);
 
-            // 4. Add final bot message to UI (using saved data + UI-specific fields like type/data)
+            // --- *** ADD THIS BLOCK TO UPDATE THE CONVERSATION TITLE *** ---
+            if (savedBotMessageResult.conversation_title) {
+                setConversations(prevConvos =>
+                    prevConvos.map(conv =>
+                        conv.convo_id === currentConversationId
+                            ? { ...conv, title: savedBotMessageResult.conversation_title } // Update title
+                            : conv // Keep others unchanged
+                    )
+                );
+            }
+            // --- *** END OF TITLE UPDATE BLOCK *** ---
+
+            // 4. Add final bot message to UI
             const finalBotMessageForUI = {
-                ...savedBotMessage, // Includes id, sender, text from backend
-                type: botMessageType, // Set the correct type for rendering
-                // Add the table data if it exists for the Table component
-                ...(botTableData && { 
-                    // Structure this according to your Table component's props
-                    tables: [{ 
-                        title: "Generated Report", // Example title
-                        headers: botTableData.headers, 
-                        rows: botTableData.rows 
-                    }],
-                    // You might need additional text fields your table component uses
-                    title2: "Analysis", 
-                    text2: "Here is the data based on your request." 
+                id: savedBotMessageResult.id, // Use ID from saved result
+                sender: savedBotMessageResult.sender,
+                text: savedBotMessageResult.text, // Use text from saved result (can serve as title/intro)
+                type: botMessageType, // Will be 'text' or 'table'
+                ...(botMessageType === "table" && botTableData && {
+                    tables: [{ // Structure expected by rendering: an array of table objects
+                        title: savedBotMessageResult.text, // Use the main text as a title for the table
+                        headers: botTableData.headers,
+                        rows: botTableData.rows
+                    }]
                 })
             };
-
             setMessages(prev => [...prev, finalBotMessageForUI]);
 
         } catch (botProcessingErr) {
@@ -500,7 +685,6 @@ const BodyContent = (user_id) => {
         }
     };
 
-    //CURRENTLY NOT BEING USED SINCE NO UI ELEMENT YET FOR ARCHIVE
     const archiveConversation = async (conversationIdToArchive) => {
         // Prevent archiving if the bot is currently responding
         if (isBotResponding) {
@@ -630,9 +814,9 @@ const BodyContent = (user_id) => {
                                     <div className="sidebar-icons-ham-icon-wrapper">
                                         <div 
                                             // Add 'disabled' class and prevent click if bot is responding
-                                            className={`ham-menu-icon active ${isBotResponding ? 'disabled' : ''}`} 
-                                            onClick={!isBotResponding ? toggleSidebar : undefined}
-                                            style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', opacity: isBotResponding ? 0.6 : 1 }} 
+                                            className={`ham-menu-icon active ${isBotResponding || isCreatingConversation  ? 'disabled' : ''}`} 
+                                            onClick={!(isBotResponding || isCreatingConversation) ? toggleSidebar : undefined}
+                                            style={{ cursor: (isBotResponding || isCreatingConversation) ? 'not-allowed' : 'pointer', opacity: (isBotResponding || isCreatingConversation) ? 0.6 : 1 }} 
                                         >
                                             <span></span>
                                             <span></span>
@@ -643,10 +827,10 @@ const BodyContent = (user_id) => {
                                                 src="../../icons/repgen-icons/newchat.png" 
                                                 alt="New" 
                                                 // Add 'disabled' class and prevent click if bot is responding
-                                                className={`newchat-icon ${isBotResponding ? 'disabled' : ''}`}
-                                                onClick={!isBotResponding ? startNewChat : undefined}
+                                                className={`newchat-icon ${isBotResponding || isCreatingConversation ? 'disabled' : ''}`}
+                                                onClick={!(isBotResponding || isCreatingConversation) ? startNewChat : undefined}
                                                 // Optional: Add style for disabled state in CSS for .newchat-icon.disabled
-                                                style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', opacity: isBotResponding ? 0.6 : 1 }} 
+                                                style={{ cursor: (isBotResponding || isCreatingConversation) ? 'not-allowed' : 'pointer', opacity: (isBotResponding || isCreatingConversation) ? 0.6 : 1 }} 
                                             />
                                         </div>
                                     </div>
@@ -675,16 +859,16 @@ const BodyContent = (user_id) => {
                                                                 justifyContent: 'space-between', 
                                                                 alignItems: 'center',
                                                                 // Apply opacity based on bot state for the whole item
-                                                                opacity: isBotResponding ? 0.6 : 1 
+                                                                opacity: (isBotResponding || isCreatingConversation) ? 0.6 : 1 
                                                             }} 
                                                         >
                                                             {/* Wrap title in a span and attach fetchMessages click here */}
                                                             <span 
-                                                                onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? () => fetchMessages(chat.convo_id) : undefined}
                                                                 // Make the title span take up available space and allow clicking
                                                                 style={{ 
                                                                     flexGrow: 1, 
-                                                                    cursor: isBotResponding ? 'not-allowed' : 'pointer', 
+                                                                    cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', 
                                                                     paddingRight: '10px', // Add space between title and icon
                                                                     overflow: 'hidden', // Prevent long titles from overlapping icon
                                                                     textOverflow: 'ellipsis', // Add ellipsis for long titles
@@ -699,14 +883,14 @@ const BodyContent = (user_id) => {
                                                                 src="../../icons/repgen-icons/archive-icon.png" // Verify path
                                                                 alt="Archive"
                                                                 // Add disabled class based on bot state
-                                                                className={`archive-icon ${isBotResponding ? 'disabled' : ''}`} 
+                                                                className={`archive-icon ${isBotResponding || isCreatingConversation  ? 'disabled' : ''}`} 
                                                                 // Attach archiveConversation click here, prevent if bot is responding
-                                                                onClick={!isBotResponding ? (e) => {
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? (e) => {
                                                                     e.stopPropagation(); // Prevent triggering fetchMessages if li had a handler
                                                                     archiveConversation(chat.convo_id); 
                                                                 } : undefined}
                                                                 style={{
-                                                                    cursor: isBotResponding ? 'not-allowed' : 'pointer',
+                                                                    cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer',
                                                                     width: '24px',  // Adjust size as needed
                                                                     height: '24px', 
                                                                     flexShrink: 0 // Prevent icon from shrinking
@@ -726,20 +910,20 @@ const BodyContent = (user_id) => {
                                                         <li 
                                                             key={chat.convo_id} 
                                                             className={`history-item ${chat.active ? 'active' : ''}`}
-                                                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isBotResponding ? 0.6 : 1 }} 
+                                                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: (isBotResponding || isCreatingConversation)  ? 0.6 : 1 }} 
                                                         >
                                                             <span 
-                                                                onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
-                                                                style={{ flexGrow: 1, cursor: isBotResponding ? 'not-allowed' : 'pointer', paddingRight: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? () => fetchMessages(chat.convo_id) : undefined}
+                                                                style={{ flexGrow: 1, cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', paddingRight: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                                                             >
                                                                 {chat.title}
                                                             </span>
                                                             <img
                                                                 src="../../icons/repgen-icons/archive-icon.png" 
                                                                 alt="Archive"
-                                                                className={`archive-icon ${isBotResponding ? 'disabled' : ''}`} 
-                                                                onClick={!isBotResponding ? (e) => { e.stopPropagation(); archiveConversation(chat.convo_id); } : undefined}
-                                                                style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', width: '24px', height: '24px', flexShrink: 0 }}
+                                                                className={`archive-icon ${isBotResponding || isCreatingConversation  ? 'disabled' : ''}`} 
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? (e) => { e.stopPropagation(); archiveConversation(chat.convo_id); } : undefined}
+                                                                style={{ cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', width: '24px', height: '24px', flexShrink: 0 }}
                                                             />
                                                         </li>
                                                     ))}
@@ -755,20 +939,20 @@ const BodyContent = (user_id) => {
                                                         <li 
                                                             key={chat.convo_id} 
                                                             className={`history-item ${chat.active ? 'active' : ''}`}
-                                                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: isBotResponding ? 0.6 : 1 }} 
+                                                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: (isBotResponding || isCreatingConversation)  ? 0.6 : 1 }} 
                                                         >
                                                             <span 
-                                                                onClick={!isBotResponding ? () => fetchMessages(chat.convo_id) : undefined}
-                                                                style={{ flexGrow: 1, cursor: isBotResponding ? 'not-allowed' : 'pointer', paddingRight: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? () => fetchMessages(chat.convo_id) : undefined}
+                                                                style={{ flexGrow: 1, cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', paddingRight: '10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                                                             >
                                                                 {chat.title}
                                                             </span>
                                                             <img
                                                                 src="../../icons/repgen-icons/archive-icon.png" 
                                                                 alt="Archive"
-                                                                className={`archive-icon ${isBotResponding ? 'disabled' : ''}`} 
-                                                                onClick={!isBotResponding ? (e) => { e.stopPropagation(); archiveConversation(chat.convo_id); } : undefined}
-                                                                style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', width: '24px', height: '24px', flexShrink: 0 }}
+                                                                className={`archive-icon ${(isBotResponding || isCreatingConversation)  ? 'disabled' : ''}`} 
+                                                                onClick={!(isBotResponding || isCreatingConversation)  ? (e) => { e.stopPropagation(); archiveConversation(chat.convo_id); } : undefined}
+                                                                style={{ cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', width: '24px', height: '24px', flexShrink: 0 }}
                                                             />
                                                         </li>
                                                     ))}
@@ -790,9 +974,9 @@ const BodyContent = (user_id) => {
                             {!isSidebarVisible && (
                                 <div 
                                     // Add 'disabled' class and prevent click if bot is responding
-                                    className={`sidebar-icons-ham-icon-wrapper ${isBotResponding ? 'disabled' : ''}`} 
-                                    onClick={!isBotResponding ? toggleSidebar : undefined}
-                                    style={{ cursor: isBotResponding ? 'not-allowed' : 'pointer', opacity: isBotResponding ? 0.6 : 1 }} 
+                                    className={`sidebar-icons-ham-icon-wrapper ${(isBotResponding || isCreatingConversation)  ? 'disabled' : ''}`} 
+                                    onClick={!(isBotResponding || isCreatingConversation)  ? toggleSidebar : undefined}
+                                    style={{ cursor: (isBotResponding || isCreatingConversation)  ? 'not-allowed' : 'pointer', opacity: (isBotResponding || isCreatingConversation)  ? 0.6 : 1 }} 
                                 >
                                     <div className="ham-menu-icon">
                                         <span></span>
@@ -812,58 +996,18 @@ const BodyContent = (user_id) => {
                                 <div className="chat-history">
                                     {messages.length === 0 ? (
                                         <div className="welres-container">
-                                            <h1 className="welc-text">Hello, Crusch K.</h1>
+                                            <h1 className="welc-text">Hello {userName}</h1>
                                         </div>
                                     ) : (
+                                        // --- 2. Use the Memoized ChatMessage Component ---
                                         messages.map((msg, index) => (
-                                            <div key={index} className={`chat-message ${msg.sender}`}>
-                                                {msg.type === "text" ? (
-                                                    <div className="message-text">
-                                                        {msg.text.split("\n").map((line, i) => (
-                                                            <React.Fragment key={i}>
-                                                                {line}
-                                                                <br />
-                                                            </React.Fragment>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <div className="chat-table-response">
-                                                        <p className="res-head">{msg.text}</p>
-                                                        <h3>{msg.title}</h3>
-                                                        {msg.tables.map((table, i) => (
-                                                            <div key={i}>
-                                                                <h4>{table.title}</h4>
-                                                                <table className="chat-table">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            {table.headers.map((header, j) => (
-                                                                                <th key={j}>{header}</th>
-                                                                            ))}
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {table.rows.map((row, k) => (
-                                                                            <tr key={k}>
-                                                                                {row.map((cell, l) => (
-                                                                                    <td key={l}>{cell}</td>
-                                                                                ))}
-                                                                            </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        ))}
-                                                        <p className="res-foot">{msg.title2}</p>
-                                                        <p className="foot-cont">{msg.text2}</p>
-                                                        <div className="action-buttons">
-                                                            <div className="dl-icon-wrapper" onClick={() => downloadCSV(msg.tables[0], 'financial-report.csv')}>
-                                                                <img src="../../icons/repgen-icons/download.png" alt="Download" className="download-icon"/>
-                                                                <span className={`tooltip ${index === messages.length - 1 ? 'right-aligned' : ''}`}>Download CSV</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <ChatMessage
+                                                key={msg.id || index} // Use stable ID if available
+                                                msg={msg}
+                                                index={index}
+                                                messagesLength={messages.length}
+                                                downloadCSV={downloadCSV}
+                                            />
                                         ))
                                     )}
                                 </div>
@@ -871,31 +1015,32 @@ const BodyContent = (user_id) => {
                                 <div className="textbar-container">
                                     <textarea
                                         ref={textareaRef}
-                                        // Update placeholder and add disabled attribute based on isBotResponding
-                                        placeholder={isBotResponding ? "Waiting for response..." : "Ask anything"}
+                                        // Update placeholder and add disabled attribute based on BOTH states
+                                        placeholder={(isBotResponding || isCreatingConversation) ? "Processing..." : "Ask anything"}
                                         className="text-input"
                                         value={inputText}
                                         onChange={handleInputChange}
                                         onKeyDown={(e) => {
-                                            // Prevent Enter key if bot is responding
-                                            if (e.key === "Enter" && !e.shiftKey && !isBotResponding) {
+                                            // Prevent Enter key if bot is responding OR creating conversation
+                                            if (e.key === "Enter" && !e.shiftKey && !(isBotResponding || isCreatingConversation)) {
                                                 e.preventDefault();
-                                                handleSendMessage(); 
+                                                handleSendMessage();
                                             }
                                         }}
                                         rows="1"
                                         style={{ height: '40px' }}
-                                        disabled={isBotResponding} // <-- Disable textarea
+                                        // Disable textarea if bot is responding OR creating conversation
+                                        disabled={isBotResponding || isCreatingConversation}
                                     />
                                     <img
                                         src="../../icons/repgen-icons/sendmsg.png"
                                         // Add a class to visually disable the icon if needed
-                                        className={`sendmsg-icon ${isBotResponding ? 'disabled' : ''}`} 
+                                        className={`sendmsg-icon ${(isBotResponding || isCreatingConversation) ? 'disabled' : ''}`} 
                                         // Prevent click if bot is responding
-                                        onClick={!isBotResponding ? handleSendMessage : undefined} 
+                                        onClick={!(isBotResponding || isCreatingConversation) ? handleSendMessage : undefined} 
                                         alt="Send"
                                         // Optional: style changes for disabled state in CSS
-                                        style={{ opacity: isBotResponding ? 0.5 : 1, cursor: isBotResponding ? 'not-allowed' : 'pointer' }}
+                                        style={{ opacity: (isBotResponding || isCreatingConversation) ? 0.5 : 1, cursor: (isBotResponding || isCreatingConversation) ? 'not-allowed' : 'pointer' }}
                                     />
                                 </div>
                             </>

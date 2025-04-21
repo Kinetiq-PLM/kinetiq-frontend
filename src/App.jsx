@@ -454,8 +454,6 @@ function App() {
       "Employee Salary": "EmployeeSalary"
     },
     "Report Generator": {
-      "Custom Reports": "CustomReports",
-      "Data Visualization": "DataVisualization",
     },
   };
 
