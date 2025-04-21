@@ -28,7 +28,7 @@
 }
 
 
-.table-container {
+.deliveryApproval .table-container {
   width: 100%;
   max-width: 100%;
   height: calc(100% - 100px);
@@ -46,45 +46,45 @@
 
 
 /* Scrollbar Styles */
-.table-container::-webkit-scrollbar {
+.deliveryApproval .table-container::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 
-.table-container::-webkit-scrollbar-track {
+.deliveryApproval .table-container::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 4px;
 }
 
 
-.table-container::-webkit-scrollbar-thumb {
+.deliveryApproval .table-container::-webkit-scrollbar-thumb {
   background: teal;
   border-radius: 4px;
 }
 
 
-.table-container::-webkit-scrollbar-thumb:hover {
+.deliveryApproval .table-container::-webkit-scrollbar-thumb:hover {
   background: #007777;
 }
 
 
-.table-container table {
+.deliveryApproval .table-container table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 
-.table-container thead {
-  position: sticky;
+.deliveryApproval .table-container thead {
+  /*position: sticky;*/
   top: 0;
   background-color: white;
-  z-index: 10;
+  /*z-index: 1;*/
 }
 
 
-.table-container thead::after {
+.deliveryApproval .table-container thead::after {
   content: '';
   position: absolute;
   left: 0;
@@ -94,13 +94,13 @@
 }
 
 
-.table-container tbody {
+.deliveryApproval .table-container tbody {
   width: 100%;
 }
 
 
-.table-container th,
-.table-container td {
+.deliveryApproval .table-container th,
+.deliveryApproval .table-container td {
   font-size: 13px;
   padding: 10px;
   border-bottom: 1px solid #ddd;
@@ -111,21 +111,21 @@
 }
 
 
-.table-container th:first-child,
-.table-container td:first-child {
-  width: 40px;
-  padding-right: 0;
+.deliveryApproval .table-container th:first-child,
+.deliveryApproval .table-container td:first-child {
+  width: 2.5rem;
+  padding-right: 0.5rem;
 }
 
 
-.table-container th:nth-child(2),
-.table-container td:nth-child(2) {
+.deliveryApproval .table-container th:nth-child(2),
+.deliveryApproval .table-container td:nth-child(2) {
   padding-left: 0;
 }
 
 
 /* CHECKBOX STYLES */
-.table-container input[type="checkbox"] {
+.deliveryApproval .table-container input[type="checkbox"] {
   appearance: none;
   width: 18px;
   height: 18px;
@@ -140,13 +140,13 @@
 }
 
 
-.table-container input[type="checkbox"]:checked {
+.deliveryApproval .table-container input[type="checkbox"]:checked {
   background-color: teal;
   border-color: teal;
 }
 
 
-.table-container input[type="checkbox"]:checked::after {
+.deliveryApproval .table-container input[type="checkbox"]:checked::after {
   content: "✔";
   font-size: 14px;
   color: white;
@@ -157,7 +157,7 @@
 }
 
 
-.custom-checkbox {
+.deliveryApproval .custom-checkbox {
   appearance: none;
   -webkit-appearance: none;
   width: 16px;
@@ -171,12 +171,12 @@
 }
 
 
-.custom-checkbox:checked {
+.deliveryApproval .custom-checkbox:checked {
   background-color: #00A8A8;
 }
 
 
-.custom-checkbox:checked::after {
+.deliveryApproval .custom-checkbox:checked::after {
   content: '';
   position: absolute;
   left: 4px;
@@ -190,7 +190,7 @@
 
 
 /* FORM STYLES */
-.form-container {
+.deliveryApproval .form-container {
   width: 100%;
   background-color: white;
   border-radius: 0.5rem;
@@ -203,7 +203,7 @@
 }
 
 
-.form-row {
+.deliveryApproval .form-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -211,7 +211,7 @@
 }
 
 
-.form-group {
+.deliveryApproval .form-group {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -220,20 +220,20 @@
 }
 
 
-.form-group:last-child {
+.deliveryApproval .form-group:last-child {
   margin-right: 0;
 }
 
 
-.form-group label {
+.deliveryApproval .form-group label {
   font-weight: bold;
   margin-bottom: 5px;
   font-size: 14px;
 }
 
 
-.form-group input,
-.form-group select {
+.deliveryApproval .form-group input,
+.deliveryApproval .form-group select {
   width: 100%;
   max-width: 250px;
   padding: 5px;
@@ -244,7 +244,7 @@
 }
 
 
-.form-group span {
+.deliveryApproval .form-group span {
   width: 100%;
   max-width: 250px;
   padding: 5px;
@@ -258,7 +258,7 @@
 
 
 /* BUTTON STYLES */
-.send-to-button-container {
+.deliveryApproval .send-to-button-container {
   width: 100%;
   display: flex;
   justify-content: flex-end;
@@ -269,7 +269,7 @@
 }
 
 
-.send-to-button {
+.deliveryApproval .send-to-button {
   background-color: #00A8A8;
   color: white;
   border: none;
@@ -282,29 +282,84 @@
 }
 
 
-.send-to-button:hover {
+.deliveryApproval .send-to-button:hover {
   background-color: #007777;
 }
 
 
 /* STATUS STYLES */
-.approval-status.Pending {
+.deliveryApproval .approval-status.Pending {
   color: #FFA500;
   font-weight: bold;
 }
 
 
-.approval-status.Approved {
+.deliveryApproval .approval-status.Approved {
   color: #008000;
   font-weight: bold;
 }
 
 
-.approval-status.Rejected {
+.deliveryApproval .approval-status.Rejected {
   color: #FF0000;
   font-weight: bold;
 }
 
+.deliveryApproval .req-input{
+  background-color: #F8F8F8;
+}
 
 
 
+/* Media query for smaller tablets */
+@media (max-width: 768px) {
+  .deliveryApproval .body-content-container {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+  }
+  .deliveryApproval .details-grid {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+    overflow-x: auto;
+  }
+  .deliveryApproval .detail-row input{
+    min-width: 7rem;
+  }
+  .deliveryApproval .header-container h2 {
+    font-size: 1.25rem; /* Smaller heading */
+  }
+  .deliveryApproval .table-container{
+    overflow-x: auto;
+    overflow-y: auto;
+  }
+  .deliveryApproval .form-group span{
+    font-size: 0.9rem;
+    white-space: nowrap;      
+    overflow-x: auto;   
+    overflow-y: hidden;      
+    overflow-wrap: normal;     
+    display: inline-block;  
+  }
+  .deliveryApproval .form-group span::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  .deliveryApproval .form-group span::-webkit-scrollbar-track {
+      background: #f1f1f1;
+  }
+
+  .deliveryApproval .form-group span::-webkit-scrollbar-thumb {
+      background: #00A8A8;
+      border-radius: 3px;
+  }
+
+  .deliveryApproval .form-group span::-webkit-scrollbar-thumb:hover {
+      background: #008080;
+  }
+  .deliveryApproval .form-group select option{
+    font-size: 0.7rem;
+  }
+}

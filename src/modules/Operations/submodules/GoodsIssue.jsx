@@ -37,6 +37,31 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
   const [error, setError] = useState(null);
 
 
+  const validateManufDate = (date, expiryDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const manufDate = new Date(date);
+    if (manufDate > today) {
+      toast.error("Manufacturing date cannot be in the future");
+      return false;
+    }
+    if (expiryDate && new Date(date) > new Date(expiryDate)) {
+      toast.error("Manufacturing date cannot be after expiry date");
+      return false;
+    }
+    return true;
+  };
+ 
+  const validateExpiryDate = (date, manufDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const expiryDate = new Date(date);
+    if (manufDate && new Date(date) < new Date(manufDate)) {
+      toast.error("Expiry date cannot be before manufacturing date");
+      return false;
+    }
+    return true;
+  };
 
   useEffect(() => {
     if (selectedData?.status) {
@@ -162,7 +187,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
           }));
          
         } catch (error) {
-          toast.error('Error fetching next document IDs:', error);
+          toast.error('Error fetching next document IDs. Please try again');
+          console.log('Error fetching next document IDs:', error)
           return
         }
       }
@@ -210,7 +236,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
           }),
         });
       } catch (error) {
-        toast.error('Error deleting row from database:', error);
+        console.log('Error deleting row from database:', error);
+        toast.error('Error deleting row from database. Please try again.');
       }
  
       // Remove the item from local state
@@ -231,7 +258,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       const updatedData = await response.json();
       return updatedData.document_items;
     } catch (error) {
-      toast.error('Reload error:', error);
+      toast.error('Reload error. Please try again.');
+      console.log('Reload error. ', error)
       return [];
     }
   };
@@ -476,8 +504,43 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       if (index !== updatedItems.length - 1) {
         // If this item exists in the database, delete it
         try {
-          const confirmDelete = window.confirm('Are you sure you want to archive this row?');
-          if (!confirmDelete) {
+          const userConfirmed = await new Promise((resolve) => {
+            toast.info(
+              <div>
+                <p style={{fontSize:"1em"}}>Do you want to archive this row?</p>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+                  <button
+                    onClick={() => {
+                      toast.dismiss();
+                      resolve(true);
+                    }}
+                    style={{ padding: '5px 15px', cursor: 'pointer', fontSize: "1em" }}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={() => {
+                      toast.dismiss();
+                      resolve(false);
+                    }}
+                    style={{ padding: '5px 15px', cursor: 'pointer', fontSize: "1em" }}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>,
+              {
+                position: "top-right",
+                autoClose: false,
+                closeButton: false,
+                draggable: false,
+                closeOnClick: false,
+                toastId: 'archive-confirmation'
+              }
+            );
+          });
+ 
+          if (!userConfirmed) {
             // Reset the select value to the previous item name
             updatedItems[index] = {
               ...currentItem,
@@ -486,9 +549,6 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
             setDocumentItems(updatedItems);
             return;
           }
- 
-
-
           await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
@@ -576,16 +636,6 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
   // Add a new function to handle create operation
   const handleCreateDocument = async () => {
     try {
-      if (!selectedOwner || !documentDetails.buyer){
-        if(!selectedOwner){
-          toast.error("Owner is required")
-          return
-        }else if(!documentDetails.buyer){
-          toast.error("Buyer Required")
-          return
-        }
-        return
-      }
       // Prepare the document items for creation
       const itemsToCreate = documentItems.slice(0, -1); // Exclude the last empty row
      
@@ -647,7 +697,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       onSuccess(result);
      
     } catch (error) {
-      toast.error(`Failed to create document: ${error.message}`);
+      toast.error(`Failed to create document.`);
+      console.log(error)
     }
   };
 
@@ -661,14 +712,30 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
- 
+    if (!selectedOwner || !documentDetails.buyer){
+      if(!selectedOwner){
+        toast.error("Owner is required")
+        return
+      }else if(!documentDetails.buyer){
+        toast.error("Buyer Required")
+        return
+      }
+      return
+    }else if (updatedDocumentItems.length === 0) {
+      toast.error("At least one item is required. Please fill all necessary data");
+      return;
+    }else if (documentDetails.transaction_cost > 1000000000) {
+      toast.dismiss()
+      toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
+      return;
+    }
     try {
       if (isCreateMode) {
         await handleCreateDocument();
       } else {
       // Step 1: Update Product Document Items
       for (let item of updatedDocumentItems) {
-        if (item.item_id?.startsWith("PRD") && item.productdocu_id) {
+        if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
         const updatedDocumentItemData = {
           product_id: item.item_id,
         };
@@ -743,7 +810,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
         tax_rate: parseFloat(documentDetails.tax_rate) || 0,
         tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
         freight: parseFloat(documentDetails.freight) || 0,
-        transaction_cost: parseFloat(documentDetails.total).toFixed(2) || 0,
+        transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0,
       };
       const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
         method: 'PUT',
@@ -770,7 +837,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
         onBack();  // Navigate back to GoodsTracking
       }
     } catch (error) {
-      toast.error(`Failed to update data. Details: ${error.message}`);
+      toast.error(`Failed to update data.`);
+      console.log(error)
     }
   };
  
@@ -853,7 +921,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       setDocumentItems([...poItems, {}]);
  
     } catch (error) {
-      toast.error(`Failed to load PO data: ${error.message}`);
+      toast.error(`Failed to load PO data.`);
+      console.log(error.message)
     }
   };
  
@@ -868,17 +937,23 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
   }, [isCreateMode]);
  
   useEffect(() => {
-    const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
-    const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = (parseFloat(initialAmount) + parseFloat(tax_amount) - parseFloat(discount_amount) + parseFloat(documentDetails.freight || 0)).toFixed(2);
- 
-    setDocumentDetails(prev => ({
-      ...prev,
-      tax_amount: tax_amount,
-      discount_amount: discount_amount,
-      transaction_cost: total,
-    }));
-  }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
+      const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
+      const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
+      const total = (parseFloat(initialAmount) + parseFloat(tax_amount) - parseFloat(discount_amount) + parseFloat(documentDetails.freight || 0)).toFixed(2);
+   
+      if (total.length <= 10) {
+        setDocumentDetails(prev => ({
+          ...prev,
+          tax_amount: tax_amount,
+          discount_amount: discount_amount,
+          transaction_cost: total,
+        }));
+      }else{
+        toast.dismiss()
+        toast.error("Item rejected")
+        toast.warning("Transaction cost must not exceed 10 digits (1 billion)")
+      }
+    }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
 
 
 
@@ -942,7 +1017,17 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                 <input
                   type="text"
                   value={documentDetails.buyer}
-                  onChange={(e) => handleDocumentDetailChange(e, "buyer")}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const regex = /^[A-Za-z\s]*$/;
+                    const maxLength = 50;
+                    if ((regex.test(value) || value === '') && value.length <= maxLength) {
+                      handleDocumentDetailChange(e, "buyer");
+                    }else{
+                      toast.dismiss()
+                      toast.info(" Please enter a valid name. Only alphabetic characters (A–Z, a–z) and only 50 characters are allowed.")
+                    }
+                  }}
                 />
               </div>
 
@@ -1029,6 +1114,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                         defaultValue="2025-01-31"
                         value={documentDetails.posting_date}
                         onChange={(e) => handleDocumentDetailChange(e, "posting_date")}
+                        min={date_today}
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
@@ -1051,6 +1137,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                         defaultValue="2025-01-31"
                         value={documentDetails.document_date}
                         onChange={(e) => handleDocumentDetailChange(e, "document_date")}
+                        max={date_today}
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
@@ -1066,7 +1153,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                     <label>Tax Rate</label>
                     <input
                       type="text"
-                      value={documentDetails.tax_rate}
+                      value={"---"}
                       onChange={(e) => handleDocumentDetailChange(e, "tax_rate")}
                     />
                   </div>
@@ -1074,17 +1161,17 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                     <label>Discount Rate</label>
                     <input
                       type="text"
-                      value={documentDetails.discount_rate}
+                      value={"---"}
                       onChange={(e) => handleDocumentDetailChange(e, "discount_rate")}
                     />
                   </div>
                   <div className="detail-row">
                     <label>Tax Amount</label>
-                    <input type="text" value={documentDetails.tax_amount.toFixed(2)} style={{ cursor: 'not-allowed' }} readOnly/>
+                    <input type="text" value={"---"} style={{ cursor: 'not-allowed' }} readOnly/>
                   </div>
                   <div className="detail-row">
                     <label>Discount Amount</label>
-                    <input type="text" value={documentDetails.discount_amount.toFixed(2)} style={{ cursor: 'not-allowed' }} readOnly/>
+                    <input type="text" value={"---"} style={{ cursor: 'not-allowed' }} readOnly/>
                   </div>
                   <div className="detail-row">
                     <label>Total</label>
@@ -1099,7 +1186,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                     <label>Freight</label>
                     <input
                       type="text"
-                      value={documentDetails.freight}
+                      value={"---"}
                       onChange={(e) => handleDocumentDetailChange(e, "freight")}
                     />
                   </div>
@@ -1168,12 +1255,30 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                           readOnly
                         />
                       </td>
-                      <td>
+                      <td className="item-number">
                         <input
                           type="number"
                           min="0"
+                          max="1000000000"
+                          step = "1"
                           value={item.quantity || ''}
-                          onChange={(e) => handleInputChange(e, index, 'quantity')}
+                          onKeyDown={(e) => {
+                            if (e.key === '.') {
+                              e.preventDefault();
+                            }
+                          }}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (
+                              /^\d*$/.test(value) &&      
+                              parseInt(value, 10) <= 10000000  
+                            ) {
+                              handleInputChange(e, index, 'quantity');
+                            }else{
+                              toast.dismiss();
+                              toast.info("Maximum quantity is 10 millions")
+                            }
+                          }}
                         />
                       </td>
                       <td>
@@ -1181,9 +1286,19 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                           type="number"
                           value={item.cost || ''}
                           onChange={(e) => handleInputChange(e, index, 'cost')}
+                          readOnly style={{ cursor: 'not-allowed' }}
                         />
                       </td>
-                      <td>{(item.quantity * item.cost || 0).toFixed(2)}</td>
+                      <td readOnly style={{ cursor: 'not-allowed' }}>
+                        {(() => {
+                          const total = (item.quantity * item.cost) || 0;
+                          if (total > 1000000000) {
+                            toast.dismiss();
+                            toast.error("Total cost must not exceed 1 billion");
+                          }
+                          return total.toFixed(2);
+                        })()}
+                      </td>
                       <td>
                         {!item.item_id?.startsWith('ADMIN-ASSET') ? (
                           <input
@@ -1204,7 +1319,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                           />
                         )}
                       </td>
-                      <td>
+                      <td className="item-date-input">
                         {!item.item_id?.startsWith('ADMIN-PROD') ? (
                           <input
                             type="text"
@@ -1217,13 +1332,19 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                             type="date"
                             value={item.product_details?.manuf_date || ''}
                             onChange={(e) => {
-                              // The date input always returns YYYY-MM-DD format
-                              handleInputChange(e, index, 'manuf_date');
+                              const isValid = validateManufDate(
+                                e.target.value,
+                                item.product_details?.expiry_date
+                              );
+                              if (isValid) {
+                                handleInputChange(e, index, 'manuf_date');
+                              }
                             }}
+                            max={new Date().toISOString().split('T')[0] && item.product_details?.expiry_date || ''}
                           />
                         )}
                       </td>
-                      <td>
+                      <td className="item-date-input">
                         {!item.item_id?.startsWith('ADMIN-PROD') ? (
                           <input
                             type="text"
@@ -1235,7 +1356,16 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                           <input
                             type="date"
                             value={item.product_details?.expiry_date || ''}
-                            onChange={(e) => handleInputChange(e, index, 'expiry_date')}
+                            onChange={(e) => {
+                              const isValid = validateExpiryDate(
+                                e.target.value,
+                                item.product_details?.manuf_date
+                              );
+                              if (isValid) {
+                                handleInputChange(e, index, 'expiry_date');
+                              }
+                            }}
+                            min={item.product_details?.manuf_date || ''}
                           />
                         )}
                       </td>
@@ -1252,8 +1382,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                           ))}
                         </select>
                       </td>
-                      <td>{item?.batch_no || "N/A"}</td>
-                      <td>{item?.serial_no || "N/A"}</td>
+                      <td readOnly style={{ cursor: 'not-allowed' }}>{item?.batch_no || "N/A"}</td>
+                      <td readOnly style={{ cursor: 'not-allowed' }}>{item?.serial_no || "N/A"}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -244,6 +244,7 @@ const GoodsTracking = ({employee_id}) => {
 
         <div className="operation_table_container">
           <div className="operations-gt-table">
+            
             <table>
               <thead>
                 <tr>
@@ -265,7 +266,8 @@ const GoodsTracking = ({employee_id}) => {
                   filteredData.map((row, index) => (
                     <tr key={row.document_id}>
                       <td>
-                        <input type="checkbox"  checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row)}/>
+                      <input type="checkbox" className="teal-checkbox" checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row)} />
+
                       </td>
                       <td>{index + 1}</td>
                       <td>{row.transaction_id}</td>
@@ -289,7 +291,7 @@ const GoodsTracking = ({employee_id}) => {
 
 
         <div className="action-buttons">
-          <button className="view-btn" onClick={handleEdit}>Edit</button>
+          <button className="view-btn" onClick={() => !loading && handleEdit()}>Edit</button>
           <button className="create-btn" onClick={handleCreate}>Create</button>
         </div>
       </div>

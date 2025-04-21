@@ -14,7 +14,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const [showSerialModal, setShowSerialModal] = useState(false);
   const [selectedSerialNumbers, setSelectedSerialNumbers] = useState([]);
 
-
   const calculateInitialAmount = () => {
     if (isCreateMode) return 0;
     return selectedData.document_items.reduce((sum, item) => {
@@ -477,8 +476,43 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       if (index !== updatedItems.length - 1) {
         // If this item exists in the database, delete it
         try {
-          const confirmDelete = window.confirm('Are you sure you want to archive this row?');
-          if (!confirmDelete) {
+          const userConfirmed = await new Promise((resolve) => {
+            toast.info(
+              <div>
+                <p style={{fontSize:"1em"}}>Do you want to archive this row?</p>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+                  <button 
+                    onClick={() => {
+                      toast.dismiss();
+                      resolve(true);
+                    }}
+                    style={{ padding: '5px 15px', cursor: 'pointer', fontSize: "1em" }}
+                  >
+                    Yes
+                  </button>
+                  <button 
+                    onClick={() => {
+                      toast.dismiss();
+                      resolve(false);
+                    }}
+                    style={{ padding: '5px 15px', cursor: 'pointer', fontSize: "1em" }}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>,
+              {
+                position: "top-right",
+                autoClose: false,
+                closeButton: false,
+                draggable: false,
+                closeOnClick: false,
+                toastId: 'archive-confirmation'
+              }
+            );
+          });
+  
+          if (!userConfirmed) {
             // Reset the select value to the previous item name
             updatedItems[index] = {
               ...currentItem,
@@ -577,16 +611,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   // Add a new function to handle create operation
   const handleCreateDocument = async () => {
     try {
-      if (!selectedOwner || !documentDetails.buyer){
-        if(!selectedOwner){
-          toast.error("Owner is required")
-          return
-        }else if(!documentDetails.buyer){
-          toast.error("Buyer Required")
-          return
-        }
-        return
-      }
+      
       // Prepare the document items for creation
       const itemsToCreate = documentItems.slice(0, -1); // Exclude the last empty row
      
@@ -607,8 +632,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         tax_amount: documentDetails.tax_amount,
         discount_rate: documentDetails.discount_rate,
         discount_amount: documentDetails.discount_amount,
-        freight: documentDetails.freight,
-        transaction_cost: documentDetails.transaction_cost,
+        freight:  parseFloat(parseFloat(documentDetails.freight).toFixed(2)),
+        transaction_cost:  parseFloat(parseFloat(documentDetails.transaction_cost).toFixed(2)),
         document_items: itemsToCreate.map(item => ({
           item_id: item.item_id,
           item_name: item.item_name,
@@ -621,6 +646,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           ...(item.item_id.startsWith("ADMIN-MATERIAL") && { material_id: item.item_id }),
         }))
       };
+      console.log(payload)
       // Call the create API
       const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
         method: 'POST',
@@ -648,7 +674,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       onSuccess(result);
      
     } catch (error) {
-      toast.error(`Failed to create document: ${error.message}`);
+      toast.error(`Failed to create document. Please try again later`);
+      console.log(error)
     }
   };
 
@@ -662,14 +689,30 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
- 
+    if (!selectedOwner || !documentDetails.buyer){
+      if(!selectedOwner){
+        toast.error("Owner is required")
+        return
+      }else if(!documentDetails.buyer){
+        toast.error("Buyer Required")
+        return
+      }
+      return
+    }else if (updatedDocumentItems.length === 0) {
+      toast.error("At least one item is required. Please fill all necessary data");
+      return;
+    }else if (documentDetails.transaction_cost > 1000000000) {
+      toast.dismiss()
+      toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
+      return;
+    }
     try {
       if (isCreateMode) {
         await handleCreateDocument();
       } else {
       // Step 1: Update Product Document Items
       for (let item of updatedDocumentItems) {
-        if (item.item_id?.startsWith("PRD") && item.productdocu_id) {
+        if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
         const updatedDocumentItemData = {
           product_id: item.item_id,
         };
@@ -744,7 +787,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         tax_rate: parseFloat(documentDetails.tax_rate) || 0,
         tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
         freight: parseFloat(documentDetails.freight) || 0,
-        transaction_cost: parseFloat(documentDetails.total).toFixed(2) || 0,
+        transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0,
       };
       const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
         method: 'PUT',
@@ -770,7 +813,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         onBack();  // Navigate back to GoodsTracking
       }
     } catch (error) {
-      toast.error(`Failed to update data. Details: ${error.message}`);
+      toast.error(`Failed to update data. Please try again later`);
+      console.log(error.message)
     }
   };
  
@@ -812,22 +856,26 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
  
       const selectedPO = await response.json();
       const quotation = selectedPO.quotation_id || {};
- 
+      const getVendor = quotation.vendor_code || {};
+      setSelectedVendor(getVendor.vendor_name || "");
+      setVendorID(getVendor.vendor_code || "");
+      setContactPerson(quotation.contact_person || "");
       // Update document details with PO information
+
       setDocumentDetails(prev => ({
         ...prev,
-        vendor_code: quotation.vendor_code || null,
-        vendor_name: quotation.vendor_name || null,
+        vendor_code: getVendor.vendor_code || null,
+        vendor_name: getVendor.vendor_name || null,
         contact_person: quotation.contact_person || null,
-        buyer: null,
+        buyer: quotation?.buyer || "",
         owner: quotation.request_id?.employee_name || null,
         delivery_date: selectedPO.delivery_date || null,
         status: "Draft",
         posting_date: date_today,
         document_date: selectedPO.document_date || null,
-        tax_rate: parseFloat(quotation.tax || 0).toFixed(2),
-        discount_rate: parseFloat(quotation.discount_percent || 0).toFixed(2),
-        freight: parseFloat(quotation.freight || 0).toFixed(2),
+        tax_amount: Number(parseFloat(quotation.tax || 0).toFixed(2)),
+        discount_rate: Number(parseFloat(quotation.discount_percent || 0).toFixed(2)),
+        freight: Number(parseFloat(quotation.freight || 0).toFixed(2)),
       }));
  
       // Get item details from pre-fetched itemOptions
@@ -848,10 +896,25 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
  
       // Calculate initial amount
       const poInitialAmount = poItems.reduce((sum, item) => sum + (item.cost * item.quantity), 0);
+      const taxAmount = parseFloat(quotation.tax || 0);
+      const discountAmount = parseFloat(quotation.discount_amount || 0);
+      const freight = parseFloat(quotation.freight || 0);
+
+      // Calculate tax rate
+      const taxBase = poInitialAmount - discountAmount;
+      const taxRate = taxBase > 0 ? (taxAmount / taxBase) * 100 : 0;
+
       setInitialAmount(poInitialAmount.toFixed(2));
-      // Set document items (add empty row)
+
+      // Set document details again to include tax rate
+      setDocumentDetails(prev => ({
+        ...prev,
+        tax_amount: Number(parseFloat(taxAmount|| 0).toFixed(2)),
+        discount_rate: Number(parseFloat(quotation.discount_percent || 0).toFixed(2)),
+        freight: Number(parseFloat(freight || 0).toFixed(2)),
+        tax_rate: Number(parseFloat(taxRate || 0).toFixed(2)),
+      }));
       setDocumentItems([...poItems, {}]);
- 
     } catch (error) {
       toast.error(`Failed to load PO data: ${error.message}`);
     }
@@ -868,21 +931,23 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   }, [isCreateMode]);
  
   useEffect(() => {
-    const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
-    const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
-    const total = (
-      parseFloat(initialAmount) +
-      parseFloat(tax_amount) -
-      parseFloat(discount_amount) +
-      parseFloat(documentDetails.freight || 0)
-    ).toFixed(2);
-    setDocumentDetails(prev => ({
-      ...prev,
-      tax_amount: tax_amount,
-      discount_amount: discount_amount,
-      transaction_cost: total,
-    }));
-  }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
+      const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
+      const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
+      const total = (parseFloat(initialAmount) + parseFloat(tax_amount) - parseFloat(discount_amount) + parseFloat(documentDetails.freight || 0)).toFixed(2);
+   
+      if (total.length <= 10) {
+        setDocumentDetails(prev => ({
+          ...prev,
+          tax_amount: tax_amount,
+          discount_amount: discount_amount,
+          transaction_cost: total,
+        }));
+      }else{
+        toast.dismiss()
+        toast.error("Item rejected")
+        toast.warning("Transaction cost must not exceed 10 digits (1 billion)")
+      }
+    }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
   useEffect(() => {
       const newInitialAmount = documentItems
         .slice(0, -1) // exclude the last empty row
@@ -907,10 +972,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                 <label>Vendor Code</label>
                 <input type="text" value={vendorID} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
-
-
-
-
               {/* Vendor Name Dropdown */}
               <div className="detail-row dropdown-scrollbar">
                 <label>Vendor Name</label>
@@ -932,22 +993,24 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                 <label>Contact Person</label>
                 <input type="text" value={contactPerson} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
-
-
-
-
               <div className="detail-row">
                 <label>Buyer</label>
                 <input
                   type="text"
                   value={documentDetails.buyer}
-                  onChange={(e) => handleDocumentDetailChange(e, "buyer")}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const regex = /^[A-Za-z\s]*$/;
+                    const maxLength = 50;
+                    if ((regex.test(value) || value === '') && value.length <= maxLength) {
+                      handleDocumentDetailChange(e, "buyer");
+                    }else{
+                      toast.dismiss()
+                      toast.info(" Please enter a valid name. Only alphabetic characters (A–Z, a–z) and only 50 characters are allowed.")
+                    }
+                  }}
                 />
               </div>
-
-
-
-
               <div className="detail-row">
                 <label>Owner</label>
                 <input
@@ -981,7 +1044,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                   Cost Details
                 </button>
               </div>
-             
               {activeTab === 'document' ? (
                 <div className="tab-content">
                   <div className="detail-row">
@@ -999,8 +1061,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                     <div className="date-input clickable">
                       <input
                         type="date"
-                        defaultValue="2025-02-02"
-                        value={documentDetails.delivery_date}
+                        value={documentDetails?.delivery_date || date_today}
                         onChange={(e) => handleDocumentDetailChange(e, "delivery_date")}
                       />
                       <span className="calendar-icon">📅</span>
@@ -1024,10 +1085,11 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                     <label>Posting Date</label>
                     <div className="date-input clickable">
                       <input
+                        className="custom-date-input"
                         type="date"
-                        defaultValue="2025-01-31"
-                        value={documentDetails.posting_date}
+                        value={documentDetails?.posting_date || date_today}
                         onChange={(e) => handleDocumentDetailChange(e, "posting_date")}
+                        min={date_today}
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
@@ -1047,9 +1109,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                     <div className="date-input clickable">
                       <input
                         type="date"
-                        defaultValue="2025-01-31"
-                        value={documentDetails.document_date}
+                        value={documentDetails?.document_date || date_today}
                         onChange={(e) => handleDocumentDetailChange(e, "document_date")}
+                        max={date_today}
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
@@ -1064,17 +1126,47 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                   <div className="detail-row">
                     <label>Tax Rate</label>
                     <input
-                      type="text"
+                      type="number"
                       value={documentDetails.tax_rate}
-                      onChange={(e) => handleDocumentDetailChange(e, "tax_rate")}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const regex = /^\d{0,2}(\.\d{0,2})?$/;
+                        if (value === '' || (regex.test(value) && parseFloat(value) <= 100)) {
+                          setDocumentDetails(prev => ({
+                            ...prev,
+                            tax_rate: value
+                          }));
+                        }else{
+                          toast.dismiss()
+                          toast.info("Please enter a valid percentage. Maximum is 100 and up to 2 decimal places.")
+                        }
+                      }}
+                      step="1"
+                      min="0"
+                      max="100"
                     />
                   </div>
                   <div className="detail-row">
                     <label>Discount Rate</label>
                     <input
-                      type="text"
+                      type="number"
                       value={documentDetails.discount_rate}
-                      onChange={(e) => handleDocumentDetailChange(e, "discount_rate")}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const regex = /^\d{0,3}(\.\d{0,2})?$/;
+                        if (value === '' || (regex.test(value) && parseFloat(value) <= 100)) {
+                          setDocumentDetails(prev => ({
+                            ...prev,
+                            discount_rate: value
+                          }));
+                        }else{
+                          toast.dismiss()
+                          toast.info("Please enter a valid percentage. Maximum is 100 and up to 2 decimal places.")
+                        }
+                      }}
+                      step="1"
+                      min="0"
+                      max="100"
                     />
                   </div>
                   <div className="detail-row">
@@ -1097,9 +1189,27 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                   <div className="detail-row">
                     <label>Freight</label>
                     <input
-                      type="text"
+                      type="number"
                       value={documentDetails.freight}
-                      onChange={(e) => handleDocumentDetailChange(e, "freight")}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.includes('.')) {
+                          return; 
+                        }
+                        const parsedValue = parseInt(value, 10);
+                        if (value === '' || (parsedValue <= 1000000000 && /^\d*$/.test(value))) {
+                          setDocumentDetails(prev => ({
+                            ...prev,
+                            freight: value
+                          }));
+                        }else{
+                          toast.dismiss();
+                          toast.info("Maximum freight is 1 Billion")
+                        }
+                      }}
+                      step="0.01"
+                      min="0"
+                      max="1000000000"
                     />
                   </div>
                 </div>
@@ -1111,20 +1221,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
           {/* Item Document */}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
           <div className="operation_table_container">
             <div className="grpo-table">
               <table className="materials-table">
@@ -1179,12 +1275,30 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                           readOnly
                         />
                       </td>
-                      <td>
+                      <td className="item-number">
                         <input
                           type="number"
                           min="0"
+                          max="1000000000"
+                          step = "1"
                           value={item.quantity || ''}
-                          onChange={(e) => handleInputChange(e, index, 'quantity')}
+                          onKeyDown={(e) => {
+                            if (e.key === '.') {
+                              e.preventDefault();
+                            }
+                          }}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (
+                              /^\d*$/.test(value) &&      
+                              parseInt(value, 10) <= 10000000  
+                            ) {
+                              handleInputChange(e, index, 'quantity');
+                            }else{
+                              toast.dismiss();
+                              toast.info("Maximum quantity is 10 Millions")
+                            }
+                          }}
                         />
                       </td>
                       <td>
@@ -1192,10 +1306,21 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                           type="number"
                           value={item.cost || ''}
                           onChange={(e) => handleInputChange(e, index, 'cost')}
+                          readOnly
+                          style={{ cursor: 'not-allowed' }}
                         />
                       </td>
-                      <td>{(item.quantity * item.cost || 0).toFixed(2)}</td>
-                      <td>
+                      <td readOnly style={{ cursor: 'not-allowed' }}>
+                        {(() => {
+                          const total = (item.quantity * item.cost) || 0;
+                          if (total > 1000000000) {
+                            toast.dismiss();
+                            toast.error("Total cost must not exceed 1 billion");
+                          }
+                          return total.toFixed(2);
+                        })()}
+                      </td>
+                      <td className="item-date-input">
                       {!item.item_id?.startsWith('ADMIN-PROD') ? (
                         <input
                           type="text"
@@ -1214,7 +1339,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                         />
                       )}
                     </td>
-                    <td>
+                    <td className="item-date-input">
                       {!item.item_id?.startsWith('ADMIN-PROD') ? (
                         <input
                           type="text"
@@ -1223,7 +1348,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                           style={{ cursor: 'not-allowed' }}
                         />
                       ) : (
-                        <input
+                        <input 
+                          className="custom-date-input"
                           type="date"
                           value={item.product_details?.expiry_date || ''}
                           onChange={(e) => handleInputChange(e, index, 'expiry_date')}
@@ -1243,8 +1369,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                           ))}
                         </select>
                       </td>
-                      <td>{item?.batch_no || "N/A"}</td>
-                      <td>{item?.serial_no || "N/A"}</td>
+                      <td readOnly style={{ cursor: 'not-allowed' }}>
+                        {item?.batch_no || "N/A"}
+                      </td>
+                      <td readOnly style={{ cursor: 'not-allowed' }}>
+                        {item?.serial_no || "N/A"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -1268,20 +1398,28 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
           <div className="button-section">
-            <div className="copy-from-button">
-            <select
-              className="copy-from-select"
-              value={selectedPO}
-              onChange={(e) => handlePOSelect(e.target.value)}
-            >
-              <option value="">Copy From</option>
-              {purchaseOrders.map(po => (
-                <option key={po.purchase_id} value={po.purchase_id}>
-                  {po.purchase_id.split('-').slice(-2).join('-')}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className="copy-from-button dropdown-scrollbar">
+              {selectedButton === "Create" ? (
+                <select
+                  className="copy-from-select"
+                  value={selectedPO}
+                  onChange={(e) => handlePOSelect(e.target.value)}
+                >
+                  <option value="">Copy From</option>
+                  {purchaseOrders.map(po => (
+                    <option key={po.purchase_id} value={po.purchase_id}>
+                      {po.purchase_id.split('-').slice(-2).join('-')}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className="copy-from-select"
+                  type="text"
+                  readOnly
+                  style={{ cursor: 'not-allowed' }}
+                >Copy From</div>
+              )}
+            </div>
             <div className="right-buttons">
               <button className="cancel-button" onClick={onBack}>Cancel</button>
             </div>
