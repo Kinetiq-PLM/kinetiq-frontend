@@ -689,6 +689,9 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                             Salesperson
                           </th>
                           <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Order Fulfillment
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
                             Tracking No.
                           </th>
                           <th className="border border-black text-white font-light text-start  p-2 text-sm">
@@ -708,6 +711,9 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                       <tr>
                         <th className="border border-black text-black font-light text-start p-2">
                           {`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.order_fulfillment}
                         </th>
                         <th className="border border-black text-black font-light text-start  p-2 text-sm">
                           {data.tracking_num || "-"}
