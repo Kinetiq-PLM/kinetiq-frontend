@@ -214,6 +214,8 @@
 
 .InternalTransfer .short-input {
     width: 14rem ;
+    min-width: 10rem;
+    overflow-x: scroll;
 }
 
 .InternalTransfer .input-group input {
@@ -221,7 +223,7 @@
     border: 0.0625rem solid #ccc;
     border-radius: 0.25rem;
     font-size: 0.875rem;
-    width: 100%;
+
 }
 
 .InternalTransfer .input-group input[type="date"] {
@@ -255,7 +257,8 @@
 }
 
 .InternalTransfer .module-dropdown {
-    width: 250px;
+    width: 14rem;
+    min-width: 10rem;
     height: 30px;
     padding: 5px;
     border: 1px solid #ccc;

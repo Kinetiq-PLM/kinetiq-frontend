@@ -184,16 +184,19 @@ const ApprovalTable = ({employee_id}) => {
       if (reworkQuantity > actualQuantity) {
         toast.dismiss()
         toast.error('Error: Rework quantity must not be greater than actual quantity.');
+        fetchDeliveryRequest()
         return;
       }
       if (data.external_module.reason_rework && (!data.external_module.rework_quantity || data.external_module.rework_quantity <= 0)) {
         toast.dismiss();
         toast.error("Rework quantity is required when a rework reason is provided.");
+        fetchDeliveryRequest()
         return;
       }
       if (!data.external_module.reason_rework && (data.external_module.rework_quantity < 0)) {
         toast.dismiss();
         toast.error("Rework reason is required when a rework quantity is provided.");
+        fetchDeliveryRequest()
         return;
       }
       const response = await fetch('http://127.0.0.1:8000/operation/external-modules/update-rework/', {
