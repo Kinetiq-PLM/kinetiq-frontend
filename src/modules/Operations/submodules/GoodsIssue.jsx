@@ -712,7 +712,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
-    if (!selectedOwner || !documentDetails.buyer){
+    if (!selectedOwner){
       if(!selectedOwner){
         toast.error("Owner is required")
         return
@@ -728,6 +728,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
     }
     try {
       if (isCreateMode) {
+        console.log("creating docu")
         await handleCreateDocument();
       } else {
       // Step 1: Update Product Document Items
