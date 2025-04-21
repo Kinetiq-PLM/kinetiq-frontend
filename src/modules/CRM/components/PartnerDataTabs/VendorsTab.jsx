@@ -81,13 +81,12 @@ export default function VendorTab() {
   return (
     <section className="h-full">
       {/* Header Section */}
-      {/* Header Section */}
       <div className="mb-4">
-        {/* Filters */}
-        <div className="flex justify-between gap-2 w-full flex-wrap">
-          <div className="h-fit items-center flex flex-row flex-1 space-x-4">
+        {/* Filters & Action */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start w-full">
+          <div className="flex flex-col md:flex-row sm:flex-wrap gap-3 flex-1">
             {/* Date Filter Dropdown */}
-            <div className="w-full max-w-[200px]">
+            <div className="w-full sm:w-[200px]">
               <Dropdown
                 options={dateFilters}
                 onChange={setDateFilter}
@@ -96,7 +95,7 @@ export default function VendorTab() {
             </div>
 
             {/* Search By Dropdown */}
-            <div className="w-full max-w-[200px]">
+            <div className="w-full sm:w-[200px]">
               <Dropdown
                 options={searchFields.map((field) => field.label)}
                 onChange={(selected) => {
@@ -108,16 +107,14 @@ export default function VendorTab() {
             </div>
 
             {/* Search Input */}
-            <div className="flex items-center w-full max-w-[600px]">
-              <div className="h-[40px] w-full">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+            <div className="w-full sm:flex-1 min-w-[250px]">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full h-[40px]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
         </div>
