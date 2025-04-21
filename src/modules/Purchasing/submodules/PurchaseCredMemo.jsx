@@ -24,8 +24,6 @@ const PurchaseCredMemoBody = () => {
   ];
   const statusOptions = ["All", "Approved", "Pending", "Completed", "Rejected"];
 
-  const handleNewForm = () => setShowForm(true);
-  const handleSendTo = () => alert("Send To feature not implemented yet.");
 
   const handleBackToDashboard = () => {
     const event = new CustomEvent("purchasing-back-to-dashboard");
@@ -224,16 +222,6 @@ const PurchaseCredMemoBody = () => {
             </div>
           </div>
 
-          <div className="credmemo-footer">
-            <button className="credmemo-new-form" onClick={handleNewForm}>
-              New Form
-            </button>
-            <div className="credmemo-footer-right">
-              <button className="credmemo-send-to" onClick={handleSendTo}>
-                Send to
-              </button>
-            </div>
-          </div>
         </div>
       )}
     </div>

@@ -33,7 +33,7 @@ const PurchasingDashboard = () => {
                 setActiveModule("PurchaseOrdStat");
                 break;
             case "GRPO":
-                window.alert("This is for operation module");
+                window.alert("This is belongs to the Operations module");
                 break;
             case "PurchaseAPInvoice":
                 setActiveModule("PurchaseAPInvoice");

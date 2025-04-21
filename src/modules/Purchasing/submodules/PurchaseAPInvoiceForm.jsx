@@ -19,10 +19,6 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
         onClose?.();
     };
 
-    const handleDone = () => {
-        console.log("Done button clicked");
-    };
-
     const { content_id } = invoiceData || {};
 
     const fetchEmployeesFromPRF = async (request_id) => {
@@ -411,9 +407,6 @@ const PurchaseAPInvoiceForm = ({ invoiceData, onClose }) => {
                                     </div>
                                     </div>
                                 </div>
-
-                                {/* Done Button */}
-                                <button className="purchase-ap-invoice-done-btn" onClick={handleDone}>Done</button>
                             </>
                         ) : (
                             <p>No data available</p>
