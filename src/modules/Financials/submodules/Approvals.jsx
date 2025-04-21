@@ -33,7 +33,7 @@ const ApprovalContent = () => {
 const [activeTab, setActiveTab] = useState(tabs[0]);
 const [isCompact, setIsCompact] = useState(window.innerWidth < 768);
 const [searchTerm, setSearchTerm] = useState("");
-const [dateRange, setDateRange] = useState("Last 30 days");
+const [dateRange, setDateRange] = useState("All Time");
 const [filterBy, setFilterBy] = useState("All");
 
 const [originalData, setOriginalData] = useState([]);
@@ -261,25 +261,18 @@ const patchEditedRows = async () => {
       let endpoint = "";
       let payload = {};
 
-      if (activeTab === "Budget Allocation Plan" && row.requestId) {
-        endpoint = `/validation/update-submission/${row.requestId}/`;
+      if (activeTab === "Budget Submission List" && row.requestId) {
+        endpoint = `/approvals/budget-submissions/${row.requestId}/`;
         payload = {
-          validated_by: row.validatedBy || "",
+          approved_by: row.approvedBy || "N/A",
           final_approved_amount: row.approvedAmount || "",
+          
         };
-      } else if (activeTab === "Budget Submission List" && row.reqID) {
-        endpoint = `/validation/update-request/${row.reqID}/`;
+      } else if (activeTab === "Budget Request List" && row.reqID) {
+        endpoint = `/approvals/budget-requests/${row.reqID}/`;
         payload = {
-          validated_by: row.validatedBy || "",
+          approved_by: row.approvedBy || "N/A",
           final_approved_amount: row.approvedAmount || "",
-        };
-      } else if (activeTab === "Budget Request List" && row.returnsId) {
-        endpoint = `/validation/update-return/${row.returnsId}/`;
-        payload = {
-          validated_by: row.validatedBy || "",
-          remarks: row.remarks || "",
-          comments: row.comments || "N/A",
-          expense_history_breakdown: row.attachedFile || "",
         };
       } else {
         console.error("Unsupported tab or missing ID:", row);
@@ -322,7 +315,6 @@ const handleProceedEdit = () => {
   patchEditedRows();
 };
 
-
 useEffect(() => {
   console.log("Date Range:", dateRange);
   console.log("Search Term:", searchTerm);
@@ -353,12 +345,12 @@ remainingBudget: formatNumber(departmentBudgets[dept].remainingBudget)
 };
 
 const updateSubmissionTable = (data) => {
-const approved = data.filter(item => item.validationStatus === "Approved").length;
-const pending = data.filter(item => item.validationStatus === "Pending").length;
-const rejected = data.filter(item => item.validationStatus === "Rejected").length;
+const approved = data.filter(item => item.approvalStatus === "Approved").length;
+const pending = data.filter(item => item.approvalStatus === "Pending").length;
+const rejected = data.filter(item => item.approvalStatus === "Rejected").length;
 
 const totalApprovedAmount = data.reduce((acc, item) => {
-if (item.validationStatus === "Approved") {
+if (item.approvalStatus === "Approved") {
 return acc + (parseFloat(item.approvedAmount?.replace(/,/g, '')) || 0);
 }
 return acc;
@@ -368,7 +360,7 @@ return acc;
 // approvedAmount: formatNumber(totalApprovedAmount)
 // });
 
-const rejectedItems = data.filter(item => item.validationStatus === "Rejected");
+const rejectedItems = data.filter(item => item.approvalStatus === "Rejected");
 // setRejectedData(rejectedItems);
 };
 
@@ -382,6 +374,7 @@ updateBudgetPlanStatus(originalData);
 if (budgetPlanStatus !== 'Final') {
 setIsRequestWarningVisible(true);
 } else {
+  setIsRequestWarningVisible(false);
 updateSubmissionTable(originalRequestData);
 updateAllocatedBudgetAndTotalSpent();
 }
@@ -479,7 +472,7 @@ return updatedBudgets;
 
 return {
 ...row,
-validationStatus: "Approved",
+approvalStatus: "Approved",
 approvedBy: editedApprovedBy,
 approvalDate: currentDate,
 remarks: "Approved",
@@ -490,7 +483,7 @@ approvedAmount: row.approvedAmount
 } else if (status === "Rejected") {
 return {
 ...row,
-validationStatus: "Rejected",
+approvalStatus: "Rejected",
 approvedBy: editedApprovedBy,
 approvalDate: currentDate,
 remarks: "For Resubmission"
@@ -517,9 +510,9 @@ setApprovalStatus(null);
 
 const getSortedFilteredData = () => {
 const dataToFilter = activeTab === "Budget Submission List" ? filteredData : filteredRequestData;
-const approved = dataToFilter.filter(item => item.validationStatus === "Approved");
-const pending = dataToFilter.filter(item => item.validationStatus === "Pending");
-const rejected = dataToFilter.filter(item => item.validationStatus === "Rejected");
+const approved = dataToFilter.filter(item => item.approvalStatus === "Approved");
+const pending = dataToFilter.filter(item => item.approvalStatus === "Pending");
+const rejected = dataToFilter.filter(item => item.approvalStatus === "Rejected");
 return [...approved, ...pending, ...rejected];
 };
 
@@ -528,7 +521,7 @@ setIsConfirmationVisible(false);
 };
 
 const updateBudgetPlanStatus = (data) => {
-const allApproved = data.every(item => item.validationStatus === "Approved");
+const allApproved = data.every(item => item.approvalStatus === "Approved");
 setBudgetPlanStatus(allApproved ? 'Final' : 'Tentative');
 };
 
@@ -545,7 +538,7 @@ let totalAllocated = 0;
 let totalSpent = 0;
 
 originalData.forEach(item => {
-if (item.validationStatus === "Approved") {
+if (item.approvalStatus === "Approved") {
 const departmentName = departmentIds[item.departmentId];
 if (departmentName) {
 const approvedAmount = parseFloat((item.approvedAmount || item.amount).replace(/,/g, ''));
@@ -634,7 +627,7 @@ try {
     requestId: sub?.validation?.budget_submission?.budget_submission_id || "",
     departmentId: sub?.validation?.budget_submission?.dept?.dept_id || "",
     amount: sub?.validation?.amount_requested || "",
-    approvedAmount: sub?.validated_amount || "",
+    approvedAmount: sub?.validation?.final_approved_amount || "",
     submissionDate: sub?.validation?.budget_submission?.date_submitted || "",
     validatedBy: sub?.validation?.validated_by || "",
     validationDate: sub?.validation?.validation_date || "",
@@ -668,13 +661,14 @@ const fetchBudgetRequests = async () => {
     console.log("Fetched Budget Requests:", data);
     setOriginalRequestData(data.map(req => ({
       approvalsId: req.budget_approvals_id || "",
-      reqID: req?.validation?.budget_request_id || "",
-      departmentId: req.dept_id || "",
-      amount: req.amount_requested || "",
-      requestDate: req.date_requested || "",
-      validatedBy: req.validated_by || "",
-      validationDate: req.validation_date || "",
+      reqID: req?.validation?.budget_request?.budget_request_id || "",
+      departmentId: req?.validation?.budget_request?.dept?.dept_id || "",
+      amount: req?.validation?.amount_requested || "",
+      requestDate: req?.validation?.budget_request?.requested_date || "",
+      validatedBy: req?.validation?.validated_by || "",
+      validationDate: req?.validation?.validation_date || "",
       approvedBy: req.approved_by || "",
+      approvedAmount: req?.validation?.final_approved_amount || "",
       approvalDate: req.approval_date || "",
       remarks: req.remarks || "",
       approvalStatus: req.approval_status || ""
@@ -704,7 +698,7 @@ amount: item?.validation?.amount_requested || "",
 requestDate: item?.validation?.budget_submission?.date_submitted || "",
 approvedBy: item.approved_by || "",
 remarks: item.remarks || "",
-validationStatus: item.approval_status || "",
+approvalStatus: item.approval_status || "",
 })));
 } catch (error) {
 console.error("Failed to load rejected approvals:", error);
@@ -824,9 +818,10 @@ Rejected <span className="status-circle rejected"></span>
 <input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
 <div className="filter-group">
 <select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+<option value="All Time">All Time</option>
 <option value="Last 30 days">Last 30 days</option>
 <option value="Last 7 days">Last 7 days</option>
-<option value="All Time">All Time</option>
+
 </select>
 <select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
 <option value="All">Filter By</option>
@@ -852,12 +847,12 @@ Rejected <span className="status-circle rejected"></span>
 <th>Approval Date</th>
 <th>Approved By</th>
 <th>Remarks</th>
-<th>Validation Status</th>
+<th>Approval Status</th>
 </tr>
 </thead>
 <tbody>
 {originalData.map((row, index) => (
-<tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedSubmissionRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.validationStatus === "Approved" ? "#f0f0f0" : "white" }}>
+<tr key={index} onClick={() => handleRowSelect(row.requestId)} className={selectedSubmissionRows.includes(row.requestId) ? "selected" : ""} style={{ backgroundColor: row.approvalStatus === "Approved" ? "#f0f0f0" : "white" }}>
 <td><div className="row-wrapper"><input type="checkbox" checked={selectedSubmissionRows.includes(row.requestId)} readOnly /></div></td>
 <td><div className="row-wrapper">{row.requestId}</div></td>
 <td><div className="row-wrapper">{row.departmentId}</div></td>
@@ -869,7 +864,7 @@ Rejected <span className="status-circle rejected"></span>
 <td><div className="row-wrapper">{formatDate(row.approvalDate)}</div></td>
 <td><div className="row-wrapper">{row.approvedBy}</div></td>
 <td><div className="row-wrapper">{row.remarks}</div></td>
-<td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+<td><div className="row-wrapper"><span className={`status-label ${row.approvalStatus.toLowerCase()}`}>{row.approvalStatus}</span></div></td>
 </tr>
 ))}
 </tbody>
@@ -906,6 +901,9 @@ readOnly
 <strong>Amount Requested:</strong> {row.amount}
 </p>
 <p>
+<strong>Validation Date:</strong> {formatDate(row.validationDate)}
+</p>
+<p>
 <strong>Approved Amount:</strong>
 <input
 type="number"
@@ -931,9 +929,6 @@ onChange={(e) => {
 }}
 />
 </p>
-<p>
-<strong>Validation Date:</strong> {formatDate(row.validationDate)}
-</p>
 </div>
 </div>
 </div>
@@ -942,10 +937,12 @@ onChange={(e) => {
 <button className="cancel-button" onClick={() => setIsSubmissionEditModalOpen(false)}>
 Cancel
 </button>
-<button className="proceed-button" onClick={handleProceedEdit}>
-Save Changes
+<button className="reject-button"  onClick={handleRejectClick}>
+Reject
 </button>
-</div>
+<button className="proceed-button" onClick={handleApproveClick}>
+Save Changes
+</button></div>
 </div>
 </InfoCard>
 )}
@@ -988,7 +985,7 @@ Save Changes
       <td><div className="row-wrapper">{formatDate(row.requestDate)}</div></td>
       <td><div className="row-wrapper">{row.approvedBy}</div></td>
       <td><div className="row-wrapper">{row.remarks === "Rejected" ? "For Resubmission" : row.remarks}</div></td>
-      <td><div className="row-wrapper"><span className={`status-label ${row.validationStatus.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+      <td><div className="row-wrapper"><span className={`status-label ${row.approvalStatus.toLowerCase()}`}>{row.approvalStatus}</span></div></td>
     </tr>
 ))}
 </tbody>
@@ -1089,6 +1086,7 @@ Rejected <span className="status-circle rejected"></span>
 <th>Validated By</th>
 <th>Approval Date</th>
 <th>Approved By</th>
+<th>Approved Amount</th>
 <th>Remarks</th>
 <th>Approval Status</th>
 </tr>
@@ -1105,6 +1103,7 @@ Rejected <span className="status-circle rejected"></span>
 <td><div className="row-wrapper">{row.validatedBy}</div></td>
 <td><div className="row-wrapper">{formatDate(row.approvalDate)}</div></td>
 <td><div className="row-wrapper">{row.approvedBy}</div></td>
+<td><div className="row-wrapper">{row.approvedAmount}</div></td>
 <td><div className="row-wrapper">{row.remarks}</div></td>
 <td><div className="row-wrapper"><span className={`status-label ${row.approvalStatus?.toLowerCase()}`}>{row.approvalStatus}</span></div></td>
 </tr>
@@ -1137,6 +1136,9 @@ readOnly
 <p><strong>Department ID:</strong> {row.departmentId}</p>
 <p><strong>Amount Requested:</strong> {row.amount}</p>
 <p>
+<strong>Validation Date:</strong> {formatDate(row.validationDate)}
+</p>
+<p>
 <strong>Approved Amount:</strong>
 <input
 type="number"
@@ -1162,21 +1164,20 @@ onChange={(e) => {
 }}
 />
 </p>
-<p>
-<strong>Validation Date:</strong> {formatDate(row.validationDate)}
-</p>
 </div>
 </div>
 </div>
 ))}
 <div className="popup-buttons">
-<button className="cancel-button" onClick={() => setIsRequestEditModalOpen(false)}>
+<button className="cancel-button" onClick={() => setIsSubmissionEditModalOpen(false)}>
 Cancel
 </button>
-<button className="proceed-button" onClick={handleProceedEdit}>
-Save Changes
+<button className="reject-button"  onClick={handleRejectClick}>
+Reject
 </button>
-</div>
+<button className="proceed-button" onClick={handleApproveClick}>
+Save Changes
+</button></div>
 </div>
 </InfoCard>
 )}
@@ -1217,7 +1218,7 @@ Save Changes
 <td><div className="row-wrapper">{formatDate(row.requestDate)}</div></td>
 <td><div className="row-wrapper">{row.approvedBy}</div></td>
 <td><div className="row-wrapper">{row.remarks}</div></td>
-<td><div className="row-wrapper"><span className={`status-label ${row.validationStatus?.toLowerCase()}`}>{row.validationStatus}</span></div></td>
+<td><div className="row-wrapper"><span className={`status-label ${row.approvalStatus?.toLowerCase()}`}>{row.approvalStatus}</span></div></td>
 </tr>
 ))}
 </tbody>
