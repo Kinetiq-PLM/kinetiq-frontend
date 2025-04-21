@@ -1,6 +1,5 @@
 import "../styles/accounting-styling.css";
 import React, { useState, useEffect } from "react";
-import { accounts } from "./ListOfAccounts";
 import axios from "axios";
 import Search from "../components/Search";
 import Button from "../components/Button";
@@ -10,11 +9,11 @@ import CoaModalInput from "../components/CoaModalInput";
 import NotifModal from "../components/modalNotif/NotifModal";
 
 const BodyContent = () => {
-  // Use states
   const columns = ["Account code", "Account name", "Account type"];
   const [selectedAccountType, setSelectedAccountType] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [accountTypes, setAccountTypes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searching, setSearching] = useState("");
   const [data, setData] = useState([]);
   const [newAccount, setNewAccount] = useState({
@@ -23,16 +22,18 @@ const BodyContent = () => {
     account_type: "",
   });
 
-  // Open modal function
-  const openModal = () => setIsModalOpen(true);
+  // API endpoint
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+  const CHART_OF_ACCOUNTS_ENDPOINT = `${API_URL}/api/chart-of-accounts/`;
 
-  // Close modal function
+  const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  // Fetch data
   useEffect(() => {
+    setIsLoading(true);
     axios
-      .get("http://127.0.0.1:8000/api/chart-of-accounts/")
+      .get(CHART_OF_ACCOUNTS_ENDPOINT)
       .then((response) => {
         const rawData = response.data.map((acc) => [
           acc.account_code,
@@ -40,15 +41,22 @@ const BodyContent = () => {
           acc.account_type,
         ]);
         setData(rawData);
-
-        // Extract unique account types from fetched data
         const uniqueTypes = [...new Set(response.data.map((acc) => acc.account_type))];
         setAccountTypes(uniqueTypes);
+        setIsLoading(false);
       })
-      .catch((error) => console.error("Error fetching data:", error));
+      .catch((error) => {
+        console.error("Error fetching data:", error.response ? error.response.data : error);
+        setValidation({
+          isOpen: true,
+          type: "error",
+          title: "Fetch Error",
+          message: "Failed to load accounts. Please check your connection.",
+        });
+        setIsLoading(false);
+      });
   }, []);
 
-  // Handle Input Change
   const handleInputChange = (field, value) => {
     setNewAccount((prev) => ({ ...prev, [field]: value }));
   };
@@ -60,9 +68,7 @@ const BodyContent = () => {
     message: "",
   });
 
-  // Submit input with user validations
   const handleSubmit = async () => {
-    // Check if required fields are filled
     if (!newAccount.account_code || !newAccount.account_name || !newAccount.account_type) {
       setValidation({
         isOpen: true,
@@ -73,7 +79,6 @@ const BodyContent = () => {
       return;
     }
 
-    // Check if the account_code already exists
     const accountCodeExists = data.some((row) => row[0] === newAccount.account_code);
     if (accountCodeExists) {
       setValidation({
@@ -85,11 +90,9 @@ const BodyContent = () => {
       return;
     }
 
-    // Submit the new account to the backend
     try {
       console.log("Submitting data:", newAccount);
-
-      const response = await axios.post("http://127.0.0.1:8000/api/chart-of-accounts/", newAccount);
+      const response = await axios.post(CHART_OF_ACCOUNTS_ENDPOINT, newAccount);
 
       if (response.status === 201) {
         const addedAccount = response.data;
@@ -109,7 +112,7 @@ const BodyContent = () => {
         setValidation({
           isOpen: true,
           type: "error",
-          title: "Server Error: Adding Account Failed",
+          title: "Server Error",
           message: "Creating account failed.",
         });
       }
@@ -119,23 +122,28 @@ const BodyContent = () => {
         isOpen: true,
         type: "error",
         title: "Check Connection!",
-        message: "Kindly check your connection to the database.",
+        message: error.response?.data?.detail || "Failed to connect to the server.",
       });
     }
   };
 
-  // Filter data based on search and selected account type
   const filteredData = data.filter(([code, name, type]) => {
     const matchesSearch = [code, name, type]
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
       .includes(searching.toLowerCase());
-
     const matchesType = selectedAccountType ? type === selectedAccountType : true;
-
     return matchesSearch && matchesType;
   });
+
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8 mt-30">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-gray-600">Loading chart of accounts data...</p>
+    </div>
+  );
 
   return (
     <div className="chartAccounts">
@@ -143,7 +151,6 @@ const BodyContent = () => {
         <div className="title-subtitle-container">
           <h1 className="subModule-title">Chart of Accounts</h1>
         </div>
-
         <div className="parent-component-container">
           <div className="component-container">
             <Dropdown
@@ -153,14 +160,12 @@ const BodyContent = () => {
               value={selectedAccountType}
               onChange={(value) => setSelectedAccountType(value)}
             />
-
             <Search
               type="text"
               placeholder="Search account.."
               onChange={(e) => setSearching(e.target.value)}
             />
           </div>
-
           <div className="component-container">
             <Button
               name={isModalOpen ? "Creating..." : "Create Account"}
@@ -170,10 +175,14 @@ const BodyContent = () => {
           </div>
         </div>
 
-        {/* Table Display */}
-        <Table data={filteredData} columns={columns} enableCheckbox={false} />
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <Table data={filteredData} columns={columns} enableCheckbox={false} />
+        )}
+        {/* Table component */}
+        
       </div>
-
       <CoaModalInput
         isModalOpen={isModalOpen}
         closeModal={closeModal}
@@ -181,7 +190,6 @@ const BodyContent = () => {
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
       />
-
       {validation.isOpen && (
         <NotifModal
           isOpen={validation.isOpen}

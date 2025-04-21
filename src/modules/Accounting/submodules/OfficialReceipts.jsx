@@ -1,40 +1,95 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
 import Table from "../components/Table";
 import Search from "../components/Search";
 import Button from "../components/Button";
 import CreateReceiptModal from "../components/CreateReceiptModal";
 import NotifModal from "../components/modalNotif/NotifModal";
+import axios from "axios";
 
 const OfficialReceipts = () => {
-  const columns = ["OR ID", "Invoice ID", "Customer ID", "OR Date", "Settled Amount", "Remaining Amount", "Payment Method", "Reference #", "Created By"];
+  // Function to get user from localStorage or sessionStorage
+  const getLoggedInUser = () => {
+    // Try common keys used by .NET or other auth systems
+    const keys = ["user", "authUser", "currentUser", "identity"];
+    for (const key of keys) {
+      const storedUser = localStorage.getItem(key) || sessionStorage.getItem(key);
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          // Handle different user object structures
+          return {
+            name:
+              parsed.name ||
+              parsed.fullName ||
+              parsed.displayName ||
+              parsed.email ||
+              "Unknown User",
+          };
+        } catch (e) {
+          console.error(`Error parsing ${key}:`, e);
+        }
+      }
+    }
+    // Fallback to Admin if no user is found
+    return { name: "Admin" };
+  };
+
+  const [user, setUser] = useState(getLoggedInUser);
+
+  // Optional: Fetch user from API if token exists
+  useEffect(() => {
+    const fetchUserFromApi = async () => {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (token) {
+        try {
+          const API_URL =
+            import.meta.env.VITE_API_URL ||
+            "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+          const response = await axios.get(`${API_URL}/api/user`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setUser({ name: response.data.name || response.data.email || "Admin" });
+        } catch (error) {
+          console.error("Error fetching user from API:", error);
+          setUser({ name: "Admin" }); // Fallback
+        }
+      }
+    };
+    fetchUserFromApi();
+  }, []);
+
+  // Listen for storage changes
+  useEffect(() => {
+    const checkUser = () => {
+      const newUser = getLoggedInUser();
+      if (newUser.name !== user.name) {
+        setUser(newUser);
+      }
+    };
+    window.addEventListener("storage", checkUser);
+    return () => window.removeEventListener("storage", checkUser);
+  }, [user]);
+
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
+
+  const columns = [
+    "OR ID",
+    "Invoice ID",
+    "Customer ID",
+    "OR Date",
+    "Settled Amount",
+    "Remaining Amount",
+    "Payment Method",
+    "Reference #",
+    "Created By",
+  ];
   const [data, setData] = useState([]);
   const [searching, setSearching] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
-
-  const openModal = () => setModalOpen(true);
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setReportForm({
-      startDate: "",
-      salesInvoiceId: "",
-      amountPaid: "",
-      paymentMethod: "",
-      bankAccount: "", // Include bankAccount for Bank Transfer
-      createdBy: "",
-    });
-  };
-
-  const [reportForm, setReportForm] = useState({
-    startDate: "",
-    salesInvoiceId: "",
-    amountPaid: "",
-    paymentMethod: "",
-    bankAccount: "", // Include bankAccount for Bank Transfer
-    createdBy: "",
-  });
-
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
@@ -42,11 +97,79 @@ const OfficialReceipts = () => {
     message: "",
   });
 
-  const fetchData = () => {
-    fetch('http://127.0.0.1:8000/api/official-receipts/')
-      .then(response => response.json())
-      .then(result => {
-        setData(result.map(entry => [
+  const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+  const OFFICIAL_RECEIPTS_ENDPOINT = `${API_URL}/api/official-receipts/`;
+
+  const openModal = () => setModalOpen(true);
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setReportForm({
+      startDate: getCurrentDate(),
+      salesInvoiceId: "",
+      amountPaid: "",
+      paymentMethod: "",
+      bankAccount: "",
+      checkNumber: "",
+      transactionId: "",
+      createdBy: user ? user.name : "Admin",
+    });
+  };
+
+  const [reportForm, setReportForm] = useState({
+    startDate: getCurrentDate(),
+    salesInvoiceId: "",
+    amountPaid: "",
+    paymentMethod: "",
+    bankAccount: "",
+    checkNumber: "",
+    transactionId: "",
+    createdBy: user ? user.name : "Admin",
+  });
+
+  // Update reportForm when user changes
+  useEffect(() => {
+    setReportForm((prevForm) => ({
+      ...prevForm,
+      createdBy: user ? user.name : "Admin",
+    }));
+  }, [user]);
+
+  const calculateRemainingAmount = (invoiceId, newSettledAmount) => {
+    const invoiceReceipts = data.filter((row) => row[1] === invoiceId);
+    const settledAmount = parseFloat(newSettledAmount);
+    if (isNaN(settledAmount) || settledAmount <= 0) {
+      throw new Error("Invalid settled amount. Please enter a valid positive number.");
+    }
+
+    if (invoiceReceipts.length === 0) {
+      const initialRemainingAmount = 10000; // Replace with API call if possible
+      const newRemaining = initialRemainingAmount - settledAmount;
+      return newRemaining >= 0 ? newRemaining : 0;
+    }
+
+    const sortedReceipts = [...invoiceReceipts].sort(
+      (a, b) => parseInt(a[0]) - parseInt(b[0])
+    );
+    const latestReceipt = sortedReceipts[sortedReceipts.length - 1];
+    const latestRemaining = parseFloat(latestReceipt[5]);
+
+    if (isNaN(latestRemaining)) {
+      throw new Error("Invalid remaining amount in the latest receipt.");
+    }
+
+    const newRemaining = latestRemaining - settledAmount;
+    return newRemaining >= 0 ? newRemaining : 0;
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(OFFICIAL_RECEIPTS_ENDPOINT);
+      console.log("API Response (fetchData):", response.data);
+      setData(
+        response.data.map((entry) => [
           entry.or_id || "-",
           entry.invoice_id || "-",
           entry.customer_id || "-",
@@ -56,48 +179,43 @@ const OfficialReceipts = () => {
           entry.payment_method || "-",
           entry.reference_number || "-",
           entry.created_by || "-",
-        ]));
-      })
-      .catch(error => console.error('Error fetching data:', error));
+        ])
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error.response ? error.response.data : error);
+      setValidation({
+        isOpen: true,
+        type: "error",
+        title: "Fetch Error",
+        message: "Failed to load official receipts. Please check your connection.",
+      });
+    }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  const fetchLatestReferenceNumber = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/official-receipts/');
-      const receipts = await response.json();
-      if (receipts.length > 0) {
-        const lastReceipt = receipts[receipts.length - 1];
-        const lastRef = lastReceipt.reference_number;
-
-        if (lastRef && lastRef.includes('-')) {
-          const parts = lastRef.split('-');
-          const numericPart = parseInt(parts[1], 10);
-          if (!isNaN(numericPart)) {
-            const newRefNumber = numericPart + 1;
-            return `REF-${newRefNumber}`;
-          }
-        }
-      }
-      return "REF-0001";
-    } catch (error) {
-      console.error("Error fetching latest reference number:", error);
-      return "REF-0001";
-    }
+  const generateReferenceNumber = () => {
+    const randomString = Math.random()
+      .toString(36)
+      .substring(2, 8)
+      .toLowerCase();
+    return `REF-${randomString}`;
   };
 
   const generateCustomORID = () => {
     const prefix = "ACC-OFR";
     const year = new Date().getFullYear();
-    const randomString = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const randomString = Math.random()
+      .toString(36)
+      .substring(2, 7)
+      .toUpperCase();
     return `${prefix}-${year}-${randomString}`;
   };
 
   const handleInputChange = (field, value) => {
-    console.log(`Updating ${field} to ${value}`); // Debug log
+    console.log(`Updating ${field} to ${value}`);
     setReportForm((prevForm) => ({
       ...prevForm,
       [field]: value,
@@ -105,53 +223,149 @@ const OfficialReceipts = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("Form data on submit:", reportForm); // Debug log
+    console.log("Form data on submit:", reportForm);
+
+    // Validate required fields
     if (
       !reportForm.startDate ||
       !reportForm.salesInvoiceId ||
       !reportForm.amountPaid ||
       !reportForm.paymentMethod ||
-      !reportForm.createdBy ||
-      (reportForm.paymentMethod === "Bank Transfer" && !reportForm.bankAccount)
+      !reportForm.createdBy
     ) {
       setValidation({
         isOpen: true,
         type: "warning",
-        title: "All Fields Required",
-        message: "Please fill in all fields, including payment method and bank account (if applicable).",
+        title: "Missing Fields",
+        message: "Please fill in all required fields. Ensure you are logged in.",
       });
       return;
     }
 
-    const referenceNumber = await fetchLatestReferenceNumber();
+    if (!reportForm.salesInvoiceId) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Missing Invoice ID",
+        message: "Enter sales invoice ID.",
+      });
+      return;
+    }
 
-    const newReceipt = {
-      or_id: generateCustomORID(),
-      invoice_id: reportForm.salesInvoiceId,
-      customer_id: "SALES-CUST-2025",
-      or_date: reportForm.startDate,
-      settled_amount: reportForm.amountPaid,
-      remaining_amount: "0.00",
-      payment_method: reportForm.paymentMethod,
-      reference_number: referenceNumber,
-      created_by: reportForm.createdBy,
-      bank_account: reportForm.paymentMethod === "Bank Transfer" ? reportForm.bankAccount : null, // Include bank account if Bank Transfer
-    };
+    if (!reportForm.amountPaid) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Missing Amount Paid",
+        message: "Please enter the amount paid.",
+      });
+      return;
+    }
 
-    console.log("Submitting receipt:", newReceipt);
+    if (!reportForm.paymentMethod) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Missing Payment Method",
+        message: "Please select a payment method.",
+      });
+      return;
+    }
+
+    if (!reportForm.createdBy) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Missing Created By",
+        message: "Please enter the creator's name.",
+      });
+      return;
+    }
+
+    // Validate payment method-specific fields
+    if (reportForm.paymentMethod === "Bank Transfer" && !reportForm.bankAccount) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Missing Bank Account",
+        message: "Please select or add a bank account for Bank Transfer.",
+      });
+      return;
+    }
+    if (reportForm.paymentMethod === "Check" && !reportForm.checkNumber) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Missing Check Number",
+        message: "Please provide a check number for Check payments.",
+      });
+      return;
+    }
+    if (
+      reportForm.paymentMethod === "Mobile Payment" &&
+      !reportForm.transactionId
+    ) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Missing Transaction ID",
+        message: "Please provide a transaction ID for Mobile Payments.",
+      });
+      return;
+    }
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/official-receipts/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newReceipt),
-      });
+      const newRemainingAmount = calculateRemainingAmount(
+        reportForm.salesInvoiceId,
+        reportForm.amountPaid
+      );
 
-      console.log("Response status:", response.status);
+      if (newRemainingAmount === 0 && parseFloat(reportForm.amountPaid) > 0) {
+        setValidation({
+          isOpen: true,
+          type: "warning",
+          title: "Invalid Payment",
+          message: `The settled amount (${reportForm.amountPaid}) exceeds the remaining invoice balance.`,
+        });
+        return;
+      }
 
-      if (response.ok) {
-        const createdReceipt = await response.json();
-        console.log("Created receipt:", createdReceipt);
+      const referenceNumber = generateReferenceNumber();
+      console.log("Generated reference_number:", referenceNumber);
+
+      const newReceipt = {
+        or_id: generateCustomORID(),
+        invoice_id: reportForm.salesInvoiceId,
+        customer_id: "SALES-CUST-2025",
+        or_date: reportForm.startDate,
+        settled_amount: parseFloat(reportForm.amountPaid).toFixed(2),
+        remaining_amount: newRemainingAmount.toFixed(2),
+        payment_method: reportForm.paymentMethod,
+        reference_number: referenceNumber,
+        created_by: reportForm.createdBy,
+        bank_account:
+          reportForm.paymentMethod === "Bank Transfer"
+            ? reportForm.bankAccount
+            : null,
+        check_number:
+          reportForm.paymentMethod === "Check" ? reportForm.checkNumber : null,
+        check_no:
+          reportForm.paymentMethod === "Check" ? reportForm.checkNumber : null,
+        transaction_id:
+          reportForm.paymentMethod === "Mobile Payment"
+            ? reportForm.transactionId
+            : null,
+        transaction_ref:
+          reportForm.paymentMethod === "Mobile Payment"
+            ? reportForm.transactionId
+            : null,
+      };
+
+      console.log("Submitting receipt:", newReceipt);
+
+      const response = await axios.post(OFFICIAL_RECEIPTS_ENDPOINT, newReceipt);
+      if (response.status === 201) {
+        console.log("Created receipt:", response.data);
         fetchData();
         closeModal();
         setValidation({
@@ -161,27 +375,25 @@ const OfficialReceipts = () => {
           message: "The receipt has been successfully created.",
         });
       } else {
-        const errorData = await response.json();
-        console.error("Error response from server:", errorData);
         setValidation({
           isOpen: true,
           type: "error",
-          title: "Failed to Create Receipt",
-          message: errorData.detail || "An error occurred while creating the receipt. Please try again.",
+          title: "Server Error",
+          message: "Failed to create receipt.",
         });
       }
     } catch (error) {
-      console.error('Error creating receipt:', error);
+      console.error("Error creating receipt:", error.response ? error.response.data : error);
       setValidation({
         isOpen: true,
         type: "error",
-        title: "Connection Error",
-        message: "Unable to connect to the server. Please check your connection.",
+        title: "Check Connection!",
+        message: error.response?.data?.detail || "Failed to connect to the server.",
       });
     }
   };
 
-  const filteredData = data.filter(row =>
+  const filteredData = data.filter((row) =>
     [row[0], row[1], row[2], row[6], row[7], row[8]]
       .filter(Boolean)
       .join(" ")
@@ -196,8 +408,19 @@ const OfficialReceipts = () => {
           <h1 className="subModule-title">Official Receipts</h1>
         </div>
         <div className="parent-component-container">
-          <Search type="text" placeholder="Search Record.." value={searching} onChange={(e) => setSearching(e.target.value)} />
-          <div><Button name="Create Receipt" variant="standard2" onclick={openModal} /></div>
+          <Search
+            type="text"
+            placeholder="Search Record.."
+            value={searching}
+            onChange={(e) => setSearching(e.target.value)}
+          />
+          <div>
+            <Button
+              name="Create Receipt"
+              variant="standard2"
+              onclick={openModal}
+            />
+          </div>
         </div>
         <Table data={filteredData} columns={columns} enableCheckbox={false} />
       </div>
@@ -208,6 +431,7 @@ const OfficialReceipts = () => {
           reportForm={reportForm}
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
+          setValidation={setValidation}
         />
       )}
       {validation.isOpen && (
