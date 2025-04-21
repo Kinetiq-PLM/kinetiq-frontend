@@ -15,6 +15,9 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [approvalFilter, setApprovalFilter] = useState("all"); // Default to show all
   const [sortOrder, setSortOrder] = useState("newest"); // Default to newest
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+
+  const statusOptions = ["All", "Approved", "Pending", "Completed", "Rejected"];
 
   // Fetch purchase requests and employee data from the API
   useEffect(() => {
@@ -103,27 +106,35 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
     setShowNewForm(false); // Hide the PurchaseReqForm if it was open
   };
 
+  const handleStatusDropdownSelect = (status) => {
+    setApprovalFilter(status === 'All' ? 'all' : status);
+    setShowStatusDropdown(false);
+  };
+
   const filteredRequests = purchaseRequests.filter((request) => {
     const searchLower = searchTerm.toLowerCase();
     const employee = employeeMap[request.employee_id];
     const employeeName = (employee && employee.name) || "";
 
-    // Apply the approval_id filter
-    const matchesApprovalFilter =
-      approvalFilter === "all" ||
-      (approvalFilter === "null" && request.approval_id === null) ||
-      (approvalFilter === "not-null" && request.approval_id !== null);
+    // Status filter (using approvalFilter as status)
+    let matchesStatus = true;
+    if (approvalFilter !== "all") {
+      if (approvalFilter === "Completed") {
+        matchesStatus = request.status === "Completed";
+      } else {
+        matchesStatus = request.status === approvalFilter;
+      }
+    }
 
-    return (
-      matchesApprovalFilter &&
-      (
-        (request.request_id || "").toLowerCase().includes(searchLower) ||
-        employeeName.toLowerCase().includes(searchLower) ||
-        (request.department || "").toLowerCase().includes(searchLower) ||
-        (request.document_date || "").toLowerCase().includes(searchLower) ||
-        (request.valid_date || "").toLowerCase().includes(searchLower)
-      )
-    );
+    // Search filter (existing)
+    const matchesSearch =
+      (request.request_id || "").toLowerCase().includes(searchLower) ||
+      employeeName.toLowerCase().includes(searchLower) ||
+      (request.department || "").toLowerCase().includes(searchLower) ||
+      (request.document_date || "").toLowerCase().includes(searchLower) ||
+      (request.valid_date || "").toLowerCase().includes(searchLower);
+
+    return matchesStatus && matchesSearch;
   });
 
   return (
@@ -135,25 +146,44 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
               <button className="purchreq-back-btn" onClick={handleBack}>← Back</button>
             )}
           </div>
-          <div className="purchreq-header-right">
-            <select
-              className="purchreq-filter"
-              value={approvalFilter}
-              onChange={(e) => setApprovalFilter(e.target.value)}
-            >
-              <option value="all">All</option>
-              <option value="null">Pending Approval</option>
-              <option value="not-null">Approved</option>
-            </select>
-          </div>
+          {/* Place filter and searchbar together, aligned right, with no wrapper or space between */}
           {!showNewForm && !showPurchQuot && (
-            <input
-              type="text"
-              className="purchreq-search"
-              placeholder="Search by PR No., Employee Name, Department, or Date..."
-              value={searchTerm}
-              onChange={handleSearch}
-            />
+            <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto', gap: '0.75rem' }}>
+              <div
+                className="purchreq-status-filter"
+                onClick={() => setShowStatusDropdown((prev) => !prev)}
+                onBlur={() => setShowStatusDropdown(false)}
+                tabIndex={0}
+              >
+                <span>Filter by: {approvalFilter === 'all' ? 'All' : approvalFilter}</span>
+                <span style={{ marginLeft: 4 }}>▼</span>
+                {showStatusDropdown && (
+                  <div className="status-options-dropdown">
+                    {statusOptions.map((status) => (
+                      <div
+                        key={status}
+                        className={`status-option${(approvalFilter === status || (status === 'All' && approvalFilter === 'all')) ? ' selected' : ''}`}
+                        onMouseDown={(e) => {
+                          e.preventDefault(); // Prevent blur before click
+                          setApprovalFilter(status === 'All' ? 'all' : status);
+                          setShowStatusDropdown(false);
+                        }}
+                      >
+                        {status}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <input
+                type="text"
+                className="purchreq-search"
+                placeholder="Search by PR No., Employee Name, Department, or Date..."
+                value={searchTerm}
+                onChange={handleSearch}
+                style={{ marginLeft: 0 }}
+              />
+            </div>
           )}
         </div>
         {showNewForm && !showPurchQuot && (

@@ -52,6 +52,45 @@ const PurchaseOrdStatBody = () => {
     setSearchTerm(e.target.value);
   };
 
+  // --- Filtering logic (reference PurchaseCredMemo) ---
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  useEffect(() => {
+    let result = [...purchaseOrders];
+    // Date filter
+    if (selectedDate && selectedDate !== 'Last 30 days') {
+      let days = 30;
+      if (selectedDate.includes('1 day')) days = 1;
+      else if (selectedDate.includes('3 days')) days = 3;
+      else if (selectedDate.includes('10 days')) days = 10;
+      else if (selectedDate.includes('20 days')) days = 20;
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+      result = result.filter((order) => {
+        if (!order.order_date) return true;
+        return new Date(order.order_date) >= cutoffDate;
+      });
+    }
+    // Status filter
+    if (selectedStatus !== 'All') {
+      result = result.filter((order) => {
+        if (selectedStatus === 'Completed') return order.status === 'Completed';
+        return order.status === selectedStatus;
+      });
+    }
+    // Search filter
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(
+        (order) =>
+          (order.purchase_id && order.purchase_id.toString().toLowerCase().includes(term)) ||
+          (order.quotation_id && order.quotation_id.toString().toLowerCase().includes(term)) ||
+          (order.order_date && order.order_date.toString().toLowerCase().includes(term)) ||
+          (order.status && order.status.toLowerCase().includes(term))
+      );
+    }
+    setFilteredOrders(result);
+  }, [purchaseOrders, selectedDate, selectedStatus, searchTerm]);
+
   // Fetch purchase orders from the API
   useEffect(() => {
     const fetchPurchaseOrders = async () => {
@@ -140,34 +179,51 @@ const PurchaseOrdStatBody = () => {
           <button className="purchordstat-back" onClick={handleBackToDashboard}>← Back</button>
           <div className="purchordstat-filters" style={{ marginLeft: 'auto' }}>
             <div className="purchordstat-date-filter">
-              <div className="date-display" onClick={() => setShowDateDropdown(!showDateDropdown)}>
+              <div
+                className="date-display"
+                tabIndex={0}
+                onClick={() => setShowDateDropdown((prev) => !prev)}
+                onBlur={() => setShowDateDropdown(false)}
+              >
                 <span>{selectedDate}</span>
                 <span>▼</span>
+                {showDateDropdown && (
+                  <div className="date-options-dropdown">
+                    {timeOptions.map((option) => (
+                      <div
+                        key={option}
+                        className={`date-option${selectedDate === option ? ' selected' : ''}`}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setSelectedDate(option);
+                          setShowDateDropdown(false);
+                        }}
+                      >
+                        {option}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              {showDateDropdown && (
-                <div className="date-options-dropdown">
-                  {timeOptions.map(option => (
-                    <div
-                      key={option}
-                      className="date-option"
-                      onClick={() => handleDateOptionSelect(option)}
-                    >
-                      {option}
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
-            <div className="purchordstat-filter-btn" onClick={() => setShowStatusFilter(!showStatusFilter)}>
+            <div className="purchordstat-filter-btn"
+              tabIndex={0}
+              onClick={() => setShowStatusFilter((prev) => !prev)}
+              onBlur={() => setShowStatusFilter(false)}
+            >
               <span>Filter by: {selectedStatus}</span>
               <span>▼</span>
               {showStatusFilter && (
                 <div className="status-options-dropdown">
-                  {statusOptions.map(status => (
+                  {statusOptions.map((status) => (
                     <div
                       key={status}
-                      className="status-option"
-                      onClick={() => handleStatusSelect(status)}
+                      className={`status-option${selectedStatus === status ? ' selected' : ''}`}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setSelectedStatus(status);
+                        setShowStatusFilter(false);
+                      }}
                     >
                       {status}
                     </div>
@@ -197,7 +253,7 @@ const PurchaseOrdStatBody = () => {
           </div>
           <div className="purchordstat-table-scrollable">
             <div className="purchordstat-table-rows">
-              {purchaseOrders.length > 0 ? purchaseOrders.map((order) => (
+              {filteredOrders.length > 0 ? filteredOrders.map((order) => (
                 <div
                   key={order.purchase_id}
                   className="purchordstat-row"
