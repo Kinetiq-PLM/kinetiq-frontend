@@ -17,8 +17,8 @@ const BodyContent = ({employee_id}) => {
     const [userName, setUserName] = useState(employee_id || '');
     const textareaRef = useRef(null);
 
-    // const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
-    const API_BASE_URL = "http://127.0.0.1:8000/";
+    const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
+    // const API_BASE_URL = "http://127.0.0.1:8000/";
 
     useEffect(() => {
         if (employee_id) { // Only fetch if user_id is available
