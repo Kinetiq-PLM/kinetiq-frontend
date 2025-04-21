@@ -38,7 +38,7 @@ const Rework = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('http://127.0.0.1:8000/api/reworks/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/reworks/');
         
         if (!response.ok) {
           if (response.status === 401) {
@@ -61,7 +61,7 @@ const Rework = () => {
 
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/employees/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -170,7 +170,7 @@ const Rework = () => {
     if (!selectedRework) return;
     
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/reworks/${selectedRework.rework_id}/assign/`, {
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/reworks/${selectedRework.rework_id}/assign/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -209,7 +209,7 @@ const Rework = () => {
     if (!selectedRework) return;
     
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/reworks/${selectedRework.rework_id}/complete/`, {
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/reworks/${selectedRework.rework_id}/complete/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -225,6 +225,18 @@ const Rework = () => {
       setShowCompleteModal(false);
       setRefreshTrigger(prev => prev + 1);
       
+      // Trigger a refresh of the failed shipments if this was a failed shipment rework
+      if (selectedRework.rework_types === 'Failed Shipment' && selectedRework.failed_shipment_info) {
+        // Use a custom event to trigger the refresh in the Shipment component
+        const refreshEvent = new CustomEvent('refreshFailedShipments');
+        window.dispatchEvent(refreshEvent);
+        
+        // Also update the resolution status in the current rework record in case it's viewed again
+        if (selectedRework.failed_shipment_info) {
+          selectedRework.failed_shipment_info.resolution_status = 'Resolved';
+        }
+      }
+      
       // Show success notification
       toast.success('Rework marked as completed successfully!');
       
@@ -236,7 +248,7 @@ const Rework = () => {
   // Handle status update
   const handleStatusUpdate = async (rework, newStatus) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/reworks/${rework.rework_id}/update-status/`, {
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/reworks/${rework.rework_id}/update-status/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
