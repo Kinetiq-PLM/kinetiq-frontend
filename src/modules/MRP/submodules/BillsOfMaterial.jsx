@@ -28,7 +28,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
     const [bomData, setBomData] = useState([]);
     const [bomDetails, setBomDetails] = useState([]);
-    const totalCostPerRM = bomDetails.reduce((sum, item) => sum + (item.p_total_cost_per_rm || 0), 0).toFixed(2);
+    
+    const [totalCost, setTotalCost] = useState([]);
+    const totalCostPerRM = totalCost.reduce((sum, item) => sum + (item.totalCost || 0), 0).toFixed(2);
     // const [bomCostDetails, setBomCostDetails] = useState({
     //     rawMaterial: 0,
     //     subtotal: 10000,
@@ -99,6 +101,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             if (statementIds.length > 0) {
                 if(type === "Project"){
                     fetchProjectBom(statementIds[0]);
+                    fetchTotalCost(statementIds[0]);
                 } else if (type === "Non Project"){
                     fetchNonProjectBom(statementIds[0]);
                 }
@@ -134,6 +137,24 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             setBomDetails(formattedData);
         } catch (error) {
             console.error("Error fetching Non Project Products:", error);
+        }
+    };
+
+    const fetchTotalCost = async (statementId) => {
+        try {
+            const response = await fetch(`${baseurl}/bills_of_material/productpricing/by-statement/${statementId}/`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch BOM details");
+            }
+            const data = await response.json();
+
+            const formattedData = data.map((item, index) => ({
+                totalCost: parseFloat(item.cost),
+            }));
+
+            setTotalCost(formattedData);
+        } catch (error) {
+            console.error("Error fetching BOM details:", error);
         }
     };
 
