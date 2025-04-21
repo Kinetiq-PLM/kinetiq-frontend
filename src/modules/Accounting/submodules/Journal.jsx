@@ -27,6 +27,7 @@ const Journal = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("asc");
   const [currencies, setCurrencies] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searching, setSearching] = useState("");
   const [sortBy, setSortBy] = useState("Debit");
   const [data, setData] = useState([]);
@@ -57,6 +58,7 @@ const Journal = () => {
 
   // Fetch data from the API - Sort by: journal_date descending
   const fetchData = () => {
+    setIsLoading(true); // Set loading to true when fetching starts
     axios
       .get(JOURNAL_ENTRIES_ENDPOINT)
       .then((response) => {
@@ -86,6 +88,7 @@ const Journal = () => {
           const latest = sortedResult[0];
           setLatestJournalId(latest.journal_id || "ACC-JOE-2025-A00000");
         }
+        setIsLoading(false); // Set loading to false when fetching is done
       })
       .catch((error) => {
         console.error(
@@ -99,6 +102,7 @@ const Journal = () => {
           message:
             "Failed to load journal entries. Please check your connection.",
         });
+        setIsLoading(false); // Set loading to false when fetching is done
       });
   };
 
@@ -279,6 +283,14 @@ const Journal = () => {
       .includes(searching.toLowerCase())
   );
 
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8 mt-30">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-gray-600">Loading accounts payable data...</p>
+    </div>
+  );
+
   return (
     <div className="Journal">
       <div className="body-content-container">
@@ -308,7 +320,11 @@ const Journal = () => {
             />
           </div>
         </div>
-        <Table data={filteredData} columns={columns} enableCheckbox={false} />
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <Table data={filteredData} columns={columns} enableCheckbox={false} />
+        )}
       </div>
       <JournalModalInput
         isModalOpen={isModalOpen}

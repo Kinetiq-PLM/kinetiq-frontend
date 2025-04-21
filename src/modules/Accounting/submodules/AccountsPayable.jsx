@@ -9,6 +9,7 @@ const AccountsPayable = () => {
   // Use States
   const [data, setData] = useState([]);
   const [searching, setSearching] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
@@ -32,6 +33,7 @@ const AccountsPayable = () => {
 
   // Fetch Data
   const fetchData = async () => {
+    setIsLoading(true); // Set loading to true when fetching starts
     try {
       const response = await axios.get(GENERAL_LEDGER_ENDPOINT);
       console.log("API Response:", response.data);
@@ -63,6 +65,7 @@ const AccountsPayable = () => {
 
       console.log("Combined AP and Cash Data:", combinedData);
       setData(combinedData);
+      setIsLoading(false); // Set loading to false when data is loaded
     } catch (error) {
       console.error("Error fetching data:", error.response ? error.response.data : error);
       setValidation({
@@ -71,6 +74,7 @@ const AccountsPayable = () => {
         title: "Fetch Error",
         message: "Failed to load accounts payable data. Please check your connection.",
       });
+      setIsLoading(false); // Set loading to false even on error
     }
   };
 
@@ -102,6 +106,14 @@ const AccountsPayable = () => {
     console.log("Total Debit:", totalDebit, "Total Credit:", totalCredit);
   }, [totalDebit, totalCredit]);
 
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8 mt-30">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-gray-600">Loading accounts payable data...</p>
+    </div>
+  );
+
   return (
     <div className="accountsPayable">
       <div className="body-content-container">
@@ -116,14 +128,22 @@ const AccountsPayable = () => {
             onChange={(e) => setSearching(e.target.value)}
           />
         </div>
-        <Table data={filteredData} columns={columns} enableCheckbox={false} />
-        <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 font-light max-sm:text-[10px] max-sm:font-light max-md:text-[10px] max-md:font-light max-lg:text-[10px] max-lg:font-light max-xl:text-[10px] max-xl:font-light 2xl:text-[10px] 2xl:font-light">
-          <div className="col-span-3"></div>
-          <div className="font-bold">Total</div>
-          <div>{formattedTotalDebit}</div>
-          <div>{formattedTotalCredit}</div>
-          <div></div>
-        </div>
+        
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <Table data={filteredData} columns={columns} enableCheckbox={false} />
+            <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 font-light max-sm:text-[10px] max-sm:font-light max-md:text-[10px] max-md:font-light max-lg:text-[10px] max-lg:font-light max-xl:text-[10px] max-xl:font-light 2xl:text-[10px] 2xl:font-light">
+              <div className="col-span-3"></div>
+              <div className="font-bold">Total</div>
+              <div>{formattedTotalDebit}</div>
+              <div>{formattedTotalCredit}</div>
+              <div></div>
+            </div>
+          </>
+        )}
+        
         {validation.isOpen && (
           <NotifModal
             isOpen={validation.isOpen}

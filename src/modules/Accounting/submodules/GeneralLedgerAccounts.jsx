@@ -18,6 +18,7 @@ const GeneralLedgerAccounts = () => {
     "Created at",
   ];
   const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -31,13 +32,15 @@ const GeneralLedgerAccounts = () => {
 
   // API endpoint
   const API_URL =
-    import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+    import.meta.env.VITE_API_URL ||
+    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const GL_ACCOUNTS_ENDPOINT = `${API_URL}/api/general-ledger-accounts/`;
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const fetchData = async () => {
+    setIsLoading(true); // Set loading to true when fetching starts
     try {
       const response = await axios.get(GL_ACCOUNTS_ENDPOINT);
       console.log("API Response (fetchData):", response.data);
@@ -51,14 +54,20 @@ const GeneralLedgerAccounts = () => {
           entry.created_at ? new Date(entry.created_at).toLocaleString() : "-",
         ])
       );
+      setIsLoading(false); // Set loading to false when fetching is done
     } catch (error) {
-      console.error("Error fetching data:", error.response ? error.response.data : error);
+      console.error(
+        "Error fetching data:",
+        error.response ? error.response.data : error
+      );
       setValidation({
         isOpen: true,
         type: "error",
         title: "Fetch Error",
-        message: "Failed to load general ledger accounts. Please check your connection.",
+        message:
+          "Failed to load general ledger accounts. Please check your connection.",
       });
+      setIsLoading(false); // Set loading to false even if there's an error
     }
   };
 
@@ -92,7 +101,7 @@ const GeneralLedgerAccounts = () => {
       return;
     }
 
-    if(!newAccount.accountName) {
+    if (!newAccount.accountName) {
       setValidation({
         isOpen: true,
         type: "warning",
@@ -102,7 +111,7 @@ const GeneralLedgerAccounts = () => {
       return;
     }
 
-    if(!newAccount.accountID) {
+    if (!newAccount.accountID) {
       setValidation({
         isOpen: true,
         type: "warning",
@@ -112,7 +121,7 @@ const GeneralLedgerAccounts = () => {
       return;
     }
 
-    if(!newAccount.status) {
+    if (!newAccount.status) {
       setValidation({
         isOpen: true,
         type: "warning",
@@ -121,7 +130,6 @@ const GeneralLedgerAccounts = () => {
       });
       return;
     }
-    
 
     const requiredFields = [
       newAccount.createdAt,
@@ -177,12 +185,16 @@ const GeneralLedgerAccounts = () => {
         });
       }
     } catch (error) {
-      console.error("Error creating account:", error.response ? error.response.data : error);
+      console.error(
+        "Error creating account:",
+        error.response ? error.response.data : error
+      );
       setValidation({
         isOpen: true,
         type: "error",
         title: "Check Connection!",
-        message: error.response?.data?.detail || "Failed to connect to the server.",
+        message:
+          error.response?.data?.detail || "Failed to connect to the server.",
       });
     }
   };
@@ -201,6 +213,14 @@ const GeneralLedgerAccounts = () => {
 
     return matchesSearch && matchesStatus;
   });
+
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8 mt-30">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-gray-600">Loading accounts payable data...</p>
+    </div>
+  );
 
   return (
     <div className="generalLedgerAccounts">
@@ -239,11 +259,11 @@ const GeneralLedgerAccounts = () => {
           </div>
         </div>
 
-        <Table
-          data={filteredData}
-          columns={columns}
-          enableCheckbox={false}
-        />
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <Table data={filteredData} columns={columns} enableCheckbox={false} />
+        )}
       </div>
 
       {isModalOpen && (
@@ -257,9 +277,7 @@ const GeneralLedgerAccounts = () => {
       {validation.isOpen && (
         <NotifModal
           isOpen={validation.isOpen}
-          onClose={() =>
-            setValidation({ ...validation, isOpen: false })
-          }
+          onClose={() => setValidation({ ...validation, isOpen: false })}
           type={validation.type}
           title={validation.title}
           message={validation.message}

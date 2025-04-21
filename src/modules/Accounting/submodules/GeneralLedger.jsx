@@ -10,11 +10,20 @@ import axios from "axios";
 
 const BodyContent = () => {
   // Use state
-  const columns = ["Entry Line ID", "GL Account ID", "Account name", "Journal ID", "Debit", "Credit", "Description"];
+  const columns = [
+    "Entry Line ID",
+    "GL Account ID",
+    "Account name",
+    "Journal ID",
+    "Debit",
+    "Credit",
+    "Description",
+  ];
   const [data, setData] = useState([]);
   const [journalDateMap, setJournalDateMap] = useState({});
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [scopedData, setScopedData] = useState(null);
   const [reportForm, setReportForm] = useState({
@@ -34,7 +43,8 @@ const BodyContent = () => {
 
   // API endpoint
   const API_URL =
-    import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+    import.meta.env.VITE_API_URL ||
+    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const JOURNAL_ENTRIES_ENDPOINT = `${API_URL}/api/journal-entries/`;
   const GENERAL_LEDGER_ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
   const FINANCIAL_REPORTS_ENDPOINT = `${API_URL}/api/financial-reports/`;
@@ -54,22 +64,28 @@ const BodyContent = () => {
       const response = await axios.get(JOURNAL_ENTRIES_ENDPOINT);
       const dateMap = {};
       response.data.forEach((entry) => {
-        dateMap[entry.journal_id || entry.id] = entry.journal_date || entry.date;
+        dateMap[entry.journal_id || entry.id] =
+          entry.journal_date || entry.date;
       });
       setJournalDateMap(dateMap);
     } catch (error) {
-      console.error("Error fetching journal dates:", error.response ? error.response.data : error);
+      console.error(
+        "Error fetching journal dates:",
+        error.response ? error.response.data : error
+      );
       setValidation({
         isOpen: true,
         type: "error",
         title: "Fetch Error",
-        message: "Failed to load general ledger data. Please check your connection.",
+        message:
+          "Failed to load general ledger data. Please check your connection.",
       });
     }
   };
 
   // Fetch General Ledger Data
   const fetchData = async () => {
+    setIsLoading(true); // Set loading to true when fetching starts
     try {
       const response = await axios.get(GENERAL_LEDGER_ENDPOINT);
       const enrichedData = response.data.map((entry) => {
@@ -91,14 +107,20 @@ const BodyContent = () => {
       });
 
       setData(enrichedData);
+      setIsLoading(false); // Set loading to false when data is loaded
     } catch (error) {
-      console.error("Error fetching GL data:", error.response ? error.response.data : error);
+      console.error(
+        "Error fetching GL data:",
+        error.response ? error.response.data : error
+      );
       setValidation({
         isOpen: true,
         type: "error",
         title: "Fetch Error",
-        message: "Failed to load general ledger data. Please check your connection.",
+        message:
+          "Failed to load general ledger data. Please check your connection.",
       });
+      setIsLoading(false); // Set loading to false even on error
     }
   };
 
@@ -133,7 +155,10 @@ const BodyContent = () => {
 
     setScopedData(filteredData);
 
-    const totalCost = filteredData.reduce((sum, item) => sum + (parseFloat(item.row[4]) || 0), 0);
+    const totalCost = filteredData.reduce(
+      (sum, item) => sum + (parseFloat(item.row[4]) || 0),
+      0
+    );
 
     const reportPayload = {
       report_id: `FR-${Date.now()}`,
@@ -145,7 +170,10 @@ const BodyContent = () => {
     };
 
     try {
-      const response = await axios.post(FINANCIAL_REPORTS_ENDPOINT, reportPayload);
+      const response = await axios.post(
+        FINANCIAL_REPORTS_ENDPOINT,
+        reportPayload
+      );
 
       if (response.status === 201) {
         setValidation({
@@ -164,12 +192,16 @@ const BodyContent = () => {
         });
       }
     } catch (error) {
-      console.error("Error submitting report:", error.response ? error.response.data : error);
+      console.error(
+        "Error submitting report:",
+        error.response ? error.response.data : error
+      );
       setValidation({
         isOpen: true,
         type: "error",
         title: "Check Connection!",
-        message: error.response?.data?.detail || "Failed to connect to the server.",
+        message:
+          error.response?.data?.detail || "Failed to connect to the server.",
       });
     }
   };
@@ -185,14 +217,19 @@ const BodyContent = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
-  
+
     return searchContent.includes(searching.toLowerCase());
   });
-  
 
   const dataToCalculate = scopedData || filteredData;
-  const totalDebit = dataToCalculate.reduce((sum, item) => sum + (parseFloat(item.row[4]) || 0), 0);
-  const totalCredit = dataToCalculate.reduce((sum, item) => sum + (parseFloat(item.row[5]) || 0), 0);
+  const totalDebit = dataToCalculate.reduce(
+    (sum, item) => sum + (parseFloat(item.row[4]) || 0),
+    0
+  );
+  const totalCredit = dataToCalculate.reduce(
+    (sum, item) => sum + (parseFloat(item.row[5]) || 0),
+    0
+  );
 
   const handleSort = () => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
@@ -213,9 +250,18 @@ const BodyContent = () => {
     setData(sortedData);
   };
 
-  const formatNumber = (num) => num.toLocaleString("en-US", { minimumFractionDigits: 2 });
+  const formatNumber = (num) =>
+    num.toLocaleString("en-US", { minimumFractionDigits: 2 });
   const formattedTotalDebit = formatNumber(totalDebit);
   const formattedTotalCredit = formatNumber(totalCredit);
+
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8 mt-30">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-gray-600">Loading accounts payable data...</p>
+    </div>
+  );
 
   return (
     <div className="generalLedger">
@@ -239,22 +285,35 @@ const BodyContent = () => {
             />
           </div>
           <div>
-            <Button name="Generate report" variant="standard2" onclick={openModal} />
+            <Button
+              name="Generate report"
+              variant="standard2"
+              onclick={openModal}
+            />
           </div>
         </div>
 
-        <Table data={filteredData.map((item) => item.row)} columns={columns} />
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <Table
+              data={filteredData.map((item) => item.row)}
+              columns={columns}
+            />
 
-        <div
-          className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 
+            <div
+              className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 
                  font-light max-sm:text-[10px] max-sm:font-light max-md:text-[10px] max-md:font-light 
                 max-lg:text-[10px] max-lg:font-light max-xl:text-[10px] max-xl:font-light 2xl:text-[10px] 2xl:font-light"
-        >
-          <div className="col-span-3"></div>
-          <div className="font-bold">Total</div>
-          <div>{formattedTotalDebit}</div>
-          <div>{formattedTotalCredit}</div>
-        </div>
+            >
+              <div className="col-span-3"></div>
+              <div className="font-bold">Total</div>
+              <div>{formattedTotalDebit}</div>
+              <div>{formattedTotalCredit}</div>
+            </div>
+          </>
+        )}
       </div>
 
       <ReportModalInput

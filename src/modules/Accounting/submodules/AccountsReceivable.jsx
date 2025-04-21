@@ -9,6 +9,7 @@ const AccountsReceivable = () => {
   // Use states
   const [data, setData] = useState([]);
   const [searching, setSearching] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
@@ -27,11 +28,13 @@ const AccountsReceivable = () => {
 
   // API endpoint
   const API_URL =
-    import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+    import.meta.env.VITE_API_URL ||
+    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const GENERAL_LEDGER_ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
 
   // Fetch data
   const fetchData = async () => {
+    setIsLoading(true); // Set loading to true when fetching starts
     try {
       const response = await axios.get(GENERAL_LEDGER_ENDPOINT);
       console.log("API Response:", response.data);
@@ -63,14 +66,20 @@ const AccountsReceivable = () => {
 
       console.log("Combined Data:", combinedData);
       setData(combinedData);
+      setIsLoading(false); // Set loading to false when fetching is done
     } catch (error) {
-      console.error("Error fetching data:", error.response ? error.response.data : error);
+      console.error(
+        "Error fetching data:",
+        error.response ? error.response.data : error
+      );
       setValidation({
         isOpen: true,
         type: "error",
         title: "Fetch Error",
-        message: "Failed to load accounts receivable data. Please check your connection.",
+        message:
+          "Failed to load accounts receivable data. Please check your connection.",
       });
+      setIsLoading(false); // Set loading to false even if there's an error
     }
   };
 
@@ -79,8 +88,14 @@ const AccountsReceivable = () => {
   }, []);
 
   // Calculates the total debit and credit
-  const totalDebit = data.reduce((sum, row) => sum + parseFloat(row[4] || 0), 0);
-  const totalCredit = data.reduce((sum, row) => sum + parseFloat(row[5] || 0), 0);
+  const totalDebit = data.reduce(
+    (sum, row) => sum + parseFloat(row[4] || 0),
+    0
+  );
+  const totalCredit = data.reduce(
+    (sum, row) => sum + parseFloat(row[5] || 0),
+    0
+  );
 
   // Search Filter based on columns
   const filteredData = data.filter((row) =>
@@ -102,6 +117,14 @@ const AccountsReceivable = () => {
     console.log("Total Debit:", totalDebit, "Total Credit:", totalCredit);
   }, [totalDebit, totalCredit]);
 
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8 mt-30">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-gray-600">Loading accounts payable data...</p>
+    </div>
+  );
+
   return (
     <div className="accountsReceivable">
       <div className="body-content-container">
@@ -116,14 +139,26 @@ const AccountsReceivable = () => {
             onChange={(e) => setSearching(e.target.value)}
           />
         </div>
-        <Table data={filteredData} columns={columns} enableCheckbox={false} />
-        <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 font-light max-sm:text-[10px] max-sm:font-light max-md:text-[10px] max-md:font-light max-lg:text-[10px] max-lg:font-light max-xl:text-[10px] max-xl:font-light 2xl:text-[10px] 2xl:font-light">
-          <div className="col-span-3"></div>
-          <div className="font-bold">Total</div>
-          <div>{formattedTotalDebit}</div>
-          <div>{formattedTotalCredit}</div>
-          <div></div>
-        </div>
+
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <Table
+              data={filteredData}
+              columns={columns}
+              enableCheckbox={false}
+            />
+            <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 font-light max-sm:text-[10px] max-sm:font-light max-md:text-[10px] max-md:font-light max-lg:text-[10px] max-lg:font-light max-xl:text-[10px] max-xl:font-light 2xl:text-[10px] 2xl:font-light">
+              <div className="col-span-3"></div>
+              <div className="font-bold">Total</div>
+              <div>{formattedTotalDebit}</div>
+              <div>{formattedTotalCredit}</div>
+              <div></div>
+            </div>
+          </>
+        )}
+
         {validation.isOpen && (
           <NotifModal
             isOpen={validation.isOpen}

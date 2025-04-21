@@ -13,6 +13,7 @@ const BodyContent = () => {
   const [selectedAccountType, setSelectedAccountType] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [accountTypes, setAccountTypes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searching, setSearching] = useState("");
   const [data, setData] = useState([]);
   const [newAccount, setNewAccount] = useState({
@@ -30,6 +31,7 @@ const BodyContent = () => {
   const closeModal = () => setIsModalOpen(false);
 
   useEffect(() => {
+    setIsLoading(true);
     axios
       .get(CHART_OF_ACCOUNTS_ENDPOINT)
       .then((response) => {
@@ -41,6 +43,7 @@ const BodyContent = () => {
         setData(rawData);
         const uniqueTypes = [...new Set(response.data.map((acc) => acc.account_type))];
         setAccountTypes(uniqueTypes);
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching data:", error.response ? error.response.data : error);
@@ -50,6 +53,7 @@ const BodyContent = () => {
           title: "Fetch Error",
           message: "Failed to load accounts. Please check your connection.",
         });
+        setIsLoading(false);
       });
   }, []);
 
@@ -133,6 +137,14 @@ const BodyContent = () => {
     return matchesSearch && matchesType;
   });
 
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8 mt-30">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-gray-600">Loading accounts payable data...</p>
+    </div>
+  );
+
   return (
     <div className="chartAccounts">
       <div className="body-content-container">
@@ -162,7 +174,14 @@ const BodyContent = () => {
             />
           </div>
         </div>
-        <Table data={filteredData} columns={columns} enableCheckbox={false} />
+
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <Table data={filteredData} columns={columns} enableCheckbox={false} />
+        )}
+        {/* Table component */}
+        
       </div>
       <CoaModalInput
         isModalOpen={isModalOpen}

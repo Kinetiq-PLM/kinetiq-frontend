@@ -26,6 +26,7 @@ const OfficialReceipts = () => {
   ];
   const [data, setData] = useState([]);
   const [searching, setSearching] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [validation, setValidation] = useState({
     isOpen: false,
@@ -97,6 +98,7 @@ const OfficialReceipts = () => {
   };
 
   const fetchData = async () => {
+    setIsLoading(true); // Set loading to true when fetching starts
     try {
       const response = await axios.get(OFFICIAL_RECEIPTS_ENDPOINT);
       console.log("API Response (fetchData):", response.data);
@@ -113,6 +115,7 @@ const OfficialReceipts = () => {
           entry.created_by || "-",
         ])
       );
+      setIsLoading(false); // Set loading to false when fetching is done
     } catch (error) {
       console.error("Error fetching data:", error.response ? error.response.data : error);
       setValidation({
@@ -121,6 +124,7 @@ const OfficialReceipts = () => {
         title: "Fetch Error",
         message: "Failed to load official receipts. Please check your connection.",
       });
+      setIsLoading(false); // Set loading to false even if there's an error
     }
   };
 
@@ -334,6 +338,14 @@ const OfficialReceipts = () => {
       .includes(searching.toLowerCase())
   );
 
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8 mt-30">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-gray-600">Loading accounts payable data...</p>
+    </div>
+  );
+
   return (
     <div className="officialReceipts">
       <div className="body-content-container">
@@ -355,7 +367,13 @@ const OfficialReceipts = () => {
             />
           </div>
         </div>
-        <Table data={filteredData} columns={columns} enableCheckbox={false} />
+
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <Table data={filteredData} columns={columns} enableCheckbox={false} />
+        )}
+        
       </div>
       {modalOpen && (
         <CreateReceiptModal
