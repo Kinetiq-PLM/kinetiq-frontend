@@ -72,7 +72,7 @@ const CarrierManagementModal = ({ onClose, carriers, employees, refreshCarriers 
     try {
       if (selectedCarrier) {
         // Update existing carrier
-        const response = await fetch(`http://127.0.0.1:8000/api/carriers/${selectedCarrier.carrier_id}/`, {
+        const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/carriers/${selectedCarrier.carrier_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ const CarrierManagementModal = ({ onClose, carriers, employees, refreshCarriers 
         toast.success(`Carrier ${getEmployeeFullName(formData.carrier_name)} updated successfully!`);
       } else {
         // Create new carrier
-        const response = await fetch('http://127.0.0.1:8000/api/carriers/', {
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/carriers/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
