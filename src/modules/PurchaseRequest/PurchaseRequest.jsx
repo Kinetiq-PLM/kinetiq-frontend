@@ -1,93 +1,127 @@
-import React, { useState, useEffect } from "react"
-import "./styles/PurchaseRequest.css"
+import React, { useState, useEffect } from "react";
+import "./styles/PurchaseRequest.css";
 import { format } from "date-fns";
-import { TestTube } from "lucide-react";
-
-const currentDate = new Date();
-const formattedDate = format(currentDate, "yyyy-MM-dd HH:mm:ss");
-console.log(formattedDate); // Outputs the correct time in the local time zone
 
 const BodyContent = ({ onClose }) => {
-  const [showPurchasePopup, setShowPurchasePopup] = useState(false)
-  const [isPurchasePopupOpen, setIsPurchasePopupOpen] = useState(false)
+  const [showPurchasePopup, setShowPurchasePopup] = useState(false);
+  const [isPurchasePopupOpen, setIsPurchasePopupOpen] = useState(false);
   const [purchaseForm, setPurchaseForm] = useState({
     documentNumber: "",
     deliveryDate: "",
     popupStatus: "Pending", // or default status
-  })
+  });
 
   const [formData, setFormData] = useState({
     name: "",
     department: "",
     email: "",
     requestType: "Material", // Default to Material
-    dateRequested: format(new Date(), "yyyy-MM-dd"), // Include time
+    dateRequested: format(new Date(), "yyyy-MM-dd"),
     dateValid: "",
-    documentDate: format(new Date(), "yyyy-MM-dd HH:mm:ss"), // Include time
+    documentDate: format(new Date(), "yyyy-MM-dd"),
     employeeId: "",
     items: [],
-  })
+  });
 
-  const [employees, setEmployees] = useState([])
-  const [materials, setMaterials] = useState([])
-  const [assets, setAssets] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [latestRequestId, setLatestRequestId] = useState(null)
-  const [successMessage, setSuccessMessage] = useState("") // Success message state
-  const [isSaveClicked, setIsSaveClicked] = useState(false) // Track if Save button is clicked
+  const [employees, setEmployees] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [assets, setAssets] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [latestRequestId, setLatestRequestId] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(""); // Success message state
+  const [isSaveClicked, setIsSaveClicked] = useState(false); // Track if Save button is clicked
 
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/")
-        const data = await response.json()
-        setEmployees(data)
+        const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
+        const data = await response.json();
+        setEmployees(data);
       } catch {
-        setError("Failed to fetch employees")
+        setError("Failed to fetch employees");
       }
-    }
-    fetchEmployees()
-  }, [])
+    };
+    fetchEmployees();
+  }, []);
 
   useEffect(() => {
     const fetchItems = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         const url =
           formData.requestType === "Material"
             ? "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/materials/list/"
-            : "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/"
-        const response = await fetch(url)
-        const data = await response.json()
-        formData.requestType === "Material" ? setMaterials(data) : setAssets(data)
+            : "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/";
+        const response = await fetch(url);
+        const data = await response.json();
+        formData.requestType === "Material" ? setMaterials(data) : setAssets(data);
       } catch {
-        setError("Failed to fetch items")
+        setError("Failed to fetch items");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-    fetchItems()
-  }, [formData.requestType])
+    };
+    fetchItems();
+  }, [formData.requestType]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e, index = null) => {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "documentDate" ? value.replace("T", " ") : value, // Convert back to "YYYY-MM-DD HH:mm:ss"
-    }));
+    if (index !== null) {
+      const updatedItems = [...formData.items];
+      updatedItems[index] = { ...updatedItems[index], [name]: value };
+      setFormData((prev) => ({ ...prev, items: updatedItems }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleEmployeeChange = (e) => {
-    const selected = employees.find((emp) => emp.employee_id === e.target.value)
+    const selected = employees.find((emp) => emp.employee_id === e.target.value);
     setFormData((prev) => ({
       ...prev,
       employeeId: e.target.value,
       email: selected?.email || "",
       department: selected?.department || "",
-    }))
-  }
+    }));
+  };
+
+  const handleAddRow = async () => {
+    if (!isFormValid()) {
+      setError("Please fill all required fields before adding items.");
+      return;
+    }
+
+    try {
+      const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/null/");
+      const data = await res.json();
+      const latest = data[data.length - 1]?.request_id;
+      setLatestRequestId(latest);
+
+      const newItem = {
+        material_id: formData.requestType === "Material" ? "" : null,
+        asset_id: formData.requestType === "Assets" ? "" : null,
+        purchase_quantity: 1,
+        request_id: latest,
+      };
+
+      setFormData((prev) => ({
+        ...prev,
+        items: [...prev.items, newItem],
+      }));
+    } catch {
+      setError("Failed to fetch latest request_id");
+    }
+  };
+
+  const isFormValid = () => {
+    return formData.employeeId && formData.dateRequested && formData.dateValid && formData.documentDate;
+  };
+
+  const handleRemoveRow = (index) => {
+    const items = formData.items.filter((_, i) => i !== index);
+    setFormData((prev) => ({ ...prev, items }));
+  };
 
   const createQuotationContent = async (item) => {
     try {
@@ -100,62 +134,27 @@ const BodyContent = ({ onClose }) => {
         asset_id: item.asset_id || null,
         request_id: item.request_id,
         purchase_quantity: item.purchase_quantity,
-      }
+      };
 
       const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/create/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      })
+      });
 
-      const result = await response.json()
-      console.log("Quotation created:", result)
-    } catch {
-      setError("Failed to create quotation content")
-    }
-  }
-
-  const handleAddRow = async () => {
-    // Check if the form is completely filled
-    if (!isFormValid()) {
-      setError("Please fill all required fields before adding items.")
-      return
-    }
-
-    try {
-      const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/null/")
-      const data = await res.json()
-      const latest = data[data.length - 1]?.request_id
-      setLatestRequestId(latest)
-
-      // Now, create the new item after fetching the request_id
-      const newItem = {
-        material_id: formData.requestType === "Material" ? "" : null,
-        asset_id: formData.requestType === "Assets" ? "" : null,
-        purchase_quantity: 1,
-        request_id: latest, // Using the fetched request_id
+      if (!response.ok) {
+        throw new Error("Failed to create quotation content");
       }
 
-      setFormData((prev) => ({
-        ...prev,
-        items: [...prev.items, newItem],
-      }))
-    } catch {
-      setError("Failed to fetch latest request_id")
+      const result = await response.json();
+      console.log("Quotation created:", result);
+    } catch (error) {
+      setError(error.message || "Failed to create quotation content");
     }
-  }
-
-  const isFormValid = () => {
-    return formData.employeeId && formData.dateRequested && formData.dateValid && formData.documentDate
-  }
-
-  const handleRemoveRow = (index) => {
-    const items = formData.items.filter((_, i) => i !== index)
-    setFormData((prev) => ({ ...prev, items }))
-  }
+  };
 
   const handleSave = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const body = {
         request_id: "",
@@ -166,56 +165,56 @@ const BodyContent = ({ onClose }) => {
         required_date: formData.dateRequested,
         quotation_content_id: null,
         items: formData.items,
-      }
+      };
 
       const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/submit/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-      })
+      });
 
-      if (!res.ok) throw new Error("Fill up the form first")
+      if (!res.ok) throw new Error("Fill up the form first");
 
-      const saved = await res.json()
-      console.log(" ", saved)
+      const saved = await res.json();
+      console.log(" ", saved);
 
-      setSuccessMessage("Purchase request saved successfully!") // Set success message
-      setIsSaveClicked(true) // Set Save clicked to true
+      setSuccessMessage("Purchase request saved successfully!");
+      setIsSaveClicked(true);
       setTimeout(() => {
-        setSuccessMessage("") // Reset after 3 seconds
-      }, 3000)
+        setSuccessMessage("");
+      }, 3000);
     } catch (error) {
-      setError(error.message)
+      setError(error.message);
       setTimeout(() => {
-        setError("")
-      }, 2000)
+        setError("");
+      }, 2000);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSubmit = async () => {
     if (!latestRequestId) {
-      setError("Cannot submit an empty form")
+      setError("Cannot submit an empty form. Please add at least one item.");
       setTimeout(() => {
-        setError("")
-      }, 2000)
-      return
+        setError("");
+      }, 2000);
+      return;
     }
 
     try {
       for (const item of formData.items) {
-        await createQuotationContent(item)
+        await createQuotationContent(item);
       }
-      setSuccessMessage("Submitted successfully!") // Success message after submission
+      setSuccessMessage("Submitted successfully!");
       setTimeout(() => {
-        setSuccessMessage("") // Reset success message
-        onClose() // Close the form after submission
-      }, 3000)
-    } catch {
-      setError("Error submitting quotation content")
+        setSuccessMessage("");
+        onClose(); // Close the form after submission
+      }, 3000);
+    } catch (error) {
+      setError(error.message || "Error submitting quotation content");
     }
-  }
+  };
 
   const handleCancel = () => {
     setFormData({
@@ -228,17 +227,9 @@ const BodyContent = ({ onClose }) => {
       documentDate: "",
       employeeId: "",
       items: [],
-    })
-  }
-
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-    return () => {
-      setIsMounted(false)
-    }
-  }, [])
+    });
+  };
+  
 
   return (
     <div className="purch-req">
@@ -301,9 +292,9 @@ const BodyContent = ({ onClose }) => {
             <div className="form-group">
                 <label>Document Date</label>
                 <input
-                  type="datetime-local"
+                  type="date"
                   name="documentDate"
-                  value={formData.documentDate.replace(" ", "T")} // Convert to `datetime-local` format
+                  value={formData.documentDate} // Convert to `datetime-local` format
                   onChange={handleInputChange}
                   disabled={true}
                 />
@@ -331,7 +322,7 @@ const BodyContent = ({ onClose }) => {
             <div className="centered-error-message">{error === "Fill up the form first" && error}</div>
           </div>
 
-          <div className="table-container">
+           <div className="table-container">
             <table>
               <thead>
                 <tr>
@@ -396,7 +387,7 @@ const BodyContent = ({ onClose }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default BodyContent;
