@@ -83,7 +83,7 @@ const ServiceAnalysis = ({employee_id}) => {
   const fetchAnalyses = async () => {
     try {
       // this filters out analyses so that only the service analyses assigned to the one currently logged in will show:
-      // const data = await GET(`analysis/analyses/technician/HR-EMP-2025-8d9f9b/`);
+      //const data = await GET(`analysis/analyses/technician/HR-EMP-2025-8d9f9b/`);
       const data = await GET(`analysis/analyses/technician/${employee_id}/`);
 
       // all analyses version:
