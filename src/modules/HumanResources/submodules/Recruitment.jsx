@@ -3,7 +3,6 @@ import axios from "axios";
 import { FiSearch, FiUpload, FiPlus } from "react-icons/fi";
 import "../styles/Recruitment.css";
 
-// Add this constant at the top of your component (outside the function)
 const S3_BASE_DIRECTORY = "Human_Resource_Management/Candidates/";
 
 const Recruitment = () => {
@@ -1277,6 +1276,9 @@ const handleEditJobPostingSubmit = async (e) => {
   
   // Create a copy of the data to send to the API
   const jobPostingData = { ...editingJobPosting };
+  
+  // Add this console log to see what's being sent
+  console.log("Submitting job posting update with data:", jobPostingData);
   
   try {
     // Validate required fields
