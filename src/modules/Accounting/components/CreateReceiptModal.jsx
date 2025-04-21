@@ -171,8 +171,8 @@ const CreateReceiptModal = ({
               onChange={(e) => handleInputChange("amountPaid", e.target.value)}
             />
 
-            <div className="flex gap-x-4">
-              <div className="flex flex-col gap-y-2">
+            <div className="flex flex-col md:flex-row md:space-x-5 space-y-5 md:space-y-0">
+              <div className="space-y-2">
                 <label className="block text-sm font-medium">
                   Select Payment Method*
                 </label>
