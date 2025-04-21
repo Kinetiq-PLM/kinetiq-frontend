@@ -1,0 +1,307 @@
+.InternalTransfer {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 140px);
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.InternalTransfer .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 0%;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 400px;
+    min-height: unset;
+    overflow: hidden;
+}
+
+.InternalTransfer .table-container,
+.InternalTransfer.rework .table-container {
+    width: 100%;
+    height: 492px;
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    padding: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.InternalTransfer .table-container table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+}
+
+.InternalTransfer .table-container thead {
+    position: sticky;
+    top: 0;
+    background: #f8f9fa;
+    z-index: 2;
+}
+
+.InternalTransfer .table-container tbody {
+    display: block;
+    overflow-y: auto;
+    height: calc(100% - 40px);
+    width: 100%;
+}
+
+.InternalTransfer .table-container thead tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.InternalTransfer .table-container tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.InternalTransfer table th {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    color: #495057;
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.InternalTransfer table td {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    color: #212529;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.InternalTransfer .input-container {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.InternalTransfer input[type="checkbox"] {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #008080;
+    background-color: white;
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+}
+
+.InternalTransfer input[type="checkbox"]:checked {
+    background-color: #008080;
+    border-color: #006666;
+    position: relative;
+}
+
+.InternalTransfer input[type="checkbox"]:checked::after {
+    content: "✔";
+    font-size: 12px;
+    color: white;
+    font-weight: bold;
+    position: absolute;
+    left: 3px;
+    top: 0px;
+}
+
+.InternalTransfer .input-group {
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+}
+
+.InternalTransfer .input-group label {
+    font-size: 0.875rem;
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+.InternalTransfer .input-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    align-items: center;
+    gap: 3.9rem;
+}
+
+.InternalTransfer .input-container-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+    .InternalTransfer .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .InternalTransfer .send-to-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    .InternalTransfer .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media only screen and (min-width: 768px) {
+    .InternalTransfer .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+.InternalTransfer .first-row {
+    justify-content: flex-start;
+}
+
+.InternalTransfer .short-input {
+    width: 14rem !important;
+}
+
+.InternalTransfer .input-group input {
+    padding: 0.2rem 0.5rem;
+    border: 0.0625rem solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    width: 100%;
+}
+
+.InternalTransfer .input-group input[type="date"] {
+    position: relative;
+    background: white url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABeoAAADyCAYAAAAyRvX6AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjw') no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 16px;
+    cursor: pointer;
+    padding-right: 1.875rem;
+}
+
+.InternalTransfer .button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.InternalTransfer .button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.InternalTransfer .send-to-button {
+    padding: 0.5rem 1rem;
+    background: #0d9488;
+    border: none;
+    border-radius: 0.375rem;
+    color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.InternalTransfer .send-to-button:hover {
+    background: #0f766e;
+}
+
+.InternalTransfer .module-dropdown {
+    width: 250px;
+    height: 30px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    appearance: auto;
+    font-size: 14px;
+}
+
+.InternalTransfer .module-dropdown::after {
+    content: "▼";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: down;
+}
+
+.InternalTransfer .module-dropdown:hover {
+    border-color: #000000;
+}
+
+.InternalTransfer .tabs {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.InternalTransfer .tab {
+    font-size: 0.875rem;
+    font-weight: normal;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    color: #666;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.InternalTransfer .tab.active {
+    color: #00A8A8;
+    font-weight: 500;
+}
+
+.InternalTransfer .tab.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 1px;
+    background-color: #00A8A8;
+}
+
+.InternalTransfer .table-container tbody::-webkit-scrollbar {
+    width: 6px;
+}
+
+.InternalTransfer .table-container tbody::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.InternalTransfer .table-container tbody::-webkit-scrollbar-thumb {
+    background: #00A8A8;
+    border-radius: 3px;
+}
+
+.InternalTransfer .table-container tbody::-webkit-scrollbar-thumb:hover {
+    background: #008080;
+}
+
+.InternalTransfer table td:first-child,
+.InternalTransfer table th:first-child {
+    width: 50px;
+    padding: 0.5rem;
+    text-align: center;
+}

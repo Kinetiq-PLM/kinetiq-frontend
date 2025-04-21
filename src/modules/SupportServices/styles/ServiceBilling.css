@@ -1,0 +1,311 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.billing .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+/* Hide scrollbar arrows unless hovered */
+.billing .content-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-right: -0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  border-radius: 8px;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  max-height: calc(100% - 7rem);
+  margin-top: 2rem;
+}
+
+.billing .filter-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 150px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 4;
+  margin-top: 0.25rem;
+}
+
+.billing .billings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inter", sans-serif;
+}
+
+.billing .billings-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 3;
+}
+
+.billing thead {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.billing th {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.billing td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+}
+
+.billing tbody tr {
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+.billing tbody tr:hover {
+  background-color: #d6f5f5;
+}
+
+.billing .billings-table .selected-row {
+  background-color: #d6f5f5;
+}
+
+.billing tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.billing .empty-row td {
+  height: 2.5rem;
+}
+
+/* Buttons container */
+.billing .buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.billing .update-button,
+.billing .add-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  min-width: 7rem;
+}
+
+.billing .update-button:hover,
+.billing .add-button:hover {
+  background-color: #098f8f;
+}
+
+.billing .update-button:active,
+.billing .add-button:active {
+  background-color: #087d7d;
+}
+
+.billing .modal-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 850px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.billing .modal-content {
+  padding: 1.8rem;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.billing .modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.billing .form-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.billing .form-row .form-group {
+  flex: 1;
+}
+
+.billing .form-group input:focus,
+.billing .form-group textarea:focus,
+.billing .form-group select:focus {
+  outline: none;
+  border: 2px solid #00a8a8; /* Thicker border when focused */
+}
+
+.billing .form-group textarea {
+  height: 10rem;
+  resize: none;
+}
+
+.billing .form-divider {
+  height: 2px;
+  background-color: #00a8a8;
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+/* not renewal styling */
+.billing  input:disabled {
+  background-color: #f0f0f0; 
+  cursor: not-allowed; 
+  opacity: 0.6; 
+}
+
+.billing  .select-wrapper input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.billing .select-arrow input:disabled  {
+  color: #ccc; 
+  cursor: not-allowed;
+}
+
+.billing .select-wrapper input:disabled + .select-arrow {
+  pointer-events: none;
+}
+
+.billing .date-input-wrapper input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.billing .billing-status-dropdown-list {
+  top: auto !important;
+  bottom: 100% !important;
+}
+
+.billing .disabled-input {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+  }
+  
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .billing .body-content-container {
+    min-width: auto;
+    max-height: none;
+    padding: 1.25rem;
+  }
+
+  .billing .modal-container {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .billing .search-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .billing .search-input-wrapper {
+    margin-right: 0;
+  }
+
+  .billing .filter-dropdown {
+    width: 100%;
+  }
+
+  .billing .filter-button {
+    width: 100%;
+  }
+
+  .billing .table-container {
+    overflow-x: auto;
+  }
+
+  .billing .billings-table {
+    min-width: 600px;
+  }
+
+  .billing .form-row {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .billing .body-content-container {
+    padding: 1rem;
+  }
+
+  .billing .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .billing .title-container {
+    width: 100%;
+  }
+
+  .billing .modal-header,
+  .billing .modal-content,
+  .billing .modal-footer {
+    padding: 1rem;
+  }
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.billing .add-cancel-button,
+.billing .edit-cancel-button {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-left: 8.75rem;
+  margin-top: 1.5rem;
+}

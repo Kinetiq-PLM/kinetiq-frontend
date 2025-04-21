@@ -1,0 +1,1702 @@
+/* REMINDER! All of your elements must use your unique namespace '.picking' at the start to avoid leaking */
+
+.picking {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.picking .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+  overflow: auto;
+}
+
+/* Page title styling */
+.picking .page-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+/* Filters section */
+.picking .filters-row {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.picking .search-container {
+  position: relative;
+  width: 300px;
+}
+
+.picking .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 14px;
+}
+
+.picking .search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.picking .search-input:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.picking .filter-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.picking .filter-label {
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.picking .status-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.picking .status-button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.picking .status-button:hover {
+  background-color: #f8f9fa;
+  border-color: #c8cfd6;
+}
+
+.picking .status-button.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+.picking .status-button.not-started.active {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.picking .status-button.in-progress.active {
+  background-color: #00a8a8;
+  border-color: #00a8a8;
+}
+
+.picking .status-button.completed.active {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.picking .warehouse-filter {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.picking .warehouse-filter:focus {
+  outline: none;
+  border-color: #00a8a8;
+}
+
+/* Stats Row */
+.picking .stats-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.picking .stat-box {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+}
+
+.picking .stat-label {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 0.25rem;
+}
+
+.picking .stat-value {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Picking Content (Table and Actions) */
+.picking .picking-content {
+  display: flex;
+  gap: 1.5rem;
+  height: 100%;
+  flex: 1;
+}
+
+/* Table styling */
+.picking .picking-table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+  min-width: 0; /* Ensure table can shrink if needed */
+}
+
+.picking .table-metadata {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.picking .table-wrapper {
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  flex: 1;
+}
+
+.picking .picking-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: center;
+}
+
+.picking .picking-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 500;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  color: #495057;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.picking .picking-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.picking .picking-table th.sortable:hover {
+  background-color: #e9ecef;
+}
+
+.picking .sort-icon {
+  margin-left: 0.25rem;
+  color: #00a8a8;
+}
+
+.picking .picking-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.875rem;
+}
+
+.picking .picking-table tr:last-child td {
+  border-bottom: none;
+}
+
+.picking .centered-cell {
+  text-align: center;
+}
+
+.picking .even-row {
+  background-color: #fff;
+}
+
+.picking .odd-row {
+  background-color: #f8f9fa;
+}
+
+.picking .selected-row {
+  background-color: rgba(0, 168, 168, 0.1) !important;
+}
+
+.picking .picking-table tbody tr:hover {
+  background-color: rgba(0, 168, 168, 0.05);
+  cursor: pointer;
+}
+
+/* Status cell styling */
+.picking .status-cell {
+  position: relative;
+  padding-left: 1.75rem;
+}
+
+.picking .status-cell::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.picking .status-not-started::before {
+  background-color: #6c757d;
+}
+
+.picking .status-in-progress::before {
+  background-color: #00a8a8;
+}
+
+.picking .status-completed::before {
+  background-color: #28a745;
+}
+
+.picking .no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Picking Actions */
+.picking .picking-actions {
+  width: 300px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.picking .actions-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.picking .picking-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.picking .detail-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.picking .detail-label {
+  color: #555;
+  font-weight: 500;
+}
+
+.picking .detail-value {
+  color: #333;
+}
+
+.picking .detail-value.status-not-started {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.picking .detail-value.status-in-progress {
+  color: #00a8a8;
+  font-weight: 500;
+}
+
+.picking .detail-value.status-completed {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.picking .action-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.picking .action-section h4 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.picking .employee-selection {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.picking .employee-dropdown {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+}
+
+.picking .assign-button {
+  padding: 0.5rem 0.75rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .assign-button:hover:not(:disabled) {
+  background-color: #009191;
+}
+
+.picking .assign-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Warehouse Selection */
+.picking .warehouse-selection {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.picking .warehouse-dropdown {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+}
+
+.picking .update-button {
+  padding: 0.5rem 0.75rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .update-button:hover:not(:disabled) {
+  background-color: #009191;
+}
+
+.picking .update-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Warehouse Display (for internal orders) */
+.picking .warehouse-display {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.75rem;
+}
+
+.picking .warehouse-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.picking .warehouse-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.picking .warehouse-value {
+  font-size: 0.875rem;
+  color: #333;
+}
+
+.picking .warehouse-note {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+}
+
+.picking .status-update-button {
+  width: 100%;
+  padding: 0.5rem;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background-color: #00a8a8;
+}
+
+.picking .status-update-button {
+  width: 100%;
+  padding: 0.5rem;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .status-update-button.status-in-progress {
+  background-color: #00a8a8;
+}
+
+/* .picking .status-update-button.status-in-progress:hover {
+  background-color: #0069d9;
+} */
+
+.picking .status-update-button.status-completed {
+  background-color: #28a745;
+}
+
+.picking .status-update-button.status-completed:hover {
+  background-color: #218838;
+}
+
+.picking .completed-message {
+  text-align: center;
+  color: #28a745;
+  font-weight: 500;
+  padding: 0.5rem;
+  background-color: rgba(40, 167, 69, 0.1);
+  border-radius: 4px;
+}
+
+/* Loading and error states */
+.picking .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #666;
+}
+
+.picking .spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #00a8a8;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.picking .error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+}
+
+.picking .error-message {
+  color: #dc3545;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: #f8d7da;
+}
+
+/* Completion Modal */
+.picking .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.picking .completion-modal {
+  background-color: white;
+  border-radius: 6px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.picking .modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.picking .modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.picking .modal-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.picking .modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.picking .cancel-button {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .cancel-button:hover {
+  background-color: #f8f9fa;
+}
+
+.picking .confirm-button {
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .confirm-button:hover {
+  background-color: #218838;
+}
+
+.picking .edit-picking-modal {
+  background-color: white;
+  border-radius: 6px;
+  width: 500px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.picking .modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picking .close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.picking .close-button:hover {
+  color: #333;
+}
+
+.picking .edit-section {
+  /* margin-top: 1.5rem;
+  padding-top: 1rem; */
+  border-top: 1px solid #eee;
+}
+
+.picking .edit-section h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.picking .employee-selection,
+.picking .warehouse-selection {
+  width: 100%;
+}
+
+.picking .employee-dropdown,
+.picking .warehouse-dropdown {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+}
+
+.picking .save-button {
+  padding: 0.5rem 1rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.picking .save-button:hover:not(:disabled) {
+  background-color: #009191;
+}
+
+.picking .save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.picking .status-update-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.picking .pagination-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  align-items: center;
+}
+
+.picking .pagination-button {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.picking .pagination-button:hover:not(:disabled) {
+  background-color: #e9ecef;
+  border-color: #c8cfd6;
+}
+
+.picking .pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.picking .page-numbers {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.picking .page-number {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.picking .page-number:hover:not(.active) {
+  background-color: #e9ecef;
+  border-color: #c8cfd6;
+}
+
+.picking .page-number.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+.picking .icon-spacing {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.picking .button-icon {
+  margin-right: 8px;
+}
+
+.picking .icon-message {
+  display: flex;
+  align-items: flex-start;
+}
+
+.picking .info-icon {
+  color: #00a8a8;
+  font-size: 20px;
+  margin-right: 10px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.picking .confirmation-message {
+  font-weight: 500;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.picking .info-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.picking .section-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.picking .section-header.status-completed {
+  color: #28a745;
+}
+
+.picking .next-steps-list {
+  margin: 8px 0 0;
+  padding-left: 25px;
+  font-size: .9rem;
+}
+
+.picking .next-steps-list li {
+  margin-bottom: 4px;
+}
+
+.picking .picking-details.enhanced {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.picking .picking-details.enhanced .detail-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.picking .picking-details.enhanced .detail-item:last-child {
+  border-bottom: none;
+}
+
+.picking .detail-value.highlight {
+  font-weight: 600;
+  color: #00a8a8;
+}
+
+.picking .confirm-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 150px;
+  justify-content: center;
+}
+
+/* Improved Modal Styles */
+.picking .edit-picking-modal.improved {
+  width: 600px;
+  max-width: 95%;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.picking .modal-title-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.picking .modal-subtitle {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: 0.2rem;
+}
+
+/* Status Indicator */
+.picking .status-indicator {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  background-color: #f8f9fa;
+  border-left: 4px solid #ddd;
+}
+
+.picking .status-indicator.status-not-started {
+  background-color: #f8f9fa;
+  border-left-color: #6c757d;
+}
+
+.picking .status-indicator.status-in-progress {
+  background-color: #e8f4ff;
+  border-left-color: #00a8a8;
+}
+
+.picking .status-indicator.status-completed {
+  background-color: #e8f8ee;
+  border-left-color: #28a745;
+}
+
+.picking .status-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.picking .status-text {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.picking .status-not-started .status-text {
+  color: #6c757d;
+}
+
+.picking .status-in-progress .status-text {
+  color: #00a8a8;
+}
+
+.picking .status-completed .status-text {
+  color: #28a745;
+}
+
+/* Info Panel */
+.picking .info-panel {
+  /* margin-bottom: 20px; */
+}
+
+.picking .section-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #495057;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+.picking .section-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.picking .required-indicator {
+  color: #dc3545;
+  margin-left: 4px;
+}
+
+.picking .picking-details.enhanced {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fcfcfc;
+  overflow: hidden;
+}
+
+.picking .detail-row {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.picking .detail-row:last-child {
+  border-bottom: none;
+}
+
+.picking .detail-item {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.picking .detail-item:not(:last-child) {
+  border-right: 1px solid #e9ecef;
+}
+
+.picking .detail-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.picking .detail-value {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+.picking .detail-value .icon {
+  margin-right: 6px;
+}
+
+.picking .detail-value.highlight {
+  color: #00a8a8;
+  font-weight: 500;
+}
+
+.picking .count-badge {
+  display: inline-block;
+  background-color: #e9ecef;
+  color: #495057;
+  border-radius: 16px;
+  padding: 2px 10px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* Assignment Sections */
+.picking .assignment-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* margin-bottom: 20px; */
+}
+
+.picking .edit-section {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.picking .employee-selection.improved,
+.picking .warehouse-selection.improved {
+  display: flex;
+  flex-direction: column;
+}
+
+.picking .employee-dropdown,
+.picking .warehouse-dropdown {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.picking .employee-dropdown:focus,
+.picking .warehouse-dropdown:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.picking .field-hint {
+  font-size: 0.75rem;
+  color: #dc3545;
+  margin-top: 4px;
+}
+
+.picking .employee-display,
+.picking .warehouse-display {
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.picking .employee-value,
+.picking .warehouse-value {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+/* Status Workflow Section */
+.picking .status-workflow-section {
+  /* margin-top: 20px; */
+}
+
+.picking .status-workflow {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.picking .workflow-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.picking .workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.picking .step-indicator {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #f8f9fa;
+  border: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+
+.picking .step-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.picking .workflow-step.current .step-indicator {
+  background-color: #00a8a8;
+  border-color: #00a8a8;
+  color: white;
+}
+
+.picking .workflow-step.current .step-label {
+  color: #00a8a8;
+  font-weight: 500;
+}
+
+.picking .workflow-step.complete .step-indicator {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+.picking .workflow-connector {
+  flex: 1;
+  height: 2px;
+  background-color: #e0e0e0;
+  margin: 0 8px;
+  position: relative;
+  top: -14px;
+}
+
+.picking .status-update-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.picking .button-icon {
+  margin-right: 8px;
+}
+
+.picking .validation-message {
+  margin-top: 8px;
+  color: #dc3545;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.picking .validation-message::before {
+  content: "⚠️";
+  margin-right: 6px;
+}
+
+/* Completed Section */
+.picking .completed-section {
+  margin-top: 20px;
+}
+
+.picking .completed-message {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: #e8f8ee;
+  border: 1px solid #d4edda;
+  border-radius: 6px;
+  color: #28a745;
+  font-weight: 500;
+}
+
+.picking .completed-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+/* Modal Footer */
+.picking .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.picking .cancel-button,
+.picking .save-button {
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.picking .cancel-button {
+  background-color: white;
+  border: 1px solid #ddd;
+  color: #495057;
+}
+
+.picking .cancel-button:hover {
+  background-color: #f8f9fa;
+  border-color: #c8cfd6;
+}
+
+.picking .save-button {
+  background-color: #00a8a8;
+  border: none;
+  color: white;
+}
+
+.picking .save-button:hover:not(:disabled) {
+  background-color: #008f8f;
+}
+
+.picking .save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .picking .edit-picking-modal.improved {
+    width: 95%;
+  }
+  
+  .picking .detail-row {
+    flex-direction: column;
+  }
+  
+  .picking .detail-item:not(:last-child) {
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .picking .workflow-steps {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .picking .workflow-step {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  
+  .picking .workflow-connector {
+    width: 2px;
+    height: 20px;
+    margin: 0 0 0 18px;
+    top: 0;
+  }
+  
+  .picking .step-indicator {
+    margin-bottom: 0;
+  }
+}
+
+/* Improved Completion Modal */
+.picking .completion-modal.improved {
+  width: 550px;
+  max-width: 95%;
+  max-height: 90vh;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Important for containing the scrollable area */
+}
+
+/* Modal Header */
+.picking .modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+}
+
+.picking .modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.picking .title-icon {
+  margin-right: 10px;
+  color: #00a8a8;
+  font-size: 18px;
+}
+
+/* Modal Body */
+.picking .modal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* min-height: 0;  */
+}
+
+/* Confirmation Banner */
+.picking .confirmation-banner {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 20px;
+  background-color: #e8f4ff;
+  border-bottom: 1px solid #d1e6ff;
+}
+
+.picking .confirmation-icon {
+  color: #0066cc;
+  font-size: 22px;
+  margin-right: 14px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.picking .confirmation-text {
+  flex: 1;
+}
+
+.picking .confirmation-message {
+  margin: 0 0 4px 0;
+  font-weight: 500;
+  color: #0066cc;
+  font-size: 1rem;
+}
+
+.picking .confirmation-submessage {
+  margin: 0;
+  color: #4d4d4d;
+  font-size: 0.9rem;
+}
+
+/* Scrollable Content Area */
+.picking .modal-content-scroll {
+  padding: 16px 20px;
+  overflow-y: auto;
+  max-height: 50vh; /* Limit the height to ensure the modal fits on screen */
+}
+
+/* Info Sections */
+.picking .info-section {
+  margin-bottom: 20px;
+}
+
+.picking .info-section:last-child {
+  margin-bottom: 0;
+}
+
+.picking .section-header {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.picking .section-header.status-completed {
+  color: #28a745;
+}
+
+.picking .icon-spacing {
+  margin-right: 8px;
+}
+
+/* Enhanced Picking Details */
+.picking .picking-details.enhanced {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fcfcfc;
+  overflow: hidden;
+}
+
+.picking .detail-row {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.picking .detail-row:last-child {
+  border-bottom: none;
+}
+
+.picking .detail-item {
+  flex: 1;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.picking .detail-item:first-child {
+  border-right: 1px solid #e9ecef;
+}
+
+.picking .detail-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.picking .detail-value {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+.picking .detail-value.highlight {
+  color: #00a8a8;
+  font-weight: 500;
+}
+
+.picking .detail-value-with-icon {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+.picking .detail-icon {
+  margin-right: 8px;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.picking .count-badge {
+  display: inline-block;
+  background-color: #e9ecef;
+  color: #495057;
+  border-radius: 16px;
+  padding: 2px 10px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* Next Steps Container */
+.picking .next-steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.picking .next-step-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 0;
+}
+
+.picking .step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #28a745;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.picking .step-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.picking .step-icon {
+  color: #28a745;
+  margin-right: 10px;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.picking .step-text {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.picking .step-connector {
+  width: 2px;
+  height: 16px;
+  background-color: #ddd;
+  margin-left: 11px; /* Center with the step number */
+}
+
+/* Modal Footer */
+.picking .modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: #f8f9fa;
+}
+
+.picking .cancel-button {
+  padding: 10px 16px;
+  background-color: white;
+  color: #495057;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.picking .cancel-button:hover {
+  background-color: #f1f3f5;
+  border-color: #c8cfd6;
+}
+
+.picking .confirm-button {
+  padding: 10px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.picking .confirm-button:hover {
+  background-color: #218838;
+}
+
+.picking .button-icon {
+  margin-right: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .picking .detail-row {
+    flex-direction: column;
+  }
+  
+  .picking .detail-item:first-child {
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .picking .modal-content-scroll {
+    max-height: 60vh;
+  }
+}
+
+/* Hover effects for interactive elements */
+.picking .close-button {
+  transition: color 0.2s ease;
+}
+
+.picking .close-button:hover {
+  color: #dc3545;
+}
+
+/* Focus states for accessibility */
+.picking .close-button:focus,
+.picking .cancel-button:focus,
+.picking .confirm-button:focus {
+  outline: 2px solid #80bdff;
+  outline-offset: 2px;
+}
+
+/* Add a subtle animation to the modal */
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.picking .completion-modal.improved {
+  animation: modalFadeIn 0.2s ease-out forwards;
+}
+
+@media (max-width: 1440px) {
+  /* Remove dots but keep color-coded statuses */
+  .picking .status-cell {
+    padding-left: 0.75rem; /* Reset the padding since we're removing the dot */
+  }
+
+  .picking .status-cell::before {
+    display: none; /* Hide the status dot */
+  }
+  
+  /* Add background color to status cells instead */
+  .picking .status-not-started {
+    background-color: rgba(108, 117, 125, 0.1);
+  }
+  
+  .picking .status-in-progress {
+    background-color: rgba(0, 168, 168, 0.1);
+  }
+  
+  .picking .status-completed {
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Make the table horizontally scrollable on small screens */
+  .picking .picking-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust row padding for better touch targets */
+  .picking .picking-table td,
+  .picking .picking-table th {
+    padding: 0.85rem 0.75rem;
+  }
+  
+  /* Handle pagination better on small screens */
+  .picking .page-numbers {
+    display: none; /* Hide page numbers, keep only prev/next */
+  }
+  
+  .picking .pagination-info {
+    display: inline-block;
+    margin: 0 0.5rem;
+  }
+  
+  .picking .pagination-button {
+    min-width: 80px; /* Make buttons bigger for touch */
+  }
+}
+
+@media (max-width: 576px) {
+  /* Hide less important columns on very small screens */
+  .picking .picking-table th:nth-child(3),
+  .picking .picking-table td:nth-child(3),
+  .picking .picking-table th:nth-child(4),
+  .picking .picking-table td:nth-child(4),
+  .picking .picking-table th:nth-child(9),
+  .picking .picking-table td:nth-child(9) {
+    display: none;
+  }
+  
+  /* Make sure no-data message spans fewer columns */
+  .picking .no-data {
+    font-size: 0.8rem;
+    padding: 1.5rem 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .picking .picking-table tbody tr {
+    cursor: pointer;
+  }
+
+  .picking .picking-table tbody tr:active {
+    background-color: rgba(0, 168, 168, 0.1);
+  }
+}
+
+@media (max-width: 576px) {
+  .picking .sort-icon {
+    display: block;
+    margin: 2px auto 0;
+  }
+}

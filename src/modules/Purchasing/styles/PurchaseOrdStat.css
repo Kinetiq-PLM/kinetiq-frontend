@@ -1,0 +1,322 @@
+.purchordstat {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.purchordstat .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 40rem;
+  min-height: 30rem;
+}
+
+.purchordstat-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+    gap: 2rem;
+    width: 100%;
+}
+
+.purchordstat-back {
+    border: none;
+    background: none;
+    color: #666;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease;
+    margin-right: 1.5rem;
+}
+
+.purchordstat-back:hover {
+    color: #00A8A8;
+}
+
+.purchordstat-filters {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.purchordstat-date-filter{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  color: black;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  min-width: 210px;
+}
+.purchordstat-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    position: relative;
+    background: white;
+    min-width: 210px;
+    box-sizing: border-box;
+    justify-content: center;
+}
+
+.purchordstat-filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    color: black;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.purchordstat-filter-btn:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+}
+
+.purchordstat-search input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #D2D2D2;
+    border-radius: 0.25rem;
+    min-width: 200px;
+    width: 300px;
+    max-width: 100%;
+}
+
+.purchordstat-content {
+  flex: 1;
+  background: white;
+  border: 1px solid #D2D2D2;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.purchordstat-table-scrollable {
+  width: 100%;
+  max-height: 50vh;
+  overflow-x: auto;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd #f5f5f5;
+}
+
+.purchordstat-table-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  font-weight: 500;
+  color: #666;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-align: center;
+  vertical-align: middle;
+  align-items: center;
+  justify-content: center;
+}
+
+.purchordstat-table-header > div, .purchordstat-row > div {
+  text-align: center;
+  vertical-align: middle;
+  align-items: center;
+  justify-content: center;
+}
+
+.purchordstat-table-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.purchordstat-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+  transition: background 0.1s;
+  text-align: center;
+  vertical-align: middle;
+  align-items: center;
+  justify-content: center;
+}
+
+.purchordstat-row:hover {
+  background: #f5f7fa;
+}
+
+.purchordstat-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.purchordstat-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.purchordstat-edit-button {
+  padding: 0.3rem 0.8rem;
+  border: none;
+  border-radius: 0.25rem;
+  background-color: #00bcd4;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.purchordstat-edit-button:hover {
+  background-color: #00A8A8;
+}
+
+.status-closed,
+.status-open,
+.status-cancelled,
+.status-draft {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.status-closed {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-open {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-cancelled {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.status-draft {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+/* Status color badges */
+.status-approved,
+.status-pending,
+.status-rejected,
+.status-completed {
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 0.85em;
+  font-weight: normal;
+  display: inline-block;
+}
+
+.status-approved {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+.status-pending {
+  color: #856404;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+}
+.status-rejected {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+.status-completed {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+}
+
+.purchordstat-footer {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+}
+
+.date-options-dropdown{
+  position: absolute;
+  top: 110%;
+  left: 0;
+  margin-top: 0.25rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 210px;
+  width: max-content;
+}
+
+.status-options-dropdown {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    margin-top: 0.25rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 210px;
+    width: max-content;
+}
+
+.date-option,
+.status-option {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+.date-option:hover,
+.status-option:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    color: #00A8A8;
+}
+.date-option:not(:last-child),
+.status-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.purchordstat-button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 1rem;
+  gap: 1rem;
+}

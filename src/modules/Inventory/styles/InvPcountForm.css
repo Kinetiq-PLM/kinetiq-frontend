@@ -1,0 +1,119 @@
+
+.pcounts .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent backdrop */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  
+
+  .pcounts .modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 380px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+  }
+  
+  @media screen and (min-width: 768px) {
+    .pcounts .modal-content {
+      width: 500px;
+    }
+  }
+  
+
+  .pcounts .modal-content form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+
+  .pcounts .modal-content label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: 500;
+  }
+  
+
+  .pcounts .modal-content input,
+  .pcounts .modal-content textarea,
+  .pcounts .modal-content select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    /* color: #555; */
+  }
+  
+  .pcounts .modal-content textarea {
+    resize: vertical;
+    min-height: 3.2rem; 
+  }
+  
+
+  .pcounts .modal-content .form-section {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+
+  .pcounts .modal-content .form-actions {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 1rem;
+  }
+  
+
+  .pcounts .modal-content .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+
+  .pcounts .modal-content .clear-btn,
+  .pcounts .modal-content .submit-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+
+  .pcounts .modal-content .clear-btn {
+    border: 1px solid teal;
+    color: teal;
+    background: none;
+  }
+  
+
+  .pcounts .modal-content .submit-btn {
+    background: teal;
+    color: white;
+    border: none;
+  }
+  
+  .pcounts .blurred {
+    filter: blur(5px);
+  }
+  
+  .pcounts .modal-content .form-section label {
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+    margin-bottom: 8px;
+  }
+  
+  .pcounts .modal-content .form-section input[type="checkbox"] {
+    margin: 0;
+    flex-shrink: 0; 
+  }

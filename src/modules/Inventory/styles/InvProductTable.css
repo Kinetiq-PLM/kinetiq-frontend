@@ -1,0 +1,16 @@
+/* White Scrollbar Styling */
+.inv .scroll-container::-webkit-scrollbar {
+  width: 6px; /* Scrollbar width */
+  height: 6px;
+  background: rgb(239, 239, 239);
+}
+
+
+
+.inv ::-webkit-scrollbar-thumb {
+  background: #00A8A8; /* Scrollbar color */
+  height: 5rem;
+  width: 5rem;
+  border-radius: 6px; /* Rounded edges */
+}
+

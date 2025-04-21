@@ -1,0 +1,314 @@
+.purchquoteform {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  .purchquoteform .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+  }
+
+  .popup-submit-button{
+    background-color: #00bcd4;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.5rem;
+    margin-top: 1rem;
+    
+  }
+
+  .popup-close-button{
+    background-color: #00bcd4;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.5rem;
+    margin-top: 1rem;
+    margin-right: 8rem;
+  }
+
+  .popup-form {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .input-with-symbol {
+    display: flex;
+    align-items: center;
+  }
+  
+  .input-with-symbol input {
+    flex: 1;
+  }
+  
+  .input-with-symbol span {
+    margin-left: 5px;
+    font-weight: bold;
+  }
+  .popup-form-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+
+  .downpayment-label {
+    display: flex;
+    align-items: center;
+    gap: 14rem; /* Add spacing between the checkbox and the label text */
+    font-size: 14px; /* Adjust font size if needed */
+  }
+  
+  .downpayment-label input[type="checkbox"] {
+    margin: 0; /* Remove default margin for better alignment */
+  }
+  
+  
+
+.purchquoteform-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.purchquoteform-title {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #333;
+    font-weight: 500;
+    text-align: center;
+}
+
+.purchquoteform-back {
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+}
+
+.purchquoteform-send {
+    padding: 0.5rem 1.5rem;
+    background-color: #00bcd4;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
+.purchquoteform-scrollable-wrapper {
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #bdbdbd #f5f5f5;
+}
+
+.purchquoteform-scrollable-wrapper .body-content-container {
+    height: auto !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+.purchquoteform-scrollable-wrapper::-webkit-scrollbar {
+    width: 8px;
+    background: #f5f5f5;
+}
+.purchquoteform-scrollable-wrapper::-webkit-scrollbar-thumb {
+    background: #bdbdbd;
+    border-radius: 8px;
+}
+.purchquoteform-scrollable-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #a0a0a0;
+}
+
+.purchquoteform-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.purchquoteform-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.form-group label:after {
+    content: "*";
+    color: red;
+    margin-left: 2px;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 0.5rem;
+    border: 1px solid #eee;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    background-color: #fff;
+    resize: none;
+}
+
+.gray-bg {
+    background-color: #f0f0f0 !important;
+}
+
+.purchquoteform-table {
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.purchquoteform-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 1rem;
+    border: 1px solid #D2D2D2;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.purchquoteform-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    background-color: #fff;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #666;
+    border-bottom: 1px solid #eee;
+}
+
+.purchquoteform-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #eee;
+}
+
+.purchquoteform-table tr:last-child td {
+    border-bottom: none;
+}
+
+.purchquoteform-add-item {
+    padding: 0.5rem 1.5rem;
+    background-color: #00bcd4;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-weight: 400;
+    float: right;
+    font-size: 0.9rem;
+}
+
+.purchquoteform-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.details-left,
+.details-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.details-right .form-group {
+    margin-bottom: 0.5rem;
+}
+
+.details-right .form-group input {
+    text-align: right;
+}
+
+.details-right .form-group label {
+    font-size: 0.8rem;
+}
+
+.purchquoteform-footer {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 2rem;
+}
+
+.purchquoteform-copy {
+    padding: 0.5rem 1.5rem;
+    background-color: white;
+    color: #00bcd4;
+    border: 1px solid #00bcd4;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
+.purchquoteform-copy:hover {
+    background-color: #f0fcfe;
+}
+
+/* Additional styles for better matching */
+.form-group textarea {
+    min-height: 100px;
+    resize: none;
+}
+
+.form-group input:read-only {
+    border: 1px solid #eee;
+    color: #333;
+}

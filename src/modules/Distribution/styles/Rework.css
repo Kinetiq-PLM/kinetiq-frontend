@@ -1,0 +1,1460 @@
+/* REMINDER! All of your elements must use your unique namespace '.rework' at the start to avoid leaking */
+
+.rework {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.rework .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+  overflow: auto;
+}
+
+/* Page title styling */
+.rework .page-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+/* Filters section */
+.rework .filters-row {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.rework .search-container {
+  position: relative;
+  width: 300px;
+}
+
+.rework .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 14px;
+}
+
+.rework .search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.rework .search-input:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.rework .filter-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rework .filter-label {
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.rework .status-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.rework .status-button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rework .status-button:hover {
+  background-color: #f8f9fa;
+  border-color: #c8cfd6;
+}
+
+.rework .status-button.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+.rework .status-button.pending.active {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.rework .status-button.in-progress.active {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.rework .status-button.completed.active {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.rework .filter-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.rework .filter-select:focus {
+  outline: none;
+  border-color: #00a8a8;
+}
+
+/* Stats Row */
+.rework .stats-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.rework .stat-box {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+}
+
+.rework .stat-label {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 0.25rem;
+}
+
+.rework .stat-value {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Rework Content (Table and Actions) */
+.rework .rework-content {
+  display: flex;
+  gap: 1.5rem;
+  height: 100%;
+  flex: 1;
+}
+
+/* Table styling */
+.rework .rework-table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+  min-width: 0; /* Ensure table can shrink if needed */
+}
+
+.rework .table-metadata {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.rework .table-wrapper {
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  flex: 1;
+}
+
+.rework .rework-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: center;
+}
+
+.rework .rework-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 500;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  color: #495057;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.rework .rework-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.875rem;
+}
+
+.rework .rework-table tr:last-child td {
+  border-bottom: none;
+}
+
+.rework .centered-cell {
+  text-align: center;
+}
+
+.rework .even-row {
+  background-color: #fff;
+}
+
+.rework .odd-row {
+  background-color: #f8f9fa;
+}
+
+.rework .selected-row {
+  background-color: rgba(0, 168, 168, 0.1) !important;
+}
+
+.rework .rework-table tbody tr:hover {
+  background-color: rgba(0, 168, 168, 0.05);
+  cursor: pointer;
+}
+
+/* Status cell styling */
+.rework .status-cell {
+  position: relative;
+  padding-left: 1.75rem;
+}
+
+.rework .status-cell::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.rework .status-pending::before {
+  background-color: #6c757d;
+}
+
+.rework .status-in-progress::before {
+  background-color: #007bff;
+}
+
+.rework .status-completed::before {
+  background-color: #28a745;
+}
+
+.rework .no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Badge styling */
+.rework .badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.rework .badge-danger {
+  background-color: #ffdddd;
+  color: #dc3545;
+}
+
+.rework .badge-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* Order link styling */
+.rework .order-link {
+  color: #007bff;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.rework .no-order {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Action buttons in table */
+.rework .actions-cell {
+  white-space: nowrap;
+}
+
+.rework .action-button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 3px;
+  border: none;
+  margin-right: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.rework .in-progress-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.rework .in-progress-button:hover {
+  background-color: #0069d9;
+}
+
+.rework .complete-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.rework .complete-button:hover {
+  background-color: #218838;
+}
+
+.rework .view-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.rework .view-button:hover {
+  background-color: #5a6268;
+}
+
+.rework .assign-button {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.rework .assign-button:hover:not(:disabled) {
+  background-color: #009191;
+}
+
+/* Modal styles */
+.rework .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.rework .rework-modal {
+  background-color: white;
+  border-radius: 6px;
+  width: 700px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.rework .assign-modal,
+.rework .complete-modal {
+  background-color: white;
+  border-radius: 6px;
+  width: 500px;
+  max-width: 90%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.rework .modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rework .modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.rework .close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #666;
+}
+
+.rework .close-button:hover {
+  color: #333;
+}
+
+.rework .modal-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.rework .modal-body p {
+  margin: 0 0 0.5rem;
+}
+
+.rework .modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Information sections */
+.rework .info-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.rework .info-section h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.rework .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.rework .info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.rework .info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.rework .info-label {
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.rework .info-value {
+  font-size: 0.875rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.rework .reason-text {
+  white-space: pre-wrap;
+}
+
+/* Status colors in info sections */
+.rework .info-value.status-pending {
+  color: #6c757d;
+}
+
+.rework .info-value.status-in-progress {
+  color: #007bff;
+}
+
+.rework .info-value.status-completed {
+  color: #28a745;
+}
+
+/* Action section */
+.rework .action-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.rework .action-section h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.rework .action-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.rework .action-button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+}
+
+.rework .action-button:disabled {
+  background-color: #e0e0e0;
+  color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+/* Completed message */
+.rework .completed-message {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Form fields for modals */
+.rework .form-row {
+  margin-bottom: 1rem;
+}
+
+.rework .form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.rework .form-input,
+.rework .form-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+}
+
+.rework .form-input:focus,
+.rework .form-select:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.rework .error-text {
+  color: #dc3545;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Warning text */
+.rework .warning-text {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+/* Rework info in confirmation modal */
+.rework .rework-info {
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  margin: 0.75rem 0;
+  line-height: 1.5;
+}
+
+/* Cancel, save, confirm buttons */
+.rework .cancel-button {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.rework .cancel-button:hover {
+  background-color: #f8f9fa;
+}
+
+.rework .save-button {
+  padding: 0.5rem 1rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.rework .save-button:hover:not(:disabled) {
+  background-color: #009191;
+}
+
+.rework .save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.rework .confirm-button {
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.rework .confirm-button:hover {
+  background-color: #218838;
+}
+
+/* Loading and error states */
+.rework .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #666;
+}
+
+.rework .spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #00a8a8;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.rework .error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+}
+
+.rework .error-message {
+  color: #dc3545;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: #f8d7da;
+}
+
+/* Tab Navigation */
+.rework .tab-navigation {
+  display: flex;
+  margin: 1.5rem 0 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.rework .tab {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.rework .tab:hover {
+  color: #00a8a8;
+}
+
+.rework .tab.active {
+  color: #00a8a8;
+  font-weight: 600;
+}
+
+.rework .tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #00a8a8;
+}
+
+.rework .pagination-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  align-items: center;
+}
+
+.rework .pagination-button {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rework .pagination-button:hover:not(:disabled) {
+  background-color: #e9ecef;
+  border-color: #c8cfd6;
+}
+
+.rework .pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rework .page-numbers {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.rework .page-number {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rework .page-number:hover:not(.active) {
+  background-color: #e9ecef;
+  border-color: #c8cfd6;
+}
+
+.rework .page-number.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+/* Enhanced Modal Styles for ERP System */
+
+/* Modal Base Structure */
+.rework .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rework .modal-container {
+  background-color: white;
+  border-radius: 8px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease-out;
+  width: 100%;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.rework .rework-modal {
+  width: 750px;
+  max-width: 90vw;
+}
+
+.rework .assign-modal,
+.rework .complete-modal {
+  width: 550px;
+  max-width: 90vw;
+}
+
+/* Modal Header */
+.rework .modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e9ef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8fafc;
+}
+
+.rework .modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rework .modal-header h3::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  background-color: #00a8a8;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.rework .close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rework .close-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #1f2937;
+}
+
+/* Modal Body */
+.rework .modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+  max-height: calc(90vh - 140px);
+}
+
+/* Information sections */
+.rework .info-section {
+  border: 1px solid #e5e9ef;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.rework .info-section:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.rework .info-section h4 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rework .info-section h4::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  background-color: #00a8a8;
+  border-radius: 1.5px;
+  display: inline-block;
+}
+
+.rework .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.rework .info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.rework .info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.rework .info-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.rework .info-value {
+  font-size: 0.9rem;
+  color: #1f2937;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.rework .reason-text {
+  white-space: pre-wrap;
+  background-color: #f8fafc;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border-left: 3px solid #e5e9ef;
+  line-height: 1.5;
+}
+
+/* Status indicators */
+.rework .info-value.status-Pending {
+  display: inline-flex;
+  align-items: center;
+  color: #6c757d;
+  font-weight: 500;
+  background-color: rgba(108, 117, 125, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.rework .info-value.status-Pending::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #6c757d;
+  margin-right: 0.5rem;
+}
+
+.rework .info-value.status-In.Progress,
+.rework .info-value.status-In-Progress {
+  display: inline-flex;
+  align-items: center;
+  color: #0068d9;
+  font-weight: 500;
+  background-color: rgba(0, 104, 217, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.rework .info-value.status-In.Progress::before,
+.rework .info-value.status-In-Progress::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #0068d9;
+  margin-right: 0.5rem;
+}
+
+.rework .info-value.status-Completed {
+  display: inline-flex;
+  align-items: center;
+  color: #28a745;
+  font-weight: 500;
+  background-color: rgba(40, 167, 69, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.rework .info-value.status-Completed::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #28a745;
+  margin-right: 0.5rem;
+}
+
+/* Action section */
+.rework .action-section {
+  border: 1px solid #e5e9ef;
+  border-radius: 8px;
+  padding: 1.25rem;
+  background-color: #f8fafc;
+}
+
+.rework .action-section h4 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.rework .action-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rework .action-button {
+  padding: 0.6rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 120px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.rework .action-button:disabled {
+  background-color: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.rework .assign-button {
+  background-color: #00a8a8;
+  color: white;
+}
+
+.rework .assign-button:hover:not(:disabled) {
+  background-color: #009191;
+  box-shadow: 0 2px 4px rgba(0, 168, 168, 0.3);
+}
+
+.rework .complete-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.rework .complete-button:hover:not(:disabled) {
+  background-color: #218838;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+/* Completed message */
+.rework .completed-message {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.925rem;
+  text-align: center;
+  font-weight: 500;
+  border-left: 4px solid #28a745;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.rework .completed-message::before {
+  content: '✓';
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+}
+
+/* Modal Footer */
+.rework .modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e9ef;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background-color: #f8fafc;
+}
+
+/* Button Styles */
+.rework .cancel-button {
+  padding: 0.6rem 1.25rem;
+  background-color: white;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.rework .cancel-button:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.rework .save-button {
+  padding: 0.6rem 1.25rem;
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  box-shadow: 0 1px 3px rgba(0, 168, 168, 0.3);
+}
+
+.rework .save-button:hover:not(:disabled) {
+  background-color: #009191;
+  box-shadow: 0 2px 5px rgba(0, 168, 168, 0.4);
+}
+
+.rework .save-button:disabled {
+  background-color: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.rework .confirm-button {
+  padding: 0.6rem 1.25rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  box-shadow: 0 1px 3px rgba(40, 167, 69, 0.3);
+}
+
+.rework .confirm-button:hover {
+  background-color: #218838;
+  box-shadow: 0 2px 5px rgba(40, 167, 69, 0.4);
+}
+
+/* Assign Modal Form Styles */
+.rework .form-row {
+  margin-bottom: 1.25rem;
+}
+
+.rework .form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.rework .form-input,
+.rework .form-select {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background-color: white;
+  transition: all 0.2s;
+}
+
+.rework .form-input:focus,
+.rework .form-select:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 3px rgba(0, 168, 168, 0.1);
+}
+
+.rework .form-input:read-only {
+  background-color: #f8fafc;
+  cursor: not-allowed;
+}
+
+.rework .form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
+.rework .error-text {
+  color: #dc2626;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rework .error-text::before {
+  content: '⚠️';
+  font-size: 0.75rem;
+}
+
+/* Complete Modal Styles */
+.rework .warning-text {
+  color: #b91c1c;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background-color: #fee2e2;
+  padding: 0.75rem;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+.rework .warning-text::before {
+  content: '⚠️';
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.rework .rework-info {
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  margin: 0.75rem 0;
+  line-height: 1.6;
+  border-left: 3px solid #e5e9ef;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+  .rework .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .rework .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .rework .action-button {
+    width: 100%;
+  }
+  
+  .rework .modal-footer {
+    flex-direction: column-reverse;
+  }
+  
+  .rework .cancel-button,
+  .rework .save-button,
+  .rework .confirm-button {
+    width: 100%;
+  }
+}
+
+/* Fix status cell class naming issue - lowercase with dashes for CSS classes */
+.rework .status-cell.status-In.Progress::before,
+.rework .status-cell.status-In-Progress::before {
+  background-color: #007bff; /* Use the same color as .status-in-progress::before */
+}
+
+/* Ensure all statuses have proper dots */
+.rework .status-cell.status-Pending::before {
+  background-color: #6c757d;
+}
+
+.rework .status-cell.status-Completed::before {
+  background-color: #28a745;
+}
+
+/* Fix table alignment */
+.rework .rework-table th,
+.rework .rework-table td {
+  text-align: center;
+}
+
+.rework .rework-table th:first-child,
+.rework .rework-table td:first-child {
+  padding-left: 1.25rem;
+}
+
+.rework .rework-table th:last-child,
+.rework .rework-table td:last-child {
+  padding-right: 1.25rem;
+}
+
+/* Responsive styles */
+@media (max-width: 1440px) {
+  /* Remove dots but keep color-coded statuses */
+  .rework .status-cell {
+    padding-left: 0.75rem; /* Reset the padding since we're removing the dot */
+  }
+
+  .rework .status-cell::before {
+    display: none; /* Hide the status dot */
+  }
+  
+  /* Add background color to status cells instead */
+  .rework .status-cell.status-Pending {
+    background-color: rgba(108, 117, 125, 0.1);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .rework .status-cell.status-In.Progress,
+  .rework .status-cell.status-In-Progress {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .rework .status-cell.status-Completed {
+    background-color: rgba(40, 167, 69, 0.1);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Make the table horizontally scrollable on small screens */
+  .rework .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust row padding for better touch targets */
+  .rework .rework-table td,
+  .rework .rework-table th {
+    padding: 0.85rem 0.75rem;
+  }
+  
+  /* Handle pagination better on small screens */
+  .rework .page-numbers {
+    display: none; /* Hide page numbers, keep only prev/next */
+  }
+  
+  .rework .pagination-controls {
+    justify-content: space-between;
+  }
+  
+  .rework .pagination-button {
+    min-width: 100px; /* Make buttons bigger for touch */
+  }
+  
+  /* Make filters better on small screens */
+  .rework .filters-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .rework .search-container {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+  
+  .rework .filter-container {
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Hide less important columns on very small screens */
+  .rework .rework-table th:nth-child(5),
+  .rework .rework-table td:nth-child(5),
+  .rework .rework-table th:nth-child(6),
+  .rework .rework-table td:nth-child(6) {
+    display: none;
+  }
+  
+  /* Make sure no-data message spans fewer columns */
+  .rework .no-data {
+    font-size: 0.8rem;
+    padding: 1.5rem 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Add touch-friendly rows */
+  .rework .rework-table tbody tr {
+    cursor: pointer;
+  }
+
+  .rework .rework-table tbody tr:active {
+    background-color: rgba(0, 168, 168, 0.05);
+  }
+  
+  /* Make status more visible */
+  .rework .status-cell {
+    font-weight: 500;
+  }
+  
+  /* Stats row responsive */
+  .rework .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+  }
+}
