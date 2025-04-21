@@ -34,7 +34,7 @@ const AttendanceTracking = () => {
   const fetchAttendance = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/attendance_tracking/attendance_tracking/");
+      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/attendance_tracking/attendance_tracking/");
       setAttendanceData(res.data);
     } catch (err) {
       console.error("Failed to fetch attendance:", err);
@@ -47,7 +47,7 @@ const AttendanceTracking = () => {
   const fetchCalendarDates = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/calendar_dates/calendar_dates/");
+      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/calendar_dates/calendar_dates/");
       setCalendarDatesData(res.data);
     } catch (err) {
       console.error("Failed to fetch calendar dates:", err);

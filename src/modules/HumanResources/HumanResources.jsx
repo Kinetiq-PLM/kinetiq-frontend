@@ -60,11 +60,11 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         setLoading(true);
         
         // Fetch all employees for total count
-        const employeesRes = await axios.get("http://127.0.0.1:8000/api/employees/");
+        const employeesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/");
         const totalEmployees = employeesRes.data.length;
         
         // Fetch attendance tracking data
-        const attendanceRes = await axios.get("http://127.0.0.1:8000/api/attendance_tracking/attendance_tracking/");
+        const attendanceRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/attendance_tracking/attendance_tracking/");
         
         // Find the latest date in attendance records
         const attendanceData = attendanceRes.data;
@@ -81,10 +81,10 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         const onLeaveCount = latestAttendance.filter(record => record.status === "On Leave").length;
         
         // Fetch leave requests
-        const leaveRequestsRes = await axios.get("http://127.0.0.1:8000/api/employee_leave_requests/leave_requests/");
+        const leaveRequestsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_leave_requests/leave_requests/");
         
         // Fetch employee performance data
-        const performanceRes = await axios.get("http://127.0.0.1:8000/api/employee_performance/employee_performance/");
+        const performanceRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_performance/employee_performance/");
         
         // Update state with fetched data
         setEmployeeStats({

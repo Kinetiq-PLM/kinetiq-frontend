@@ -101,8 +101,8 @@ const Recruitment = () => {
       try {
         // Existing fetch calls
         const [candidatesRes, archivedCandidatesRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
-          axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/archived/")
         ]);
 
         console.log('Candidates data:', candidatesRes.data);
@@ -119,17 +119,17 @@ const Recruitment = () => {
         }
 
         const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/"),
-          axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/archived/")
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/archived/")
         ]);
 
-        const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
+        const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
 
         // New fetch calls for departments, positions, and employees - THIS WAS MISSING
         const [deptsRes, positionsRes, employeesRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/api/departments/department/"),
-          axios.get("http://127.0.0.1:8000/api/positions/positions/"),
-          axios.get("http://127.0.0.1:8000/api/employees/")
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/"),
+          axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/")
         ]);
 
         // Add this debugging to see what's coming back
@@ -327,13 +327,13 @@ const Recruitment = () => {
   // Archive and restore functions
   const handleArchiveCandidate = async (candidate) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/candidates/candidates/${candidate.candidate_id || candidate.id}/archive/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${candidate.candidate_id || candidate.id}/archive/`);
       showToast("Candidate archived successfully", true);
       
       // Refresh candidate lists
       const [candidatesRes, archivedCandidatesRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
-        axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/archived/")
       ]);
       
       setCandidates(candidatesRes.data);
@@ -346,13 +346,13 @@ const Recruitment = () => {
 
   const handleRestoreCandidate = async (candidate) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/candidates/candidates/${candidate.candidate_id || candidate.id}/restore/`);
+      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${candidate.candidate_id || candidate.id}/restore/`);
       showToast("Candidate restored successfully", true);
       
       // Refresh candidate lists
       const [candidatesRes, archivedCandidatesRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
-        axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/archived/")
       ]);
       
       setCandidates(candidatesRes.data);
@@ -383,7 +383,7 @@ const Recruitment = () => {
     try {
       // Update resignation logic here
       await axios.patch(
-        `http://127.0.0.1:8000/api/resignation/resignations/${editingResignation.resignation_id}/`, 
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${editingResignation.resignation_id}/`, 
         editingResignation
       );
       
@@ -391,7 +391,7 @@ const Recruitment = () => {
       setShowEditResignationModal(false);
       
       // Refresh resignations
-      const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
+      const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
       setResignations(resignationsRes.data);
     } catch (err) {
       console.error("Error updating resignation:", err.response?.data || err);
@@ -425,7 +425,7 @@ const Recruitment = () => {
       
       // Submit to API
       const response = await axios.patch(
-        `http://127.0.0.1:8000/api/candidates/candidates/${editingCandidate.candidate_id || editingCandidate.id}/`,
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${editingCandidate.candidate_id || editingCandidate.id}/`,
         formData,
         {
           headers: {
@@ -438,7 +438,7 @@ const Recruitment = () => {
       setShowEditCandidateModal(false);
       
       // Refresh the candidates list
-      const candidatesRes = await axios.get("http://127.0.0.1:8000/api/candidates/candidates/");
+      const candidatesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/");
       setCandidates(candidatesRes.data.filter(c => !c.is_archived));
       setArchivedCandidates(candidatesRes.data.filter(c => c.is_archived));
       
@@ -477,7 +477,7 @@ const Recruitment = () => {
       
       // Create an array of promises for each selected candidate
       const promises = selectedArchivedCandidates.map(id => 
-        axios.post(`http://127.0.0.1:8000/api/candidates/candidates/${id}/restore/`)
+        axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${id}/restore/`)
       );
       
       // Execute all promises
@@ -491,8 +491,8 @@ const Recruitment = () => {
       
       // Refresh candidate lists
       const [candidatesRes, archivedCandidatesRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/candidates/candidates/"),
-        axios.get("http://127.0.0.1:8000/api/candidates/candidates/archived/")
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/archived/")
       ]);
       
       setCandidates(candidatesRes.data);
@@ -535,7 +535,7 @@ const Recruitment = () => {
         
         // Send update request
         return axios.patch(
-          `http://127.0.0.1:8000/api/job_posting/job_postings/${id}/`, 
+          `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/${id}/`, 
           updateData
         );
       });
@@ -551,8 +551,8 @@ const Recruitment = () => {
       
       // Refresh job posting lists
       const [jobPostingsRes, archivedJobPostingsRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/"),
-        axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/archived/")
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/"),
+        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/archived/")
       ]);
       
       setJobPostings(jobPostingsRes.data);
@@ -1328,7 +1328,7 @@ const handleEditJobPostingSubmit = async (e) => {
     }
     
     await axios.patch(
-      `http://127.0.0.1:8000/api/job_posting/job_postings/${editingJobPosting.job_id}/`, 
+      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/${editingJobPosting.job_id}/`, 
       jobPostingData
     );
     
@@ -1336,7 +1336,7 @@ const handleEditJobPostingSubmit = async (e) => {
     setShowEditJobModal(false);
     
     // Refresh job postings
-    const jobPostingsRes = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
+    const jobPostingsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/");
     setJobPostings(jobPostingsRes.data);
   } catch (err) {
     console.error("Error updating job posting:", err.response?.data || err);
@@ -1461,11 +1461,11 @@ const handleJobPostingSubmit = async (e) => {
     
     console.log("Submitting job posting data:", jobPostingData);
     // Submit the modified data
-    const response = await axios.post("http://127.0.0.1:8000/api/job_posting/job_postings/", jobPostingData);
+    const response = await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/", jobPostingData);
     showToast("Job posting created successfully!", true);
     
     // Refresh job postings and close modal
-    const jobPostingsRes = await axios.get("http://127.0.0.1:8000/api/job_posting/job_postings/");
+    const jobPostingsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/");
     setJobPostings(jobPostingsRes.data);
     setShowAddJobModal(false);
     
@@ -1503,7 +1503,7 @@ const handleResignationSubmit = async (e) => {
     
     // Send resignation data to the API
     const response = await axios.post(
-      "http://127.0.0.1:8000/api/resignation/resignations/", 
+      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/", 
       newResignation
     );
     
@@ -1511,7 +1511,7 @@ const handleResignationSubmit = async (e) => {
     setShowAddResignationModal(false);
     
     // Refresh resignations
-    const resignationsRes = await axios.get("http://127.0.0.1:8000/api/resignation/resignations/");
+    const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
     setResignations(resignationsRes.data);
   } catch (err) {
     console.error("Error creating resignation:", err.response?.data || err);
@@ -1550,7 +1550,7 @@ const handleArchiveJobPosting = async (jobPosting) => {
     
     // Call API to archive the job posting with all the required data
     await axios.patch(
-      `http://127.0.0.1:8000/api/job_posting/job_postings/${jobPosting.job_id}/`, 
+      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/${jobPosting.job_id}/`, 
       updateData
     );
     
@@ -1596,7 +1596,7 @@ const handleRestoreJobPosting = async (jobPosting) => {
     
     // Call API to restore the job posting with all the required data
     await axios.patch(
-      `http://127.0.0.1:8000/api/job_posting/job_postings/${jobPosting.job_id}/`, 
+      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/${jobPosting.job_id}/`, 
       updateData
     );
     
@@ -1637,7 +1637,7 @@ const submitCandidateForm = async (e) => {
     
     // Submit to API
     const response = await axios.post(
-      "http://127.0.0.1:8000/api/candidates/candidates/",
+      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/",
       formData,
       {
         headers: {
@@ -1650,7 +1650,7 @@ const submitCandidateForm = async (e) => {
     setShowAddCandidateModal(false);
     
     // Refresh the candidates list
-    const candidatesRes = await axios.get("http://127.0.0.1:8000/api/candidates/candidates/");
+    const candidatesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/");
     setCandidates(candidatesRes.data);
     
   } catch (err) {
@@ -1697,7 +1697,7 @@ const submitCandidateForm = async (e) => {
       });
       
       // Step 4: Fetch current documents for the candidate
-      const candidateResponse = await axios.get(`http://127.0.0.1:8000/api/candidates/candidates/${currentCandidate.candidate_id || currentCandidate.id}/`);
+      const candidateResponse = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${currentCandidate.candidate_id || currentCandidate.id}/`);
       
       // Step 5: Parse existing documents or create a new structure
       let documents = { required: {}, optional: {} };
@@ -1732,14 +1732,14 @@ const submitCandidateForm = async (e) => {
       
       // Step 7: Update the candidate's documents in your backend
       await axios.patch(
-        `http://127.0.0.1:8000/api/candidates/candidates/${currentCandidate.candidate_id || currentCandidate.id}/`, 
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/${currentCandidate.candidate_id || currentCandidate.id}/`, 
         { documents: JSON.stringify(documents) }
       );
       
       showToast("Document uploaded successfully", true);
       
       // Refresh candidates data
-      const candidatesRes = await axios.get("http://127.0.0.1:8000/api/candidates/candidates/");
+      const candidatesRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/candidates/candidates/");
       setCandidates(candidatesRes.data.filter(c => !c.is_archived));
       setArchivedCandidates(candidatesRes.data.filter(c => c.is_archived));
       
