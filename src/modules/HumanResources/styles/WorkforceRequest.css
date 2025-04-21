@@ -372,3 +372,9 @@
   to   { opacity: 0; }
 }
 
+
+.form-error {
+  color: #d32f2f;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
