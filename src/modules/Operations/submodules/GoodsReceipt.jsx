@@ -556,8 +556,8 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       const payload = {
         document_type: "Goods Receipt",
         status: selectedStatus,
-        vendor_code: vendorID || null,
-        buyer: null,
+        vendor_code: null,
+        buyer: "null",
         employee_id: employee_id,
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
@@ -692,7 +692,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       //initial amount discount rate discount amount freight tax rate tax amount total
       const updatedData = {
         status: selectedStatus,
-        vendor_code: vendorID,
+        vendor_code: null,
         buyer: "null",
         employee_id: isCreateMode ? employee_id : selectedData?.employee_id || employee_id,
         transaction_id: documentDetails.transaction_id,
@@ -859,7 +859,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
               {/* Vendor Code (ID) */}
               <div className="detail-row">
                 <label>Vendor Code</label>
-                <input type="text" value={vendorID} style={{ cursor: 'not-allowed' }} readOnly/>
+                <input type="text" value={"---"} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
 
 
@@ -868,23 +868,12 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
               {/* Vendor Name Dropdown */}
               <div className="detail-row dropdown-scrollbar">
                 <label>Vendor Name</label>
-                <select value={selectedVendor} onChange={handleVendorChange}>
-                  <option value="">Select Vendor</option>
-                  {loading ? (
-                    <option value="">Loading vendors...</option>
-                  ) : (
-                    vendorList.map((vendor) => (
-                      <option key={vendor.vendor_code} value={vendor.vendor_name}>
-                        {vendor.vendor_name}
-                      </option>
-                    ))
-                  )}
-                </select>
+                <input type="text" value={"---"} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
               {/* Contact Person */}
               <div className="detail-row">
                 <label>Contact Person</label>
-                <input type="text" value={contactPerson} style={{ cursor: 'not-allowed' }} readOnly/>
+                <input type="text" value={"---"} style={{ cursor: 'not-allowed' }} readOnly/>
               </div>
               <div className="detail-row">
                 <label>Buyer</label>
