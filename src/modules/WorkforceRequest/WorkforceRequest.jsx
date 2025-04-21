@@ -7,15 +7,25 @@ const WorkforceRequest = () => {
   // States for form data
   const [formData, setFormData] = useState({
     requesting_dept_id: "",
+    current_dept_id: "",
+    hr_approver: "",
+    employee_id: "",
     required_skills: "",
     task_description: "",
     start_date: "",
     end_date: "",
+    status: "Draft",
+    approval_status: "Pending",
+    rejection_reason: ""
   });
+
+  // States for form validation
+  const [formErrors, setFormErrors] = useState({});
 
   // States for list view and shared functionality 
   const [requests, setRequests] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [activeTab, setActiveTab] = useState("form");
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,7 +41,7 @@ const WorkforceRequest = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Fetch departments for dropdown
+  // Fetch departments, employees, and requests
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
@@ -40,6 +50,16 @@ const WorkforceRequest = () => {
       } catch (err) {
         console.error("Error fetching departments:", err);
         showToast("Failed to load departments", false);
+      }
+    };
+
+    const fetchEmployees = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/api/employees/");
+        setEmployees(response.data);
+      } catch (err) {
+        console.error("Error fetching employees:", err);
+        showToast("Failed to load employees", false);
       }
     };
 
@@ -56,6 +76,7 @@ const WorkforceRequest = () => {
     };
 
     fetchDepartments();
+    fetchEmployees();
     fetchRequests();
   }, []);
 
@@ -68,42 +89,80 @@ const WorkforceRequest = () => {
     }));
   };
 
+  const validateForm = () => {
+    const errors = {};
+    
+    // Check date constraint
+    if (formData.start_date && formData.end_date && 
+        new Date(formData.end_date) < new Date(formData.start_date)) {
+      errors.end_date = "End date must be after start date";
+    }
+    
+    // Check employee constraint when approved
+    if (formData.approval_status === "Approved" && !formData.employee_id) {
+      errors.employee_id = "Employee is required when status is Approved";
+    }
+    
+    // Check rejection reason when rejected
+    if (formData.approval_status === "Rejected" && !formData.rejection_reason) {
+      errors.rejection_reason = "Rejection reason is required when status is Rejected";
+    }
+    
+    return errors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     
-    // Validate dates
-    if (new Date(formData.end_date) < new Date(formData.start_date)) {
-      showToast("End date cannot be before start date", false);
+    // Validate form
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       setSubmitting(false);
       return;
     }
     
     try {
-      await axios.post("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/request_workforce/", formData);
+      await axios.post("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/", formData);
       showToast("Request submitted successfully");
       setFormData({
         requesting_dept_id: "",
+        current_dept_id: "",
+        hr_approver: "",
+        employee_id: "",
         required_skills: "",
         task_description: "",
         start_date: "",
         end_date: "",
+        status: "Draft",
+        approval_status: "Pending",
+        rejection_reason: ""
       });
-      setActiveTab("list");
     } catch (err) {
       console.error("Submit error:", err);
-      let errorMessage = "Failed to submit request";
       
-      // Better error handling to show the specific backend error
+      // Improved error handling - similar to WorkforceAllocation
       if (err.response) {
-        if (err.response.data.detail) {
-          errorMessage = err.response.data.detail;
-        } else if (typeof err.response.data === 'string') {
-          errorMessage = err.response.data;
+        if (err.response.data) {
+          console.error("Error details:", err.response.data);
+          // Set form errors from API response
+          setFormErrors(err.response.data || {});
+          
+          // Show toast with meaningful error message
+          if (err.response.data.detail) {
+            showToast(err.response.data.detail, false);
+          } else if (err.response.data.non_field_errors) {
+            showToast(err.response.data.non_field_errors[0], false);
+          } else {
+            showToast("Failed to submit request. Please check the form for errors.", false);
+          }
+        } else {
+          showToast("Failed to submit request", false);
         }
+      } else {
+        showToast(`Failed to submit request: ${err.message}`, false);
       }
-      
-      showToast(errorMessage, false);
     } finally {
       setSubmitting(false);
     }
@@ -112,10 +171,16 @@ const WorkforceRequest = () => {
   const handleCancel = () => {
     setFormData({
       requesting_dept_id: "",
+      current_dept_id: "",
+      hr_approver: "",
+      employee_id: "",
       required_skills: "",
       task_description: "",
       start_date: "",
       end_date: "",
+      status: "Draft",
+      approval_status: "Pending",
+      rejection_reason: ""
     });
   };
 
@@ -241,7 +306,6 @@ const WorkforceRequest = () => {
           {activeTab === "form" ? (
             <div className="request-workforce-request-form-container">
               <form onSubmit={handleSubmit} className="request-workforce-request-form">
-                {/* Left Column */}
                 <div className="left-column">
                   <div className="form-group">
                     <label>Requesting Department</label>
@@ -258,8 +322,96 @@ const WorkforceRequest = () => {
                         </option>
                       ))}
                     </select>
+                    {formErrors.requesting_dept_id && <div className="form-error">{formErrors.requesting_dept_id}</div>}
                   </div>
+                  
+                  <div className="form-group">
+                    <label>Current Department</label>
+                    <select
+                      name="current_dept_id"
+                      value={formData.current_dept_id}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">-- Select Department --</option>
+                      {departments.map(dept => (
+                        <option key={dept.dept_id} value={dept.dept_id}>
+                          {dept.dept_name}
+                        </option>
+                      ))}
+                    </select>
+                    {formErrors.current_dept_id && <div className="form-error">{formErrors.current_dept_id}</div>}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>HR Approver</label>
+                    <select
+                      name="hr_approver"
+                      value={formData.hr_approver}
+                      onChange={handleChange}
+                    >
+                      <option value="">-- Select HR Approver --</option>
+                      {employees.map(emp => (
+                        <option key={emp.employee_id} value={emp.employee_id}>
+                          {emp.first_name} {emp.last_name}
+                        </option>
+                      ))}
+                    </select>
+                    {formErrors.hr_approver && <div className="form-error">{formErrors.hr_approver}</div>}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Employee</label>
+                    <select
+                      name="employee_id"
+                      value={formData.employee_id}
+                      onChange={handleChange}
+                    >
+                      <option value="">-- Select Employee --</option>
+                      {employees.map(emp => (
+                        <option key={emp.employee_id} value={emp.employee_id}>
+                          {emp.first_name} {emp.last_name}
+                        </option>
+                      ))}
+                    </select>
+                    {formErrors.employee_id && <div className="form-error">{formErrors.employee_id}</div>}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="Draft">Draft</option>
+                      <option value="Submitted">Submitted</option>
+                      <option value="Active">Active</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Canceled">Canceled</option>
+                    </select>
+                    {formErrors.status && <div className="form-error">{formErrors.status}</div>}
+                  </div>
+                </div>
 
+                <div className="right-column">
+                  <div className="form-group">
+                    <label>Approval Status</label>
+                    <select
+                      name="approval_status"
+                      value={formData.approval_status}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                      <option value="Under Review">Under Review</option>
+                    </select>
+                    {formErrors.approval_status && <div className="form-error">{formErrors.approval_status}</div>}
+                  </div>
+                  
                   <div className="form-group">
                     <label>Start Date</label>
                     <input
@@ -269,6 +421,7 @@ const WorkforceRequest = () => {
                       onChange={handleChange}
                       required
                     />
+                    {formErrors.start_date && <div className="form-error">{formErrors.start_date}</div>}
                   </div>
 
                   <div className="form-group">
@@ -280,39 +433,56 @@ const WorkforceRequest = () => {
                       onChange={handleChange}
                       required
                     />
+                    {formErrors.end_date && <div className="form-error">{formErrors.end_date}</div>}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Rejection Reason</label>
+                    <textarea
+                      name="rejection_reason"
+                      value={formData.rejection_reason}
+                      onChange={handleChange}
+                      disabled={formData.approval_status !== 'Rejected'}
+                    />
+                    {formErrors.rejection_reason && <div className="form-error">{formErrors.rejection_reason}</div>}
                   </div>
                 </div>
 
-                {/* Right Column */}
-                <div className="right-column">
-                  <div className="form-group required-skills">
-                    <label>Required Skills</label>
-                    <textarea
-                      name="required_skills"
-                      value={formData.required_skills}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="form-group task-description">
-                    <label>Task Description</label>
-                    <textarea
-                      name="task_description"
-                      value={formData.task_description}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+                <div className="form-group full-width">
+                  <label>Required Skills</label>
+                  <textarea
+                    name="required_skills"
+                    value={formData.required_skills}
+                    onChange={handleChange}
+                    required
+                  />
+                  {formErrors.required_skills && <div className="form-error">{formErrors.required_skills}</div>}
+                </div>
+                
+                <div className="form-group full-width">
+                  <label>Task Description</label>
+                  <textarea
+                    name="task_description"
+                    value={formData.task_description}
+                    onChange={handleChange}
+                    required
+                  />
+                  {formErrors.task_description && <div className="form-error">{formErrors.task_description}</div>}
+                </div>
 
-                  <div className="request-workforce-request-form-buttons">
-                    <button type="button" onClick={handleCancel} className="cancel-btn">
-                      Cancel
-                    </button>
-                    <button type="submit" className="submit-btn" disabled={submitting}>
-                      {submitting ? "Submitting..." : "Save"}
-                    </button>
-                  </div>
+                <div className="form-group full-width">
+                  {formErrors.non_field_errors && (
+                    <div className="form-error">{formErrors.non_field_errors}</div>
+                  )}
+                </div>
+
+                <div className="request-workforce-request-form-buttons">
+                  <button type="button" onClick={handleCancel} className="cancel-btn">
+                    Cancel
+                  </button>
+                  <button type="submit" className="submit-btn" disabled={submitting}>
+                    {submitting ? "Submitting..." : "Save"}
+                  </button>
                 </div>
               </form>
             </div>
