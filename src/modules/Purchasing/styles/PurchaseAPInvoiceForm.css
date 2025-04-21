@@ -1,4 +1,4 @@
-.purchase-ap-invoice-scrollable-wrapper {
+.purchase-ap-invoice-form .purchase-ap-invoice-scrollable-wrapper {
     width: 100%;
     max-height: 80vh;
     overflow-y: auto;
@@ -37,7 +37,7 @@
 }
 
 /* Header Section */
-.purchase-ap-invoice-header {
+.purchase-ap-invoice-form .purchase-ap-invoice-header {
     width: 100%;
     display: flex;
     align-items: center;
@@ -47,7 +47,7 @@
     margin-bottom: 2rem;
 }
 
-.purchase-ap-invoice-header h1 {
+.purchase-ap-invoice-form .purchase-ap-invoice-header h1 {
     flex: 1;
     text-align: center;
     font-size: 1.5rem;
@@ -56,7 +56,7 @@
     font-weight: 600;
 }
 
-.purchase-ap-invoice-back-btn {
+.purchase-ap-invoice-form .purchase-ap-invoice-back-btn {
     position: absolute;
     left: 0;
     border: none;
@@ -70,12 +70,12 @@
     font-weight: 500;
 }
 
-.purchase-ap-invoice-back-btn:hover {
+.purchase-ap-invoice-form .purchase-ap-invoice-back-btn:hover {
     color: #00A8A8;
 }
 
 /* Main Content */
-.purchase-ap-invoice-content {
+.purchase-ap-invoice-form .purchase-ap-invoice-content {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -83,14 +83,14 @@
 }
 
 /* Company Logo and Details Section */
-.purchase-ap-invoice-company-section {
+.purchase-ap-invoice-form .purchase-ap-invoice-company-section {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 2.5rem;
 }
 
-.purchase-ap-invoice-logo {
+.purchase-ap-invoice-form .purchase-ap-invoice-logo {
     width: 400px;
     height: 150px;
     padding: 2rem;
@@ -101,19 +101,19 @@
     margin-top: 4rem;
 }
 
-.purchase-ap-invoice-logo img {
+.purchase-ap-invoice-form .purchase-ap-invoice-logo img {
     width: 400px;
     height: 400px;
     object-fit: contain;
 }
 
-.purchase-ap-invoice-details {
+.purchase-ap-invoice-form .purchase-ap-invoice-details {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-.purchase-ap-invoice-info {
+.purchase-ap-invoice-form .purchase-ap-invoice-info {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -121,20 +121,20 @@
     color: #666;
 }
 
-.purchase-ap-invoice-info label {
+.purchase-ap-invoice-form .purchase-ap-invoice-info label {
     font-size: 0.95rem;
     color: #666;
     font-weight: normal;
 }
 
-.purchase-ap-invoice-info span {
+.purchase-ap-invoice-form .purchase-ap-invoice-info span {
     min-width: 120px;
     text-align: right;
     font-size: 0.95rem;
     color: #333;
 }
 
-.purchase-ap-invoice-info:first-child span {
+.purchase-ap-invoice-form .purchase-ap-invoice-info:first-child span {
     color: #00A8A8;
     display: flex;
     align-items: center;
@@ -143,42 +143,51 @@
 }
 
 /* Addresses Section */
-.purchase-ap-invoice-addresses {
+.purchase-ap-invoice-form .purchase-ap-invoice-addresses {
     display: flex;
     justify-content: space-between;
     gap: 6rem;
     padding: 2rem 0;
 }
 
-.purchase-ap-invoice-from,
-.purchase-ap-invoice-to {
+.purchase-ap-invoice-form .purchase-ap-invoice-from{
     flex: 1;
 }
 
-.purchase-ap-invoice-from h3,
-.purchase-ap-invoice-to h3 {
+.purchase-ap-invoice-form .purchase-ap-invoice-to {
+    flex: 1;
+}
+
+.purchase-ap-invoice-form .purchase-ap-invoice-from h3{
     font-size: 0.95rem;
     color: #666;
     margin-bottom: 0.5rem;
     font-weight: normal;
 }
 
-.purchase-ap-invoice-from h2,
-.purchase-ap-invoice-to h2 {
+.purchase-ap-invoice-form .purchase-ap-invoice-to h3 {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-weight: normal;
+}
+
+.purchase-ap-invoice-form .purchase-ap-invoice-from h2,
+.purchase-ap-invoice-form .purchase-ap-invoice-to h2 {
     font-size: 1.5rem;
     margin: 0 0 1rem 0;
     color: #333;
     font-weight: 600;
 }
 
-.purchase-ap-invoice-from p,
-.purchase-ap-invoice-to p {
+.purchase-ap-invoice-form .purchase-ap-invoice-from p,
+.purchase-ap-invoice-form .purchase-ap-invoice-to p {
     margin: 0.35rem 0;
     color: #666;
     font-size: 0.95rem;
 }
 
-.purchase-ap-invoice-to {
+.purchase-ap-invoice-form .purchase-ap-invoice-to {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -186,32 +195,32 @@
     gap: 2rem;
 }
 
-.purchase-ap-invoice-to > div {
+.purchase-ap-invoice-form .purchase-ap-invoice-to > div {
     flex: 0 1 auto;
     width: 100%;
     max-width: 300px;
 }
 
-.purchase-ap-invoice-to h3 {
+.purchase-ap-invoice-form .purchase-ap-invoice-to h3 {
     margin-bottom: 1rem;
 }
 
 /* Table Section */
-.purchase-ap-invoice-table {
+.purchase-ap-invoice-form .purchase-ap-invoice-table {
     width: 100%;
     overflow-x: auto;
     border: 1px solid #D2D2D2;
     border-radius: 8px;
 }
 
-.purchase-ap-invoice-table table {
+.purchase-ap-invoice-form .purchase-ap-invoice-table table {
     width: 100%;
     border-collapse: collapse;
     min-width: 800px;
 }
 
-.purchase-ap-invoice-table th,
-.purchase-ap-invoice-table td {
+.purchase-ap-invoice-form .purchase-ap-invoice-table th,
+.purchase-ap-invoice-form .purchase-ap-invoice-table td {
     padding: 0.75rem 1rem;
     text-align: left;
     border-bottom: 1px solid #eee;
@@ -219,75 +228,75 @@
     font-size: 0.95rem;
 }
 
-.purchase-ap-invoice-table th {
+.purchase-ap-invoice-form .purchase-ap-invoice-table th {
     background-color: white;
     font-weight: 500;
     color: #666;
 }
 
-.purchase-ap-invoice-table td {
+.purchase-ap-invoice-form .purchase-ap-invoice-table td {
     color: #666;
 }
 
 /* Payment and Total Section */
-.purchase-ap-invoice-summary {
+.purchase-ap-invoice-form .purchase-ap-invoice-summary {
     display: flex;
     justify-content: space-between;
     gap: 6rem;
 }
 
-.purchase-ap-invoice-payment {
+.purchase-ap-invoice-form .purchase-ap-invoice-payment {
     flex: 1;
 }
 
-.purchase-ap-invoice-payment h3 {
+.purchase-ap-invoice-form .purchase-ap-invoice-payment h3 {
     font-size: 0.95rem;
     color: #666;
     margin-bottom: 1rem;
     font-weight: normal;
 }
 
-.payment-details p {
+.purchase-ap-invoice-form .payment-details p {
     margin: 0.35rem 0;
     color: #666;
     font-size: 0.95rem;
 }
 
-.purchase-ap-invoice-totals {
+.purchase-ap-invoice-form .purchase-ap-invoice-totals {
     flex: 1;
     max-width: 300px;
 }
 
-.total-row {
+.purchase-ap-invoice-form .total-row {
     display: flex;
     justify-content: space-between;
     padding: 0.35rem 0;
     font-size: 0.95rem;
 }
 
-.total-row span:first-child {
+.purchase-ap-invoice-form .total-row span:first-child {
     color: #666;
 }
 
-.total-row span:last-child {
+.purchase-ap-invoice-form .total-row span:last-child {
     color: #333;
     font-weight: 500;
 }
 
-.total-row.balance-due {
+.purchase-ap-invoice-form .total-row.balance-due {
     margin-top: 1rem;
     padding-top: 1rem;
     border-top: 1px solid #eee;
     font-weight: 500;
 }
 
-.total-row.balance-due span {
+.purchase-ap-invoice-form .total-row.balance-due span {
     color: #333;
     font-size: 1rem;
 }
 
 /* Done Button */
-.purchase-ap-invoice-done-btn {
+.purchase-ap-invoice-form .purchase-ap-invoice-done-btn {
     align-self: flex-end;
     padding: 0.5rem 2rem;
     background-color: #00A8A8;
@@ -299,6 +308,6 @@
     transition: background-color 0.2s ease;
 }
 
-.purchase-ap-invoice-done-btn:hover {
+.purchase-ap-invoice-form .purchase-ap-invoice-done-btn:hover {
     background-color: #008080;
 }

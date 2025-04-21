@@ -161,7 +161,8 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
         )}
         <form onSubmit={handleSubmit}>
           <div className="po-edit-form-group">
-            <label>Status</label>
+            <div className="label-req">
+            <label>Status</label></div>
             <select
               name="status"
               value={formData.status}
@@ -178,7 +179,8 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
             </select>
           </div>
           <div className="po-edit-form-group">
-            <label>Delivery Date</label>
+            <div className="label-req">
+            <label>Delivery Date</label></div>
             <input
               type="date"
               name="delivery_date"

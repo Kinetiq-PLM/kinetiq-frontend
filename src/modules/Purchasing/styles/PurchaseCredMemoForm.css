@@ -158,14 +158,14 @@
     border: 1px solid #e6e6e6;
 }
 
-.items-table {
+.purchase-cred-memo-form .items-table {
     width: 100%;
     border-collapse: collapse;
     background: white;
 }
 
-.items-table th, 
-.items-table td {
+.purchase-cred-memo-form .items-table th, 
+.purchase-cred-memo-form .items-table td {
     padding: 0.75rem 1rem;
     text-align: center;
     border: 1px solid #e6e6e6;
@@ -173,27 +173,27 @@
     font-size: 0.875rem;
 }
 
-.items-table th {
+.purchase-cred-memo-form .items-table th {
     background-color: #fff;
     font-weight: 500;
     color: #666;
     border-top: none;
 }
 
-.items-table th:first-child {
+.purchase-cred-memo-form .items-table th:first-child {
     border-left: none;
 }
 
-.items-table th:last-child {
+.purchase-cred-memo-form .items-table th:last-child {
     border-right: none;
 }
 
-.items-table td {
+.purchase-cred-memo-form .items-table td {
     border-left: none;
     border-right: none;
 }
 
-.items-table tr:last-child td {
+.purchase-cred-memo-form .items-table tr:last-child td {
     border-bottom: none;
 }
 

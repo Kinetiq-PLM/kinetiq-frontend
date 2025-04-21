@@ -11,6 +11,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   const [materials, setMaterials] = useState([]);
   const [assets, setAssets] = useState([]);
   const [isDownpaymentEnabled, setIsDownpaymentEnabled] = useState(false);
+  const [employeeMap, setEmployeeMap] = useState({}); // State to store employee data
   const [isPopupVisible, setIsPopupVisible] = useState(false); // Popup state
   const [formData, setFormData] = useState({
     vendor: "",
@@ -35,6 +36,50 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
     deliveryDate: "",
     popupStatus: "",
   });
+  // Fetch employee data and map employee_id to employee_name
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
+        const employeeData = response.data.reduce((map, employee) => {
+          const fullName = `${employee.first_name} ${employee.last_name}`.trim();
+          map[employee.employee_id] = fullName;
+          return map;
+        }, {});
+        setEmployeeMap(employeeData);
+      } catch (error) {
+        console.error("Error fetching employees:", error.response?.data || error.message);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
+  // Fetch the employee_id matching the request_id
+  useEffect(() => {
+    const fetchEmployeeIdForRequest = async () => {
+      if (!requestId) return;
+
+      try {
+        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
+        const matchingRequest = response.data.find((req) => req.request_id === requestId);
+
+        if (matchingRequest?.employee_id) {
+          const employeeName = employeeMap[matchingRequest.employee_id] || "Unknown Employee";
+          setFormData((prev) => ({
+            ...prev,
+            buyer: employeeName, // Set the buyer field to the employee_name
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching request data:", error.response?.data || error.message);
+      }
+    };
+
+    fetchEmployeeIdForRequest();
+  }, [requestId, employeeMap]);
+
+  
 
   // Fetch data when the component mounts or when requestId changes
   useEffect(() => {
@@ -159,84 +204,121 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   computeTotalPaymentDue();
 }, [formData.totalAmount, formData.discountPercentage, formData.downpayment_request.value, formData.freight, formData.tax]);
 
-  useEffect(() => {
-    const fetchQuotationData = async () => {
-  if (quotation) {
-    console.log("Using passed quotation data:", quotation);
-    setFormData({
-      vendor: quotation.vendor_code || "",
-      documentNumber: quotation.document_no || "",
-      status: quotation.status || "",
-      validUntil: quotation.valid_date || "",
-      documentDate: quotation.document_date || "",
-      requiredDate: quotation.required_date || "",
-      totalAmount: quotation.total_before_discount || "",
-      discountPercentage: quotation.discount_percent || "",
-      freight: quotation.freight || "",
-      tax: quotation.tax || "",
-      totalPaymentDue: quotation.total_payment || "",
-      request_id: quotation.request_id || null,
-      remarks: quotation.remarks || "",
-      delivery_loc: quotation.delivery_loc || "",
-      downpayment_request: {
-        enabled: !!quotation.downpayment_request,
-        value: quotation.downpayment_request || "",
-      },
-      buyer: quotation.employee_name || "Unknown Employee",
-    });
+useEffect(() => {
+  const fetchQuotationData = async () => {
+    if (quotation) {
+      console.log("Using passed quotation data:", quotation);
 
-    if (quotation.request_id) {
-      await fetchItems();
-    }
-  } else if (request) {
-    console.log("Using passed request data:", request);
-    setFormData({
-      vendor: request.vendor_code || "",
-      documentNumber: request.document_no || "",
-      status: request.status || "",
-      validUntil: request.valid_date || "",
-      documentDate: request.document_date || "",
-      requiredDate: request.required_date || "",
-      totalAmount: request.total_before_discount || "",
-      discountPercentage: request.discount_percent || "",
-      freight: request.freight || "",
-      tax: request.tax || "",
-      totalPaymentDue: request.total_payment || "",
-      request_id: request.request_id || null,
-      remarks: request.remarks || "",
-      delivery_loc: request.delivery_loc || "",
-      downpayment_request: {
-        enabled: !!request.downpayment_request,
-        value: request.downpayment_request || "",
-      },
-      buyer: request.employee_name || "Unknown Employee",
-    });
+      // Find the vendor based on the vendor_code
+      const selectedVendor = vendors.find((v) => v.vendor_code === quotation.vendor_code);
 
-    if (request.request_id) {
-      await fetchItems();
-    }
-  }
-};
-    fetchQuotationData();
-}, [quotation, request]);
+      setFormData({
+        vendor: quotation.vendor_code || "",
+        documentNumber: quotation.document_no || "",
+        status: quotation.status || "",
+        validUntil: quotation.valid_date || "",
+        documentDate: quotation.document_date || "",
+        requiredDate: quotation.required_date || "",
+        totalAmount: quotation.total_before_discount || "",
+        discountPercentage: quotation.discount_percent || "",
+        freight: quotation.freight || "",
+        tax: quotation.tax || "",
+        totalPaymentDue: quotation.total_payment || "",
+        request_id: quotation.request_id || null,
+        remarks: quotation.remarks || "",
+        delivery_loc: quotation.delivery_loc || "",
+        downpayment_request: {
+          enabled: !!quotation.downpayment_request,
+          value: quotation.downpayment_request || "",
+        },
+        buyer: quotation.employee_name || "Unknown Employee",
+        owner: selectedVendor?.vendor_name || "n/a", // Set the owner field
+      });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "vendor") {
-      const selectedVendor = vendors.find((v) => v.vendor_code === value);
-      setFormData((prev) => ({
-        ...prev,
-        vendor: value,
-        owner: selectedVendor?.vendor_name || "",
-        contactPerson: selectedVendor?.contact_person || "",
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      if (quotation.request_id) {
+        await fetchItems();
+      }
+    } else if (request) {
+      console.log("Using passed request data:", request);
+
+      // Find the vendor based on the vendor_code
+      const selectedVendor = vendors.find((v) => v.vendor_code === request.vendor_code);
+
+      setFormData({
+        vendor: request.vendor_code || "",
+        documentNumber: request.document_no || "",
+        status: request.status || "",
+        validUntil: request.valid_date || "",
+        documentDate: request.document_date || "",
+        requiredDate: request.required_date || "",
+        totalAmount: request.total_before_discount || "",
+        discountPercentage: request.discount_percent || "",
+        freight: request.freight || "",
+        tax: request.tax || "",
+        totalPaymentDue: request.total_payment || "",
+        request_id: request.request_id || null,
+        remarks: request.remarks || "",
+        delivery_loc: request.delivery_loc || "",
+        downpayment_request: {
+          enabled: !!request.downpayment_request,
+          value: request.downpayment_request || "",
+        },
+        buyer: request.employee_name || "Unknown Employee",
+        owner: selectedVendor?.vendor_name || "n/a", // Set the owner field
+      });
+
+      if (request.request_id) {
+        await fetchItems();
+      }
     }
   };
+
+  fetchQuotationData();
+}, [quotation, request, vendors]);
+
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  if (name === "vendor") {
+    // Find the selected vendor from the vendors array
+    const selectedVendor = vendors.find((v) => v.vendor_code === value);
+    console.log("Selected Vendor:", selectedVendor); // Debugging
+
+    // Update the formData with the selected vendor details
+    setFormData((prev) => ({
+      ...prev,
+      vendor: value,
+      owner: selectedVendor?.vendor_name || "n/a", // Set the owner field to the vendor_name
+      contactPerson: selectedVendor?.contact_person || "", // Set the contact person
+    }));
+  } else {
+    // Update other fields
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+};
+
+// Fetch vendors when the component mounts
+useEffect(() => {
+  const fetchVendors = async () => {
+    try {
+      const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/");
+      console.log("Vendors fetched:", response.data); // Debugging
+      setVendors(response.data);
+    } catch (error) {
+      console.error("Error fetching vendors:", error.response?.data || error.message);
+    }
+  };
+
+  fetchVendors();
+}, []);
+
+// Log formData updates for debugging
+useEffect(() => {
+  console.log("Form Data Updated:", formData); // Debugging
+}, [formData]);
 
   const handleSubmit = async () => {
     const payload = {
@@ -439,7 +521,7 @@ const handleSendTo = async () => {
                 className="purchquoteform-send"
                 onClick={() => setIsPopupVisible(true)}
               >
-                Send To
+                Proceed To Order
               </button>
             )}
           </div>
@@ -447,7 +529,8 @@ const handleSendTo = async () => {
           <div className="purchquoteform-content">
             <div className="purchquoteform-grid">
               <div className="form-group">
-                <label>Contact Person</label>
+                <div className="label-req">
+                <label >Contact Person</label></div>
                 <select name="vendor" value={formData.vendor} onChange={handleInputChange}>
                   <option value="">Select Vendor</option>
                   {vendors.map((v) => (
@@ -469,7 +552,8 @@ const handleSendTo = async () => {
                 />
               </div>
               <div className="form-group">
-                <label>Status</label>
+                <div className="label-req">
+                <label>Status</label></div>
                 <select name="status" value={formData.status} onChange={handleInputChange}>
                   <option value="">Select Status</option>
                   <option value="Pending">Pending</option>
@@ -489,7 +573,8 @@ const handleSendTo = async () => {
                 />
               </div>
               <div className="form-group">
-                <label>Document Date</label>
+                <div className="label-req">
+                <label>Document Date</label></div>
                 <input 
                   type="date" 
                   name="documentDate"
@@ -499,7 +584,8 @@ const handleSendTo = async () => {
                 />
               </div>
               <div className="form-group">
-                <label>Currency</label>
+                <div className="label-req">
+                <label>Currency</label></div>
                 <input 
                   type="text" 
                   name="currency"
@@ -508,7 +594,8 @@ const handleSendTo = async () => {
                 />
               </div>
               <div className="form-group">
-                <label>Valid until</label>
+                <div className="label-req">
+                <label>Valid until</label></div>
                 <input 
                   type="date" 
                   name="validUntil"
@@ -518,7 +605,8 @@ const handleSendTo = async () => {
                 />
               </div>
               <div className="form-group">
-                <label>Required Date</label>
+              <div className="label-req">
+                <label>Required Date</label></div>
                 <input 
                   type="date" 
                   name="requiredDate"
@@ -560,25 +648,30 @@ const handleSendTo = async () => {
             <div className="purchquoteform-details">
               <div className="details-left">
                 <div className="form-group">
-                  <label>Buyer</label>
+                  <div className="label-req">
+                  <label>Buyer</label></div>
                   <input 
                     type="text" 
                     name="buyer"
                     value={formData.buyer}
                     onChange={handleInputChange}
+                    disabled
                   />
                 </div>
                 <div className="form-group">
-                  <label>Owner</label>
+                  <div className="label-req">
+                  <label>Owner</label></div>
                   <input 
                     type="text" 
                     name="owner"
                     value={formData.owner}
                     onChange={handleInputChange}
+                    disabled
                   />
                 </div>
                 <div className="form-group">
-                  <label>Delivery Location</label>
+                  <div className="label-req">
+                  <label>Delivery Location</label></div>
                   <input 
                     type="text" 
                     name="delivery_loc"
@@ -609,45 +702,47 @@ const handleSendTo = async () => {
                   />
                 </div>
                 <div className="form-group">
-  <label className="downpayment-label" >
-    <input
-    className="input-with-symbol"
-      type="checkbox"
-      checked={formData.downpayment_request.enabled}
-      onChange={(e) =>
-        setFormData((prev) => ({
-          ...prev,
-          downpayment_request: {
-            ...prev.downpayment_request,
-            enabled: e.target.checked, // Toggle the enabled state
-            value: e.target.checked ? prev.downpayment_request.value : "", // Reset value if unchecked
-          },
-        }))
-      }
-    />
-    Downpayment&nbsp;Request
-  </label>
-  <div className="input-with-symbol">
-  <input
-    type="text"
-    name="downpayment_request"
-    value={formData.downpayment_request.value}
-    onChange={(e) =>
-      setFormData((prev) => ({
-        ...prev,
-        downpayment_request: {
-          ...prev.downpayment_request,
-          value: e.target.value, // Update the value
-        },
-      }))
-    }
-    disabled={!formData.downpayment_request.enabled} // Disable the input if the toggle is off
-  />
-  <span>%</span>
-</div>
+                <div className="label-req">
+                  <label className="downpayment-label" >
+                    <input
+                    className="input-with-symbol"
+                      type="checkbox"
+                      checked={formData.downpayment_request.enabled}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          downpayment_request: {
+                            ...prev.downpayment_request,
+                            enabled: e.target.checked, // Toggle the enabled state
+                            value: e.target.checked ? prev.downpayment_request.value : "", // Reset value if unchecked
+                          },
+                        }))
+                      }
+                    />
+                    Downpayment&nbsp;Request
+                  </label></div>
+                  <div className="input-with-symbol">
+                  <input
+                    type="text"
+                    name="downpayment_request"
+                    value={formData.downpayment_request.value}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        downpayment_request: {
+                          ...prev.downpayment_request,
+                          value: e.target.value, // Update the value
+                        },
+                      }))
+                    }
+                    disabled={!formData.downpayment_request.enabled} // Disable the input if the toggle is off
+                  />
+                  <span>%</span>
+                </div>
                 </div>
                 <div className="form-group">
-                  <label>Discount Percentage</label>
+                  <div className="label-req">
+                  <label>Discount Percentage</label></div>
                   <div className="input-with-symbol">
                     <input
                       type="text"
@@ -659,7 +754,8 @@ const handleSendTo = async () => {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Freight</label>
+                  <div className="label-req">
+                  <label>Freight</label></div>
                   <input 
                     type="text" 
                     name="freight"
@@ -668,7 +764,8 @@ const handleSendTo = async () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Tax</label>
+                  <div className="label-req">
+                  <label>Tax</label></div>
                   <input 
                     type="text" 
                     name="tax"
@@ -687,7 +784,7 @@ const handleSendTo = async () => {
                   />
                 </div>
                 
-                </div>
+              </div>
             </div>
           </div>
 
@@ -755,7 +852,6 @@ const handleSendTo = async () => {
         )}
 
           <div className="purchquoteform-footer">
-            <button className="purchquoteform-copy">Copy From</button>
           </div>
         </div>
       </div>
