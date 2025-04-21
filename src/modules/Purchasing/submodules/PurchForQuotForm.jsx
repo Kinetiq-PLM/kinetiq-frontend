@@ -16,22 +16,24 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
     vendor: "",
     documentNumber: "",
     status: "",
-    contactPerson: "Son Goku",
+    contactPerson: "",
     documentDate: new Date().toISOString().split("T")[0],
     currency: "Philippine Peso",
     validUntil: "",
     requiredDate: "",
-    buyer: employeeName, // Set the buyer to the employee_name
-    owner: "Me",
-    deliveryLocation: "Me",
-    remarks: "Please Deliver ASAP", // New field
-    delivery_loc: "", // New field
-    downpayment_request: { enabled: false, value: "" }, // Add an object to track both the toggle and the value
-    totalAmount: "",
-    discountPercentage: "",
-    freight: "1620.00",
-    tax: "2.00",
-    totalPaymentDue: "2.00",
+    buyer: "",
+    owner: "",
+    deliveryLocation: "",
+    remarks: "",
+    delivery_loc: "",
+    downpayment_request: { enabled: false, value: "" },
+    totalAmount: "0.00",
+    discountPercentage: "0",
+    freight: "0.00",
+    tax: "0.00",
+    totalPaymentDue: "0.00",
+    deliveryDate: "",
+    popupStatus: "",
   });
 
   // Fetch data when the component mounts or when requestId changes
@@ -54,7 +56,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
     try {
         const response = await axios.get(`https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/list/`);
         const filteredItems = response.data.filter((item) => item.request_id === requestId);
-        console.log("Filtered Items for Request ID:", filteredItems); // Debugging
+        console.log("Filtered Items:", filteredItems);
         setItems(filteredItems); // Set only the items related to the request_id
     } catch (error) {
         console.error("Error fetching quotation items:", error.response?.data || error.message);
@@ -159,65 +161,62 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
 
   useEffect(() => {
     const fetchQuotationData = async () => {
-        if (quotation) {
-            console.log("Using passed quotation data:", quotation);
-            setFormData({
-                vendor: quotation.vendor_code || "",
-                documentNumber: quotation.document_no || "",
-                status: quotation.status || "",
-                validUntil: quotation.valid_date || "",
-                documentDate: quotation.document_date || "",
-                requiredDate: quotation.required_date || "",
-                totalAmount: quotation.total_before_discount || "",
-                discountPercentage: quotation.discount_percent || "",
-                freight: quotation.freight || "",
-                tax: quotation.tax || "",
-                totalPaymentDue: quotation.total_payment || "",
-                request_id: quotation.request_id || null,
-                remarks: quotation.remarks || "",
-                delivery_loc: quotation.delivery_loc || "",
-                downpayment_request: {
-                    enabled: !!quotation.downpayment_request,
-                    value: quotation.downpayment_request || "",
-                },
-                buyer: quotation.employee_name || "Unknown Employee", // Set buyer to employee_name
-            });
+  if (quotation) {
+    console.log("Using passed quotation data:", quotation);
+    setFormData({
+      vendor: quotation.vendor_code || "",
+      documentNumber: quotation.document_no || "",
+      status: quotation.status || "",
+      validUntil: quotation.valid_date || "",
+      documentDate: quotation.document_date || "",
+      requiredDate: quotation.required_date || "",
+      totalAmount: quotation.total_before_discount || "",
+      discountPercentage: quotation.discount_percent || "",
+      freight: quotation.freight || "",
+      tax: quotation.tax || "",
+      totalPaymentDue: quotation.total_payment || "",
+      request_id: quotation.request_id || null,
+      remarks: quotation.remarks || "",
+      delivery_loc: quotation.delivery_loc || "",
+      downpayment_request: {
+        enabled: !!quotation.downpayment_request,
+        value: quotation.downpayment_request || "",
+      },
+      buyer: quotation.employee_name || "Unknown Employee",
+    });
 
-            // Fetch items related to the quotation's request_id
-            if (quotation.request_id) {
-                await fetchItems();
-            }
-        } else if (request) {
-            console.log("Using passed request data:", request);
-            setFormData({
-                vendor: request.vendor_code || "",
-                documentNumber: request.document_no || "",
-                status: request.status || "",
-                validUntil: request.valid_date || "",
-                documentDate: request.document_date || "",
-                requiredDate: request.required_date || "",
-                totalAmount: request.total_before_discount || "",
-                discountPercentage: request.discount_percent || "",
-                freight: request.freight || "",
-                tax: request.tax || "",
-                totalPaymentDue: request.total_payment || "",
-                request_id: request.request_id || null,
-                remarks: request.remarks || "",
-                delivery_loc: request.delivery_loc || "",
-                downpayment_request: {
-                    enabled: !!request.downpayment_request,
-                    value: request.downpayment_request || "",
-                },
-                buyer: request.employee_name || "Unknown Employee", // Set buyer to employee_name
-            });
+    if (quotation.request_id) {
+      await fetchItems();
+    }
+  } else if (request) {
+    console.log("Using passed request data:", request);
+    setFormData({
+      vendor: request.vendor_code || "",
+      documentNumber: request.document_no || "",
+      status: request.status || "",
+      validUntil: request.valid_date || "",
+      documentDate: request.document_date || "",
+      requiredDate: request.required_date || "",
+      totalAmount: request.total_before_discount || "",
+      discountPercentage: request.discount_percent || "",
+      freight: request.freight || "",
+      tax: request.tax || "",
+      totalPaymentDue: request.total_payment || "",
+      request_id: request.request_id || null,
+      remarks: request.remarks || "",
+      delivery_loc: request.delivery_loc || "",
+      downpayment_request: {
+        enabled: !!request.downpayment_request,
+        value: request.downpayment_request || "",
+      },
+      buyer: request.employee_name || "Unknown Employee",
+    });
 
-            // Fetch items related to the request's request_id
-            if (request.request_id) {
-                await fetchItems();
-            }
-        }
-    };
-
+    if (request.request_id) {
+      await fetchItems();
+    }
+  }
+};
     fetchQuotationData();
 }, [quotation, request]);
 
@@ -410,6 +409,7 @@ const handleSendTo = async () => {
   
 
   const getItemName = (id, type) => {
+    console.log("Getting item name for ID:", id, "Type:", type);
     if (type === "material") {
       const material = materials.find((m) => m.material_id === id);
       return material ? material.material_name : "Unknown Material";

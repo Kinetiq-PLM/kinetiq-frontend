@@ -166,28 +166,29 @@ const BodyContent = ({ onClose }) => {
         quotation_content_id: null,
         items: formData.items,
       };
-
+  
       const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/submit/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
+  
       if (!res.ok) throw new Error("Fill up the form first");
-
+  
       const saved = await res.json();
-      console.log(" ", saved);
-
+      console.log("Saved:", saved);
+  
       setSuccessMessage("Purchase request saved successfully!");
       setIsSaveClicked(true);
       setTimeout(() => {
         setSuccessMessage("");
       }, 3000);
     } catch (error) {
+      console.log("Error:", error.message); // Log the error
       setError(error.message);
       setTimeout(() => {
         setError("");
-      }, 2000);
+      }, 5000); // Increased timeout duration
     } finally {
       setIsLoading(false);
     }
@@ -201,18 +202,22 @@ const BodyContent = ({ onClose }) => {
       }, 2000);
       return;
     }
-
+  
     try {
       for (const item of formData.items) {
         await createQuotationContent(item);
       }
+  
       setSuccessMessage("Submitted successfully!");
       setTimeout(() => {
         setSuccessMessage("");
-        onClose(); // Close the form after submission
+        window.location.reload(); // Refresh the page after showing the success message
       }, 3000);
     } catch (error) {
       setError(error.message || "Error submitting quotation content");
+      setTimeout(() => {
+        setError("");
+      }, 5000);
     }
   };
 
@@ -222,9 +227,9 @@ const BodyContent = ({ onClose }) => {
       department: "",
       email: "",
       requestType: "Material",
-      dateRequested: "",
+      dateRequested: format(new Date(), "yyyy-MM-dd"),
       dateValid: "",
-      documentDate: "",
+      documentDate: format(new Date(), "yyyy-MM-dd"),
       employeeId: "",
       items: [],
     });
