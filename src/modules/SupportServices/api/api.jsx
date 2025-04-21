@@ -1,6 +1,6 @@
 // const API_BASE_URL = "http://localhost:8000/";
-const API_BASE_URL = "http://localhost:8001/";
-// const API_BASE_URL = "https://wdsuewblda.execute-api.ap-southeast-1.amazonaws.com/dev/";
+// const API_BASE_URL = "http://localhost:8001/";
+const API_BASE_URL = "https://wdsuewblda.execute-api.ap-southeast-1.amazonaws.com/dev/";
 const API_BASE_URL_NOTIF = "https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/";
 
 export const GET = async (endpoint) => {
