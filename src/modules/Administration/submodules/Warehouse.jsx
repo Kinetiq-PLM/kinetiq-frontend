@@ -20,6 +20,7 @@ import {
     PlusOutlined,
     EyeOutlined,
     EditOutlined,
+    DeleteOutlined,
     UndoOutlined,
     SearchOutlined
 } from "@ant-design/icons";
@@ -37,6 +38,7 @@ const Warehouse = () => {
     const [searchValue, setSearchValue] = useState("");
     const [archivedSearchValue, setArchivedSearchValue] = useState("");
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [viewDetailsModalVisible, setViewDetailsModalVisible] = useState(false);
 
     // Pagination states
     const [activeTab] = useState("warehouse");
@@ -134,6 +136,11 @@ const Warehouse = () => {
         setWarehouseModalVisible(true);
     };
 
+    const handleViewDetails = (record) => {
+        setSelectedRecord(record);
+        setViewDetailsModalVisible(true);
+    };
+
     const handleEditWarehouse = (record) => {
         setModalMode("edit");
         setSelectedRecord(record);
@@ -189,6 +196,22 @@ const Warehouse = () => {
         }
     };
 
+    // Handle table sorting
+    const handleTableChange = (pagination, filters, sorter, extra) => {
+        if (sorter && sorter.field) {
+            const orderField = sorter.field;
+            const orderDirection = sorter.order;
+            fetchWarehouse(searchValue, orderField, orderDirection);
+        }
+    };
+
+    const handleArchivedTableChange = (pagination, filters, sorter, extra) => {
+        if (sorter && sorter.field) {
+            const orderField = sorter.field;
+            const orderDirection = sorter.order;
+            fetchArchivedWarehouse(archivedSearchValue, orderField, orderDirection);
+        }
+    };
 
     // Table columns definitions with sorting added
     const warehouseColumns = [
@@ -197,7 +220,7 @@ const Warehouse = () => {
             dataIndex: "warehouse_id",
             key: "warehouse_id",
             sorter: true,
-            width: 100,
+            width: 120,
         },
         {
             title: "Warehouse Location",
@@ -211,12 +234,12 @@ const Warehouse = () => {
             dataIndex: "stored_materials",
             key: "stored_materials",
             sorter: true,
-            width: 250,
+            width: 300,
         },
         {
             title: "Actions",
             key: "actions",
-            width: 60, // Fixed width for actions column
+            width: 80, // Increased width for 3 buttons
             align: "center",
             render: (_, record) => (
                 <Space size="small">
@@ -226,11 +249,22 @@ const Warehouse = () => {
                         size="small"
                         onClick={() => handleEditWarehouse(record)}
                     />
+                    <Popconfirm
+                        title="Are you sure you want to archive this warehouse?"
+                        onConfirm={() => handleArchiveWarehouse(record.warehouse_id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            size="small"
+                        />
+                    </Popconfirm>
                 </Space>
             ),
         },
     ];
-
 
     const archivedWarehouseColumns = [
         {
@@ -259,10 +293,16 @@ const Warehouse = () => {
         {
             title: "Actions",
             key: "actions",
-            width: 10, // Fixed width for actions column
+            width: 80,
             align: "center",
             render: (_, record) => (
                 <Space size="small">
+                    <Button
+                        type="primary"
+                        icon={<EyeOutlined />}
+                        size="small"
+                        onClick={() => handleViewDetails(record)}
+                    />
                     <Popconfirm
                         title="Are you sure you want to restore this warehouse?"
                         onConfirm={() => handleRestoreWarehouse(record.warehouse_id)}
@@ -288,7 +328,6 @@ const Warehouse = () => {
         return warehouse.slice(start, end);
     };
 
-
     // Render main component
     return (
         <div className="warehouse">
@@ -303,7 +342,7 @@ const Warehouse = () => {
                         activeKey={activeTab}
                         size="middle"
                         tabBarGutter={8}
-                        className="user-tabs"
+                        className="warehouse-tabs"
                         type={windowWidth <= 768 ? "card" : "line"}
                         tabPosition="top"
                         destroyInactiveTabPane={false}
@@ -379,6 +418,7 @@ const Warehouse = () => {
                                     size="middle"
                                     showSorterTooltip={false}
                                     sortDirections={['ascend', 'descend']}
+                                    onChange={handleTableChange}
                                     className="scrollable-table"
                                 />
                             </div>
@@ -428,7 +468,44 @@ const Warehouse = () => {
                     </Form>
                 </Modal>
 
-                {/* Archived Roles Modal */}
+                {/* View Details Modal */}
+                <Modal
+                    title="Warehouse Details"
+                    visible={viewDetailsModalVisible}
+                    onCancel={() => setViewDetailsModalVisible(false)}
+                    footer={[
+                        <Button key="close" onClick={() => setViewDetailsModalVisible(false)}>
+                            Close
+                        </Button>
+                    ]}
+                    width={700}
+                    className="custom-modal"
+                >
+                    {selectedRecord && (
+                        <div className="warehouse-details">
+                            <div className="detail-item">
+                                <Typography.Text strong>Warehouse ID:</Typography.Text>
+                                <Typography.Text>{selectedRecord.warehouse_id}</Typography.Text>
+                            </div>
+                            <div className="detail-item">
+                                <Typography.Text strong>Warehouse Location:</Typography.Text>
+                                <Typography.Text>
+                                    {selectedRecord.warehouse_location && selectedRecord.warehouse_location.startsWith("ARCHIVED_") 
+                                        ? selectedRecord.warehouse_location.replace("ARCHIVED_", "") 
+                                        : selectedRecord.warehouse_location}
+                                </Typography.Text>
+                            </div>
+                            <div className="detail-item">
+                                <Typography.Text strong>Stored Materials:</Typography.Text>
+                                <Typography.Paragraph>
+                                    {selectedRecord.stored_materials || "No materials information available"}
+                                </Typography.Paragraph>
+                            </div>
+                        </div>
+                    )}
+                </Modal>
+
+                {/* Archived Warehouses Modal */}
                 <Modal
                     title="Archived Warehouse"
                     visible={archiveModalVisible}
@@ -467,6 +544,7 @@ const Warehouse = () => {
                         size="middle"
                         showSorterTooltip={false}
                         sortDirections={['ascend', 'descend']}
+                        onChange={handleArchivedTableChange}
                     />
                 </Modal>
             </div>
