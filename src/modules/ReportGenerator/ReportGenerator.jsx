@@ -345,14 +345,22 @@ const BodyContent = ({employee_id}) => {
     };
 
     // Function to call the chatbot backend API
-    const getBotResponse = async (userMessageText) => {
+    const getBotResponse = async (userMessageText, currentConversationId) => { // Added currentConversationId
+        // --- Ensure conversation ID is present ---
+        if (!currentConversationId) {
+            console.error("Cannot get bot response without a conversation ID.");
+            throw new Error("Conversation ID is missing.");
+        }
+
         try {
-            const encodedMessage = encodeURIComponent(userMessageText);
-            const response = await fetch(`${API_BASE_URL}chatbot/chatbot/?message=${encodedMessage}`, {
-                method: 'GET',
+            // --- Update URL to include conversation ID ---
+            const response = await fetch(`${API_BASE_URL}chatbot/conversations/${currentConversationId}/respond/`, {
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json', 
-                }
+                    'Content-Type': 'application/json',
+                    // Add other headers like Authorization if needed
+                },
+                body: JSON.stringify({ message: userMessageText })
             });
 
             if (!response.ok) {
@@ -361,19 +369,17 @@ const BodyContent = ({employee_id}) => {
             }
 
             const botData = await response.json();
-            // The backend returns { response: "text", data: {...}, sql_error: "..." }
-            return botData; 
+            return botData;
 
         } catch (err) {
             console.error('Error fetching bot response:', err);
-            // Re-throw the error to be handled in handleSendMessage
-            throw err; 
+            throw err;
         }
     };
 
     const handleSendMessage = async () => {
         const trimmedInput = inputText.trim();
-        if (trimmedInput === "" || isBotResponding) return; // Don't send empty messages
+        if (trimmedInput === "" || isBotResponding || !activeConversationId) return; // Don't send empty messages
 
         let currentConversationId = activeConversationId;
 
@@ -464,7 +470,7 @@ const BodyContent = ({employee_id}) => {
             };
             setMessages(prev => [...prev, thinkingMessage]);
 
-            const botApiResponse = await getBotResponse(trimmedInput);
+            const botApiResponse = await getBotResponse(trimmedInput, activeConversationId);
 
             // Remove the "thinking" message
             setMessages(prev => prev.filter(msg => msg.id !== thinkingMessage.id));
