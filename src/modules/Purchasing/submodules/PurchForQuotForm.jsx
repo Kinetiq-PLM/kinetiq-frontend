@@ -439,7 +439,7 @@ const handleSendTo = async () => {
                 className="purchquoteform-send"
                 onClick={() => setIsPopupVisible(true)}
               >
-                Send To
+                Proceed To Order
               </button>
             )}
           </div>
@@ -447,7 +447,8 @@ const handleSendTo = async () => {
           <div className="purchquoteform-content">
             <div className="purchquoteform-grid">
               <div className="form-group">
-                <label>Contact Person</label>
+                <div className="label-req">
+                <label >Contact Person</label></div>
                 <select name="vendor" value={formData.vendor} onChange={handleInputChange}>
                   <option value="">Select Vendor</option>
                   {vendors.map((v) => (
@@ -469,7 +470,8 @@ const handleSendTo = async () => {
                 />
               </div>
               <div className="form-group">
-                <label>Status</label>
+                <div className="label-req">
+                <label>Status</label></div>
                 <select name="status" value={formData.status} onChange={handleInputChange}>
                   <option value="">Select Status</option>
                   <option value="Pending">Pending</option>
@@ -489,7 +491,8 @@ const handleSendTo = async () => {
                 />
               </div>
               <div className="form-group">
-                <label>Document Date</label>
+                <div className="label-req">
+                <label>Document Date</label></div>
                 <input 
                   type="date" 
                   name="documentDate"
@@ -499,7 +502,8 @@ const handleSendTo = async () => {
                 />
               </div>
               <div className="form-group">
-                <label>Currency</label>
+                <div className="label-req">
+                <label>Currency</label></div>
                 <input 
                   type="text" 
                   name="currency"
@@ -508,7 +512,8 @@ const handleSendTo = async () => {
                 />
               </div>
               <div className="form-group">
-                <label>Valid until</label>
+                <div className="label-req">
+                <label>Valid until</label></div>
                 <input 
                   type="date" 
                   name="validUntil"
@@ -518,7 +523,8 @@ const handleSendTo = async () => {
                 />
               </div>
               <div className="form-group">
-                <label>Required Date</label>
+              <div className="label-req">
+                <label>Required Date</label></div>
                 <input 
                   type="date" 
                   name="requiredDate"
@@ -560,7 +566,8 @@ const handleSendTo = async () => {
             <div className="purchquoteform-details">
               <div className="details-left">
                 <div className="form-group">
-                  <label>Buyer</label>
+                  <div className="label-req">
+                  <label>Buyer</label></div>
                   <input 
                     type="text" 
                     name="buyer"
@@ -569,7 +576,8 @@ const handleSendTo = async () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Owner</label>
+                  <div className="label-req">
+                  <label>Owner</label></div>
                   <input 
                     type="text" 
                     name="owner"
@@ -578,7 +586,8 @@ const handleSendTo = async () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Delivery Location</label>
+                  <div className="label-req">
+                  <label>Delivery Location</label></div>
                   <input 
                     type="text" 
                     name="delivery_loc"
@@ -609,6 +618,7 @@ const handleSendTo = async () => {
                   />
                 </div>
                 <div className="form-group">
+                <div className="label-req">
                   <label className="downpayment-label" >
                     <input
                     className="input-with-symbol"
@@ -626,7 +636,7 @@ const handleSendTo = async () => {
                       }
                     />
                     Downpayment&nbsp;Request
-                  </label>
+                  </label></div>
                   <div className="input-with-symbol">
                   <input
                     type="text"
@@ -647,7 +657,8 @@ const handleSendTo = async () => {
                 </div>
                 </div>
                 <div className="form-group">
-                  <label>Discount Percentage</label>
+                  <div className="label-req">
+                  <label>Discount Percentage</label></div>
                   <div className="input-with-symbol">
                     <input
                       type="text"
@@ -659,7 +670,8 @@ const handleSendTo = async () => {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Freight</label>
+                  <div className="label-req">
+                  <label>Freight</label></div>
                   <input 
                     type="text" 
                     name="freight"
@@ -668,7 +680,8 @@ const handleSendTo = async () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Tax</label>
+                  <div className="label-req">
+                  <label>Tax</label></div>
                   <input 
                     type="text" 
                     name="tax"
@@ -755,7 +768,6 @@ const handleSendTo = async () => {
         )}
 
           <div className="purchquoteform-footer">
-            <button className="purchquoteform-copy">Copy From</button>
           </div>
         </div>
       </div>

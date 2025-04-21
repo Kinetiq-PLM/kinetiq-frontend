@@ -514,9 +514,6 @@ const PurchaseOrderUI = ({
             <h2>{item.name}</h2>
           </div>
           <div className="purchord-modal-body">
-            <div className="purchord-modal-image-container">
-              <img src={item.image} alt={item.name} className="purchord-modal-image" />
-            </div>
             <div className="purchord-modal-details">
               <div className="purchord-modal-info">
                 <h3>Material:</h3>
@@ -589,7 +586,6 @@ const PurchaseOrderUI = ({
               summaryData.items.map((item) => (
                 <div key={item.id} className="purchord-item-card">
                   <div className="purchord-item-details" onClick={() => handleItemClick(item)}>
-                    <img src={item.image} alt={item.name} className="purchord-item-image" />
                     <h3>{item.name}</h3>
                     <p><strong>Quantity:</strong> {item.quantity}</p>
                     <p><strong>Unit Price:</strong> ₱{item.price}</p>
@@ -628,7 +624,8 @@ const PurchaseOrderUI = ({
               {error && <div className="error-message">{error}</div>}
               <form onSubmit={handleQCSubmit}>
                 <div className="purchord-qc-form">
-                  <div className="form-group">
+                  <div className="label-req">
+                  <div className="form-group"></div>
                     <label>Inspection Date</label>
                     <input
                       type="date"
@@ -639,7 +636,8 @@ const PurchaseOrderUI = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Shipment ID</label>
+                    <div className="label-req">
+                    <label>Shipment ID</label></div>
                     {shipments.length > 0 ? (
                       <select
                         value={qcForm.shipment_id}
@@ -666,7 +664,8 @@ const PurchaseOrderUI = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Inspector</label>
+                    <div className="label-req">
+                    <label>Inspector</label></div>
                     <select
                       value={qcForm.employee_id}
                       onChange={(e) => setQcForm({...qcForm, employee_id: e.target.value})}
@@ -682,7 +681,8 @@ const PurchaseOrderUI = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Inspection Result</label>
+                    <div className="label-req">
+                    <label>Inspection Result</label></div>
                     <select
                       value={qcForm.inspection_result}
                       onChange={(e) => setQcForm({...qcForm, inspection_result: e.target.value})}

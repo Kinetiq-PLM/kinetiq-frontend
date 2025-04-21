@@ -185,7 +185,7 @@
     color: #666;
 }
 
-.form-group label:after {
+.label-req label:after{
     content: "*";
     color: red;
     margin-left: 2px;
