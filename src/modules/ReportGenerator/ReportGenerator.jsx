@@ -1,5 +1,79 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, memo } from "react";
 import "./styles/ReportGenerator.css";
+
+const ChatMessage = memo(({ msg, index, messagesLength, downloadCSV }) => {
+    // Function to safely render cell content, handling potential objects/arrays
+    const renderCellContent = (cell) => {
+        if (typeof cell === 'object' && cell !== null) {
+            return JSON.stringify(cell); // Or handle specific object types differently
+        }
+        return cell;
+    };
+
+    return (
+        <div key={msg.id || index} className={`chat-message ${msg.sender}`}>
+            {msg.type === "text" ? (
+                <div className="message-text">
+                    {/* Render loading indicator if applicable */}
+                    {msg.isLoading ? (
+                        <span className="loading-dots">...</span> // Or a spinner component
+                    ) : (
+                        msg.text.split("\n").map((line, i) => (
+                            <React.Fragment key={i}>
+                                {line}
+                                <br />
+                            </React.Fragment>
+                        ))
+                    )}
+                </div>
+            ) : (
+                // When type is 'table'
+                <div className="chat-table-response">
+                    {/* Render the main text response (summary/intro) */}
+                    <p className="res-head">{msg.text}</p>
+
+                    {/* Map through the tables */}
+                    {msg.tables && msg.tables.map((table, i) => (
+                        // --- 3. Add a wrapper div for horizontal scrolling ---
+                        <div key={i} className="table-scroll-wrapper">
+                            <table className="chat-table">
+                                <thead>
+                                    <tr>
+                                        {table.headers.map((header, j) => (
+                                            <th key={j}>{header}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {table.rows.map((row, k) => (
+                                        <tr key={k}>
+                                            {/* Ensure row is an array before mapping */}
+                                            {Array.isArray(row) ? row.map((cell, l) => (
+                                                <td key={l}>{renderCellContent(cell)}</td>
+                                            )) : (
+                                                // Handle cases where row might not be an array (e.g., error)
+                                                <td colSpan={table.headers.length}>Invalid row data</td>
+                                            )}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ))}
+                    <div className="action-buttons">
+                        {msg.tables && msg.tables.length > 0 && (
+                            <div className="dl-icon-wrapper" onClick={() => downloadCSV(msg.tables[0], 'report-data.csv')}>
+                                <img src="../../icons/repgen-icons/download.png" alt="Download" className="download-icon"/>
+                                {/* Adjust tooltip alignment based on index */}
+                                <span className={`tooltip ${index === messagesLength - 1 ? 'right-aligned' : ''}`}>Download CSV</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+});
 
 const BodyContent = ({employee_id}) => {
     const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -102,52 +176,70 @@ const BodyContent = ({employee_id}) => {
 
     const fetchMessages = async (conversationId) => {
         setIsLoadingMessages(true);
-        setError(null); // Clear previous errors
-        setMessages([]); // Clear previous messages immediately
-        setActiveConversationId(conversationId); // Set active conversation right away
+        setError(null);
+        setMessages([]);
+        setActiveConversationId(conversationId);
         console.log("Fetching messages for conversation ID:", conversationId);
+
+        const TABLE_DATA_MARKER = "[TABLE_DATA]:"; // Use the same marker
+
         try {
-            // Construct the API URL for fetching messages
-            // Ensure this matches your Django urls.py pattern for load_messages
             const response = await fetch(`${API_BASE_URL}chatbot/load_messages/${conversationId}/`, {
                 method: 'GET',
                 headers: {
-                    // Include authentication headers if required by your backend
-                    // 'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json',
                 }
             });
-            
+
             if (!response.ok) {
-                // Handle HTTP errors (e.g., 404 Not Found, 500 Internal Server Error)
-                const errorData = await response.json().catch(() => ({})); // Try to get error details
+                const errorData = await response.json().catch(() => ({}));
                 throw new Error(`HTTP error! status: ${response.status} - ${errorData.error || 'Failed to fetch'}`);
             }
 
             const data = await response.json();
 
             // Map the backend message format to the frontend format
-            const formattedMessages = data.map(msg => ({
-                // Assuming your frontend expects 'text' and 'sender'
-                // You might need more complex mapping if your frontend
-                // needs to handle different message types (like tables)
-                // based on backend fields (e.g., msg.intent, msg.sql_query)
-                id: msg.message_id, // Keep track of message ID if needed
-                sender: msg.sender, // 'user' or 'bot'
-                text: msg.message, // The actual message content
-                type: "text", // Default to 'text'. Add logic here to determine type if needed.
-                // Add other fields if your frontend components use them
-                // e.g., created_at: msg.created_at
-            }));
+            const formattedMessages = data.map(msg => {
+                let messageType = "text";
+                let tablesData = null;
+                let originalSqlQuery = msg.sql_query; // Store original query
+
+                // *** Check if sql_query contains encoded table data ***
+                if (msg.sql_query && msg.sql_query.startsWith(TABLE_DATA_MARKER)) {
+                    try {
+                        const tableJsonString = msg.sql_query.substring(TABLE_DATA_MARKER.length);
+                        tablesData = JSON.parse(tableJsonString);
+                        messageType = "table";
+                        // Clear sql_query for frontend state as it held table data
+                        originalSqlQuery = null;
+                    } catch (parseError) {
+                        console.error("Failed to parse table data from fetched sql_query:", parseError, "for message:", msg.message_id);
+                        // Fallback to text if parsing fails
+                        messageType = "text";
+                        tablesData = null;
+                        // Keep the original (malformed) sql_query string? Or set to null?
+                        // Let's keep it for debugging, but maybe set to null in production
+                        // originalSqlQuery = msg.sql_query;
+                    }
+                }
+                // *** End of table decoding logic ***
+
+                return {
+                    id: msg.message_id,
+                    sender: msg.sender,
+                    text: msg.message,
+                    type: messageType, // Determined type
+                    tables: tablesData, // Decoded tables or null
+                    sql_query: originalSqlQuery // Original SQL or null if used for tables
+                    // created_at: msg.created_at
+                };
+            });
 
             setMessages(formattedMessages);
 
         } catch (err) {
             console.error('Error fetching messages:', err);
-            // Display a user-friendly error message
             setError(`Failed to load conversation: ${err.message}. Please select another or try again.`);
-            // Optionally clear messages if the fetch failed completely
-            // setMessages([]);
         } finally {
             setIsLoadingMessages(false);
         }
@@ -225,54 +317,88 @@ const BodyContent = ({employee_id}) => {
     };
 
     const saveMessage = async (conversationId, messageData) => {
-        // messageData should be an object like { sender: 'user'/'bot', message: 'text content' }
+        // messageData now includes: { sender, text, type, sql_query?, tables? }
         if (!conversationId) {
             console.error("Cannot save message without an active conversation ID.");
             throw new Error("No active conversation selected.");
         }
-        
+
+        const TABLE_DATA_MARKER = "[TABLE_DATA]:";
+
         try {
-            // Construct the API URL for creating a message
-            // Ensure this matches your Django urls.py pattern for create_message
+            // Construct the payload based on message type
+            const payload = {
+                sender: messageData.sender,
+                message: messageData.text,
+                // Default sql_query to null or the provided one
+                sql_query: messageData.sql_query || null
+            };
+
+            // *** If type is 'table', encode tables into sql_query field ***
+            if (messageData.type === 'table' && messageData.tables) {
+                try {
+                    const tableJsonString = JSON.stringify(messageData.tables);
+                    // Store encoded table data in the sql_query field
+                    payload.sql_query = TABLE_DATA_MARKER + tableJsonString;
+                } catch (jsonError) {
+                    console.error("Failed to stringify table data:", jsonError);
+                    // Decide how to handle: save without table? throw error?
+                    // For now, let's save with null sql_query
+                    payload.sql_query = null;
+                }
+            }
+            // *** End of table encoding logic ***
+
             const response = await fetch(`${API_BASE_URL}chatbot/create_message/${conversationId}/`, {
               method: 'POST',
-              headers: { 
-                // Include authentication headers if required by your backend
-                // 'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json' 
+              headers: {
+                'Content-Type': 'application/json'
               },
-              // Send the message data in the request body
-              body: JSON.stringify({
-                  sender: messageData.sender, // 'user' or 'bot'
-                  message: messageData.text // The actual text content
-                  // Add other fields like intent, sql_query if needed for the backend
-              }) 
+              body: JSON.stringify(payload) // Send the modified payload
             });
 
             if (!response.ok) {
-                // Handle HTTP errors (e.g., 400 Bad Request, 404 Not Found, 500)
-                const errorData = await response.json().catch(() => ({})); // Try to get error details
+                const errorData = await response.json().catch(() => ({}));
                 console.error("API Error Response:", errorData);
                 throw new Error(`HTTP error! status: ${response.status} - ${errorData.error || 'Failed to save message'}`);
             }
 
-            // Parse the response which should contain the newly created message object from the backend
             const savedMessage = await response.json();
-            
-            // Map the backend response to the frontend format if necessary
-            // (Assuming backend returns fields compatible with frontend state for now)
+
+            // Map the backend response back to the frontend format
+            // We need to decode the table data if it was stored in sql_query
+            let messageType = "text";
+            let tablesData = null;
+            let originalSqlQuery = savedMessage.sql_query; // Keep original for potential use
+
+            if (savedMessage.sql_query && savedMessage.sql_query.startsWith(TABLE_DATA_MARKER)) {
+                try {
+                    const tableJsonString = savedMessage.sql_query.substring(TABLE_DATA_MARKER.length);
+                    tablesData = JSON.parse(tableJsonString);
+                    messageType = "table";
+                    // Since sql_query was used for tables, clear it for the frontend state
+                    originalSqlQuery = null;
+                } catch (parseError) {
+                    console.error("Failed to parse table data from sql_query:", parseError);
+                    // Fallback to text type if parsing fails
+                    messageType = "text";
+                    tablesData = null;
+                }
+            }
+
             return {
                 id: savedMessage.message_id,
                 sender: savedMessage.sender,
                 text: savedMessage.message,
-                type: "text", // Adjust if backend provides type info
-                conversation_title: savedMessage.conversation_title
+                type: messageType, // Determined type
+                tables: tablesData, // Decoded tables or null
+                sql_query: originalSqlQuery, // Original SQL or null if used for tables
+                conversation_title: savedMessage.conversation_title // Keep title update logic
             };
 
         } catch (err) {
             console.error('Error saving message via API:', err);
-            // Re-throw the error so handleSendMessage can catch it
-            throw err; 
+            throw err;
         }
     };
 
@@ -482,28 +608,31 @@ const BodyContent = ({employee_id}) => {
             let botText = botApiResponse.response || "Sorry, I couldn't generate a response.";
             let botMessageType = "text"; // Default type
             let botTableData = null; // To store table data if present
+            let botSqlQuery = botApiResponse.sql_query || null; // Get the query
 
             if (botApiResponse.sql_error) {
                 botText += `\n\n[Error executing SQL: ${botApiResponse.sql_error}]`;
             }
-            
-            // --- Handle Table Data (Example) ---
-            // Adjust this logic based on the actual structure of botApiResponse.data
+
             if (botApiResponse.data && botApiResponse.data.headers && botApiResponse.data.rows) {
-                 botMessageType = "table"; // Change type if data looks like a table
-                 botTableData = botApiResponse.data; 
-                 // You might want to keep the text response as a title or intro for the table
-                 // botText = botApiResponse.response; // Keep the original text response as well
+                 botMessageType = "table";
+                 botTableData = botApiResponse.data;
             }
-            // --- End Table Data Handling ---
 
-
-            const botMessageDataForSaving = { 
-                sender: "bot", 
-                text: botText // Save the primary text response
-                // Optionally include intent, sql_query from botApiResponse if needed by backend
-                // intent: botApiResponse.intent, 
-                // sql_query: botApiResponse.sql_query 
+            // --- Include sql_query when preparing data for saving ---
+            const botMessageDataForSaving = {
+                sender: "bot",
+                text: botText,
+                type: botMessageType, // 'text' or 'table'
+                sql_query: botSqlQuery, // Pass the *actual* SQL query here (can be null)
+                // Pass the actual table data if type is 'table'
+                // saveMessage will handle encoding this into the sql_query field if type is 'table'
+                tables: botMessageType === 'table' ? [{
+                    headers: botTableData.headers,
+                    rows: botTableData.rows
+                }] : null
+                // Optionally include intent if needed by backend:
+                // intent: botApiResponse.intent
             };
 
             // 3. Save bot response to backend
@@ -525,9 +654,15 @@ const BodyContent = ({employee_id}) => {
             const finalBotMessageForUI = {
                 id: savedBotMessageResult.id, // Use ID from saved result
                 sender: savedBotMessageResult.sender,
-                text: savedBotMessageResult.text, // Use text from saved result
-                type: botMessageType,
-                 ...(botTableData && { /* ... table data structure ... */ })
+                text: savedBotMessageResult.text, // Use text from saved result (can serve as title/intro)
+                type: botMessageType, // Will be 'text' or 'table'
+                ...(botMessageType === "table" && botTableData && {
+                    tables: [{ // Structure expected by rendering: an array of table objects
+                        title: savedBotMessageResult.text, // Use the main text as a title for the table
+                        headers: botTableData.headers,
+                        rows: botTableData.rows
+                    }]
+                })
             };
             setMessages(prev => [...prev, finalBotMessageForUI]);
 
@@ -864,55 +999,15 @@ const BodyContent = ({employee_id}) => {
                                             <h1 className="welc-text">Hello {userName}</h1>
                                         </div>
                                     ) : (
+                                        // --- 2. Use the Memoized ChatMessage Component ---
                                         messages.map((msg, index) => (
-                                            <div key={index} className={`chat-message ${msg.sender}`}>
-                                                {msg.type === "text" ? (
-                                                    <div className="message-text">
-                                                        {msg.text.split("\n").map((line, i) => (
-                                                            <React.Fragment key={i}>
-                                                                {line}
-                                                                <br />
-                                                            </React.Fragment>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <div className="chat-table-response">
-                                                        <p className="res-head">{msg.text}</p>
-                                                        <h3>{msg.title}</h3>
-                                                        {msg.tables.map((table, i) => (
-                                                            <div key={i}>
-                                                                <h4>{table.title}</h4>
-                                                                <table className="chat-table">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            {table.headers.map((header, j) => (
-                                                                                <th key={j}>{header}</th>
-                                                                            ))}
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {table.rows.map((row, k) => (
-                                                                            <tr key={k}>
-                                                                                {row.map((cell, l) => (
-                                                                                    <td key={l}>{cell}</td>
-                                                                                ))}
-                                                                            </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        ))}
-                                                        <p className="res-foot">{msg.title2}</p>
-                                                        <p className="foot-cont">{msg.text2}</p>
-                                                        <div className="action-buttons">
-                                                            <div className="dl-icon-wrapper" onClick={() => downloadCSV(msg.tables[0], 'financial-report.csv')}>
-                                                                <img src="../../icons/repgen-icons/download.png" alt="Download" className="download-icon"/>
-                                                                <span className={`tooltip ${index === messages.length - 1 ? 'right-aligned' : ''}`}>Download CSV</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <ChatMessage
+                                                key={msg.id || index} // Use stable ID if available
+                                                msg={msg}
+                                                index={index}
+                                                messagesLength={messages.length}
+                                                downloadCSV={downloadCSV}
+                                            />
                                         ))
                                     )}
                                 </div>
