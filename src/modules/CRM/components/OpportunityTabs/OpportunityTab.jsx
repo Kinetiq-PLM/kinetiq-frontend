@@ -9,7 +9,7 @@ import { useAlert } from "../../../Sales/components/Context/AlertContext";
 
 import loading from "../../../Sales/components/Assets/kinetiq-loading.gif";
 
-export default function OpportunityTab({ setActiveTab }) {
+export default function OpportunityTab({ setActiveTab, employee_id }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const showAlert = useAlert();
@@ -19,7 +19,7 @@ export default function OpportunityTab({ setActiveTab }) {
   const [customers, setCustomers] = useState([]);
   const opportunityQuery = useQuery({
     queryKey: ["opportunities"],
-    queryFn: async () => await GET("crm/opportunities"),
+    queryFn: async () => await GET(`crm/opportunities?salesrep=${employee_id}`),
     retry: 2,
   });
 

@@ -37,7 +37,9 @@ export default function MainTab({ employee_id }) {
   const customerOppQuery = useQuery({
     queryKey: ["customerOpps"],
     queryFn: async () =>
-      await GET(`crm/opportunities?customer=${selectedCustomer.customer_id}`),
+      await GET(
+        `crm/opportunities?customer=${selectedCustomer.customer_id}?salesrep=${employee_id}`
+      ),
     retry: 2,
   });
 
