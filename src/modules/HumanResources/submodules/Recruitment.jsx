@@ -1681,8 +1681,9 @@ const submitCandidateForm = async (e) => {
       
       // Step 1: Get the upload URL from the API
       const getUrlResponse = await axios.post('https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload-to-s3/', {
-        fileName: uploadingFile.name,
-        directory: directory
+        filename: uploadingFile.name,
+        directory: directory,
+        contentType: uploadingFile.type
       });
       
       console.log("S3 URL response:", getUrlResponse.data);
