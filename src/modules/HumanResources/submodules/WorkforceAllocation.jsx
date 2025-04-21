@@ -5,8 +5,12 @@ import "../styles/WorkforceAllocation.css";
 
 const WorkforceAllocation = () => {
   // States for data
+  const [employees, setEmployees] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [allocations, setAllocations] = useState([]);
-  const [archivedAllocations, setArchivedAllocations] = useState([]);
+  const [archivedAllocations, setArchivedAllocations] = useState([]); 
+  const [formErrors, setFormErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   // UI States
   const [showArchived, setShowArchived] = useState(false);
@@ -30,6 +34,7 @@ const WorkforceAllocation = () => {
     requesting_dept_id: "",
     current_dept_id: "",
     hr_approver: "",
+    employee_id: "", // Added employee_id field
     status: "Draft",
     start_date: "",
     end_date: "",
@@ -62,8 +67,44 @@ const WorkforceAllocation = () => {
   };
 
   useEffect(() => {
+    const fetchDropdownData = async () => {
+      try {
+        const [employeesRes, deptsRes] = await Promise.all([
+          axios.get("http://127.0.0.1:8000/api/employees/"),
+          axios.get("http://127.0.0.1:8000/api/departments/department/")
+        ]);
+        setEmployees(employeesRes.data);
+        setDepartments(deptsRes.data);
+      } catch (err) {
+        console.error("Failed to fetch dropdown data:", err);
+      }
+    };
+    
+    fetchDropdownData();
     fetchAllocations();
   }, []);
+
+  const validateAddForm = () => {
+    const errors = {};
+    
+    // Check date constraint
+    if (newAllocation.start_date && newAllocation.end_date && 
+        new Date(newAllocation.end_date) < new Date(newAllocation.start_date)) {
+      errors.end_date = "End date must be after start date";
+    }
+    
+    // Check employee constraint when approved
+    if (newAllocation.approval_status === "Approved" && !newAllocation.employee_id) {
+      errors.employee_id = "Employee is required when status is Approved";
+    }
+    
+    // Check rejection reason when rejected
+    if (newAllocation.approval_status === "Rejected" && !newAllocation.rejection_reason) {
+      errors.rejection_reason = "Rejection reason is required when status is Rejected";
+    }
+    
+    return errors;
+  };
 
   // Search and filter logic
   const filterAndPaginate = (dataArray) => {
@@ -102,7 +143,16 @@ const WorkforceAllocation = () => {
 
   const handleUnarchive = async (id) => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${id}/unarchive/`);
+      await axios.post(
+        `http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
+        {}, // Empty payload
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
       showToast("Allocation unarchived successfully");
       fetchAllocations();
     } catch (err) {
@@ -119,32 +169,87 @@ const WorkforceAllocation = () => {
     }));
   };
 
+  
   const handleAddAllocation = async (e) => {
-    e.preventDefault();
-    
-    try {
-      await axios.post("http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/", newAllocation);
-      showToast("Allocation added successfully");
-      setShowAddModal(false);
-      fetchAllocations();
+      e.preventDefault();
       
-      // Reset form
-      setNewAllocation({
-        required_skills: "",
-        task_description: "",
-        requesting_dept_id: "",
-        current_dept_id: "",
-        hr_approver: "",
-        status: "Draft",
-        start_date: "",
-        end_date: "",
-        approval_status: "Pending",
-        rejection_reason: ""
-      });
-    } catch (err) {
-      console.error("Add allocation error:", err);
-      showToast("Failed to add allocation", false);
-    }
+      // Prevent duplicate submissions
+      if (submitting) {
+          console.log("Submission already in progress");
+          return;
+      }
+      
+      // Validate form
+      const errors = validateAddForm();
+      if (Object.keys(errors).length > 0) {
+        setFormErrors(errors);
+        return;
+      }
+      
+      try {
+        setSubmitting(true); // Start submission
+        
+        // Format payload with explicit field mapping
+        const payload = {
+          required_skills: newAllocation.required_skills,
+          task_description: newAllocation.task_description,
+          requesting_dept_id: newAllocation.requesting_dept_id,
+          current_dept_id: newAllocation.current_dept_id,
+          hr_approver: newAllocation.hr_approver || null,
+          employee: newAllocation.employee_id || null,
+          status: newAllocation.status,
+          start_date: newAllocation.start_date,
+          end_date: newAllocation.end_date,
+          approval_status: newAllocation.approval_status,
+          rejection_reason: newAllocation.rejection_reason || ""
+        };
+        
+        console.log("Sending payload:", payload);
+        
+        const response = await axios.post(
+          "http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/", 
+          payload,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          }
+        );
+        
+        console.log("Response:", response);
+        showToast("Allocation added successfully");
+        setShowAddModal(false);
+        fetchAllocations();
+        
+        // Reset form
+        setNewAllocation({
+          required_skills: "",
+          task_description: "",
+          requesting_dept_id: "",
+          current_dept_id: "",
+          hr_approver: "",
+          employee_id: "",
+          status: "Draft",
+          start_date: "",
+          end_date: "",
+          approval_status: "Pending",
+          rejection_reason: ""
+        });
+        setFormErrors({});
+      } catch (err) {
+        console.error("Add allocation error:", err);
+        
+        if (err.response) {
+          console.error("Error details:", err.response.data);
+          setFormErrors(err.response.data || {});
+          showToast(`Failed to add allocation: ${JSON.stringify(err.response.data)}`, false);
+        } else {
+          showToast(`Failed to add allocation: ${err.message}`, false);
+        }
+      } finally {
+        setSubmitting(false);
+      }
   };
 
   const handleEditAllocationChange = (e) => {
@@ -158,11 +263,25 @@ const WorkforceAllocation = () => {
   const handleEditAllocation = async (e) => {
     e.preventDefault();
     
+    // Validate form
+    const errors = {};
+    if (editingAllocation.approval_status === "Approved" && !editingAllocation.employee_id) {
+      errors.employee_id = "Employee is required when status is Approved";
+    }
+    if (editingAllocation.approval_status === "Rejected" && !editingAllocation.rejection_reason) {
+      errors.rejection_reason = "Rejection reason is required when status is Rejected";
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+    
     try {
       await axios.patch(
         `http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${editingAllocation.allocation_id}/`, 
         {
-          employee: editingAllocation.employee_id,
+          employee: editingAllocation.employee_id, // This is correct, keep as is
           hr_approver: editingAllocation.hr_approver,
           approval_status: editingAllocation.approval_status,
           status: editingAllocation.status,
@@ -172,8 +291,12 @@ const WorkforceAllocation = () => {
       showToast("Allocation updated successfully");
       setShowEditModal(false);
       fetchAllocations();
+      setFormErrors({});
     } catch (err) {
       console.error("Edit allocation error:", err);
+      if (err.response && err.response.data) {
+        setFormErrors(err.response.data);
+      }
       showToast("Failed to update allocation", false);
     }
   };
@@ -486,34 +609,80 @@ const WorkforceAllocation = () => {
                   <div className="form-column">
                     <div className="form-group">
                       <label>Requesting Department</label>
-                      <input
-                        type="text"
+                      <select
                         name="requesting_dept_id"
                         value={newAllocation.requesting_dept_id}
                         onChange={handleAddAllocationChange}
                         required
-                      />
+                      >
+                        <option value="">Select Department</option>
+                        {departments.map(dept => (
+                          <option key={dept.dept_id} value={dept.dept_id}>
+                            {dept.dept_name}
+                          </option>
+                        ))}
+                      </select>
+                      {formErrors.requesting_dept_id && (
+                        <div className="form-error">{formErrors.requesting_dept_id}</div>
+                      )}
                     </div>
                     
                     <div className="form-group">
                       <label>Current Department</label>
-                      <input
-                        type="text"
+                      <select
                         name="current_dept_id"
                         value={newAllocation.current_dept_id}
                         onChange={handleAddAllocationChange}
                         required
-                      />
+                      >
+                        <option value="">Select Department</option>
+                        {departments.map(dept => (
+                          <option key={dept.dept_id} value={dept.dept_id}>
+                            {dept.dept_name}
+                          </option>
+                        ))}
+                      </select>
+                      {formErrors.current_dept_id && (
+                        <div className="form-error">{formErrors.current_dept_id}</div>
+                      )}
                     </div>
                     
                     <div className="form-group">
                       <label>HR Approver</label>
-                      <input
-                        type="text"
+                      <select
                         name="hr_approver"
                         value={newAllocation.hr_approver}
                         onChange={handleAddAllocationChange}
-                      />
+                      >
+                        <option value="">Select HR Approver</option>
+                        {employees.map(emp => (
+                          <option key={emp.employee_id} value={emp.employee_id}>
+                            {emp.first_name} {emp.last_name}
+                          </option>
+                        ))}
+                      </select>
+                      {formErrors.hr_approver && (
+                        <div className="form-error">{formErrors.hr_approver}</div>
+                      )}
+                    </div>
+                    
+                    <div className="form-group">
+                      <label>Employee</label>
+                      <select
+                        name="employee_id"
+                        value={newAllocation.employee_id}
+                        onChange={handleAddAllocationChange}
+                      >
+                        <option value="">Select Employee</option>
+                        {employees.map(emp => (
+                          <option key={emp.employee_id} value={emp.employee_id}>
+                            {emp.first_name} {emp.last_name}
+                          </option>
+                        ))}
+                      </select>
+                      {formErrors.employee_id && (
+                        <div className="form-error">{formErrors.employee_id}</div>
+                      )}
                     </div>
                     
                     <div className="form-group">
@@ -525,12 +694,19 @@ const WorkforceAllocation = () => {
                         required
                       >
                         <option value="Draft">Draft</option>
+                        <option value="Submitted">Submitted</option>
                         <option value="Active">Active</option>
                         <option value="Completed">Completed</option>
                         <option value="Canceled">Canceled</option>
                       </select>
+                      {formErrors.status && (
+                        <div className="form-error">{formErrors.status}</div>
+                      )}
                     </div>
                     
+                  </div>
+                  
+                  <div className="form-column">
                     <div className="form-group">
                       <label>Approval Status</label>
                       <select
@@ -544,10 +720,11 @@ const WorkforceAllocation = () => {
                         <option value="Rejected">Rejected</option>
                         <option value="Under Review">Under Review</option>
                       </select>
+                      {formErrors.approval_status && (
+                        <div className="form-error">{formErrors.approval_status}</div>
+                      )}
                     </div>
-                  </div>
                   
-                  <div className="form-column">
                     <div className="form-group">
                       <label>Start Date</label>
                       <input
@@ -557,6 +734,9 @@ const WorkforceAllocation = () => {
                         onChange={handleAddAllocationChange}
                         required
                       />
+                      {formErrors.start_date && (
+                        <div className="form-error">{formErrors.start_date}</div>
+                      )}
                     </div>
                     
                     <div className="form-group">
@@ -568,6 +748,9 @@ const WorkforceAllocation = () => {
                         onChange={handleAddAllocationChange}
                         required
                       />
+                      {formErrors.end_date && (
+                        <div className="form-error">{formErrors.end_date}</div>
+                      )}
                     </div>
                     
                     <div className="form-group">
@@ -576,7 +759,11 @@ const WorkforceAllocation = () => {
                         name="rejection_reason"
                         value={newAllocation.rejection_reason}
                         onChange={handleAddAllocationChange}
+                        disabled={newAllocation.approval_status !== 'Rejected'}
                       />
+                      {formErrors.rejection_reason && (
+                        <div className="form-error">{formErrors.rejection_reason}</div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -589,6 +776,9 @@ const WorkforceAllocation = () => {
                     onChange={handleAddAllocationChange}
                     required
                   />
+                  {formErrors.required_skills && (
+                    <div className="form-error">{formErrors.required_skills}</div>
+                  )}
                 </div>
                 
                 <div className="form-group full-width">
@@ -599,14 +789,31 @@ const WorkforceAllocation = () => {
                     onChange={handleAddAllocationChange}
                     required
                   />
+                  {formErrors.task_description && (
+                    <div className="form-error">{formErrors.task_description}</div>
+                  )}
                 </div>
                 
+                {/* Show any non-field errors */}
+                {formErrors.non_field_errors && (
+                  <div className="form-error">{formErrors.non_field_errors}</div>
+                )}
+                
                 <div className="workforceallocation-modal-buttons">
-                  <button type="submit" className="submit-btn">Add</button>
+                  <button 
+                    type="submit" 
+                    className="submit-btn" 
+                    disabled={submitting}
+                  >
+                    {submitting ? "Adding..." : "Add"}
+                  </button>
                   <button 
                     type="button" 
                     className="cancel-btn" 
-                    onClick={() => setShowAddModal(false)}
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setFormErrors({});
+                    }}
                   >
                     Cancel
                   </button>
@@ -634,23 +841,41 @@ const WorkforceAllocation = () => {
                     </div>
                     
                     <div className="form-group">
-                      <label>Employee ID</label>
-                      <input
-                        type="text"
+                      <label>Employee</label>
+                      <select
                         name="employee_id"
                         value={editingAllocation.employee_id || ''}
                         onChange={handleEditAllocationChange}
-                      />
+                      >
+                        <option value="">Select Employee</option>
+                        {employees.map(emp => (
+                          <option key={emp.employee_id} value={emp.employee_id}>
+                            {emp.first_name} {emp.last_name}
+                          </option>
+                        ))}
+                      </select>
+                      {formErrors.employee_id && (
+                        <div className="form-error">{formErrors.employee_id}</div>
+                      )}
                     </div>
                     
                     <div className="form-group">
                       <label>HR Approver</label>
-                      <input
-                        type="text"
+                      <select
                         name="hr_approver"
                         value={editingAllocation.hr_approver || ''}
                         onChange={handleEditAllocationChange}
-                      />
+                      >
+                        <option value="">Select HR Approver</option>
+                        {employees.map(emp => (
+                          <option key={emp.employee_id} value={emp.employee_id}>
+                            {emp.first_name} {emp.last_name}
+                          </option>
+                        ))}
+                      </select>
+                      {formErrors.hr_approver && (
+                        <div className="form-error">{formErrors.hr_approver}</div>
+                      )}
                     </div>
                   </div>
                   
@@ -664,10 +889,14 @@ const WorkforceAllocation = () => {
                         required
                       >
                         <option value="Draft">Draft</option>
+                        <option value="Submitted">Submitted</option>
                         <option value="Active">Active</option>
                         <option value="Completed">Completed</option>
                         <option value="Canceled">Canceled</option>
                       </select>
+                      {formErrors.status && (
+                        <div className="form-error">{formErrors.status}</div>
+                      )}
                     </div>
                     
                     <div className="form-group">
@@ -683,6 +912,9 @@ const WorkforceAllocation = () => {
                         <option value="Rejected">Rejected</option>
                         <option value="Under Review">Under Review</option>
                       </select>
+                      {formErrors.approval_status && (
+                        <div className="form-error">{formErrors.approval_status}</div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -693,15 +925,27 @@ const WorkforceAllocation = () => {
                     name="rejection_reason"
                     value={editingAllocation.rejection_reason || ''}
                     onChange={handleEditAllocationChange}
+                    disabled={editingAllocation.approval_status !== 'Rejected'}
                   />
+                  {formErrors.rejection_reason && (
+                    <div className="form-error">{formErrors.rejection_reason}</div>
+                  )}
                 </div>
+                
+                {/* Show any non-field errors */}
+                {formErrors.non_field_errors && (
+                  <div className="form-error">{formErrors.non_field_errors}</div>
+                )}
                 
                 <div className="workforceallocation-modal-buttons">
                   <button type="submit" className="submit-btn">Save</button>
                   <button 
                     type="button" 
                     className="cancel-btn" 
-                    onClick={() => setShowEditModal(false)}
+                    onClick={() => {
+                      setShowEditModal(false);
+                      setFormErrors({});
+                    }}
                   >
                     Cancel
                   </button>
