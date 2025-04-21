@@ -66,7 +66,7 @@ const ReworkTable = ({
               <th>Rework Date</th>
               <th>Expected Completion</th>
               {/* <th>Original Order</th> */}
-              <th>Actions</th>
+              {/* <th>Actions</th> */}
             </tr>
           </thead>
           <tbody>
@@ -102,7 +102,7 @@ const ReworkTable = ({
                   <td>{getEmployeeName(rework.assigned_to)}</td>
                   <td>{formatDate(rework.rework_date)}</td>
                   <td>{formatDate(rework.expected_completion)}</td>
-                  <td className="actions-cell">
+                  {/* <td className="actions-cell">
                     {!showCompleted && (
                       <>
                         {rework.rework_status === 'Pending' && (
@@ -138,7 +138,7 @@ const ReworkTable = ({
                     >
                       View
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               ))
             )}

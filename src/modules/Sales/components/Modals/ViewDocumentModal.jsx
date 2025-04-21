@@ -713,10 +713,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                           {data.tracking_num || "-"}
                         </th>
                         <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                          30% Downpayment, 70% After Delivery
+                          {data.shipping_method}
                         </th>
                         <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                          {data.shipping_method}
+                          30% Downpayment, 70% After Delivery
                         </th>
                         <th className="border border-black text-black font-light text-start  p-2 text-sm">
                           {!data.shipping_date

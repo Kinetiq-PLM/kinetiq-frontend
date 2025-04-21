@@ -35,7 +35,7 @@ const Picking = () => {
         setLoading(true);
         setError(null);
         // const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/');
-        const response = await fetch('http://127.0.0.1:8000/api/picking-lists/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/');
         
         if (!response.ok) {
           if (response.status === 401) {
@@ -58,7 +58,7 @@ const Picking = () => {
   
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/employees/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -74,7 +74,7 @@ const Picking = () => {
   
     const fetchWarehouses = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/warehouses/');
+        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouses/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -152,7 +152,7 @@ const Picking = () => {
     }
     
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -194,7 +194,7 @@ const Picking = () => {
       }
   
       // Always make the API call when status changes (or when completing)
-      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -243,7 +243,7 @@ const Picking = () => {
     try {
       // Get the current employee and warehouse selections from the modal
       // Since the modal is closed at this point, we'll use the selectedList data
-      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${selectedList.picking_list_id}/update/`, {
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${selectedList.picking_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
