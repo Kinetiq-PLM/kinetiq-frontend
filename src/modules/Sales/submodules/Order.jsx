@@ -251,7 +251,6 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         transferOperation: "quotation",
       });
       setCanEditTable(false);
-      setIsQuotation(true);
     } else if (
       copyFromModal === "Blanket Agreement" &&
       selectedBlanketAgreement
