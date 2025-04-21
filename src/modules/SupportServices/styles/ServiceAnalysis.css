@@ -24,7 +24,7 @@
   position: sticky;
   top: 0;
   background-color: white;
-  z-index: 3;
+  z-index: 0;
   padding-top: 1rem;
 }
 
