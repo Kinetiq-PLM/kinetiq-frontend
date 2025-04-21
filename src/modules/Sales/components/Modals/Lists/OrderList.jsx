@@ -132,7 +132,7 @@ const OrderListModal = ({ isOpen, onClose, setOrder }) => {
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Orders
+            List of Orders
           </h2>
         </div>
 
