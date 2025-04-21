@@ -2,6 +2,7 @@
     import InvRestockForm from "../components/InvTransferStockForm";
     import NoSelectedItemModal from "../components/NoSelectedItemModal";
     import "../styles/StockFlow.css";
+import { ContinuousColorLegend } from "@mui/x-charts";
 
 
     const BodyContent = () => {
@@ -51,7 +52,7 @@
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseMovementsView(data);
-                    console.log("Fetched Data:", data); 
+                    console.log("Fetched Warehouse Movements Data:", data); 
                 } catch (err) {
                     setError(err.message);
                 } finally {
@@ -71,7 +72,7 @@
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseItemsData(data);
-                    console.log("Fetched Warehouse Data:", data); 
+                    console.log("Fetched Items Per Warehouse Data:", data); 
                 }
                 catch (err) {
                     setError(err.message);
@@ -93,7 +94,7 @@
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseListData(data);
-                    console.log("Fetched Data:", data); 
+                    console.log("Fetched Warehouse List Data:", data); 
                 } catch (err) {
                     setError(err.message);
                 } finally {
@@ -192,17 +193,18 @@
             
         };
 
-        
-
+        console.log(stockFlowTableConfigs["Warehouse"])
+        console.log(stockFlowTableConfigs)
         const activeConfig = stockFlowTableConfigs[activeTab];
-
+       
 
         return (
             <div className={`stockflow ${showModal ? "blurred" : ""}`}>
+                
                 <div className="body-content-container">
-                    
+                
                     {/* Navigation Tabs */}
-                    <nav className="top-0 left-0 flex flex-wrap justify-between max-h-[50px] space-x-8 w-full p-2">
+                    <nav className="top-0 left-0 flex flex-wrap justify-between  space-x-8 w-full p-2 mt-15">
                         <div className="invNav flex border-b border-gray-200 space-x-8 md:w-auto mt-1 mb-1">
                             {Object.keys(stockFlowTableConfigs).map((tab) => (
                                 <span
@@ -255,18 +257,17 @@
                                     Transfer Stock
                     </button>
 
-
-
+                     
                     {/* Data Table Section */}
                     <main className="flex flex-wrap w-full h-full  rounded-lg">
-                        <div className="w-full h-full md:flex-1 border max-h-[800px] border-gray-300 rounded-lg scroll-container overflow-y-auto p-3">
+                        <div className="stockflow-table w-full h-120 md:flex-1 border border-gray-300 rounded-lg scroll-container overflow-y-auto">
                             {loading ? (
                                 <p className="text-center text-gray-600">Loading data...</p>
                             ) : error ? (
                                 <p className="text-center text-red-600">{error}</p>
                             ) : (
                                 <table className="w-full table-layout:fixed text-center cursor-pointer">
-                                    <thead>
+                                    <thead className="bg-white sticky left-0 top-0 z-20 ">
                                         <tr className="border-b border-gray-300">
                                             {activeConfig.Columns.map((header) => (
                                                 <th key={header} className="p-2 text-gray-600">{header}</th>
@@ -363,6 +364,9 @@
 
 
             </div>
+
+
+
         );
     };
 
