@@ -404,11 +404,12 @@ const NewOpportunityModal = ({
                 isValidationVisible={isValidationVisible}
               />
               <NumberInputField
-                label={"Weighted Amount"}
-                value={weightedAmount}
-                validation={validateWeightedAmount}
-                disabled={true}
+                label={"Probability"}
+                value={probability}
+                setValue={setProbability}
+                validation={validateProbability}
                 isValidationVisible={isValidationVisible}
+                isPercent={true}
               />
             </div>
             <div className="flex gap-2">
@@ -419,7 +420,6 @@ const NewOpportunityModal = ({
                 validation={validateGrossProfit}
                 isValidationVisible={isValidationVisible}
                 isPercent={true}
-                max={false}
               />
               <NumberInputField
                 label={"Gross Profit Total"}
@@ -427,15 +427,13 @@ const NewOpportunityModal = ({
                 disabled={true}
               />
             </div>
-
             <div className="flex gap-2">
               <NumberInputField
-                label={"Probabiility"}
-                value={probability}
-                setValue={setProbability}
-                validation={validateProbability}
+                label={"Weighted Amouaaant"}
+                value={weightedAmount}
+                setValue={setWeightedAmount}
+                validation={validateWeightedAmount}
                 isValidationVisible={isValidationVisible}
-                isPercent={true}
               />
               <div className="flex-1"></div>
             </div>

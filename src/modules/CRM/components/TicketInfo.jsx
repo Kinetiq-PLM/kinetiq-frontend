@@ -6,7 +6,7 @@ const InputCustomer = ({ label, value = "", customerListModal }) => {
     <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
       <p className="w-[150px] text-sm">{label}</p>
       <div
-        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded"
+        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded overflow-hidden"
         onClick={() => {
           customerListModal(true);
         }}
@@ -26,10 +26,10 @@ const InputCustomer = ({ label, value = "", customerListModal }) => {
 
 const Information = ({ label, value = "" }) => {
   return (
-    <div className="flex justify-between mb-2 w-full">
+    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
       <p className="w-[150px] text-sm">{label}</p>
       <div
-        className={`border border-[#9a9a9a] flex-1 p-1 h-[30px] rounded whitespace-nowrap overflow-x-auto ${
+        className={`border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded whitespace-nowrap overflow-x-auto ${
           value === "" ? "bg-[#f7f7f7]" : ""
         }`}
       >
@@ -54,7 +54,7 @@ const PriorityDropbar = ({ label, setTicketInfo }) => {
   };
 
   return (
-    <div className="flex justify-between mb-2 w-full">
+    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
       <p className="w-[150px] text-sm">{label}</p>
       <select
         className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white rounded cursor-pointer text-sm"
@@ -88,7 +88,7 @@ const StatusDropbar = ({ label, setTicketInfo }) => {
   };
 
   return (
-    <div className="flex justify-between mb-2 w-full">
+    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
       <p className="w-[150px] text-sm">{label}</p>
       <select
         className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white rounded cursor-pointer text-sm"
@@ -130,7 +130,7 @@ const TicketInfo = ({
   //   }
 
   return (
-    <section className="flex justify-between gap-6 flex-col md:flex-row">
+    <section className="flex flex-col md:flex-row md:gap-6">
       <div className="h-full w-full flex flex-col items-center">
         <InputCustomer
           label={"Customer ID"}
