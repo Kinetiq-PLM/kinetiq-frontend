@@ -1,123 +1,241 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { auditLogAPI } from "../api/api";
 import "../styles/AuditLogs.css";
+import {
+    Table,
+    Input,
+    Tabs,
+    message,
+    Typography,
+    Divider,
+    Pagination
+} from "antd";
+import {
+    UserOutlined,
+    SearchOutlined
+} from "@ant-design/icons";
 
-const dummyLogs = [
-    { logId: "LOG-100001", userId: "Admin01", action: "Login", timestamp: "2025-04-01 08:00", ip: "192.168.1.10" },
-    { logId: "LOG-100002", userId: "Admin02", action: "Logout", timestamp: "2025-04-01 09:30", ip: "192.168.1.11" },
-    { logId: "LOG-100003", userId: "UserA", action: "Update Record", timestamp: "2025-04-02 12:00", ip: "192.168.1.12" },
-    { logId: "LOG-100004", userId: "UserB", action: "Delete Record", timestamp: "2025-04-03 14:45", ip: "192.168.1.13" },
-    { logId: "LOG-100005", userId: "SuperUser", action: "Access Logs", timestamp: "2025-04-04 10:15", ip: "192.168.1.14" },
-];
+const { TabPane } = Tabs;
+const { Title } = Typography;
 
-const AuditLogs = () => {
-    const [filterOpen, setFilterOpen] = useState(false);
-    const [subFilter, setSubFilter] = useState(null);
-    const [dateRange, setDateRange] = useState({ from: "", to: "" });
+const AuditLog = () => {
+    // State variables
+    const [auditLog, setAuditLog] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [searchValue, setSearchValue] = useState("");
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-    const toggleFilter = () => {
-        setFilterOpen((prev) => !prev);
-        setSubFilter(null);
+    // Pagination states
+    const [activeTab] = useState("auditLog");
+    const [auditLogPagination, setAuditLogPagination] = useState({
+        current: 1,
+        pageSize: 10,
+        total: 0
+    });
+
+    useEffect(() => {
+        fetchAuditLog();
+    }, []);  // Empty dependency array ensures it runs once on mount
+
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Data fetching functions
+    const fetchAuditLog = async (searchTerm = "", orderField = "", orderDirection = "") => {
+        setLoading(true);
+        try {
+            const data = await auditLogAPI.getAuditLogs({
+                search: searchTerm,
+                ordering: orderDirection === "descend" ? `-${orderField}` : orderField
+            });
+            setAuditLog(data.results || data);
+            setAuditLogPagination(prev => ({
+                ...prev,
+                total: (data.results || data).length
+            }));
+        } catch (error) {
+            message.error("Failed to fetch log");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
     };
 
+    // Handle pagination changes
+    const handleAuditLogPaginationChange = (page, pageSize) => {
+        setAuditLogPagination(prev => ({
+            ...prev,
+            current: page,
+            pageSize
+        }));
+    };
+
+    // Handle search with debounce
+    const handleSearch = (value) => {
+        setSearchValue(value);
+        if (activeTab === "auditLog") {
+            fetchAuditLog(value);
+        }
+    };
+
+    const handleTableChange = (pagination, filters, sorter, extra) => {
+        if (sorter && sorter.field) {
+            const orderField = sorter.field;
+            const orderDirection = sorter.order;
+
+            fetchAuditLog(searchValue, orderField, orderDirection);
+        }
+    };
+
+
+    // Table columns definitions with sorting added
+    const auditLogColumns = [
+        {
+            title: "Log ID",
+            dataIndex: "log_id",
+            key: "log_id",
+            sorter: true,
+            width: 100,
+        },
+        {
+            title: "User ID",
+            dataIndex: "user_id",
+            key: "user_id",
+            sorter: true,
+            width: 120,
+        },
+        { // need baguhin
+            title: "Action",
+            dataIndex: "action",
+            key: "action",
+            sorter: true,
+            width: 180,
+        },
+        {
+            title: "Timestamp",
+            dataIndex: "timestamp",
+            key: "timestamp",
+            sorter: true,
+            width: 130,
+            render: (text) => {
+                if (!text) return "-";
+                const date = new Date(text);
+                const options = {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                };
+                const timeOptions = {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: true,
+                };
+        
+                const datePart = date.toLocaleDateString(undefined, options);
+                const timePart = date.toLocaleTimeString(undefined, timeOptions);
+                return `${datePart} ,  ${timePart}`;
+            },
+        },
+        { // not sure pano render neto
+            title: "IP Address",
+            dataIndex: "ip_address",
+            key: "ip_address",
+            sorter: true,
+            width: 130,
+        },
+    ];
+
+    // Calculate table data for pagination
+    const getAuditLogTableData = () => {
+        const { current, pageSize } = auditLogPagination;
+        const start = (current - 1) * pageSize;
+        const end = start + pageSize;
+        return auditLog.slice(start, end);
+    };
+
+    // Render main component
     return (
-        <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Audit Logs</h2>
+        <div className="auditLog">
+            <div className="log-container">
+                <Title level={4} className="page-title">
+                    {activeTab === "auditLog" ? "Audit Logs" : ""}
+                </Title>
+                <Divider className="title-divider" />
 
-            <div className="flex justify-between items-center mb-4 relative">
-                <input
-                    type="text"
-                    placeholder="Search..."
-                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                />
-
-                <div className="relative">
-                    <button
-                        onClick={toggleFilter}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300"
+                <div className="tabs-wrapper">
+                    <Tabs
+                        activeKey={activeTab}
+                        size="middle"
+                        tabBarGutter={8}
+                        className="log-tabs"
+                        type={windowWidth <= 768 ? "card" : "line"}
+                        tabPosition="top"
+                        destroyInactiveTabPane={false}
+                        tabBarExtraContent={{
+                            right: (
+                                <div className="header-right-content">
+                                    <div className="search-container">
+                                        <Input.Search
+                                            placeholder="Search logs..."
+                                            allowClear
+                                            onSearch={handleSearch}
+                                            value={searchValue}
+                                            onChange={(e) => setSearchValue(e.target.value)}
+                                            prefix={<SearchOutlined />}
+                                        />
+                                    </div>
+                                </div>
+                            )
+                        }}
                     >
-                        Filter by ▾
-                    </button>
-
-                    {filterOpen && (
-                        <div className="absolute right-0 mt-2 bg-white border shadow-lg rounded-lg z-50 w-48">
-                            <div
-                                onClick={() => setSubFilter("date")}
-                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                            >
-                                Filter By Date ▸
-                            </div>
-                            <div
-                                onClick={() => setSubFilter("column")}
-                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                            >
-                                Filter By Columns ▸
-                            </div>
-                        </div>
-                    )}
-
-                    {subFilter === "date" && (
-                        <div className="absolute right-0 mt-2 bg-white border shadow-lg rounded-lg p-4 z-50 w-72">
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm text-gray-600">From</label>
-                                <input
-                                    type="date"
-                                    value={dateRange.from}
-                                    onChange={(e) => setDateRange({ ...dateRange, from: e.target.value })}
-                                    className="border px-3 py-2 rounded-md"
-                                />
-                                <label className="text-sm text-gray-600">To</label>
-                                <input
-                                    type="date"
-                                    value={dateRange.to}
-                                    onChange={(e) => setDateRange({ ...dateRange, to: e.target.value })}
-                                    className="border px-3 py-2 rounded-md"
-                                />
-                                <div className="flex justify-end gap-2 mt-3">
-                                    <button className="px-4 py-1 bg-teal-500 text-white rounded hover:bg-teal-600">OK</button>
-                                    <button onClick={() => setSubFilter(null)} className="px-4 py-1 bg-white text-gray-600 border border-gray-400 rounded hover:bg-gray-100">Cancel</button>
+                        <TabPane
+                            tab={<span><UserOutlined /> {windowWidth > 576 ? "Notification" : ""}</span>}
+                            key="auditLog"
+                        >
+                            {/* Notif tab content */}
+                            <div className="table-meta-info">
+                                <span className="record-count">Total Logs: {auditLog.length}</span>
+                                <div className="table-pagination">
+                                    <Pagination
+                                        current={auditLogPagination.current}
+                                        pageSize={auditLogPagination.pageSize}
+                                        total={auditLog.length}
+                                        onChange={handleAuditLogPaginationChange}
+                                        showSizeChanger={false}
+                                        size="small"
+                                    />
                                 </div>
                             </div>
-                        </div>
-                    )}
 
-                    {subFilter === "column" && (
-                        <div className="absolute right-0 mt-2 bg-white border shadow-lg rounded-lg p-4 z-50 w-72">
-                            <p className="text-sm text-gray-500 mb-2">Column filter UI here...</p>
-                            <div className="flex justify-end gap-2">
-                                <button className="px-4 py-1 bg-teal-500 text-white rounded hover:bg-teal-600">OK</button>
-                                <button onClick={() => setSubFilter(null)} className="px-4 py-1 bg-white text-gray-600 border border-gray-400 rounded hover:bg-gray-100">Cancel</button>
+                            <div className="table-container">
+                                <Table
+                                    dataSource={getAuditLogTableData()}
+                                    columns={auditLogColumns}
+                                    rowKey="log_id"
+                                    loading={loading}
+                                    scroll={{ x: true, y: 400 }}
+                                    pagination={false}
+                                    bordered
+                                    size="middle"
+                                    showSorterTooltip={false}
+                                    sortDirections={['ascend', 'descend']}
+                                    onChange={handleTableChange}
+                                    className="scrollable-table"
+                                />
                             </div>
-                        </div>
-                    )}
+                        </TabPane>
+                    </Tabs>
                 </div>
-            </div>
-
-            <div className="bg-white shadow-md rounded-xl p-4 overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-200 rounded-xl">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            <th className="p-3 border border-gray-200 text-left">Log ID</th>
-                            <th className="p-3 border border-gray-200 text-left">User ID</th>
-                            <th className="p-3 border border-gray-200 text-left">Action</th>
-                            <th className="p-3 border border-gray-200 text-left">Timestamp</th>
-                            <th className="p-3 border border-gray-200 text-left">IP Address</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {dummyLogs.map((log, index) => (
-                            <tr key={index} className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100">
-                                <td className="p-3 border border-gray-200">{log.logId}</td>
-                                <td className="p-3 border border-gray-200">{log.userId}</td>
-                                <td className="p-3 border border-gray-200">{log.action}</td>
-                                <td className="p-3 border border-gray-200">{log.timestamp}</td>
-                                <td className="p-3 border border-gray-200">{log.ip}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
             </div>
         </div>
     );
 };
 
-export default AuditLogs;
+export default AuditLog;
