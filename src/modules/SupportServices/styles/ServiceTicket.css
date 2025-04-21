@@ -175,7 +175,7 @@
 }
 
 .servtick tbody tr {
-  background-color: #eff8f9;
+  background-color: #ffffff;
   transition: background-color 0.3s ease;
 }
 
@@ -236,7 +236,9 @@
 .servtick .modal-content {
   padding: 1.5rem;
   flex: 1;
+  max-height: 70vh;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .servtick .modal-form {
