@@ -165,7 +165,10 @@ const WorkforceAllocation = () => {
       e.preventDefault();
       
       // Prevent duplicate submissions
-      if (submitting) return;
+      if (submitting) {
+          console.log("Submission already in progress, ignoring click");
+          return;
+      }
       
       // Validate form
       const errors = validateAddForm();
@@ -210,7 +213,10 @@ const WorkforceAllocation = () => {
         }
         showToast("Failed to add allocation", false);
       } finally {
-        setSubmitting(false); // End submission state
+        // Small delay before allowing another submission
+        setTimeout(() => {
+          setSubmitting(false);
+        }, 500);
       }
   };
 
