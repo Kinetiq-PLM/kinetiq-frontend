@@ -172,7 +172,6 @@
   position: sticky; /* Keep the header fixed while scrolling */
   top: 0;
   background-color: #f3f9fa;
-  z-index: 5;
 }
 
 .hr-employee-salary-table thead th {

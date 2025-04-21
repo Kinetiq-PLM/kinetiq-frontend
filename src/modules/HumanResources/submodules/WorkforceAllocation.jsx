@@ -11,6 +11,8 @@ const WorkforceAllocation = () => {
   const [archivedAllocations, setArchivedAllocations] = useState([]); 
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  // Add this new state for selected archived allocations
+  const [selectedArchivedAllocations, setSelectedArchivedAllocations] = useState([]);
 
   // UI States
   const [showArchived, setShowArchived] = useState(false);
@@ -161,6 +163,38 @@ const WorkforceAllocation = () => {
     }
   };
 
+  // Add these functions right after your existing handleUnarchive function
+  const toggleSelectArchivedAllocation = (id) => {
+    setSelectedArchivedAllocations(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const bulkUnarchiveAllocations = async () => {
+    try {
+      await Promise.all(
+        selectedArchivedAllocations.map(id => 
+          axios.post(
+            `http://127.0.0.1:8000/api/workforce_allocation/workforce_allocations/${id}/unarchive/`,
+            {},
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              }
+            }
+          )
+        )
+      );
+      showToast("Allocations unarchived successfully");
+      setSelectedArchivedAllocations([]);
+      fetchAllocations();
+    } catch (err) {
+      console.error("Bulk unarchive error:", err);
+      showToast("Failed to unarchive selected allocations", false);
+    }
+  };
+
   const handleAddAllocationChange = (e) => {
     const { name, value } = e.target;
     setNewAllocation(prev => ({
@@ -301,7 +335,7 @@ const WorkforceAllocation = () => {
     }
   };
 
-  // Render table
+  // Modify the renderTable function to include checkboxes
   const renderTable = () => {
     const data = showArchived ? archivedAllocations : allocations;
     const { paginated, totalPages } = filterAndPaginate(data);
@@ -316,6 +350,8 @@ const WorkforceAllocation = () => {
             <table className="workforceallocation-table">
               <thead>
                 <tr>
+                  {/* Add checkbox column header when showing archived items */}
+                  {showArchived && <th>Select</th>}
                   <th>Allocation ID</th>
                   <th>Request ID</th>
                   <th>Requesting Dept ID</th>
@@ -338,6 +374,16 @@ const WorkforceAllocation = () => {
               <tbody>
                 {paginated.map((allocation, index) => (
                   <tr key={allocation.allocation_id || index}>
+                    {/* Add checkbox in each row when showing archived items */}
+                    {showArchived && (
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedArchivedAllocations.includes(allocation.allocation_id)}
+                          onChange={() => toggleSelectArchivedAllocation(allocation.allocation_id)}
+                        />
+                      </td>
+                    )}
                     <td>{allocation.allocation_id}</td>
                     <td>{allocation.request_id}</td>
                     <td>{allocation.requesting_dept_id}</td>
@@ -576,12 +622,26 @@ const WorkforceAllocation = () => {
               <button className="workforceallocation-add-btn" onClick={() => setShowAddModal(true)}>
                 + Add Allocation
               </button>
+              
               <button
                 className="workforceallocation-add-btn"
-                onClick={() => setShowArchived(!showArchived)}
+                onClick={() => {
+                  setShowArchived(!showArchived);
+                  setSelectedArchivedAllocations([]);  // Clear selections when toggling view
+                }}
               >
                 {showArchived ? "View Active" : "View Archived"}
               </button>
+              
+              {/* Add the Unarchive Selected button that appears conditionally */}
+              {showArchived && selectedArchivedAllocations.length > 0 && (
+                <button 
+                  className="workforceallocation-add-btn" 
+                  onClick={bulkUnarchiveAllocations}
+                >
+                  Unarchive Selected ({selectedArchivedAllocations.length})
+                </button>
+              )}
             </div>
           </div>
 
