@@ -21,7 +21,8 @@ const CreateReceiptModal = ({
   });
 
   const API_URL =
-    import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+    import.meta.env.VITE_API_URL ||
+    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const GENERAL_LEDGER_ENDPOINT = `${API_URL}/api/general-ledger-accounts/`;
 
   const fetchData = () => {
@@ -191,13 +192,7 @@ const CreateReceiptModal = ({
                 <Dropdown
                   style="selection"
                   defaultOption="Select payment method..."
-                  options={[
-                    "Cash",
-                 // "Credit Card",
-                    "Bank Transfer",
-                 // "Check",
-                 // "Mobile Payment",
-                  ]}
+                  options={["Cash", "Bank Transfer"]}
                   value={reportForm.paymentMethod}
                   onChange={(value) => {
                     handleInputChange("paymentMethod", value);
@@ -311,7 +306,7 @@ const CreateReceiptModal = ({
               formName="Created By*"
               placeholder="Created by..."
               value={reportForm.createdBy}
-              onChange={(e) => handleInputChange("createdBy", e.target.value)}
+              disabled={true}
             />
           </div>
           <div className="modal-footer mt-5 flex justify-end space-x-3">

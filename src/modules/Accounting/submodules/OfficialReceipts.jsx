@@ -8,9 +8,72 @@ import NotifModal from "../components/modalNotif/NotifModal";
 import axios from "axios";
 
 const OfficialReceipts = () => {
+  // Function to get user from localStorage or sessionStorage
+  const getLoggedInUser = () => {
+    // Try common keys used by .NET or other auth systems
+    const keys = ["user", "authUser", "currentUser", "identity"];
+    for (const key of keys) {
+      const storedUser = localStorage.getItem(key) || sessionStorage.getItem(key);
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          // Handle different user object structures
+          return {
+            name:
+              parsed.name ||
+              parsed.fullName ||
+              parsed.displayName ||
+              parsed.email ||
+              "Unknown User",
+          };
+        } catch (e) {
+          console.error(`Error parsing ${key}:`, e);
+        }
+      }
+    }
+    // Fallback to Admin if no user is found
+    return { name: "Admin" };
+  };
+
+  const [user, setUser] = useState(getLoggedInUser);
+
+  // Optional: Fetch user from API if token exists
+  useEffect(() => {
+    const fetchUserFromApi = async () => {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (token) {
+        try {
+          const API_URL =
+            import.meta.env.VITE_API_URL ||
+            "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+          const response = await axios.get(`${API_URL}/api/user`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setUser({ name: response.data.name || response.data.email || "Admin" });
+        } catch (error) {
+          console.error("Error fetching user from API:", error);
+          setUser({ name: "Admin" }); // Fallback
+        }
+      }
+    };
+    fetchUserFromApi();
+  }, []);
+
+  // Listen for storage changes
+  useEffect(() => {
+    const checkUser = () => {
+      const newUser = getLoggedInUser();
+      if (newUser.name !== user.name) {
+        setUser(newUser);
+      }
+    };
+    window.addEventListener("storage", checkUser);
+    return () => window.removeEventListener("storage", checkUser);
+  }, [user]);
+
   const getCurrentDate = () => {
     const today = new Date();
-    return today.toISOString().split("T")[0]; // returns 'YYYY-MM-DD'
+    return today.toISOString().split("T")[0];
   };
 
   const columns = [
@@ -26,7 +89,6 @@ const OfficialReceipts = () => {
   ];
   const [data, setData] = useState([]);
   const [searching, setSearching] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [validation, setValidation] = useState({
     isOpen: false,
@@ -35,9 +97,9 @@ const OfficialReceipts = () => {
     message: "",
   });
 
-  // API endpoint
   const API_URL =
-    import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+    import.meta.env.VITE_API_URL ||
+    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const OFFICIAL_RECEIPTS_ENDPOINT = `${API_URL}/api/official-receipts/`;
 
   const openModal = () => setModalOpen(true);
@@ -45,14 +107,14 @@ const OfficialReceipts = () => {
   const closeModal = () => {
     setModalOpen(false);
     setReportForm({
-      startDate: "",
+      startDate: getCurrentDate(),
       salesInvoiceId: "",
       amountPaid: "",
       paymentMethod: "",
       bankAccount: "",
       checkNumber: "",
       transactionId: "",
-      createdBy: "",
+      createdBy: user ? user.name : "Admin",
     });
   };
 
@@ -64,20 +126,25 @@ const OfficialReceipts = () => {
     bankAccount: "",
     checkNumber: "",
     transactionId: "",
-    createdBy: "",
+    createdBy: user ? user.name : "Admin",
   });
+
+  // Update reportForm when user changes
+  useEffect(() => {
+    setReportForm((prevForm) => ({
+      ...prevForm,
+      createdBy: user ? user.name : "Admin",
+    }));
+  }, [user]);
 
   const calculateRemainingAmount = (invoiceId, newSettledAmount) => {
     const invoiceReceipts = data.filter((row) => row[1] === invoiceId);
     const settledAmount = parseFloat(newSettledAmount);
     if (isNaN(settledAmount) || settledAmount <= 0) {
-      throw new Error(
-        "Invalid settled amount. Please enter a valid positive number."
-      );
+      throw new Error("Invalid settled amount. Please enter a valid positive number.");
     }
 
     if (invoiceReceipts.length === 0) {
-      // Ideally, fetch initial invoice amount from API
       const initialRemainingAmount = 10000; // Replace with API call if possible
       const newRemaining = initialRemainingAmount - settledAmount;
       return newRemaining >= 0 ? newRemaining : 0;
@@ -98,7 +165,6 @@ const OfficialReceipts = () => {
   };
 
   const fetchData = async () => {
-    setIsLoading(true); // Set loading to true when fetching starts
     try {
       const response = await axios.get(OFFICIAL_RECEIPTS_ENDPOINT);
       console.log("API Response (fetchData):", response.data);
@@ -115,7 +181,6 @@ const OfficialReceipts = () => {
           entry.created_by || "-",
         ])
       );
-      setIsLoading(false); // Set loading to false when fetching is done
     } catch (error) {
       console.error("Error fetching data:", error.response ? error.response.data : error);
       setValidation({
@@ -124,7 +189,6 @@ const OfficialReceipts = () => {
         title: "Fetch Error",
         message: "Failed to load official receipts. Please check your connection.",
       });
-      setIsLoading(false); // Set loading to false even if there's an error
     }
   };
 
@@ -163,22 +227,22 @@ const OfficialReceipts = () => {
 
     // Validate required fields
     if (
-      !reportForm.startDate &&
-      !reportForm.salesInvoiceId &&
-      !reportForm.amountPaid &&
-      !reportForm.paymentMethod &&
+      !reportForm.startDate ||
+      !reportForm.salesInvoiceId ||
+      !reportForm.amountPaid ||
+      !reportForm.paymentMethod ||
       !reportForm.createdBy
     ) {
       setValidation({
         isOpen: true,
         type: "warning",
         title: "Missing Fields",
-        message: "Please fill in all required fields.",
+        message: "Please fill in all required fields. Ensure you are logged in.",
       });
       return;
     }
 
-    if(!reportForm.salesInvoiceId) {
+    if (!reportForm.salesInvoiceId) {
       setValidation({
         isOpen: true,
         type: "warning",
@@ -213,7 +277,7 @@ const OfficialReceipts = () => {
         isOpen: true,
         type: "warning",
         title: "Missing Created By",
-        message: "Please enter the name of the person creating the receipt.",
+        message: "Please enter the creator's name.",
       });
       return;
     }
@@ -269,7 +333,6 @@ const OfficialReceipts = () => {
       const referenceNumber = generateReferenceNumber();
       console.log("Generated reference_number:", referenceNumber);
 
-      // Flexible payload to accommodate different backend field names
       const newReceipt = {
         or_id: generateCustomORID(),
         invoice_id: reportForm.salesInvoiceId,
@@ -287,7 +350,7 @@ const OfficialReceipts = () => {
         check_number:
           reportForm.paymentMethod === "Check" ? reportForm.checkNumber : null,
         check_no:
-          reportForm.paymentMethod === "Check" ? reportForm.checkNumber : null, // Fallback
+          reportForm.paymentMethod === "Check" ? reportForm.checkNumber : null,
         transaction_id:
           reportForm.paymentMethod === "Mobile Payment"
             ? reportForm.transactionId
@@ -295,7 +358,7 @@ const OfficialReceipts = () => {
         transaction_ref:
           reportForm.paymentMethod === "Mobile Payment"
             ? reportForm.transactionId
-            : null, // Fallback
+            : null,
       };
 
       console.log("Submitting receipt:", newReceipt);
@@ -338,14 +401,6 @@ const OfficialReceipts = () => {
       .includes(searching.toLowerCase())
   );
 
-  // Loading spinner component
-  const LoadingSpinner = () => (
-    <div className="flex justify-center items-center p-8 mt-30">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      <p className="ml-4 text-gray-600">Loading receipts...</p>
-    </div>
-  );
-
   return (
     <div className="officialReceipts">
       <div className="body-content-container">
@@ -367,13 +422,7 @@ const OfficialReceipts = () => {
             />
           </div>
         </div>
-
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
-          <Table data={filteredData} columns={columns} enableCheckbox={false} />
-        )}
-        
+        <Table data={filteredData} columns={columns} enableCheckbox={false} />
       </div>
       {modalOpen && (
         <CreateReceiptModal
@@ -388,9 +437,7 @@ const OfficialReceipts = () => {
       {validation.isOpen && (
         <NotifModal
           isOpen={validation.isOpen}
-          onClose={() =>
-            setValidation({ ...validation, isOpen: false })
-          }
+          onClose={() => setValidation({ ...validation, isOpen: false })}
           type={validation.type}
           title={validation.title}
           message={validation.message}
