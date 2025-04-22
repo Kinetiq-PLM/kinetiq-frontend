@@ -229,7 +229,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                                 }}>
                                     <option value="" className="text-gray-600">Select Warehouse</option>
                                     {warehouseList.map((warehouse) => (
-                                        <option className="text-gray-600 cursor-pointer" key={warehouse.warehouse_location} value={warehouse.warehouse_location}>
+                                        <option className="text-gray-600 cursor-pointer" key={warehouse.warehouse_id} value={warehouse.warehouse_location}>
                                             {warehouse.warehouse_location}
                                         </option>
                                     ))}

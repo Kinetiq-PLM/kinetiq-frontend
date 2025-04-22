@@ -21,7 +21,7 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
         return date.toISOString().split('T')[0];
     };
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/users/")
+        fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/users/")
             .then((res) => {
                 if (!res.ok) {
                     throw new Error(`Error fetching users: ${res.status}`);
@@ -41,14 +41,14 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
                 console.error("Failed to fetch users:", err);
             });
     }, []);
-    
+
     useEffect(() => {
         if (Object.keys(inventoryItems).length > 0) {
 
             const itemsList = Object.values(inventoryItems);
             setInventoryItemsList(itemsList);
         } else {
-            fetch("http://127.0.0.1:8000/api/inventory-items/")
+            fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
                 .then((res) => {
                     if (!res.ok) {
                         throw new Error(`Error fetching inventory items: ${res.status}`);
@@ -66,39 +66,39 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
         }
     }, [inventoryItems]);
 
-useEffect(() => {
-    if (selectedItem) {
-      // First, ensure the inventory item is set
-      if (selectedItem.inventory_item_id) {
-        setInventoryItemId(selectedItem.inventory_item_id);
-        
-        // Try to find the inventory item in our list if not in the map
-        let itemDetails = inventoryItems[selectedItem.inventory_item_id];
-        
-        if (!itemDetails) {
-          // Try to find it in the inventory items list
-          itemDetails = inventoryItemsList.find(item => 
-            item.inventory_item_id === selectedItem.inventory_item_id
-          );
+    useEffect(() => {
+        if (selectedItem) {
+            // First, ensure the inventory item is set
+            if (selectedItem.inventory_item_id) {
+                setInventoryItemId(selectedItem.inventory_item_id);
+
+                // Try to find the inventory item in our list if not in the map
+                let itemDetails = inventoryItems[selectedItem.inventory_item_id];
+
+                if (!itemDetails) {
+                    // Try to find it in the inventory items list
+                    itemDetails = inventoryItemsList.find(item =>
+                        item.inventory_item_id === selectedItem.inventory_item_id
+                    );
+                }
+
+                if (itemDetails) {
+                    setSelectedInventoryItem(itemDetails);
+                }
+            } else if (selectedItem.item_id) {
+                // If we have item_id instead of inventory_item_id
+                setInventoryItemId(selectedItem.item_id);
+            }
+
+            // You can also prefill additional fields if desired
+            // For example, if you have discrepancy details in the selected item
+            if (selectedItem.remarks) {
+                setDescription(selectedItem.remarks);
+            }
+        } else {
+            handleClear();
         }
-        
-        if (itemDetails) {
-          setSelectedInventoryItem(itemDetails);
-        }
-      } else if (selectedItem.item_id) {
-        // If we have item_id instead of inventory_item_id
-        setInventoryItemId(selectedItem.item_id);
-      }
-      
-      // You can also prefill additional fields if desired
-      // For example, if you have discrepancy details in the selected item
-      if (selectedItem.remarks) {
-        setDescription(selectedItem.remarks);
-      }
-    } else {
-      handleClear();
-    }
-  }, [selectedItem, inventoryItems, inventoryItemsList]);
+    }, [selectedItem, inventoryItems, inventoryItemsList]);
 
     // Handle inventory item selection
     const handleInventoryItemChange = (e) => {
@@ -140,23 +140,23 @@ useEffect(() => {
             return;
         }
 
-const itemDetails = selectedInventoryItem
-? `${selectedInventoryItem.item_type || 'Item'} (${inventoryItemId})`
-: inventoryItemId;
+        const itemDetails = selectedInventoryItem
+            ? `${selectedInventoryItem.item_type || 'Item'} (${inventoryItemId})`
+            : inventoryItemId;
 
-const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Type: ${discrepancyType}, Severity: ${severity}, Reported by: ${employeeId}, Description: ${description}, Reported on: ${new Date().toISOString()}`;
+        const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Type: ${discrepancyType}, Severity: ${severity}, Reported by: ${employeeId}, Description: ${description}, Reported on: ${new Date().toISOString()}`;
 
-      
+
         const notification = {
             module: "INVENTORY",
-            to_user_id: selectedUserId, 
+            to_user_id: selectedUserId,
             message: formattedMessage,
             notifications_status: "Unread"
         };
 
         try {
-       
-            const response = await fetch("http://127.0.0.1:8000/api/notifications/", {
+
+            const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(notification),
@@ -285,7 +285,7 @@ const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Ty
                                 <option value="Medium">Medium</option>
                                 <option value="High">High</option>
                                 <option value="Critical">Critical</option>
-                            </select>                            
+                            </select>
                         </span>
 
                         <span>
@@ -298,7 +298,7 @@ const formattedMessage = `Inventory Discrepancy Report: Item: ${itemDetails}, Ty
                                 value={employeeId}
                                 onChange={(e) => setEmployeeId(e.target.value)}
                                 required
-                            />                            
+                            />
                         </span>
 
 
