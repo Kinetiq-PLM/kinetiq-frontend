@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { FaUser, FaBox, FaMoneyBillWave, FaClipboardCheck, FaInfoCircle, FaTags } from "react-icons/fa";
+import { 
+  FaUser, 
+  FaBox, 
+  FaMoneyBillWave, 
+  FaClipboardCheck, 
+  FaInfoCircle, 
+  FaTags,
+  FaWarehouse,
+  FaCalendarAlt,
+  FaRegCheckCircle,
+  FaCheckDouble,
+  FaShippingFast,
+  FaChevronDown,
+  FaChevronUp,
+  FaArrowRight,
+  FaExclamationCircle
+} from "react-icons/fa";
 
 const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSave, onStatusUpdate }) => {
   // State for edited values
@@ -9,6 +25,16 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     material_cost: 0,
     labor_cost: 0,
     total_packing_cost: 0
+  });
+  const [maxItemsCount, setMaxItemsCount] = useState(0);
+  
+  // Accordion state for collapsible sections
+  const [expandedSections, setExpandedSections] = useState({
+    info: true,
+    pickingInfo: true,
+    employee: true,
+    packingType: true,
+    costs: true
   });
   
   // Check if packing list is already packed or shipped (both are final states for this module)
@@ -27,11 +53,60 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     }
   }, [packingList]);
   
+  useEffect(() => {
+    // If we have picking_list_id, fetch the items_count to use as max value
+    if (packingList && packingList.picking_list_id) {
+      const fetchPickingListDetails = async () => {
+        try {
+          const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${packingList.picking_list_id}/`);
+          if (response.ok) {
+            const pickingList = await response.json();
+            if (pickingList.items_count) {
+              // Store the max items count
+              setMaxItemsCount(pickingList.items_count);
+              
+              // If total_items_packed is null, initialize it with items_count
+              if (!packingList.total_items_packed || packingList.total_items_packed === null) {
+                handleInputChange('total_items_packed', pickingList.items_count);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching picking list:", error);
+        }
+      };
+      
+      fetchPickingListDetails();
+    }
+  }, [packingList]);
+
+  // Toggle section expansion
+  const toggleSection = (section) => {
+    setExpandedSections({
+      ...expandedSections,
+      [section]: !expandedSections[section]
+    });
+  };
+
   // Handle input changes
   const handleInputChange = (field, value) => {
     // Don't update if packed or shipped
     if (isNotEditable) return;
     
+    // For total_items_packed, limit to the max items count from picking list
+    if (field === 'total_items_packed') {
+      const numValue = parseInt(value) || 0;
+      // Ensure value doesn't exceed the max items count
+      const limitedValue = Math.min(numValue, maxItemsCount);
+      
+      setEditedValues(prev => ({
+        ...prev,
+        [field]: limitedValue
+      }));
+      return;
+    }
+    
+    // For other fields, update normally
     setEditedValues(prev => ({
       ...prev,
       [field]: value
@@ -111,6 +186,11 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
   
   // Check if status update button should be disabled
   const isStatusUpdateDisabled = () => {
+    // Always require 100% completion before allowing status update
+    if (getCompletionPercentage() < 100) {
+      return true;
+    }
+    
     // Need an employee assigned
     if (!editedValues.packed_by && !packingList.packed_by) {
       return true;
@@ -129,13 +209,45 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return false;
   };
   
+  // Get validation message for status update
+  const getValidationMessage = () => {
+    if (getCompletionPercentage() < 100) {
+      return 'All required fields must be completed (100%)';
+    }
+    
+    if (!editedValues.packed_by && !packingList.packed_by) {
+      return 'Please assign an employee for packing';
+    }
+    
+    if (!editedValues.packing_type && !packingList.packing_type) {
+      return 'Please select a packing type';
+    }
+    
+    if (packingCost.material_cost <= 0 && packingCost.labor_cost <= 0) {
+      return 'Please enter valid packing costs';
+    }
+    
+    return '';
+  };
+  
   // Handle status update button click
   const handleStatusUpdate = () => {
     if (isNotEditable) return;
     
     const nextStatus = getNextStatus();
     if (nextStatus) {
-      onStatusUpdate(packingList, nextStatus);
+      // Create an object with all current edited values
+      const updatedValues = {
+        ...editedValues,
+        packed_by: editedValues.packed_by || packingList.packed_by,
+        packing_type: editedValues.packing_type || packingList.packing_type,
+        material_cost: packingCost.material_cost,
+        labor_cost: packingCost.labor_cost,
+        total_packing_cost: packingCost.total_packing_cost
+      };
+      
+      // Call onStatusUpdate with all the edited values
+      onStatusUpdate(packingList, nextStatus, updatedValues);
     }
   };
   
@@ -151,261 +263,398 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return packingType ? packingType.name : 'Not specified';
   };
   
+  // Get status badge class
+  const getStatusBadgeClass = (status) => {
+    if (!status) return '';
+    
+    return `status-badge status-${status.toLowerCase()}`;
+  };
+  
+  // Get completion percentage based on filled fields
+  const getCompletionPercentage = () => {
+    let totalScore = 0;
+    let maxScore = 5; // Now including 5 factors (4 original + items packed)
+    
+    // Original factors
+    if (editedValues.packed_by || packingList.packed_by) totalScore++;
+    if (editedValues.packing_type || packingList.packing_type) totalScore++;
+    if (packingCost.material_cost > 0) totalScore++;
+    if (packingCost.labor_cost > 0) totalScore++;
+    
+    // Add factor for packed items (as a percentage of max items)
+    const currentItemsCount = editedValues.total_items_packed || packingList.total_items_packed || 0;
+    if (maxItemsCount > 0) {
+      const itemsPercentage = currentItemsCount / maxItemsCount;
+      totalScore += itemsPercentage; // This will add up to 1.0 for 100% packed
+    }
+    
+    return (totalScore / maxScore) * 100;
+  };
+  
   return (
-    <div className="modal-overlay">
-      <div className="edit-packing-modal">
+    <div className="packing modal-overlay" onClick={onClose}>
+      <div className="edit-packing-modal improved" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>{isNotEditable ? 'View Packing List' : 'Edit Packing List'}</h3>
-          <button className="close-button" onClick={onClose}>×</button>
+          <div className="modal-title-container">
+            <h3>{isNotEditable ? 'View Packing List' : 'Edit Packing List'}</h3>
+            <div className="modal-subtitle">
+              <span className={getStatusBadgeClass(packingList.packing_status)}>
+                {packingList.packing_status || 'No Status'}
+              </span>
+            </div>
+          </div>
+          <button className="close-button" onClick={onClose} aria-label="Close modal">×</button>
         </div>
         
         <div className="modal-body">
-          {/* Basic Information */}
-          <div className="info-section">
-            <h4><FaBox className="icon-spacing" /> Packing Information</h4>
-            <div className="info-grid">
-              <div className="info-item">
-                <span className="info-label">Packing ID:</span>
-                <span className="info-value">{packingList.packing_list_id}</span>
+          <div className="modal-scrollable-content">
+            {/* Basic Information */}
+            <div className="accordion-section">
+              <div 
+                className="accordion-header" 
+                onClick={() => toggleSection('info')}
+                aria-expanded={expandedSections.info}
+              >
+                <div className="accordion-title">
+                  <FaBox className="section-icon" /> Packing Information
+                </div>
+                <div className="accordion-toggle">
+                  {expandedSections.info ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
               </div>
-              <div className="info-item">
-                <span className="info-label">Order Type:</span>
-                <span className="info-value">{packingList.is_external ? 'External' : 'Internal'}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Status:</span>
-                <span className={`info-value status-${packingList.packing_status?.toLowerCase()}`}>
-                  {packingList.packing_status || '-'}
-                </span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Items Count:</span>
-                <span className="info-value">{packingList.total_items_packed || '0'}</span>
-              </div>
-              {packingList.packing_date && (
-                <div className="info-item">
-                  <span className="info-label">Packing Date:</span>
-                  <span className="info-value">{new Date(packingList.packing_date).toLocaleDateString()}</span>
+              
+              {expandedSections.info && (
+                <div className="accordion-content">
+                  <div className="info-grid">
+                    <div className="info-item">
+                      <span className="info-label">Packing ID</span>
+                      <span className="info-value highlight">{packingList.packing_list_id}</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">Order Type</span>
+                      <span className="info-value">
+                        {packingList.is_external ? 'External Order' : 'Internal Order'}
+                      </span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">Status</span>
+                      <span className={`info-value status-${packingList.packing_status?.toLowerCase()}`}>
+                        {packingList.packing_status || '-'}
+                      </span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">
+                        Packed Items Count
+                        <span className="items-max-info">(Max: {maxItemsCount})</span>
+                      </span>
+                      {isNotEditable ? (
+                        <span className="info-value">{packingList.total_items_packed || '0'}</span>
+                      ) : (
+                        <div className="items-count-input-container">
+                          <input
+                            type="number"
+                            className="form-control"
+                            value={editedValues.total_items_packed || packingList.total_items_packed || ''}
+                            onChange={(e) => handleInputChange('total_items_packed', parseInt(e.target.value) || 0)}
+                            min="0"
+                            max={maxItemsCount}
+                          />
+                          <div className="slider-container">
+                            <input
+                              type="range"
+                              min="0"
+                              max={maxItemsCount}
+                              value={editedValues.total_items_packed || packingList.total_items_packed || 0}
+                              onChange={(e) => handleInputChange('total_items_packed', parseInt(e.target.value))}
+                              className="range-slider"
+                            />
+                            <div className="range-labels">
+                              <span>0</span>
+                              <span>{maxItemsCount}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {packingList.packing_date && (
+                      <div className="info-item">
+                        <span className="info-label">Packing Date</span>
+                        <div className="info-value-with-icon">
+                          {/* <FaCalendarAlt className="info-icon" /> */}
+                          <span>{new Date(packingList.packing_date).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-          
-          {/* Related Picking List */}
-          {packingList.picking_list_info && (
-            <div className="info-section">
-              <h4><FaClipboardCheck className="icon-spacing" /> Related Picking List</h4>
-              <div className="info-grid">
-                <div className="info-item">
-                  <span className="info-label">Picking ID:</span>
-                  <span className="info-value">{packingList.picking_list_info.picking_list_id}</span>
+            
+            {/* Packing Assignment Section */}
+            <div className="accordion-section">
+              <div 
+                className="accordion-header" 
+                onClick={() => toggleSection('employee')}
+                aria-expanded={expandedSections.employee}
+              >
+                <div className="accordion-title">
+                  <FaUser className="section-icon" /> Assign Packer
+                  {!isNotEditable && (!editedValues.packed_by && !packingList.packed_by) && 
+                    <span className="required-indicator">*</span>
+                  }
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Picked By:</span>
-                  <span className="info-value">{getEmployeeName(packingList.packed_by) || '-'}</span>
+                <div className="accordion-toggle">
+                  {expandedSections.employee ? <FaChevronUp /> : <FaChevronDown />}
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Status:</span>
-                  <span className={`info-value status-${packingList.picking_list_info.picked_status?.toLowerCase().replace(' ', '-')}`}>
-                    {packingList.picking_list_info.picked_status || '-'}
-                  </span>
+              </div>
+              
+              {expandedSections.employee && (
+                <div className="accordion-content">
+                  {isNotEditable ? (
+                    <div className="employee-display info-display">
+                      <FaUser className="display-icon" />
+                      <span className="display-value">
+                        {getEmployeeName(packingList.packed_by)}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="input-container">
+                      <select
+                        className="form-select"
+                        value={editedValues.packed_by || packingList.packed_by || ''}
+                        onChange={(e) => handleInputChange('packed_by', e.target.value)}
+                        disabled={isNotEditable}
+                      >
+                        <option value="">-- Select Employee --</option>
+                        {employees.map((employee) => (
+                          <option key={employee.employee_id} value={employee.employee_id}>
+                            {employee.full_name}
+                          </option>
+                        ))}
+                      </select>
+                      
+                      {(!editedValues.packed_by && !packingList.packed_by) && (
+                        <div className="field-hint">Employee assignment is required</div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                {packingList.picking_list_info.warehouse_name && (
-                  <div className="info-item">
-                    <span className="info-label">Warehouse:</span>
-                    <span className="info-value">{packingList.picking_list_info.warehouse_name}</span>
+              )}
+            </div>
+            
+            {/* Packing Type Section */}
+            <div className="accordion-section">
+              <div 
+                className="accordion-header" 
+                onClick={() => toggleSection('packingType')}
+                aria-expanded={expandedSections.packingType}
+              >
+                <div className="accordion-title">
+                  <FaTags className="section-icon" /> Packing Type
+                  {!isNotEditable && (!editedValues.packing_type && !packingList.packing_type) && 
+                    <span className="required-indicator">*</span>
+                  }
+                </div>
+                <div className="accordion-toggle">
+                  {expandedSections.packingType ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
+              </div>
+              
+              {expandedSections.packingType && (
+                <div className="accordion-content">
+                  {isNotEditable ? (
+                    <div className="packing-type-display info-display">
+                      <FaTags className="display-icon" />
+                      <span className="display-value">
+                        {getPackingTypeName(packingList.packing_type)}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="input-container">
+                      <select
+                        className="form-select"
+                        value={editedValues.packing_type || packingList.packing_type || ''}
+                        onChange={(e) => handleInputChange('packing_type', e.target.value)}
+                        disabled={isNotEditable}
+                      >
+                        <option value="">-- Select Packing Type --</option>
+                        {packingTypes.map((type) => (
+                          <option key={type.id} value={type.id}>
+                            {type.name}
+                          </option>
+                        ))}
+                      </select>
+                      
+                      {(!editedValues.packing_type && !packingList.packing_type) && (
+                        <div className="field-hint">Packing type is required</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            {/* Packing Cost Section */}
+            <div className="accordion-section">
+              <div 
+                className="accordion-header" 
+                onClick={() => toggleSection('costs')}
+                aria-expanded={expandedSections.costs}
+              >
+                <div className="accordion-title">
+                  <FaMoneyBillWave className="section-icon" /> Packing Costs
+                  {!isNotEditable && (packingCost.material_cost <= 0 && packingCost.labor_cost <= 0) && 
+                    <span className="required-indicator">*</span>
+                  }
+                </div>
+                <div className="accordion-toggle">
+                  {expandedSections.costs ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
+              </div>
+              
+              {expandedSections.costs && (
+                <div className="accordion-content">
+                  {isNotEditable ? (
+                    <div className="cost-display">
+                      <div className="cost-info-row">
+                        <span className="cost-label">Material Cost:</span>
+                        <span className="cost-value">{formatCurrency(packingCost.material_cost)}</span>
+                      </div>
+                      <div className="cost-info-row">
+                        <span className="cost-label">Labor Cost:</span>
+                        <span className="cost-value">{formatCurrency(packingCost.labor_cost)}</span>
+                      </div>
+                      <div className="cost-total-row">
+                        <span className="cost-total-label">Total Cost:</span>
+                        <span className="cost-total-value">
+                          {formatCurrency(packingCost.total_packing_cost)}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="cost-editing">
+                      <div className="cost-input-row">
+                        <label className="cost-label">Material Cost:</label>
+                        <input
+                          type="number"
+                          className="cost-input"
+                          value={packingCost.material_cost}
+                          onChange={(e) => handleCostChange('material_cost', e.target.value)}
+                          step="0.01"
+                          min="0"
+                          disabled={isNotEditable}
+                        />
+                      </div>
+                      <div className="cost-input-row">
+                        <label className="cost-label">Labor Cost:</label>
+                        <input
+                          type="number"
+                          className="cost-input"
+                          value={packingCost.labor_cost}
+                          onChange={(e) => handleCostChange('labor_cost', e.target.value)}
+                          step="0.01"
+                          min="0"
+                          disabled={isNotEditable}
+                        />
+                      </div>
+                      <div className="cost-total-row">
+                        <span className="cost-total-label">Total Cost:</span>
+                        <span className="cost-total-value">
+                          {formatCurrency(packingCost.total_packing_cost)}
+                        </span>
+                      </div>
+                      
+                      {(packingCost.material_cost <= 0 && packingCost.labor_cost <= 0) && (
+                        <div className="field-hint">At least one cost value must be greater than zero</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            {/* Status Update Section */}
+            {canUpdateStatus() && (
+              <div className="status-update-section">
+                <h4>Status Update</h4>
+                
+                {/* Progress indicator */}
+                <div className="progress-container">
+                  <div className="progress-label">Completion Status</div>
+                  <div className="progress-bar-container">
+                    <div 
+                      className="progress-bar" 
+                      style={{width: `${getCompletionPercentage()}%`}}
+                    ></div>
+                  </div>
+                  <div className="progress-percentage">{Math.round(getCompletionPercentage())}%</div>
+                </div>
+                
+                <button
+                  className={`status-update-button status-${getNextStatus().toLowerCase()}`}
+                  onClick={handleStatusUpdate}
+                  disabled={isStatusUpdateDisabled()}
+                >
+                  <FaShippingFast className="button-icon" />
+                  {getNextStatusLabel()}
+                </button>
+                
+                {isStatusUpdateDisabled() && (
+                  <div className="validation-message">
+                    <FaExclamationCircle className="validation-icon" />
+                    {getValidationMessage()}
+                  </div>
+                )}
+                
+                {/* Next steps info when button is enabled */}
+                {!isStatusUpdateDisabled() && (
+                  <div className="next-steps-info">
+                    <h5><FaInfoCircle className="info-icon" /> What happens when you mark as packed?</h5>
+                    <div className="next-steps-content">
+                      <div className="next-step-item">
+                        <div className="step-indicator">1</div>
+                        <span>The packing list status will change to "Packed"</span>
+                      </div>
+                      <div className="next-step-item">
+                        <div className="step-indicator">2</div>
+                        <span>The packing costs will be recorded</span>
+                      </div>
+                      <div className="next-step-item">
+                        <div className="step-indicator">3</div>
+                        <span>A new shipment record will be created automatically</span>
+                      </div>
+                      <div className="next-step-item">
+                        <div className="step-indicator">4</div>
+                        <span>The item will move to the shipping stage</span>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
-            </div>
-          )}
-          
-          {/* Packing Assignment Section */}
-          <div className="edit-section">
-            <h4><FaUser className="icon-spacing" /> Assign Packer</h4>
-            {isNotEditable ? (
-              <div className="employee-display">
-                <span className="employee-value">
-                  {getEmployeeName(packingList.packed_by)}
-                </span>
-              </div>
-            ) : (
-              <div className="employee-selection">
-                <select
-                  className="employee-dropdown"
-                  value={editedValues.packed_by || packingList.packed_by || ''}
-                  onChange={(e) => handleInputChange('packed_by', e.target.value)}
-                  disabled={isNotEditable}
-                >
-                  <option value="">-- Select Employee --</option>
-                  {employees.map((employee) => (
-                    <option key={employee.employee_id} value={employee.employee_id}>
-                      {employee.full_name}
-                    </option>
-                  ))}
-                </select>
+            )}
+            
+            {/* Status message for packed items */}
+            {isPacked && (
+              <div className="status-message-section status-packed">
+                <FaRegCheckCircle className="status-icon" />
+                <div className="status-message">
+                  <h5>This packing list has been completed</h5>
+                  <p>The items are now ready to be shipped.</p>
+                </div>
               </div>
             )}
-          </div>
-          
-          {/* Packing Type Section */}
-          <div className="edit-section">
-            <h4><FaTags className="icon-spacing" /> Packing Type</h4>
-            {isNotEditable ? (
-              <div className="packing-type-display">
-                <span className="packing-type-value">
-                  {getPackingTypeName(packingList.packing_type)}
-                </span>
-              </div>
-            ) : (
-              <div className="packing-type-selection">
-                <select
-                  className="packing-type-dropdown"
-                  value={editedValues.packing_type || packingList.packing_type || ''}
-                  onChange={(e) => handleInputChange('packing_type', e.target.value)}
-                  disabled={isNotEditable}
-                >
-                  <option value="">-- Select Packing Type --</option>
-                  {packingTypes.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-          
-          {/* Packing Cost Section */}
-          <div className="edit-section">
-            <h4><FaMoneyBillWave className="icon-spacing" /> Packing Costs</h4>
-            {isNotEditable ? (
-              <div className="cost-display">
-                <div className="cost-info-row">
-                  <span className="cost-label">Material Cost:</span>
-                  <span className="cost-value">{formatCurrency(packingCost.material_cost)}</span>
-                </div>
-                <div className="cost-info-row">
-                  <span className="cost-label">Labor Cost:</span>
-                  <span className="cost-value">{formatCurrency(packingCost.labor_cost)}</span>
-                </div>
-                <div className="cost-total-row">
-                  <span className="cost-total-label">Total Cost:</span>
-                  <span className="cost-total-value">
-                    {formatCurrency(packingCost.total_packing_cost)}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="cost-editing">
-                <div className="cost-input-row">
-                  <label className="cost-label">Material Cost:</label>
-                  <input
-                    type="number"
-                    className="cost-input"
-                    value={packingCost.material_cost}
-                    onChange={(e) => handleCostChange('material_cost', e.target.value)}
-                    step="0.01"
-                    min="0"
-                    disabled={isNotEditable}
-                  />
-                </div>
-                <div className="cost-input-row">
-                  <label className="cost-label">Labor Cost:</label>
-                  <input
-                    type="number"
-                    className="cost-input"
-                    value={packingCost.labor_cost}
-                    onChange={(e) => handleCostChange('labor_cost', e.target.value)}
-                    step="0.01"
-                    min="0"
-                    disabled={isNotEditable}
-                  />
-                </div>
-                <div className="cost-total-row">
-                  <span className="cost-total-label">Total Cost:</span>
-                  <span className="cost-total-value">
-                    {formatCurrency(packingCost.total_packing_cost)}
-                  </span>
+            
+            {/* Status message for shipped items */}
+            {isShipped && (
+              <div className="status-message-section status-shipped">
+                <FaCheckDouble className="status-icon" />
+                <div className="status-message">
+                  <h5>This packing list has been shipped</h5>
+                  <p>This record cannot be modified and is for reference only.</p>
                 </div>
               </div>
             )}
           </div>
-          
-          {/* Status Update Button */}
-          {canUpdateStatus() && (
-            <div className="status-section">
-              <h4>Status Update</h4>
-              <button
-                className={`status-update-button status-${getNextStatus().toLowerCase()}`}
-                onClick={() => {
-                  // Create an object with all current edited values
-                  const updatedValues = {
-                    ...editedValues,
-                    packed_by: editedValues.packed_by || packingList.packed_by,
-                    packing_type: editedValues.packing_type || packingList.packing_type,
-                    material_cost: packingCost.material_cost,
-                    labor_cost: packingCost.labor_cost,
-                    total_packing_cost: packingCost.total_packing_cost
-                  };
-                  
-                  // Call onStatusUpdate with all the edited values
-                  onStatusUpdate(packingList, getNextStatus(), updatedValues);
-                }}
-                disabled={isStatusUpdateDisabled()}
-              >
-                {getNextStatusLabel()}
-              </button>
-              
-              {isStatusUpdateDisabled() && (
-                <div className="validation-message" style={{
-                  color: '#dc3545',
-                  fontSize: '0.8rem',
-                  marginTop: '0.5rem'
-                }}>
-                  {!editedValues.packed_by && !packingList.packed_by ? 'Please assign an employee for packing' : 
-                   (!editedValues.packing_type && !packingList.packing_type) ? 'Please select a packing type' : 
-                   (packingCost.material_cost <= 0 && packingCost.labor_cost <= 0) ? 'Please enter valid packing costs' : ''}
-                </div>
-              )}
-            </div>
-          )}
-          
-          {/* Status message for packed items */}
-          {isPacked && (
-            <div className="completed-message">
-              <FaClipboardCheck className="icon-spacing" />
-              <span className="info-text">This packing list has been completed.</span>
-            </div>
-          )}
-          
-          {/* Status message for shipped items */}
-          {isShipped && (
-            <div className="completed-message">
-              <FaClipboardCheck className="icon-spacing" />
-              <span className="info-text">This packing list has been shipped and cannot be modified.</span>
-            </div>
-          )}
-          
-          {/* Next steps info section for pending packing lists */}
-          {canUpdateStatus() && !isStatusUpdateDisabled() && (
-            <div className="info-section">
-              <div className="icon-message">
-                <FaInfoCircle className="info-icon" />
-                <div>
-                  <p className="confirmation-message">
-                    What happens when you mark as packed?
-                  </p>
-                  <ul className="next-steps-list">
-                    <li>The packing list status will change to "Packed"</li>
-                    <li>The packing costs will be recorded</li>
-                    <li>A new shipment record will be created automatically</li>
-                    <li>The item will move to the shipping stage</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
         
         <div className="modal-footer">
@@ -418,6 +667,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
               onClick={handleSave}
               disabled={!hasChanges() || isNotEditable}
             >
+              <FaRegCheckCircle className="button-icon" />
               Save Changes
             </button>
           )}

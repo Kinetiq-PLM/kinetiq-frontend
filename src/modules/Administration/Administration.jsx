@@ -1,265 +1,296 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import CountUp from "react-countup";
 import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from "recharts";
+  AppstoreOutlined,
+  ToolOutlined,
+  ShoppingOutlined,
+  ExperimentOutlined,
+  UserOutlined,
+  ShopOutlined,
+  HomeOutlined,
+  FileTextOutlined,
+  FileSearchOutlined,
+  LoadingOutlined,
+  DollarOutlined
+} from "@ant-design/icons";
+
+// Import API services
+import { 
+  userAPI, 
+  roleAPI,
+  policiesAPI, 
+  assetsAPI, 
+  productsAPI, 
+  rawMaterialsAPI, 
+  businessPartnerAPI,
+  vendorAPI,
+  auditLogAPI,
+  currencyAPI,
+  warehouseAPI
+} from "../Administration/api/api";
 
 const Administration = ({ setActiveSubModule, loadSubModule }) => {
-    const currencyData = [
-        { name: "Nov 1", value: 1.8 },
-        { name: "Nov 2", value: 2.4 },
-        { name: "Nov 3", value: 2.5 },
-        { name: "Nov 4", value: 1.3 },
-        { name: "Nov 5", value: 1.5 },
-        { name: "Nov 6", value: 3 },
-        { name: "Nov 7", value: 1.4 }
-    ];
+  // State variables for dashboard data
+  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState(0);
+  const [assets, setAssets] = useState(0);
+  const [products, setProducts] = useState(0);
+  const [rawMaterials, setRawMaterials] = useState(0);
+  const [partners, setPartners] = useState(0);
+  const [vendors, setVendors] = useState(0);
+  const [policies, setPolicies] = useState(0);
+  const [auditLogs, setAuditLogs] = useState(0);
+  const [warehouses, setWarehouses] = useState(0);
+  const [exchangeRate, setExchangeRate] = useState(0);
+  const [currency, setCurrency] = useState("PHP");
 
-    return (
-        <div className="flex p-6 gap-6">
-            {/* LEFT PANEL */}
-            <div className="w-full md:w-1/2 space-y-6">
-                {/* Combined User & Roles Card */}
-                <div className="bg-white shadow-md rounded-lg p-6 flex justify-between items-center">
-                    {/* USER Section - Clickable */}
-                    <div
-                        className="flex-1 flex items-center gap-4 cursor-pointer hover:opacity-80 transition"
-                        onClick={() => {
-                            setActiveSubModule("User");
-                            loadSubModule("User");
-                        }}
-                    >
-                        <img src="/icons/user.png" alt="User Icon" className="w-10 h-10 object-contain" />
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch all data in parallel
+        const [
+          usersData,
+          assetsData,
+          productsData,
+          rawMaterialsData,
+          partnersData,
+          vendorsData,
+          policiesData,
+          logsData,
+          warehousesData,
+          currenciesData
+        ] = await Promise.all([
+          userAPI.getUsers(),
+          assetsAPI.getAssets(),
+          productsAPI.getProducts(),
+          rawMaterialsAPI.getRawMaterials(),
+          businessPartnerAPI.getBusinessPartners(),
+          vendorAPI.getVendors(),
+          policiesAPI.getPolicies(),
+          auditLogAPI.getAuditLogs(),
+          warehouseAPI.getWarehouses(),
+          currencyAPI.getActiveCurrencies()
+        ]);
+
+        // Set state with fetched data counts
+        setUsers(usersData.count || usersData.length || 0);
+        setAssets(assetsData.count || assetsData.length || 0);
+        setProducts(productsData.count || productsData.length || 0);
+        setRawMaterials(rawMaterialsData.count || rawMaterialsData.length || 0);
+        setPartners(partnersData.count || partnersData.length || 0);
+        setVendors(vendorsData.count || vendorsData.length || 0);
+        setPolicies(policiesData.count || policiesData.length || 0);
+        setAuditLogs(logsData.count || logsData.length || 0);
+        setWarehouses(warehousesData.count || warehousesData.length || 0);
+
+        // Find USD exchange rate
+        const usdCurrency = currenciesData.results?.find(c => c.currency_name === "USD") || 
+                           currenciesData.find(c => c.currency_name === "USD");
+        
+        if (usdCurrency) {
+          setExchangeRate(usdCurrency.exchange_rate || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        // Set loading to false immediately after data is fetched
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  // Function to navigate to modules
+  const handleClick = (module, tab = null) => {
+    setActiveSubModule(module);
+    loadSubModule(module);
+    if (tab) {
+      setTimeout(() => {
+        const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
+        if (tabBtn) tabBtn.click();
+      }, 100);
+    }
+  };
+
+  return (
+    <div className="admin">
+        <div className="admin custom-scroll">
+          {/* Dashboard Title */}
+          <h1 className="text-2xl font-bold mb-6 w-full text-center flex items-center justify-center">
+            <span className="text-[#00A8A8] mr-2">Administration</span> Dashboard
+          </h1>
+
+          {loading ? (
+            <div className="admin body-content-container flex items-center justify-center">
+              <LoadingOutlined className="text-[#00A8A8] text-4xl" />
+              <p className="ml-3">Loading dashboard data...</p>
+            </div>
+          ) : (
+            <>
+              {/* Top Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-4">
+                <div onClick={() => handleClick("User")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-teal-200">
+                  <div className="flex items-center">
+                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                      <UserOutlined className="text-2xl text-[#00A8A8]" />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">User & Roles</p>
+                      <p className="text-2xl font-bold"><CountUp end={users} duration={1.5} /></p>
+                      <p className="text-sm text-gray-500">Employees</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div onClick={() => handleClick("Currency")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-blue-200">
+                    <div className="flex items-center">
+                        <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                        <DollarOutlined className="text-2xl text-[#00A8A8]" />
+                        </div>
                         <div>
-                            <p className="text-sm text-gray-500">User</p>
-                            <p className="text-xl font-bold text-black">101</p>
-                            <p className="text-xs text-gray-400">Employees</p>
+                        <p className="text-gray-600 font-medium mb-1">Exchange Rate (PHP to USD)</p>
+                        <p className="text-2xl font-bold">₱ <CountUp end={exchangeRate} decimals={6} duration={1.5} preserveValue={true} /></p>
+                        <p className="text-sm text-gray-500 flex items-center">
+                            Latest Rate 
+                            <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Live</span>
+                        </p>
                         </div>
                     </div>
-
-                    {/* Divider */}
-                    <div className="w-px h-12 bg-gray-200 mx-4" />
-
-                    {/* ROLES Section */}
-                    <div className="flex-1">
-                        <p className="text-sm text-gray-500">Roles</p>
-                        <p className="text-xl font-bold text-black">16</p>
-                        <p className="text-xs text-gray-400">Employees</p>
-                    </div>
                 </div>
 
-                {/* Currency Chart - Clickable */}
-                <div
-                    className="bg-white shadow-md rounded-lg p-4 cursor-pointer hover:opacity-90 transition"
-                    onClick={() => {
-                        setActiveSubModule("Currency");
-                        loadSubModule("Currency");
-                    }}
-                >
-                    <div className="flex justify-between mb-2">
-                        <h3 className="text-md font-semibold text-gray-800">currency</h3>
-                        <span className="text-sm text-gray-500">UNITED STATES</span>
+                <div onClick={() => handleClick("Warehouse")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-teal-200">
+                  <div className="flex items-center">
+                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                      <HomeOutlined className="text-2xl text-[#00A8A8]" />
                     </div>
-                    <p className="text-sm text-gray-600 mb-1">November</p>
-                    <ResponsiveContainer width="100%" height={160}>
-                        <BarChart data={currencyData}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="name" hide />
-                            <YAxis domain={[0, 3]} ticks={[0, 1, 2, 3]} />
-                            <Tooltip />
-                            <Bar dataKey="value" fill="#00A8A8" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">Warehouse</p>
+                      <p className="text-2xl font-bold"><CountUp end={warehouses} duration={1.5} /></p>
+                      <p className="text-sm text-gray-500">Locations</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Middle Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-4">
+                <div onClick={() => handleClick("Item Masterlist")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-sky-200">
+                  <div className="flex items-center">
+                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                      <AppstoreOutlined className="text-2xl text-[#00A8A8]" />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">Item Masterlist</p>
+                      <p className="text-2xl font-bold"><CountUp end={assets + products + rawMaterials} duration={1.5} /></p>
+                      <p className="text-sm text-gray-500">Records</p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Policy Table */}
-                <Card title="Policy" onViewAll={() => {
-                    setActiveSubModule("Policy");
-                    loadSubModule("Policy");
-                }}>
-                    <Table
-                        headers={["User id", "Employee ID", "First name", "Last name"]}
-                        data={[
-                            ["User_02", "User02@Gmail.Com", "2024-12-16", "Employee Benefits"],
-                            ["User_02", "User02@Gmail.Com", "2024-12-16", "Employee Benefits"],
-                        ]}
-                        withCheckbox
-                    />
-                </Card>
-            </div>
-
-            {/* RIGHT PANEL */}
-            <div className="w-full md:w-1/2 space-y-6 overflow-y-auto pr-2 max-h-[calc(100vh-100px)] custom-scroll">
-
-                {/* ITEM MASTERLIST SECTION */}
-                <div>
-                    <h2 className="text-lg font-semibold text-gray-700 mb-2">Item Masterlist</h2>
-                    <hr className="mb-4 border-gray-300" />
-                    <div className="grid grid-cols-2 gap-4">
-                        {[
-                            { title: "Item Masterlist", module: "Item Masterlist", count: 57, icon: "/icons/inventory.png" },
-                            { title: "Assets", module: "Item Masterlist", tab: "Assets", count: 32, icon: "/icons/asset.png" },
-                            { title: "Products", module: "Item Masterlist", tab: "Product", count: 19, icon: "/icons/product.png" },
-                            { title: "Raw Materials", module: "Item Masterlist", tab: "Raw Materials", count: 44, icon: "/icons/raw.png" }
-                        ].map(({ title, module, tab, count, icon }) => (
-                            <div
-                                key={title}
-                                className="bg-white shadow-md rounded-lg p-6 flex items-center gap-4 cursor-pointer hover:opacity-90 transition"
-                                onClick={() => {
-                                    setActiveSubModule(module);
-                                    loadSubModule(module);
-                                    if (tab) {
-                                        setTimeout(() => {
-                                            const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
-                                            if (tabBtn) tabBtn.click();
-                                        }, 100);
-                                    }
-                                }}
-                            >
-                                <img src={icon} alt={`${title} Icon`} className="w-10 h-10 object-contain" />
-                                <div>
-                                    <p className="text-sm text-gray-500">{title}</p>
-                                    <p className="text-xl font-bold text-black">{count}</p>
-                                    <p className="text-xs text-gray-400">Records</p>
-                                </div>
-                            </div>
-                        ))}
+                <div className="flex flex-col gap-2">
+                  <div onClick={() => handleClick("Item Masterlist", "Assets")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-amber-200">
+                    <div className="flex items-center">
+                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
+                        <ToolOutlined className="text-xl text-[#00A8A8]" />
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-medium mb-1">Assets</p>
+                        <p className="text-xl font-bold"><CountUp end={assets} duration={1.5} /></p>
+                        <p className="text-xs text-gray-500">Records</p>
+                      </div>
                     </div>
+                  </div>
+                  
+                  <div onClick={() => handleClick("Item Masterlist", "Product")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-green-200">
+                    <div className="flex items-center">
+                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
+                        <ShoppingOutlined className="text-xl text-[#00A8A8]" />
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-medium mb-1">Products</p>
+                        <p className="text-xl font-bold"><CountUp end={products} duration={1.5} /></p>
+                        <p className="text-xs text-gray-500">Records</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div onClick={() => handleClick("Item Masterlist", "Raw Materials")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-yellow-200">
+                    <div className="flex items-center">
+                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
+                        <ExperimentOutlined className="text-xl text-[#00A8A8]" />
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-medium mb-1">Raw Materials</p>
+                        <p className="text-xl font-bold"><CountUp end={rawMaterials} duration={1.5} /></p>
+                        <p className="text-xs text-gray-500">Records</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* BUSINESS PARTNER MASTERLIST SECTION */}
-                <div>
-                    <h2 className="text-lg font-semibold text-gray-700 mb-2">Business Partner</h2>
-                    <hr className="mb-4 border-gray-300" />
-                    <div className="grid grid-cols-2 gap-4">
-                        {[
-                            {
-                                title: "Business Partner Masterlist",
-                                module: "Business Partner Masterlist",
-                                count: 23,
-                                icon: "/icons/business-partner.png"
-                            },
-                            {
-                                title: "Vendors",
-                                module: "Business Partner Masterlist",
-                                tab: "Vendor",
-                                count: 18,
-                                icon: "/icons/vendor.png"
-                            }
-                        ].map(({ title, module, tab, count, icon }) => (
-                            <div
-                                key={title}
-                                className="bg-white shadow-md rounded-lg p-6 flex items-center gap-4 cursor-pointer hover:opacity-90 transition"
-                                onClick={() => {
-                                    setActiveSubModule(module);
-                                    loadSubModule(module);
-                                    if (tab) {
-                                        setTimeout(() => {
-                                            const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
-                                            if (tabBtn) tabBtn.click();
-                                        }, 100);
-                                    }
-                                }}
-                            >
-                                <img src={icon} alt={`${title} Icon`} className="w-10 h-10 object-contain" />
-                                <div>
-                                    <p className="text-sm text-gray-500">{title}</p>
-                                    <p className="text-xl font-bold text-black">{count}</p>
-                                    <p className="text-xs text-gray-400">Records</p>
-                                </div>
-                            </div>
-                        ))}
+                <div className="flex flex-col gap-2">
+                  <div onClick={() => handleClick("Business Partner Masterlist")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-indigo-200">
+                    <div className="flex items-center">
+                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
+                        <UserOutlined className="text-xl text-[#00A8A8]" />
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-medium mb-1">Business Partner Masterlist</p>
+                        <p className="text-xl font-bold"><CountUp end={partners} duration={1.5} /></p>
+                        <p className="text-xs text-gray-500">Partners</p>
+                      </div>
                     </div>
+                  </div>
+                  
+                  <div onClick={() => handleClick("Business Partner Masterlist", "Vendor")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-purple-200">
+                    <div className="flex items-center">
+                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
+                        <ShopOutlined className="text-xl text-[#00A8A8]" />
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-medium mb-1">Vendors</p>
+                        <p className="text-xl font-bold"><CountUp end={vendors} duration={1.5} /></p>
+                        <p className="text-xs text-gray-500">Partners</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                <div onClick={() => handleClick("Policy")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-gray-200">
+                  <div className="flex items-center">
+                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                      <FileTextOutlined className="text-2xl text-[#00A8A8]" />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">Policy</p>
+                      <p className="text-2xl font-bold"><CountUp end={policies} duration={1.5} /></p>
+                      <p className="text-sm text-gray-500">Documents</p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* TABLE SECTIONS */}
-                {[
-                    { title: "Audit Logs", module: "Audit Logs" },
-                    { title: "Warehouse", module: "Warehouse" }
-                ].map(({ title, module }) => (
-                    <Card
-                        key={title}
-                        title={title}
-                        onViewAll={() => {
-                            setActiveSubModule(module);
-                            loadSubModule(module);
-                        }}
-                    >
-                        <Table
-                            headers={["User id", "Employee ID", "First name", "Last name"]}
-                            data={[
-                                ["User_02", "User02@Gmail.Com", "2024-12-16", "Employee Benefits"],
-                                ["User_02", "User02@Gmail.Com", "2024-12-16", "Employee Benefits"]
-                            ]}
-                            withCheckbox
-                            badge
-                        />
-                    </Card>
-                ))}
-            </div>
+                <div onClick={() => handleClick("Audit Logs")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-red-200">
+                  <div className="flex items-center">
+                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                      <FileSearchOutlined className="text-2xl text-[#00A8A8]" />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">Audit Logs</p>
+                      <p className="text-2xl font-bold"><CountUp end={auditLogs} duration={1.5} /></p>
+                      <p className="text-sm text-gray-500">System Records</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
-    );
+      </div>
+  );
 };
-
-const Card = ({ title, children, onViewAll }) => (
-    <div className="bg-white shadow-md rounded-lg p-4 relative overflow-hidden">
-        <div className="flex justify-between items-center mb-2">
-            <h3 className="text-md font-semibold text-gray-800">{title}</h3>
-            <button
-                onClick={onViewAll}
-                className="text-sm text-blue-500 hover:underline"
-            >
-                View all
-            </button>
-        </div>
-        <div className="max-h-[200px] overflow-y-auto custom-scroll">
-            {children}
-        </div>
-    </div>
-);
-
-const Table = ({ headers, data, withCheckbox = false, highlightDisabledRow = false, badge = false }) => (
-    <table className="w-full border-collapse border border-gray-200 rounded-lg text-sm">
-        <thead>
-            <tr className="bg-gray-100 text-gray-700">
-                {withCheckbox && (
-                    <th className="p-3 border border-gray-200 text-left">
-                    </th>
-                )}
-                {headers.map((header, index) => (
-                    <th key={index} className="p-3 border border-gray-200 text-left font-medium">
-                        {header}
-                    </th>
-                ))}
-            </tr>
-        </thead>
-        <tbody>
-            {data.map((row, rowIndex) => (
-                <tr key={rowIndex} className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100">
-                    {withCheckbox && (
-                        <td className="p-3 border border-gray-200">
-                        </td>
-                    )}
-                    {row.map((cell, cellIndex) => (
-                        <td
-                            key={cellIndex}
-                            className={`p-3 border border-gray-200 ${highlightDisabledRow && rowIndex === 2
-                                    ? 'text-gray-400 border-gray-300'
-                                    : 'text-gray-700'
-                                }`}
-                        >
-                            {badge && cellIndex === 0 ? (
-                                <span className="px-2 py-1 border rounded-lg text-[#00A8A8] border-[#00A8A8]">
-                                    {cell}
-                                </span>
-                            ) : (
-                                cell
-                            )}
-                        </td>
-                    ))}
-                </tr>
-            ))}
-        </tbody>
-    </table>
-);
 
 export default Administration;

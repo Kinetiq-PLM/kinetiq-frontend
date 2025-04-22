@@ -120,18 +120,18 @@ const ReworkModal = ({ rework, employees, onClose, onAssign, onComplete }) => {
                   <span className="info-label">Order ID</span>
                   <span className="info-value">{rework.original_order_info.order_id}</span>
                 </div>
-                <div className="info-item">
+                {/* <div className="info-item">
                   <span className="info-label">Order Date</span>
                   <span className="info-value">{formatDate(rework.original_order_info.order_date)}</span>
-                </div>
-                <div className="info-item">
+                </div> */}
+                {/* <div className="info-item">
                   <span className="info-label">Order Status</span>
                   <span className="info-value">{rework.original_order_info.order_status}</span>
-                </div>
-                <div className="info-item">
+                </div> */}
+                {/* <div className="info-item">
                   <span className="info-label">Order Total Amount</span>
                   <span className="info-value">₱{rework.original_order_info.order_total_amount?.toFixed(2) || 'N/A'}</span>
-                </div>
+                </div> */}
                 <div className="info-item">
                   <span className="info-label">Customer ID</span>
                   <span className="info-value">{rework.original_order_info.customer_id}</span>

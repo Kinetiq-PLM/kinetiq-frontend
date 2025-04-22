@@ -18,5 +18,24 @@
     justify-content: center;
     min-width: 40rem;
     min-height: 30rem;
+    overflow-y: auto;
   }
+
+  .inv .body-content-container::-webkit-scrollbar {
+    width: 8px; /* Scrollbar width */
+    background: #e5e7eb;
+  }
+  
+  .inv .body-content-container::-webkit-scrollbar-thumb {
+    background: rgb(168, 168, 168); /* Scrollbar color */
+    border-radius: 6px; 
+  }
+  
+  .inv .body-content-container::-webkit-scrollbar-thumb:hover {
+    background: #c1c3c6;
+  }
+
+
+
+  
   

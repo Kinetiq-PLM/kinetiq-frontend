@@ -6,7 +6,7 @@ export const InputCustomer = ({ label, value = "", customerListModal }) => {
     <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
       <p className="flex-1 text-sm">{label}</p>
       <div
-        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded"
+        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded truncate"
         onClick={() => {
           customerListModal(true);
         }}
@@ -28,7 +28,7 @@ const Information = ({ label, value = "" }) => {
     <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
       <p className="flex-1 text-sm">{label}</p>
       <div
-        className={`border border-[#9a9a9a] flex-1 p-1 h-[30px] rounded overflow-x-auto whitespace-nowrap ${
+        className={`border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded truncate whitespace-nowrap ${
           value === "" ? "bg-[#f7f7f7]" : ""
         }`}
       >
@@ -38,95 +38,10 @@ const Information = ({ label, value = "" }) => {
   );
 };
 
-const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
-  const [address, setAddress] = useState(
-    customer.address_line1 || customer.address_line2 || ""
-  );
-
-  const addresses = [customer.address_line1, customer.address_line2].filter(
-    Boolean
-  );
-
-  const handleAddressChange = (event) => {
-    const selectedAddress = event.target.value;
-    setAddress(selectedAddress);
-    setCustomerAddress(selectedAddress);
-  };
-
-  useEffect(() => {
-    setAddress(customer.address_line1);
-    setCustomerAddress(customer.address_line1);
-  }, [customer]);
-
+const OpportunityInfo = ({ customerListModal, customer }) => {
   return (
-    <div className="flex justify-between mb-2 w-full">
-      <p className="flex-1">{label}</p>
-      {customer ? (
-        <select
-          className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white rounded cursor-pointer text-sm"
-          onChange={handleAddressChange}
-          value={address || ""}
-        >
-          {addresses.map((addr, index) => (
-            <option key={index} value={addr}>
-              {addr}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <div
-          className={`border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-[#f7f7f7]`}
-        ></div>
-      )}
-    </div>
-  );
-};
-
-const DateSelector = ({ label, customer, setDeliveryDate }) => {
-  // Calculate the default date (3 days from today)
-  const defaultDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split("T")[0];
-
-  // Initialize state with the customer's delivery date or default date
-  const [date, setDate] = useState(customer.delivery_date || defaultDate);
-
-  // Effect to set the default date when the component mounts
-  useEffect(() => {
-    if (!customer.delivery_date) {
-      setDeliveryDate(defaultDate);
-    }
-  }, []); // Runs only once on mount
-
-  const handleDateChange = (event) => {
-    const selectedDate = event.target.value;
-    setDate(selectedDate);
-    setDeliveryDate(defaultDate);
-  };
-
-  return (
-    <div className="flex justify-between mb-2 w-full">
-      <p className="flex-1">{label}</p>
-      <input
-        type="date"
-        className="border border-[#9a9a9a] flex-1 p-1 h-[30px] rounded cursor-pointer"
-        onChange={handleDateChange}
-        value={date}
-        min={defaultDate} // Restrict to at least 3 days from now
-      />
-    </div>
-  );
-};
-
-const OpportunityInfo = ({
-  customerListModal,
-  customer,
-  employeeListModal,
-  employee,
-}) => {
-  return (
-    <section className="flex justify-between gap-0 sm:gap-6 flex-col md:flex-row">
-      <div className="h-full w-full flex flex-col items-center">
+    <div className="flex flex-col lg:flex-row lg:gap-6">
+      <div className="h-full w-full flex flex-col items-center  flex-1 ">
         <InputCustomer
           label={"Customer ID"}
           value={customer.customer_id}
@@ -134,13 +49,14 @@ const OpportunityInfo = ({
         />
         <Information label={"Contact Person"} value={customer.contact_person} />
       </div>
-      <div className="w-full hidden xl:block"></div>
-      <div className="h-full w-full flex flex-col items-center">
+
+      <div className="lg:max-w-[100px] xl:max-w-none flex-1 hidden lg:block"></div>
+
+      <div className="h-full w-full flex flex-col items-center flex-1 ">
         <Information label={"Number"} value={customer.phone_number} />
         <Information label={"Email"} value={customer.email_address} />
       </div>
-      {/* Employee ID Input */}
-    </section>
+    </div>
   );
 };
 

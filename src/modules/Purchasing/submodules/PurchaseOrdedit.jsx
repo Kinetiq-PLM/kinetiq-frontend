@@ -19,7 +19,7 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
     const fetchPurchaseOrder = async () => {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/purchase-orders/list/`
+          `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/`
         );
         const order = response.data.find(
           po => po.purchase_id === purchaseOrder.purchase_id
@@ -89,7 +89,7 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
   const submitChanges = async (changedFields) => {
     try {
       const response = await axios.patch(
-        `http://127.0.0.1:8000/api/purchase-orders/edit/${purchaseOrder.purchase_id}/`,
+        `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/edit/${purchaseOrder.purchase_id}/`,
         changedFields,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -107,7 +107,7 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
 
         try {
           const shipmentResponse = await axios.post(
-            "http://127.0.0.1:8000/api/received-shipment/create/",
+            "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/create/",
             shipmentPayload,
             { headers: { 'Content-Type': 'application/json' } }
           );
@@ -161,7 +161,8 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
         )}
         <form onSubmit={handleSubmit}>
           <div className="po-edit-form-group">
-            <label>Status</label>
+            <div className="label-req">
+            <label>Status</label></div>
             <select
               name="status"
               value={formData.status}
@@ -178,7 +179,8 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
             </select>
           </div>
           <div className="po-edit-form-group">
-            <label>Delivery Date</label>
+            <div className="label-req">
+            <label>Delivery Date</label></div>
             <input
               type="date"
               name="delivery_date"

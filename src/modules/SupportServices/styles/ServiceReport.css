@@ -259,7 +259,7 @@
   top: 0;
   background-color: #00a8a8; 
   color: white;
-  z-index: 3;
+  z-index: 0;
 }
 
 .service-report .reports-table th {
@@ -278,7 +278,7 @@
 }
 
 .service-report tbody tr {
-  background-color: #eff8f9;
+  background-color: #ffffff;
   transition: background-color 0.3s ease;
 }
 
@@ -383,7 +383,9 @@
 .service-report .modal-content {
   padding: 1.5rem;
   flex: 1;
+  max-height: 70vh;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .service-report .modal-form {

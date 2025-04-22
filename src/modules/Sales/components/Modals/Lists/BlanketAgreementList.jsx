@@ -125,7 +125,7 @@ const BlanketAgreementListModal = ({
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Blanket Agreements
+            List of Blanket Agreements
           </h2>
         </div>
 

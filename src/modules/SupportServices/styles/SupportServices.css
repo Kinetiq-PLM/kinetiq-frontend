@@ -444,7 +444,7 @@
   border-radius: 8px;
   font-size: 0.875rem;
   font-family: "Poppins", sans-serif;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   width: 100%;
   min-width: 350px;
   margin-bottom: 0px;
@@ -453,7 +453,6 @@
 .serv .search-input:focus {
   outline: none;
   border: none;
-  background-color: #f5f5f5;
   box-shadow: none;
 }
 

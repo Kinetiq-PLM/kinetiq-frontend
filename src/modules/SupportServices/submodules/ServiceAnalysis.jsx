@@ -16,6 +16,7 @@ import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 import { GET } from "../api/api"
 import { POST } from "../api/api"
 import { PATCH } from "../api/api"
+import { POST_NOTIF } from "../api/api"
 
 const ServiceAnalysis = ({employee_id}) => {
   // State for analyses
@@ -96,6 +97,8 @@ const ServiceAnalysis = ({employee_id}) => {
 
   useEffect(() => {
     fetchAnalyses();
+    fetchMRP();
+    fetchDistrib();
   }, []);
 
     useEffect(() => {
@@ -447,11 +450,35 @@ const ServiceAnalysis = ({employee_id}) => {
     }
   }
 
+  const [mrp, setMRP] = useState([])
+
+  const fetchMRP = async () => {
+    try {
+      const data = await GET("call/calls/mat-planners/");
+      const userIds = data.map(user => user.user_id);
+      setMRP(userIds);
+    } catch (error) {
+      console.error("Error fetching material planners:", error)
+    }
+  }
+
   const handleCreateOrderItem = async (orderItemData) => {
     console.log("Creating order item:", orderItemData)
+
+    const notifData = {
+      module: "Support & Services",
+      submodule: "Service Analysis",
+      recipient_ids: mrp,
+      msg: "New service order item awaiting markup pricing."
+    }
+    console.log(notifData)
     try {
       const data = await POST("order/item/", orderItemData);
       console.log("Order item created successfully:", data);
+
+      const notif_data_batch = await POST_NOTIF("send-notif-batch/", notifData);
+      console.log("Notification sent successfully:", notif_data_batch);
+
       setShowAddItemModal(false);
       fetchServiceOrderItems(serviceOrderInfo.serviceOrderId);
       
@@ -555,6 +582,18 @@ const ServiceAnalysis = ({employee_id}) => {
     }
   }
 
+  const [distrib, setDistrib] = useState([])
+
+  const fetchDistrib = async () => {
+    try {
+      const data = await GET("call/calls/distrib-manager/");
+      const userIds = data.map(user => user.user_id);
+      setDistrib(userIds);
+    } catch (error) {
+      console.error("Error fetching material planners:", error)
+    }
+  }
+
   const createDeliveryOrder  = async () => {
     if (activeTab === "Delivery Order") {
       const newDeliveryOrderInfo  = {
@@ -565,9 +604,22 @@ const ServiceAnalysis = ({employee_id}) => {
         service_order_id: deliveryOrderInfo.serviceOrderId,
       }
       console.log("Creating delivery order:", newDeliveryOrderInfo )
+
+      const notifData = {
+        module: "Support & Services",
+        submodule: "Service Analysis",
+        recipient_ids: distrib,
+        msg: "A new delivery order has been submitted. Please review details."
+      }
+      console.log(notifData)
+
       try {
         const data = await POST("delivery/", newDeliveryOrderInfo );
         console.log("Delivery order created successfully:", data);
+
+        const notif_data_batch = await POST_NOTIF("send-notif-batch/", notifData);
+        console.log("Notification sent successfully:", notif_data_batch);
+
         fetchDeliveryOrder(serviceOrderInfo.serviceOrderId);
         setSuccessModalMessage("Service delivery order created successfully!"); 
         setShowSuccessModal(true);  

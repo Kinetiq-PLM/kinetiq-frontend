@@ -147,7 +147,7 @@ const DeliveredList = ({
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Deliveries
+            List of Deliveries
           </h2>
         </div>
 

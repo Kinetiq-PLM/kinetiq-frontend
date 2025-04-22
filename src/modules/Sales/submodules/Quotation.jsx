@@ -323,6 +323,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             setCustomerInfo={setQuotationInfo}
             operationID={q_id}
             setDeliveryDate={setDeliveryDate}
+            date={new Date().toISOString().split("T")[0]}
             setAddress={setAddress}
           />
         </div>

@@ -1,260 +1,624 @@
-import React, { useState, useRef, useEffect } from "react";
-import "../styles/ItemMasterlist.css";
+import React, { useState, useEffect } from "react";
+import { businessPartnerAPI, vendorAPI } from "../api/api";
+import "../styles/BusinessPartner.css";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Tabs,
+  Space,
+  Tag,
+  Popconfirm,
+  message,
+  Spin,
+  Typography,
+  Divider,
+  Pagination,
+  Descriptions
+} from "antd";
+import { 
+  UserOutlined, 
+  ShopOutlined, 
+  EditOutlined, 
+  DeleteOutlined,
+  EyeOutlined,
+  SearchOutlined
+} from "@ant-design/icons";
 
-const categories = ["Employee", "Vendor", "Customer"];
-
-const bpRows = [
-    {
-        partnerId: "Maria",
-        employeeId: "Clara",
-        vendorCode: "Mari123",
-        customerId: "Masikip",
-        partnerName: "Sad",
-        category: "Employee",
-        contactInfo: "Qwdw",
-    },
-];
-
-const vendorRowsInit = [
-    {
-        vendorCode: "OABC00WE",
-        applicationRef: "Mari123",
-        partnerId: "Vaccshouts Dept.",
-        vendorName: "XYZ Materials",
-        contactPerson: "956GUY",
-        status: "Active",
-    },
-];
+const { TabPane } = Tabs;
+const { Title } = Typography;
+const { Option } = Select;
 
 const BusinessPartnerMasterlist = () => {
-    const [activeTab, setActiveTab] = useState("Business Partners Masterlist");
-    const [bpData, setBpData] = useState(bpRows);
-    const [vendorData, setVendorData] = useState(vendorRowsInit);
-    const [openMenuIndex, setOpenMenuIndex] = useState(null);
-    const [showAddDropdown, setShowAddDropdown] = useState(false);
-    const addDropdownRef = useRef(null);
+  // State variables
+  const [activeTab, setActiveTab] = useState("partners");
 
-    const toggleDropdown = (index) => {
-        setOpenMenuIndex(openMenuIndex === index ? null : index);
+  const [partners, setPartners] = useState([]);
+  const [vendors, setVendors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  // Pagination states
+  const [partnerPagination, setPartnerPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
+  
+  const [vendorPagination, setVendorPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
+
+  // Modal states
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [partnerEditModalVisible, setPartnerEditModalVisible] = useState(false);
+  const [vendorEditModalVisible, setVendorEditModalVisible] = useState(false);
+
+  // Form states
+  const [partnerForm] = Form.useForm();
+  const [vendorForm] = Form.useForm();
+
+  // Fetch data when component mounts or tab changes
+  useEffect(() => {
+    if (activeTab === "partners") {
+      fetchPartners();
+    } else if (activeTab === "vendors") {
+      fetchVendors();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
     };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (addDropdownRef.current && !addDropdownRef.current.contains(e.target)) {
-                setShowAddDropdown(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+  // Data fetching functions
+  const fetchPartners = async (searchTerm = "", orderField = "", orderDirection = "") => {
+    setLoading(true);
+    try {
+      const data = await businessPartnerAPI.getBusinessPartners({ 
+        search: searchTerm,
+        ordering: orderDirection === "descend" ? `-${orderField}` : orderField
+      });
+      setPartners(data.results || data);
+      setPartnerPagination(prev => ({
+        ...prev,
+        total: (data.results || data).length
+      }));
+    } catch (error) {
+      message.error("Failed to fetch business partners");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const renderDropdown = (type) => {
-        const fields =
-            type === "Vendor"
-                ? ["Vendor Code*", "Partner ID*", "Vendor Name", "Contact Person"]
-                : [
-                    "Partner ID",
-                    "Employee ID",
-                    "Vendor code",
-                    "Customer ID",
-                    "Partner Name",
-                    "Contact Info",
-                ];
+  const fetchVendors = async (searchTerm = "", orderField = "", orderDirection = "") => {
+    setLoading(true);
+    try {
+      const data = await vendorAPI.getVendors({ 
+        search: searchTerm,
+        ordering: orderDirection === "descend" ? `-${orderField}` : orderField
+      });
+      setVendors(data.results || data);
+      setVendorPagination(prev => ({
+        ...prev,
+        total: (data.results || data).length
+      }));
+    } catch (error) {
+      message.error("Failed to fetch vendors");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        return (
-            <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded-2xl p-6 z-50 w-[450px]">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
-                    {type === "Vendor" ? "Vendor Information" : "Business Partner Information"}
-                </h3>
-                <div className="space-y-3">
-                    {fields.map((label, i) => (
-                        <div key={i}>
-                            <label className="block text-sm text-teal-700 mb-1">{label}</label>
-                            <input
-                                type="text"
-                                placeholder={`Please enter ${label}`}
-                                className="w-full border px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
-                            />
-                        </div>
-                    ))}
-                </div>
-                <div className="flex justify-end gap-2 mt-6">
-                    <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
-                    <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">
-                        {type === "Vendor" ? "Alter" : "Remove"}
-                    </button>
-                    <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Delete</button>
-                    <button
-                        className="border border-gray-300 text-gray-600 px-6 py-2 rounded-md text-sm"
-                        onClick={() => setShowAddDropdown(false)}
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        );
-    };
+  // Prevent layout jump when changing tabs
+  const handleTabChange = (key) => {
+    // Save current scroll position
+    const scrollPosition = window.scrollY;
+    
+    setActiveTab(key);
+    setSearchValue(""); // Clear search when switching tabs
 
-    return (
-        <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Business Partner Masterlist</h2>
+    setTimeout(() => {
+      window.scrollTo(0, scrollPosition);
+    }, 0);
+  };
 
-            <div className="flex items-center gap-4 mb-4 border-b">
-                {["Business Partners Masterlist", "Vendor"].map((tab) => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`py-2 border-b-2 ${activeTab === tab
-                            ? "border-teal-500 text-teal-600 font-semibold"
-                            : "border-transparent text-gray-600"
-                            } px-3`}
-                    >
-                        {tab}
-                    </button>
-                ))}
-                <div className="ml-auto flex items-center gap-2 relative">
-                    <input
-                        type="text"
-                        placeholder="Search"
-                        className="border border-gray-300 px-3 py-2 rounded-md text-sm"
+  const handleTableChange = (pagination, filters, sorter, extra) => {
+    if (sorter && sorter.field) {
+      const orderField = sorter.field;
+      const orderDirection = sorter.order;
+      
+      if (activeTab === "partners") {
+        fetchPartners(searchValue, orderField, orderDirection);
+      } else if (activeTab === "vendors") {
+        fetchVendors(searchValue, orderField, orderDirection);
+      }
+    }
+  };
+
+  // Handle pagination changes
+  const handlePartnerPaginationChange = (page, pageSize) => {
+    setPartnerPagination(prev => ({
+      ...prev,
+      current: page,
+      pageSize
+    }));
+  };
+
+  const handleVendorPaginationChange = (page, pageSize) => {
+    setVendorPagination(prev => ({
+      ...prev,
+      current: page,
+      pageSize
+    }));
+  };
+
+  // View details handler
+  const handleViewDetails = (record) => {
+    setSelectedRecord(record);
+    setDetailModalVisible(true);
+  };
+
+  // Partner edit handlers
+  const handleEditPartner = (record) => {
+    setSelectedRecord(record);
+    partnerForm.setFieldsValue({
+      partner_name: record.partner_name,
+      category: record.category,
+      contact_info: record.contact_info
+    });
+    setPartnerEditModalVisible(true);
+  };
+
+  const handlePartnerFormSubmit = async (values) => {
+    try {
+      await businessPartnerAPI.updateBusinessPartner(selectedRecord.partner_id, values);
+      message.success("Business partner updated successfully");
+      setPartnerEditModalVisible(false);
+      fetchPartners(searchValue);
+    } catch (error) {
+      message.error(`Failed to update business partner: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
+  // Vendor edit handlers
+  const handleEditVendor = (record) => {
+    setSelectedRecord(record);
+    vendorForm.setFieldsValue({
+      vendor_name: record.vendor_name,
+      contact_person: record.contact_person,
+      status: record.status
+    });
+    setVendorEditModalVisible(true);
+  };
+
+  const handleVendorFormSubmit = async (values) => {
+    try {
+      await vendorAPI.updateVendor(selectedRecord.vendor_code, values);
+      message.success("Vendor updated successfully");
+      setVendorEditModalVisible(false);
+      fetchVendors(searchValue);
+    } catch (error) {
+      message.error(`Failed to update vendor: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
+  // Handle search with debounce
+  const handleSearch = (value) => {
+    setSearchValue(value);
+    if (activeTab === "partners") {
+      fetchPartners(value);
+    } else {
+      fetchVendors(value);
+    }
+  };
+
+  // Table columns definitions with sorting added
+  const partnerColumns = [
+    {
+      title: "Partner ID",
+      dataIndex: "partner_id",
+      key: "partner_id",
+      sorter: true,
+      width: 180,
+    },
+    {
+      title: "Partner Name",
+      dataIndex: "partner_name",
+      key: "partner_name",
+      sorter: true,
+      width: 150,
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+      sorter: true,
+      width: 100,
+      render: (category) => (
+        <Tag color={
+          category === "Employee" ? "blue" : 
+          category === "Customer" ? "green" : 
+          category === "Vendor" ? "orange" : "default"
+        }>
+          {category}
+        </Tag>
+      ),
+    },
+    {
+      title: "Employee ID",
+      dataIndex: "employee_id",
+      key: "employee_id",
+      sorter: true,
+      width: 110,
+      render: (text) => text || "-",
+    },
+    {
+      title: "Vendor Code",
+      dataIndex: "vendor_code",
+      key: "vendor_code",
+      sorter: true,
+      width: 150,
+      render: (text) => text || "-",
+    },
+    {
+      title: "Customer ID",
+      dataIndex: "customer_id",
+      key: "customer_id",
+      sorter: true,
+      width: 150,
+      render: (text) => text || "-",
+    },
+    {
+      title: "Contact Info",
+      dataIndex: "contact_info",
+      key: "contact_info",
+      sorter: true,
+      width: 120,
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      width: 60,
+      align: "center",
+      render: (_, record) => (
+        <Space size="small">
+          <Button 
+            type="primary" 
+            icon={<EditOutlined />} 
+            size="small"
+            onClick={() => handleEditPartner(record)}
+          />
+        </Space>
+      ),
+    },
+  ];
+
+  const vendorColumns = [
+    {
+      title: "Vendor Code",
+      dataIndex: "vendor_code",
+      key: "vendor_code",
+      sorter: true,
+      width: 180,
+    },
+    {
+      title: "Vendor Name",
+      dataIndex: "vendor_name",
+      key: "vendor_name",
+      sorter: true,
+      width: 180,
+    },
+    {
+      title: "Contact Person",
+      dataIndex: "contact_person",
+      key: "contact_person",
+      sorter: true,
+      width: 150,
+    },
+    {
+      title: "Application Reference",
+      dataIndex: "application_reference",
+      key: "application_reference",
+      sorter: true,
+      width: 200,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      sorter: true,
+      width: 100,
+      render: (status) => (
+        <Tag color={status === "Active" ? "green" : "red"}>
+          {status}
+        </Tag>
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      width: 60,
+      align: "center",
+      render: (_, record) => (
+        <Space size="small">
+          <Button 
+            type="primary" 
+            icon={<EditOutlined />} 
+            size="small"
+            onClick={() => handleEditVendor(record)}
+          />
+        </Space>
+      ),
+    },
+  ];
+
+  // Calculate table data for pagination
+  const getPartnerTableData = () => {
+    const { current, pageSize } = partnerPagination;
+    const start = (current - 1) * pageSize;
+    const end = start + pageSize;
+    return partners.slice(start, end);
+  };
+
+  const getVendorTableData = () => {
+    const { current, pageSize } = vendorPagination;
+    const start = (current - 1) * pageSize;
+    const end = start + pageSize;
+    return vendors.slice(start, end);
+  };
+
+  // Render main component
+  return (
+    <div className="partner-manage">
+      <div className="partner-container">
+        <Title level={4} className="page-title">
+          {activeTab === "partners" ? "Business Partner Masterlist" : "Vendor Masterlist"}
+        </Title>
+        <Divider className="title-divider" />
+        
+        <div className="tabs-wrapper">
+          <Tabs 
+            activeKey={activeTab} 
+            onChange={handleTabChange}
+            size="middle"
+            tabBarGutter={8}
+            className="partner-tabs"
+            type={windowWidth <= 768 ? "card" : "line"}
+            tabPosition="top"
+            destroyInactiveTabPane={false}
+            tabBarExtraContent={{
+              right: (
+                <div className="header-right-content">
+                  <div className="search-container">
+                    <Input.Search
+                      placeholder={activeTab === "partners" ? "Search partners..." : "Search vendors..."}
+                      allowClear
+                      onSearch={handleSearch}
+                      value={searchValue}
+                      onChange={(e) => setSearchValue(e.target.value)}
+                      prefix={<SearchOutlined />}
                     />
-                    <button
-                        className="bg-teal-500 text-white px-4 py-2 rounded-md text-sm"
-                        onClick={() => setShowAddDropdown((prev) => !prev)}
-                    >
-                        Add
-                    </button>
-
-                    {showAddDropdown && (
-                        <div
-                            ref={addDropdownRef}
-                            className="absolute top-full right-0 mt-2 bg-white shadow-xl border rounded-2xl p-6 z-50 w-[450px] max-h-[75vh] overflow-y-auto"
-                        >
-                            <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
-                                {activeTab === "Vendor" ? "Vendor Information" : "Business Partner Information"}
-                            </h3>
-                            <div className="space-y-3">
-                                {(activeTab === "Vendor"
-                                    ? ["Vendor Code*", "Partner ID*", "Vendor Name", "Contact Person"]
-                                    : ["Partner ID", "Employee ID", "Vendor code", "Customer ID", "Partner Name", "Contact Info"]
-                                ).map((label, i) => (
-                                    <div key={i}>
-                                        <label className="block text-sm text-teal-700 mb-1">{label}</label>
-                                        <input
-                                            type="text"
-                                            placeholder={`Please enter ${label}`}
-                                            className="w-full border px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="flex justify-end gap-2 mt-6">
-                                <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm">Add</button>
-                                <button className="border border-teal-500 text-teal-600 px-6 py-2 rounded-md text-sm">
-                                    {activeTab === "Vendor" ? "Alter" : "Remove"}
-                                </button>
-                                <button className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">Delete</button>
-                                <button
-                                    className="border border-gray-300 text-gray-600 px-6 py-2 rounded-md text-sm"
-                                    onClick={() => setShowAddDropdown(false)}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                  </div>
                 </div>
-            </div>
+              )
+            }}
+          >
+            <TabPane 
+              tab={<span><UserOutlined /> {windowWidth > 576 ? "Business Partners" : ""}</span>} 
+              key="partners"
+            >
+              {/* Partners tab content */}
+              <div className="table-meta-info">
+                <span className="record-count">Total Business Partners: {partners.length}</span>
+                <div className="table-pagination">
+                  <Pagination 
+                    current={partnerPagination.current}
+                    pageSize={partnerPagination.pageSize}
+                    total={partners.length}
+                    onChange={handlePartnerPaginationChange}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
+              </div>
+              
+              <div className="table-container">
+                <Table 
+                  dataSource={getPartnerTableData()} 
+                  columns={partnerColumns} 
+                  rowKey="partner_id"
+                  loading={loading}
+                  scroll={{ x: true, y: 400 }}
+                  pagination={false}
+                  bordered
+                  size="middle"
+                  showSorterTooltip={false}
+                  sortDirections={['ascend', 'descend']}
+                  onChange={handleTableChange}
+                  className="scrollable-table"
+                />
+              </div>
+            </TabPane>
 
-            <div className="bg-white shadow-md rounded-xl p-4 overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-200 rounded-xl">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            {activeTab === "Vendor"
-                                ? ["Vendor Code", "Application Reference", "Vendor Name", "Contact Person", "Status", ""]
-                                    .map((col, i) => (
-                                        <th key={i} className="px-4 py-3 border border-gray-200 text-left">{col}</th>
-                                    ))
-                                : ["Partner ID", "Employee ID", "Vendor Code", "Customer ID", "Partner Name", "Category", "Contact Info", ""]
-                                    .map((col, i) => (
-                                        <th key={i} className="px-4 py-3 border border-gray-200 text-left">{col}</th>
-                                    ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {activeTab === "Vendor"
-                            ? vendorData.map((row, idx) => (
-                                <tr key={idx} className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100 relative">
-                                    <td className="px-4 py-3 border border-gray-200">{row.vendorCode}</td>
-                                    <td className="px-4 py-3 border border-gray-200">{row.applicationRef}</td>
-                                    <td className="px-4 py-3 border border-gray-200">{row.vendorName}</td>
-                                    <td className="px-4 py-3 border border-gray-200">{row.contactPerson}</td>
-                                    <td className="px-4 py-3 border border-gray-200">
-                                        <select
-                                            value={row.status}
-                                            onChange={(e) => {
-                                                const updated = [...vendorData];
-                                                updated[idx].status = e.target.value;
-                                                setVendorData(updated);
-                                            }}
-                                            className="w-full border px-2 py-1 rounded-md"
-                                        >
-                                            <option value="Active">Active</option>
-                                            <option value="Inactive">Inactive</option>
-                                        </select>
-                                    </td>
-                                    <td className="px-4 py-3 border border-gray-200 relative text-right">
-                                        <button
-                                            onClick={() => toggleDropdown(idx)}
-                                            className="text-xl hover:bg-gray-200 px-2 rounded"
-                                        >
-                                            ⋮
-                                        </button>
-                                        {openMenuIndex === idx && renderDropdown("Vendor")}
-                                    </td>
-                                </tr>
-                            ))
-                            : bpData.map((row, idx) => (
-                                <tr key={idx} className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100 relative">
-                                    <td className="px-4 py-3 border border-gray-200">{row.partnerId}</td>
-                                    <td className="px-4 py-3 border border-gray-200">{row.employeeId}</td>
-                                    <td className="px-4 py-3 border border-gray-200">{row.vendorCode}</td>
-                                    <td className="px-4 py-3 border border-gray-200">{row.customerId}</td>
-                                    <td className="px-4 py-3 border border-gray-200">{row.partnerName}</td>
-                                    <td className="px-4 py-3 border border-gray-200">
-                                        <select
-                                            value={row.category}
-                                            onChange={(e) => {
-                                                const updated = [...bpData];
-                                                updated[idx].category = e.target.value;
-                                                setBpData(updated);
-                                            }}
-                                            className="w-full border px-2 py-1 rounded-md"
-                                        >
-                                            {categories.map((cat) => (
-                                                <option key={cat} value={cat}>
-                                                    {cat}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </td>
-                                    <td className="px-4 py-3 border border-gray-200">{row.contactInfo}</td>
-                                    <td className="px-4 py-3 border border-gray-200 relative text-right">
-                                        <button
-                                            onClick={() => toggleDropdown(idx)}
-                                            className="text-xl hover:bg-gray-200 px-2 rounded"
-                                        >
-                                            ⋮
-                                        </button>
-                                        {openMenuIndex === idx && renderDropdown("BusinessPartner")}
-                                    </td>
-                                </tr>
-                            ))}
-                    </tbody>
-                </table>
-            </div>
+            <TabPane 
+              tab={<span><ShopOutlined /> {windowWidth > 576 ? "Vendors" : ""}</span>} 
+              key="vendors"
+            >
+              {/* Vendors tab content */}
+              <div className="table-meta-info">
+                <span className="record-count">Total Vendors: {vendors.length}</span>
+                <div className="table-pagination">
+                  <Pagination 
+                    current={vendorPagination.current}
+                    pageSize={vendorPagination.pageSize}
+                    total={vendors.length}
+                    onChange={handleVendorPaginationChange}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
+              </div>
+              <div className="table-container">
+                <Table 
+                  dataSource={getVendorTableData()} 
+                  columns={vendorColumns} 
+                  rowKey="vendor_code"
+                  loading={loading}
+                  scroll={{ x: true, y: 400 }}
+                  pagination={false}
+                  bordered
+                  size="middle"
+                  showSorterTooltip={false}
+                  sortDirections={['ascend', 'descend']}
+                  onChange={handleTableChange}
+                  className="scrollable-table"
+                />
+              </div>
+            </TabPane>
+          </Tabs>
         </div>
-    );
+        
+        {/* Details Modal */}
+        <Modal
+          title="View Details"
+          visible={detailModalVisible}
+          onCancel={() => setDetailModalVisible(false)}
+          footer={[
+            <Button key="close" type="primary" onClick={() => setDetailModalVisible(false)}>
+              Close
+            </Button>
+          ]}
+          width={500}
+          className="custom-modal"
+        >
+        </Modal>
+        
+        {/* Partner Edit Modal */}
+        <Modal
+          title="Edit Business Partner"
+          visible={partnerEditModalVisible}
+          onCancel={() => setPartnerEditModalVisible(false)}
+          footer={null}
+          width={500}
+          className="custom-modal"
+        >
+          <Form
+            form={partnerForm}
+            layout="vertical"
+            onFinish={handlePartnerFormSubmit}
+          >
+            <Form.Item
+              name="partner_name"
+              label="Partner Name"
+              rules={[{ required: true, message: "Please enter partner name" }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="category"
+              label="Category"
+              rules={[{ required: true, message: "Please select a category" }]}
+            >
+              <Select>
+                <Option value="Employee">Employee</Option>
+                <Option value="Customer">Customer</Option>
+                <Option value="Vendor">Vendor</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="contact_info"
+              label="Contact Information"
+              rules={[{ required: true, message: "Please enter contact information" }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item className="form-actions">
+              <Space>
+                <Button type="primary" htmlType="submit">
+                  Update
+                </Button>
+                <Button onClick={() => setPartnerEditModalVisible(false)}>
+                  Cancel
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        {/* Vendor Edit Modal */}
+        <Modal
+          title="Edit Vendor"
+          visible={vendorEditModalVisible}
+          onCancel={() => setVendorEditModalVisible(false)}
+          footer={null}
+          width={500}
+          className="custom-modal"
+        >
+          <Form
+            form={vendorForm}
+            layout="vertical"
+            onFinish={handleVendorFormSubmit}
+          >
+            <Form.Item
+              name="vendor_name"
+              label="Vendor Name"
+              rules={[{ required: true, message: "Please enter vendor name" }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="contact_person"
+              label="Contact Person"
+              rules={[{ required: true, message: "Please enter contact person" }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="status"
+              label="Status"
+              rules={[{ required: true, message: "Please select a status" }]}
+            >
+              <Select>
+                <Option value="Active">Active</Option>
+                <Option value="Inactive">Inactive</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item className="form-actions">
+              <Space>
+                <Button type="primary" htmlType="submit">
+                  Update
+                </Button>
+                <Button onClick={() => setVendorEditModalVisible(false)}>
+                  Cancel
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+    </div>
+  );
 };
 
 export default BusinessPartnerMasterlist;

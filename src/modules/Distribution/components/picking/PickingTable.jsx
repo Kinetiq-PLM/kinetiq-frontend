@@ -205,7 +205,9 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               ))
             ) : (
               <tr>
-                <td colSpan="9" className="no-data">No picking lists found with the current filters</td>
+                <td colSpan={window.innerWidth <= 576 ? 6 : 9} className="no-data">
+                  No picking lists found with the current filters
+                </td>
               </tr>
             )}
           </tbody>
