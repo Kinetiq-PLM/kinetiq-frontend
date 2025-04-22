@@ -11,7 +11,6 @@ const JournalModalInput = ({
   handleInputChange,
   handleSubmit,
   currencyOptions,
-  invoiceOptions, // New prop
 }) => {
   return (
     <div className="accounting-modal">
@@ -47,16 +46,13 @@ const JournalModalInput = ({
                 onChange={(e) => handleInputChange("description", e.target.value)}
               />
 
-              <div className="flex flex-col gap-y-1">
-                <label>Invoice ID*</label>
-                <Dropdown
-                  style="selection"
-                  defaultOption="Select invoice..."
-                  options={invoiceOptions}
-                  value={journalForm.invoiceId}
-                  onChange={(value) => handleInputChange("invoiceId", value)}
-                />
-              </div>
+              <Forms
+                type="text"
+                formName="Invoice ID*"
+                placeholder="Enter Invoice ID"
+                value={journalForm.invoiceId}
+                onChange={(e) => handleInputChange("invoiceId", e.target.value)}
+              />
 
               <div className="flex flex-col gap-y-1">
                 <label>Currency*</label>

@@ -156,7 +156,6 @@ const Journal = () => {
   }, []);
 
   const currencyOptions = currencies.map((c) => c.currency_name);
-  const invoiceOptions = invoices.map((inv) => inv.invoice_id);
 
   const generateNextJournalId = () => {
     if (!latestJournalId) return "ACC-JOE-2025-A00001";
@@ -203,19 +202,6 @@ const Journal = () => {
         type: "warning",
         title: "Missing Required Fields",
         message: "Please fill in all required fields, including Invoice ID.",
-      });
-      return;
-    }
-
-    const selectedInvoice = invoices.find(
-      (inv) => inv.invoice_id === journalForm.invoiceId
-    );
-    if (!selectedInvoice) {
-      setValidation({
-        isOpen: true,
-        type: "warning",
-        title: "Invalid Invoice",
-        message: "Please select a valid invoice.",
       });
       return;
     }
@@ -331,7 +317,6 @@ const Journal = () => {
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
         currencyOptions={currencyOptions}
-        invoiceOptions={invoiceOptions}
       />
       {validation.isOpen && (
         <NotifModal
