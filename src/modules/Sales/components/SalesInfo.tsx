@@ -89,11 +89,16 @@ const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
   );
 };
 
-const DateSelector = ({ label, customer, setDeliveryDate, disabled }) => {
-  // Calculate the default date (3 days from today)
-  const defaultDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+const DateSelector = ({
+  label,
+  customer,
+  setDeliveryDate,
+  disabled,
+  defaultDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
     .toISOString()
-    .split("T")[0];
+    .split("T")[0],
+}) => {
+  // Calculate the default date (3 days from today)
 
   // Initialize state with the customer's delivery date or default date
   const [date, setDate] = useState(customer.delivery_date || defaultDate);
@@ -135,6 +140,9 @@ const SalesInfo = ({
   setAddress,
   setDeliveryDate,
   enabled = true,
+  date = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0],
 }) => {
   let id = "";
   if (type === "Quotation") {
@@ -185,6 +193,7 @@ const SalesInfo = ({
               ? "Date Issued"
               : "Delivery Date"
           }
+          defaultDate={date}
           disabled={["Quotation", "Order"].includes(type)}
         />
       </div>
