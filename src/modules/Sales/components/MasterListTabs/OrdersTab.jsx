@@ -13,6 +13,7 @@ export default function OrdersTab({
   setActiveSubModule,
   setIsDocumentModalOpen,
   setDocument,
+  employee_id,
 }) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +24,7 @@ export default function OrdersTab({
   const [orderList, setOrderList] = useState([]); // Default date filter
   const orderQuery = useQuery({
     queryKey: ["orders"],
-    queryFn: async () => await GET("sales/order"),
+    queryFn: async () => await GET(`sales/order?salesrep=${employee_id}`),
     retry: 2,
   });
   const columns = [

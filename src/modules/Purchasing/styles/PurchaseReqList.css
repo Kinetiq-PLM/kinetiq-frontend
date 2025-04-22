@@ -4,7 +4,7 @@
   height: 100%;
 }
 
-.purchreq-body-content-container {
+.purchreq .purchreq-body-content-container {
   width: 100%;
     height: 100%;
     border-radius: 0.5rem;
@@ -19,7 +19,7 @@
     min-height: 30rem;
 }
 
-.purchreq-header {
+.purchreq .purchreq-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -28,13 +28,13 @@
   width: 100%;
 }
 
-.purchreq-header-left {
+.purchreq .purchreq-header-left {
   display: flex;
   gap: 1rem;
   align-items: center;
 }
 
-.purchreq-back-btn {
+.purchreq .purchreq-back-btn {
   padding: 0.5rem 1rem;
   border: none;
   background: none;
@@ -47,18 +47,74 @@
   transition: color 0.2s ease;
 }
 
-.purchreq-back-btn:hover {
+.purchreq .purchreq-back-btn:hover {
   color: #00A8A8;
 }
 
-.purchreq-search {
+.purchreq .purchreq-search {
   padding: 0.5rem 1rem;
   border: 1px solid #ddd;
   border-radius: 0.25rem;
   width: 300px;
 }
 
-.purchreq-table-container {
+.purchreq .purchreq-status-filter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    min-width: 210px;
+    box-sizing: border-box;
+    background: #fff;
+    justify-content: center;
+    font-weight: 500;
+}
+
+.purchreq .purchreq-status-filter span:first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100px;
+}
+
+.purchreq .status-options-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.purchreq .status-option {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.purchreq .status-option:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    color: #00A8A8;
+}
+
+.purchreq .status-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.purchreq .status-option.selected {
+    background-color: #f4fcfa;
+    font-weight: 600;
+}
+
+.purchreq .purchreq-table-container {
   flex: 1;
   background: white;
   border: 1px solid #D2D2D2;
@@ -70,7 +126,7 @@
   width: 100%;
 }
 
-.purchreq-table-scrollable {
+.purchreq .purchreq-table-scrollable {
   width: 100%;
   max-height: 50vh;
   overflow-x: auto;
@@ -79,7 +135,7 @@
   scrollbar-color: #bdbdbd #f5f5f5;
 }
 
-.purchreq-table {
+.purchreq .purchreq-table {
   flex: 1;
   border-radius: 0.25rem;
   overflow: hidden;
@@ -88,47 +144,49 @@
   background: white;
 }
 
-.purchreq-table-header {
+.purchreq .purchreq-table-header {
   display: grid;
-  grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  gap: 2rem;
   padding: 1rem;
   background-color: #f8f9fa;
   border-bottom: 1px solid #eee;
   font-weight: 500;
+  text-align: center;
   color: #666;
 }
 
-.purchreq-table-header > div {
+.purchreq .purchreq-table-header > div {
   text-align: center;
 }
 
-.purchreq-table-rows {
+.purchreq .purchreq-table-rows {
   display: flex;
   flex-direction: column;
 }
 
-.purchreq-row {
+.purchreq .purchreq-row {
   display: grid;
-  grid-template-columns: 40px 1fr 1fr 1fr 1fr 1fr;
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  gap: 2rem;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #f0f0f0;
   align-items: center;
+  text-align: center;
   cursor: pointer;
   transition: background 0.15s;
 }
 
-.purchreq-row:hover {
+.purchreq .purchreq-row:hover {
   background: #f5fcfc;
 }
 
-.purchreq-checkbox {
+.purchreq .purchreq-checkbox {
   display: flex;
   justify-content: center;
 }
 
-.purchreq-no-results {
+.purchreq .purchreq-no-results {
   text-align: center;
   font-size: 1rem;
   font-weight: bold;
@@ -136,7 +194,7 @@
   grid-column: 1 / -1;
 }
 
-.purchreq-footer {
+.purchreq .purchreq-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -144,7 +202,7 @@
   margin-top: 1rem;
 }
 
-.purchreq-new-form {
+.purchreq .purchreq-new-form {
   padding: 0.5rem 1.2rem;
   background: #00A8A8;
   color: #fff;
@@ -155,6 +213,6 @@
   transition: background 0.2s;
 }
 
-.purchreq-new-form:hover {
+.purchreq .purchreq-new-form:hover {
   background: #008080;
 }

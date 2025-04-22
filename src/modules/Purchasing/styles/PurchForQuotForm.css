@@ -185,7 +185,7 @@
     color: #666;
 }
 
-.form-group label:after {
+.label-req label:after{
     content: "*";
     color: red;
     margin-left: 2px;
@@ -268,9 +268,6 @@
     gap: 1rem;
 }
 
-.details-right .form-group {
-    margin-bottom: 0.5rem;
-}
 
 .details-right .form-group input {
     text-align: right;

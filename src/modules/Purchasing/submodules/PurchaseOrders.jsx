@@ -43,7 +43,7 @@ const PurchaseOrderUI = ({
         setError("");
         
         // Fetch purchase quotation data
-        const quotationResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
+        const quotationResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
         const quotation = quotationResponse.data.find((q) => q.quotation_id === quotation_id);
 
         if (!quotation) {
@@ -53,13 +53,13 @@ const PurchaseOrderUI = ({
         const requestId = quotation.request_id;
 
         // Fetch quotation content
-        const quotationContentResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/list/");
+        const quotationContentResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/list/");
         const quotationContent = quotationContentResponse.data.filter((qc) => qc.request_id === requestId);
 
         // Fetch materials and assets
         const [materialsResponse, assetsResponse] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/api/quotation-content/materials/list/"),
-          axios.get("http://127.0.0.1:8000/api/quotation-content/assets/list/")
+          axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/materials/list/"),
+          axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/")
         ]);
 
         // Process items
@@ -87,7 +87,7 @@ const PurchaseOrderUI = ({
         const vendorCode = quotation.vendor_code || "N/A";
         let vendorName = "N/A";
         if (vendorCode !== "N/A") {
-          const vendorResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/vendor/list/");
+          const vendorResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/");
           const vendor = vendorResponse.data.find((v) => v.vendor_code === vendorCode);
           vendorName = vendor ? vendor.vendor_name : "N/A";
         }
@@ -95,17 +95,17 @@ const PurchaseOrderUI = ({
         // Fetch employee data
         let employeeName = "N/A";
         if (requestId) {
-          const requestResponse = await axios.get("http://127.0.0.1:8000/api/prf/list/");
+          const requestResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
           const request = requestResponse.data.find((r) => r.request_id === requestId);
           if (request) {
-            const employeeResponse = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+            const employeeResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
             const employee = employeeResponse.data.find((e) => e.employee_id === request.employee_id);
             employeeName = employee ? `${employee.first_name} ${employee.last_name}` : "N/A";
           }
         }
 
         // Fetch shipments data
-        const shipmentsResponse = await axios.get("http://127.0.0.1:8000/api/received-shipment/list/");
+        const shipmentsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/list/");
         console.log("All shipments:", shipmentsResponse.data); // Debug log
         
         const filteredShipments = shipmentsResponse.data.filter((shipment) => {
@@ -122,7 +122,7 @@ const PurchaseOrderUI = ({
         }));
 
         // Fetch employees for QC form
-        const employeesResponse = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+        const employeesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
         setEmployees(employeesResponse.data);
 
         // Update summary data
@@ -158,7 +158,7 @@ const PurchaseOrderUI = ({
         setError("");
 
         // Fetch purchase quotation data
-        const quotationResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
+        const quotationResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
         const quotation = quotationResponse.data.find((q) => q.quotation_id === quotation_id);
 
         if (!quotation) {
@@ -169,7 +169,7 @@ const PurchaseOrderUI = ({
         console.log("Purchase ID from Quotation:", purchaseId);
 
         // Fetch shipments data
-        const shipmentsResponse = await axios.get("http://127.0.0.1:8000/api/received-shipment/list/");
+        const shipmentsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/list/");
         console.log("All shipments:", shipmentsResponse.data); // Debug log
 
         // Filter shipments by purchase_id
@@ -187,7 +187,7 @@ const PurchaseOrderUI = ({
         }));
 
         // Fetch employees for QC form
-        const employeesResponse = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+        const employeesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
         setEmployees(employeesResponse.data);
 
       } catch (error) {
@@ -208,7 +208,7 @@ const PurchaseOrderUI = ({
         setError("");
 
         // Step 1: Fetch purchase orders to get purchase_id and quotation_id
-        const purchaseOrdersResponse = await axios.get("http://127.0.0.1:8000/api/purchase-orders/list/");
+        const purchaseOrdersResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/");
         const purchaseOrder = purchaseOrdersResponse.data.find((po) => po.quotation_id === quotation_id);
 
         if (!purchaseOrder) {
@@ -219,7 +219,7 @@ const PurchaseOrderUI = ({
         console.log("Purchase ID from Purchase Orders:", purchaseId);
 
         // Step 2: Fetch shipments data
-        const shipmentsResponse = await axios.get("http://127.0.0.1:8000/api/received-shipment/list/");
+        const shipmentsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/list/");
         console.log("All shipments:", shipmentsResponse.data); // Debug log
 
         // Step 3: Filter shipments by purchase_id
@@ -237,7 +237,7 @@ const PurchaseOrderUI = ({
         }));
 
         // Step 5: Fetch employees for QC form
-        const employeesResponse = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+        const employeesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
         setEmployees(employeesResponse.data);
 
       } catch (error) {
@@ -258,7 +258,7 @@ const PurchaseOrderUI = ({
         setError("");
 
         // Step 1: Fetch purchase orders to get purchase_id and quotation_id
-        const purchaseOrdersResponse = await axios.get("http://127.0.0.1:8000/api/purchase-orders/list/");
+        const purchaseOrdersResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/");
         const purchaseOrder = purchaseOrdersResponse.data.find((po) => po.quotation_id === quotation_id);
 
         if (!purchaseOrder) {
@@ -269,7 +269,7 @@ const PurchaseOrderUI = ({
         console.log("Purchase ID from Purchase Orders:", purchaseId);
 
         // Step 2: Fetch shipments data
-        const shipmentsResponse = await axios.get("http://127.0.0.1:8000/api/received-shipment/list/");
+        const shipmentsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/list/");
         console.log("All shipments:", shipmentsResponse.data); // Debug log
 
         // Step 3: Filter shipments by purchase_id
@@ -287,7 +287,7 @@ const PurchaseOrderUI = ({
         }));
 
         // Step 5: Fetch employees for QC form
-        const employeesResponse = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+        const employeesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
         setEmployees(employeesResponse.data);
 
       } catch (error) {
@@ -308,7 +308,7 @@ const PurchaseOrderUI = ({
         setError("");
 
         // Step 1: Fetch purchase orders to get purchase_id and quotation_id
-        const purchaseOrdersResponse = await axios.get("http://127.0.0.1:8000/api/purchase-orders/list/");
+        const purchaseOrdersResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/");
         const purchaseOrder = purchaseOrdersResponse.data.find((po) => po.quotation_id === quotation_id);
 
         if (!purchaseOrder) {
@@ -319,7 +319,7 @@ const PurchaseOrderUI = ({
         console.log("Purchase ID from Purchase Orders:", purchaseId);
 
         // Step 2: Fetch shipments data
-        const shipmentsResponse = await axios.get("http://127.0.0.1:8000/api/received-shipment/list/");
+        const shipmentsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/list/");
         console.log("All shipments:", shipmentsResponse.data); // Debug log
 
         // Step 3: Filter shipments by purchase_id
@@ -357,7 +357,7 @@ const PurchaseOrderUI = ({
       setError("");
 
       // Step 1: Fetch purchase orders to get purchase_id using quotation_id
-      const purchaseOrdersResponse = await axios.get("http://127.0.0.1:8000/api/purchase-orders/list/");
+      const purchaseOrdersResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/");
       const purchaseOrder = purchaseOrdersResponse.data.find((po) => po.quotation_id === quotation_id);
 
       if (!purchaseOrder) {
@@ -368,7 +368,7 @@ const PurchaseOrderUI = ({
       console.log("Purchase ID from Purchase Orders:", purchaseId);
 
       // Step 2: Fetch shipments data
-      const shipmentsResponse = await axios.get("http://127.0.0.1:8000/api/received-shipment/list/");
+      const shipmentsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/list/");
       console.log("All shipments:", shipmentsResponse.data); // Debug log
 
       // Step 3: Filter shipments by purchase_id
@@ -407,7 +407,7 @@ const PurchaseOrderUI = ({
       setError("");
 
       // Step 1: Fetch purchase orders to get purchase_id using quotation_id
-      const purchaseOrdersResponse = await axios.get("http://127.0.0.1:8000/api/purchase-orders/list/");
+      const purchaseOrdersResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/");
       const purchaseOrder = purchaseOrdersResponse.data.find((po) => po.quotation_id === quotation_id);
 
       if (!purchaseOrder) {
@@ -418,7 +418,7 @@ const PurchaseOrderUI = ({
       console.log("Purchase ID from Purchase Orders:", purchaseId);
 
       // Step 2: Fetch shipments data
-      const shipmentsResponse = await axios.get("http://127.0.0.1:8000/api/received-shipment/list/");
+      const shipmentsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/list/");
       console.log("All shipments:", shipmentsResponse.data); // Debug log
 
       // Step 3: Filter shipments by purchase_id
@@ -479,7 +479,7 @@ const PurchaseOrderUI = ({
       };
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/batch-inspection/create/",
+        "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/batch-inspection/create/",
         payload,
         {
           headers: {
@@ -514,9 +514,6 @@ const PurchaseOrderUI = ({
             <h2>{item.name}</h2>
           </div>
           <div className="purchord-modal-body">
-            <div className="purchord-modal-image-container">
-              <img src={item.image} alt={item.name} className="purchord-modal-image" />
-            </div>
             <div className="purchord-modal-details">
               <div className="purchord-modal-info">
                 <h3>Material:</h3>
@@ -589,7 +586,6 @@ const PurchaseOrderUI = ({
               summaryData.items.map((item) => (
                 <div key={item.id} className="purchord-item-card">
                   <div className="purchord-item-details" onClick={() => handleItemClick(item)}>
-                    <img src={item.image} alt={item.name} className="purchord-item-image" />
                     <h3>{item.name}</h3>
                     <p><strong>Quantity:</strong> {item.quantity}</p>
                     <p><strong>Unit Price:</strong> ₱{item.price}</p>
@@ -628,7 +624,8 @@ const PurchaseOrderUI = ({
               {error && <div className="error-message">{error}</div>}
               <form onSubmit={handleQCSubmit}>
                 <div className="purchord-qc-form">
-                  <div className="form-group">
+                  <div className="label-req">
+                  <div className="form-group"></div>
                     <label>Inspection Date</label>
                     <input
                       type="date"
@@ -639,7 +636,8 @@ const PurchaseOrderUI = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Shipment ID</label>
+                    <div className="label-req">
+                    <label>Shipment ID</label></div>
                     {shipments.length > 0 ? (
                       <select
                         value={qcForm.shipment_id}
@@ -666,7 +664,8 @@ const PurchaseOrderUI = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Inspector</label>
+                    <div className="label-req">
+                    <label>Inspector</label></div>
                     <select
                       value={qcForm.employee_id}
                       onChange={(e) => setQcForm({...qcForm, employee_id: e.target.value})}
@@ -682,7 +681,8 @@ const PurchaseOrderUI = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Inspection Result</label>
+                    <div className="label-req">
+                    <label>Inspection Result</label></div>
                     <select
                       value={qcForm.inspection_result}
                       onChange={(e) => setQcForm({...qcForm, inspection_result: e.target.value})}

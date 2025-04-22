@@ -24,7 +24,8 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit, user_id, employee_id }) 
   const [createdAt, setCreatedAt] = useState(() => {
     return new Date().toISOString().split("T")[0]; // yyyy/mm/dd
   });
-  const [ticketType, setTicketType] = useState("")
+  const [ticketType, setTicketType] = useState("Service")
+  const [userId, setUserId] = useState("")
 
   
 
@@ -64,6 +65,16 @@ const fetchTechnicians = async () => {
   }
 };
 
+const fetchUserId = async (techId) => {
+  try {
+    const response = await GET(`call/calls/user/${techId}`); 
+    setUserId(response.user_id);
+    console.log("user id", response.user_id)
+  } catch (error) {
+    console.error("Error fetching user:", error);
+  }
+};
+
 const handleToggleDropdownTech = () => {
   if (!isDropdownOpenT) {
     fetchTechnicians(); 
@@ -73,6 +84,7 @@ const handleToggleDropdownTech = () => {
 };
 
 const handleSelectTechnician = (technician) => {
+  fetchUserId(technician.employee_id)
   setTechnicianId(technician.employee_id); 
   setDropdownOpenT(false); 
 };
@@ -133,7 +145,8 @@ const handleSelectType = (selectedType) => {
       subject: subject,
       description: description,
       type: ticketType,
-      salesrep_id: technicianId
+      salesrep_id: technicianId,
+      userId: userId
     })
     setCustomerId("");
     setName("");
@@ -208,11 +221,11 @@ const handleSelectType = (selectedType) => {
                     id="ticketType"
                     value={ticketType}
                     readOnly
-                    onChange={(e) => setTicketType(e.target.value)}
+                    // onChange={(e) => setTicketType(e.target.value)}
                     placeholder="Select ticket type"
                   />
-                  <span className="select-arrow" onClick={handleTypeDropdown}>▼</span>
-                  {isDropdownOpenType && (
+                  {/* <span className="select-arrow" onClick={handleTypeDropdown}>▼</span> */}
+                  {/* {isDropdownOpenType && (
                     <ul className="dropdown-list">
                       {["Service", "Sales"].map((type) => (
                         <li key={type} onClick={() => handleSelectType(type)}>
@@ -220,7 +233,7 @@ const handleSelectType = (selectedType) => {
                         </li>
                       ))}
                     </ul>
-                  )}
+                  )} */}
                 </div>   
               </div>         
               

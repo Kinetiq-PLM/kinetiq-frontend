@@ -18,7 +18,9 @@ const Opportunity = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const tabs = [
     {
       name: "Opportunity",
-      component: <OpportunityTab setActiveTab={setActiveTab} />,
+      component: (
+        <OpportunityTab setActiveTab={setActiveTab} employee_id={employee_id} />
+      ),
     },
     {
       name: "Main Page",

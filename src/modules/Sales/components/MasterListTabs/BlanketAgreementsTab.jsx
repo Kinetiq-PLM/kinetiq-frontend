@@ -15,6 +15,7 @@ export default function BlanketAgreementsTab({
   setIsQuotationListOpen,
   setIsDocumentModalOpen,
   setDocument,
+  employee_id,
 }) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +27,7 @@ export default function BlanketAgreementsTab({
 
   const agreementQuery = useQuery({
     queryKey: ["agreements"],
-    queryFn: async () => await GET("sales/agreement"),
+    queryFn: async () => await GET(`sales/agreement?salesrep=${employee_id}`),
     retry: 2,
   });
   const columns = [
