@@ -186,6 +186,11 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
   
   // Check if status update button should be disabled
   const isStatusUpdateDisabled = () => {
+    // Always require 100% completion before allowing status update
+    if (getCompletionPercentage() < 100) {
+      return true;
+    }
+    
     // Need an employee assigned
     if (!editedValues.packed_by && !packingList.packed_by) {
       return true;
@@ -206,6 +211,10 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
   
   // Get validation message for status update
   const getValidationMessage = () => {
+    if (getCompletionPercentage() < 100) {
+      return 'All required fields must be completed (100%)';
+    }
+    
     if (!editedValues.packed_by && !packingList.packed_by) {
       return 'Please assign an employee for packing';
     }
