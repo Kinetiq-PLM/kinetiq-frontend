@@ -1037,7 +1037,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center px-4">
                 <div style={{width: '100%', maxWidth: 525, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', borderRadius: 10, padding: 24, display: 'flex', flexDirection: 'column', gap: 24, position: 'relative'}}>
-                    <img style={{width: 171, height: 171, margin: '0 auto'}} src="public/icons/module-icons/MRP-icons/MRPCheck.png" />
+                    <img style={{width: 171, height: 171, margin: '0 auto'}} src="/icons/module-icons/MRP-icons/MRPCheck.png" />
                     <div style={{textAlign: 'center', fontSize: 28, fontFamily: 'Inter', fontWeight: 400, color: '#130101', letterSpacing: 1.2, textTransform: 'capitalize'}}>Bills of Material Created</div>
                     <div style={{textAlign: 'center', fontSize: 14, fontFamily: 'Inter', fontWeight: 400, color: '#130101', textTransform: 'capitalize', letterSpacing: 0.56}}>The BOM is sent to the sales for approval, <br />go to pending for more information</div>
                     <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
