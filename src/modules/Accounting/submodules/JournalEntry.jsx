@@ -103,6 +103,7 @@ const JournalEntry = () => {
           { accountName: "SSS Contribution", glAccountId: "ACC-GLA-2025-d7b748" },
           { accountName: "Philhealth Contribution", glAccountId: "ACC-GLA-2025-4d5181" },
           { accountName: "Pagibig Contribution", glAccountId: "ACC-GLA-2025-63f1b1" },
+          { accountName: "Tax", glAccountId: "ACC-GLA-2025-d761c0" },
           { accountName: "Late Deduction", glAccountId: "ACC-GLA-2025-63550f" },
           { accountName: "Absent Deduction", glAccountId: "ACC-GLA-2025-92225f" },
           { accountName: "Undertime Deduction", glAccountId: "ACC-GLA-2025-1a67b8" },
