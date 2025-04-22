@@ -1,6 +1,5 @@
     import React, { useState, useEffect, use } from "react";
-    import InvRestockForm from "../components/InvTransferStockForm";
-    import NoSelectedItemModal from "../components/NoSelectedItemModal";
+    import InvTransferStockForm from "../components/InvTransferStockForm";
     import "../styles/StockFlow.css";
 import { ContinuousColorLegend } from "@mui/x-charts";
 
@@ -347,20 +346,24 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                             
                         </div>
                     </main>
+
+                                
+
                 </div>          
 
                 {showModal && (
-                    <InvRestockForm
-                        onClose={() => {
-                            toggleModal();
-                            setSelectedItem(null);
-                            // refreshInventory();
-                        }}
-                        selectedItem={warehouseItemsData[selectedItem]}
-                        warehouseList={warehouseList}
-                        
-                    />
-                )}
+                <InvTransferStockForm
+                    onClose={() => {
+                        toggleModal();
+                        setSelectedItem(null);
+                        // refreshInventory();
+                    }}
+                    selectedItem={selectedItem}
+                    warehouseList={warehouseList}
+                    
+                 />
+            )}
+
 
 
             </div>
