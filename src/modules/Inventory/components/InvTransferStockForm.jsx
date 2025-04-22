@@ -9,32 +9,32 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
   const [warehouseOrigin, setWarehouseOrigin] = useState("");
   const [warehouseSource, setWarehouseSource] = useState("");
   const [warehouseDestination, setWarehouseDestination] = useState("");
-  const [comments, setComments]  = useState("");
+  const [comments, setComments] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  
+
   useEffect(() => {
     if (selectedItem) {
-        setInventoryItemID(selectedItem.inventory_item_id || "");
-        setInventoryItemName(selectedItem.item_name || "");
-        setCurrentQuantity(selectedItem.current_quantity || "");
-        setWarehouseOrigin(selectedItem.warehouse_location || "");
-        setWarehouseSource(selectedItem.warehouse_id || "");
+      setInventoryItemID(selectedItem.inventory_item_id || "");
+      setInventoryItemName(selectedItem.item_name || "");
+      setCurrentQuantity(selectedItem.current_quantity || "");
+      setWarehouseOrigin(selectedItem.warehouse_location || "");
+      setWarehouseSource(selectedItem.warehouse_id || "");
     } else {
-        // Reset fields if no selectedItem
-        setInventoryItemID("");
-        setInventoryItemName("");
-        setCurrentQuantity("");
-        setWarehouseOrigin("");
-        setWarehouseSource("");
-        
+      // Reset fields if no selectedItem
+      setInventoryItemID("");
+      setInventoryItemName("");
+      setCurrentQuantity("");
+      setWarehouseOrigin("");
+      setWarehouseSource("");
+
     }
-}, [selectedItem]);
+  }, [selectedItem]);
 
 
   const handleClear = () => {
-    
+
   };
 
 
@@ -43,17 +43,17 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
-  
+
     if (!selectedItem) {
       setErrorMessage("No item selected. Please select an item first.");
       return;
     }
-  
-    if (inputQuantity>currentQuantity) {
+
+    if (inputQuantity > currentQuantity) {
       setErrorMessage("Quantity Must be Equal to Current  or Less then the Item's Current Quantity");
       return;
     }
-    
+
     try {
       // data for warehouse_movement first
       const warehouseMovementData = {
@@ -63,17 +63,17 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
       };
 
       // post req first sa warehouse movement 
-      const warehouseMovementResponse = await fetch("http://127.0.0.1:8000/api/warehousemovement-transfer/", {
+      const warehouseMovementResponse = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-transfer/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(warehouseMovementData),
       });
-  
+
       if (!warehouseMovementResponse.ok) {
         const errorData = await warehouseMovementResponse.json();
         throw new Error(`Failed to create transfer request: ${JSON.stringify(errorData)}`);
       }
-  
+
       const warehouseMovement = await warehouseMovementResponse.json();
       console.log("Warehouse Movement created:", warehouseMovement);
 
@@ -85,7 +85,7 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
       }
 
       // post req first sa movement items
-      const warehouseMovementItemResponse = await fetch("http://127.0.0.1:8000/api/warehousemovement-items/", {
+      const warehouseMovementItemResponse = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-items/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(warehouseMovementItemData),
@@ -95,10 +95,10 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
         const errorData = await warehouseMovementItemResponse.json();
         throw new Error(`Failed to create transfer request: ${JSON.stringify(errorData)}`);
       }
-  
+
       const warehouseMovementItem = await warehouseMovementItemResponse.json();
       console.log("Warehouse Movement Item created:", warehouseMovementItem);
-  
+
 
       console.log("transfer request created:", warehouseMovementItemData);
       setTimeout(() => onClose(), 2000);
@@ -118,7 +118,7 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
         </div>
 
         {successMessage && (
-          <p style={{ color: "green", marginBottom: "0.5rem"}} className="text-sm">
+          <p style={{ color: "green", marginBottom: "0.5rem" }} className="text-sm">
             {successMessage}
           </p>
         )}
@@ -129,9 +129,9 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
         )}
 
         {selectedItem ? (
-            <form onSubmit={handleSubmit} className="">
+          <form onSubmit={handleSubmit} className="">
 
-            
+
             <label>Item ID</label>
             <input
               type="text"
@@ -162,18 +162,18 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
               placeholder={selectedItem}
               value={warehouseOrigin}
               disabled
-              
+
             />
 
             <label>Warehouse Destination <span className="text-red-500">*</span></label>
-              <select name="" id="" className="border rounded-lg border-gray-300 h-[50px] text-gray-600 cursor-pointer p-1" onChange={(e) => setWarehouseDestination(e.target.value)}>
-                <option value="" className="text-gray-600">Select Warehouse</option>
-                  {warehouseList.map((warehouse) => (
-                      <option className="text-gray-600 cursor-pointer" key={warehouse.warehouse_location} value={warehouse.warehouse_id} onChange={(e) => setWarehouseDestination(e.target.value)}>
-                      {warehouse.warehouse_location}
-                      </option>
-                    ))}
-              </select>
+            <select name="" id="" className="border rounded-lg border-gray-300 h-[50px] text-gray-600 cursor-pointer p-1" onChange={(e) => setWarehouseDestination(e.target.value)}>
+              <option value="" className="text-gray-600">Select Warehouse</option>
+              {warehouseList.map((warehouse) => (
+                <option className="text-gray-600 cursor-pointer" key={warehouse.warehouse_location} value={warehouse.warehouse_id} onChange={(e) => setWarehouseDestination(e.target.value)}>
+                  {warehouse.warehouse_location}
+                </option>
+              ))}
+            </select>
 
             <label>Comment</label>
             <textarea
@@ -202,9 +202,9 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
           <div className="text-center mt-6 text-red-500 font-medium">
             You must select an item first, to make a transfer.
           </div>
-          )}
+        )}
 
-        
+
       </div>
     </div>
   );

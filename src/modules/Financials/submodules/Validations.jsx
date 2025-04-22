@@ -361,7 +361,7 @@ const BodyContent = () => {
 
   const fetchReturns = async () => {
     try {
-      const data = await GET("/validation/budget-returns/");
+      const data = await GET("validation/budget-returns/");
       const mappedData = data.map(sub => ({
         validationId: sub.validation_id,
         returnsId: sub?.budget_return?.budget_return_id || "",
@@ -384,7 +384,7 @@ const BodyContent = () => {
 
   const fetchRequests = async () => {
     try {
-      const data = await GET("/validation/budget-requests/");
+      const data = await GET("validation/budget-requests/");
       const mappedData = data.map(sub => ({
         validationId: sub.validation_id,
         reqID: sub?.budget_request?.budget_request_id || "",
@@ -405,7 +405,7 @@ const BodyContent = () => {
 
   const fetch = async () => {
     try {
-      const data = await GET("/validation/budget-submissions/");
+      const data = await GET("validation/budget-submissions/");
       const mappedData = data.map(sub => ({
         validationId: sub.validation_id,
         requestId: sub?.budget_submission?.budget_submission_id || "",
@@ -1064,4 +1064,3 @@ const BodyContent = () => {
 };
 
 export default BodyContent;
-
