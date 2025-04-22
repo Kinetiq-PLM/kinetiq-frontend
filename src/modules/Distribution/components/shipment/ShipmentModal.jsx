@@ -26,6 +26,7 @@ const ShipmentModal = ({
   // Form validation state
   const [formErrors, setFormErrors] = useState({});
   const [isDirty, setIsDirty] = useState(false);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   
   // Tabs for better organization
   const [activeTab, setActiveTab] = useState('details');
@@ -310,6 +311,33 @@ const ShipmentModal = ({
     }
   };
   
+  const ErrorSummary = () => {
+    // Only show if we have errors and user has attempted to submit
+    if (Object.keys(formErrors).length === 0 || !hasAttemptedSubmit) return null;
+    
+    return (
+      <div className="error-summary" style={{ 
+        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+        padding: '0.75rem',
+        marginBottom: '1rem',
+        borderRadius: '4px',
+        border: '1px solid rgba(220, 53, 69, 0.3)',
+        color: '#dc3545'
+      }}>
+        <div style={{ fontWeight: '500', marginBottom: '0.5rem', display: 'flex', alignItems: 'center' }}>
+          <span style={{ marginRight: '0.5rem' }}>⚠️</span>
+          Please fix the following issues:
+        </div>
+        <ul style={{ margin: '0', paddingLeft: '1.5rem' }}>
+          {formErrors.carrier_id && <li>Select a carrier for this shipment</li>}
+          {formErrors.weight_kg && <li>{formErrors.weight_kg}</li>}
+          {formErrors.distance_km && <li>{formErrors.distance_km}</li>}
+          {!hasValidShippingDetails && <li>Both weight and distance must be greater than zero</li>}
+        </ul>
+      </div>
+    );
+  };  
+
   // Handle input changes with validation
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -415,8 +443,21 @@ const ShipmentModal = ({
   
   // Handle mark as shipped
   const handleShip = () => {
+    // Mark that user attempted to submit
+    setHasAttemptedSubmit(true);
+    
     // Validate form first
     if (!validateForm()) {
+      // Show error message and scroll to the error summary
+      toast.error('Please fix the validation errors before shipping');
+      
+      // Switch to the appropriate tab based on errors
+      if (formErrors.carrier_id) {
+        setActiveTab('details');
+      } else if (formErrors.weight_kg || formErrors.distance_km) {
+        setActiveTab('costs');
+      }
+      
       return;
     }
     
@@ -439,8 +480,12 @@ const ShipmentModal = ({
   // Handle modal close with unsaved changes warning
   const handleClose = () => {
     if (isDirty) {
-      // Show confirmation dialog
-      if (window.confirm('You have unsaved changes. Are you sure you want to close?')) {
+      // Show a more detailed confirmation dialog
+      const message = Object.keys(formErrors).length > 0
+        ? 'You have unsaved changes with validation errors. If you close now, your changes will be lost.'
+        : 'You have unsaved changes. Would you like to save before closing?';
+      
+      if (window.confirm(message)) {
         onClose();
       }
     } else {
@@ -650,6 +695,7 @@ const ShipmentModal = ({
             {/* Tab Content */}
             {activeTab === 'details' && (
               <div className="tab-content">
+                {hasAttemptedSubmit && formErrors.carrier_id && <ErrorSummary />}
                 <div className="info-section">
                   <h4>Shipment Information</h4>
                   <div className="info-grid">
@@ -1020,6 +1066,7 @@ const ShipmentModal = ({
             
             {activeTab === 'costs' && (
               <div className="tab-content">
+                {hasAttemptedSubmit && (formErrors.weight_kg || formErrors.distance_km) && <ErrorSummary />}
                 {/* Shipping Cost Section */}
                 <div className="edit-section">
                   <h4>Shipping Details & Dimensions</h4>
@@ -1458,37 +1505,9 @@ const ShipmentModal = ({
                       className={`status-update-button ship ${isActionDisabled ? 'disabled' : ''}`}
                       onClick={handleShip}
                       disabled={isActionDisabled}
-                      style={{ 
-                        flex: '1',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: isActionDisabled ? 'not-allowed' : 'pointer',
-                        backgroundColor: isActionDisabled ? '#99c2ff' : '#007bff',
-                        transition: 'all 0.2s ease'
-                      }}
                     >
                       <span style={{ marginRight: '0.5rem', fontSize: '1.1rem' }}>📦</span>
                       Mark as Shipped
-                    </button>
-                  )}
-                  
-                  {hasDeliveryReceipt && (
-                    <button
-                      type="button"
-                      className="status-update-button delivery"
-                      onClick={() => onShowDeliveryReceipt(shipment)}
-                      style={{ 
-                        flex: '1',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop: canBeShipped ? '0.5rem' : '0',
-                        backgroundColor: '#28a745'
-                      }}
-                    >
-                      <span style={{ marginRight: '0.5rem', fontSize: '1.1rem' }}>🧾</span>
-                      Manage Delivery Receipt
                     </button>
                   )}
 
@@ -1511,6 +1530,24 @@ const ShipmentModal = ({
                       Report Failure
                     </button>
                   )}
+
+                  {canBeShipped && isActionDisabled && (
+                    <div style={{ 
+                      fontSize: '0.8rem', 
+                      color: '#666', 
+                      padding: '0.5rem',
+                      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                      borderRadius: '4px'
+                    }}>
+                      <span style={{ fontWeight: '500' }}>To ship this package:</span>
+                      <ul style={{ margin: '0.25rem 0 0 0', paddingLeft: '1.25rem' }}>
+                        {!formData.carrier_id && <li>Select a carrier</li>}
+                        {parseFloat(formData.weight_kg) <= 0 && <li>Enter package weight</li>}
+                        {parseFloat(formData.distance_km) <= 0 && <li>Enter shipping distance</li>}
+                      </ul>
+                    </div>
+                  )}
+
                 </div>
               )}
             </div>

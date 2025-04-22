@@ -16,13 +16,21 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
   
   useEffect(() => {
     if (selectedItem) {
-      setInventoryItemID(selectedItem.inventory_item_id);
-      setInventoryItemName(selectedItem.item_name)
-      setCurrentQuantity(selectedItem.current_quantity);
-      setWarehouseOrigin(selectedItem.warehouse_location);
-      setWarehouseSource(selectedItem.warehouse_id)
-    } 
-  }, [selectedItem]);
+        setInventoryItemID(selectedItem.inventory_item_id || "");
+        setInventoryItemName(selectedItem.item_name || "");
+        setCurrentQuantity(selectedItem.current_quantity || "");
+        setWarehouseOrigin(selectedItem.warehouse_location || "");
+        setWarehouseSource(selectedItem.warehouse_id || "");
+    } else {
+        // Reset fields if no selectedItem
+        setInventoryItemID("");
+        setInventoryItemName("");
+        setCurrentQuantity("");
+        setWarehouseOrigin("");
+        setWarehouseSource("");
+        
+    }
+}, [selectedItem]);
 
 
   const handleClear = () => {
