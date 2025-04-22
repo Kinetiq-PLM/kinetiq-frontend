@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "../styles/PurchaseAPInvoice.css";
-import axios from "axios";
 import PurchaseAPInvoiceForm from "./PurchaseAPInvoiceForm";
 
 const PurchaseAPInvoiceBody = () => {
@@ -12,7 +11,6 @@ const PurchaseAPInvoiceBody = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showDateDropdown, setShowDateDropdown] = useState(false);
     const [showStatusFilter, setShowStatusFilter] = useState(false);
-    const [purchaseOrders, setPurchaseOrders] = useState({}); // Map of content_id to purchase_id
 
     const timeOptions = [
         "Last 30 days",
@@ -32,51 +30,16 @@ const PurchaseAPInvoiceBody = () => {
 
     useEffect(() => {
         // Fetch invoices from the API
-        const fetchInvoices = async () => {
-            try {
-                const response = await axios.get(
-                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/list/"
-                );
-                console.log("Fetched invoices:", response.data);
-                setInvoices(response.data);
-                setFilteredInvoices(response.data); // Initialize filtered invoices
-            } catch (error) {
+        fetch("http://127.0.0.1:8000/api/invoices/list/")
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Fetched data:", data);
+                setInvoices(data);
+                setFilteredInvoices(data); // Initialize filtered invoices
+            })
+            .catch((error) => {
                 console.error("Error fetching invoices:", error);
-            }
-        };
-
-        fetchInvoices();
-    }, []);
-
-    useEffect(() => {
-        // Fetch purchase orders using content_id from external-module
-        const fetchPurchaseOrders = async () => {
-            try {
-                const externalModulesResponse = await axios.get(
-                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/external-modules/"
-                );
-                const purchaseOrdersResponse = await axios.get(
-                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/"
-                );
-
-                const purchaseOrderMap = {};
-                externalModulesResponse.data.forEach((module) => {
-                    const purchaseOrder = purchaseOrdersResponse.data.find(
-                        (order) => order.purchase_id === module.purchase_id
-                    );
-                    if (purchaseOrder) {
-                        purchaseOrderMap[module.content_id] = purchaseOrder.purchase_id;
-                    }
-                });
-
-                console.log("Mapped Purchase Orders:", purchaseOrderMap);
-                setPurchaseOrders(purchaseOrderMap);
-            } catch (error) {
-                console.error("Error fetching purchase orders:", error);
-            }
-        };
-
-        fetchPurchaseOrders();
+            });
     }, []);
 
     useEffect(() => {
@@ -105,7 +68,7 @@ const PurchaseAPInvoiceBody = () => {
             const term = searchTerm.toLowerCase();
             result = result.filter(invoice => 
                 (invoice.invoice_id && invoice.invoice_id.toString().toLowerCase().includes(term)) ||
-                (invoice.content_id && purchaseOrders[invoice.content_id]?.toString().toLowerCase().includes(term)) ||
+                (invoice.purchase_order && invoice.purchase_order.toString().toLowerCase().includes(term)) ||
                 (invoice.document_date && invoice.document_date.toString().toLowerCase().includes(term)) ||
                 (invoice.status && invoice.status.toLowerCase().includes(term))
             );
@@ -202,6 +165,7 @@ const PurchaseAPInvoiceBody = () => {
 
                     <div className="apinvoice-content">
                         <div className="apinvoice-table-header">
+                            <div className="apinvoice-checkbox"><input type="checkbox" /></div>
                             <div>Invoice ID</div>
                             <div>Purchase Order</div>
                             <div>Status</div>
@@ -217,8 +181,11 @@ const PurchaseAPInvoiceBody = () => {
                                             className="apinvoice-row"
                                             onClick={() => handleInvoiceClick(invoice)}
                                         >
+                                            <div className="apinvoice-checkbox">
+                                                <input type="checkbox" />
+                                            </div>
                                             <div>{invoice.invoice_id}</div>
-                                            <div>{purchaseOrders[invoice.content_id] || "N/A"}</div>
+                                            <div>{invoice.purchase_order}</div>
                                             <div>
                                                 <span className={`status-${invoice.status?.toLowerCase()}`}>{invoice.status}</span>
                                             </div>

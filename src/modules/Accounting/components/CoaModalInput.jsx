@@ -53,18 +53,17 @@ const CoaModalInput = ({ isModalOpen, closeModal, coaForm, handleInputChange, ha
       const existingAccounts = response.data.filter((acc) => acc.account_type === accountType);
       console.log("Existing accounts for type:", existingAccounts);
 
-      let maxNumber = baseNumber - 10; // Adjust for increment by 10
+      let maxNumber = baseNumber - 1;
       existingAccounts.forEach((acc) => {
-        const code = acc.account_code; // e.g., ACC-COA-2025-CA1090
+        const code = acc.account_code; // e.g., ACC-COA-2025-IB8010
         console.log("Processing code:", code);
         const numberPart = parseInt(code.split("-")[3].replace(prefix, ""), 10);
-        if (!isNaN(numberPart) && numberPart > maxNumber) {
+        if (!isNaN(numberPart) && numberPart >= maxNumber) {
           maxNumber = numberPart;
         }
       });
 
-      // Round up to the next multiple of 10
-      const newNumber = Math.ceil((maxNumber + 1) / 10) * 10;
+      const newNumber = maxNumber + 1;
       const newCode = `ACC-COA-${currentYear}-${prefix}${newNumber}`;
       console.log("Generated code:", newCode);
       return newCode;

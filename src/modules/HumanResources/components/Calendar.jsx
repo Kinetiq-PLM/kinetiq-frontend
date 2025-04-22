@@ -2,50 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Calendar.css";
 
-// Add navigateTo to the props
-const Calendar = ({ leaveRequests = [], navigateTo }) => {
+const Calendar = () => {
   /* ── state ─────────────────────────────────────────────────────────── */
   const [currentDate, setCurrentDate] = useState(new Date());
   const [calendarData, setCalendarData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [showDayModal, setShowDayModal] = useState(false);
-
-  /* Add this mapping for leave type icons */
-  const getLeaveTypeEmoji = (leaveType) => {
-    switch (leaveType?.toLowerCase()) {
-      case 'sick':
-        return '🤒';
-      case 'vacation':
-        return '🏖️';
-      case 'personal':
-        return '🏠';
-      case 'maternity':
-        return '👶';
-      case 'paternity':
-        return '👨‍👦';
-      case 'solo parent':
-        return '👨‍👧';
-      case 'unpaid':
-        return '📝';
-      default:
-        return '📅';
-    }
-  };
-
-  /* Add a function to get the primary leave emoji for a cell */
-  const getPrimaryLeaveEmoji = (leaves) => {
-    if (!leaves || leaves.length === 0) return null;
-    
-    // If only one leave, return its emoji
-    if (leaves.length === 1) {
-      return getLeaveTypeEmoji(leaves[0].leave_type);
-    }
-    
-    // If multiple leave types, use a mixed emoji or count
-    return leaves.length > 1 ? `${leaves.length}+` : getLeaveTypeEmoji(leaves[0].leave_type);
-  };
 
   /* ── data fetch ─────────────────────────────────────────────────────── */
   useEffect(() => {
@@ -53,7 +15,7 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/calendar_dates/calendar_dates/"
+          "http://127.0.0.1:8000/api/calendar_dates/calendar_dates/"
         );
         setCalendarData(data);
         setError(null);
@@ -75,9 +37,6 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
     setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
     );
-  const jumpToToday = () => {
-    setCurrentDate(new Date());
-  };
 
   /* ── helpers ────────────────────────────────────────────────────────── */
   const todayISO = new Date().toISOString().split("T")[0];
@@ -99,15 +58,6 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
         d
       ).padStart(2, "0")}`;
       const meta = calendarData.find((c) => c.date === dateStr) || {};
-
-      // Find leave requests for this date
-      const dayLeaves = leaveRequests.filter((leave) => {
-        const startDate = new Date(leave.start_date);
-        const endDate = new Date(leave.end_date);
-        const currentDate = new Date(dateStr);
-        return currentDate >= startDate && currentDate <= endDate;
-      });
-
       cells.push({
         day: d,
         dateStr,
@@ -116,8 +66,6 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
         isHoliday: meta.is_holiday || false,
         isSpecial: meta.is_special || false,
         holidayName: meta.holiday_name || "",
-        leaves: dayLeaves,
-        hasLeaves: dayLeaves.length > 0,
       });
     }
     /* trailing cells so the grid is always complete */
@@ -134,71 +82,28 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
     });
   };
 
-  /* ── event handlers ─────────────────────────────────────────────────── */
-  const handleDayClick = (day) => {
-    if (!day.empty) {
-      setSelectedDay(day);
-      setShowDayModal(true);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setShowDayModal(false);
-  };
-
-  // Add new handler for navigation with date context
-  const handleNavigate = (path, dateStr) => {
-    if (navigateTo) {
-      // Pass the selected date as a query parameter or state
-      navigateTo(path, { selectedDate: dateStr });
-    }
-  };
-
   /* ── derived ────────────────────────────────────────────────────────── */
   const cells = getMonthData();
   const holidays = holidaysThisMonth();
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
   ];
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
   /* ── render ─────────────────────────────────────────────────────────── */
-  if (loading) return <div className="hr-calendar-status">Loading…</div>;
-  if (error) return <div className="hr-calendar-status error">{error}</div>;
+  if (loading)  return <div className="hr-calendar-status">Loading…</div>;
+  if (error)    return <div className="hr-calendar-status error">{error}</div>;
 
   return (
     <div className="hr-calendar">
       {/* header */}
       <div className="hr-calendar-header">
-        <button onClick={prevMonth} aria-label="Previous month">
-          ‹
-        </button>
+        <button onClick={prevMonth} aria-label="Previous month">‹</button>
         <h3>
           {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
         </h3>
-        <div className="hr-calendar-header-buttons">
-          <button
-            onClick={jumpToToday}
-            className="hr-calendar-today-btn"
-            aria-label="Jump to today"
-          >
-            Today
-          </button>
-          <button onClick={nextMonth} aria-label="Next month">
-            ›
-          </button>
-        </div>
+        <button onClick={nextMonth} aria-label="Next month">›</button>
       </div>
 
       {/* day‑of‑week strip */}
@@ -221,25 +126,13 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
                 c.isToday && "today",
                 c.isHoliday && "holiday",
                 c.isSpecial && "special",
-                c.hasLeaves && "has-leaves",
                 c.isWorkday ? "workday" : "nonwork",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              title={
-                c.holidayName ||
-                (c.hasLeaves ? `${c.leaves.length} leave request(s)` : "")
-              }
-              onClick={() => handleDayClick(c)}
+              ].filter(Boolean).join(" ")}
+              title={c.holidayName}
             >
               <span className="date-number">{c.day}</span>
               {c.isHoliday && <span className="badge">🎉</span>}
               {c.isSpecial && !c.isHoliday && <span className="badge">✨</span>}
-              {c.hasLeaves && (
-                <span className="badge leaves" title={`${c.leaves.length} leave(s)`}>
-                  {getPrimaryLeaveEmoji(c.leaves)}
-                </span>
-              )}
             </div>
           )
         )}
@@ -266,85 +159,6 @@ const Calendar = ({ leaveRequests = [], navigateTo }) => {
           </ul>
         )}
       </div>
-
-      {/* Day Details Modal */}
-      {showDayModal && selectedDay && (
-        <div className="hr-calendar-modal-overlay" onClick={handleCloseModal}>
-          <div
-            className="hr-calendar-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="hr-calendar-modal-header">
-              <h4>{selectedDay.dateStr}</h4>
-              <button
-                onClick={handleCloseModal}
-                className="hr-calendar-modal-close"
-              >
-                ×
-              </button>
-            </div>
-            <div className="hr-calendar-modal-content">
-              {selectedDay.isHoliday && (
-                <div className="hr-calendar-modal-holiday">
-                  <span className="hr-calendar-modal-badge">🎉</span>
-                  <p>
-                    <strong>Holiday:</strong> {selectedDay.holidayName}
-                  </p>
-                </div>
-              )}
-              {selectedDay.isSpecial && !selectedDay.isHoliday && (
-                <div className="hr-calendar-modal-special">
-                  <span className="hr-calendar-modal-badge">✨</span>
-                  <p>
-                    <strong>Special Day</strong>
-                  </p>
-                </div>
-              )}
-              <p>
-                <strong>Workday:</strong>{" "}
-                {selectedDay.isWorkday ? "Yes" : "No"}
-              </p>
-
-              {/* Leave information */}
-              {selectedDay.hasLeaves && (
-                <div className="hr-calendar-modal-leaves">
-                  <h5>
-                    {selectedDay.leaves.length} Leave Request
-                    {selectedDay.leaves.length !== 1 ? "s" : ""}
-                  </h5>
-                  <ul>
-                    {selectedDay.leaves.map((leave) => (
-                      <li key={leave.leave_id}>
-                        <span className="leave-emoji">{getLeaveTypeEmoji(leave.leave_type)}</span>
-                        {leave.employee_name} -{" "}
-                        <span className={`leave-type ${leave.leave_type.toLowerCase()}`}>
-                          {leave.leave_type}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Link to attendance or leave requests for this day */}
-              <div className="hr-calendar-modal-actions">
-                <button 
-                  className="hr-calendar-modal-btn attendance"
-                  onClick={() => handleNavigate('/attendance', selectedDay.dateStr)}
-                >
-                  View Attendance
-                </button>
-                <button 
-                  className="hr-calendar-modal-btn leaves"
-                  onClick={() => handleNavigate('/leave-requests', selectedDay.dateStr)}
-                >
-                  View Leave Requests
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

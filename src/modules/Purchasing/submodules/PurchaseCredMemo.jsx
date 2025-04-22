@@ -15,28 +15,33 @@ const PurchaseCredMemoBody = () => {
   const [showStatusFilter, setShowStatusFilter] = useState(false);
 
   const timeOptions = [
-    "All",
     "Last 30 days",
     "Last 20 days",
     "Last 10 days",
     "Last 3 days",
-    "Last 1 day",
+    "Last 1 day"
   ];
-  const statusOptions = ["All", "Approved", "Pending", "Completed", "Rejected"];
+  const statusOptions = [
+    "All",
+    "Approved",
+    "Pending",
+    "Completed",
+    "Rejected"
+  ];
 
+  const handleNewForm = () => setShowForm(true);
+  const handleSendTo = () => alert("Send To feature not implemented yet.");
 
+  // Add back button handler to toggle dashboard
   const handleBackToDashboard = () => {
-    const event = new CustomEvent("purchasing-back-to-dashboard");
+    const event = new CustomEvent('purchasing-back-to-dashboard');
     window.dispatchEvent(event);
   };
 
   useEffect(() => {
     const fetchCreditMemos = async () => {
       try {
-        const response = await axios.get(
-          "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/credit-memo/list/"
-        );
-        console.log("Credit Memos API Response:", response.data);
+        const response = await axios.get("http://127.0.0.1:8000/api/credit-memo/list/");
         setCreditMemos(response.data);
         setFilteredMemos(response.data);
       } catch (error) {
@@ -56,45 +61,32 @@ const PurchaseCredMemoBody = () => {
 
     // Date filter
     if (selectedDate !== "All") {
-      const days = parseInt(selectedDate.match(/\d+/)[0], 10); // Extract the number of days from the selectedDate
+      const days = parseInt(selectedDate.match(/\d+/)[0], 10);
       const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - days); // Calculate the cutoff date
-      console.log("Cutoff Date:", cutoffDate);
-
-      result = result.filter((memo) => {
-        if (!memo.document_date) {
-          return true; // Include items with missing dates
-        }
-        return new Date(memo.document_date) >= cutoffDate;
-      });
-      console.log("After Date Filter:", result.length);
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+      result = result.filter(memo => new Date(memo.document_date) >= cutoffDate);
     }
 
     // Status filter
     if (selectedStatus !== "All") {
-      result = result.filter((memo) => {
+      result = result.filter(memo => {
         if (selectedStatus === "Completed") {
+          // Completed: status is 'Completed'
           return memo.status === "Completed";
         }
         return memo.status === selectedStatus;
       });
-      console.log("After Status Filter:", result.length);
     }
 
     // Search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      result = result.filter(
-        (memo) =>
-          (memo.credit_memo_id &&
-            memo.credit_memo_id.toString().toLowerCase().includes(term)) ||
-          (memo.invoice_id &&
-            memo.invoice_id.toString().toLowerCase().includes(term)) ||
-          (memo.document_date &&
-            memo.document_date.toString().toLowerCase().includes(term)) ||
-          (memo.status && memo.status.toLowerCase().includes(term))
+      result = result.filter(memo => 
+        (memo.credit_memo_id && memo.credit_memo_id.toString().toLowerCase().includes(term)) ||
+        (memo.purchase_order && memo.purchase_order.toString().toLowerCase().includes(term)) ||
+        (memo.document_date && memo.document_date.toString().toLowerCase().includes(term)) ||
+        (memo.status && memo.status.toLowerCase().includes(term))
       );
-      console.log("After Search Filter:", result.length);
     }
 
     setFilteredMemos(result);
@@ -119,19 +111,14 @@ const PurchaseCredMemoBody = () => {
       {showForm ? (
         <PurchaseCredMemoForm onClose={() => setShowForm(false)} />
       ) : selectedMemo ? (
-        <PurchaseCredMemoForm
-          memoData={selectedMemo}
-          onClose={() => setSelectedMemo(null)}
-        />
+        <PurchaseCredMemoForm memoData={selectedMemo} onClose={() => setSelectedMemo(null)} />
       ) : (
         <div className="credmemo-body-content-container">
           <div className="credmemo-header">
-            <button className="credmemo-back" onClick={handleBackToDashboard}>
-              ← Back
-            </button>
-            <div className="credmemo-filters" style={{ marginLeft: "auto" }}>
+            <button className="credmemo-back" onClick={handleBackToDashboard}>← Back</button>
+            <div className="credmemo-filters" style={{ marginLeft: 'auto' }}>
               <div className="credmemo-date-filter">
-                <div
+                <div 
                   className="date-display"
                   onClick={() => setShowDateDropdown(!showDateDropdown)}
                 >
@@ -152,7 +139,7 @@ const PurchaseCredMemoBody = () => {
                   </div>
                 )}
               </div>
-              <div
+              <div 
                 className="credmemo-status-filter"
                 onClick={() => setShowStatusFilter(!showStatusFilter)}
               >
@@ -173,9 +160,9 @@ const PurchaseCredMemoBody = () => {
                 )}
               </div>
               <div className="credmemo-search">
-                <input
-                  type="text"
-                  placeholder="Search by Memo ID, Invoice ID..."
+                <input 
+                  type="text" 
+                  placeholder="Search by Memo ID, PO..." 
                   value={searchTerm}
                   onChange={handleSearch}
                 />
@@ -185,43 +172,39 @@ const PurchaseCredMemoBody = () => {
 
           <div className="credmemo-content">
             <div className="credmemo-table-header">
+              <div className="credmemo-checkbox"><input type="checkbox" /></div>
               <div>Credit Memo</div>
-              <div>Invoice ID</div>
+              <div>Ref: A/P Invoice</div>
               <div>Status</div>
               <div>Document Date</div>
               <div>Due Date</div>
             </div>
             <div className="credmemo-table-scrollable">
               <div className="credmemo-table-rows">
-                {filteredMemos.length > 0 ? (
-                  filteredMemos.map((memo) => (
-                    <div
-                      key={memo.credit_memo_id}
-                      className="credmemo-row"
-                      onClick={() => setSelectedMemo(memo)}
-                    >
-                      <div>{memo.credit_memo_id}</div>
-                      <div>{memo.invoice_id || "N/A"}</div>
-                      <div>
-                        <span
-                          className={`status-${memo.status.toLowerCase()}`}
-                        >
-                          {memo.status}
-                        </span>
-                      </div>
-                      <div>{memo.document_date}</div>
-                      <div>{memo.due_date}</div>
+                {filteredMemos.length > 0 ? filteredMemos.map((memo) => (
+                  <div key={memo.id} className="credmemo-row" onClick={() => setSelectedMemo(memo)}>
+                    <div className="credmemo-checkbox"><input type="checkbox" /></div>
+                    <div>{memo.credit_memo_id}</div>
+                    <div>{memo.purchase_order}</div>
+                    <div>
+                      <span className={`status-${memo.status.toLowerCase()}`}>{memo.status}</span>
                     </div>
-                  ))
-                ) : (
-                  <div className="credmemo-no-data">
-                    No credit memos found matching your criteria
+                    <div>{memo.document_date}</div>
+                    <div>{memo.due_date}</div>
                   </div>
+                )) : (
+                  <div className="credmemo-no-data">No credit memos found matching your criteria</div>
                 )}
               </div>
             </div>
           </div>
 
+          <div className="credmemo-footer">
+            <button className="credmemo-new-form" onClick={handleNewForm}>New Form</button>
+            <div className="credmemo-footer-right">
+              <button className="credmemo-send-to" onClick={handleSendTo}>Send to</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

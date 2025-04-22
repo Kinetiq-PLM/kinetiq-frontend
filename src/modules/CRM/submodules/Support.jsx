@@ -16,7 +16,7 @@ import { useAlert } from "../../Sales/components/Context/AlertContext";
 
 import loading from "../../Sales/components/Assets/kinetiq-loading.gif";
 
-const Support = ({ employee_id }) => {
+const Support = () => {
   const showAlert = useAlert();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,7 +30,7 @@ const Support = ({ employee_id }) => {
   const [isTicketResolveOpen, setIsTicketResolveOpen] = useState(false);
   const ticketQuery = useQuery({
     queryKey: ["tickets"],
-    queryFn: async () => await GET(`crm/ticket?salesrep=${employee_id}`),
+    queryFn: async () => await GET("crm/ticket"),
   });
   const columns = [
     { key: "ticket_id", label: "Ticket ID" },
@@ -198,10 +198,10 @@ const Support = ({ employee_id }) => {
   );
 };
 
-const BodyContent = ({ employee_id }) => {
+const BodyContent = () => {
   return (
     <AlertProvider>
-      <Support employee_id={employee_id} />
+      <Support />
     </AlertProvider>
   );
 };

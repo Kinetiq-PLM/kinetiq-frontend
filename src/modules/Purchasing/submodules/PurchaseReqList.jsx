@@ -9,25 +9,21 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
   const [showNewForm, setShowNewForm] = useState(false);
   const [showPurchQuot, setShowPurchQuot] = useState(false);
   const [purchaseRequests, setPurchaseRequests] = useState([]);
-  const [employeeMap, setEmployeeMap] = useState({});
+  const [employeeMap, setEmployeeMap] = useState({}); // Map of employee_id to employee_name
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedRequest, setSelectedRequest] = useState(null);
-  const [approvalFilter, setApprovalFilter] = useState("all"); // Default to show all
-  const [sortOrder, setSortOrder] = useState("newest"); // Default to newest
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-
-  const statusOptions = ["All", "Approved", "Pending", "Completed", "Rejected"];
+  const [selectedRequest, setSelectedRequest] = useState(null); // Store selected request
 
   // Fetch purchase requests and employee data from the API
   useEffect(() => {
     const fetchPurchaseRequests = async () => {
       try {
-        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
+        const response = await axios.get("http://127.0.0.1:8000/api/prf/list/");
+        // Sort the purchase requests by request_id in descending order
         const sortedRequests = response.data.sort((a, b) => {
-          const dateA = new Date(a.document_date);
-          const dateB = new Date(b.document_date);
-          return dateB - dateA; // Default to descending order (newest first)
+          const idA = parseInt(a.request_id, 10);
+          const idB = parseInt(b.request_id, 10);
+          return idB - idA; // Descending order
         });
         setPurchaseRequests(sortedRequests);
       } catch (error) {
@@ -39,42 +35,34 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
     };
 
     const fetchEmployees = async () => {
-      try {
-        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
-        const employeeData = response.data.reduce((map, employee) => {
-          const fullName = `${employee.first_name} ${employee.last_name}`.trim();
-          map[employee.employee_id] = {
-            name: fullName,
-            dept_id: employee.dept_id,
-          };
-          return map;
-        }, {});
-        setEmployeeMap(employeeData);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-        setError("Failed to load employee data");
-      }
-    };
+        try {
+          const response = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+          // Create a map of employee_id to full name (first_name + last_name)
+          const employeeData = response.data.reduce((map, employee) => {
+            const fullName = `${employee.first_name} ${employee.last_name}`.trim(); // Combine first_name and last_name
+            map[employee.employee_id] = fullName;
+            return map;
+          }, {});
+          setEmployeeMap(employeeData);
+        } catch (error) {
+          console.error("Error fetching employees:", error);
+          setError("Failed to load employee data");
+        }
+      };
 
     fetchPurchaseRequests();
     fetchEmployees();
   }, []);
 
-  // Sort purchase requests dynamically based on sortOrder
-  const handleSortToggle = () => {
-    const newSortOrder = sortOrder === "newest" ? "oldest" : "newest";
-    setSortOrder(newSortOrder);
-
-    const sortedRequests = [...purchaseRequests].sort((a, b) => {
-      const dateA = new Date(a.document_date);
-      const dateB = new Date(b.document_date);
-      return newSortOrder === "newest" ? dateB - dateA : dateA - dateB;
-    });
-
-    setPurchaseRequests(sortedRequests);
-  };
+  // Safety net: never allow both forms to show at once
+  useEffect(() => {
+    if (showNewForm && showPurchQuot) {
+      setShowNewForm(false); // Always prioritize PurchForQuotForm
+    }
+  }, [showNewForm, showPurchQuot]);
 
   const handleBack = () => {
+    // If we're in a detail or form view, reset local state; otherwise, go back to dashboard and toggle sidebar
     if (showNewForm || showPurchQuot || selectedRequest) {
       setShowNewForm(false);
       setShowPurchQuot(false);
@@ -100,41 +88,27 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
 
   const handleRequestClick = (request) => {
     console.log("Selected Request (PurchaseReqList):", request); // Debugging
-    const employeeName = employeeMap[request.employee_id]?.name || "Unknown"; // Get employee_name from the map
-    setSelectedRequest({ ...request, employee_name: employeeName }); // Set the clicked request
+    const employeeName = employeeMap[request.employee_id] || "Unknown"; // Get employee_name from the map
+    setSelectedRequest({...request, employee_name: employeeName}); // Set the clicked request
     setShowPurchQuot(true); // Show the quotation form
     setShowNewForm(false); // Hide the PurchaseReqForm if it was open
   };
 
-  const handleStatusDropdownSelect = (status) => {
-    setApprovalFilter(status === 'All' ? 'all' : status);
-    setShowStatusDropdown(false);
+  const handleCheckboxClick = (event) => {
+    event.stopPropagation();
   };
 
+  // Filter requests
   const filteredRequests = purchaseRequests.filter((request) => {
     const searchLower = searchTerm.toLowerCase();
-    const employee = employeeMap[request.employee_id];
-    const employeeName = (employee && employee.name) || "";
-
-    // Status filter (using approvalFilter as status)
-    let matchesStatus = true;
-    if (approvalFilter !== "all") {
-      if (approvalFilter === "Completed") {
-        matchesStatus = request.status === "Completed";
-      } else {
-        matchesStatus = request.status === approvalFilter;
-      }
-    }
-
-    // Search filter (existing)
-    const matchesSearch =
+    const employeeName = employeeMap[request.employee_id] || ""; // Get employee_name from the map
+    return (
       (request.request_id || "").toLowerCase().includes(searchLower) ||
-      employeeName.toLowerCase().includes(searchLower) ||
+      employeeName.toLowerCase().includes(searchLower) || // Search by employee_name
       (request.department || "").toLowerCase().includes(searchLower) ||
       (request.document_date || "").toLowerCase().includes(searchLower) ||
-      (request.valid_date || "").toLowerCase().includes(searchLower);
-
-    return matchesStatus && matchesSearch;
+      (request.valid_date || "").toLowerCase().includes(searchLower)
+    );
   });
 
   return (
@@ -146,44 +120,14 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
               <button className="purchreq-back-btn" onClick={handleBack}>← Back</button>
             )}
           </div>
-          {/* Place filter and searchbar together, aligned right, with no wrapper or space between */}
           {!showNewForm && !showPurchQuot && (
-            <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto', gap: '0.75rem' }}>
-              <div
-                className="purchreq-status-filter"
-                onClick={() => setShowStatusDropdown((prev) => !prev)}
-                onBlur={() => setShowStatusDropdown(false)}
-                tabIndex={0}
-              >
-                <span>Filter by: {approvalFilter === 'all' ? 'All' : approvalFilter}</span>
-                <span style={{ marginLeft: 4 }}>▼</span>
-                {showStatusDropdown && (
-                  <div className="status-options-dropdown">
-                    {statusOptions.map((status) => (
-                      <div
-                        key={status}
-                        className={`status-option${(approvalFilter === status || (status === 'All' && approvalFilter === 'all')) ? ' selected' : ''}`}
-                        onMouseDown={(e) => {
-                          e.preventDefault(); // Prevent blur before click
-                          setApprovalFilter(status === 'All' ? 'all' : status);
-                          setShowStatusDropdown(false);
-                        }}
-                      >
-                        {status}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <input
-                type="text"
-                className="purchreq-search"
-                placeholder="Search by PR No., Employee Name, Department, or Date..."
-                value={searchTerm}
-                onChange={handleSearch}
-                style={{ marginLeft: 0 }}
-              />
-            </div>
+            <input
+              type="text"
+              className="purchreq-search"
+              placeholder="Search by PR No., Employee Name, Department, or Date..."
+              value={searchTerm}
+              onChange={handleSearch}
+            />
           )}
         </div>
         {showNewForm && !showPurchQuot && (
@@ -206,27 +150,21 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
         {!showNewForm && !showPurchQuot && (
           <div className="purchreq-table-container">
             <div className="purchreq-table-header">
+              <div className="purchreq-checkbox"><input type="checkbox" onClick={handleCheckboxClick} /></div>
               <div>PR No.</div>
               <div>Employee Name</div>
               <div>Department</div>
-              <div>
-                <span
-                  className="sortable-header"
-                  onClick={handleSortToggle}
-                  style={{ cursor: "pointer", textDecoration: "underline" }}
-                >
-                  Document Date ({sortOrder === "newest" ? "Newest" : "Oldest"})
-                </span>
-              </div>
+              <div>Document Date</div>
               <div>Valid Date</div>
             </div>
             <div className="purchreq-table-scrollable">
               <div className="purchreq-table-rows">
                 {filteredRequests.length > 0 ? filteredRequests.map((request, index) => (
                   <div key={index} className="purchreq-row" onClick={() => handleRequestClick(request)}>
+                    <div className="purchreq-checkbox"><input type="checkbox" onClick={handleCheckboxClick} /></div>
                     <div>{request.request_id}</div>
-                    <div>{employeeMap[request.employee_id]?.name || " "}</div>
-                    <div>{employeeMap[request.employee_id]?.dept_id || " "}</div>
+                    <div>{employeeMap[request.employee_id] || " "}</div>
+                    <div>{request.department}</div>
                     <div>{request.document_date}</div>
                     <div>{request.valid_date}</div>
                   </div>
@@ -235,6 +173,11 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
                 )}
               </div>
             </div>
+          </div>
+        )}
+        {!showNewForm && !showPurchQuot && (
+          <div className="purchreq-footer">
+            <button className="purchreq-new-form" onClick={handleNewRequest}>New Form</button>
           </div>
         )}
       </div>

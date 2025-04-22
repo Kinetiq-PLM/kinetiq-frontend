@@ -158,14 +158,14 @@
     border: 1px solid #e6e6e6;
 }
 
-.purchase-cred-memo-form .items-table {
+.items-table {
     width: 100%;
     border-collapse: collapse;
     background: white;
 }
 
-.purchase-cred-memo-form .items-table th, 
-.purchase-cred-memo-form .items-table td {
+.items-table th, 
+.items-table td {
     padding: 0.75rem 1rem;
     text-align: center;
     border: 1px solid #e6e6e6;
@@ -173,27 +173,27 @@
     font-size: 0.875rem;
 }
 
-.purchase-cred-memo-form .items-table th {
+.items-table th {
     background-color: #fff;
     font-weight: 500;
     color: #666;
     border-top: none;
 }
 
-.purchase-cred-memo-form .items-table th:first-child {
+.items-table th:first-child {
     border-left: none;
 }
 
-.purchase-cred-memo-form .items-table th:last-child {
+.items-table th:last-child {
     border-right: none;
 }
 
-.purchase-cred-memo-form .items-table td {
+.items-table td {
     border-left: none;
     border-right: none;
 }
 
-.purchase-cred-memo-form .items-table tr:last-child td {
+.items-table tr:last-child td {
     border-bottom: none;
 }
 

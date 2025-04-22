@@ -82,7 +82,7 @@ const VendorAppForm = () => {
             console.log("📤 Submitting Vendor Application Payload:", payload);
 
             const response = await axios.post(
-                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/VendorApp/create/",
+                "http://127.0.0.1:8000/api/VendorApp/create/",
                 payload
             );
             console.log("✅ Response from server:", response.data);
@@ -154,6 +154,15 @@ const VendorAppForm = () => {
                                         />
                                     </div>
                                 ))}
+                                <div className="form-group">
+                                    <label>Tax Exempt</label>
+                                    <input
+                                        type="checkbox"
+                                        name="tax_exempt"
+                                        checked={formData.tax_exempt}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -191,43 +200,9 @@ const VendorAppForm = () => {
                             </div>
                         </div>
 
-                        {/* Tax Exempt, Checks and Card */}
+                        {/* Checks and Card */}
                         <div className="vendorappform-bottom">
                             <div className="vendorappform-checks">
-                            <div className="check-group">
-                                    <h4>Tax Exempt</h4>
-                                    <div className="radio-group">
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="tax_exempt"
-                                                checked={formData.tax_exempt}
-                                                onChange={() =>
-                                                    setFormData((prev) => ({
-                                                        ...prev,
-                                                        tax_exempt: true,
-                                                    }))
-                                                }
-                                            />
-                                            Yes
-                                        </label>
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="tax_exempt"
-                                                checked={!formData.tax_exempt}
-                                                onChange={() =>
-                                                    setFormData((prev) => ({
-                                                        ...prev,
-                                                        tax_exempt: false,
-                                                    }))
-                                                }
-                                            />
-                                            No
-                                        </label>
-                                    </div>
-                                </div>
-
                                 <div className="check-group">
                                     <h4>Separate Checks?</h4>
                                     <div className="radio-group">
@@ -288,6 +263,40 @@ const VendorAppForm = () => {
                                                     setFormData((prev) => ({
                                                         ...prev,
                                                         purchasing_card: false,
+                                                    }))
+                                                }
+                                            />
+                                            No
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="check-group">
+                                    <h4>Tax Exempt</h4>
+                                    <div className="radio-group">
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                name="tax_exempt"
+                                                checked={formData.tax_exempt}
+                                                onChange={() =>
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        tax_exempt: true,
+                                                    }))
+                                                }
+                                            />
+                                            Yes
+                                        </label>
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                name="tax_exempt"
+                                                checked={!formData.tax_exempt}
+                                                onChange={() =>
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        tax_exempt: false,
                                                     }))
                                                 }
                                             />

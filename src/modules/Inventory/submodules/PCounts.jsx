@@ -54,7 +54,7 @@ const BodyContent = () => {
     setLoading(true);
     setError(null);
 
-    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/")
+    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouses/")
     .then((res) => {
       if (!res.ok) {
         throw new Error(`HTTP error fetching warehouses! Status: ${res.status}`);
@@ -344,8 +344,8 @@ const BodyContent = () => {
                     >
                       <option value="">Select Warehouse</option>
                       {warehouses.map((w) => (
-                        <option key={w.warehouse_location} value={w.id} className="">
-                          {w.warehouse_location}
+                        <option key={w.id} value={w.id}>
+                          {w.name}
                         </option>
                       ))}
                     </select>

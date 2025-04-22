@@ -251,6 +251,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         transferOperation: "quotation",
       });
       setCanEditTable(false);
+      setIsQuotation(true);
     } else if (
       copyFromModal === "Blanket Agreement" &&
       selectedBlanketAgreement
@@ -426,7 +427,6 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             setDeliveryDate={setDeliveryDate}
             setAddress={setAddress}
             enabled={canEditTable}
-            date={new Date().toISOString().split("T")[0]}
           />
         </div>
         {/* TABLE */}

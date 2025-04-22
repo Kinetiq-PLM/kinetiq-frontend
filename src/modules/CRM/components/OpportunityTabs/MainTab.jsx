@@ -37,17 +37,13 @@ export default function MainTab({ employee_id }) {
   const customerOppQuery = useQuery({
     queryKey: ["customerOpps"],
     queryFn: async () =>
-      await GET(
-        `crm/opportunities?customer=${selectedCustomer.customer_id}&salesrep=${employee_id}`
-      ),
+      await GET(`crm/opportunities?customer=${selectedCustomer.customer_id}`),
     retry: 2,
   });
 
   const deleteOppMutation = useMutation({
     mutationFn: async (data) =>
-      await PATCH(`crm/opportunities/${data.opportunity_id}/`, {
-        is_archived: true,
-      }),
+      await DELETE(`crm/opportunities/${data.opportunity_id}/`),
     onSuccess: (data) => {
       showAlert({
         type: "success",

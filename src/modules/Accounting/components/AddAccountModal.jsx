@@ -59,17 +59,15 @@ const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
       });
       return;
     }
-  
+
     const accountData = {
       glAccountId: selectedAccount.gl_account_id,
       accountName: selectedAccount.account_name,
-      accountCode: selectedAccount.account_code,
     };
-  
-    handleSubmit(accountData);  
-    setTimeout(() => closeModal(), 100);
+
+    handleSubmit(accountData);
+    closeModal();
   };
-  
 
   if (!isModalOpen) return null;
 
@@ -90,7 +88,7 @@ const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
           <div className="modal-body mt-4">
             <Search
               type="text"
-              placeholder="Search name or ID..."
+              placeholder="Search by Name or GL Account ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

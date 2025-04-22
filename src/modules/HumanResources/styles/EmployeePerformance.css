@@ -21,7 +21,8 @@
   box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
-  min-width: unset; /* Remove fixed min-width to prevent overflow */
+  min-width: 40rem;
+  min-height: 30rem;
   box-sizing: border-box;
   overflow: hidden; /* scrolled inside .hr-employee-performance-scrollable */
 }
@@ -140,6 +141,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
+  min-width: 1400px; /* Force minimum width to ensure horizontal scroll */
 }
 
 .hr-employee-performance-no-scroll-table {
@@ -165,6 +167,7 @@
   position: sticky; /* Keep the header fixed while scrolling */
   top: 0;
   background-color: #f3f9fa;
+  z-index: 5;
 }
 .hr-employee-performance-table th,
 .hr-employee-performance-table td {
@@ -207,60 +210,24 @@
   background-color: white;
   border-radius: 8px;
   margin-top: 1rem;
-  flex-wrap: wrap;
-  max-width: 100%;
 }
-
-.hr-employee-performance-pagination-numbers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-  max-width: calc(100% - 100px);
-  margin-right: 0.5rem;
-}
-
 .hr-employee-performance-pagination button {
   background: white;
   border: 1px solid #ccc;
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
   cursor: pointer;
-  min-width: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
-
 .hr-employee-performance-pagination button.active {
   background-color: #00b0b5;
   color: white;
   border-color: #00b0b5;
 }
-
-.hr-employee-performance-pagination button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.hr-employee-performance-pagination button:hover:not(.active):not(:disabled) {
-  background-color: #f0f0f0;
-}
-
 .hr-employee-performance-pagination-size {
   padding: 0.4rem;
   font-size: 0.9rem;
   border-radius: 4px;
   border: 1px solid #ccc;
-}
-
-.hr-employee-performance-pagination-arrow {
-  font-weight: bold;
-}
-
-.hr-employee-performance-pagination-ellipsis {
-  padding: 0.4rem;
-  color: #666;
 }
 
 /* TOAST NOTIFICATION (Optional) */
@@ -416,131 +383,4 @@
 .hr-rating-tag.rating-1 {
   background-color: #f8d7da;
   color: #842029; /* Poor - Red */
-}
-
-/* ---------------------------------------------------------
-   RESPONSIVE DESIGN
-   --------------------------------------------------------- */
-
-/* Base responsive adjustments */
-.hr-employee-performance-body-content-container {
-  min-width: unset; /* Remove fixed min-width to prevent overflow */
-  width: 100%;
-  max-width: 1600px;
-  padding: 1rem;
-}
-
-.hr-employee-performance-table {
-  width: 100%;
-}
-
-/* Large screens (desktops) */
-@media (min-width: 1200px) {
-  .hr-employee-performance-body-content-container {
-    padding: 1.5rem;
-  }
-  
-  .hr-employee-performance-scrollable {
-    padding: 1.75rem;
-  }
-  
-  .hr-employee-performance-table {
-    min-width: 1400px; /* Only force min-width on large screens */
-  }
-}
-
-/* Medium screens (tablets and small desktops) */
-@media (min-width: 768px) and (max-width: 1199px) {
-  .hr-employee-performance-scrollable {
-    padding: 1.25rem;
-  }
-  
-  .hr-employee-performance-heading {
-    margin-bottom: 1.25rem;
-  }
-  
-  .hr-employee-performance-heading h2 {
-    font-size: 1.5rem;
-  }
-  
-  .hr-employee-performance-right-controls {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .hr-employee-performance-search {
-    width: 200px;
-  }
-  
-  .hr-employee-performance-filter {
-    min-width: 150px;
-  }
-  
-  .hr-employee-performance-table-container {
-    max-height: calc(100vh - 200px);
-  }
-  
-  /* Modal adjustments for tablets */
-  .hr-employee-performance-modal {
-    width: 90vw;
-    max-width: 90vw;
-  }
-}
-
-/* Small screens (mobile) */
-@media (max-width: 767px) {
-  .hr-employee-performance-body-content-container {
-    padding: 0.75rem;
-    min-height: auto;
-  }
-  
-  .hr-employee-performance-scrollable {
-    padding: 1rem 0.75rem;
-  }
-  
-  /* Header and controls */
-  .hr-employee-performance-heading {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-  }
-  
-  .hr-employee-performance-heading h2 {
-    font-size: 1.4rem;
-  }
-  
-  .hr-employee-performance-right-controls {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-  }
-  
-  .hr-employee-performance-search-wrapper {
-    width: 100%;
-    margin-right: 0;
-  }
-  
-  .hr-employee-performance-search {
-    width: 100%;
-  }
-  
-  .hr-employee-performance-filter {
-    width: 100%;
-  }
-  
-  /* Table adjustments */
-  .hr-employee-performance-table-container {
-    max-height: none; /* Remove fixed height constraint on mobile */
-  }
-  
-  .hr-employee-performance-table-scrollable {
-    overflow-x: auto;
-  }
-  
-  .hr-employee-performance-table th,
-  .hr-employee-performance-table td {
-    padding: 0.6rem 0.75rem;
-  }
 }

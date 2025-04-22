@@ -6,30 +6,26 @@
 
 .repgen .body-content-container {
   width: 100%;
-  height: 100%; /* Or appropriate height based on layout */
+  height: 100%;
   border-radius: 0.5rem;
   background-color: white;
   padding: 1rem;
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
   min-width: 40rem;
+  min-height: 30rem;
   flex-grow: 1;
-  overflow: hidden; /* Prevent body scroll */
 }
 
 .repgen .welres-container {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Center vertically */
-  align-items: center; /* Center horizontally */
+  justify-content: center;
   color: #00A8A8;
-  /* margin-bottom: 100px; */ /* Remove or adjust margin if flex centering handles it */
-  flex-grow: 1; /* Allow it to take available space */
-  width: 100%;
-  height: 100%; /* Take full height of the container */
-  text-align: center; /* Ensure text within is centered if needed */
-  font-size: 24px; /* Added: Increase font size (adjust value as needed) */
+  margin-bottom: 100px;
 }
 
 .repgen .header-content-container {
@@ -65,9 +61,9 @@
 .repgen .sidebar-main-separator {
   flex-grow: 1;
   display: flex;
-  flex-direction: column; /* Stack navbar and main content */
+  flex-direction: column;
+  height: 100%;
   transition: width 0.3s ease-in-out;
-  overflow: hidden; /* Prevent this container from causing body scroll */
 }
 
 .repgen .sidebar-container.visible+.repgen .sidebar-main-separator {
@@ -161,11 +157,12 @@
 .repgen .main-content-container {
   display: flex;
   flex-direction: column;
-  width: 100%; /* Occupy full width of separator */
-  overflow: hidden; /* Prevent this container itself from scrolling */
-  flex-grow: 1; /* Take available vertical space */
-  position: relative; /* Needed if using absolute positioning inside */
-  box-sizing: border-box; /* Ensure padding/borders are included in width */
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 75%;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
 .repgen .textbar-container {
@@ -176,15 +173,12 @@
   padding-left: 10px;
   margin-left: 20px;
   margin-right: 20px;
-  width: calc(100% - 40px); /* Adjust width to account for margins */
+  width: 100%;
   height: auto;
   justify-content: space-between;
   border-radius: 15px;
   padding-top: 5px;
   padding-bottom: 10px;
-  box-sizing: border-box; /* Include padding in width calculation */
-  margin-top: auto; /* Push textbar to the bottom */
-  margin-bottom: 10px; /* Add some space at the very bottom */
 }
 
 .repgen .text-input {
@@ -238,102 +232,115 @@
   width: 100%;
   flex-direction: column;
   gap: 10px;
+  padding: 15px;
+  max-height: 400px;
+  overflow-y: auto;
   box-sizing: border-box;
-  flex-grow: 1; /* Allow chat history to take up space */
-  overflow-y: auto; /* Enable vertical scrolling for messages */
-  overflow-x: hidden; /* Prevent horizontal scrolling at this level */
-  padding: 20px; /* Or your desired padding */
-  padding-bottom: 80px; /* Adjust based on textbar height */
 }
 
 .repgen .chat-history::-webkit-scrollbar {
-   width: 8px; /* Example: Make scrollbar visible */
-}
-.repgen .chat-history::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-.repgen .chat-history::-webkit-scrollbar-thumb {
-    background: #00A8A8;
-    border-radius: 4px;
-}
-.repgen .chat-history::-webkit-scrollbar-thumb:hover {
-    background: #008080;
+  display: none;
 }
 
 .repgen .chat-message {
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 80%;
   word-wrap: break-word;
-  max-width: 100%; /* Prevent individual messages from causing overflow initially */
-  margin-bottom: 15px; /* Spacing between messages */
-  display: flex;
 }
 
 .repgen .chat-message.user {
-  justify-content: flex-end;
+  align-self: flex-end;
+  background-color: #F7F9FB;
+  text-align: right;
+  margin-left: auto;
+  margin-right: 10px;
 }
 
 .repgen .chat-message.bot {
-  justify-content: flex-start;
-}
-
-/* Add this new rule for the text part of the message */
-.repgen .message-text {
-  padding: 10px 15px;
-  border-radius: 15px;
-  background-color: #f0f0f0; /* Example background */
-  max-width: 80%; /* Limit width of message bubbles */
-  word-wrap: break-word; /* Wrap long text */
-  /* Add box-shadow or other styling */
+  align-self: flex-start;
+  margin-left: 10px;
+  margin-right: auto;
 }
 
 .repgen .chat-table-response {
+  border-radius: 8px;
   margin-top: 10px;
-  padding: 10px 15px;
-  border-radius: 15px;
-  max-width: 90%; /* Adjust as needed, maybe wider than text */
-  background-color: #e9ecef; /* Example bot table background */
-  word-wrap: break-word; /* Wrap intro text */
+  width: 100%; 
 }
 
-/* Add this new wrapper class */
-.repgen .table-scroll-wrapper {
-  overflow-x: auto; /* Enable horizontal scrolling ONLY for the table */
-  max-width: 100%; /* Ensure wrapper doesn't overflow the bubble */
-  margin-top: 10px; /* Space between intro text and table */
-  border-radius: 10px; /* Apply radius to wrapper if table has it */
-  overflow: hidden; /* Hide corners of table if needed */
+.repgen .res-head {
+  font-size: 15px;
+  color: #000000;
+  margin-bottom: 10px;
+}
+
+.repgen .res-foot {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000000;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.repgen .foot-cont {
+  font-size: 15px;
+  color: #000000;
+  margin-bottom: 10px;
+}
+
+.repgen .chat-table-response h3 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.repgen .chat-table-response h4 {
+  font-size: 18px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  color: #000000;
 }
 
 .repgen .chat-table {
-  width: 100%; /* Make table initially try to fit */
-  min-width: 600px; /* Example: Set a minimum width if needed, forcing scroll */
-  border-collapse: separate; /* Keep separate for border-radius */
+  width: 100%;
+  border-collapse: separate;
   border-spacing: 0;
+  margin-top: 5px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .repgen .chat-table th,
 .repgen .chat-table td {
-  border: 1px solid #dee2e6; /* Updated border color */
-  padding: 8px 12px; /* Updated padding */
+  border: 1px solid black;
+  padding: 8px;
   text-align: left;
-  white-space: nowrap; /* Prevent text wrapping within cells initially */
 }
 
 .repgen .chat-table th {
-  background-color: #00a8a8; /* Keep existing theme or use #f8f9fa */
+  background-color: #00a8a8;
   color: white;
-  font-weight: bold;
 }
 
 .repgen .chat-table td {
-  background-color: #E1FFF6; /* Keep existing theme or remove */
+  background-color: #E1FFF6;
 }
 
-.repgen .action-buttons {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  justify-content: flex-end; /* Align icons to the right */
-  padding-right: 5px; /* Optional padding */
+.repgen .chat-table thead tr:first-child th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.repgen .chat-table thead tr:first-child th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.repgen .chat-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+.repgen .chat-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
 }
 
 .repgen .srch-new-icon {
@@ -397,6 +404,12 @@
 .repgen .dl-icon-wrapper:hover .tooltip {
     visibility: visible;
     opacity: 1;
+}
+
+.repgen .action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .repgen .dl-icon-wrapper {
@@ -553,15 +566,4 @@
   .repgen .sidebar-icons-hamburger-container {
     display: block;
   }
-}
-
-.repgen .loading-message {
-  display: flex; /* Use flexbox for centering */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  flex-grow: 1; /* Allow it to take available space */
-  width: 100%;
-  height: 100%; /* Take full height of the container */
-  font-size: 16px; /* Adjust font size as needed */
-  color: #555; /* Adjust color as needed */
 }

@@ -681,75 +681,67 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                     <span className="font-light">DELIVERY NOTE</span>
                   </div>
                   <CustomerDetails data={data} />
-                  <div className="w-full">
-                    <table className=" text-sm font-light table-fixed border border-black border-collapse w-full">
+                  <div>
+                    <table className="w-full text-sm font-light table-auto border border-black border-collapse">
                       <thead className="bg-[#469fc2] border border-black">
                         <tr>
-                          <th className="whitespace-normal break-words border border-black text-white font-light text-start p-2">
+                          <th className="border border-black text-white font-light text-start p-2">
                             Salesperson
                           </th>
-                          <th className="whitespace-normal break-words border border-black text-white font-light text-start  p-2 text-sm">
-                            Order Fulfillment
-                          </th>
-                          <th className="whitespace-normal break-words border border-black text-white font-light text-start  p-2 text-sm">
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
                             Tracking No.
                           </th>
-                          <th className="whitespace-normal break-words border border-black text-white font-light text-start  p-2 text-sm">
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
                             Shipping Method
                           </th>
-                          <th className="whitespace-normal break-wordsborder border-black text-white font-light text-start  p-2 text-sm">
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
                             Payment Terms
                           </th>
-                          <th className="whitespace-normal break-wordsborder border-black text-white font-light text-start  p-2 text-sm">
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
                             Shipping Date
                           </th>
-                          <th className="whitespace-normal break-words border border-black text-white font-light text-start  p-2 text-sm">
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
                             Delivery Date
                           </th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr>
-                          <td className="whitespace-normal break-words border border-black text-black font-light text-start p-2">
-                            {`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}
-                          </td>
-                          <td className="whitespace-normal break-words border border-black text-black font-light text-start  p-2 text-sm">
-                            {data.order_fulfillment}
-                          </td>
-                          <td className="whitespace-normal break-words border border-black text-black font-light text-start  p-2 text-sm">
-                            {data.tracking_num || "-"}
-                          </td>
-                          <td className="whitespace-normal break-words border border-black text-black font-light text-start  p-2 text-sm">
-                            {data.shipping_method}
-                          </td>
-                          <td className="whitespace-normal break-words border border-black text-black font-light text-start  p-2 text-sm">
-                            30% Downpayment, 70% After Delivery
-                          </td>
-                          <td className="whitespace-normal break-words border border-black text-black font-light text-start  p-2 text-sm">
-                            {!data.shipping_date
-                              ? "-"
-                              : new Date(data.shipping_date).toLocaleDateString(
-                                  "en-GB",
-                                  {
-                                    day: "2-digit",
-                                    month: "long",
-                                    year: "numeric",
-                                  }
-                                )}
-                          </td>
-                          <td className="whitespace-normal break-words border border-black text-black font-light text-start  p-2 text-sm">
-                            {!data.actual_delivery_date
-                              ? "-"
-                              : new Date(
-                                  data.actual_delivery_date
-                                ).toLocaleDateString("en-GB", {
+                      <tr>
+                        <th className="border border-black text-black font-light text-start p-2">
+                          {`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.tracking_num || "-"}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.shipping_method}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          30% Downpayment, 70% After Delivery
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {!data.shipping_date
+                            ? "-"
+                            : new Date(data.shipping_date).toLocaleDateString(
+                                "en-GB",
+                                {
                                   day: "2-digit",
                                   month: "long",
                                   year: "numeric",
-                                })}
-                          </td>
-                        </tr>
-                      </tbody>
+                                }
+                              )}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {!data.actual_delivery_date
+                            ? "-"
+                            : new Date(
+                                data.actual_delivery_date
+                              ).toLocaleDateString("en-GB", {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              })}
+                        </th>
+                      </tr>
                     </table>
                   </div>
                   <div>
@@ -1145,7 +1137,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                       <div className="flex  justify-between">
                         <span className="font-bold ">Name: </span>
                         <span className="text-end">
-                          <u>{`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}</u>
+                          <u>{data.statement.customer.contact_person}</u>
                         </span>
                       </div>
                       <div className="flex justify-between">

@@ -80,45 +80,6 @@
   background:rgba(255,255,255,.35);
 }
 
-/* Today button and header adjustments */
-.hr-calendar-header-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.hr-calendar-today-btn {
-  background: rgba(255,255,255,.18);
-  border: none;
-  padding: 0.3rem 0.7rem;
-  border-radius: 4px;
-  color: #fff;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: .2s;
-}
-
-.hr-calendar-today-btn:hover {
-  background: rgba(255,255,255,.35);
-}
-
-/* Update the Today button to override the general button styles */
-.hr-calendar-header .hr-calendar-today-btn {
-  width: auto;
-  height: auto;
-  background: rgba(255,255,255,.18);
-  border: none;
-  padding: 0.3rem 0.7rem;
-  border-radius: 4px;
-  color: #fff;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: .2s;
-}
-
-.hr-calendar-header .hr-calendar-today-btn:hover {
-  background: rgba(255,255,255,.35);
-}
-
 /* ------------------------------------------------------------------- */
 /*  Grids                                                              */
 /* ------------------------------------------------------------------- */
@@ -163,20 +124,6 @@
   box-shadow:0 4px 12px rgba(0,0,0,.12);
 }
 
-/* Make the calendar cells more obviously clickable */
-.hr-calendar-cell:not(.empty) {
-  cursor: pointer;
-}
-
-/* Leave indicator on calendar */
-.hr-calendar-cell.has-leaves {
-  box-shadow: inset 0 -3px 0 rgba(0, 176, 181, 0.5);
-}
-
-.hr-calendar-cell.has-leaves:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,.12), inset 0 -3px 0 rgba(0, 176, 181, 0.5);
-}
-
 /* empty cells (prev/next month) */
 .hr-calendar-cell.empty{
   background:#fafafa;
@@ -204,14 +151,6 @@
   font-size:1rem;
   margin-top:2px;
   pointer-events:none;
-}
-
-.badge.leaves {
-  color: var(--primary);
-  font-size: 0.85rem;
-  position: absolute;
-  top: 4px;
-  right: 4px;
 }
 
 /* ------------------------------------------------------------------- */
@@ -265,186 +204,6 @@
   color:var(--holiday);
 }
 .name{color:var(--text-main)}
-
-/* ------------------------------------------------------------------- */
-/*  Modal styles                                                       */
-/* ------------------------------------------------------------------- */
-.hr-calendar-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  cursor: pointer;
-}
-
-.hr-calendar-modal {
-  background: white;
-  border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  width: 400px;
-  max-width: 90%;
-  cursor: default;
-  overflow: hidden;
-}
-
-.hr-calendar-modal-header {
-  background: linear-gradient(135deg,var(--primary),var(--primary-dark));
-  color: white;
-  padding: 1rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.hr-calendar-modal-header h4 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
-.hr-calendar-modal-close {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-}
-
-.hr-calendar-modal-content {
-  padding: 1.5rem;
-}
-
-.hr-calendar-modal-holiday, 
-.hr-calendar-modal-special {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  border-radius: 8px;
-}
-
-.hr-calendar-modal-holiday {
-  background: #ffecec;
-}
-
-.hr-calendar-modal-special {
-  background: #fff6e6;
-}
-
-.hr-calendar-modal-badge {
-  font-size: 1.5rem;
-  margin-right: 0.75rem;
-}
-
-.hr-calendar-modal-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.hr-calendar-modal-btn {
-  padding: 0.6rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-weight: 500;
-  cursor: pointer;
-  flex: 1;
-  transition: 0.2s;
-}
-
-.hr-calendar-modal-btn.attendance {
-  background: var(--primary);
-  color: white;
-}
-
-.hr-calendar-modal-btn.attendance:hover {
-  background: var(--primary-dark);
-}
-
-.hr-calendar-modal-btn.leaves {
-  background: #f0f0f0;
-  color: #333;
-}
-
-.hr-calendar-modal-btn.leaves:hover {
-  background: #e0e0e0;
-}
-
-/* Leave details in modal */
-.hr-calendar-modal-leaves {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-}
-
-.hr-calendar-modal-leaves h5 {
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
-}
-
-.hr-calendar-modal-leaves ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.hr-calendar-modal-leaves li {
-  padding: 0.5rem;
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 0.9rem;
-}
-
-.hr-calendar-modal-leaves li:last-child {
-  border-bottom: none;
-}
-
-.hr-calendar-modal-leaves .leave-type {
-  font-weight: 500;
-  padding: 0.1rem 0.4rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-}
-
-/* Match the leave type colors from the HumanResources.css */
-.leave-type.sick {
-  background-color: #d1e7dd;
-  color: #0f5132;
-}
-
-.leave-type.vacation {
-  background-color: #cfe2ff;
-  color: #084298;
-}
-
-.leave-type.personal {
-  background-color: #e2e3e5;
-  color: #343a40;
-}
-
-.leave-type.maternity,
-.leave-type.paternity {
-  background-color: #f8d7da;
-  color: #842029;
-}
-
-.leave-type.unpaid {
-  background-color: #fff3cd;
-  color: #664d03;
-}
-
-.leave-emoji {
-  margin-right: 0.5rem;
-  font-size: 1rem;
-}
 
 /* ------------------------------------------------------------------- */
 /*  Responsive tweaks                                                  */

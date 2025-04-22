@@ -19,7 +19,7 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
     const fetchPurchaseOrder = async () => {
       try {
         const response = await axios.get(
-          `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/`
+          `http://127.0.0.1:8000/api/purchase-orders/list/`
         );
         const order = response.data.find(
           po => po.purchase_id === purchaseOrder.purchase_id
@@ -89,7 +89,7 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
   const submitChanges = async (changedFields) => {
     try {
       const response = await axios.patch(
-        `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/edit/${purchaseOrder.purchase_id}/`,
+        `http://127.0.0.1:8000/api/purchase-orders/edit/${purchaseOrder.purchase_id}/`,
         changedFields,
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -107,7 +107,7 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
 
         try {
           const shipmentResponse = await axios.post(
-            "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/create/",
+            "http://127.0.0.1:8000/api/received-shipment/create/",
             shipmentPayload,
             { headers: { 'Content-Type': 'application/json' } }
           );
@@ -161,8 +161,7 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
         )}
         <form onSubmit={handleSubmit}>
           <div className="po-edit-form-group">
-            <div className="label-req">
-            <label>Status</label></div>
+            <label>Status</label>
             <select
               name="status"
               value={formData.status}
@@ -179,8 +178,7 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
             </select>
           </div>
           <div className="po-edit-form-group">
-            <div className="label-req">
-            <label>Delivery Date</label></div>
+            <label>Delivery Date</label>
             <input
               type="date"
               name="delivery_date"

@@ -15,7 +15,8 @@
   box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
-  min-width: unset; /* Remove fixed min-width */
+  min-width: 40rem;
+  min-height: 30rem;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -56,6 +57,7 @@
   font-size: 1.75rem;
 }
 
+/* Main container for header, tabs + table */
 .hr-leave-requests-table-container {
   background-color: white;
   border-radius: 8px;
@@ -66,9 +68,11 @@
   margin-bottom: 1rem;
 }
 
+/* Header containing tabs */
 .hr-leave-requests-header {
   position: sticky;
   top: 0;
+  z-index: 10;
   background-color: white;
   margin: 1rem 0;
   border-top: 1px solid #e4e4e4;
@@ -78,6 +82,7 @@
   align-items: center;
 }
 
+/* Tabs */
 .hr-leave-requests-tabs {
   display: flex;
   gap: 1.25rem;
@@ -107,6 +112,7 @@
   margin-left: 6px;
 }
 
+/* Right-side controls */
 .hr-leave-requests-right-controls {
   display: flex;
   align-items: center;
@@ -115,6 +121,7 @@
   justify-content: flex-end;
 }
 
+/* Search wrapper and input */
 .hr-leave-requests-search-wrapper {
   position: relative;
   margin-right: 0.5rem;
@@ -138,6 +145,7 @@
   font-size: 0.95rem;
 }
 
+/* Add hover and focus effects for the search bar */
 .hr-leave-requests-search:hover {
   border-color: #00b0b5;
 }
@@ -148,6 +156,7 @@
   box-shadow: 0 0 0 2px rgba(0, 176, 181, 0.1);
 }
 
+/* Filter dropdown */
 .hr-leave-requests-filter {
   height: 36px;
   min-width: 200px;
@@ -174,10 +183,12 @@
   padding: 8px;
 }
 
+/* Table section */
 .hr-leave-requests-table-content {
   overflow: auto;
 }
 
+/* Table wrapper and scrollable */
 .hr-leave-requests-table-wrapper {
   border: 1px solid #eee;
   border-radius: 8px;
@@ -213,12 +224,14 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
+  min-width: 1400px;
 }
 
 .hr-leave-requests-table thead th {
   position: sticky;
   top: 0;
   background-color: #f3f9fa;
+  /* z-index: 10; */
   border-bottom: 1px solid #eee;
 }
 
@@ -230,6 +243,7 @@
   white-space: nowrap;
 }
 
+/* Add and Archive buttons */
 .hr-leave-requests-add-btn,
 .hr-leave-requests-archive-btn {
   background-color: teal;
@@ -256,6 +270,7 @@
   background-color: #4B5563;
 }
 
+/* Pagination */
 .hr-leave-requests-pagination {
   display: flex;
   align-items: center;
@@ -268,6 +283,7 @@
   max-width: 100%;
 }
 
+/* Pagination numbers container */
 .hr-leave-requests-pagination-numbers {
   display: flex;
   flex-wrap: wrap;
@@ -298,53 +314,29 @@
   border: 1px solid #ccc;
 }
 
-.hr-leave-requests-pagination button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.hr-leave-requests-pagination button:hover:not(.active):not(:disabled) {
-  background-color: #f0f0f0;
-}
-
-.hr-leave-requests-pagination-arrow {
-  font-weight: bold;
-  min-width: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hr-leave-requests-pagination-ellipsis {
-  padding: 0.4rem;
-  color: #666;
-}
-
+/* Toast notification */
 .hr-leave-requests-toast {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  min-width: 250px;
-  padding: 15px 20px;
-  border-radius: 4px;
   color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  padding: 12px 24px;
+  border-radius: 4px;
   z-index: 1000;
-  animation: toast-slide-in 0.3s ease-out;
-  max-width: 80%;
+  animation: slideIn 0.5s, fadeOut 0.5s 2.5s forwards;
 }
 
-@keyframes toast-slide-in {
-  from {
-    transform: translateY(100px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }
 
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* No results message */
 .hr-leave-requests-no-results {
   text-align: center;
   font-style: italic;
@@ -352,11 +344,13 @@
   color: #888;
 }
 
+/* Archived row styling */
 .hr-leave-requests-archived-row {
   background-color: #f9fafb;
   color: #6B7280;
 }
 
+/* Tag styles */
 .hr-tag {
   padding: 0.3rem 0.6rem;
   border-radius: 1rem;
@@ -366,6 +360,7 @@
   text-align: center;
 }
 
+/* Leave Types */
 .hr-tag.sick {
   background-color: #d1e7dd;
   color: #0f5132;
@@ -392,6 +387,7 @@
   color: #664d03;
 }
 
+/* Is Paid */
 .hr-tag.yes {
   background-color: #d1e7dd;
   color: #0f5132;
@@ -402,6 +398,7 @@
   color: #842029;
 }
 
+/* Status */
 .hr-tag.pending {
   background-color: #fff3cd;
   color: #664d03;
@@ -432,6 +429,7 @@
   color: #343a40;
 }
 
+/* Total Days Tags */
 .hr-tag.short-leave {
   background-color: #e6f7ff;
   color: #0077cc;
@@ -447,6 +445,7 @@
   color: #52c41a;
 }
 
+/* Leave Balance Tags */
 .hr-tag.high-leave {
   background-color: #d1e7dd;
   color: #0f5132; /* Green - Good amount */
@@ -462,6 +461,7 @@
   color: #842029; /* Red - Low amount */
 }
 
+/* Unpaid Leave Tags (inverted scale) */
 .hr-tag.low-unpaid {
   background-color: #d1e7dd;
   color: #0f5132; /* Green - Low unpaid is good */
@@ -477,6 +477,7 @@
   color: #842029; /* Red - High unpaid is concerning */
 }
 
+/* Dots dropdown */
 .leave-requests-actions {
   position: relative;
   cursor: pointer;
@@ -512,6 +513,7 @@
   background-color: #f5f5f5;
 }
 
+/* Modal styles */
 .leave-requests-modal-overlay {
   position: fixed;
   top: 0;
@@ -530,9 +532,6 @@
   padding: 2rem;
   border-radius: 8px;
   min-width: 500px;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
 }
 
 .leave-requests-modal h3 {
@@ -609,6 +608,214 @@
   background-color: #d1d5db;
 }
 
+/* Container and Layout */
+.hr-employee {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.hr-employee-body-content-container {
+  width: 100%;
+  height: 38.1rem;
+  max-width: 1222px;
+  margin: 0 auto;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+  min-height: 30rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.hr-employee-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.hr-employee-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.hr-employee-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+/* Table Container */
+.hr-department-table-container {
+  background-color: white;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  max-height: calc(100vh - 250px);
+}
+
+.hr-department-table-wrapper {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 400px);
+}
+
+.hr-department-table-scrollable {
+  width: 100%;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.hr-department-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  min-width: 1400px;
+}
+
+.hr-department-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #f3f9fa;
+  /* z-index: 5; */
+}
+
+.hr-department-table th,
+.hr-department-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Scrollbar Styling */
+.hr-department-table-scrollable::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-department-table-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-department-table-scrollable::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Pagination */
+.hr-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 1rem;
+  gap: 0.5rem;
+  background-color: white;
+  border-radius: 0 0 8px 8px;
+}
+
+.hr-pagination button {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.hr-pagination button.active {
+  background-color: #00b0b5;
+  color: white;
+  border-color: #00b0b5;
+}
+
+.hr-pagination-size {
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Modal Styling */
+.hr-department-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.hr-department-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  min-width: 500px;
+}
+
+.hr-department-modal h3 {
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.hr-department-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hr-department-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.submit-btn,
+.cancel-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-btn {
+  background-color: #00b0b5;
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #009ba0;
+}
+
+.cancel-btn {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.cancel-btn:hover {
+  background-color: #d1d5db;
+}
+
+/* Add this to your CSS file */
 .leave-requests-form-two-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -622,11 +829,14 @@
   gap: 1rem;
 }
 
+/* Responsive adjustment */
 @media (max-width: 768px) {
   .leave-requests-form-two-columns {
     grid-template-columns: 1fr;
   }
 }
+
+/* Add this to your LeaveRequests.css file */
 
 .leave-balance-info {
   margin-top: 15px;
@@ -660,6 +870,40 @@
   color: #f44336; /* Red error color */
 }
 
+/* Toast notification improvements */
+.hr-leave-requests-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  min-width: 250px;
+  padding: 15px 20px;
+  border-radius: 4px;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  animation: toast-slide-in 0.3s ease-out;
+  max-width: 80%;
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Improve the modal for better readability */
+.leave-requests-modal {
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Make the form elements more user-friendly */
 .form-group select,
 .form-group input[type="date"] {
   width: 100%;
@@ -676,281 +920,8 @@
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
 
+/* Checkbox styling for better visibility */
 .form-group input[type="checkbox"] {
   transform: scale(1.2);
   margin-left: 5px;
-}
-
-/* ---------------------------------------------------------
-   RESPONSIVE DESIGN
-   --------------------------------------------------------- */
-
-@media (min-width: 1200px) {
-  .hr-leave-requests-body-content-container {
-    padding: 1.5rem;
-  }
-  
-  .hr-leave-requests-scrollable {
-    padding: 1.75rem;
-  }
-  
-  .hr-leave-requests-table {
-    min-width: 1400px; /* Only force min-width on large screens */
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1199px) {
-  .hr-leave-requests-scrollable {
-    padding: 1.25rem;
-  }
-  
-  .hr-leave-requests-heading {
-    margin-bottom: 1.25rem;
-  }
-  
-  .hr-leave-requests-heading h2 {
-    font-size: 1.5rem;
-  }
-  
-  .hr-leave-requests-right-controls {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .hr-leave-requests-search {
-    width: 200px;
-  }
-  
-  .hr-leave-requests-filter {
-    min-width: 150px;
-  }
-  
-  .hr-leave-requests-table-container {
-    max-height: calc(100vh - 200px);
-  }
-  
-  .leave-requests-form-two-columns {
-    gap: 1.25rem;
-  }
-  
-  .leave-requests-modal {
-    width: 90vw;
-    max-width: 90vw;
-  }
-}
-
-@media (max-width: 767px) {
-  .hr-leave-requests-body-content-container {
-    padding: 0.75rem;
-    min-height: auto;
-  }
-  
-  .hr-leave-requests-scrollable {
-    padding: 1rem 0.75rem;
-  }
-  
-  .hr-leave-requests-heading {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-  }
-  
-  .hr-leave-requests-heading h2 {
-    font-size: 1.4rem;
-  }
-  
-  .hr-leave-requests-right-controls {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-  }
-  
-  .hr-leave-requests-search-wrapper {
-    width: 100%;
-    margin-right: 0;
-  }
-  
-  .hr-leave-requests-search {
-    width: 100%;
-  }
-  
-  .hr-leave-requests-filter {
-    width: 100%;
-  }
-  
-  .hr-leave-requests-add-btn,
-  .hr-leave-requests-archive-btn {
-    width: 100%;
-    padding: 0.75rem;
-  }
-  
-  .hr-leave-requests-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding-bottom: 0.5rem;
-  }
-  
-  .hr-leave-requests-tabs {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-  }
-  
-  .hr-leave-requests-tabs button {
-    font-size: 0.9rem;
-    padding: 0.5rem 0.25rem;
-    white-space: nowrap;
-  }
-  
-  .hr-leave-requests-table-container {
-    max-height: none; /* Remove fixed height constraint on mobile */
-  }
-  
-  .hr-leave-requests-table-scrollable {
-    overflow-x: auto;
-  }
-  
-  .hr-leave-requests-table th,
-  .hr-leave-requests-table td {
-    padding: 0.6rem 0.75rem;
-    font-size: 0.85rem;
-  }
-  
-  .hr-leave-requests-pagination {
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 0.75rem;
-  }
-  
-  .hr-leave-requests-pagination-numbers {
-    width: 100%;
-    max-width: 100%;
-    margin-right: 0;
-  }
-  
-  .hr-leave-requests-pagination button {
-    min-width: 36px;
-    padding: 0.35rem 0.6rem;
-  }
-  
-  .leave-requests-modal {
-    width: 95vw;
-    max-width: 95vw;
-    padding: 1.25rem;
-    max-height: 85vh;
-  }
-  
-  .leave-requests-modal-form {
-    padding-right: 0.5rem;
-    gap: 1rem;
-  }
-  
-  .leave-requests-form-two-columns {
-    grid-template-columns: 1fr; /* Single column on mobile */
-    gap: 1rem;
-  }
-  
-  .leave-requests-modal-buttons {
-    flex-direction: column-reverse; /* Place primary button on top */
-    width: 100%;
-    gap: 0.5rem;
-  }
-  
-  .submit-btn,
-  .cancel-btn {
-    width: 100%;
-    margin-left: 0;
-  }
-  
-  .leave-balance-info {
-    padding: 8px;
-  }
-  
-  .hr-tag {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.7rem;
-  }
-  
-  .leave-requests-dropdown {
-    right: 0;
-    width: 160px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hr-leave-requests-body-content-container {
-    padding: 0.5rem;
-  }
-  
-  .hr-leave-requests-scrollable {
-    padding: 0.75rem 0.5rem;
-  }
-  
-  .hr-leave-requests-heading h2 {
-    font-size: 1.25rem;
-  }
-  
-  .leave-requests-modal {
-    padding: 1rem;
-  }
-  
-  .hr-leave-requests-table th,
-  .hr-leave-requests-table td {
-    padding: 0.5rem;
-    font-size: 0.8rem;
-  }
-  
-  .hr-leave-requests-toast {
-    min-width: auto;
-    max-width: 90%;
-    font-size: 0.85rem;
-    padding: 12px 16px;
-  }
-  
-  .leave-requests-dropdown {
-    width: 140px;
-  }
-}
-
-@media (hover: hover) {
-  .hr-leave-requests-table-scrollable::-webkit-scrollbar,
-  .leave-requests-modal::-webkit-scrollbar,
-  .hr-leave-requests-scrollable::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-}
-
-@media print {
-  .hr-leave-requests-add-btn,
-  .hr-leave-requests-archive-btn,
-  .hr-leave-requests-filter,
-  .hr-leave-requests-search-wrapper,
-  .leave-requests-actions,
-  .hr-leave-requests-pagination {
-    display: none;
-  }
-  
-  .hr-leave-requests-body-content-container {
-    box-shadow: none;
-  }
-  
-  .hr-leave-requests-table {
-    min-width: 100%;
-  }
-  
-  .hr-leave-requests-table-container,
-  .hr-leave-requests-table-scrollable {
-    max-height: none;
-    overflow: visible;
-  }
-  
-  .hr-tag {
-    border: 1px solid #ddd;
-    background-color: transparent !important;
-    color: #333 !important;
-  }
 }

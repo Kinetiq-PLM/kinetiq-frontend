@@ -48,7 +48,7 @@ const EmployeePerformance = () => {
   const fetchPerformanceData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_performance/employee_performance/");
+      const res = await axios.get("http://127.0.0.1:8000/api/employee_performance/employee_performance/");
       setPerformanceData(res.data);
     } catch (err) {
       console.error("Failed to fetch performance data:", err);
@@ -117,7 +117,7 @@ const EmployeePerformance = () => {
       
       // Send the request with the correct data format
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employee_performance/employee_performance/${selectedPerformance.performance_id}/`,
+        `http://127.0.0.1:8000/api/employee_performance/employee_performance/${selectedPerformance.performance_id}/`,
         { rating: ratingValue }
       );
       
@@ -218,116 +218,15 @@ const EmployeePerformance = () => {
   
         {/* Pagination moved outside */}
         <div className="hr-employee-performance-pagination">
-          <button 
-            className="hr-employee-performance-pagination-arrow" 
-            onClick={() => setCurrentPage(1)} 
-            disabled={currentPage === 1}
-          >
-            &#171; {/* Double left arrow */}
-          </button>
-          
-          <button 
-            className="hr-employee-performance-pagination-arrow" 
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-            disabled={currentPage === 1}
-          >
-            &#8249; {/* Single left arrow */}
-          </button>
-          
-          <div className="hr-employee-performance-pagination-numbers">
-            {(() => {
-              const pageNumbers = [];
-              const maxVisiblePages = 5;
-              
-              if (totalPages <= maxVisiblePages + 2) {
-                // Show all pages if there are few
-                for (let i = 1; i <= totalPages; i++) {
-                  pageNumbers.push(
-                    <button
-                      key={i}
-                      className={i === currentPage ? "active" : ""}
-                      onClick={() => setCurrentPage(i)}
-                    >
-                      {i}
-                    </button>
-                  );
-                }
-              } else {
-                // Always show first page
-                pageNumbers.push(
-                  <button
-                    key={1}
-                    className={1 === currentPage ? "active" : ""}
-                    onClick={() => setCurrentPage(1)}
-                  >
-                    1
-                  </button>
-                );
-                
-                // Calculate range around current page
-                let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
-                let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
-                
-                // Adjust if we're near the end
-                if (endPage - startPage < maxVisiblePages - 1) {
-                  startPage = Math.max(2, endPage - maxVisiblePages + 1);
-                }
-                
-                // Add ellipsis after first page if needed
-                if (startPage > 2) {
-                  pageNumbers.push(<span key="ellipsis1" className="hr-employee-performance-pagination-ellipsis">...</span>);
-                }
-                
-                // Add middle pages
-                for (let i = startPage; i <= endPage; i++) {
-                  pageNumbers.push(
-                    <button
-                      key={i}
-                      className={i === currentPage ? "active" : ""}
-                      onClick={() => setCurrentPage(i)}
-                    >
-                      {i}
-                    </button>
-                  );
-                }
-                
-                // Add ellipsis before last page if needed
-                if (endPage < totalPages - 1) {
-                  pageNumbers.push(<span key="ellipsis2" className="hr-employee-performance-pagination-ellipsis">...</span>);
-                }
-                
-                // Always show last page
-                pageNumbers.push(
-                  <button
-                    key={totalPages}
-                    className={totalPages === currentPage ? "active" : ""}
-                    onClick={() => setCurrentPage(totalPages)}
-                  >
-                    {totalPages}
-                  </button>
-                );
-              }
-              
-              return pageNumbers;
-            })()}
-          </div>
-          
-          <button 
-            className="hr-employee-performance-pagination-arrow" 
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
-            disabled={currentPage === totalPages}
-          >
-            &#8250; {/* Single right arrow */}
-          </button>
-          
-          <button 
-            className="hr-employee-performance-pagination-arrow" 
-            onClick={() => setCurrentPage(totalPages)} 
-            disabled={currentPage === totalPages}
-          >
-            &#187; {/* Double right arrow */}
-          </button>
-          
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              className={i + 1 === currentPage ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
           <select
             className="hr-employee-performance-pagination-size"
             value={itemsPerPage}

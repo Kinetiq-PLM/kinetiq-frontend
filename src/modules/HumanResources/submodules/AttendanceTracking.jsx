@@ -34,7 +34,7 @@ const AttendanceTracking = () => {
   const fetchAttendance = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/attendance_tracking/attendance_tracking/");
+      const res = await axios.get("http://127.0.0.1:8000/api/attendance_tracking/attendance_tracking/");
       setAttendanceData(res.data);
     } catch (err) {
       console.error("Failed to fetch attendance:", err);
@@ -47,7 +47,7 @@ const AttendanceTracking = () => {
   const fetchCalendarDates = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/calendar_dates/calendar_dates/");
+      const res = await axios.get("http://127.0.0.1:8000/api/calendar_dates/calendar_dates/");
       setCalendarDatesData(res.data);
     } catch (err) {
       console.error("Failed to fetch calendar dates:", err);
@@ -64,17 +64,6 @@ const AttendanceTracking = () => {
       fetchCalendarDates();
     }
   }, [activeTab]);
-
-  useEffect(() => {
-    // Check if there's a selected date in sessionStorage
-    const selectedDate = sessionStorage.getItem('selectedDate');
-    if (selectedDate) {
-      // Use the date to filter the table or navigate to that date
-      setSearchTerm(selectedDate);
-      // Clear it after use
-      sessionStorage.removeItem('selectedDate');
-    }
-  }, []);
 
   /******************************************
    * 2) Searching + Debounce
@@ -175,11 +164,7 @@ const AttendanceTracking = () => {
                     </td>
                     <td>{att.late_hours}</td>
                     <td>{att.undertime_hours}</td>
-                    <td>
-                      <span className={`hr-attendance-tag holiday-${att.is_holiday ? "yes" : "no"}`}>
-                        {att.is_holiday ? "Yes" : "No"}
-                      </span>
-                    </td>
+                    <td>{att.is_holiday ? "Yes" : "No"}</td>
                     <td>{att.created_at}</td>
                     <td>{att.updated_at}</td>
                   </tr>
@@ -222,17 +207,17 @@ const AttendanceTracking = () => {
                   <tr key={date.date || index}>
                     <td>{date.date}</td>
                     <td>
-                      <span className={`hr-attendance-tag workday-${date.is_workday ? "yes" : "no"}`}>
+                      <span className={`hr-attendance-tag workday ${date.is_workday ? "yes" : "no"}`}>
                         {date.is_workday ? "Yes" : "No"}
                       </span>
                     </td>
                     <td>
-                      <span className={`hr-attendance-tag holiday-${date.is_holiday ? "yes" : "no"}`}>
+                      <span className={`hr-attendance-tag holiday ${date.is_holiday ? "yes" : "no"}`}>
                         {date.is_holiday ? "Yes" : "No"}
                       </span>
                     </td>
                     <td>
-                      <span className={`hr-attendance-tag special-${date.is_special ? "yes" : "no"}`}>
+                      <span className={`hr-attendance-tag special ${date.is_special ? "yes" : "no"}`}>
                         {date.is_special ? "Yes" : "No"}
                       </span>
                     </td>
@@ -251,116 +236,17 @@ const AttendanceTracking = () => {
   // Shared pagination component for both tables
   const renderPagination = (totalPages) => (
     <div className="hr-attendance-pagination">
-      <button 
-        className="hr-attendance-pagination-arrow" 
-        onClick={() => setCurrentPage(1)} 
-        disabled={currentPage === 1}
-      >
-        &#171; {/* Double left arrow */}
-      </button>
-      
-      <button 
-        className="hr-attendance-pagination-arrow" 
-        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-        disabled={currentPage === 1}
-      >
-        &#8249; {/* Single left arrow */}
-      </button>
-      
       <div className="hr-attendance-pagination-numbers">
-        {(() => {
-          const pageNumbers = [];
-          const maxVisiblePages = 5;
-          
-          if (totalPages <= maxVisiblePages + 2) {
-            // Show all pages if there are few
-            for (let i = 1; i <= totalPages; i++) {
-              pageNumbers.push(
-                <button
-                  key={i}
-                  className={i === currentPage ? "active" : ""}
-                  onClick={() => setCurrentPage(i)}
-                >
-                  {i}
-                </button>
-              );
-            }
-          } else {
-            // Always show first page
-            pageNumbers.push(
-              <button
-                key={1}
-                className={1 === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(1)}
-              >
-                1
-              </button>
-            );
-            
-            // Calculate range around current page
-            let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
-            
-            // Adjust if we're near the end
-            if (endPage - startPage < maxVisiblePages - 1) {
-              startPage = Math.max(2, endPage - maxVisiblePages + 1);
-            }
-            
-            // Add ellipsis after first page if needed
-            if (startPage > 2) {
-              pageNumbers.push(<span key="ellipsis1" className="hr-attendance-pagination-ellipsis">...</span>);
-            }
-            
-            // Add middle pages
-            for (let i = startPage; i <= endPage; i++) {
-              pageNumbers.push(
-                <button
-                  key={i}
-                  className={i === currentPage ? "active" : ""}
-                  onClick={() => setCurrentPage(i)}
-                >
-                  {i}
-                </button>
-              );
-            }
-            
-            // Add ellipsis before last page if needed
-            if (endPage < totalPages - 1) {
-              pageNumbers.push(<span key="ellipsis2" className="hr-attendance-pagination-ellipsis">...</span>);
-            }
-            
-            // Always show last page
-            pageNumbers.push(
-              <button
-                key={totalPages}
-                className={totalPages === currentPage ? "active" : ""}
-                onClick={() => setCurrentPage(totalPages)}
-              >
-                {totalPages}
-              </button>
-            );
-          }
-          
-          return pageNumbers;
-        })()}
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            className={i + 1 === currentPage ? "active" : ""}
+            onClick={() => setCurrentPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
       </div>
-      
-      <button 
-        className="hr-attendance-pagination-arrow" 
-        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
-        disabled={currentPage === totalPages}
-      >
-        &#8250; {/* Single right arrow */}
-      </button>
-      
-      <button 
-        className="hr-attendance-pagination-arrow" 
-        onClick={() => setCurrentPage(totalPages)} 
-        disabled={currentPage === totalPages}
-      >
-        &#187; {/* Double right arrow */}
-      </button>
-      
       <select
         className="hr-attendance-pagination-size"
         value={itemsPerPage}

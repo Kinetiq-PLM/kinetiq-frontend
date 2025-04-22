@@ -53,7 +53,7 @@
   top: 0;
   background-color: #00a8a8; 
   color: white;
-  z-index: 0;
+  z-index: 3;
 }
 
 .servrequ thead {

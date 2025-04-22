@@ -38,7 +38,6 @@ const BodyContent = ({
           setActiveSubModule={setActiveSubModule}
           setIsDocumentModalOpen={setIsDocumentModalOpen}
           setDocument={setDocument}
-          employee_id={employee_id}
         />
       ),
     },
@@ -50,7 +49,6 @@ const BodyContent = ({
           setActiveSubModule={setActiveSubModule}
           setIsDocumentModalOpen={setIsDocumentModalOpen}
           setDocument={setDocument}
-          employee_id={employee_id}
         />
       ),
     },
@@ -62,7 +60,6 @@ const BodyContent = ({
           setActiveSubModule={setActiveSubModule}
           setIsDocumentModalOpen={setIsDocumentModalOpen}
           setDocument={setDocument}
-          employee_id={employee_id}
         />
       ),
     },
@@ -74,7 +71,6 @@ const BodyContent = ({
           setActiveSubModule={setActiveSubModule}
           setIsDocumentModalOpen={setIsDocumentModalOpen}
           setDocument={setDocument}
-          employee_id={employee_id}
         />
       ),
     },
@@ -87,7 +83,6 @@ const BodyContent = ({
           setIsQuotationListOpen={setIsQuotationListOpen}
           setIsDocumentModalOpen={setIsDocumentModalOpen}
           setDocument={setDocument}
-          employee_id={employee_id}
         />
       ),
     },

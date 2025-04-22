@@ -15,7 +15,6 @@ export default function InvoicesTab({
   setActiveSubModule,
   setIsDocumentModalOpen,
   setDocument,
-  employee_id,
 }) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
@@ -40,7 +39,7 @@ export default function InvoicesTab({
   const [invoiceList, setInvoiceList] = useState([]);
   const invoiceQuery = useQuery({
     queryKey: ["invoices"],
-    queryFn: async () => await GET(`sales/invoice?salesrep=${employee_id}`),
+    queryFn: async () => await GET("sales/invoice"),
     retry: 2,
   });
 

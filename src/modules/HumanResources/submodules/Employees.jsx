@@ -17,9 +17,6 @@ const Employees = () => {
   const [showEditEmployeeModal, setShowEditEmployeeModal] = useState(false);
   const [showConfirmUnarchiveEmployee, setShowConfirmUnarchiveEmployee] = useState(null);
 
-  // Add this to your component's JavaScript
-  const [activeModalTab, setActiveModalTab] = useState(0);
-
   // The new employee to add
   const [newEmployee, setNewEmployee] = useState({
     user_id: "", // Auto-generated
@@ -86,334 +83,41 @@ const Employees = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const switchModalTab = (tabIndex) => {
-    setActiveModalTab(tabIndex);
-    
-    // Get all tab buttons and sections
-    const tabButtons = document.querySelectorAll('.hr-employee-modal-tabs button');
-    const tabSections = document.querySelectorAll('.hr-employee-modal-section');
-    
-    // Remove active class from all
-    tabButtons.forEach(btn => btn.classList.remove('active'));
-    tabSections.forEach(section => section.classList.remove('active'));
-    
-    // Add active class to selected tab and section
-    tabButtons[tabIndex].classList.add('active');
-    tabSections[tabIndex].classList.add('active');
-  };
-
-  // SALARY_GRADE_TABLE constant
-
-  const DAILY_RATE_TABLE = {
-    "DR-1-1": [500, 600],
-    "DR-1-2": [600, 700],
-
-    "DR-2-1": [700, 800],
-    "DR-2-2": [800, 900],
-
-    "DR-3-1": [900, 1100],
-    "DR-3-2": [1100, 1300],
-
-    "DR-4-1": [1300, 1500],
-    "DR-4-2": [1500, 1700],
-
-    "DR-5-1": [1700, 1850],
-    "DR-5-2": [1850, 2000]
-  };
-
   const SALARY_GRADE_TABLE = {
-    "SG-1-1":  [14061, 14164],
-    "SG-1-2":  [14164, 14278],
-    "SG-1-3":  [14278, 14393],
-    "SG-1-4":  [14393, 14509],
-    "SG-1-5":  [14509, 14626],
-    "SG-1-6":  [14626, 14743],
-    "SG-1-7":  [14743, 14862],
-    "SG-1-8":  [14862],
-  
-    "SG-2-1":  [14863, 15035],
-    "SG-2-2":  [15035, 15146],
-    "SG-2-3":  [15146, 15258],
-    "SG-2-4":  [15258, 15371],
-    "SG-2-5":  [15371, 15484],
-    "SG-2-6":  [15484, 15599],
-    "SG-2-7":  [15599, 15714],
-    "SG-2-8":  [15714],
-  
-    "SG-3-1":  [15715, 15971],
-    "SG-3-2":  [15971, 16088],
-    "SG-3-3":  [16088, 16208],
-    "SG-3-4":  [16208, 16329],
-    "SG-3-5":  [16329, 16448],
-    "SG-3-6":  [16448, 16571],
-    "SG-3-7":  [16571, 16693],
-    "SG-3-8":  [16693],
-  
-    "SG-4-1":  [16694, 16958],
-    "SG-4-2":  [16958, 17084],
-    "SG-4-3":  [17084, 17209],
-    "SG-4-4":  [17209, 17337],
-    "SG-4-5":  [17337, 17464],
-    "SG-4-6":  [17464, 17594],
-    "SG-4-7":  [17594, 17724],
-    "SG-4-8":  [17724],
-  
-    "SG-5-1":  [17725, 18000],
-    "SG-5-2":  [18000, 18133],
-    "SG-5-3":  [18133, 18267],
-    "SG-5-4":  [18267, 18401],
-    "SG-5-5":  [18401, 18538],
-    "SG-5-6":  [18538, 18676],
-    "SG-5-7":  [18676, 18813],
-    "SG-5-8":  [18813],
-  
-    "SG-6-1":  [18814, 19098],
-    "SG-6-2":  [19098, 19239],
-    "SG-6-3":  [19239, 19383],
-    "SG-6-4":  [19383, 19526],
-    "SG-6-5":  [19526, 19670],
-    "SG-6-6":  [19670, 19816],
-    "SG-6-7":  [19816, 19963],
-    "SG-6-8":  [19963],
-  
-    "SG-7-1":  [19964, 20258],
-    "SG-7-2":  [20258, 20408],
-    "SG-7-3":  [20408, 20560],
-    "SG-7-4":  [20560, 20711],
-    "SG-7-5":  [20711, 20865],
-    "SG-7-6":  [20865, 21019],
-    "SG-7-7":  [21019, 21175],
-    "SG-7-8":  [21175],
-  
-    "SG-8-1":  [21176, 21642],
-    "SG-8-2":  [21642, 21839],
-    "SG-8-3":  [21839, 22035],
-    "SG-8-4":  [22035, 22234],
-    "SG-8-5":  [22234, 22435],
-    "SG-8-6":  [22435, 22638],
-    "SG-8-7":  [22638, 22843],
-    "SG-8-8":  [22843],
-  
-    "SG-9-1":  [22844, 23411],
-    "SG-9-2":  [23411, 23599],
-    "SG-9-3":  [23599, 23788],
-    "SG-9-4":  [23788, 23978],
-    "SG-9-5":  [23978, 24170],
-    "SG-9-6":  [24170, 24364],
-    "SG-9-7":  [24364, 24558],
-    "SG-9-8":  [24558],
-  
-    "SG-10-1": [24559, 25790],
-    "SG-10-2": [25790, 25996],
-    "SG-10-3": [25996, 26203],
-    "SG-10-4": [26203, 26412],
-    "SG-10-5": [26412, 26623],
-    "SG-10-6": [26623, 26835],
-    "SG-10-7": [26835, 27050],
-    "SG-10-8": [27050],
-  
-    "SG-11-1": [27051, 30308],
-    "SG-11-2": [30308, 30597],
-    "SG-11-3": [30597, 30889],
-    "SG-11-4": [30889, 31185],
-    "SG-11-5": [31185, 31486],
-    "SG-11-6": [31486, 31790],
-    "SG-11-7": [31790, 32099],
-    "SG-11-8": [32099],
-  
-    "SG-12-1": [32100, 32529],
-    "SG-12-2": [32529, 32817],
-    "SG-12-3": [32817, 33108],
-    "SG-12-4": [33108, 33403],
-    "SG-12-5": [33403, 33702],
-    "SG-12-6": [33702, 34004],
-    "SG-12-7": [34004, 34310],
-    "SG-12-8": [34310],
-  
-    "SG-13-1": [34311, 34733],
-    "SG-13-2": [34733, 35049],
-    "SG-13-3": [35049, 35369],
-    "SG-13-4": [35369, 35694],
-    "SG-13-5": [35694, 36022],
-    "SG-13-6": [36022, 36354],
-    "SG-13-7": [36354, 36691],
-    "SG-13-8": [36691],
-  
-    "SG-14-1": [36692, 37384],
-    "SG-14-2": [37384, 37749],
-    "SG-14-3": [37749, 38118],
-    "SG-14-4": [38118, 38491],
-    "SG-14-5": [38491, 38869],
-    "SG-14-6": [38869, 39252],
-    "SG-14-7": [39252, 39640],
-    "SG-14-8": [39640],
-  
-    "SG-15-1": [39641, 40604],
-    "SG-15-2": [40604, 41006],
-    "SG-15-3": [41006, 41413],
-    "SG-15-4": [41413, 41824],
-    "SG-15-5": [41824, 42241],
-    "SG-15-6": [42241, 42662],
-    "SG-15-7": [42662, 43090],
-    "SG-15-8": [43090],
-  
-    "SG-16-1": [43091, 43996],
-    "SG-16-2": [43996, 44438],
-    "SG-16-3": [44438, 44885],
-    "SG-16-4": [44885, 45338],
-    "SG-16-5": [45338, 45796],
-    "SG-16-6": [45796, 46261],
-    "SG-16-7": [46261, 46730],
-    "SG-16-8": [46730],
-  
-    "SG-17-1": [46731, 47727],
-    "SG-17-2": [47727, 48213],
-    "SG-17-3": [48213, 48705],
-    "SG-17-4": [48705, 49203],
-    "SG-17-5": [49203, 49708],
-    "SG-17-6": [49708, 50218],
-    "SG-17-7": [50218, 50735],
-    "SG-17-8": [50735],
-  
-    "SG-18-1": [50736, 51832],
-    "SG-18-2": [51832, 52367],
-    "SG-18-3": [52367, 52907],
-    "SG-18-4": [52907, 53456],
-    "SG-18-5": [53456, 54010],
-    "SG-18-6": [54010, 54572],
-    "SG-18-7": [54572, 55140],
-    "SG-18-8": [55140],
-  
-    "SG-19-1": [55141, 57165],
-    "SG-19-2": [57165, 57953],
-    "SG-19-3": [57953, 58753],
-    "SG-19-4": [58753, 59567],
-    "SG-19-5": [59567, 60394],
-    "SG-19-6": [60394, 61235],
-    "SG-19-7": [61235, 62089],
-    "SG-19-8": [62089],
-  
-    "SG-20-1": [62090, 63842],
-    "SG-20-2": [63842, 64732],
-    "SG-20-3": [64732, 65637],
-    "SG-20-4": [65637, 66557],
-    "SG-20-5": [66557, 67479],
-    "SG-20-6": [67479, 68409],
-    "SG-20-7": [68409, 69342],
-    "SG-20-8": [69342],
-  
-    "SG-21-1": [69343, 71000],
-    "SG-21-2": [71000, 72004],
-    "SG-21-3": [72004, 73024],
-    "SG-21-4": [73024, 74061],
-    "SG-21-5": [74061, 75115],
-    "SG-21-6": [75115, 76151],
-    "SG-21-7": [76151, 77239],
-    "SG-21-8": [77239],
-  
-    "SG-22-1": [77240, 79277],
-    "SG-22-2": [79277, 80411],
-    "SG-22-3": [80411, 81564],
-    "SG-22-4": [81564, 82735],
-    "SG-22-5": [82735, 83887],
-    "SG-22-6": [83887, 85096],
-    "SG-22-7": [85096, 86324],
-    "SG-22-8": [86324],
-  
-    "SG-23-1": [86325, 88574],
-    "SG-23-2": [88574, 89855],
-    "SG-23-3": [89855, 91163],
-    "SG-23-4": [91163, 92592],
-    "SG-23-5": [92592, 94043],
-    "SG-23-6": [94043, 95518],
-    "SG-23-7": [95518, 96955],
-    "SG-23-8": [96955],
-  
-    "SG-24-1": [96956, 99721],
-    "SG-24-2": [99721, 101283],
-    "SG-24-3": [101283, 102871],
-    "SG-24-4": [102871, 104483],
-    "SG-24-5": [104483, 106123],
-    "SG-24-6": [106123, 107739],
-    "SG-24-7": [107739, 109431],
-    "SG-24-8": [109431],
-  
-    "SG-25-1": [109432, 113476],
-    "SG-25-2": [113476, 115254],
-    "SG-25-3": [115254, 117062],
-    "SG-25-4": [117062, 118899],
-    "SG-25-5": [118899, 120766],
-    "SG-25-6": [120766, 122664],
-    "SG-25-7": [122664, 124591],
-    "SG-25-8": [124591],
-  
-    "SG-26-1": [124592, 128228],
-    "SG-26-2": [128228, 130238],
-    "SG-26-3": [130238, 132280],
-    "SG-26-4": [132280, 134356],
-    "SG-26-5": [134356, 136465],
-    "SG-26-6": [136465, 138608],
-    "SG-26-7": [138608, 140788],
-    "SG-26-8": [140788],
-  
-    "SG-27-1": [140789, 144897],
-    "SG-27-2": [144897, 147169],
-    "SG-27-3": [147169, 149407],
-    "SG-27-4": [149407, 151752],
-    "SG-27-5": [151752, 153850],
-    "SG-27-6": [153850, 156267],
-    "SG-27-7": [156267, 158723],
-    "SG-27-8": [158723],
-  
-    "SG-28-1": [158724, 162988],
-    "SG-28-2": [162988, 165548],
-    "SG-28-3": [165548, 167994],
-    "SG-28-4": [167994, 170634],
-    "SG-28-5": [170634, 173320],
-    "SG-28-6": [173320, 175803],
-    "SG-28-7": [175803, 178572],
-    "SG-28-8": [178572],
-  
-    "SG-29-1": [178573, 183332],
-    "SG-29-2": [183332, 186218],
-    "SG-29-3": [186218, 189151],
-    "SG-29-4": [189151, 192131],
-    "SG-29-5": [192131, 194797],
-    "SG-29-6": [194797, 197870],
-    "SG-29-7": [197870, 200993],
-    "SG-29-8": [200993],
-  
-    "SG-30-1": [200994, 206401],
-    "SG-30-2": [206401, 209558],
-    "SG-30-3": [209558, 212766],
-    "SG-30-4": [212766, 216022],
-    "SG-30-5": [216022, 219434],
-    "SG-30-6": [219434, 222797],
-    "SG-30-7": [222797, 226319],
-    "SG-30-8": [226319],
-  
-    "SG-31-1": [226320, 298773],
-    "SG-31-2": [298773, 304464],
-    "SG-31-3": [304464, 310119],
-    "SG-31-4": [310119, 315883],
-    "SG-31-5": [315883, 321846],
-    "SG-31-6": [321846, 327895],
-    "SG-31-7": [327895, 334059],
-    "SG-31-8": [334059],
-  
-    "SG-32-1": [334060, 354743],
-    "SG-32-2": [354743, 361736],
-    "SG-32-3": [361736, 368694],
-    "SG-32-4": [368694, 375969],
-    "SG-32-5": [375969, 383391],
-    "SG-32-6": [383391, 390963],
-    "SG-32-7": [390963, 398686],
-    "SG-32-8": [398686],
-  
-    "SG-33-1": [398687, 451713],
-    "SG-33-2": [451713]
+    1: [14061, 14164, 14278, 14393, 14509, 14626, 14743, 14862],
+    2: [14925, 15035, 15146, 15258, 15371, 15484, 15599, 15714],
+    3: [15852, 15971, 16088, 16208, 16329, 16448, 16571, 16693],
+    4: [16833, 16958, 17084, 17209, 17337, 17464, 17591, 17718],
+    5: [17866, 18000, 18133, 18267, 18401, 18534, 18668, 18813],
+    6: [18957, 19098, 19239, 19383, 19526, 19670, 19816, 19963],
+    7: [20110, 20258, 20408, 20560, 20711, 20865, 21021, 21175],
+    8: [21410, 21621, 21831, 22045, 22260, 22475, 22693, 22910],
+    9: [23226, 23411, 23599, 23788, 23978, 24170, 24364, 24558],
+    10: [25586, 25790, 25996, 26203, 26412, 26622, 26833, 27046],
+    11: [30024, 30308, 30592, 30889, 31184, 31483, 31782, 32084],
+    12: [32245, 32529, 32817, 33108, 33403, 33700, 34000, 34310],
+    13: [34421, 34733, 35049, 35369, 35694, 36022, 36356, 36691],
+    14: [37024, 37384, 37749, 38118, 38491, 38869, 39249, 39634],
+    15: [40620, 40641, 41006, 41413, 41824, 42241, 42662, 43099],
+    16: [43560, 43996, 44438, 44885, 45338, 45796, 46261, 46730],
+    17: [47247, 47727, 48213, 48705, 49203, 49708, 50218, 50735],
+    18: [51304, 51832, 52367, 52907, 53456, 54010, 54572, 55142],
+    19: [56390, 57165, 57953, 58753, 59567, 60394, 61235, 62089],
+    20: [62967, 63842, 64732, 65637, 66557, 67479, 68409, 69342],
+    21: [70013, 71001, 72004, 73024, 74061, 75116, 76185, 77271],
+    22: [78162, 79277, 80411, 81564, 82735, 83927, 85137, 86324],
+    23: [87315, 88574, 89855, 91163, 92592, 94043, 95518, 96955],
+    24: [98185, 99572, 101283, 102871, 104483, 106123, 107739, 109431],
+    25: [111727, 113476, 115254, 117062, 118899, 120766, 122664, 124591],
+    26: [126252, 128228, 130238, 132280, 134356, 136465, 138608, 140788],
+    27: [142653, 144897, 147169, 149407, 151752, 153850, 156267, 158723],
+    28: [160469, 162898, 165548, 167994, 170421, 172805, 175307, 177872],
+    29: [180492, 183332, 186218, 189151, 192131, 195172, 198270, 200993],
+    30: [203200, 206401, 209558, 212766, 216022, 219434, 222797, 226319],
+    31: [293191, 298778, 304464, 310119, 315888, 321846, 327895, 334059],
+    32: [347888, 354743, 361736, 368694, 375969, 383391, 390963, 398686],
+    33: [314782, 317930, 321109, 324320, 327563, 330839, 334147, 337488]
   };
-  
 
   // Add this function after the existing SALARY_GRADE_TABLE constant
   const calculateContractualSalaryGrade = (minSalary, maxSalary) => {
@@ -485,8 +189,8 @@ const Employees = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees"),
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/archived/")
+        axios.get("http://127.0.0.1:8000/api/employees/employees/"),
+        axios.get("http://127.0.0.1:8000/api/employees/employees/archived/")
       ]);
       setEmployees(activeRes.data);
       setArchivedEmployees(archivedRes.data);
@@ -502,7 +206,7 @@ const Employees = () => {
 
   const fetchDepartmentSuperiors = async () => {
     try {
-      const response = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/");
+      const response = await axios.get("http://127.0.0.1:8000/api/department_superiors/department-superiors/");
       setDepartmentSuperiors(response.data.filter(sup => !sup.is_archived && sup.status === "Active"));
     } catch (err) {
       console.error("Fetch department superiors error:", err);
@@ -517,8 +221,8 @@ const Employees = () => {
     setLoading(true);
     try {
       const [activeRes, archivedRes] = await Promise.all([
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/"),
-        axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/archived/")
+        axios.get("http://127.0.0.1:8000/api/positions/positions/"),
+        axios.get("http://127.0.0.1:8000/api/positions/positions/archived/")
       ]);
       setPositions(activeRes.data);
       setArchivedPositions(archivedRes.data);
@@ -532,7 +236,7 @@ const Employees = () => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/");
+      const response = await axios.get("http://127.0.0.1:8000/api/departments/department/");
       
       // Handle both array and object responses
       const departmentsData = response.data;
@@ -714,7 +418,7 @@ const Employees = () => {
       // Add logging to debug
       console.log("Sending employee data:", JSON.stringify(employeeData));
   
-      const response = await axios.post("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/", employeeData);
+      const response = await axios.post("http://127.0.0.1:8000/api/employees/employees/", employeeData);
       setShowEmployeeModal(false);
       showToast("Employee added successfully");
       fetchEmployees();
@@ -797,7 +501,7 @@ const Employees = () => {
       };
 
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${editingEmployee.employee_id}/`,
+        `http://127.0.0.1:8000/api/employees/employees/${editingEmployee.employee_id}/`,
         employeeData
       );
       setShowEditEmployeeModal(false);
@@ -814,17 +518,8 @@ const Employees = () => {
   const handleArchiveEmployee = async (id) => {
     if (!window.confirm("Archive this employee?")) return;
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/archive/`);
+      await axios.post(`http://127.0.0.1:8000/api/employees/employees/${id}/archive/`);
       showToast("Employee archived successfully");
-      
-      // Immediately update state to reflect changes
-      const archivedEmployee = employees.find(emp => emp.employee_id === id);
-      if (archivedEmployee) {
-        setEmployees(prev => prev.filter(emp => emp.employee_id !== id));
-        setArchivedEmployees(prev => [...prev, archivedEmployee]);
-      }
-      
-      // Still fetch fresh data from server
       fetchEmployees();
     } catch (err) {
       console.error("Archive employee error", err);
@@ -839,18 +534,9 @@ const Employees = () => {
 
   const handleUnarchiveEmployee = async (id) => {
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8000/api/employees/employees/${id}/unarchive/`);
       setShowConfirmUnarchiveEmployee(null);
       showToast("Employee unarchived successfully");
-      
-      // Immediately update state to reflect changes
-      const unarchiveEmployee = archivedEmployees.find(emp => emp.employee_id === id);
-      if (unarchiveEmployee) {
-        setArchivedEmployees(prev => prev.filter(emp => emp.employee_id !== id));
-        setEmployees(prev => [...prev, unarchiveEmployee]);
-      }
-      
-      // Still fetch fresh data from server
       fetchEmployees();
     } catch (err) {
       console.error("Unarchive employee error", err);
@@ -869,23 +555,11 @@ const Employees = () => {
     try {
       await Promise.all(
         selectedArchivedEmployees.map((id) =>
-          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${id}/unarchive/`)
+          axios.post(`http://127.0.0.1:8000/api/employees/employees/${id}/unarchive/`)
         )
       );
       showToast("Employees unarchived successfully");
-      
-      // Immediately update state
-      const unarchiveEmployees = archivedEmployees.filter(emp => 
-        selectedArchivedEmployees.includes(emp.employee_id)
-      );
-      setArchivedEmployees(prev => 
-        prev.filter(emp => !selectedArchivedEmployees.includes(emp.employee_id))
-      );
-      setEmployees(prev => [...prev, ...unarchiveEmployees]);
-      
       setSelectedArchivedEmployees([]);
-      
-      // Fetch fresh data
       fetchEmployees();
     } catch (err) {
       console.error("Bulk unarchive employees error", err);
@@ -913,97 +587,59 @@ const Employees = () => {
 
   const handleAddPositionChange = (e) => {
     const { name, value } = e.target;
-  
+
     if (name === "employment_type") {
       setNewPosition((prev) => ({
         ...prev,
         employment_type: value,
-        salary_grade: "", // Reset salary grade when employment type changes
-        min_salary: value === "Regular" ? 0 : 500, // Set minimum valid value based on type
-        max_salary: value === "Regular" ? 0 : 500,
-        typical_duration_days: value === "Regular" ? null : 
-                               value === "Seasonal" ? 1 : 30, // Set defaults based on type
+        salary_grade: value === "Regular" ? prev.salary_grade : "",
+        min_salary: 0,
+        max_salary: 0,
+        typical_duration_days: value === "Regular" ? null : value === "Seasonal" ? 1 : 30,
       }));
       return;
     }
-  
-    if (name === "salary_grade") {
-      if (newPosition.employment_type === "Regular") {
-        const salaryRange = SALARY_GRADE_TABLE[value] || [];
-        setNewPosition((prev) => ({
-          ...prev,
-          salary_grade: value,
-          min_salary: salaryRange[0] || 0,
-          max_salary: salaryRange[1] || 0,
-        }));
-      } else {
-        // For Contractual/Seasonal
-        const dailyRateRange = DAILY_RATE_TABLE[value] || [];
-        setNewPosition((prev) => ({
-          ...prev,
-          salary_grade: value,
-          min_salary: dailyRateRange[0] || 500,
-          max_salary: dailyRateRange[1] || 500,
-        }));
+
+    if (name === "salary_grade" && newPosition.employment_type === "Regular") {
+      const salarySteps = SALARY_GRADE_TABLE[value] || [];
+      setNewPosition((prev) => ({
+        ...prev,
+        salary_grade: value,
+        min_salary: salarySteps[0] || 0,
+        max_salary: salarySteps[salarySteps.length - 1] || 0,
+      }));
+      return;
+    }
+
+    if ((name === "min_salary" || name === "max_salary") && newPosition.employment_type !== "Regular") {
+      const numValue = parseFloat(value);
+      if (numValue >= 0) {
+        const updatedPosition = {
+          ...newPosition,
+          [name]: numValue
+        };
+        
+        // Update the other salary value if needed
+        let otherField = name === "min_salary" ? "max_salary" : "min_salary";
+        if (name === "min_salary" && numValue > newPosition.max_salary) {
+          updatedPosition.max_salary = numValue;
+        } else if (name === "max_salary" && numValue < newPosition.min_salary) {
+          updatedPosition.min_salary = numValue;
+        }
+        
+        // Calculate salary grade for contractual/seasonal positions
+        if (updatedPosition.min_salary > 0 && updatedPosition.max_salary > 0) {
+          updatedPosition.salary_grade = calculateContractualSalaryGrade(
+            updatedPosition.min_salary, 
+            updatedPosition.max_salary
+          );
+        }
+        
+        setNewPosition(updatedPosition);
       }
       return;
     }
-  
-    // Handle min/max salary validation for non-Regular positions
-    if (name === "min_salary" && newPosition.employment_type !== "Regular") {
-      const minVal = parseFloat(value);
-      const maxVal = parseFloat(newPosition.max_salary);
-      
-      // Ensure min salary is within valid range
-      if (minVal < 500) {
-        setNewPosition(prev => ({ ...prev, [name]: 500 }));
-      } else if (minVal > 10000) {
-        setNewPosition(prev => ({ ...prev, [name]: 10000 }));
-      } else if (minVal > maxVal) {
-        // If min exceeds max, adjust max up
-        setNewPosition(prev => ({ 
-          ...prev, 
-          [name]: minVal,
-          max_salary: minVal 
-        }));
-      } else {
-        setNewPosition(prev => ({ ...prev, [name]: value }));
-      }
-      return;
-    }
-  
-    if (name === "max_salary" && newPosition.employment_type !== "Regular") {
-      const maxVal = parseFloat(value);
-      const minVal = parseFloat(newPosition.min_salary);
-      
-      if (maxVal < minVal) {
-        setNewPosition(prev => ({ ...prev, [name]: minVal }));
-      } else if (maxVal > 10000) {
-        setNewPosition(prev => ({ ...prev, [name]: 10000 }));
-      } else {
-        setNewPosition(prev => ({ ...prev, [name]: value }));
-      }
-      return;
-    }
-  
-    // Handle typical_duration_days based on employment type
-    if (name === "typical_duration_days") {
-      const daysValue = parseInt(value);
-      
-      if (newPosition.employment_type === "Contractual") {
-        if (daysValue < 30) setNewPosition(prev => ({ ...prev, [name]: 30 }));
-        else if (daysValue > 180) setNewPosition(prev => ({ ...prev, [name]: 180 }));
-        else setNewPosition(prev => ({ ...prev, [name]: daysValue }));
-      } 
-      else if (newPosition.employment_type === "Seasonal") {
-        if (daysValue < 1) setNewPosition(prev => ({ ...prev, [name]: 1 }));
-        else if (daysValue > 29) setNewPosition(prev => ({ ...prev, [name]: 29 }));
-        else setNewPosition(prev => ({ ...prev, [name]: daysValue }));
-      }
-      return;
-    }
-  
-    // Default handling for other fields
+
     setNewPosition((prev) => ({
       ...prev,
       [name]: value,
@@ -1012,92 +648,44 @@ const Employees = () => {
 
   const submitPositionModal = async (e) => {
     e.preventDefault();
-  
+
     // Enhanced validation for all required fields
     const validationErrors = [];
     
     // Always required fields
-    if (!newPosition.position_title.trim()) {
-      validationErrors.push("Position title is required");
-    }
-    
-    if (!newPosition.employment_type) {
-      validationErrors.push("Employment type is required");
-    }
+    if (!newPosition.position_title) validationErrors.push("Position Title");
+    if (!newPosition.employment_type) validationErrors.push("Employment Type");
     
     // Fields required based on employment type
     if (newPosition.employment_type === "Regular") {
-      if (!newPosition.salary_grade) {
-        validationErrors.push("Salary grade is required for Regular positions");
-      }
-      
-      if (parseFloat(newPosition.min_salary) < 0) {
-        validationErrors.push("Min salary cannot be negative for Regular positions");
-      }
-      
-      if (parseFloat(newPosition.max_salary) < parseFloat(newPosition.min_salary)) {
-        validationErrors.push("Max salary must be greater than or equal to min salary");
-      }
+      if (!newPosition.salary_grade) validationErrors.push("Salary Grade");
     } else {
-      // For Contractual and Seasonal positions
-      const minSalary = parseFloat(newPosition.min_salary);
-      const maxSalary = parseFloat(newPosition.max_salary);
-      
-      if (minSalary < 500 || minSalary > 10000) {
-        validationErrors.push("Min salary must be between 500 and 10,000 for non-Regular positions");
-      }
-      
-      if (maxSalary < minSalary) {
-        validationErrors.push("Max salary must be greater than or equal to min salary");
-      }
-      
-      if (newPosition.employment_type === "Contractual") {
-        if (!newPosition.typical_duration_days) {
-          validationErrors.push("Duration days are required for Contractual positions");
-        } else if (newPosition.typical_duration_days < 30 || newPosition.typical_duration_days > 180) {
-          validationErrors.push("Duration for Contractual positions must be between 30 and 180 days");
-        }
-      } else if (newPosition.employment_type === "Seasonal") {
-        if (!newPosition.typical_duration_days) {
-          validationErrors.push("Duration days are required for Seasonal positions");
-        } else if (newPosition.typical_duration_days < 1 || newPosition.typical_duration_days > 29) {
-          validationErrors.push("Duration for Seasonal positions must be between 1 and 29 days");
-        }
-      }
+      // For Contractual and Seasonal
+      if (!newPosition.min_salary) validationErrors.push("Daily Rate (Min)");
+      if (!newPosition.max_salary) validationErrors.push("Daily Rate (Max)");
+      if (!newPosition.typical_duration_days) validationErrors.push("Typical Duration (Days)");
     }
-    
+
     // Show validation errors if any
     if (validationErrors.length > 0) {
-      alert(`Please correct the following errors:\n${validationErrors.join("\n")}`);
+      showToast(`Please fill these required fields: ${validationErrors.join(", ")}`, false);
       return;
     }
-    
-    // Form data to be sent to API
-    const formData = {
-      ...newPosition,
-      typical_duration_days: newPosition.employment_type === "Regular" ? null : newPosition.typical_duration_days
-    };
-    
+
+    // Validate salary range
+    if (Number(newPosition.min_salary) > Number(newPosition.max_salary)) {
+      showToast("Minimum salary cannot be greater than maximum salary", false);
+      return;
+    }
+
     try {
-      const response = await fetch("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to add position");
-      }
-      
-      // Handle successful response
-      await fetchPositions();
+      await axios.post("http://127.0.0.1:8000/api/positions/positions/", newPosition);
       setShowPositionModal(false);
       showToast("Position added successfully");
-    } catch (error) {
-      showToast(error.message, false);
+      fetchPositions();
+    } catch (err) {
+      console.error("Add position error:", err);
+      showToast("Failed to add position", false);
     }
   };
 
@@ -1141,25 +729,14 @@ const Employees = () => {
       return;
     }
 
-    if (name === "salary_grade") {
-      if (editingPosition.employment_type === "Regular") {
-        const salaryRange = SALARY_GRADE_TABLE[value] || [];
-        setEditingPosition((prev) => ({
-          ...prev,
-          salary_grade: value,
-          min_salary: salaryRange[0] || 0,
-          max_salary: salaryRange[1] || 0,
-        }));
-      } else {
-        // For Contractual/Seasonal
-        const dailyRateRange = DAILY_RATE_TABLE[value] || [];
-        setEditingPosition((prev) => ({
-          ...prev,
-          salary_grade: value,
-          min_salary: dailyRateRange[0] || 0,
-          max_salary: dailyRateRange[1] || 0,
-        }));
-      }
+    if (name === "salary_grade" && editingPosition.employment_type === "Regular") {
+      const salarySteps = SALARY_GRADE_TABLE[value] || [];
+      setEditingPosition((prev) => ({
+        ...prev,
+        salary_grade: value,
+        min_salary: salarySteps[0] || 0,
+        max_salary: salarySteps[salarySteps.length - 1] || 0,
+      }));
       return;
     }
 
@@ -1240,7 +817,7 @@ const Employees = () => {
       };
 
       await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/${editingPosition.position_id}/`,
+        `http://127.0.0.1:8000/api/positions/positions/${editingPosition.position_id}/`,
         formattedData
       );
       setShowEditPositionModal(false);
@@ -1257,17 +834,8 @@ const Employees = () => {
   const handleArchivePosition = async (id) => {
     if (!window.confirm("Archive this position?")) return;
     try {
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/${id}/archive/`);
+      await axios.post(`http://127.0.0.1:8000/api/positions/positions/${id}/archive/`);
       showToast("Position archived successfully");
-      
-      // Immediately update state to reflect changes
-      const archivedPosition = positions.find(pos => pos.position_id === id);
-      if (archivedPosition) {
-        setPositions(prev => prev.filter(pos => pos.position_id !== id));
-        setArchivedPositions(prev => [...prev, archivedPosition]);
-      }
-      
-      // Still fetch fresh data from server
       fetchPositions();
     } catch (err) {
       console.error("Archive position error", err);
@@ -1282,19 +850,9 @@ const Employees = () => {
 
   const handleUnarchivePosition = async (id) => {
     try {
-      const encodedId = encodeURIComponent(id);
-      await axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/${encodedId}/unarchive/`);
+      await axios.post(`http://127.0.0.1:8000/api/positions/positions/${id}/unarchive/`);
       setShowConfirmUnarchivePosition(null);
       showToast("Position unarchived successfully");
-      
-      // Immediately update state to reflect changes
-      const unarchivePosition = archivedPositions.find(pos => pos.position_id === id);
-      if (unarchivePosition) {
-        setArchivedPositions(prev => prev.filter(pos => pos.position_id !== id));
-        setPositions(prev => [...prev, unarchivePosition]);
-      }
-      
-      // Still fetch fresh data from server
       fetchPositions();
     } catch (err) {
       console.error("Unarchive position error", err);
@@ -1313,23 +871,11 @@ const Employees = () => {
     try {
       await Promise.all(
         selectedArchivedPositions.map((id) =>
-          axios.post(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/positions/positions/${id}/unarchive/`)
+          axios.post(`http://127.0.0.1:8000/api/positions/positions/${id}/unarchive/`)
         )
       );
       showToast("Positions unarchived successfully");
-      
-      // Immediately update state
-      const unarchivePositions = archivedPositions.filter(pos => 
-        selectedArchivedPositions.includes(pos.position_id)
-      );
-      setArchivedPositions(prev => 
-        prev.filter(pos => !selectedArchivedPositions.includes(pos.position_id))
-      );
-      setPositions(prev => [...prev, ...unarchivePositions]);
-      
       setSelectedArchivedPositions([]);
-      
-      // Fetch fresh data
       fetchPositions();
     } catch (err) {
       console.error("Bulk unarchive positions error", err);
@@ -1455,116 +1001,17 @@ const Employees = () => {
           </div>
         </div>
         <div className="hr-employee-pagination">
-          <button 
-            className="hr-employee-pagination-arrow" 
-            onClick={() => setCurrentPage(1)} 
-            disabled={currentPage === 1}
-          >
-            &#171; {/* Double left arrow */}
-          </button>
-          
-          <button 
-            className="hr-employee-pagination-arrow" 
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-            disabled={currentPage === 1}
-          >
-            &#8249; {/* Single left arrow */}
-          </button>
-          
           <div className="hr-employee-pagination-numbers">
-            {(() => {
-              const pageNumbers = [];
-              const maxVisiblePages = 5;
-              
-              if (totalPages <= maxVisiblePages + 2) {
-                // Show all pages if there are few
-                for (let i = 1; i <= totalPages; i++) {
-                  pageNumbers.push(
-                    <button
-                      key={i}
-                      className={i === currentPage ? "active" : ""}
-                      onClick={() => setCurrentPage(i)}
-                    >
-                      {i}
-                    </button>
-                  );
-                }
-              } else {
-                // Always show first page
-                pageNumbers.push(
-                  <button
-                    key={1}
-                    className={1 === currentPage ? "active" : ""}
-                    onClick={() => setCurrentPage(1)}
-                  >
-                    1
-                  </button>
-                );
-                
-                // Calculate range around current page
-                let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
-                let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
-                
-                // Adjust if we're near the end
-                if (endPage - startPage < maxVisiblePages - 1) {
-                  startPage = Math.max(2, endPage - maxVisiblePages + 1);
-                }
-                
-                // Add ellipsis after first page if needed
-                if (startPage > 2) {
-                  pageNumbers.push(<span key="ellipsis1" className="hr-employee-pagination-ellipsis">...</span>);
-                }
-                
-                // Add middle pages
-                for (let i = startPage; i <= endPage; i++) {
-                  pageNumbers.push(
-                    <button
-                      key={i}
-                      className={i === currentPage ? "active" : ""}
-                      onClick={() => setCurrentPage(i)}
-                    >
-                      {i}
-                    </button>
-                  );
-                }
-                
-                // Add ellipsis before last page if needed
-                if (endPage < totalPages - 1) {
-                  pageNumbers.push(<span key="ellipsis2" className="hr-employee-pagination-ellipsis">...</span>);
-                }
-                
-                // Always show last page
-                pageNumbers.push(
-                  <button
-                    key={totalPages}
-                    className={totalPages === currentPage ? "active" : ""}
-                    onClick={() => setCurrentPage(totalPages)}
-                  >
-                    {totalPages}
-                  </button>
-                );
-              }
-              
-              return pageNumbers;
-            })()}
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                className={i + 1 === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
           </div>
-          
-          <button 
-            className="hr-employee-pagination-arrow" 
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
-            disabled={currentPage === totalPages}
-          >
-            &#8250; {/* Single right arrow */}
-          </button>
-          
-          <button 
-            className="hr-employee-pagination-arrow" 
-            onClick={() => setCurrentPage(totalPages)} 
-            disabled={currentPage === totalPages}
-          >
-            &#187; {/* Double right arrow */}
-          </button>
-          
           <select
             className="hr-employee-pagination-size"
             value={itemsPerPage}
@@ -1686,116 +1133,17 @@ const Employees = () => {
           </div>
         </div>
         <div className="hr-employee-pagination">
-          <button 
-            className="hr-employee-pagination-arrow" 
-            onClick={() => setCurrentPage(1)} 
-            disabled={currentPage === 1}
-          >
-            &#171; {/* Double left arrow */}
-          </button>
-          
-          <button 
-            className="hr-employee-pagination-arrow" 
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-            disabled={currentPage === 1}
-          >
-            &#8249; {/* Single left arrow */}
-          </button>
-          
           <div className="hr-employee-pagination-numbers">
-            {(() => {
-              const pageNumbers = [];
-              const maxVisiblePages = 5;
-              
-              if (totalPages <= maxVisiblePages + 2) {
-                // Show all pages if there are few
-                for (let i = 1; i <= totalPages; i++) {
-                  pageNumbers.push(
-                    <button
-                      key={i}
-                      className={i === currentPage ? "active" : ""}
-                      onClick={() => setCurrentPage(i)}
-                    >
-                      {i}
-                    </button>
-                  );
-                }
-              } else {
-                // Always show first page
-                pageNumbers.push(
-                  <button
-                    key={1}
-                    className={1 === currentPage ? "active" : ""}
-                    onClick={() => setCurrentPage(1)}
-                  >
-                    1
-                  </button>
-                );
-                
-                // Calculate range around current page
-                let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
-                let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
-                
-                // Adjust if we're near the end
-                if (endPage - startPage < maxVisiblePages - 1) {
-                  startPage = Math.max(2, endPage - maxVisiblePages + 1);
-                }
-                
-                // Add ellipsis after first page if needed
-                if (startPage > 2) {
-                  pageNumbers.push(<span key="ellipsis1" className="hr-employee-pagination-ellipsis">...</span>);
-                }
-                
-                // Add middle pages
-                for (let i = startPage; i <= endPage; i++) {
-                  pageNumbers.push(
-                    <button
-                      key={i}
-                      className={i === currentPage ? "active" : ""}
-                      onClick={() => setCurrentPage(i)}
-                    >
-                      {i}
-                    </button>
-                  );
-                }
-                
-                // Add ellipsis before last page if needed
-                if (endPage < totalPages - 1) {
-                  pageNumbers.push(<span key="ellipsis2" className="hr-employee-pagination-ellipsis">...</span>);
-                }
-                
-                // Always show last page
-                pageNumbers.push(
-                  <button
-                    key={totalPages}
-                    className={totalPages === currentPage ? "active" : ""}
-                    onClick={() => setCurrentPage(totalPages)}
-                  >
-                    {totalPages}
-                  </button>
-                );
-              }
-              
-              return pageNumbers;
-            })()}
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                className={i + 1 === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
           </div>
-          
-          <button 
-            className="hr-employee-pagination-arrow" 
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
-            disabled={currentPage === totalPages}
-          >
-            &#8250; {/* Single right arrow */}
-          </button>
-          
-          <button 
-            className="hr-employee-pagination-arrow" 
-            onClick={() => setCurrentPage(totalPages)} 
-            disabled={currentPage === totalPages}
-          >
-            &#187; {/* Double right arrow */}
-          </button>
-          
           <select
             className="hr-employee-pagination-size"
             value={itemsPerPage}
@@ -2144,254 +1492,122 @@ const Employees = () => {
       {/* ========== Employees: Edit Modal ========== */}
       {showEditEmployeeModal && editingEmployee && (
         <div className="hr-employee-modal-overlay">
-          <div className="hr-employee-modal hr-employee-modal-improved">
-            <div className="hr-employee-modal-header">
-              <h3>Edit Employee</h3>
-              <button 
-                className="hr-employee-modal-close" 
-                onClick={() => setShowEditEmployeeModal(false)}
-              >
-                ×
-              </button>
-            </div>
-      
-            <div className="hr-employee-modal-tabs">
-              <button 
-                className={activeModalTab === 0 ? "active" : ""} 
-                onClick={() => switchModalTab(0)}
-                type="button"
-              >
-                Basic Info
-              </button>
-              <button 
-                className={activeModalTab === 1 ? "active" : ""} 
-                onClick={() => switchModalTab(1)}
-                type="button"
-              >
-                Employment Details
-              </button>
-              <button 
-                className={activeModalTab === 2 ? "active" : ""} 
-                onClick={() => switchModalTab(2)}
-                type="button"
-              >
-                System Info
-              </button>
-            </div>
-      
-            <form onSubmit={handleEditEmployeeSubmit} className="hr-employee-modal-form">
-              {/* Basic Info Section - Visible by default */}
-              <div className="hr-employee-modal-section active">
-                <div className="hr-section-heading">
-                  <h4>Personal Information</h4>
-                  <p>Update the employee's personal details</p>
-                </div>
-                
-                <div className="hr-two-col">
-                  <div className="form-group">
-                    <label>Employee ID</label>
-                    <div className="input-with-icon readonly">
-                      <i className="id-icon">ID</i>
-                      <input
-                        type="text"
-                        value={editingEmployee.employee_id}
-                        disabled
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>User ID</label>
-                    <div className="input-with-icon readonly">
-                      <i className="user-icon">👤</i>
-                      <input
-                        type="text"
-                        value={editingEmployee.user_id}
-                        disabled
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="first_name">First Name <span className="required">*</span></label>
-                    <div className="input-with-icon">
-                      <input
-                        id="first_name"
-                        type="text"
-                        name="first_name"
-                        value={editingEmployee.first_name}
-                        onChange={handleEditEmployeeChange}
-                        required
-                      />
-                    </div>
-                    <small>Legal first name as it appears on official documents</small>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="last_name">Last Name <span className="required">*</span></label>
-                    <div className="input-with-icon">
-                      <input
-                        id="last_name"
-                        type="text"
-                        name="last_name"
-                        value={editingEmployee.last_name}
-                        onChange={handleEditEmployeeChange}
-                        required
-                      />
-                    </div>
-                    <small>Legal last name as it appears on official documents</small>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="phone">Phone Number</label>
-                    <div className="input-with-icon">
-                      <i className="phone-icon">📞</i>
-                      <input
-                        id="phone"
-                        type="tel"
-                        name="phone"
-                        value={editingEmployee.phone}
-                        onChange={handleEditEmployeeChange}
-                        placeholder="0XXXXXXXXXX"
-                        maxLength="11"
-                      />
-                    </div>
-                    <small>Format: 0XXXXXXXXXX (11 digits)</small>
-                  </div>
-                </div>
+          <div className="hr-employee-modal">
+            <h3 style={{ marginBottom: "1rem" }}>Edit Employee</h3>
+            <form onSubmit={handleEditEmployeeSubmit} className="hr-department-modal-form hr-two-col">
+              <div className="form-group">
+                <label>Employee ID</label>
+                <input
+                  type="text"
+                  value={editingEmployee.employee_id}
+                  disabled
+                />
               </div>
-              
-              {/* Employment Details Section - Initially hidden */}
-              <div className="hr-employee-modal-section">
-                <div className="hr-section-heading">
-                  <h4>Employment Status</h4>
-                  <p>Manage how this employee is classified and employed</p>
-                </div>
-                
-                <div className="hr-two-col">
-                  <div className="form-group">
-                    <label htmlFor="employment_type">Employment Type</label>
-                    <select
-                      id="employment_type"
-                      name="employment_type"
-                      value={editingEmployee.employment_type}
-                      onChange={handleEditEmployeeChange}
-                    >
-                      <option value="Regular">Regular</option>
-                      <option value="Contractual">Contractual</option>
-                      <option value="Seasonal">Seasonal</option>
-                    </select>
-                    <small>Determines benefits eligibility and contract terms</small>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="status">Employee Status</label>
-                    <select
-                      id="status"
-                      name="status"
-                      value={editingEmployee.status}
-                      onChange={handleEditEmployeeChange}
-                      className={`status-select ${editingEmployee.status.toLowerCase()}`}
-                    >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                    <small>Active employees have system access</small>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="reports_to">Reports To</label>
-                    <select
-                      id="reports_to"
-                      name="reports_to"
-                      value={editingEmployee.reports_to || ""}
-                      onChange={handleEditEmployeeChange}
-                    >
-                      <option value="">-- No Direct Supervisor --</option>
-                      {departmentSuperiors.map(superior => (
-                        <option key={superior.dept_superior_id} value={superior.employee_id}>
-                          {superior.superior_name} - {superior.dept_name} ({superior.position_title})
-                        </option>
-                      ))}
-                    </select>
-                    <small>Employee's direct supervisor</small>
-                  </div>
-                  
-                  <div className="form-group checkbox-group">
-                    <label htmlFor="is_supervisor">Supervisor Role</label>
-                    <div className="checkbox-container">
-                      <input
-                        id="is_supervisor"
-                        type="checkbox"
-                        name="is_supervisor"
-                        checked={editingEmployee.is_supervisor}
-                        onChange={(e) => handleEditEmployeeChange({
-                          target: {
-                            name: 'is_supervisor',
-                            type: 'checkbox',
-                            checked: e.target.checked
-                          }
-                        })}
-                      />
-                      {/* <label htmlFor="is_supervisor" className="checkbox-label">
-                        This employee is a supervisor
-                      </label> */}
-                    </div>
-                    <small>Can manage other employees and approve requests</small>
-                  </div>
-                </div>
+              <div className="form-group">
+                <label>First Name</label>
+                <input
+                  type="text"
+                  name="first_name"
+                  value={editingEmployee.first_name}
+                  onChange={handleEditEmployeeChange}
+                  required
+                />
               </div>
-              
-              {/* System Info Section - Initially hidden */}
-              <div className="hr-employee-modal-section">
-                <div className="hr-section-heading">
-                  <h4>System Information</h4>
-                  <p>View system-generated information</p>
-                </div>
-                
-                <div className="hr-two-col">
-                  <div className="form-group">
-                    <label>Department</label>
-                    <input
-                      type="text"
-                      value={departments.find(d => d.dept_id === editingEmployee.dept_id)?.dept_name || ""}
-                      disabled
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Position</label>
-                    <input
-                      type="text"
-                      value={positions.find(p => p.position_id === editingEmployee.position_id)?.position_title || ""}
-                      disabled
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Created At</label>
-                    <div className="input-with-icon readonly">
-                      <i className="calendar-icon">📅</i>
-                      <input type="text" value={editingEmployee.created_at || ""} disabled />
-                    </div>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Last Updated</label>
-                    <div className="input-with-icon readonly">
-                      <i className="calendar-icon">🕒</i>
-                      <input type="text" value={editingEmployee.updated_at || ""} disabled />
-                    </div>
-                  </div>
-                </div>
+              <div className="form-group">
+                <label>Last Name</label>
+                <input
+                  type="text"
+                  name="last_name"
+                  value={editingEmployee.last_name}
+                  onChange={handleEditEmployeeChange}
+                  required
+                />
               </div>
-            
-              <div className="hr-employee-modal-buttons">
-                <button type="button" className="hr-employee-cancel-btn" onClick={() => setShowEditEmployeeModal(false)}>
+              <div className="form-group">
+                <label>Employment Type</label>
+                <select
+                  name="employment_type"
+                  value={editingEmployee.employment_type}
+                  onChange={handleEditEmployeeChange}
+                >
+                  <option value="Regular">Regular</option>
+                  <option value="Contractual">Contractual</option>
+                  <option value="Seasonal">Seasonal</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Status</label>
+                <select
+                  name="status"
+                  value={editingEmployee.status}
+                  onChange={handleEditEmployeeChange}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+
+              {/* Commented out less frequently updated fields
+              <div className="form-group">
+                <label>User ID</label>
+                <input
+                  type="text"
+                  name="user_id"
+                  value={editingEmployee.user_id}
+                  onChange={handleEditEmployeeChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Phone</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={editingEmployee.phone}
+                  onChange={handleEditEmployeeChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Reports To</label>
+                <select
+                  name="reports_to"
+                  value={editingEmployee.reports_to || ""}
+                  onChange={handleEditEmployeeChange}
+                >
+                  <option value="">-- No Supervisor --</option>
+                  {departmentSuperiors.map(superior => (
+                    <option key={superior.dept_superior_id} value={superior.employee_id}>
+                      {superior.superior_name} - {superior.dept_name} ({superior.position_title})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Is Supervisor?</label>
+                <input
+                  type="checkbox"
+                  name="is_supervisor"
+                  checked={editingEmployee.is_supervisor}
+                  onChange={handleEditEmployeeChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Created At</label>
+                <input type="text" value={editingEmployee.created_at || ""} disabled />
+              </div>
+              <div className="form-group">
+                <label>Updated At</label>
+                <input type="text" value={editingEmployee.updated_at || ""} disabled />
+              </div>
+              */}
+
+              <div className="hr-employee-modal-buttons hr-two-col-buttons">
+                <button type="submit" className="submit-btn">Save</button>
+                <button
+                  type="button"
+                  className="hr-employee-cancel-btn"
+                  onClick={() => setShowEditEmployeeModal(false)}
+                >
                   Cancel
-                </button>
-                <button type="submit" className="submit-btn">
-                  Save Changes
                 </button>
               </div>
             </form>
@@ -2465,9 +1681,9 @@ const Employees = () => {
                       required
                     >
                       <option value="">Select Salary Grade</option>
-                      {Object.keys(SALARY_GRADE_TABLE).map((grade) => (
-                        <option key={grade} value={grade}>
-                          {grade}
+                      {[...Array(33)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
                         </option>
                       ))}
                     </select>
@@ -2484,28 +1700,28 @@ const Employees = () => {
               ) : (
                 <>
                   <div className="form-group">
-                    <label>Daily Rate Grade *</label>
-                    <select
-                      name="salary_grade"
-                      value={newPosition.salary_grade}
+                    <label>Daily Rate (Min) *</label>
+                    <input
+                      type="number"
+                      name="min_salary"
+                      value={newPosition.min_salary}
                       onChange={handleAddPositionChange}
+                      min="0"
+                      step="0.01"
                       required
-                    >
-                      <option value="">Select Daily Rate Grade</option>
-                      {Object.keys(DAILY_RATE_TABLE).map((grade) => (
-                        <option key={grade} value={grade}>
-                          {grade}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </div>
                   <div className="form-group">
-                    <label>Daily Rate (Min)</label>
-                    <input type="number" name="min_salary" value={newPosition.min_salary} disabled />
-                  </div>
-                  <div className="form-group">
-                    <label>Daily Rate (Max)</label>
-                    <input type="number" name="max_salary" value={newPosition.max_salary} disabled />
+                    <label>Daily Rate (Max) *</label>
+                    <input
+                      type="number"
+                      name="max_salary"
+                      value={newPosition.max_salary}
+                      onChange={handleAddPositionChange}
+                      min="0"
+                      step="0.01"
+                      required
+                    />
                   </div>
                 </>
               )}
@@ -2593,9 +1809,9 @@ const Employees = () => {
                       onChange={handleEditPositionChange}
                     >
                       <option value="">Select Salary Grade</option>
-                      {Object.keys(SALARY_GRADE_TABLE).map((grade) => (
-                        <option key={grade} value={grade}>
-                          {grade}
+                      {[...Array(33)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
                         </option>
                       ))}
                     </select>
@@ -2612,27 +1828,26 @@ const Employees = () => {
               ) : (
                 <>
                   <div className="form-group">
-                    <label>Daily Rate Grade</label>
-                    <select
-                      name="salary_grade"
-                      value={editingPosition.salary_grade}
-                      onChange={handleEditPositionChange}
-                    >
-                      <option value="">Select Daily Rate Grade</option>
-                      {Object.keys(DAILY_RATE_TABLE).map((grade) => (
-                        <option key={grade} value={grade}>
-                          {grade}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="form-group">
                     <label>Daily Rate (Min)</label>
-                    <input type="number" name="min_salary" value={editingPosition.min_salary} disabled />
+                    <input
+                      type="number"
+                      name="min_salary"
+                      value={editingPosition.min_salary}
+                      onChange={handleEditPositionChange}
+                      min="0"
+                      step="0.01"
+                    />
                   </div>
                   <div className="form-group">
                     <label>Daily Rate (Max)</label>
-                    <input type="number" name="max_salary" value={editingPosition.max_salary} disabled />
+                    <input
+                      type="number"
+                      name="max_salary"
+                      value={editingPosition.max_salary}
+                      onChange={handleEditPositionChange}
+                      min="0"
+                      step="0.01"
+                    />
                   </div>
                 </>
               )}

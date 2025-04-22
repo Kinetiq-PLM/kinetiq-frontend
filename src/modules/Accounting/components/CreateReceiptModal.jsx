@@ -11,8 +11,8 @@ const CreateReceiptModal = ({
   handleInputChange,
   handleSubmit,
   setValidation,
-  invoiceOptions, // Added prop for Sales Invoice ID dropdown
 }) => {
+  const [data, setData] = useState([]);
   const [bankAccounts, setBankAccounts] = useState([]);
   const [showBankInput, setShowBankInput] = useState(false);
   const [newBankAccount, setNewBankAccount] = useState({
@@ -35,6 +35,20 @@ const CreateReceiptModal = ({
         return response.json();
       })
       .then((result) => {
+        console.log("API Response (fetchData):", result);
+        setData(
+          result.map((entry) => [
+            entry.gl_account_id || "-",
+            entry.account_name || "-",
+            entry.account_code || "-",
+            entry.account_id || "-",
+            entry.status || "-",
+            entry.created_at
+              ? new Date(entry.created_at).toLocaleString()
+              : "-",
+          ])
+        );
+
         const filtered = result.filter(
           (entry) =>
             entry.account_name?.toLowerCase().includes("bank") ||
@@ -43,6 +57,7 @@ const CreateReceiptModal = ({
         );
         setBankAccounts(filtered);
         if (filtered.length === 0) {
+          console.warn("No bank accounts found.");
           setValidation({
             isOpen: true,
             type: "warning",
@@ -63,10 +78,8 @@ const CreateReceiptModal = ({
   };
 
   useEffect(() => {
-    if (isModalOpen) {
-      fetchData();
-    }
-  }, [isModalOpen]);
+    fetchData();
+  }, []);
 
   const saveBankAccount = () => {
     if (!newBankAccount.accountName || !newBankAccount.accountCode) {
@@ -107,6 +120,7 @@ const CreateReceiptModal = ({
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("Bank account saved:", data);
         fetchData();
         setNewBankAccount({ accountName: "", accountCode: "" });
         setShowBankInput(false);
@@ -153,16 +167,15 @@ const CreateReceiptModal = ({
                 onChange={(e) => handleInputChange("startDate", e.target.value)}
               />
             </div>
-            <div className="flex flex-col gap-y-1">
-              <label>Sales Invoice ID*</label>
-              <Dropdown
-                style="selection"
-                defaultOption="Select invoice..."
-                options={invoiceOptions}
-                value={reportForm.salesInvoiceId}
-                onChange={(value) => handleInputChange("salesInvoiceId", value)}
-              />
-            </div>
+
+            <Forms
+              type="text"
+              formName="Sales Invoice ID*"
+              placeholder="Enter sales invoice ID"
+              value={reportForm.salesInvoiceId}
+              onChange={(e) => handleInputChange("salesInvoiceId", e.target.value)}
+            />
+
             <Forms
               type="number"
               formName="Amount Paid*"
@@ -199,7 +212,6 @@ const CreateReceiptModal = ({
               {reportForm.paymentMethod === "Bank Transfer" && (
                 <div className="md:w-2/3 border border-gray-300 rounded-lg p-4 bg-gray-100 space-y-4">
                   <div className="flex flex-col sm:flex-row gap-y-2 sm:gap-x-6 text-sm">
-
                     <label className="flex items-center gap-x-2">
                       <input
                         type="radio"
@@ -269,7 +281,6 @@ const CreateReceiptModal = ({
                 </div>
               )}
             </div>
-
             {reportForm.paymentMethod === "Check" && (
               <Forms
                 type="text"

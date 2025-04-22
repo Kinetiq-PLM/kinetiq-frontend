@@ -72,7 +72,7 @@ export function Alert({
       {onClose && (
         <button
           type="button"
-          className="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex items-center justify-center h-8 w-8 hover:bg-opacity-25 hover:opacity-75 cursor-pointer transition duration-200 ease-in-out"
+          className="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex items-center justify-center h-8 w-8 hover:bg-opacity-25 hover:bg-gray-500"
           onClick={() => {
             setIsVisible(false);
             onClose();
