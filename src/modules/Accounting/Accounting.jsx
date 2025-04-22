@@ -87,7 +87,7 @@ const AccountingDashboard = () => {
         if (
           accountName === "Accounts Payable" || accountName === "Cash in Bank"
         ) {
-          accountsPayableTotal += debit; // Net Payable
+          accountsPayableTotal += debit - credit; // Net Payable
         }
 
         // Accounts Receivable Summary

@@ -164,11 +164,20 @@ const CreateReceiptModal = ({
               />
             </div>
             <Forms
-              type="number"
+              type="text"
               formName="Amount Paid*"
               placeholder="Enter Amount paid"
-              value={reportForm.amountPaid}
-              onChange={(e) => handleInputChange("amountPaid", e.target.value)}
+              value={
+                reportForm.amountPaid
+                  ? new Intl.NumberFormat().format(reportForm.amountPaid)
+                  : ""
+              }
+              onChange={(e) => {
+                const rawValue = e.target.value.replace(/,/g, "");
+                if (!isNaN(rawValue)) {
+                  handleInputChange("amountPaid", rawValue);
+                }
+              }}
             />
 
             <div className="flex flex-col md:flex-row md:space-x-5 space-y-5 md:space-y-0">
