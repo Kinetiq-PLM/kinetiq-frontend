@@ -35,7 +35,6 @@ const GeneralWithContractModal = ({ isOpen, onClose, onUpdate, onShowResolution,
   // Update form when callData changes
   useEffect(() => {
     if (callData) {
-      console.log("asdasd", callData)
       // Reset all fields to empty to show placeholders
       setCallId(callData.service_call_id || "")
       setCustomerId(callData.customer?.customer_id || "")

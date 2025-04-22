@@ -689,6 +689,9 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                             Salesperson
                           </th>
                           <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Order Fulfillment
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
                             Tracking No.
                           </th>
                           <th className="border border-black text-white font-light text-start  p-2 text-sm">
@@ -710,13 +713,16 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                           {`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}
                         </th>
                         <th className="border border-black text-black font-light text-start  p-2 text-sm">
+                          {data.order_fulfillment}
+                        </th>
+                        <th className="border border-black text-black font-light text-start  p-2 text-sm">
                           {data.tracking_num || "-"}
                         </th>
                         <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                          30% Downpayment, 70% After Delivery
+                          {data.shipping_method}
                         </th>
                         <th className="border border-black text-black font-light text-start  p-2 text-sm">
-                          {data.shipping_method}
+                          30% Downpayment, 70% After Delivery
                         </th>
                         <th className="border border-black text-black font-light text-start  p-2 text-sm">
                           {!data.shipping_date
@@ -1137,7 +1143,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                       <div className="flex  justify-between">
                         <span className="font-bold ">Name: </span>
                         <span className="text-end">
-                          <u>{data.statement.customer.contact_person}</u>
+                          <u>{`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}</u>
                         </span>
                       </div>
                       <div className="flex justify-between">

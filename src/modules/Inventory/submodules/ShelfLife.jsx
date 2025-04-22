@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "../styles/StockLevels.css";
+import "../styles/InvShelfLife.css";
 
 const BodyContent = () => {
     const [expiringItemsData, setExpiringItemsData] = useState([]);
@@ -29,7 +29,7 @@ const BodyContent = () => {
     
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/expiry-report/")
+        fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/expiry-report/")
             .then((res) => res.json())
             .then((data) => {
                 setExpiringItemsData(data);
@@ -44,7 +44,7 @@ const BodyContent = () => {
 
     // assets fetching
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/assets-depreciation-report/")
+        fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/assets-depreciation-report/")
             .then((res) => res.json())
             .then((data) => {
                 setAssetsData(data);
@@ -60,7 +60,7 @@ const BodyContent = () => {
 
     // warehouse list fetching
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/warehouse-list/")
+        fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/")
             .then((res) => res.json())
             .then((data) => {
                 setWarehouseList(data);
@@ -77,11 +77,11 @@ const BodyContent = () => {
     // Filtered Tab Config
     const tableConfig = {
         "Expiring Items": {
-            columns: ["Item Name", "Item Type", "Item Management ID", "Expiry Date", "Quantity", "Status"],
+            columns: ["Item Name", "Item Type", "Item Identification", "Expiry Date", "Quantity", "Status"],
             data: expiringItemsData.map((item) => ({
                 "Item Name": item?.item_name || "---",
                 "Item Type": item?.item_type || "---",
-                "Item Management ID": item?.item_management_id || "---",
+                "Item Identification": item?.item_management_id || "---",
                 "Expiry Date": item?.expiry,
                 "Quantity": item?.current_quantity,
                 "Status": item?.expiry_report_status,
@@ -172,13 +172,18 @@ const BodyContent = () => {
     console.log("Selected Row:", selectedRow);
 
     return (
-        <div className="stocklvl">
+        <div className="selflife">
             <div className="body-content-container">
 
                 {/* Flex container seperating nav and main content */}
-                <div className="flex w-full  flex-col min-h-screen px-3 py-12">
+                <div className="flex-col flex-wrap w-full min-h-screen space-y-2 px-3 py-[5rem]">
                     
-                    <nav className="md:flex md:flex-wrap justify-between items-center p-2">
+                    <nav className="md:flex flex-1 justify-between items-center p-2">
+                        
+                        <div className="text-sm text-gray-500 md:order-2">
+                        {formatPhilippineTime(currentTime)}
+                        </div>
+                        
                         <div className="invNav flex border-b border-gray-300 mt-1 space-x-8 md:order-1">
                             {tabs.map((tab) => (
                             <span
@@ -195,43 +200,41 @@ const BodyContent = () => {
                             ))}
                         </div>
                         
-                        <div className="text-sm text-gray-500 order-2">
-                        {formatPhilippineTime(currentTime)}
-                        </div>
+                        
                     </nav>
                     
                     {/* FILTER SECTION */}
-                    <div className="flex h-8 space-x-3 mt-1">
-                        <select className="border border-gray-300 rounded-md p-1 text-gray-500   cursor-pointer" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+                    <div className="flex flex-wrap md:max-h-8 space-x-3 space-y-3 mt-1 mb-1 p-1">
+                        <select className="w-full md:w-[130px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
                             <option value="">Filter Status</option>
                                 {["Pending", "Approved"].map((s) => (
                                     <option key={s} value={s}>{s}</option>
                                 ))}
                         </select>
 
-                        <select  className="border border-gray-300 rounded-md p-1 text-gray-500 cursor-pointer" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
+                        <select  className="w-full md:w-[130px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
                             <option value="">Filter Period</option>
                                 {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
                                     <option key={d} value={d}>{d}</option>
                                 ))}
                         </select>
 
-                        <select  className="warehouse-filter border border-gray-300 rounded-md p-1 text-gray-500 cursor-pointer"> 
+                        <select  className="w-full md:w-[150px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer"> 
                             <option value="">Filter Warehouse</option>
                                 {warehouseList.map((d) => (
                                     <option key={d} value={d}>{d.warehouse_location}</option>
                                 ))}
                         </select>
-                        {/* value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} */}
+                        
 
 
                     </div>
 
                     {/* main content */}
-                    <main className="flex flex-row w-full h-full space-x-4 py-2">
+                    <main className="flex w-full space-x-4 py-2">
 
                         {/* Main Table */}
-                        <div className="pcounts-table-container flex-2 border border-gray-300 rounded-lg scroll-container overflow-y-auto min-h-40 w-full p-1">
+                        <div className="expiry-table-container flex-2 border border-gray-300 rounded-lg scroll-container overflow-y-auto min-h-30 w-full p-1">
                             <table className="w-full table-layout:fixed text-center cursor-pointer">
                                 <thead>
                                     <tr className="border-b border-gray-300">
@@ -266,7 +269,7 @@ const BodyContent = () => {
 
 
                         {/* Selected Item details Details */}
-                        <div className="">
+                        {/* <div className="">
                             
                             <div className="w-full min-w-[180px] border border-gray-300 rounded-lg p-3 flex-row flex-wrap justify-between">
                                 <p className="text-center text-gray-600 font-bold mb-2">ITEM DETAILS</p>
@@ -282,7 +285,7 @@ const BodyContent = () => {
 
 
                             </div>  
-                        </div>
+                        </div> */}
 
                     </main>
 

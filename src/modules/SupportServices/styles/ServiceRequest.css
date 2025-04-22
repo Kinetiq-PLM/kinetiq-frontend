@@ -53,7 +53,7 @@
   top: 0;
   background-color: #00a8a8; 
   color: white;
-  z-index: 3;
+  z-index: 0;
 }
 
 .servrequ thead {
@@ -77,7 +77,7 @@
 }
 
 .servrequ tbody tr {
-  background-color: #eff8f9;
+  background-color: #ffffff;
   transition: background-color 0.3s ease;
 }
 

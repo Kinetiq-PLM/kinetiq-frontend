@@ -9,21 +9,19 @@
   gap: 30px;
 }
 
-
 .costprodheader-section {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
   width: 100%;
+}
 
-  h1 {
-    font-family: Inter;
-    font-size: 36px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-  }
-
+.costprodheader-section h1 {
+  font-family: Inter;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
 }
 
 .column-expanded {
@@ -55,8 +53,6 @@
   gap: 10px;
 }
 
-
-
 .costprotable {
   background-color: white;
   width: 100%;
@@ -86,7 +82,7 @@
 .costprotable tbody tr {
   display: table;
   width: 100%;
-  table-layout: fixed; 
+  table-layout: fixed;
 }
 
 .costprotable thead {
@@ -94,7 +90,7 @@
   position: sticky;
   top: 0;
   background-color: white;
-  z-index: 2;
+  z-index: 0;
 }
 
 .costprotable td {
@@ -122,7 +118,6 @@
   line-height: normal;
   border-bottom: 1px solid #007878;
   width: 200px;
-
 }
 
 .costprotable tbody::-webkit-scrollbar {
@@ -145,7 +140,7 @@
 
 .costrework-header {
   color: #000000;
-  padding-bottom: 20PX;
+  padding-bottom: 20px;
   font-family: Inter;
   font-size: 36px;
   font-style: normal;
@@ -154,11 +149,10 @@
 }
 
 .costrework-cost {
-  padding: 1rem;
+  padding: 10px;
   overflow-x: auto;
-  height: 90%;
+  height: 88.3%;
   background-color: rgb(255, 255, 255);
-  padding: 1rem;
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -168,15 +162,11 @@
   border-collapse: collapse;
   table-layout: fixed;
   background-color: rgb(255, 255, 255);
-
-
-
-  h1 {
-    font-weight: 500px;
-  }
-
 }
 
+.costrework-cost-table h1 {
+  font-weight: 500px;
+}
 
 .costrework-cost-table td {
   border-bottom: 1px solid #ddd;
@@ -202,39 +192,43 @@
   font-style: normal;
   font-weight: 500;
   line-height: normal;
+  background-color: rgb(255, 255, 255);
 }
 
+.costrework-cost-table tbody tr td:last-child {
+  padding-top: 14px; 
+}
 
-
-.costrework-cost-table input[type="text"] {
+.costrework-cost-table input[type="text"],
+.costprotable input[type="text"],
+.costprotable select,
+.costprotable textarea {
   width: 100%;
   border: 1px solid #ddd;
   padding: 6px 8px;
   border-radius: 6px;
   box-sizing: border-box;
   font-family: inherit;
+  display: none; /* Hidden by default */
 }
 
-.costrework-cost-table input[type="text"]:focus {
+.costrework-cost-table input[type="text"]:focus,
+.costprotable input[type="text"]:focus,
+.costprotable select:focus,
+.costprotable textarea:focus {
   border-color: #00A8A8;
   outline: none;
   background-color: #fff;
   box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  display: block; /* Show when focused */
 }
 
-.costrework-cost-table input[type="text"]:hover {
-  border-color: #9cd4d4; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
-  cursor: pointer; 
-}
 .costrework-cost-table {
   max-height: 400px;
   overflow-y: auto;
   display: block;
   border-collapse: collapse;
 }
-
 
 .costrework-cost-table::-webkit-scrollbar {
   width: 10px;
@@ -252,14 +246,12 @@
   width: 8px;
 }
 
-
 .costrework-cost-table thead tr {
   position: sticky;
   top: 0;
   background-color: white;
   z-index: 1;
 }
-
 
 .cpsearch-wrapper {
   position: relative;
@@ -321,7 +313,6 @@
   }
 }
 
-
 @media (max-width: 768px) {
   .costprod {
     flex-direction: column;
@@ -369,124 +360,88 @@
   }
 }
 
+/* Styles for editable cells with hover effect */
+/* Styles for editable cells with hover effect */
+.editable-cell {
+  position: relative;
+  cursor: pointer;
+}
+
+.editable-cell .cell-content {
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.editable-cell:hover .cell-content {
+  background-color: #f5f5f5;
+}
+
+.editable-cell .cell-content input,
+.editable-cell .cell-content select,
+.editable-cell .cell-content textarea {
+  display: block; /* Ensure inputs are visible when rendered (during editing) */
+}
+
+.editable-rework-cell {
+  position: relative;
+  cursor: pointer;
+}
+
+.editable-rework-cell .cell-content {
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.editable-rework-cell:hover .cell-content {
+  background-color: #f5f5f5;
+   /* Border already present, kept for consistency */
+}
+
+.editable-rework-cell .cell-content input {
+  display: block; /* Ensure inputs are visible when rendered (during editing) */
+}
+
+/* Specific styles for inputs */
 .actual-quantity-input {
-  width: 50px; /* adjust as needed */
+  width: 50px;
   padding: 4px 6px;
   font-size: 14px;
   text-align: center;
   border: 1px solid #ccc;
   border-radius: 6px;
   box-sizing: border-box;
-}  
-
-.actual-quantity-input[type="text"]:focus {
-  border-color: #00A8A8; 
-  outline: none; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5); 
-}
-
-.actual-quantity-input[type="text"]:hover {
-  border-color: #9cd4d4; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
-  cursor: pointer; 
 }
 
 .cost-of-production-input {
-  width: 90px; 
+  width: 90px;
   padding: 4px 6px;
   font-size: 14px;
   text-align: center;
   border: 1px solid #ccc;
   border-radius: 6px;
   box-sizing: border-box;
-}
-
-.cost-of-production-input[type="text"]:focus {
-  border-color: #00A8A8; 
-  outline: none; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5); 
-}
-
-.cost-of-production-input[type="text"]:hover {
-  border-color: #9cd4d4; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
-  cursor: pointer; 
 }
 
 .miscellaneous-costs-input {
-  width: 80px; 
+  width: 80px;
   padding: 4px 6px;
   font-size: 14px;
   text-align: center;
   border: 1px solid #ccc;
   border-radius: 6px;
   box-sizing: border-box;
-}
-
-.miscellaneous-costs-input[type="text"]:focus {
-  border-color: #00A8A8; 
-  outline: none; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5); 
-}
-
-.miscellaneous-costs-input[type="text"]:hover {
-  border-color: #9cd4d4; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
-  cursor: pointer; 
 }
 
 .rework-required-select {
-  width: 60px; 
+  width: 60px;
   padding: 4px 6px;
   font-size: 14px;
   text-align: center;
   border: 1px solid #ccc;
   border-radius: 6px;
   box-sizing: border-box;
-}
-
-.rework-required-select:focus {
-  border-color: #00A8A8; 
-  outline: none; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5); 
-}
-
-.rework-required-select:hover {
-  border-color: #9cd4d4; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
-  cursor: pointer; 
-}
-
-.rework-notes-input {
-  width: 70px; 
-  padding: 4px 6px;
-  font-size: 14px;
-  text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.rework-notes-input:focus {
-  border-color: #00A8A8; 
-  outline: none; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5); 
-}
-
-.rework-notes-input:hover {
-  border-color: #9cd4d4; 
-  background-color: #ffffff; 
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
-  cursor: pointer; 
 }
 
 .rework-notes-input {
@@ -500,24 +455,35 @@
   border-radius: 6px;
   line-height: 1.3;
   resize: none;
-  white-space: pre-wrap;  /* wrap text */
-  word-wrap: break-word;  /* break long words */
+  white-space: pre-wrap;
+  word-wrap: break-word;
   background-color: #f9f9f9;
   box-sizing: border-box;
-
-  scrollbar-width: thin;               /* For Firefox */
+  scrollbar-width: thin;
   scrollbar-color: #00A8A8 #e0e0e0;
+}
+
+.additional-cost-input,
+.additional-misc-input {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 14px;
+  text-align: left;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
 }
 
 th.wrap-header {
   white-space: normal;
   word-wrap: break-word;
-  width: 200px; /* or whatever fits best */
+  width: 200px;
 }
 
-.prodcontainer
-{
+.prodcontainer {
+  align-items: left;
+}
 
-align-items: left;
-
+.prod-align-cell {
+  text-align: left;
 }

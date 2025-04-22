@@ -16,6 +16,7 @@
   align-items: center;
   justify-content: flex-start;
   min-width: 40rem;
+  overflow-y: auto;
 }
 
 .reports .tabs {
@@ -29,6 +30,7 @@
   z-index: 50;
   align-self: start;
   margin-left: 15px;
+  margin-top: 50px;
 }
 
 .reports .tabs button {
@@ -1046,5 +1048,3 @@ width: 400px;
     margin-right: 70px;
   }
 }
-
-

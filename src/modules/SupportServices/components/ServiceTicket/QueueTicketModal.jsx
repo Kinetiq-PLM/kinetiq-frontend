@@ -22,6 +22,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   const [technicianName, setTechnicianName] = useState("");
   const [callType, setCallType] = useState("");
   const [priority, setPriority] = useState("");
+  const [userId, setUserId] = useState("")
 
   useEffect(() => {
     if (ticket) {
@@ -40,7 +41,8 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
       customer_id: customerId,
       technician: technicianId,
       call_type: callType, 
-      priority_level: priority
+      priority_level: priority,
+      userId: userId
     })
 
     // reset form
@@ -68,6 +70,16 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
     }
   };
 
+  const fetchUserId = async (techId) => {
+    try {
+      const response = await GET(`call/calls/user/${techId}`); 
+      setUserId(response.user_id);
+      console.log("user id", response.user_id)
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+
   const handleToggleDropdownTech = () => {
     if (!isTechDropdown) {
       fetchTechnicians(); 
@@ -77,6 +89,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   };
 
   const handleSelectTechnician = (technician) => {
+    fetchUserId(technician.employee_id)
     setTechnicianId(technician.employee_id); 
     setTechnicianName(technician.first_name + " " + technician.last_name); 
     setOpenTechDD(false); 

@@ -12,6 +12,7 @@ import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 import { GET } from "../api/api"
 import { POST } from "../api/api"
 import { PATCH } from "../api/api"
+import { POST_NOTIF } from "../api/api"
 
 const ServiceTicket = ({ user_id, employee_id }) => {
   // State for form fields
@@ -39,8 +40,8 @@ const ServiceTicket = ({ user_id, employee_id }) => {
   const fetchTickets = async () => {
     try {
       // this filters out tickets so that only the tickets assigned to the one currently logged in will show:
-      const data = await GET(`ticket/tickets/salesrep/HR-EMP-2025-de92df/`);
-      // const data = await GET(`ticket/tickets/salesrep/${employee_id}/`);
+      // const data = await GET(`ticket/tickets/salesrep/HR-EMP-2025-de92df/`);
+      const data = await GET(`ticket/tickets/salesrep/${employee_id}/`);
       
       // all tix version:
       // const data = await GET("ticket/");
@@ -89,9 +90,23 @@ const ServiceTicket = ({ user_id, employee_id }) => {
   // Handle submit from modal
   const handleSubmitTicket = async (ticketData) => {
     console.log("Submitting ticket:", ticketData)
+
+    const notifData = {
+      module: "Support & Services",
+      submodule: "Service Ticket",
+      recipient_id: ticketData.userId,
+      msg: "New ticket submitted for you to review."
+    }
+
+    const { userId, ...ticketPayload } = ticketData;
+    console.log("Sending notif:", notifData)
     try {
-        const data = await POST("ticket/", ticketData);
+        const data = await POST("ticket/", ticketPayload);
         console.log("Ticket created successfully:", data);
+
+        const notif_data = await POST_NOTIF("send-notif/", notifData);
+        console.log("Notification sent successfully:", notif_data);
+
         setShowSubmitModal(false);
         fetchTickets();
     } catch (error) {
@@ -157,9 +172,23 @@ const ServiceTicket = ({ user_id, employee_id }) => {
   const handleQueueCall = async (queueData) => {
     console.log("Queueing ticket:", queueData)
 
+    const notifData = {
+      module: "Support & Services",
+      submodule: "Service Call",
+      recipient_id: queueData.userId,
+      msg: "New queued call for you to review."
+    }
+
+    const { userId, ...queuePayload } = queueData;
+    console.log("Sending notif:", notifData)
+
     try {
-      const data = await POST("call/", queueData);
+      const data = await POST("call/", queuePayload);
       console.log("Service call created successfully:", data);
+
+      const notif_data = await POST_NOTIF("send-notif/", notifData);
+      console.log("Notification sent successfully:", notif_data);
+
       inProgTix(ticketId);
       setShowQueueModal(false);
     } catch (error) {
@@ -266,7 +295,7 @@ const ServiceTicket = ({ user_id, employee_id }) => {
                     className="search-input"
                   />
                 </div>
-                <div className="filter-dropdown">
+                <div className="filter-dropdown" >
                   <button className="filter-button" onClick={() => setShowFilterOptions(!showFilterOptions)}>
                   {filterOptions.find(opt => opt.value === filterBy)?.label || "Filter by"}
                     <span className="arrow">▼</span>

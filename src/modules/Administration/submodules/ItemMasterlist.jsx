@@ -136,8 +136,10 @@ const ItemMasterManagement = () => {
     } else if (activeTab === "products") {
       fetchProducts();
       fetchPolicies();
+      fetchContentIds();
     } else if (activeTab === "materials") {
       fetchRawMaterials();
+      fetchVendors();
     }
   }, [activeTab]);
 
@@ -210,6 +212,29 @@ const ItemMasterManagement = () => {
     }
   };
 
+  // const fetchVendors = async () => {
+  //   try {
+  //     const data = await rawMaterialsAPI.getVendors();
+  //     setVendors(data.results || data);
+  //   } catch (error) {
+  //     message.error("Failed to fetch vendors");
+  //     console.error(error);
+  //   }
+  // };
+
+  const fetchVendors = async () => {
+    setLoading(true);
+    try {
+        const data = await vendorAPI.getVendors();
+        setVendors(data.results || data);
+    } catch (error) {
+        message.error("Failed to fetch vendors");
+        console.error(error);
+    } finally {
+        setLoading(false);
+    }
+  };
+
   const fetchProducts = async (searchTerm = "", orderField = "", orderDirection = "") => {
     setLoading(true);
     try {
@@ -250,18 +275,7 @@ const ItemMasterManagement = () => {
     }
   };
 
-  const fetchVendors = async () => {
-    setLoading(true);
-    try {
-        const data = await vendorAPI.getVendors();
-        setVendors(data.results || data);
-    } catch (error) {
-        message.error("Failed to fetch vendors");
-        console.error(error);
-    } finally {
-        setLoading(false);
-    }
-  };
+
 
   const fetchArchivedItems = async (searchTerm = "", orderField = "", orderDirection = "") => {
     setLoading(true);
@@ -544,16 +558,23 @@ const ItemMasterManagement = () => {
   const handleEditProduct = (record) => {
     setModalMode("edit");
     setSelectedRecord(record);
+
+    // Safe number conversion
+    const toNumberOrNull = (value) => {
+      const num = Number(value);
+      return isNaN(num) ? null : num; 
+    };
+  
     // Set form values based on your product structure
     productForm.setFieldsValue({
       product_name: record.product_name,
       description: record.description,
-      selling_price: record.selling_price,
-      stock_level: record.stock_level,
+      selling_price: toNumberOrNull(record.selling_price),
+      stock_level: toNumberOrNull(record.stock_level),
       unit_of_measure: record.unit_of_measure,
       batch_no: record.batch_no,
       item_status: record.item_status,
-      warranty_period: record.warranty_period,
+      warranty_period: toNumberOrNull(record.warranty_period),
       policy_id: record.policy_id,
       content_id: record.content_id
     });
@@ -815,6 +836,7 @@ const ItemMasterManagement = () => {
           />
           <Popconfirm
             title="Are you sure you want to archive this item?"
+            popupPlacement="topRight"
             onConfirm={() => handleArchiveItem(record.item_id)}
             okText="Yes"
             cancelText="No"
@@ -890,6 +912,7 @@ const ItemMasterManagement = () => {
           />
           <Popconfirm
             title="Are you sure you want to archive this asset?"
+            popupPlacement="topRight"
             onConfirm={() => handleArchiveAsset(record.asset_id)}
             okText="Yes"
             cancelText="No"
@@ -1003,6 +1026,7 @@ const ItemMasterManagement = () => {
           />
           <Popconfirm
             title="Are you sure you want to archive this product?"
+            popupPlacement="topRight"
             onConfirm={() => handleArchiveProduct(record.product_id)}
             okText="Yes"
             cancelText="No"
@@ -1024,21 +1048,21 @@ const ItemMasterManagement = () => {
       dataIndex: "material_id",
       key: "material_id",
       sorter: true,
-      width: 100,
+      width: 140,
     },
     {
       title: "Material Name",
       dataIndex: "material_name",
       key: "material_name",
       sorter: true,
-      width: 120,
+      width: 130,
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
       sorter: true,
-      width: 140,
+      width: 220,
     },
     {
       title: "UOM",
@@ -1059,12 +1083,12 @@ const ItemMasterManagement = () => {
       dataIndex: "vendor_code",
       key: "vendor_code",
       sorter: true,
-      width: 100,
+      width: 140,
     },
     {
       title: "Actions",
       key: "actions",
-      width: 100,
+      width: 40,
       align: "center",
       render: (_, record) => (
         <Space size="small">
@@ -1076,6 +1100,7 @@ const ItemMasterManagement = () => {
           />
           <Popconfirm
             title="Are you sure you want to archive this raw material?"
+            popupPlacement="topRight"
             onConfirm={() => handleArchiveMaterial(record.material_id)}
             okText="Yes"
             cancelText="No"
@@ -1793,7 +1818,7 @@ const archivedProductColumns = [
                 </div>
                 
                 <div className="action-row">
-                    <Button 
+                    {/* <Button 
                     type="primary" 
                     onClick={() => {
                         setModalMode("edit");
@@ -1810,7 +1835,7 @@ const archivedProductColumns = [
                     style={{ backgroundColor: '#00A8A8', borderColor: '#00A8A8' }}
                     >
                     Edit
-                    </Button>
+                    </Button> */}
                 </div>
                 </div>
             ) : (
@@ -1943,6 +1968,7 @@ const archivedProductColumns = [
             <Form.Item
               name="purchase_price"
               label="Purchase Price"
+              rules={[{ required: true, message: "Please enter a valid purchase price" }]}
             >
               <InputNumber 
                 min={0}
@@ -2015,6 +2041,7 @@ const archivedProductColumns = [
             <Form.Item
               name="description"
               label="Description"
+              rules={[{ required: true, message: "Please enter product description" }]}
             >
               <TextArea rows={4} />
             </Form.Item>
@@ -2022,18 +2049,24 @@ const archivedProductColumns = [
             <Form.Item
               name="selling_price"
               label="Selling Price"
+              rules={[{ required: true, message: "Please enter a valid selling price" }]}
             >
               <InputNumber 
                 min={0}
                 style={{ width: '100%' }}
-                formatter={value => `₱ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                parser={value => value.replace(/\$\s?|(,*)/g, '')}
               />
             </Form.Item>
 
             <Form.Item
               name="stock_level"
               label="Stock Level"
+              rules={[
+                {
+                  type: 'number',
+                  message: 'stock level must be a number',
+                  transform: (value) => (value === '' ? null : value), // treat empty string as null
+                }
+              ]}
             >
               <InputNumber 
                 min={0}
@@ -2075,6 +2108,13 @@ const archivedProductColumns = [
             <Form.Item
               name="warranty_period"
               label="Warranty Period"
+              rules={[
+                {
+                  type: 'number',
+                  message: 'Selling Price must be a number',
+                  transform: (value) => (value === '' ? null : value), // treat empty string as null
+                }
+              ]}
             >
               <InputNumber 
                 min={0}
@@ -2151,36 +2191,10 @@ const archivedProductColumns = [
             </Form.Item>
 
             <Form.Item
-              name="material_code"
-              label="Material Code"
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
               name="description"
               label="Description"
             >
               <TextArea rows={4} />
-            </Form.Item>
-
-            <Form.Item
-              name="category"
-              label="Category"
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              name="unit_cost"
-              label="Unit Cost"
-            >
-              <InputNumber 
-                min={0}
-                style={{ width: '100%' }}
-                formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                parser={value => value.replace(/\$\s?|(,*)/g, '')}
-              />
             </Form.Item>
 
             <Form.Item
@@ -2197,13 +2211,23 @@ const archivedProductColumns = [
             </Form.Item>
 
             <Form.Item
-              name="preferred_vendor"
-              label="Preferred Vendor"
+              name="cost_per_unit"
+              label="Cost Per Unit"
+            >
+              <InputNumber 
+                min={0}
+                style={{ width: '100%' }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="vendor_code"
+              label="Vendor"
             >
               <Select allowClear placeholder="Select a vendor">
                 {vendors.map(vendor => (
-                  <Option key={vendor.vendor_id} value={vendor.vendor_id}>
-                    {vendor.vendor_name}
+                  <Option key={vendor.vendor_code} value={vendor.vendor_code}>
+                    {vendor.vendor_code}
                   </Option>
                 ))}
               </Select>
@@ -2344,3 +2368,5 @@ const archivedProductColumns = [
 };
 
 export default ItemMasterManagement;
+
+

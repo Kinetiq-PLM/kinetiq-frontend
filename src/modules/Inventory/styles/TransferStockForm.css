@@ -5,7 +5,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5); /* Semi-transparent backdrop */
+  background: rgba(0, 0, 0, 0.5); 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,7 +57,7 @@
 
 .stockflow .modal-content textarea {
   resize: vertical;
-  min-height: 3rem; /* Adjust as needed */
+  min-height: 2rem; 
 }
 
 /* Form Section (Checkbox Groups) */

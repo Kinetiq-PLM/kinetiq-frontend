@@ -122,7 +122,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const customerName = e.target.value;
     setSelectedVendor(customerName);
     const selectedVendorData = vendorList.find(v => v.name === customerName);
-    setVendorID(selectedVendorData ? selectedVendorData.customer_id : null);
+    setVendorID(selectedVendorData ? selectedVendorData.customer_id : "");
     setContactPerson(selectedVendorData ? selectedVendorData.contact_person : "");
   };
 
@@ -226,9 +226,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
 
-
-
-
     // Handle date fields
     if (field === 'manuf_date' || field === 'expiry_date') {
       updatedItems[index] = {
@@ -238,7 +235,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           [field]: e.target.value // This will be in YYYY-MM-DD format from the date input
         }
       };
-    } else {
+    }
+    else {
       updatedItems[index][field] = e.target.value;
     }
     setDocumentItems(updatedItems);
@@ -311,8 +309,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             item_name: '',
             unit_of_measure: '',
             quantity: '',
-            cost: '',
-            warehouse_id: ''
+            cost: ''
           });
  
           setDocumentItems(updatedItems);
@@ -322,8 +319,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         const payload = {
           document_id: selectedData.document_id,
           quantity: parseInt(lastRow.quantity),
-          cost: parseFloat(lastRow.cost),
-          warehouse_id: lastRow.warehouse_id,
+          cost: parseFloat(lastRow.cost)
         };
  
         // Set the appropriate item type field
@@ -405,8 +401,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           item_name: '',
           unit_of_measure: '',
           quantity: '',
-          cost: '',
-          warehouse_id: ''
+          cost: ''
         });
  
         setDocumentItems(updatedItems);
@@ -428,8 +423,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           item_name: '',
           unit_of_measure: '',
           quantity: '',
-          cost: '',
-          warehouse_id: ''
+          cost: ''
         });
 
 
@@ -676,19 +670,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   // Add a new function to handle create operation
   const handleCreateDocument = async () => {
     try {
-      if (!selectedOwner || !vendorID){
-        if(!selectedOwner){
-          toast.error("Owner is required")
-          return
-        }else if(!documentDetails.buyer){
-          toast.error("Buyer Required")
-          return
-        }else if(!(documentDetails.invoice_id)){
-          toast.error("Invoice ID required")
-          return
-        }
-        return
-      }
+      
       // Prepare the document items for creation
       const itemsToCreate = documentItems.slice(0, -1); // Exclude the last empty row
      
@@ -718,7 +700,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           item_name: item.item_name,
           quantity: item.quantity,
           cost: item.cost,
-          warehouse_id: item.warehouse_id,
           batch: item.batch_no || null,
           ...(item.item_id.startsWith("ADMIN-PROD") && { product_id: item.item_id }),
           ...(item.item_id.startsWith("ADMIN-ASSET") && { asset_id: item.item_id }),
@@ -761,7 +742,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       onSuccess(result);
      
     } catch (error) {
-      toast.error(`Failed to create document: ${error.message}`);
+      toast.error(`Failed to create document. Please try again later`);
+      console.log(error)
     }
   };
 
@@ -783,13 +765,25 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
     const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
-    if (!vendorID){
-      toast.error("Customer Required")
+    if(!selectedOwner){
+      toast.error("Owner is required")
       return
-    }
-    if(!(documentDetails.invoice_id)){
+    }else if(!(documentDetails.invoice_id)){
+      toast.dismiss()
       toast.error("Invoice ID required")
       return
+    }else if(!vendorID){
+      toast.dismiss()
+      toast.error("Customer is required")
+      return
+    }else if (updatedDocumentItems.length === 0) {
+      toast.dismiss()
+      toast.error("At least one item is required. Please fill all necessary data");
+      return;
+    }else if (documentDetails.transaction_cost > 1000000000) {
+      toast.dismiss()
+      toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
+      return;
     }
     try {
       if (isCreateMode) {
@@ -826,8 +820,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         const updateDocomentItems = {
           quantity: parseInt(item.quantity) || 0,
           cost: parseFloat(item.cost) || 0,
-          total: parseFloat(item.quantity * item.cost).toFixed(2) || 0,
-          warehouse_id: item.warehouse_id || "",
+          total: parseFloat(item.quantity * item.cost).toFixed(2) || 0
         };
         if (item.item_id?.startsWith("ADMIN-MATERIAL")) {
           updateDocomentItems.material_id = item.item_id;
@@ -870,7 +863,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         tax_rate: parseFloat(documentDetails.tax_rate) || 0,
         tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
         freight: parseFloat(documentDetails.freight) || 0,
-        transaction_cost: parseFloat(documentDetails.total).toFixed(2) || 0,
+        transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0,
       };
       const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
         method: 'PUT',
@@ -897,7 +890,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         onBack();  // Navigate back to GoodsTracking
       }
     } catch (error) {
-      toast.error(`Failed to update data. Details: ${error.message}`);
+      toast.error(`Failed to update data. Please try again later`);
+      console.log(error)
     }
   };
  
@@ -1191,6 +1185,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         defaultValue="2025-01-31"
                         value={documentDetails.posting_date}
                         onChange={(e) => handleDocumentDetailChange(e, "posting_date")}
+                        min={date_today}
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
@@ -1205,6 +1200,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         defaultValue="2025-01-31"
                         value={documentDetails.document_date}
                         onChange={(e) => handleDocumentDetailChange(e, "document_date")}
+                        max={date_today}
                       />
                       <span className="calendar-icon">📅</span>
                     </div>
@@ -1233,11 +1229,26 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     />
                   </div>
                   <div className="detail-row">
-                    <label>Sales Tax</label>
+                    <label>Tax Rate</label>
                     <input
-                      type="text"
+                      type="number"
                       value={documentDetails.tax_rate}
-                      onChange={(e) => handleDocumentDetailChange(e, "tax_rate")}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const regex = /^\d{0,2}(\.\d{0,2})?$/;
+                        if (value === '' || (regex.test(value) && parseFloat(value) <= 100)) {
+                          setDocumentDetails(prev => ({
+                            ...prev,
+                            tax_rate: value
+                          }));
+                        }else{
+                          toast.dismiss()
+                          toast.info("Please enter a valid percentage. Maximum is 100 and up to 2 decimal places.")
+                        }
+                      }}
+                      step="1"
+                      min="0"
+                      max="100"
                     />
                   </div>
                   <div className="detail-row">
@@ -1245,7 +1256,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <label>Total</label>
                     <input type="text" value={
                       documentDetails.transaction_cost
-                    }  />
+                      }  
+                      readOnly style={{ cursor: 'not-allowed' }}
+                    />
                   </div>
                   </div>
                   <div className="detail-row">
@@ -1308,12 +1321,30 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         ))}
                       </select>
                       </td>
-                      <td>
+                      <td className="item-number">
                         <input
                           type="number"
-                          value={item.quantity || ''}
-                          onChange={(e) => handleInputChange(e, index, 'quantity')}
                           min="0"
+                          max="1000000000"
+                          step = "1"
+                          value={item.quantity || ''}
+                          onKeyDown={(e) => {
+                            if (e.key === '.') {
+                              e.preventDefault();
+                            }
+                          }}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (
+                              /^\d*$/.test(value) &&      
+                              parseInt(value, 10) <= 10000000  
+                            ) {
+                              handleInputChange(e, index, 'quantity');
+                            }else{
+                              toast.dismiss();
+                              toast.info("Maximum quantity is 10 millions")
+                            }
+                          }}
                         />
                       </td>
                       <td>
@@ -1321,9 +1352,19 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                           type="number"
                           value={item.cost || ''}
                           onChange={(e) => handleInputChange(e, index, 'cost')}
+                          readOnly style={{ cursor: 'not-allowed' }}
                         />
                       </td>
-                      <td>{(item.quantity * item.cost || 0).toFixed(2)}</td>
+                      <td readOnly style={{ cursor: 'not-allowed' }}>
+                        {(() => {
+                          const total = (item.quantity * item.cost) || 0;
+                          if (total > 1000000000) {
+                            toast.dismiss();
+                            toast.error("Total cost must not exceed 1 billion");
+                          }
+                          return total.toFixed(2);
+                        })()}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

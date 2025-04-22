@@ -11,8 +11,9 @@ import {
     Pagination
 } from "antd";
 import {
-    UserOutlined,
-    SearchOutlined
+    BookOutlined,
+    SearchOutlined,
+    FilterOutlined,
 } from "@ant-design/icons";
 
 const { TabPane } = Tabs;
@@ -196,7 +197,7 @@ const AuditLog = () => {
                         }}
                     >
                         <TabPane
-                            tab={<span><UserOutlined /> {windowWidth > 576 ? "Notification" : ""}</span>}
+                            tab={<span><BookOutlined /> {windowWidth > 576 ? "Logs" : ""}</span>}
                             key="auditLog"
                         >
                             {/* Notif tab content */}
@@ -239,3 +240,4 @@ const AuditLog = () => {
 };
 
 export default AuditLog;
+
