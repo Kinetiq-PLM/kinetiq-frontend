@@ -128,8 +128,6 @@ const JournalEntry = () => {
     setSelectedIndex(null);
   };
   
-  
-  
 
   const handleSubmit = async () => {
     // Validation checks
@@ -204,9 +202,13 @@ const JournalEntry = () => {
         });
         setJournalForm({
           journalId: "",
-          transactions: [{ type: "debit", glAccountId: "", amount: "", accountName: "" }],
+          transactions: [
+            { type: "debit", glAccountId: "", amount: "", accountName: "" },
+            { type: "credit", glAccountId: "", amount: "", accountName: "" },
+          ],
           description: "",
         });
+        
         setTotalDebit(0);
         setTotalCredit(0);
       } else {
