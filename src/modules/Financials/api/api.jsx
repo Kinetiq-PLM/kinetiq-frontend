@@ -1,6 +1,6 @@
-const API_BASE_URL = "https://eq7nxor488.execute-api.ap-southeast-1.amazonaws.com/dev";
-//const API_BASE_URL = "http://127.0.0.1:8000/"; // Local development URL
-//const uploadToS3Endpoint = 'https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload-to-s3/'
+//const API_BASE_URL = "https://eq7nxor488.execute-api.ap-southeast-1.amazonaws.com/dev/";
+const API_BASE_URL = "http://127.0.0.1:8000/"; // Local development URL
+const uploadToS3Endpoint = 'https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload-to-s3/'
 
 export const GET = async (endpoint) => {
   try {
@@ -44,7 +44,7 @@ export const POST = async (endpoint, data) => {
 
 export const PATCH = async (endpoint, data) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export const PATCH = async (endpoint, data) => {
     throw error;
   }
 };
-/*
+
 export const uploadToS3 = async (file, directory) => {
   if (!file || !directory) {
     alert("Please select a file and directory.");
@@ -112,4 +112,3 @@ export const uploadToS3 = async (file, directory) => {
     return null;
   }
 };
-*/
