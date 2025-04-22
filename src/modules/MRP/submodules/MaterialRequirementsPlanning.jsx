@@ -1047,7 +1047,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </div>
                     </div>
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
-                    <button onClick={() => setCreated(false)} style={buttonStyle2('#fff')}>
+                    <button onClick={() => {setCreated(false), setIsOpen2(false), setIsOpen(false), setChecker(false), setCreated(false), setAdditionalCost(false), setAdditionalCost2(false), setRawMaterial(false)}} style={buttonStyle2('#fff')}>
                         <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
                         <span style={{color: '#969696'}}>Close</span>
                     </button>
