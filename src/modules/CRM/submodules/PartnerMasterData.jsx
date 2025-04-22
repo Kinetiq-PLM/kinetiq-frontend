@@ -8,7 +8,6 @@ import Dropdown from "../../Sales/components/Dropdown";
 import { AlertProvider } from "../../Sales/components/Context/AlertContext";
 
 import CustomerTab from "../components/PartnerDataTabs/CustomerTab";
-import SuppliersTab from "../components/PartnerDataTabs/SupplierTab";
 import VendorsTab from "../components/PartnerDataTabs/VendorsTab";
 
 const PartnerMasterData = () => {
@@ -16,10 +15,6 @@ const PartnerMasterData = () => {
     {
       name: "Customers",
       component: <CustomerTab />,
-    },
-    {
-      name: "Suppliers",
-      component: <SuppliersTab />,
     },
     {
       name: "Vendors",

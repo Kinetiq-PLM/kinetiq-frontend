@@ -14,6 +14,7 @@ export default function BlanketAgreementsTab({
   setActiveSubModule,
   setIsDocumentModalOpen,
   setDocument,
+  employee_id,
 }) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +44,7 @@ export default function BlanketAgreementsTab({
 
   const deliveryQuery = useQuery({
     queryKey: ["deliveries"],
-    queryFn: async () => await GET("sales/delivery"),
+    queryFn: async () => await GET(`sales/delivery?salesrep=${employee_id}`),
     retry: 2,
   });
 

@@ -11,7 +11,7 @@ import Search from "../components/Search";
 const Journal = () => {
   const getCurrentDate = () => {
     const today = new Date();
-    return today.toISOString().split("T")[0]; // returns 'YYYY-MM-DD'
+    return today.toISOString().split("T")[0];
   };
 
   const columns = [
@@ -27,7 +27,7 @@ const Journal = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("asc");
   const [currencies, setCurrencies] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [invoices, setInvoices] = useState([]);
   const [searching, setSearching] = useState("");
   const [sortBy, setSortBy] = useState("Debit");
   const [data, setData] = useState([]);
@@ -44,119 +44,135 @@ const Journal = () => {
     message: "",
   });
 
-  // API endpoint
   const API_URL =
     import.meta.env.VITE_API_URL ||
     "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const JOURNAL_ENTRIES_ENDPOINT = `${API_URL}/api/journal-entries/`;
+  const INVOICES_ENDPOINT = `${API_URL}/api/invoices/`;
+  const CURRENCIES_ENDPOINT = `${API_URL}/api/currencies/`;
 
-  // Open modal function
   const openModal = () => setIsModalOpen(true);
-
-  // Close modal function
   const closeModal = () => setIsModalOpen(false);
 
-  // Fetch data from the API - Sort by: journal_date descending
-  const fetchData = () => {
-    setIsLoading(true); // Set loading to true when fetching starts
-    axios
-      .get(JOURNAL_ENTRIES_ENDPOINT)
-      .then((response) => {
-        console.log("API Response (fetchData):", response.data);
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const response = await axios.get(JOURNAL_ENTRIES_ENDPOINT, config);
+      const sortedResult = response.data.sort(
+        (a, b) =>
+          new Date(b.journal_date || b.date) -
+          new Date(a.journal_date || a.date)
+      );
+      setData(
+        sortedResult.map((entry) => [
+          entry.journal_id || entry.id || "-",
+          entry.journal_date || entry.date || "-",
+          entry.description || "-",
+          entry.total_debit || 0,
+          entry.total_credit || 0,
+          entry.invoice_id || "-",
+          entry.currency_id || "-",
+        ])
+      );
+      if (sortedResult.length > 0) {
+        const latest = sortedResult[0];
+        setLatestJournalId(latest.journal_id || "ACC-JOE-2025-A00000");
+      }
+    } catch (error) {
+      console.error("Error fetching journal data:", error);
+      setValidation({
+        isOpen: true,
+        type: "error",
+        title: "Journal Fetch Failed",
+        message: "Failed to load journal entries. Please check your connection or API configuration.",
+      });
+    }
+  };
 
-        // Sort result by journal_date descending (latest first)
-        const sortedResult = response.data.sort(
-          (a, b) =>
-            new Date(b.journal_date || b.date) -
-            new Date(a.journal_date || a.date)
-        );
+  const fetchCurrencies = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const response = await axios.get(CURRENCIES_ENDPOINT, config);
+      const activeCurrencies = response.data.filter((c) => c.is_active);
+      setCurrencies(activeCurrencies);
+    } catch (error) {
+      console.error("Error fetching currencies:", error);
+      setValidation({
+        isOpen: true,
+        type: "error",
+        title: "Currency Fetch Failed",
+        message: "Could not load currency list. Please check your connection or API configuration.",
+      });
+    }
+  };
 
-        setData(
-          sortedResult.map((entry) => [
-            entry.journal_id || entry.id || "-",
-            entry.journal_date || entry.date || "-",
-            entry.description || "-",
-            entry.total_debit || 0,
-            entry.total_credit || 0,
-            entry.invoice_id || "-",
-            entry.currency_id || "-",
-          ])
-        );
-
-        // Get the latest journal ID (first after sorting)
-        if (sortedResult.length > 0) {
-          const latest = sortedResult[0];
-          setLatestJournalId(latest.journal_id || "ACC-JOE-2025-A00000");
-        }
-        setIsLoading(false); // Set loading to false when fetching is done
-      })
-      .catch((error) => {
-        console.error(
-          "Error fetching data:",
-          error.response ? error.response.data : error
-        );
+  const fetchInvoices = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      // Use require_receipt=false to include invoices without receipts
+      const response = await axios.get(`${INVOICES_ENDPOINT}?for_journal=true&require_receipt=false`, config);
+      setInvoices(response.data);
+      if (response.data.length === 0) {
+        // REVISED: Improved validation message
         setValidation({
           isOpen: true,
-          type: "error",
-          title: "Fetch Error",
-          message:
-            "Failed to load journal entries. Please check your connection.",
+          type: "warning",
+          title: "No Invoices Available",
+          message: "No invoices with a remaining balance found. All invoices may be fully paid or returned.",
         });
-        setIsLoading(false); // Set loading to false when fetching is done
+      }
+    } catch (error) {
+      console.error("Error fetching invoices:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
       });
+      let message = "Could not load invoice list. Please ensure the API is accessible.";
+      if (error.response?.status === 404) {
+        message = "Invoice endpoint not found. Verify the API configuration.";
+      } else if (error.response?.status === 403) {
+        message = "Access denied. Please check your authentication credentials.";
+      } else if (error.code === "ERR_NETWORK") {
+        message = "Network error. Please ensure the API is running.";
+      } else if (error.response?.status === 504) {
+        message = "Gateway timeout. Check the backend response time.";
+      }
+      setValidation({
+        isOpen: true,
+        type: "error",
+        title: "Invoice Fetch Failed",
+        message: error.response?.data?.detail || message,
+      });
+    }
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
-
-  const fetchCurrencies = () => {
-    axios
-      .get(`${API_URL}/api/currencies/`)
-      .then((res) => {
-        const activeCurrencies = res.data.filter((c) => c.is_active);
-        setCurrencies(activeCurrencies);
-      })
-      .catch((err) => {
-        console.error("Error fetching currencies:", err);
-        setValidation({
-          isOpen: true,
-          type: "error",
-          title: "Currency Fetch Failed",
-          message: "Could not load currency list. Please try again.",
-        });
-      });
-  };
-
-  useEffect(() => {
-    fetchData();
-    fetchCurrencies(); // 👈 AWS API call
+    fetchCurrencies();
+    fetchInvoices();
   }, []);
 
   const currencyOptions = currencies.map((c) => c.currency_name);
+  const invoiceOptions = invoices.map((inv) => inv.invoice_id);
 
-  // Generate the next Journal ID
   const generateNextJournalId = () => {
-    if (!latestJournalId) return "ACC-JOE-2025-A00001"; // Default for the first journal ID
-
-    // Extract the alphanumeric part (e.g., "A1B2C3")
+    if (!latestJournalId) return "ACC-JOE-2025-A00001";
     const matches = latestJournalId.match(/ACC-JOE-2025-([A-Z0-9]+)$/);
     if (matches && matches[1]) {
       const lastIncrement = matches[1];
       const nextIncrement = incrementAlphaNumeric(lastIncrement);
       return `ACC-JOE-2025-${nextIncrement}`;
     }
-
-    return "ACC-JOE-2025-A00001"; // Fallback default
+    return "ACC-JOE-2025-A00001";
   };
 
-  // Increment an alphanumeric string (e.g., "A1B2C3" -> "A1B2C4")
   const incrementAlphaNumeric = (str) => {
-    // Validate input (only allow alphanumeric characters)
     if (!/^[A-Z0-9]+$/.test(str)) {
       throw new Error("Invalid alphanumeric string");
     }
-
     const chars = str.split("");
     for (let i = chars.length - 1; i >= 0; i--) {
       if (chars[i] === "Z") {
@@ -171,32 +187,40 @@ const Journal = () => {
     return chars.join("");
   };
 
-  // Update the journal form state when an input field changes
   const handleInputChange = (field, value) => {
     setJournalForm((prevState) => ({ ...prevState, [field]: value }));
   };
 
-  // Handle submit with user validations
   const handleSubmit = async () => {
     if (
       !journalForm.journalDate ||
       !journalForm.description ||
-      !journalForm.invoiceId ||
-      !journalForm.currencyId
+      !journalForm.currencyId ||
+      !journalForm.invoiceId
     ) {
       setValidation({
         isOpen: true,
         type: "warning",
         title: "Missing Required Fields",
-        message: "Please fill in all required fields.",
+        message: "Please fill in all required fields, including Invoice ID.",
       });
       return;
     }
 
-    // Generate the next journal ID automatically
-    const nextJournalId = generateNextJournalId();
+    const selectedInvoice = invoices.find(
+      (inv) => inv.invoice_id === journalForm.invoiceId
+    );
+    if (!selectedInvoice) {
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "Invalid Invoice",
+        message: "Please select a valid invoice.",
+      });
+      return;
+    }
 
-    // Generate the next Journal ID
+    const nextJournalId = generateNextJournalId();
     const selectedCurrency = currencies.find(
       (c) => c.currency_name === journalForm.currencyId
     );
@@ -207,19 +231,18 @@ const Journal = () => {
       description: journalForm.description,
       total_debit: "0.00",
       total_credit: "0.00",
-      invoice_id: journalForm.invoiceId || null,
-      currency_id: selectedCurrency?.currency_id || "", // send actual ID
+      invoice_id: journalForm.invoiceId,
+      currency_id: selectedCurrency?.currency_id || "",
     };
 
-    console.log("Submitting payload:", payload);
-
     try {
-      const response = await axios.post(JOURNAL_ENTRIES_ENDPOINT, payload);
-
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const response = await axios.post(JOURNAL_ENTRIES_ENDPOINT, payload, config);
       if (response.status === 201) {
         fetchData();
         setJournalForm({
-          journalDate: "",
+          journalDate: getCurrentDate(),
           description: "",
           currencyId: "",
           invoiceId: "",
@@ -240,55 +263,34 @@ const Journal = () => {
         });
       }
     } catch (error) {
-      console.error(
-        "Error submitting data:",
-        error.response ? error.response.data : error
-      );
+      console.error("Error submitting journal:", error);
       setValidation({
         isOpen: true,
         type: "error",
-        title: "Check Connection!",
-        message:
-          error.response?.data?.detail || "Failed to connect to the server.",
+        title: "Submission Failed",
+        message: error.response?.data?.detail || "Failed to connect to the API.",
       });
     }
   };
 
-  // Handle sorting (applies to both Debit and Credit columns)
   const handleSort = (criteria) => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newSortOrder);
     setSortBy(criteria);
-
     const sortedData = [...data].sort((a, b) => {
       const valueA = parseFloat(a[columns.indexOf(criteria)]) || 0;
       const valueB = parseFloat(b[columns.indexOf(criteria)]) || 0;
-
-      if (newSortOrder === "asc") {
-        return valueA - valueB;
-      } else {
-        return valueB - valueA;
-      }
+      return newSortOrder === "asc" ? valueA - valueB : valueB - valueA;
     });
-
     setData(sortedData);
   };
 
-  // Search filtering
   const filteredData = data.filter((row) =>
     [row[0], row[1], row[2], row[5], row[6]]
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
       .includes(searching.toLowerCase())
-  );
-
-  // Loading spinner component
-  const LoadingSpinner = () => (
-    <div className="flex justify-center items-center p-8 mt-30">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      <p className="ml-4 text-gray-600">Loading journal data...</p>
-    </div>
   );
 
   return (
@@ -320,11 +322,7 @@ const Journal = () => {
             />
           </div>
         </div>
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
-          <Table data={filteredData} columns={columns} enableCheckbox={false} />
-        )}
+        <Table data={filteredData} columns={columns} enableCheckbox={false} />
       </div>
       <JournalModalInput
         isModalOpen={isModalOpen}
@@ -333,6 +331,7 @@ const Journal = () => {
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
         currencyOptions={currencyOptions}
+        invoiceOptions={invoiceOptions}
       />
       {validation.isOpen && (
         <NotifModal

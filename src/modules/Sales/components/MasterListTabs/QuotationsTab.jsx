@@ -15,6 +15,7 @@ export default function QuotationsTab({
   setActiveSubModule,
   setIsDocumentModalOpen,
   setDocument,
+  employee_id,
 }) {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +29,7 @@ export default function QuotationsTab({
 
   const quotationQuery = useQuery({
     queryKey: ["quotations"],
-    queryFn: async () => await GET("sales/quotation/"),
+    queryFn: async () => await GET(`sales/quotation?salesrep=${employee_id}`),
     retry: 2,
   });
 

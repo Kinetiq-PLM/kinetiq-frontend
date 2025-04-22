@@ -81,63 +81,53 @@ const JournalEntry = () => {
 
   const handleAddAccount = (accountData) => {
     setJournalForm((prevState) => {
+      if (selectedIndex === null) return prevState;
+  
       const updatedTransactions = prevState.transactions.map((entry, i) =>
         i === selectedIndex
           ? {
               ...entry,
               glAccountId: accountData.glAccountId,
               accountName: accountData.accountName,
+              accountCode: accountData.accountCode, // optional: keep for reference
             }
           : entry
       );
-
+  
       const isTargetDebit =
-        accountData.glAccountId === "ACC-GLA-2025-ae6010" &&
+        accountData.accountCode?.toUpperCase() === "ACC-COA-2025-AE6010" &&
         prevState.transactions[selectedIndex].type === "debit";
-
+  
       if (isTargetDebit) {
         const creditEntries = [
-          {
-            glAccountId: "ACC-GLA-2025-cl2060",
-            accountName: "SSS Contribution",
-          },
-          {
-            glAccountId: "ACC-GLA-2025-cl2060",
-            accountName: "Philhealth Contribution",
-          },
-          {
-            glAccountId: "ACC-GLA-2025-cl2060",
-            accountName: "Pagibig Contribution",
-          },
-          { glAccountId: "ACC-GLA-2025-cl2030", accountName: "Tax" },
-          { glAccountId: "ACC-GLA-2025-cl2060", accountName: "Late Deduction" },
-          {
-            glAccountId: "ACC-GLA-2025-cl2060",
-            accountName: "Absent Deduction",
-          },
-          {
-            glAccountId: "ACC-GLA-2025-cl2060",
-            accountName: "Undertime Deduction",
-          },
-          { glAccountId: "", accountName: "" },
+          { accountName: "SSS Contribution", glAccountId: "ACC-GLA-2025-d7b748" },
+          { accountName: "Philhealth Contribution", glAccountId: "ACC-GLA-2025-4d5181" },
+          { accountName: "Pagibig Contribution", glAccountId: "ACC-GLA-2025-63f1b1" },
+          { accountName: "Late Deduction", glAccountId: "ACC-GLA-2025-63550f" },
+          { accountName: "Absent Deduction", glAccountId: "ACC-GLA-2025-92225f" },
+          { accountName: "Undertime Deduction", glAccountId: "ACC-GLA-2025-1a67b8" },
         ];
-
+  
         creditEntries.forEach((credit) => {
           updatedTransactions.push({
             type: "credit",
             glAccountId: credit.glAccountId,
-            amount: "",
             accountName: credit.accountName,
           });
         });
       }
-
+  
+      updateTotals(updatedTransactions);
+      console.log("Updated transactions:", updatedTransactions); // <- verify here
       return { ...prevState, transactions: updatedTransactions };
     });
-
+  
     setIsAccountModalOpen(false);
     setSelectedIndex(null);
   };
+  
+  
+  
 
   const handleSubmit = async () => {
     // Validation checks
