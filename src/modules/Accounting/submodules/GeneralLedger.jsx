@@ -15,6 +15,7 @@ const BodyContent = () => {
     "GL Account ID",
     "Account name",
     "Journal ID",
+    "Date", // Added Date column
     "Debit",
     "Credit",
     "Description",
@@ -91,13 +92,14 @@ const BodyContent = () => {
       const enrichedData = response.data.map((entry) => {
         const journalId = entry.journal_id;
         const journalDate = journalDateMap[journalId] || null;
-
+  
         return {
           row: [
             entry.entry_line_id,
             entry.gl_account_id || "N/A",
             entry.account_name || "No Account",
             journalId || "-",
+            journalDate || "-", // Include the journal date in the row
             parseFloat(entry.debit_amount || "0.00").toFixed(2),
             parseFloat(entry.credit_amount || "0.00").toFixed(2),
             entry.description || "-",
@@ -105,7 +107,7 @@ const BodyContent = () => {
           journalDate,
         };
       });
-
+  
       setData(enrichedData);
       setIsLoading(false); // Set loading to false when data is loaded
     } catch (error) {
@@ -212,7 +214,8 @@ const BodyContent = () => {
       item.row[1], // GL Account ID
       item.row[2], // Account Name
       item.row[3], // Journal ID
-      item.row[6], // Description
+      item.row[4], // Date
+      item.row[7], // Description
     ]
       .filter(Boolean)
       .join(" ")
