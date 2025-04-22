@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 .deliveryApproval {
   display: flex;
   width: 100%;
@@ -694,3 +695,370 @@
 
 
 >>>>>>> origin/IT/merge-v3
+=======
+/* Global Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+
+.deliveryApproval {
+  display: flex;
+  width: 100%;
+  height: calc(92vh - 64px);
+  overflow: hidden;
+}
+
+
+.deliveryApproval .body-content-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+
+.deliveryApproval .table-container {
+  width: 100%;
+  max-width: 100%;
+  height: calc(100% - 100px);
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  box-sizing: border-box;
+  flex-grow: 1;
+  overflow-y: auto;
+  scrollbar-color: teal #f1f1f1;
+  scrollbar-width: thin;
+}
+
+
+/* Scrollbar Styles */
+.deliveryApproval .table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+
+.deliveryApproval .table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+
+.deliveryApproval .table-container::-webkit-scrollbar-thumb {
+  background: teal;
+  border-radius: 4px;
+}
+
+
+.deliveryApproval .table-container::-webkit-scrollbar-thumb:hover {
+  background: #007777;
+}
+
+
+.deliveryApproval .table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+
+.deliveryApproval .table-container thead {
+  /*position: sticky;*/
+  top: 0;
+  background-color: white;
+  /*z-index: 1;*/
+}
+
+
+.deliveryApproval .table-container thead::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+
+.deliveryApproval .table-container tbody {
+  width: 100%;
+}
+
+
+.deliveryApproval .table-container th,
+.deliveryApproval .table-container td {
+  font-size: 13px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.deliveryApproval .table-container th:first-child,
+.deliveryApproval .table-container td:first-child {
+  width: 2.5rem;
+  padding-right: 0.5rem;
+}
+
+
+.deliveryApproval .table-container th:nth-child(2),
+.deliveryApproval .table-container td:nth-child(2) {
+  padding-left: 0;
+}
+
+
+/* CHECKBOX STYLES */
+.deliveryApproval .table-container input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid teal;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  margin: 0;
+  vertical-align: middle;
+}
+
+
+.deliveryApproval .table-container input[type="checkbox"]:checked {
+  background-color: teal;
+  border-color: teal;
+}
+
+
+.deliveryApproval .table-container input[type="checkbox"]:checked::after {
+  content: "✔";
+  font-size: 14px;
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+.deliveryApproval .custom-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #00A8A8;
+  border-radius: 3px;
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+  outline: none;
+}
+
+
+.deliveryApproval .custom-checkbox:checked {
+  background-color: #00A8A8;
+}
+
+
+.deliveryApproval .custom-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+
+/* FORM STYLES */
+.deliveryApproval .form-container {
+  width: 100%;
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  box-sizing: border-box;
+  height: 180px;
+  flex-shrink: 0;
+}
+
+
+.deliveryApproval .form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+
+.deliveryApproval .form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  margin-right: 10px;
+}
+
+
+.deliveryApproval .form-group:last-child {
+  margin-right: 0;
+}
+
+
+.deliveryApproval .form-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+
+.deliveryApproval .form-group input,
+.deliveryApproval .form-group select {
+  width: 100%;
+  max-width: 250px;
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  height: 32px;
+}
+
+
+.deliveryApproval .form-group span {
+  width: 100%;
+  max-width: 250px;
+  padding: 5px;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+
+/* BUTTON STYLES */
+.deliveryApproval .send-to-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+  padding-right: 10px;
+  flex-shrink: 0;
+  margin-bottom: 15px;
+}
+
+
+.deliveryApproval .send-to-button {
+  background-color: #00A8A8;
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+
+.deliveryApproval .send-to-button:hover {
+  background-color: #007777;
+}
+
+
+/* STATUS STYLES */
+.deliveryApproval .approval-status.Pending {
+  color: #FFA500;
+  font-weight: bold;
+}
+
+
+.deliveryApproval .approval-status.Approved {
+  color: #008000;
+  font-weight: bold;
+}
+
+
+.deliveryApproval .approval-status.Rejected {
+  color: #FF0000;
+  font-weight: bold;
+}
+
+.deliveryApproval .req-input{
+  background-color: #F8F8F8;
+}
+
+
+
+/* Media query for smaller tablets */
+@media (max-width: 768px) {
+  .deliveryApproval .body-content-container {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+  }
+  .deliveryApproval .details-grid {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+    overflow-x: auto;
+  }
+  .deliveryApproval .detail-row input{
+    min-width: 7rem;
+  }
+  .deliveryApproval .header-container h2 {
+    font-size: 1.25rem; /* Smaller heading */
+  }
+  .deliveryApproval .table-container{
+    overflow-x: auto;
+    overflow-y: auto;
+  }
+  .deliveryApproval .form-group span{
+    font-size: 0.9rem;
+    white-space: nowrap;      
+    overflow-x: auto;   
+    overflow-y: hidden;      
+    overflow-wrap: normal;     
+    display: inline-block;  
+  }
+  .deliveryApproval .form-group span::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  .deliveryApproval .form-group span::-webkit-scrollbar-track {
+      background: #f1f1f1;
+  }
+
+  .deliveryApproval .form-group span::-webkit-scrollbar-thumb {
+      background: #00A8A8;
+      border-radius: 3px;
+  }
+
+  .deliveryApproval .form-group span::-webkit-scrollbar-thumb:hover {
+      background: #008080;
+  }
+  .deliveryApproval .form-group select option{
+    font-size: 0.7rem;
+  }
+}
+>>>>>>> IT/merge-v3
