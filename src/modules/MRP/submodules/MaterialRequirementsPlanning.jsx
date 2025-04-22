@@ -488,54 +488,65 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     ]
 
     const getFilteredData = () => {
-        return mrpData.filter((item) => {
+        const term = (searchTerm || "").toLowerCase();
+      
+        const filterItem = (item) => {
+          const number = (item.number || item.serviceOrderItemId || "").toLowerCase();
+          const date = (item.date || "").toLowerCase();
+          const details = (item.details || item.description || "").toLowerCase();
+      
+          return (
+            number.includes(term) ||
+            date.includes(term) ||
+            details.includes(term)
+          );
+        };
+      
+        const mrpFiltered = (mrpData || []).filter(item => {
           const matchesFlag =
             flag === 0 ||
             (flag === 1 && item.type === "Project") ||
-            (flag === 2 && item.type === "Non Project") ||
-            (flag === 3 && item.type === "Item Principal");
-      
-          const term = (searchTerm || "").toLowerCase(); 
-          const number = (item.number || "").toLowerCase();
-          const date = (item.date || "").toLowerCase();
-          const details = (item.details || "").toLowerCase();
-      
-          const searchMatch =
-            number.includes(term) ||
-            date.includes(term) ||
-            details.includes(term);
-      
-          return matchesFlag && searchMatch;
+            (flag === 2 && item.type === "Non Project");
+          return matchesFlag && filterItem(item);
         });
-    };
+      
+        const principalFiltered = (principalOrder || []).filter(item => {
+          const matchesFlag = flag === 0 || flag === 3;
+          return matchesFlag && filterItem(item);
+        }).map(item => ({
+          number: item.serviceOrderItemId,
+          type: item.type || "Principal Item",
+          details: item.description || "—",
+          date: item.date || ""
+        }));
+      
+        return [...mrpFiltered, ...principalFiltered];
+        };
+      
 
     const filteredData = getFilteredData();
 
-    const mergedRows2 = (
-        flag === 0
-          ? [...(filteredData || []), ...(principalOrder || [])]
-          : flag === 3
-          ? principalOrder
-          : filteredData 
-      ).map((item) => {
-        const number = item.number || item.serviceOrderItemId;
-        const type = item.type;
-        const details = item.details || item.description;
-        const date = item.date;
-      
-        const pnpMatch = pnpOrder.find(p => p.pnp_orderID === number);
-        const prinMatch = prinOrder.find(p => p.sr_orderID === number);
-      
-        const status = pnpMatch?.pnp_status || prinMatch?.sr_status || "";
-      
+    const mergedRows2 = getFilteredData()
+    .map(item => {
+        const number = item.number || "";
+        const type = item.type || "Unknown";
+        const details = item.details || "—";
+        const date = item.date || "";
+
+        const pnpMatch = (pnpOrder || []).find(p => p.pnp_orderID === number);
+        const prinMatch = (prinOrder || []).find(p => p.sr_orderID === number);
+
+        const status = (pnpMatch?.pnp_status || prinMatch?.sr_status || "").toLowerCase().trim();
+
         return {
-          number,
-          type,
-          details,
-          date,
-          status
+        number,
+        type,
+        details,
+        date,
+        status,
         };
-      }).filter(item => (item.status || "").toLowerCase() !== "complete");
+    });
+
     
     const buttonStyle = (bg, border, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer', });
     const buttonStyle2 = (bg, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, border: '0.5px solid #585757', color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer',});

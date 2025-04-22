@@ -323,27 +323,62 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     });
 
     const getFilteredData = () => {
-        return bomData.filter((item) => {
+        const term = (searchTerm || "").toLowerCase();
+      
+        const filterItem = (item) => {
+          const number = (item.number || item.serviceOrderItemId || "").toLowerCase();
+          const date = (item.date || "").toLowerCase();
+          const details = (item.details || item.description || "").toLowerCase();
+      
+          return (
+            number.includes(term) ||
+            date.includes(term) ||
+            details.includes(term)
+          );
+        };
+      
+        const bomFiltered = (bomData || []).filter(item => {
           const matchesFlag =
             flag === 0 ||
             (flag === 1 && item.type === "Project") ||
-            (flag === 2 && item.type === "Non Project") ||
-            (flag === 3 && item.type === "Principal Items");
+            (flag === 2 && item.type === "Non Project");
       
-          const term = (searchTerm || "").toLowerCase();
-      
-          const number = (item.number || "").toLowerCase();
-          const date = (item.date || "").toLowerCase();
-          const status = (item.status || "").toLowerCase();
-      
-          const searchMatch =
-            number.includes(term) ||
-            date.includes(term) ||
-            status.includes(term);
-
-          return matchesFlag && searchMatch;
+          return matchesFlag && filterItem(item);
         });
-    };
+      
+        const principalFiltered = (principalOrder || []).filter(item => {
+          const matchesFlag = flag === 0 || flag === 3;
+          return matchesFlag && filterItem(item);
+        }).map(item => ({
+          number: item.serviceOrderItemId,
+          type: item.type || "Principal Items",
+          details: item.description || "—",
+          date: item.date || ""
+        }));
+      
+        return [...bomFiltered, ...principalFiltered];
+      };
+      
+      const mergedRows2 = getFilteredData().map(item => {
+        const number = item.number || "";
+        const type = item.type || "Unknown";
+        const details = item.details || "—";
+        const date = item.date || "";
+      
+        const pnpMatch = (pnpOrder || []).find(p => p.pnp_orderID === number);
+        const prinMatch = (prinOrder || []).find(p => p.sr_orderID === number);
+      
+        const status = (pnpMatch?.pnp_status || prinMatch?.sr_status || "").toLowerCase().trim();
+      
+        return {
+          number,
+          type,
+          details,
+          date,
+          status
+        };
+      });
+      
     const filteredData = getFilteredData();
 
     function printBOMContent() {
@@ -363,37 +398,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
           window.location.reload()
         }, 200);
     }
-    
-    const mergedRows2 = (
-    flag === 0
-        ? [...(filteredData || []), ...(principalOrder || [])]
-        : flag === 3
-        ? principalOrder
-        : filteredData
-    )
-    .map(item => {
-        const number = item.number || item.serviceOrderItemId;
-        const type = item.type;
-        const details = item.details || item.description;
-        const date = item.date;
 
-        const pnpMatch = pnpOrder.find(p => p.pnp_orderID === number);
-        const prinMatch = prinOrder.find(p => p.sr_orderID === number);
-
-        const pnpStatus = pnpMatch?.pnp_status?.toLowerCase().trim();
-        const prinStatus = prinMatch?.sr_status?.toLowerCase().trim();
-
-        const isComplete = pnpStatus === "complete" || prinStatus === "complete";
-
-        return {
-        number,
-        type,
-        details,
-        date,
-        status: isComplete ? "Complete" : "", 
-        };
-    })
-    .filter(item => item.status === "Complete");
 
     const rowCellStyle = {
         flex: "1 1 25%",
