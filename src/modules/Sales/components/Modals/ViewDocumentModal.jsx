@@ -1143,7 +1143,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                       <div className="flex  justify-between">
                         <span className="font-bold ">Name: </span>
                         <span className="text-end">
-                          <u>{data.statement.customer.contact_person}</u>
+                          <u>{`${data.statement.salesrep.first_name} ${data.statement.salesrep.last_name}`}</u>
                         </span>
                       </div>
                       <div className="flex justify-between">
