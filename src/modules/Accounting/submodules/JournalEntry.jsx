@@ -14,8 +14,8 @@ const JournalEntry = () => {
   const [journalOptions, setJournalOptions] = useState([]);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [isLoadingPayroll, setIsLoadingPayroll] = useState(false);
 
-  // Initialize journalForm without localStorage
   const [journalForm, setJournalForm] = useState({
     journalId: "",
     transactions: [
@@ -31,13 +31,15 @@ const JournalEntry = () => {
     message: "",
   });
 
-  // API endpoint
+  // API endpoints
   const API_URL =
     import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const JOURNAL_ENTRIES_ENDPOINT = `${API_URL}/api/journal-entries/`;
+  const PAYROLL_ENDPOINT = `${API_URL}/api/payrolls/`;
 
   const handleInputChange = (index, field, value) => {
-    const sanitizedValue = value.replace(/[^0-9.]/g, "");
+    // Allow numbers, a single decimal point, and a leading '-' for negative values
+    const sanitizedValue = value.replace(/[^0-9.-]/g, "").replace(/(?!^)-/g, ""); // Ensures '-' is only at the start
     setJournalForm((prevState) => {
       const updatedTransactions = prevState.transactions.map((entry, i) =>
         i === index ? { ...entry, [field]: sanitizedValue } : entry
@@ -82,55 +84,128 @@ const JournalEntry = () => {
   const handleAddAccount = (accountData) => {
     setJournalForm((prevState) => {
       if (selectedIndex === null) return prevState;
-  
+
       const updatedTransactions = prevState.transactions.map((entry, i) =>
         i === selectedIndex
           ? {
               ...entry,
               glAccountId: accountData.glAccountId,
               accountName: accountData.accountName,
-              accountCode: accountData.accountCode, // optional: keep for reference
+              accountCode: accountData.accountCode,
+              amount: "", // Initialize amount as empty
             }
           : entry
       );
-  
+
       const isTargetDebit =
         accountData.accountCode?.toUpperCase() === "ACC-COA-2025-AE6010" &&
         prevState.transactions[selectedIndex].type === "debit";
-  
+
       if (isTargetDebit) {
         const creditEntries = [
-          { accountName: "SSS Contribution", glAccountId: "ACC-GLA-2025-d7b748" },
-          { accountName: "Philhealth Contribution", glAccountId: "ACC-GLA-2025-4d5181" },
-          { accountName: "Pagibig Contribution", glAccountId: "ACC-GLA-2025-63f1b1" },
-          { accountName: "Tax", glAccountId: "ACC-GLA-2025-d761c0" },
-          { accountName: "Late Deduction", glAccountId: "ACC-GLA-2025-63550f" },
-          { accountName: "Absent Deduction", glAccountId: "ACC-GLA-2025-92225f" },
-          { accountName: "Undertime Deduction", glAccountId: "ACC-GLA-2025-1a67b8" },
-          { accountName: "", glAccountId: "" },
+          { accountName: "SSS Contribution", glAccountId: "ACC-GLA-2025-d7b748", field: "sss_contribution" },
+          { accountName: "Philhealth Contribution", glAccountId: "ACC-GLA-2025-4d5181", field: "philhealth_contribution" },
+          { accountName: "Pagibig Contribution", glAccountId: "ACC-GLA-2025-63f1b1", field: "pagibig_contribution" },
+          { accountName: "Tax", glAccountId: "ACC-GLA-2025-d761c0", field: "tax" },
+          { accountName: "Late Deduction", glAccountId: "ACC-GLA-2025-63550f", field: "late_deduction" },
+          { accountName: "Absent Deduction", glAccountId: "ACC-GLA-2025-92225f", field: "absent_deduction" },
+          { accountName: "Undertime Deduction", glAccountId: "ACC-GLA-2025-1a67b8", field: "undertime_deduction" },
+          { accountName: "Net Pay (test)", glAccountId: "ACC-GLA-2025-253367", field: "net_pay" },
         ];
-  
+
+        // Add credit entries with empty amounts
         creditEntries.forEach((credit) => {
           updatedTransactions.push({
             type: "credit",
             glAccountId: credit.glAccountId,
             accountName: credit.accountName,
+            amount: "",
+            field: credit.field,
           });
         });
+
+        // Fetch payroll data to check status
+        fetchPayrollData(updatedTransactions, selectedIndex);
       }
-  
+
       updateTotals(updatedTransactions);
-      console.log("Updated transactions:", updatedTransactions); // <- verify here
+      console.log("Updated transactions:", updatedTransactions);
       return { ...prevState, transactions: updatedTransactions };
     });
-  
+
     setIsAccountModalOpen(false);
     setSelectedIndex(null);
   };
-  
+
+  const fetchPayrollData = async (transactions, debitIndex) => {
+    setIsLoadingPayroll(true);
+    try {
+      const response = await axios.get(PAYROLL_ENDPOINT);
+      const processingPayroll = response.data.find(
+        (payroll) => payroll.status === "Processing"
+      );
+
+      if (!processingPayroll) {
+        setValidation({
+          isOpen: true,
+          type: "info",
+          title: "No Processing Payroll",
+          message: "No payroll records with status 'Processing' found. Please enter amounts manually.",
+        });
+        setIsLoadingPayroll(false);
+        // Reset all amounts to empty for manual entry
+        setJournalForm((prevState) => ({
+          ...prevState,
+          transactions: transactions.map((t) => ({ ...t, amount: "" })),
+        }));
+        return;
+      }
+
+      // Populate amounts only for Processing status
+      setJournalForm((prevState) => {
+        const updatedTransactions = transactions
+          .map((entry, i) => {
+            if (i === debitIndex) {
+              return {
+                ...entry,
+                amount: parseFloat(processingPayroll.gross_pay).toFixed(2),
+              };
+            }
+            if (entry.type === "credit" && entry.field) {
+              const amount = parseFloat(processingPayroll[entry.field] || 0).toFixed(2);
+              return { ...entry, amount: amount !== "0.00" ? amount : "" };
+            }
+            return entry;
+          })
+          .filter((entry) => entry.type === "debit" || (entry.type === "credit" && entry.amount));
+
+        updateTotals(updatedTransactions);
+
+        // Keep the description unchanged
+        return {
+          ...prevState,
+          transactions: updatedTransactions,
+        };
+      });
+    } catch (error) {
+      console.error("Error fetching payroll data:", error.response ? error.response.data : error);
+      setValidation({
+        isOpen: true,
+        type: "error",
+        title: "Fetch Error",
+        message: "Failed to load payroll data. Please check your connection or enter amounts manually.",
+      });
+      // Reset all amounts to empty for manual entry
+      setJournalForm((prevState) => ({
+        ...prevState,
+        transactions: transactions.map((t) => ({ ...t, amount: "" })),
+      }));
+    } finally {
+      setIsLoadingPayroll(false);
+    }
+  };
 
   const handleSubmit = async () => {
-    // Validation checks
     if (!journalForm.journalId || !journalForm.description) {
       setValidation({
         isOpen: true,
@@ -140,18 +215,24 @@ const JournalEntry = () => {
       });
       return;
     }
+  
     const invalidTransactions = journalForm.transactions.some(
-      (t) => !t.glAccountId || !t.accountName || parseFloat(t.amount) <= 0
+      (t) =>
+        !t.glAccountId || // GL Account ID must be present
+        !t.accountName || // Account Name must be present
+        isNaN(parseFloat(t.amount)) // Amount must be a valid number (positive or negative)
     );
+  
     if (invalidTransactions) {
       setValidation({
         isOpen: true,
         type: "warning",
         title: "Missing Account Details",
-        message: "All transactions must have a GL Account ID, Account Name, and a positive amount.",
+        message: "All transactions must have a GL Account ID, Account Name, and a valid amount.",
       });
       return;
     }
+  
     if (journalForm.transactions.length < 2) {
       setValidation({
         isOpen: true,
@@ -161,6 +242,7 @@ const JournalEntry = () => {
       });
       return;
     }
+  
     if (totalDebit !== totalCredit || totalDebit === 0) {
       setValidation({
         isOpen: true,
@@ -170,10 +252,10 @@ const JournalEntry = () => {
       });
       return;
     }
-
+  
     const currentYear = new Date().getFullYear();
     const baseIdentifier = "YZ2020";
-
+  
     const payload = {
       total_debit: totalDebit.toFixed(2),
       total_credit: totalCredit.toFixed(2),
@@ -186,13 +268,13 @@ const JournalEntry = () => {
         description: journalForm.description || null,
       })),
     };
-
+  
     try {
       const response = await axios.patch(
         `${JOURNAL_ENTRIES_ENDPOINT}${journalForm.journalId}/`,
         payload
       );
-
+  
       if (response.status === 200 || response.status === 201) {
         setValidation({
           isOpen: true,
@@ -202,13 +284,9 @@ const JournalEntry = () => {
         });
         setJournalForm({
           journalId: "",
-          transactions: [
-            { type: "debit", glAccountId: "", amount: "", accountName: "" },
-            { type: "credit", glAccountId: "", amount: "", accountName: "" },
-          ],
+          transactions: [{ type: "debit", glAccountId: "", amount: "", accountName: "" }],
           description: "",
         });
-        
         setTotalDebit(0);
         setTotalCredit(0);
       } else {
@@ -224,6 +302,7 @@ const JournalEntry = () => {
       });
     }
   };
+  
 
   useEffect(() => {
     const fetchJournalIDs = async () => {
@@ -318,6 +397,8 @@ const JournalEntry = () => {
             />
           </div>
         </div>
+
+        {isLoadingPayroll && <div>Loading payroll data...</div>}
 
         <div className="journal-table">
           <div className="table-header">
