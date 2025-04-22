@@ -1511,6 +1511,25 @@ const ShipmentModal = ({
                     </button>
                   )}
 
+                  {hasDeliveryReceipt && (
+                    <button
+                      type="button"
+                      className="status-update-button delivery"
+                      onClick={() => onShowDeliveryReceipt(shipment)}
+                      style={{ 
+                        flex: '1',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: canBeShipped ? '0.5rem' : '0',
+                        backgroundColor: '#28a745'
+                      }}
+                    >
+                      <span style={{ marginRight: '0.5rem', fontSize: '1.1rem' }}>🧾</span>
+                      Manage Delivery Receipt
+                    </button>
+                  )}
+
                   {canBeFailed && (
                     <button
                       type="button"
