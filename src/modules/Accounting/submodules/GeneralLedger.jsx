@@ -92,7 +92,7 @@ const BodyContent = () => {
       const enrichedData = response.data.map((entry) => {
         const journalId = entry.journal_id;
         const journalDate = journalDateMap[journalId] || null;
-  
+
         return {
           row: [
             entry.entry_line_id,
@@ -107,7 +107,7 @@ const BodyContent = () => {
           journalDate,
         };
       });
-  
+
       setData(enrichedData);
       setIsLoading(false); // Set loading to false when data is loaded
     } catch (error) {
@@ -307,13 +307,13 @@ const BodyContent = () => {
 
             <div
               className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 
-                 font-light max-sm:text-[10px] max-sm:font-light max-md:text-[10px] max-md:font-light 
-                max-lg:text-[10px] max-lg:font-light max-xl:text-[10px] max-xl:font-light 2xl:text-[10px] 2xl:font-light"
+             font-light max-sm:text-[8px] max-sm:font-light max-md:text-[10px] max-md:font-light 
+             max-lg:text-[10px] max-lg:font-light max-xl:text-[10px] max-xl:font-light 2xl:text-[10px] 2xl:font-light"
             >
               <div className="col-span-3"></div>
               <div className="font-bold">Total</div>
-              <div>{formattedTotalDebit}</div>
-              <div>{formattedTotalCredit}</div>
+              <div className="break-words max-sm:break-all">{formattedTotalDebit}</div>
+              <div className="break-words max-sm:break-all">{formattedTotalCredit}</div>
             </div>
           </>
         )}
