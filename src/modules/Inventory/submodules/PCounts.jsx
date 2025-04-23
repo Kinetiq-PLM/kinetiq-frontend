@@ -42,83 +42,57 @@ const BodyContent = () => {
 
   // Timer for real-time clock updates
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    // Clean up timer on component unmount
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-
-    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/")
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error(`HTTP error fetching warehouses! Status: ${res.status}`);
+    const fetchWarehouses = async () => {
+      try {
+        const res = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
+        if (!res.ok) {
+          throw new Error(`HTTP error fetching warehouses! Status: ${res.status}`);
+        }
+        const data = await res.json();
+        console.log("Warehouse data:", data);
+        if (data && Array.isArray(data) && data.length > 0) {
+          setWarehouses(data);
+          console.log("Updated warehouses state:", data);
+        } else {
+          console.warn("No warehouse data received");
+        }
+      } catch (err) {
+        console.error("Error fetching warehouses:", err);
+        setError(`Failed to load warehouses: ${err.message}`);
       }
-      return res.json();
-    })
-    .then((data) => {
-      console.log("Warehouse data:", data);
-      if (data && data.length > 0) {
-        setWarehouses(data);
-      }
-    })
-    .catch((err) => {
-      console.error("Error fetching warehouses:", err);
-    });
-
-    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
-      .then((res) => {
+    };
+  
+    const fetchInventoryItems = async () => {
+      try {
+        const res = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/");
         if (!res.ok) {
           throw new Error(`HTTP error fetching inventory items! Status: ${res.status}`);
         }
-        return res.json();
-      })
-      .then((data) => {
+        const data = await res.json();
         console.log("Inventory Items API Response:", data);
         const itemsMap = {};
         data.forEach(item => {
-
           if (item && item.inventory_item_id) {
-            console.log(`Processing item ${item.inventory_item_id} with type: ${item.item_type}`);
             itemsMap[item.inventory_item_id] = item;
           } else {
             console.warn("Skipping invalid inventory item:", item);
           }
         });
-        console.log("Final inventoryItems map:", itemsMap);
         setInventoryItems(itemsMap);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Error fetching inventory items:", err);
-      });
-
-    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/")
-      .then((res) => {
+      }
+    };
+  
+    const fetchCyclicCounts = async () => {
+      try {
+        const res = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/");
         if (!res.ok) {
           throw new Error(`HTTP error fetching cyclic counts! Status: ${res.status}`);
         }
-        return res.json();
-      })
-      .then((data) => {
+        const data = await res.json();
         console.log("Cyclic Counts API Response:", data);
-
-    
-        if (warehouses.length === 0) {
-          const uniqueWarehouses = [...new Set(data
-            .filter(item => item.warehouse_id)
-            .map(item => item.warehouse_id))];
-
-          if (uniqueWarehouses.length > 0) {
-            setWarehouses(uniqueWarehouses);
-          }
-        }
-
-        // Process count history by inventory_item_id
+  
         const history = {};
         data.forEach(count => {
           if (count.inventory_item_id) {
@@ -128,28 +102,36 @@ const BodyContent = () => {
             history[count.inventory_item_id].push(count);
           }
         });
-
-        // Sort each item's history by date
+  
         Object.keys(history).forEach(itemId => {
           history[itemId].sort((a, b) => {
-            // Sort by date if available, otherwise by time_period
             if (a.date_created && b.date_created) {
               return new Date(b.date_created) - new Date(a.date_created);
             }
             return 0;
           });
         });
-
+  
         setCountHistory(history);
         setPcounts(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Error fetching cyclic counts:", err);
         setError(`Failed to load cyclic counts: ${err.message}`);
-        setLoading(false);
-      });
+      }
+    };
+  
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      await fetchWarehouses();
+      await Promise.all([fetchInventoryItems(), fetchCyclicCounts()]);
+      setLoading(false);
+      console.log("Final warehouses state after all fetches:", warehouses);
+    };
+  
+    fetchData();
   }, []);
+
   
   // Updated function to open the remarks modal instead of using prompt
   const updateCountStatus = (newStatus) => {
@@ -285,6 +267,8 @@ const BodyContent = () => {
 
     if (history.length <= 1) return null;
 
+    console.log("Debugging Warehouse:", warehouses);
+
     return (
       <div className="mt-2">
         <table className="w-full text-xs border-collapse">
@@ -337,18 +321,34 @@ const BodyContent = () => {
 
                 <span className="flex flex-row  text-sm space-x-3">
                   {/* Warehouse filter dropdown */}
-                    <select
-                      className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
-                      value={selectedWarehouse}
-                      onChange={(e) => setSelectedWarehouse(e.target.value)}
-                    >
-                      <option value="">Select Warehouse</option>
-                      {warehouses.map((w) => (
-                        <option key={w.warehouse_location} value={w.id} className="">
-                          {w.warehouse_location}
-                        </option>
-                      ))}
-                    </select>
+                  <select
+                    className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
+                    value={selectedWarehouse}
+                    onChange={(e) => setSelectedWarehouse(e.target.value)}
+                    disabled={loading || error}
+                  >
+                    <option value="">Select Warehouse</option>
+                    {loading ? (
+                      <option disabled>Loading...</option>
+                    ) : error ? (
+                      <option disabled>Error loading warehouses</option>
+                    ) : warehouses.length === 0 ? (
+                      <option disabled>No warehouses available</option>
+                    ) : (
+                      warehouses.map((w, index) => {
+                        console.log("Rendering warehouse option:", w); // Log each option
+                        return (
+                          <option
+                            key={w.warehouse_id || index}
+                            value={w.warehouse_id}
+                            className="text-gray-600 cursor-pointer"
+                          >
+                            {w.warehouse_location || `Warehouse ${w.warehouse_id}`}
+                          </option>
+                        );
+                      })
+                    )}
+                  </select>
 
                     <select
                       className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
