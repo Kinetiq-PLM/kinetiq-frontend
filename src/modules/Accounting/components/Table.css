@@ -12,7 +12,6 @@
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-
 }
 
 .accounting-table thead {
@@ -156,6 +155,11 @@ td {
 
 @media (max-width: 768px) {
 
+  .accounting-table table {
+    width: 120%;
+    table-layout: auto;
+  }
+
   .accounting-table th,
   td {
     padding: .3rem;
@@ -173,6 +177,11 @@ td {
 }
 
 @media (max-width: 480px) {
+
+  .accounting-table table {
+    width: 50rem;
+    table-layout: auto;
+  }
 
   .accounting-table th,
   td {
