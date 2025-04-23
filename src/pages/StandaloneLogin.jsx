@@ -108,7 +108,7 @@ export default function StandaloneLogin() {
     console.log("Generated code:", code);
 
     try {
-      emailjs.send("service_fpuj34n","template_vcrih1l",{
+      emailjs.send("service_fpuj34n", "template_vcrih1l", {
         code: code,
         email: email,
         kinetiq_email: resetData.kinetiq_email,
