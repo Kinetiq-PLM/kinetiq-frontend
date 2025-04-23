@@ -527,25 +527,27 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const filteredData = getFilteredData();
 
     const mergedRows2 = getFilteredData()
-    .map(item => {
-        const number = item.number || "";
-        const type = item.type || "Unknown";
-        const details = item.details || "—";
-        const date = item.date || "";
+  .map(item => {
+    const number = item.number || "";
+    const type = item.type || "Unknown";
+    const details = item.details || "—";
+    const date = item.date || "";
 
-        const pnpMatch = (pnpOrder || []).find(p => p.pnp_orderID === number);
-        const prinMatch = (prinOrder || []).find(p => p.sr_orderID === number);
+    const pnpMatch = (pnpOrder || []).find(p => p.pnp_orderID === number);
+    const prinMatch = (prinOrder || []).find(p => p.sr_orderID === number);
 
-        const status = (pnpMatch?.pnp_status || prinMatch?.sr_status || "").toLowerCase().trim();
+    const status = (pnpMatch?.pnp_status || prinMatch?.sr_status || "").toLowerCase().trim();
 
-        return {
-        number,
-        type,
-        details,
-        date,
-        status,
-        };
-    });
+    return {
+      number,
+      type,
+      details,
+      date,
+      status,
+    };
+  })
+  .filter(item => item.status !== "complete");
+
 
     
     const buttonStyle = (bg, border, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer', });

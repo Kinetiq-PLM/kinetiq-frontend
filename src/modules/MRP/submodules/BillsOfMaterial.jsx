@@ -342,7 +342,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             flag === 0 ||
             (flag === 1 && item.type === "Project") ||
             (flag === 2 && item.type === "Non Project");
-      
           return matchesFlag && filterItem(item);
         });
       
@@ -359,25 +358,28 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         return [...bomFiltered, ...principalFiltered];
       };
       
-      const mergedRows2 = getFilteredData().map(item => {
-        const number = item.number || "";
-        const type = item.type || "Unknown";
-        const details = item.details || "—";
-        const date = item.date || "";
+      const mergedRows2 = getFilteredData()
+        .map(item => {
+          const number = item.number || "";
+          const type = item.type || "Unknown";
+          const details = item.details || "—";
+          const date = item.date || "";
       
-        const pnpMatch = (pnpOrder || []).find(p => p.pnp_orderID === number);
-        const prinMatch = (prinOrder || []).find(p => p.sr_orderID === number);
+          const pnpMatch = (pnpOrder || []).find(p => p.pnp_orderID === number);
+          const prinMatch = (prinOrder || []).find(p => p.sr_orderID === number);
       
-        const status = (pnpMatch?.pnp_status || prinMatch?.sr_status || "").toLowerCase().trim();
+          const status = (pnpMatch?.pnp_status || prinMatch?.sr_status || "").toLowerCase().trim();
       
-        return {
-          number,
-          type,
-          details,
-          date,
-          status
-        };
-      });
+          return {
+            number,
+            type,
+            details,
+            date,
+            status,
+          };
+        })
+        .filter(item => item.status === "complete"); 
+      
       
     const filteredData = getFilteredData();
 
@@ -466,9 +468,13 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             } else if (item.type === "Non Project") {
                             setPrintBOM2(true);
                             fetchOrderStatement(item.number, "Non Project");
+                            fetchCostProduction(item.number);
+                            fetchCostLabor(item.number);
                             } else {
                             setPrintBOM3(true);
-                            fetchPrincipalBOM(item.number)
+                            fetchPrincipalBOM(item.number);
+                            fetchCostProduction(item.number);
+                            fetchCostLabor(item.number);
                             }
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")}
