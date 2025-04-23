@@ -383,6 +383,7 @@ const OfficialReceipts = () => {
             <Dropdown
               options={["Default", "Ascending", "Descending"]}
               style="selection"
+              defaultOption="Sort remaining amount by.."
               onChange={(selected) => {
                 const selectedValue = selected.toLowerCase();
                 if (selectedValue === "default") {
@@ -394,10 +395,6 @@ const OfficialReceipts = () => {
                 }
               }}
             />
-
-
-
-
             <Search
               type="text"
               placeholder="Search Record.."
