@@ -30,7 +30,7 @@ export default function StandaloneLogin() {
   // localStorage.setItem('login_attemtps', '1')
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCredentials(prev => ({ ...prev, [name]: value }));
+    setCredentials(prev => ({ ...prev, [name]: value.trim() }));
     setLoginError("");
   };
 
@@ -215,7 +215,7 @@ export default function StandaloneLogin() {
                     <input
                       type="text"
                       name="email"
-                      placeholder="Username or Email"
+                      placeholder="Email"
                       value={credentials.email}
                       onChange={handleChange}
                       required
