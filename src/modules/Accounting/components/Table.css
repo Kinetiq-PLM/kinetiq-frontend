@@ -107,6 +107,10 @@ td {
   padding: 0.5vh 2vh;
 }
 
+.accounting-table .status-active:hover {
+  background-color: #9aedc2;
+}
+
 .accounting-table .status-inactive {
   background-color: #ffd0d0;
   color: #b91c1c;
@@ -114,6 +118,10 @@ td {
   border-radius: 30px;
   width: fit-content;
   padding: 0.5vh 2vh;
+}
+
+.accounting-table .status-inactive:hover {
+  background-color: #fca5a5;
 }
 
 .accounting-table .selected-row {

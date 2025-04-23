@@ -26,8 +26,15 @@ const GeneralLedgerAccounts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
+
   const [statusFilter, setStatusFilter] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    rowIndex: null,
+    newStatus: null,
+  });
+
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
@@ -235,6 +242,51 @@ const GeneralLedgerAccounts = () => {
   });
 
 
+  // Handle status toggle function
+  const handleStatusToggle = (rowIndex) => {
+    const currentRow = filteredData[rowIndex];
+    const currentStatus = currentRow[4];
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+
+    setStatusModal({ isOpen: true, rowIndex, newStatus });
+  };
+
+
+  const confirmStatusChange = async () => {
+    const { rowIndex, newStatus } = statusModal;
+    const glAccountID = filteredData[rowIndex][0];
+
+    try {
+      await axios.patch(`${GL_ACCOUNTS_ENDPOINT}${glAccountID}/`, { status: newStatus });
+      fetchData(); // Refresh data
+      setValidation({
+        isOpen: true,
+        type: "success",
+        title: "Status Updated",
+        message: `Status successfully changed to ${newStatus}`,
+      });
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setValidation({
+        isOpen: true,
+        type: "error",
+        title: "Update Failed",
+        message: "Failed to update status. Try again later.",
+      });
+    } finally {
+      setStatusModal({ isOpen: false, rowIndex: null, newStatus: null });
+    }
+  };
+
+  const cancelStatusChange = () => {
+    setStatusModal({ isOpen: false, rowIndex: null, newStatus: null });
+  };
+
+
+
+
+
+
   // Loading spinner component
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
@@ -286,7 +338,7 @@ const GeneralLedgerAccounts = () => {
         {isLoading ? (
           <LoadingSpinner />
         ) : (
-          <Table data={filteredData} columns={columns} enableCheckbox={false} />
+          <Table data={filteredData} columns={columns} enableCheckbox={false} handleStatusToggle={handleStatusToggle} />
         )}
       </div>
 
@@ -307,6 +359,23 @@ const GeneralLedgerAccounts = () => {
           message={validation.message}
         />
       )}
+
+      {statusModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 space-y-4">
+            <h2 className="text-xl font-semibold text-gray-800">Change Status</h2>
+            <p className="text-gray-600">
+              Are you sure you want to change the status to{" "}
+              <span className="font-bold">{statusModal.newStatus}</span>?
+            </p>
+            <div className="flex justify-end gap-4">
+              <Button name="Cancel" variant="standard1" onclick={cancelStatusChange} />
+              <Button name="Confirm" variant="standard2" onclick={confirmStatusChange} />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
