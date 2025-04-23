@@ -305,20 +305,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                             ))}
                         </select>
 
-                        {selectedInventoryItem && (
-                            <div className="mb-4 p-3 bg-gray-50 rounded-md">
-                                <h3 className="font-medium text-gray-700 mb-2">Selected Item Details</h3>
-                                <div className="grid grid-cols-2 gap-2 text-sm">
-                                    <p><span className="font-medium">Type:</span> {selectedInventoryItem.item_type}</p>
-                                    <p><span className="font-medium">Current Qty:</span> {selectedInventoryItem.current_quantity}</p>
-                                    {selectedInventoryItem.expiry && (
-                                        <p className={new Date(selectedInventoryItem.expiry) < new Date() ? 'text-red-500' : ''}>
-                                            <span className="font-medium">Expiry:</span> {formatDate(selectedInventoryItem.expiry)}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        )}
+                        
 
 
                         {/* Employee ID  */}
