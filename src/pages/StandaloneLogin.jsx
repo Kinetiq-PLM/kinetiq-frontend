@@ -386,7 +386,7 @@ export default function StandaloneLogin() {
                         value={resetData.newPassword}
                         onChange={(e) => setResetData({ ...resetData, newPassword: e.target.value })}
                         required
-                        style={{ color: 'gray', marginBottom: '1rem' }}
+                        style={{ color: 'gray' }}
                       />
                       <span className="eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
                         {showNewPassword ? (
@@ -403,7 +403,7 @@ export default function StandaloneLogin() {
 
                     </div>
 
-                    <h4>Confirm New Password: </h4>
+                    <h4 style={{ color: 'gray', marginTop: '1rem' }}>Confirm New Password: </h4>
 
                     <div className="password-wrapper">
 
