@@ -45,7 +45,7 @@ const AccountsReceivable = () => {
           .filter(
             (entry) =>
               (entry.account_name === "Accounts Receivable" ||
-                entry.account_name === "Raw Materials Used") &&
+                entry.account_name === "Sales Revenue") &&
               (entry.debit_amount != 0 || entry.credit_amount != 0)
           )
           .map((entry) => entry.journal_id)
