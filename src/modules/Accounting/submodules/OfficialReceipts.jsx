@@ -3,6 +3,7 @@ import "../styles/accounting-styling.css";
 import Table from "../components/Table";
 import Search from "../components/Search";
 import Button from "../components/Button";
+import Dropdown from "../components/Dropdown";
 import CreateReceiptModal from "../components/CreateReceiptModal";
 import NotifModal from "../components/modalNotif/NotifModal";
 import axios from "axios";
@@ -84,6 +85,7 @@ const OfficialReceipts = () => {
   const [data, setData] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [searching, setSearching] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [validation, setValidation] = useState({
     isOpen: false,
@@ -338,13 +340,37 @@ const OfficialReceipts = () => {
     }
   };
 
-  const filteredData = data.filter((row) =>
+  const sortedData = [...data].sort((a, b) => {
+    if (sortOrder === "asc" || sortOrder === "desc") {
+      const valA = parseFloat(a[5]);
+      const valB = parseFloat(b[5]);
+      if (isNaN(valA) || isNaN(valB)) return 0;
+      return sortOrder === "asc" ? valA - valB : valB - valA;
+    }
+
+    // Explicit default case
+    if (sortOrder === "default" || !sortOrder) {
+      const idA = a[1]?.toString().toLowerCase() || "";
+      const idB = b[1]?.toString().toLowerCase() || "";
+      return idA.localeCompare(idB);
+    }
+
+    return 0; // fail-safe
+  });
+
+
+
+
+  const filteredData = sortedData.filter((row) =>
     [row[0], row[1], row[2], row[6], row[7], row[8]]
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
       .includes(searching.toLowerCase())
   );
+
+
+
 
   return (
     <div className="officialReceipts">
@@ -353,12 +379,32 @@ const OfficialReceipts = () => {
           <h1 className="subModule-title">Official Receipts</h1>
         </div>
         <div className="parent-component-container">
-          <Search
-            type="text"
-            placeholder="Search Record.."
-            value={searching}
-            onChange={(e) => setSearching(e.target.value)}
-          />
+          <div className="component-container">
+            <Dropdown
+              options={["Default", "Ascending", "Descending"]}
+              style="selection"
+              onChange={(selected) => {
+                const selectedValue = selected.toLowerCase();
+                if (selectedValue === "default") {
+                  setSortOrder("default");
+                } else if (selectedValue === "ascending") {
+                  setSortOrder("asc");
+                } else if (selectedValue === "descending") {
+                  setSortOrder("desc");
+                }
+              }}
+            />
+
+
+
+
+            <Search
+              type="text"
+              placeholder="Search Record.."
+              value={searching}
+              onChange={(e) => setSearching(e.target.value)}
+            />
+          </div>
           <div>
             <Button
               name="Create Receipt"
