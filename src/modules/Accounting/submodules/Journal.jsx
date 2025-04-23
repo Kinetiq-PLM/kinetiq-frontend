@@ -259,17 +259,33 @@ const Journal = () => {
     }
   };
 
-  const handleSort = (criteria) => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-    setSortBy(criteria);
-    const sortedData = [...data].sort((a, b) => {
-      const valueA = parseFloat(a[columns.indexOf(criteria)]) || 0;
-      const valueB = parseFloat(b[columns.indexOf(criteria)]) || 0;
-      return newSortOrder === "asc" ? valueA - valueB : valueB - valueA;
-    });
+  const handleSort = (value) => {
+    let sortedData = [];
+  
+    if (value === "Default") {
+      // Sort by Journal ID (alphanumeric sorting)
+      sortedData = [...data].sort((a, b) => {
+        const idA = a[columns.indexOf("Journal Id")] || "";
+        const idB = b[columns.indexOf("Journal Id")] || "";
+        return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: 'base' });
+      });
+      setSortBy("Journal Id");
+    } else {
+      const criteria = "Debit"; // Still fixed on Debit for Asc/Desc
+      const newSortOrder = value === "Ascending" ? "asc" : "desc";
+      setSortOrder(newSortOrder);
+      setSortBy(criteria);
+      sortedData = [...data].sort((a, b) => {
+        const valueA = parseFloat(a[columns.indexOf(criteria)]) || 0;
+        const valueB = parseFloat(b[columns.indexOf(criteria)]) || 0;
+        return newSortOrder === "asc" ? valueA - valueB : valueB - valueA;
+      });
+    }
+  
     setData(sortedData);
   };
+  
+  
 
   const filteredData = data.filter((row) =>
     [row[0], row[1], row[2], row[5], row[6]]
@@ -288,9 +304,9 @@ const Journal = () => {
         <div className="parent-component-container">
           <div className="component-container">
             <Dropdown
-              options={["Debit", "Credit"]}
+              options={["Default","Ascending", "Descending"]}
               style="selection"
-              defaultOption="Sort By.."
+              defaultOption="Sort By debit and credit.."
               onChange={(value) => handleSort(value)}
             />
             <Search

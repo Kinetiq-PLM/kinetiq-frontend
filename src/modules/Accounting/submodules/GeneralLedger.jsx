@@ -158,7 +158,7 @@ const BodyContent = () => {
     setScopedData(filteredData);
 
     const totalCost = filteredData.reduce(
-      (sum, item) => sum + (parseFloat(item.row[4]) || 0),
+      (sum, item) => sum + (parseFloat(item.row[5]) || 0),
       0
     );
 
@@ -226,11 +226,11 @@ const BodyContent = () => {
 
   const dataToCalculate = scopedData || filteredData;
   const totalDebit = dataToCalculate.reduce(
-    (sum, item) => sum + (parseFloat(item.row[4]) || 0),
+    (sum, item) => sum + (parseFloat(item.row[5]) || 0),
     0
   );
   const totalCredit = dataToCalculate.reduce(
-    (sum, item) => sum + (parseFloat(item.row[5]) || 0),
+    (sum, item) => sum + (parseFloat(item.row[6]) || 0),
     0
   );
 
@@ -239,10 +239,10 @@ const BodyContent = () => {
     setSortOrder(newSortOrder);
 
     const sortedData = [...data].sort((a, b) => {
-      const debitA = parseFloat(a.row[4]) || 0;
-      const creditA = parseFloat(a.row[5]) || 0;
-      const debitB = parseFloat(b.row[4]) || 0;
-      const creditB = parseFloat(b.row[5]) || 0;
+      const debitA = parseFloat(a.row[5]) || 0;
+      const creditA = parseFloat(a.row[6]) || 0;
+      const debitB = parseFloat(b.row[5]) || 0;
+      const creditB = parseFloat(b.row[6]) || 0;
 
       const totalA = debitA + creditA;
       const totalB = debitB + creditB;
