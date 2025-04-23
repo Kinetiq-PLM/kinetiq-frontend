@@ -9,6 +9,8 @@ import NotifModal from "../components/modalNotif/NotifModal";
 import axios from "axios";
 
 const GeneralLedgerAccounts = () => {
+
+  // Column names for the table
   const columns = [
     "GL Account ID",
     "Account Name",
@@ -17,6 +19,9 @@ const GeneralLedgerAccounts = () => {
     "Status",
     "Created at",
   ];
+
+
+  // State variables
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searching, setSearching] = useState("");
@@ -29,6 +34,7 @@ const GeneralLedgerAccounts = () => {
     title: "",
     message: "",
   });
+
 
   // API endpoint
   const API_URL =
@@ -44,8 +50,9 @@ const GeneralLedgerAccounts = () => {
     try {
       const response = await axios.get(GL_ACCOUNTS_ENDPOINT);
       console.log("API Response (fetchData):", response.data);
-      setData(
-        response.data.map((entry) => [
+
+      const sortedData = response.data
+        .map((entry) => [
           entry.gl_account_id || "-",
           entry.account_name || "-",
           entry.account_code || "-",
@@ -53,7 +60,9 @@ const GeneralLedgerAccounts = () => {
           entry.status || "-",
           entry.created_at ? new Date(entry.created_at).toLocaleString() : "-",
         ])
-      );
+        .sort((a, b) => a[0].localeCompare(b[0])); // Sort by GL Account ID
+
+      setData(sortedData);
       setIsLoading(false); // Set loading to false when fetching is done
     } catch (error) {
       console.error(
@@ -71,21 +80,13 @@ const GeneralLedgerAccounts = () => {
     }
   };
 
+
   useEffect(() => {
     fetchData();
   }, []);
 
-  const handleSort = () => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-    const sortedData = [...data].sort((a, b) => {
-      return newSortOrder === "asc"
-        ? a[5].localeCompare(b[5])
-        : b[5].localeCompare(a[5]);
-    });
-    setData(sortedData);
-  };
 
+  // Status filter function
   const handleStatusFilter = (status) => {
     setStatusFilter(status === "" ? "All" : status);
   };
@@ -199,6 +200,25 @@ const GeneralLedgerAccounts = () => {
     }
   };
 
+
+  // Sorting function
+  const handleSort = (value) => {
+    let sortedData = [...data];
+
+    if (value === "Default") {
+      sortedData.sort((a, b) => a[0].localeCompare(b[0]));
+    } else if (value === "Date Ascending") {
+      sortedData.sort((a, b) => a[5].localeCompare(b[5]));
+    } else if (value === "Date Descending") {
+      sortedData.sort((a, b) => b[5].localeCompare(a[5]));
+    }
+
+    setData(sortedData);
+  };
+
+
+
+  // Filter data based on search input and status filter
   const filteredData = data.filter((row) => {
     const matchesSearch = [row[0], row[1], row[2], row[3], row[4], row[5]]
       .filter(Boolean)
@@ -214,6 +234,7 @@ const GeneralLedgerAccounts = () => {
     return matchesSearch && matchesStatus;
   });
 
+
   // Loading spinner component
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
@@ -221,6 +242,7 @@ const GeneralLedgerAccounts = () => {
       <p className="ml-4 text-gray-600">Loading general ledger accounts data...</p>
     </div>
   );
+
 
   return (
     <div className="generalLedgerAccounts">
@@ -232,11 +254,13 @@ const GeneralLedgerAccounts = () => {
         <div className="parent-component-container">
           <div className="component-container">
             <Dropdown
-              options={["Ascending", "Descending"]}
+              options={["Default", "Date Ascending", "Date Descending"]}
               style="selection"
-              defaultOption="Sort by Date.."
-              onChange={handleSort}
+              defaultOption="Sort by date.."
+              onChange={(value) => handleSort(value)}
             />
+
+
             <Dropdown
               options={["All", "Active", "Inactive"]}
               style="selection"
