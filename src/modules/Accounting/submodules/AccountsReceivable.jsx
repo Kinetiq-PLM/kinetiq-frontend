@@ -39,21 +39,25 @@ const AccountsReceivable = () => {
       const response = await axios.get(GENERAL_LEDGER_ENDPOINT);
       console.log("API Response:", response.data);
 
-      // Get journal IDs for entries involving "Accounts Receivable" or "Raw Materials Used"
       const relevantJournalIds = new Set(
         response.data
           .filter(
             (entry) =>
               (entry.account_name === "Accounts Receivable" ||
-                entry.account_name === "Sales Revenue") &&
+               entry.account_name === "Sales Revenue") &&
               (entry.debit_amount != 0 || entry.credit_amount != 0)
           )
           .map((entry) => entry.journal_id)
       );
-
-      // Include all entries for those journal IDs to capture both debit and credit sides
+      
+      // 👇 Add an additional filter for account_name
       const combinedData = response.data
-        .filter((entry) => relevantJournalIds.has(entry.journal_id))
+        .filter(
+          (entry) =>
+            relevantJournalIds.has(entry.journal_id) &&
+            (entry.account_name === "Accounts Receivable" ||
+             entry.account_name === "Sales Revenue")
+        )
         .map((entry) => [
           entry.entry_line_id || "N/A",
           entry.gl_account_id || "N/A",
@@ -63,6 +67,7 @@ const AccountsReceivable = () => {
           parseFloat(entry.credit_amount || "0.00").toFixed(2),
           entry.description || "-",
         ]);
+      
 
       console.log("Combined Data:", combinedData);
       setData(combinedData);
