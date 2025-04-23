@@ -81,10 +81,10 @@ const JournalEntry = () => {
     setTotalCredit(creditSum);
   };
 
-  const handleAddAccount = (accountData) => {
+  const handleAddAccount = async (accountData) => {
     setJournalForm((prevState) => {
       if (selectedIndex === null) return prevState;
-
+  
       const updatedTransactions = prevState.transactions.map((entry, i) =>
         i === selectedIndex
           ? {
@@ -96,11 +96,11 @@ const JournalEntry = () => {
             }
           : entry
       );
-
+  
       const isTargetDebit =
-        accountData.accountCode?.toUpperCase() === "ACC-COA-2025-AE6010" &&
+        accountData.glAccountId === "ACC-GLA-2025-ed2da5" && // Match the specific GL Account ID
         prevState.transactions[selectedIndex].type === "debit";
-
+  
       if (isTargetDebit) {
         const creditEntries = [
           { accountName: "SSS Contribution", glAccountId: "ACC-GLA-2025-d7b748", field: "sss_contribution" },
@@ -112,7 +112,7 @@ const JournalEntry = () => {
           { accountName: "Undertime Deduction", glAccountId: "ACC-GLA-2025-1a67b8", field: "undertime_deduction" },
           { accountName: "Net Pay (test)", glAccountId: "ACC-GLA-2025-253367", field: "net_pay" },
         ];
-
+  
         // Add credit entries with empty amounts
         creditEntries.forEach((credit) => {
           updatedTransactions.push({
@@ -123,34 +123,56 @@ const JournalEntry = () => {
             field: credit.field,
           });
         });
-
-        // Fetch payroll data to check status
-        fetchPayrollData(updatedTransactions, selectedIndex);
+  
+        // Fetch payroll data for the selected GL Account ID
+        fetchPayrollDataForGLAccount(updatedTransactions, selectedIndex, accountData.glAccountId);
       }
-
+  
       updateTotals(updatedTransactions);
       console.log("Updated transactions:", updatedTransactions);
       return { ...prevState, transactions: updatedTransactions };
     });
-
+  
     setIsAccountModalOpen(false);
     setSelectedIndex(null);
   };
-
-  const fetchPayrollData = async (transactions, debitIndex) => {
+  
+  const fetchPayrollDataForGLAccount = async (transactions, debitIndex, glAccountId) => {
     setIsLoadingPayroll(true);
     try {
-      const response = await axios.get(PAYROLL_ENDPOINT);
-      const processingPayroll = response.data.find(
-        (payroll) => payroll.status === "Processing"
+      // Fetch the mapping of GL Account IDs to Account IDs
+      const accountResponse = await axios.get(`${API_URL}/api/general-ledger-accounts/`);
+      const accountData = accountResponse.data.find(
+        (account) => account.gl_account_id === glAccountId
       );
-
-      if (!processingPayroll) {
+  
+      if (!accountData) {
         setValidation({
           isOpen: true,
           type: "info",
-          title: "No Processing Payroll",
-          message: "No payroll records with status 'Processing' found. Please enter amounts manually.",
+          title: "No Relevant Account",
+          message: `No account found for GL Account ID: ${glAccountId}. Please check the account setup.`,
+        });
+        setIsLoadingPayroll(false);
+        return;
+      }
+  
+      const accountId = accountData.account_id; // Get the corresponding account_id (employee_id)
+  
+      // Fetch the payroll data using the account_id
+      const payrollResponse = await axios.get(PAYROLL_ENDPOINT);
+      const payrollData = payrollResponse.data.find(
+        (payroll) =>
+          payroll.employee_id === accountId && // To Match the employee_id
+          payroll.status === "Processing" // To ensure the payroll status is "Processing"
+      );
+  
+      if (!payrollData) {
+        setValidation({
+          isOpen: true,
+          type: "info",
+          title: "No Relevant Payroll",
+          message: `No payroll record found for Account ID: ${accountId} with status 'Processing'. Please enter amounts manually.`,
         });
         setIsLoadingPayroll(false);
         // Reset all amounts to empty for manual entry
@@ -160,28 +182,27 @@ const JournalEntry = () => {
         }));
         return;
       }
-
-      // Populate amounts only for Processing status
+  
+      // Populate amounts for the selected Payroll ID
       setJournalForm((prevState) => {
         const updatedTransactions = transactions
           .map((entry, i) => {
             if (i === debitIndex) {
               return {
                 ...entry,
-                amount: parseFloat(processingPayroll.gross_pay).toFixed(2),
+                amount: parseFloat(payrollData.gross_pay).toFixed(2),
               };
             }
             if (entry.type === "credit" && entry.field) {
-              const amount = parseFloat(processingPayroll[entry.field] || 0).toFixed(2);
+              const amount = parseFloat(payrollData[entry.field] || 0).toFixed(2);
               return { ...entry, amount: amount !== "0.00" ? amount : "" };
             }
             return entry;
           })
           .filter((entry) => entry.type === "debit" || (entry.type === "credit" && entry.amount));
-
+  
         updateTotals(updatedTransactions);
-
-        // Keep the description unchanged
+  
         return {
           ...prevState,
           transactions: updatedTransactions,
@@ -195,7 +216,6 @@ const JournalEntry = () => {
         title: "Fetch Error",
         message: "Failed to load payroll data. Please check your connection or enter amounts manually.",
       });
-      // Reset all amounts to empty for manual entry
       setJournalForm((prevState) => ({
         ...prevState,
         transactions: transactions.map((t) => ({ ...t, amount: "" })),
@@ -204,6 +224,7 @@ const JournalEntry = () => {
       setIsLoadingPayroll(false);
     }
   };
+  
 
   const handleSubmit = async () => {
     if (!journalForm.journalId || !journalForm.description) {
