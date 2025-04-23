@@ -367,7 +367,7 @@ const Journal = () => {
 
           <div className="component-container">
             <Button
-              name="Create Journal Entry"
+              name="Create Journal ID"
               variant="standard2"
               onclick={openModal}
             />
