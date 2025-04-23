@@ -9,11 +9,15 @@ import NotifModal from "../components/modalNotif/NotifModal";
 import Search from "../components/Search";
 
 const Journal = () => {
+
+  // Current date for the Journal Entry form
   const getCurrentDate = () => {
     const today = new Date();
     return today.toISOString().split("T")[0];
   };
 
+
+  // Table Columns
   const columns = [
     "Journal Id",
     "Journal Date",
@@ -23,6 +27,9 @@ const Journal = () => {
     "Invoice Id",
     "Currency Id",
   ];
+
+
+  // State variables
   const [latestJournalId, setLatestJournalId] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -44,6 +51,8 @@ const Journal = () => {
     message: "",
   });
 
+
+  // API Endpoints
   const API_URL =
     import.meta.env.VITE_API_URL ||
     "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
@@ -51,9 +60,13 @@ const Journal = () => {
   const INVOICES_ENDPOINT = `${API_URL}/api/invoices/`;
   const CURRENCIES_ENDPOINT = `${API_URL}/api/currencies/`;
 
+
+  // Function to open and close the modal
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
+
+  // Fetching data from the API
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -90,6 +103,8 @@ const Journal = () => {
     }
   };
 
+
+  // Fetching currencies and invoices from the API
   const fetchCurrencies = async () => {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -108,6 +123,8 @@ const Journal = () => {
     }
   };
 
+
+  // Fetching invoices from the API
   const fetchInvoices = async () => {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
@@ -155,9 +172,12 @@ const Journal = () => {
     fetchInvoices();
   }, []);
 
-  const currencyOptions = currencies.map((c) => c.currency_name);
-  const invoiceOptions = invoices.map((inv) => inv.invoice_id);
 
+  // Generate currency options for the dropdown
+  const currencyOptions = currencies.map((c) => c.currency_name);
+
+
+  // Generate invoice options for the dropdown
   const generateNextJournalId = () => {
     if (!latestJournalId) return "ACC-JOE-2025-A00001";
     const matches = latestJournalId.match(/ACC-JOE-2025-([A-Z0-9]+)$/);
@@ -169,6 +189,8 @@ const Journal = () => {
     return "ACC-JOE-2025-A00001";
   };
 
+
+  // Increment the alphanumeric string
   const incrementAlphaNumeric = (str) => {
     if (!/^[A-Z0-9]+$/.test(str)) {
       throw new Error("Invalid alphanumeric string");
@@ -187,10 +209,14 @@ const Journal = () => {
     return chars.join("");
   };
 
+
+  // Handle input changes in the form
   const handleInputChange = (field, value) => {
     setJournalForm((prevState) => ({ ...prevState, [field]: value }));
   };
 
+
+  // Handle form submission
   const handleSubmit = async () => {
     if (
       !journalForm.journalDate ||
@@ -207,24 +233,15 @@ const Journal = () => {
       return;
     }
 
-    const selectedInvoice = invoices.find(
-      (inv) => inv.invoice_id === journalForm.invoiceId
-    );
-    if (!selectedInvoice) {
-      setValidation({
-        isOpen: true,
-        type: "warning",
-        title: "Invalid Invoice",
-        message: "Please select a valid invoice.",
-      });
-      return;
-    }
 
+    // Currency ID is now set to the selected currency's ID
     const nextJournalId = generateNextJournalId();
     const selectedCurrency = currencies.find(
       (c) => c.currency_name === journalForm.currencyId
     );
 
+
+    // Prepare the payload for the API request
     const payload = {
       journal_id: nextJournalId,
       journal_date: journalForm.journalDate,
@@ -235,6 +252,8 @@ const Journal = () => {
       currency_id: selectedCurrency?.currency_id || "",
     };
 
+
+    // Check if the invoice ID is valid
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
@@ -273,18 +292,41 @@ const Journal = () => {
     }
   };
 
-  const handleSort = (criteria) => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-    setSortBy(criteria);
-    const sortedData = [...data].sort((a, b) => {
-      const valueA = parseFloat(a[columns.indexOf(criteria)]) || 0;
-      const valueB = parseFloat(b[columns.indexOf(criteria)]) || 0;
-      return newSortOrder === "asc" ? valueA - valueB : valueB - valueA;
-    });
+
+  // Handle sorting of the table data
+  const handleSort = (value) => {
+    let sortedData = [];
+  
+    if (value === "Default") {
+
+      // Sort by Journal ID (alphanumeric sorting)
+      sortedData = [...data].sort((a, b) => {
+        const idA = a[columns.indexOf("Journal Id")] || "";
+        const idB = b[columns.indexOf("Journal Id")] || "";
+        return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: 'base' });
+      });
+      setSortBy("Journal Id");
+
+
+    } else {
+
+      // Sort by Debit or Credit based on the selected value
+      const criteria = "Debit"; 
+      const newSortOrder = value === "Ascending" ? "asc" : "desc";
+      setSortOrder(newSortOrder);
+      setSortBy(criteria);
+      sortedData = [...data].sort((a, b) => {
+        const valueA = parseFloat(a[columns.indexOf(criteria)]) || 0;
+        const valueB = parseFloat(b[columns.indexOf(criteria)]) || 0;
+        return newSortOrder === "asc" ? valueA - valueB : valueB - valueA;
+      });
+    }
+  
     setData(sortedData);
   };
+  
 
+  // Handle search input change
   const filteredData = data.filter((row) =>
     [row[0], row[1], row[2], row[5], row[6]]
       .filter(Boolean)
@@ -296,15 +338,22 @@ const Journal = () => {
   return (
     <div className="Journal">
       <div className="body-content-container">
+
+
+        {/* Title Container */}
         <div className="title-subtitle-container">
           <h1 className="subModule-title">Journal</h1>
         </div>
+
+
+        {/* Searching, sorting, and button */}
         <div className="parent-component-container">
+
           <div className="component-container">
             <Dropdown
-              options={["Debit", "Credit"]}
+              options={["Default","Ascending", "Descending"]}
               style="selection"
-              defaultOption="Sort By.."
+              defaultOption="Sort By debit and credit.."
               onChange={(value) => handleSort(value)}
             />
             <Search
@@ -314,16 +363,24 @@ const Journal = () => {
               onChange={(e) => setSearching(e.target.value)}
             />
           </div>
+
+
           <div className="component-container">
             <Button
-              name="Create Journal Entry"
+              name="Create Journal ID"
               variant="standard2"
               onclick={openModal}
             />
           </div>
         </div>
+
+
+        {/* Table Component */}
         <Table data={filteredData} columns={columns} enableCheckbox={false} />
       </div>
+
+
+      {/* Modal for Journal Entry Form */}
       <JournalModalInput
         isModalOpen={isModalOpen}
         closeModal={closeModal}
@@ -331,8 +388,10 @@ const Journal = () => {
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
         currencyOptions={currencyOptions}
-        invoiceOptions={invoiceOptions}
       />
+
+
+      {/* Modal for Notifications */}
       {validation.isOpen && (
         <NotifModal
           isOpen={validation.isOpen}
