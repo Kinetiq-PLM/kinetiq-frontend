@@ -266,7 +266,7 @@ function App() {
 
   const mainModules = import.meta.glob('./modules/*/*.jsx');
   const subModules = import.meta.glob('./modules/*/submodules/*.jsx');
-  
+
   const loadMainModule = (moduleId) => {
     const moduleFile = `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`;
 
@@ -292,10 +292,10 @@ function App() {
 
   const loadSubModule = (submoduleId, mainModule = activeModule) => {
     const submoduleFile = `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`;
-  
+
     if (subModules[submoduleFile]) {
       const LazyComponent = lazy(subModules[submoduleFile]);
-  
+
       const WrappedComponent = () => (
         <LazyComponent
           loadSubModule={loadSubModule}
@@ -304,7 +304,7 @@ function App() {
           employee_id={user?.employee_id}
         />
       );
-  
+
       setModuleComponent(() => WrappedComponent);
       setShowUserProfile(false);
     } else {
@@ -366,9 +366,9 @@ function App() {
     },
     "Financials": {
       "Reports": "Reports",
-      "Validations" : "Validations",
-      "Approvals" : "Approvals",
-      "Forms" : "Forms"
+      "Validations": "Validations",
+      "Approvals": "Approvals",
+      "Forms": "Forms"
     },
     "Purchasing": {
       "Purchase Request List": "PurchaseReqList",
@@ -440,7 +440,7 @@ function App() {
       "Project Request": "Projectrequest",
       "Tasks": "TaskMonitoring",
       "Report Monitoring": "Reports",
-      "Warranty Monitoring":"Warranties",
+      "Warranty Monitoring": "Warranties",
     },
     "Human Resources": {
       "Employees": "Employees",
