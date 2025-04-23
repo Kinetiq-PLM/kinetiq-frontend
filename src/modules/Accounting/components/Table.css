@@ -12,7 +12,6 @@
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-
 }
 
 .accounting-table thead {
@@ -42,7 +41,7 @@ tr:hover {
 
 .accounting-table td {
   padding: .3rem .8rem;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   text-wrap: wrap;
 }
@@ -108,6 +107,10 @@ td {
   padding: 0.5vh 2vh;
 }
 
+.accounting-table .status-active:hover {
+  background-color: #9aedc2;
+}
+
 .accounting-table .status-inactive {
   background-color: #ffd0d0;
   color: #b91c1c;
@@ -115,6 +118,10 @@ td {
   border-radius: 30px;
   width: fit-content;
   padding: 0.5vh 2vh;
+}
+
+.accounting-table .status-inactive:hover {
+  background-color: #fca5a5;
 }
 
 .accounting-table .selected-row {
@@ -156,6 +163,11 @@ td {
 
 @media (max-width: 768px) {
 
+  .accounting-table table {
+    width: 120%;
+    table-layout: auto;
+  }
+
   .accounting-table th,
   td {
     padding: .3rem;
@@ -173,6 +185,11 @@ td {
 }
 
 @media (max-width: 480px) {
+
+  .accounting-table table {
+    width: 50rem;
+    table-layout: auto;
+  }
 
   .accounting-table th,
   td {

@@ -30,7 +30,7 @@ export default function StandaloneLogin() {
   // localStorage.setItem('login_attemtps', '1')
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCredentials(prev => ({ ...prev, [name]: value }));
+    setCredentials(prev => ({ ...prev, [name]: value.trim() }));
     setLoginError("");
   };
 
@@ -108,11 +108,11 @@ export default function StandaloneLogin() {
     console.log("Generated code:", code);
 
     try {
-      // emailjs.send("service_fpuj34n","template_vcrih1l",{
-      //   code: code,
-      //   email: email,
-      //   kinetiq_email: 
-      //   });
+      emailjs.send("service_fpuj34n","template_vcrih1l",{
+        code: code,
+        email: email,
+        kinetiq_email: resetData.kinetiq_email,
+      });
       console.log("Email sent successfully! to: ", email);
 
       console.log("Email not sent, using console.log for testing bc limited api calls.");
@@ -215,7 +215,7 @@ export default function StandaloneLogin() {
                     <input
                       type="text"
                       name="email"
-                      placeholder="Username or Email"
+                      placeholder="Email"
                       value={credentials.email}
                       onChange={handleChange}
                       required
