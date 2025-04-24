@@ -43,9 +43,7 @@ const AccountsPayable = () => {
         response.data
           .filter(
             (entry) =>
-              (entry.account_name === "Accounts Payable" ||
-                entry.account_name === "Cash in Bank") &&
-              (entry.debit_amount != 0 || entry.credit_amount != 0)
+              (entry.account_name === "Accounts Payable" || entry.account_name === "Raw Material Used")
           )
           .map((entry) => entry.journal_id)
       );
