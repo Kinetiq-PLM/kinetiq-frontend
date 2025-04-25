@@ -4,23 +4,17 @@ import Heading from "../components/Heading";
 import Button from "../components/Button";
 import Dropdown from "../components/Dropdown";
 
-import QuotationsTab from "./../components/MasterListTabs/QuotationsTab";
-import OrdersTab from "./../components/MasterListTabs/OrdersTab";
-import DeliveriesTab from "./../components/MasterListTabs/DeliveriesTab";
-import InvoicesTab from "./../components/MasterListTabs/InvoicesTab";
-import BlanketAgreementsTab from "./../components/MasterListTabs/BlanketAgreementsTab";
+import QuotationsTab from "../components/MasterListTabs/QuotationsTab";
+import OrdersTab from "../components/MasterListTabs/OrdersTab";
+import DeliveriesTab from "../components/MasterListTabs/DeliveriesTab";
+import InvoicesTab from "../components/MasterListTabs/InvoicesTab";
+import BlanketAgreementsTab from "../components/MasterListTabs/BlanketAgreementsTab";
 import { AlertProvider } from "../components/Context/AlertContext";
 import BlanketAgreementDetailsModal from "../components/Modals/BlanketAgreementDetails";
 import QuotationListModal from "../components/Modals/Lists/QuotationList";
 import ViewDocumentModal from "../components/Modals/ViewDocumentModal";
 
-const BodyContent = ({
-  setActiveModule,
-  loadSubModule,
-  setActiveSubModule,
-  newBlanketAgreement,
-  employee_id,
-}) => {
+const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   console.log(employee_id);
   const [isBlanketAgreementDetailsOpen, setIsBlanketAgreementDetailsOpen] =
     useState(false);
@@ -105,7 +99,7 @@ const BodyContent = ({
       <div className="master-list">
         <div className="body-content-container">
           <Heading
-            Title="Master List"
+            Title="Transactions"
             SubTitle="Comprehensive lists regarding various information used in sales."
           />
           <main className="">
