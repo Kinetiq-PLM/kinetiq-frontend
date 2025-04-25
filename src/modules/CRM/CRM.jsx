@@ -1,5 +1,5 @@
 import React from "react";
-import "./styles/index.css";
+import "./styles/Index.css";
 import Heading from "../Sales/components/Heading";
 
 const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
