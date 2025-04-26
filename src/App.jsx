@@ -142,6 +142,7 @@ function App() {
     MRP: {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
       "Bills Of Material": "BillsOfMaterial",
+      "Product Materials": "ProductMaterials",
     },
     "Project Management": {
       "Task Assignments": "TaskAssignments",
