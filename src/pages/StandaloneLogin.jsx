@@ -20,6 +20,31 @@ export default function StandaloneLogin() {
     confirmNewPassword: "",
   };
 
+  const isNewPassSame = async (newPass) => {
+    console.log("checking password");
+    console.log("KINETIK EMAIL" + resetData.kinetiq_email);
+    console.log("NEW PASS INPUTTED: " + newPass);
+    const res = await fetch("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/check-password/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: resetData.kinetiq_email,
+        password: newPass,
+      }),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+
+      console.log("MATCHED WITH PASS");
+      return true;
+
+    } else {
+      console.log("NOT MAECHRC WITH PASS");
+      return false;
+    }
+  };
+
   const [resetData, setResetData] = useState(initialResetData);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +55,7 @@ export default function StandaloneLogin() {
   // localStorage.setItem('login_attemtps', '1')
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCredentials(prev => ({ ...prev, [name]: value }));
+    setCredentials(prev => ({ ...prev, [name]: value.trim() }));
     setLoginError("");
   };
 
@@ -108,15 +133,13 @@ export default function StandaloneLogin() {
     console.log("Generated code:", code);
 
     try {
-      // emailjs.send("service_fpuj34n","template_vcrih1l",{
-      //   code: code,
-      //   email: email,
-      //   kinetiq_email: 
-      //   });
+      emailjs.send("service_fpuj34n", "template_vcrih1l", {
+        code: code,
+        email: email,
+        kinetiq_email: resetData.kinetiq_email,
+      });
       console.log("Email sent successfully! to: ", email);
-
-      console.log("Email not sent, using console.log for testing bc limited api calls.");
-
+      
     } catch (err) {
       console.error("Failed to send email:", err);
       alert("Error sending reset code.");
@@ -141,8 +164,14 @@ export default function StandaloneLogin() {
   };
 
   const handleChangePassword = async () => {
+    setLoginError(""); // clear any old error
     const savedCode = localStorage.getItem("reset_code");
     const savedEmail = localStorage.getItem("reset_email");
+
+    if (await isNewPassSame(resetData.newPassword)) {
+      setLoginError("* New password cannot be the same as the current password. *");
+      return;
+    }
 
     // reset code match
     if (resetData.code !== savedCode) {
@@ -215,7 +244,7 @@ export default function StandaloneLogin() {
                     <input
                       type="text"
                       name="email"
-                      placeholder="Username or Email"
+                      placeholder="Email"
                       value={credentials.email}
                       onChange={handleChange}
                       required
@@ -355,7 +384,7 @@ export default function StandaloneLogin() {
                         value={resetData.newPassword}
                         onChange={(e) => setResetData({ ...resetData, newPassword: e.target.value })}
                         required
-                        style={{ color: 'gray', marginBottom: '1rem' }}
+                        style={{ color: 'gray' }}
                       />
                       <span className="eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
                         {showNewPassword ? (
@@ -372,7 +401,7 @@ export default function StandaloneLogin() {
 
                     </div>
 
-                    <h4>Confirm New Password: </h4>
+                    <h4 style={{ color: 'gray', marginTop: '1rem' }}>Confirm New Password: </h4>
 
                     <div className="password-wrapper">
 

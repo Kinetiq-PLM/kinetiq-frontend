@@ -1,10 +1,9 @@
-
 import { useState, useRef, Suspense, lazy, act, useEffect } from "react";
 import "./App.css";
 import "./MediaQueries.css";
 //import SearchBar from "./shared/components/SearchBar";
 import UserProfile from "./shared/components/UserProfile";
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { User } from "lucide-react";
 import LandingPage from "./pages/LandingPage";
@@ -27,7 +26,7 @@ function App() {
 
   const displayName = user
     ? `${user.first_name} ${user.last_name?.charAt(0)}.`
-    : '';
+    : "";
 
   const iconsRef = useRef(null);
   const descsRef = useRef(null);
@@ -64,23 +63,22 @@ function App() {
         setActiveSubModule(null);
       } else if (storedModule) {
         setActiveModule(storedModule);
-        if (storedSubModule && storedSubModule !== "null") setActiveSubModule(storedSubModule);
+        if (storedSubModule && storedSubModule !== "null")
+          setActiveSubModule(storedSubModule);
       }
     } else {
       setUser(null);
       navigate("/login", { replace: true }); // redirect to login if no user found
     }
-
   }, []);
 
-
   const handleLogout = () => {
-    localStorage.removeItem("user");   // clear saved session
+    localStorage.removeItem("user"); // clear saved session
     localStorage.removeItem("activeModule");
     localStorage.removeItem("activeSubModule");
     localStorage.removeItem("showUserProfile");
-    setUser(null);   // clear local user state 
-    navigate("/login");  // redirect to login
+    setUser(null); // clear local user state
+    navigate("/login"); // redirect to login
   };
 
   const toggleProfileMenu = () => {
@@ -93,8 +91,8 @@ function App() {
 
     const handleClickOutsideProfileDropdown = (e) => {
       if (
-        !e.target.closest('.header-profile-container') &&
-        !e.target.closest('.profile-dropdown')
+        !e.target.closest(".header-profile-container") &&
+        !e.target.closest(".profile-dropdown")
       ) {
         setIsProfileMenuOpen(false);
       }
@@ -111,8 +109,8 @@ function App() {
 
     const handleClickOutsideNotif = (e) => {
       if (
-        !e.target.closest('.notif-icon') &&
-        !e.target.closest('.notif-menu')
+        !e.target.closest(".notif-icon") &&
+        !e.target.closest(".notif-menu")
       ) {
         setNotifOpen(false);
       }
@@ -124,85 +122,93 @@ function App() {
     };
   }, [notifOpen]);
 
-
   //fetch notifs
   const fetchNotifs = async (user) => {
-    console.log("Fetching notifs...")
-    const resp = await fetch(`https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/?user_id=${user?.user_id}`, { method: 'GET' })
+    console.log("Fetching notifs...");
+    const resp = await fetch(
+      `https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/?user_id=${user?.user_id}`,
+      { method: "GET" }
+    );
     // const resp_text = await resp.text()
     // console.log("resp text")
     // console.log(resp_text)
     const resp_data = await resp.json();
-    const notif_items = resp_data.data
-    console.log("Notifs fetched:")
-    console.log(notif_items)
-    var temp_list = []
+    const notif_items = resp_data.data;
+    console.log("Notifs fetched:");
+    console.log(notif_items);
+    var temp_list = [];
     //populate notifs table
     notif_items.map((notif_item, i) => {
-      origin = notif_item.module.split('/')
-      const orig_module = origin[0]
-      const orig_submodule = origin.length == 2 ? origin[1] : null
-      const time_formatted = new Date(notif_item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      origin = notif_item.module.split("/");
+      const orig_module = origin[0];
+      const orig_submodule = origin.length == 2 ? origin[1] : null;
+      const time_formatted = new Date(notif_item.created_at).toLocaleTimeString(
+        [],
+        { hour: "2-digit", minute: "2-digit" }
+      );
       temp_list[i] = {
         id: notif_item.notifications_id,
         msg: notif_item.message,
         orig_module: orig_module,
         orig_submodule: orig_submodule,
-        read: notif_item.notifications_status == 'Read',
-        time: time_formatted
-      }
-    })
-    setNotifs(temp_list)
-    console.log('Final notif list:')
-    console.log(temp_list)
+        read: notif_item.notifications_status == "Read",
+        time: time_formatted,
+      };
+    });
+    setNotifs(temp_list);
+    console.log("Final notif list:");
+    console.log(temp_list);
 
     //notif icon toggle (for loop so we can break out)
     for (var i = 0; i < temp_list.length; ++i) {
       if (temp_list[i].read == false) {
-        console.log('found notif')
-        setHasNotification(true)
-        break
+        console.log("found notif");
+        setHasNotification(true);
+        break;
       }
     }
-  }
+  };
 
   //func for marking notifs as read
   const readNotif = async (notif_id) => {
-    const resp = await fetch(`https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        notifications_id: notif_id
-      })
-    })
-  }
+    const resp = await fetch(
+      `https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/notifications/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          notifications_id: notif_id,
+        }),
+      }
+    );
+  };
 
   //get notifs
   useEffect(() => {
     if (user) {
-      fetchNotifs(user)
+      fetchNotifs(user);
     }
   }, [user]);
 
   // hooks for loading modules
   useEffect(() => {
-    console.log("(debug) main hook")
+    console.log("(debug) main hook");
     if (activeModule) {
-      console.log("(debug) calling loadmainmodule")
-      loadMainModule(activeModule)
+      console.log("(debug) calling loadmainmodule");
+      loadMainModule(activeModule);
     }
   }, [activeModule]);
 
   useEffect(() => {
-    console.log("(debug) sub hook")
+    console.log("(debug) sub hook");
     if (activeSubModule) {
-      console.log("(debug) calling loadsubmodule")
-      loadSubModule(activeSubModule)
+      console.log("(debug) calling loadsubmodule");
+      loadSubModule(activeSubModule);
     } else {
-      console.log("(debug) calling loadmainmodule from sub hook")
-      loadMainModule(activeModule)
+      console.log("(debug) calling loadmainmodule from sub hook");
+      loadMainModule(activeModule);
     }
   }, [activeSubModule]);
 
@@ -263,10 +269,9 @@ function App() {
   //   }
   // };
 
+  const mainModules = import.meta.glob("./modules/*/*.jsx");
+  const subModules = import.meta.glob("./modules/*/submodules/*.jsx");
 
-  const mainModules = import.meta.glob('./modules/*/*.jsx');
-  const subModules = import.meta.glob('./modules/*/submodules/*.jsx');
-  
   const loadMainModule = (moduleId) => {
     const moduleFile = `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`;
 
@@ -289,13 +294,12 @@ function App() {
     }
   };
 
-
   const loadSubModule = (submoduleId, mainModule = activeModule) => {
     const submoduleFile = `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`;
-  
+
     if (subModules[submoduleFile]) {
       const LazyComponent = lazy(subModules[submoduleFile]);
-  
+
       const WrappedComponent = () => (
         <LazyComponent
           loadSubModule={loadSubModule}
@@ -304,7 +308,7 @@ function App() {
           employee_id={user?.employee_id}
         />
       );
-  
+
       setModuleComponent(() => WrappedComponent);
       setShowUserProfile(false);
     } else {
@@ -312,51 +316,50 @@ function App() {
     }
   };
 
-
   const moduleFileNames = {
-    "Management": "Management",
-    "Administration": "Administration",
-    "Accounting": "Accounting",
-    "Financials": "Financials",
-    "Purchasing": "Purchasing",
-    "Operations": "Operations",
-    "Sales": "Sales",
-    "CRM": "CRM",
+    Management: "Management",
+    Administration: "Administration",
+    Accounting: "Accounting",
+    Financials: "Financials",
+    Purchasing: "Purchasing",
+    Operations: "Operations",
+    Sales: "Sales",
+    CRM: "CRM",
     "Support & Services": "SupportServices",
-    "Inventory": "Inventory",
-    "Distribution": "Distribution",
-    "Production": "Production",
-    "MRP": "MRP",
+    Inventory: "Inventory",
+    Distribution: "Distribution",
+    Production: "Production",
+    MRP: "MRP",
     "Project Management": "ProjectManagement",
     "Human Resources": "HumanResources",
     "Report Generator": "ReportGenerator",
     "Purchase Request": "PurchaseRequest",
     "Project Request": "ProjectRequest",
     "Workforce Request": "WorkforceRequest",
-    "Job Posting": "JobPosting"
+    "Job Posting": "JobPosting",
   };
 
   const moduleSubmoduleFileNames = {
     Management: {
-      "Dashboard": "ManagementDashboard",
+      Dashboard: "ManagementDashboard",
       "Project Approval": "ManagementApprovals",
       "User Roles": "UserRoles",
       "Access Control": "AccessControl",
       Settings: "Settings",
     },
     Administration: {
-      "User": "User",
+      User: "User",
       "Item Masterlist": "ItemMasterlist",
       "Business Partner Masterlist": "BusinessPartnerMasterlist",
       "Audit Logs": "AuditLogs",
-      "Policy": "Policy",
-      "Currency": "Currency",
-      "Warehouse": "Warehouse",
-      "Notification": "Notification",
+      Policy: "Policy",
+      Currency: "Currency",
+      Warehouse: "Warehouse",
+      Notification: "Notification",
     },
-    "Accounting": {
+    Accounting: {
       "Chart of Accounts": "ChartOfAccounts",
-      "Journal": "Journal",
+      Journal: "Journal",
       "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
       "General Ledger Accounts": "GeneralLedgerAccounts",
@@ -364,13 +367,13 @@ function App() {
       "Accounts Payable": "AccountsPayable",
       "Official Receipts": "OfficialReceipts",
     },
-    "Financials": {
-      "Reports": "Reports",
-      "Validations" : "Validations",
-      "Approvals" : "Approvals",
-      "Forms" : "Forms"
+    Financials: {
+      Reports: "Reports",
+      Validations: "Validations",
+      Approvals: "Approvals",
+      Forms: "Forms",
     },
-    "Purchasing": {
+    Purchasing: {
       "Purchase Request List": "PurchaseReqList",
       "Puchase Quotation List": "PurchaseQuot",
       "Purchase Order Status": "PurchaseOrdStat",
@@ -389,11 +392,8 @@ function App() {
       Quotation: "Quotation",
       Order: "Order",
       Delivery: "Delivery",
-      // Invoice: "Invoice",
-      // "Blanket Agreement": "BlanketAgreement",
-      "Master List": "MasterList",
+      Transactions: "Transactions",
       Reporting: "Reporting",
-      // Return: "Return",
     },
     CRM: {
       Ticket: "Ticket",
@@ -412,25 +412,25 @@ function App() {
       "Service Report": "ServiceReport",
       "Service Contract": "ServiceContract",
     },
-    "Inventory": {
+    Inventory: {
       "Shelf Life": "ShelfLife",
       "P-Counts": "PCounts",
       "Stock Flow": "StockFlow",
     },
-    "Distribution": {
+    Distribution: {
       "External Delivery": "ExternalDelivery",
       "Internal Delivery": "InternalDelivery",
-      "Picking": "Picking",
-      "Packing": "Packing",
+      Picking: "Picking",
+      Packing: "Packing",
       Shipment: "Shipment",
-      "Rework": "Rework",
+      Rework: "Rework",
     },
-    "Production": {
+    Production: {
       "Equipment and Labor": "Equipment&Labor",
       //"Quality Control": "QualityControl",
-      "Cost of Production": "CostOfProduction"
+      "Cost of Production": "CostOfProduction",
     },
-    "MRP": {
+    MRP: {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
       "Bills Of Material": "BillsOfMaterial",
     },
@@ -438,26 +438,23 @@ function App() {
       "Project List": "Project List",
       "Project Planning": "ProjectPlanning",
       "Project Request": "Projectrequest",
-      "Tasks": "TaskMonitoring",
+      Tasks: "TaskMonitoring",
       "Report Monitoring": "Reports",
-      "Warranty Monitoring":"Warranties",
+      "Warranty Monitoring": "Warranties",
     },
     "Human Resources": {
-      "Employees": "Employees",
-      "Recruitment": "Recruitment",
+      Employees: "Employees",
+      Recruitment: "Recruitment",
       "Attendance Tracking": "AttendanceTracking",
-      "Payroll": "Payroll",
-      "Departments": "Departments",
+      Payroll: "Payroll",
+      Departments: "Departments",
       "Workforce Allocation": "WorkforceAllocation",
       "Leave Requests": "LeaveRequests",
       "Employee Performance": "EmployeePerformance",
-      "Employee Salary": "EmployeeSalary"
+      "Employee Salary": "EmployeeSalary",
     },
-    "Report Generator": {
-    },
+    "Report Generator": {},
   };
-
-
 
   const rawPermissions = user?.role?.permissions || "";
   const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
@@ -465,10 +462,10 @@ function App() {
   const filteredModuleFileNames = allowedModules.includes("All")
     ? moduleFileNames
     : Object.fromEntries(
-      Object.entries(moduleFileNames).filter(([key]) =>
-        allowedModules.includes(key)
-      )
-    );
+        Object.entries(moduleFileNames).filter(([key]) =>
+          allowedModules.includes(key)
+        )
+      );
 
   const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
     id: module,
@@ -519,8 +516,11 @@ function App() {
                         setActiveSubModule(null);
                         loadMainModule(module.id);
                         setIsMainModuleCollapsed(true);
-                      } else { // if it's already active and is the opened module, toggle off
-                        isMainModuleCollapsed ? setIsMainModuleCollapsed(false) : setIsMainModuleCollapsed(true); // open submodules if reclicked
+                      } else {
+                        // if it's already active and is the opened module, toggle off
+                        isMainModuleCollapsed
+                          ? setIsMainModuleCollapsed(false)
+                          : setIsMainModuleCollapsed(true); // open submodules if reclicked
                         //setActiveModule(null);
                         setActiveSubModule(null);
                       }
@@ -542,8 +542,13 @@ function App() {
                 </div>
 
                 <div
-                  className={`sidebar-submodule-empty-container ${isMainModuleCollapsed && isSidebarOpen && activeModule === module.id ? "opened" : ""
-                    }`}
+                  className={`sidebar-submodule-empty-container ${
+                    isMainModuleCollapsed &&
+                    isSidebarOpen &&
+                    activeModule === module.id
+                      ? "opened"
+                      : ""
+                  }`}
                 >
                   {/* submodules - only show if this module is active */}
                   {moduleSubmoduleFileNames[module.id] &&
@@ -595,8 +600,11 @@ function App() {
                         setActiveSubModule(null);
                         loadMainModule(module.id);
                         setIsMainModuleCollapsed(true);
-                      } else { // if it's already active and is the opened module, toggle off
-                        isMainModuleCollapsed ? setIsMainModuleCollapsed(false) : setIsMainModuleCollapsed(true); // open submodules if reclicked
+                      } else {
+                        // if it's already active and is the opened module, toggle off
+                        isMainModuleCollapsed
+                          ? setIsMainModuleCollapsed(false)
+                          : setIsMainModuleCollapsed(true); // open submodules if reclicked
                         //setActiveModule(null);
                         setActiveSubModule(null);
                       }
@@ -607,9 +615,7 @@ function App() {
                       setActiveSubModule(null);
                       loadMainModule(module.id);
                     }
-
                   }}
-
                   onMouseEnter={() => setHoveredModule(module.id)}
                   onMouseLeave={() => setHoveredModule(null)}
                 >
@@ -617,8 +623,13 @@ function App() {
                 </div>
 
                 <div
-                  className={`sidebar-submodule-empty-container ${isMainModuleCollapsed && isSidebarOpen && activeModule === module.id ? "opened" : ""
-                    }`}
+                  className={`sidebar-submodule-empty-container ${
+                    isMainModuleCollapsed &&
+                    isSidebarOpen &&
+                    activeModule === module.id
+                      ? "opened"
+                      : ""
+                  }`}
                 >
                   {/* Submodules - only show if the main module is active */}
                   {moduleSubmoduleFileNames[module.id] &&
@@ -652,11 +663,11 @@ function App() {
 
         {/* adjustable right content */}
         <div className="header-body-container">
-
           <div className={`header-navi ${isSidebarOpen ? "squished" : ""}`}>
             <div
-              className={`header-tabs-container ${!showUserProfile && activeModule ? "visible" : "hidden"
-                }`}
+              className={`header-tabs-container ${
+                !showUserProfile && activeModule ? "visible" : "hidden"
+              }`}
             >
               <img
                 src={`/icons/header-module-icons/${moduleFileNames[activeModule]}.png`}
@@ -664,7 +675,9 @@ function App() {
               />
               <div className="header-module-names">
                 <p
-                  className={`header-module-name ${!activeSubModule ? "active" : "inactive"}`}
+                  className={`header-module-name ${
+                    !activeSubModule ? "active" : "inactive"
+                  }`}
                   onClick={() => {
                     setActiveModule(activeModule);
                     //loadMainModule(activeModule);
@@ -683,62 +696,97 @@ function App() {
 
             <div className="header-right-container">
               {/*<SearchBar />*/}
-              <img className="notif-icon"
-                src={`/icons/Notification-${hasNotification ? "active-" : ""
-                  }logo.png`}
+              <img
+                className="notif-icon"
+                src={`/icons/Notification-${
+                  hasNotification ? "active-" : ""
+                }logo.png`}
                 alt="Notificaton-Logo"
                 onClick={() => {
-                  setNotifOpen(!notifOpen)
+                  setNotifOpen(!notifOpen);
                   setIsProfileMenuOpen(false); //close profile menu if notif menu is opened
-                  setHasNotification(false)
+                  setHasNotification(false);
                 }} //to be replaecd by func for setting notifs as read
               ></img>
-              {notifOpen && <div className="notif-menu">
-                <div className="notif-title"><p>Notifications</p></div>
-                {notifs.length === 0 ? (
-                  <div className="notif-empty">
-                    <p className="notif-msg">No notifications to show.</p>
+              {notifOpen && (
+                <div className="notif-menu">
+                  <div className="notif-title">
+                    <p>Notifications</p>
                   </div>
-                ) : (notifs.map((notif, i) =>
-                  <div className={notif.read ? "notif-item" : "notif-item-unread"}
-                    onClick={
-                      notif.orig_submodule ? () => {
-                        notifs[i].read = true
-                        readNotif(notif.id)
-                        setActiveModule(notif.orig_module)
-                        setActiveSubModule(notif.orig_submodule)
-                      }
-                        : () => {
-                          notifs[i].read = true
-                          readNotif(notif.id)
-                          setActiveModule(notif.orig_module)
-                          setActiveSubModule(null)
-                        }
-                    }
-                    key={i}
-                  >
-                    <div className="notif-toprow">
-                      <div className="notif-origin"><p>{notif.orig_submodule ? notif.orig_submodule : notif.orig_module}</p></div>
-                      <div className="notif-time-and-icon">
-                        <div className="notif-time"><p>{notif.time}</p></div>
-                        {!notif.read && <p className="unread-notif-icon"><img src="/icons/unread-notif-icon.png" /></p>/* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */}
-                      </div>
+                  {notifs.length === 0 ? (
+                    <div className="notif-empty">
+                      <p className="notif-msg">No notifications to show.</p>
                     </div>
-                    <div className="notif-msg"><p>{notif.msg}</p></div>
-                  </div>
-                ))}
-              </div>}
+                  ) : (
+                    notifs.map((notif, i) => (
+                      <div
+                        className={
+                          notif.read ? "notif-item" : "notif-item-unread"
+                        }
+                        onClick={
+                          notif.orig_submodule
+                            ? () => {
+                                notifs[i].read = true;
+                                readNotif(notif.id);
+                                setActiveModule(notif.orig_module);
+                                setActiveSubModule(notif.orig_submodule);
+                              }
+                            : () => {
+                                notifs[i].read = true;
+                                readNotif(notif.id);
+                                setActiveModule(notif.orig_module);
+                                setActiveSubModule(null);
+                              }
+                        }
+                        key={i}
+                      >
+                        <div className="notif-toprow">
+                          <div className="notif-origin">
+                            <p>
+                              {notif.orig_submodule
+                                ? notif.orig_submodule
+                                : notif.orig_module}
+                            </p>
+                          </div>
+                          <div className="notif-time-and-icon">
+                            <div className="notif-time">
+                              <p>{notif.time}</p>
+                            </div>
+                            {
+                              !notif.read && (
+                                <p className="unread-notif-icon">
+                                  <img src="/icons/unread-notif-icon.png" />
+                                </p>
+                              ) /* placeholder, should be an img/icon etc (or maybe ascii icon to avoid loading time) */
+                            }
+                          </div>
+                        </div>
+                        <div className="notif-msg">
+                          <p>{notif.msg}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
               {isProfileMenuOpen && (
                 <div className="profile-dropdown">
                   <div className="profile-dropdown-header">
-                    <div className="profile-name">{user?.first_name} {user?.last_name}</div>
-                    <div className="profile-details">ID: {user?.employee_id}</div>
-                    <div className="profile-details">{user?.role?.role_name}</div>
+                    <div className="profile-name">
+                      {user?.first_name} {user?.last_name}
+                    </div>
+                    <div className="profile-details">
+                      ID: {user?.employee_id}
+                    </div>
+                    <div className="profile-details">
+                      {user?.role?.role_name}
+                    </div>
                   </div>
 
                   <div className="dropdown-divider"></div>
                   <div className="dropdown-menu">
-                    <div className="dropdown-item"
+                    <div
+                      className="dropdown-item"
                       onClick={() => {
                         setShowUserProfile(true);
                         setIsProfileMenuOpen(false);
@@ -746,17 +794,23 @@ function App() {
                         setActiveSubModule(null);
                       }}
                     >
-                      <img src="/icons/settings.png" />User Profile
+                      <img src="/icons/settings.png" />
+                      User Profile
                     </div>
-                    <div className="dropdown-item" onClick={handleLogout}><img src="/icons/logout.png" /> Logout</div>
+                    <div className="dropdown-item" onClick={handleLogout}>
+                      <img src="/icons/logout.png" /> Logout
+                    </div>
                   </div>
-
                 </div>
               )}
 
               <div className="header-profile-container">
-                <div className={`header-profile-icon-wrapper ${isProfileMenuOpen ? "opened" : ""}`}
-                  onClick={toggleProfileMenu}>
+                <div
+                  className={`header-profile-icon-wrapper ${
+                    isProfileMenuOpen ? "opened" : ""
+                  }`}
+                  onClick={toggleProfileMenu}
+                >
                   <div className="header-profile-icon">
                     {" "}
                     {displayName?.charAt(0)}
@@ -776,7 +830,11 @@ function App() {
                 />
               ) : (
                 ModuleComponent && (
-                  <Suspense fallback={<div className="loading-suspense">Loading...</div>}>
+                  <Suspense
+                    fallback={
+                      <div className="loading-suspense">Loading...</div>
+                    }
+                  >
                     <ModuleComponent
                       setActiveModule={setActiveModule}
                       loadSubModule={loadSubModule}
@@ -791,7 +849,7 @@ function App() {
           </QueryClientProvider>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
 
