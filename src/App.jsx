@@ -382,8 +382,8 @@ function App() {
       "Goods Tracking": "GoodsTracking",
       "Internal Transfer": "InternalTransfer",
       "Delivery Approval": "DeliveryApproval",
-      "Delivery Receipt": "DeliveryReceipt",
-      "Item Removal": "ItemRemoval",
+      "External Delivery": "External Delivery",
+      "Item Removal Requisition ": "ItemRemovalRequisition",
     },
     Sales: {
       Quotation: "Quotation",

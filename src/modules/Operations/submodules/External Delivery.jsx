@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "../styles/DeliveryReceipt.css";
+import "../styles/External Delivery.css";
 
 const TabSystem = () => {
     const [activeTab, setActiveTab] = useState("Billing Receipt");
-    const tabs = ["Billing Receipt", "Delivery Receipt", "Rework Order", "Goods Issue"];
+    const tabs = ["Billing Receipt", "Delivery Receipt", "Return Order", "Goods Issue"];
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,7 +22,7 @@ const TabSystem = () => {
 
 
             const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/`);
-            if (endpoint === "DeliveryReworkOrder"){
+            if (endpoint === "DeliveryReturnOrder"){
                 const syncDataResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/sync-deliveryreworkorder/`);
             }else if (endpoint === "DeliveryReceipt"){
                 const syncDataResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/${endpoint}/sync-deliveryreceipt/`);
@@ -52,7 +52,7 @@ const TabSystem = () => {
     useEffect(() => {
         if (activeTab === "Billing Receipt") fetchData("BillingReceipt");
         else if (activeTab === "Delivery Receipt") fetchData("DeliveryReceipt");
-        else if (activeTab === "Rework Order") fetchData("DeliveryReworkOrder");
+        else if (activeTab === "Return Order") fetchData("DeliveryReturnOrder"); else if (activeTab === "Delivery Rework Order") fetchData("DeliveryReworkOrder");
         else if (activeTab === "Goods Issue") fetchData("GoodsIssue");
     }, [activeTab]);
 
@@ -147,15 +147,15 @@ const TabSystem = () => {
                     )}
 
                     {/* Rework Order */}
-                    {activeTab === "Rework Order" && (
+                    {activeTab === "Return Order" && (
                         <div className="table-container">
                             <div className="table-wrapper">
                                 <table className="billing-table">
                                     <thead>
                                         <tr>
-                                            <th>Rework ID</th>
+                                            <th>Return ID</th>
                                             <th>Delivery ID</th>
-                                            <th>Rework Date</th>
+                                            <th>Return Date</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
