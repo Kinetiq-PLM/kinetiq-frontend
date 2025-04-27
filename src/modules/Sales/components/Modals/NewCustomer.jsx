@@ -63,7 +63,7 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
       validatePostalCode,
       validateMainAddress,
       validateSecondaryAddress,
-      validateCustomerType,
+      // validateCustomerType,
     ];
 
     const errorCount = validators.reduce(
@@ -337,14 +337,14 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
               validation={validateSecondaryAddress}
               isValidationVisible={isValidationVisible}
             />
-            <Dropdown
+            {/* <Dropdown
               label="Customer Type"
               options={CustomerTypes}
               onChange={setCustomerType}
               value={customerType}
               validation={validateCustomerType}
               isValidationVisible={isValidationVisible}
-            />
+            /> */}
           </form>
 
           <div className="flex justify-between">
