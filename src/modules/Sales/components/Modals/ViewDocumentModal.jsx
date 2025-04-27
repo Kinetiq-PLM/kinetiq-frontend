@@ -753,88 +753,47 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                     </table>
                   </div>
                   <div>
-                    <OrdersTable data={data} />
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <div>Thank you for your business.</div>
-                    <table>
+                    <table className="w-full text-sm font-light table-auto border border-black border-collapse">
+                      <thead className="bg-[#469fc2] border border-black">
+                        <tr>
+                          <th className="border border-black text-white font-light text-start p-2">
+                            Order No.
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Item & Description
+                          </th>
+                          <th className="border border-black text-white font-light text-start  p-2 text-sm">
+                            Qty
+                          </th>
+                        </tr>
+                      </thead>
                       <tbody>
-                        <tr>
-                          <td className="flex justify-between gap-10">
-                            <span>Subtotal</span>
-                            <span>
-                              {Number(data.statement.subtotal).toLocaleString(
-                                "en-US",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }
-                              )}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="flex justify-between gap-10">
-                            <span>Sales Tax</span>
-                            <span>
-                              {Number(data.statement.total_tax).toLocaleString(
-                                "en-US",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }
-                              )}
-                            </span>
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <td className="flex justify-between gap-10">
-                            <span>Shipping Fee</span>
-                            <span>
-                              {Number(data.shipping_fee).toLocaleString(
-                                "en-US",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }
-                              )}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="flex justify-between gap-10">
-                            <span>Total Discount</span>
-                            <span>
-                              {Number(data.statement.discount).toLocaleString(
-                                "en-US",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }
-                              )}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="bg-[#eff8f9]">
-                          <td className="flex justify-between font-bold p-1">
-                            <span className="font-bold text-[#469fc2]">
-                              Total
-                            </span>
-                            <span className="fold-bold text-[#469fc2]">
-                              {Number(
-                                data.statement.total_amount
-                              ).toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                            </span>
-                          </td>
-                        </tr>
+                        {data.statement.items.map((item) => {
+                          return (
+                            <tr>
+                              <td className="border border-black text-black font-light text-start  p-2 text-xs">
+                                {item.product.product_id}
+                              </td>
+                              <td className="border border-black text-black font-light text-start  p-2 text-xs">
+                                <div className="flex flex-col">
+                                  <span>{item.product.product_name}</span>
+                                  <span className="text-gray-500">
+                                    {item.product.description}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="border border-black text-black font-light text-start  p-2 text-xs">
+                                {item.quantity}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
-                  <Terms />
+                  <div className="flex justify-between text-xs">
+                    <div>Thank you for your business.</div>
+                  </div>
                 </div>
               )}
             {data &&
