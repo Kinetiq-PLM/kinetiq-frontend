@@ -9,6 +9,8 @@ import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../../api/api";
 
+import Dropdown from "../../Dropdown.jsx";
+
 import loading from "../../Assets/kinetiq-loading.gif";
 
 const CustomerListModal = ({
@@ -21,13 +23,15 @@ const CustomerListModal = ({
 }) => {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [customerFilter, setCustomerFilter] = useState("Clients"); // Default date filter
+  const customerTypes = ["Client", "Prospect"];
 
   // setSelectedCustomer is used to set the selected customer in this component
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   // Filtered data is used to filter the data based on the search term
-  //const [filteredData, setFilteredData] = useState([]); // ORIGINAL
-  const [filteredData, setFilteredData] = useState([]); // TEMP
+  const [filteredData, setFilteredData] = useState([]);
 
   const [customers, setCustomers] = useState([]);
 
@@ -86,6 +90,25 @@ const CustomerListModal = ({
       });
     }
   }, [customersQuery.data, customersQuery.status]);
+
+  const handleSearchAndFilter = () => {
+    if (customersQuery.status !== "success") return;
+    const filteredData = customers
+      .filter((customer) => customer.name.toLowerCase().includes(searchTerm))
+      .filter(
+        (customer) =>
+          customer.customer_type.toLowerCase() == customerFilter.toLowerCase()
+      );
+
+    console.log(customers[0].customer_type.toLowerCase());
+    console.log(customerFilter.toLowerCase());
+
+    setFilteredData(filteredData);
+  };
+
+  useEffect(() => {
+    handleSearchAndFilter();
+  }, [customerFilter]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -147,20 +170,25 @@ const CustomerListModal = ({
 
         {/* BODY */}
         <div className="px-6 mt-4">
-          <div className="mb-4 flex items-center">
+          <div className="mb-4 flex items-center gap-4">
             <p className="mr-2">Search:</p>
             <input
               type="text"
               placeholder="Search..."
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
+              value={searchTerm}
               onChange={(e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                const filteredData = customers.filter((customer) =>
-                  customer.name.toLowerCase().includes(searchTerm)
-                );
-                setFilteredData(filteredData);
+                setSearchTerm(e.target.value);
+                handleSearchAndFilter();
               }}
             />
+            <div className="w-full sm:w-[200px]">
+              <Dropdown
+                options={customerTypes}
+                onChange={setCustomerFilter}
+                value={customerFilter}
+              />
+            </div>
           </div>
           {isLoading ? (
             <div className="h-[300px] rounded-md flex justify-center items-center">
@@ -185,9 +213,9 @@ const CustomerListModal = ({
               >
                 Select
               </Button>
-              <Button type="primary" onClick={() => newCustomerModal(true)}>
+              {/* <Button type="primary" onClick={() => newCustomerModal(true)}>
                 New
-              </Button>
+              </Button> */}
             </div>
             <div>
               <Button type="outline" onClick={onClose}>

@@ -395,11 +395,11 @@ function App() {
       Transactions: "Transactions",
     },
     CRM: {
-      Ticket: "Ticket",
-      Campaign: "Campaign",
-      "Partner Master Data": "PartnerMasterData",
+      Leads: "Leads",
       Opportunity: "Opportunity",
-      Support: "Support",
+      Campaign: "Campaign",
+      Contacts: "Contacts",
+      Cases: "Cases",
     },
     "Support & Services": {
       "Service Ticket": "ServiceTicket",

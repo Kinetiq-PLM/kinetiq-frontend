@@ -361,7 +361,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             {/* Employee ID Input */}
             <div className="flex mb-2 w-full mt-4 gap-4 items-center">
               <p className="">Employee ID</p>
-              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded">
+              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
                 <p className="text-sm">{employee_id || ""}</p>
               </div>
             </div>

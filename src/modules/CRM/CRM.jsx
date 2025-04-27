@@ -4,11 +4,11 @@ import Heading from "../Sales/components/Heading";
 
 const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const crmSubModule = {
-    Ticket: "Ticket",
-    Campaign: "Campaign",
-    "Partner Master Data": "PartnerMasterData",
+    Leads: "Leads",
     Opportunity: "Opportunity",
-    Support: "Support",
+    Campaign: "Campaign",
+    Contacts: "Contacts",
+    Cases: "Cases",
   };
 
   return (

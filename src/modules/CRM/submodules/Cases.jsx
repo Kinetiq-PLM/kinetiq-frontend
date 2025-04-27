@@ -9,10 +9,10 @@ import {
 } from "../../Sales/components/Context/AlertContext";
 import TicketInfo from "../components/TicketInfo";
 import EmployeeListModal from "../../Sales/components/Modals/Lists/EmployeeListModal";
-import InputField from "./../../Sales/components/InputField";
-import TextField from "./../components/TextField";
-import CustomerListModal from "./../../Sales/components/Modals/Lists/CustomerList";
-import NewCustomerModal from "./../../Sales/components/Modals/NewCustomer";
+import InputField from "../../Sales/components/InputField";
+import TextField from "../components/TextField";
+import CustomerListModal from "../../Sales/components/Modals/Lists/CustomerList";
+import NewCustomerModal from "../../Sales/components/Modals/NewCustomer";
 import { POST } from "../../Sales/api/api";
 import { useMutation } from "@tanstack/react-query";
 
