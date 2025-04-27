@@ -1043,7 +1043,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                           year: "numeric",
                         })}
                       </b>
-                      , unless terminated earlier.
+                      .
                     </span>
                   </div>
                   <div className="flex flex-col gap-2">
