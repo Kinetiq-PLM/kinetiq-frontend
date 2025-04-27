@@ -393,7 +393,6 @@ function App() {
       Order: "Order",
       Delivery: "Delivery",
       Transactions: "Transactions",
-      Reporting: "Reporting",
     },
     CRM: {
       Ticket: "Ticket",
