@@ -63,16 +63,16 @@ const ViewCustomerModal = ({ isOpen, onClose, data, action }) => {
     console.log("Data received in modal:", data);
 
     // Search for their data and set states if modal is open
-    setCustomerID();
-    setCompanyName("");
-    setContactPerson("");
-    setContactNumber("");
-    setEmail("");
-    setCountry("");
-    setCity("");
-    setPostalCode("");
-    setMainAddress("");
-    setSecondaryAddress("");
+    setCustomerID(data.customer_id);
+    setCompanyName(data.customer_name);
+    setContactPerson(data.contact_person);
+    setContactNumber(data.phone_number);
+    setEmail(data.email_address);
+    setCountry(data.country);
+    setPostalCode(data.postal_code);
+    setMainAddress(data.address_line1);
+    setSecondaryAddress(data.address_line2);
+    setCity(data.city);
   }, [isOpen, data]);
 
   if (!isOpen) return null;
@@ -150,8 +150,8 @@ const ViewCustomerModal = ({ isOpen, onClose, data, action }) => {
             <div className="flex flex-row space-x-2">
               <InputField
                 label={"City"}
-                value={setCity}
-                setValue={city}
+                value={city}
+                setValue={setCity}
                 isDisabled={true}
               />
               <InputField

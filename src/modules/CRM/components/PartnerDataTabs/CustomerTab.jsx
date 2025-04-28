@@ -22,7 +22,7 @@ export default function CustomerTab() {
 
   const customersQuery = useQuery({
     queryKey: ["customerPartners"],
-    queryFn: async () => await GET("misc/business-partners?category=Customer"),
+    queryFn: async () => await GET("sales/customer"),
     retry: 2,
   });
   const columns = [

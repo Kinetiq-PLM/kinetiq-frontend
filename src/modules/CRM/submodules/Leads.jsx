@@ -5,7 +5,7 @@ import Heading from "../../Sales/components/Heading";
 import Button from "../../Sales/components/Button";
 import Table from "../../Sales/components/Table";
 import Dropdown from "../../Sales/components/Dropdown";
-import { GET } from "../../Sales/api/api";
+import { GET, PATCH } from "../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 
 import { useAlert } from "../../Sales/components/Context/AlertContext";
@@ -36,14 +36,15 @@ const Leads = () => {
 
   const customersQuery = useQuery({
     queryKey: ["customerPartners"],
-    queryFn: async () => await GET("misc/business-partners?category=Customer"),
+    queryFn: async () => await GET("sales/customer?type=Lead"),
     retry: 2,
   });
   const columns = [
-    { key: "partner_id", label: "Partner ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
-    { key: "contact_info", label: "Contact Information" },
+    { key: "contact_person", label: "Contact Person" },
+    { key: "email_address", label: "Email Address" },
+    { key: "phone_number", label: "Phone" },
   ];
 
   const dateFilters = [
@@ -82,10 +83,16 @@ const Leads = () => {
   useEffect(() => {
     if (customersQuery.status === "success") {
       const data = customersQuery.data.map((customer) => ({
-        partner_id: customer.partner_id,
         customer_id: customer.customer_id,
-        customer_name: customer.partner_name,
-        contact_info: customer.contact_info,
+        customer_name: customer.name,
+        phone_number: customer.phone_number,
+        email_address: customer.email_address,
+        contact_person: customer.contact_person,
+        postal_code: customer.postal_code,
+        address_line1: customer.address_line1,
+        address_line2: customer.address_line2,
+        city: customer.city,
+        country: customer.country,
       }));
       setCustomers(data);
       setIsLoading(false);
@@ -96,6 +103,7 @@ const Leads = () => {
 
   const handleQualification = () => {
     // Handle qualification logic here || remove from leads table
+    // const resp = await PATCH(`sales/customer/${}`, {)
     showAlert({ type: "success", title: "Lead qualified successfully." });
   };
 
