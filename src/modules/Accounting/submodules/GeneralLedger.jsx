@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
-import Button from "../components/Button";
-import Dropdown from "../components/Dropdown";
-import Table from "../components/Table";
-import Search from "../components/Search";
+import Dropdown from "../components/dropdown/Dropdown";
+import Table from "../components/table/Table";
+import Search from "../components/search/Search";
 import NotifModal from "../components/modalNotif/NotifModal";
 import ReportModalInput from "../components/ReportModalInput";
 import axios from "axios";
@@ -344,14 +343,6 @@ const BodyContent = () => {
               placeholder="Search Entries.."
               value={searching}
               onChange={(e) => setSearching(e.target.value)}
-            />
-          </div>
-          
-          <div>
-            <Button
-              name="Generate report"
-              variant="standard2"
-              onclick={openModal}
             />
           </div>
         </div>

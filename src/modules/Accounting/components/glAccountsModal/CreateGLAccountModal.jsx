@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "./ModalInput.css";
-import Button from "./Button";
-import Dropdown from "./Dropdown";
-import Forms from "./Forms";
+import "../ModalInput.css";
+import Button from "../button/Button";
+import Dropdown from "../dropdown/Dropdown";
+import Forms from "../forms/Forms";
 import { accounts, subAccounts } from "../../submodules/ListOfAccounts";
 import { accountCodeMapping2 } from "../../submodules/AccountMapping";
 

@@ -1,12 +1,12 @@
 import "../styles/accounting-styling.css";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Button from "../components/Button";
-import Dropdown from "../components/Dropdown";
-import Table from "../components/Table";
-import JournalModalInput from "../components/JournalModalInput";
+import Button from "../components/button/Button";
+import Dropdown from "../components/dropdown/Dropdown";
+import Table from "../components/table/Table";
+import JournalModalInput from "../components/journalModal/JournalModalInput";
 import NotifModal from "../components/modalNotif/NotifModal";
-import Search from "../components/Search";
+import Search from "../components/search/Search";
 
 const Journal = () => {
 

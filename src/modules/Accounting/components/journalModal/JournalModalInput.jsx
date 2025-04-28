@@ -1,8 +1,8 @@
 import React from "react";
-import "./ModalInput.css";
-import Forms from "./Forms";
-import Button from "../components/Button";
-import Dropdown from "./Dropdown";
+import "../ModalInput.css";
+import Forms from "../forms/Forms";
+import Button from "../button/Button";
+import Dropdown from "../dropdown/Dropdown";
 
 const JournalModalInput = ({
   isModalOpen,
