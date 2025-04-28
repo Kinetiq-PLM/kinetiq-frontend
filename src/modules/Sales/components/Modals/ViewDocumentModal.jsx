@@ -145,13 +145,13 @@ const OrdersTable = ({ data }) => {
           return (
             <tr>
               <td className="border border-black text-black font-light text-start  p-2 text-xs">
-                {item.product.product_id}
+                {item.inventory_item.item.item_id}
               </td>
               <td className="border border-black text-black font-light text-start  p-2 text-xs">
                 <div className="flex flex-col">
-                  <span>{item.product.product_name}</span>
+                  <span>{item.inventory_item.item.item_name}</span>
                   <span className="text-gray-500">
-                    {item.product.description}
+                    {item.inventory_item.item.item_description}
                   </span>
                 </div>
               </td>
@@ -379,6 +379,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
     try {
       const pdf = await html2pdf().set(opt).from(element).save();
     } catch (error) {
+      console.log(error);
       showAlert({
         type: "error",
         title: "Error generating PDF",
@@ -813,13 +814,15 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                           return (
                             <tr>
                               <td className="border border-black text-black font-light text-start  p-2 text-xs">
-                                {item.product.product_id}
+                                {item.inventory_item.item.item_id}
                               </td>
                               <td className="border border-black text-black font-light text-start  p-2 text-xs">
                                 <div className="flex flex-col">
-                                  <span>{item.product.product_name}</span>
+                                  <span>
+                                    {item.inventory_item.item.item_name}
+                                  </span>
                                   <span className="text-gray-500">
-                                    {item.product.description}
+                                    {item.inventory_item.item.item_description}
                                   </span>
                                 </div>
                               </td>
