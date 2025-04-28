@@ -72,16 +72,17 @@ const OfficialReceipts = () => {
   };
 
   const columns = [
-    "OR ID",
+    "Official Receipt ID",
     "Invoice ID",
     "Customer ID",
-    "OR Date",
+    "Official Receipt Date",
     "Settled Amount",
     "Remaining Amount",
     "Payment Method",
     "Reference #",
     "Created By",
   ];
+
   const [data, setData] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [searching, setSearching] = useState("");
