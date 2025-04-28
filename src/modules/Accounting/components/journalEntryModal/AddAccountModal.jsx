@@ -3,7 +3,7 @@ import "./ModalInput.css";
 import Button from "./Button";
 import Dropdown from "./Dropdown";
 import Search from "./Search";
-import NotifModal from "./modalNotif/NotifModal";
+import NotifModal from "../modalNotif/NotifModal";
 import axios from "axios";
 
 const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {

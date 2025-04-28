@@ -3,8 +3,8 @@ import "./ModalInput.css";
 import Button from "./Button";
 import Dropdown from "./Dropdown";
 import Forms from "./Forms";
-import { accounts, subAccounts } from "../submodules/ListOfAccounts";
-import { accountCodeMapping2 } from "../submodules/AccountMapping";
+import { accounts, subAccounts } from "../../submodules/ListOfAccounts";
+import { accountCodeMapping2 } from "../../submodules/AccountMapping";
 
 const CreateGLAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
   const getCurrentDate = () => {

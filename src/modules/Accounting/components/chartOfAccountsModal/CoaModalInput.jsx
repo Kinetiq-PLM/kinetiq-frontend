@@ -3,9 +3,9 @@ import "./ModalInput.css";
 import Forms from "./Forms";
 import Dropdown from "./Dropdown";
 import Button from "../components/Button";
-import NotifModal from "./modalNotif/NotifModal";
-import { accounts } from "../submodules/ListOfAccounts";
-import { accountCodeMapping } from "../submodules/AccountMapping";
+import NotifModal from "../modalNotif/NotifModal";
+import { accounts } from "../../submodules/ListOfAccounts";
+import { accountCodeMapping } from "../../submodules/AccountMapping";
 import axios from "axios";
 
 const CoaModalInput = ({ isModalOpen, closeModal, coaForm, handleInputChange, handleSubmit }) => {
