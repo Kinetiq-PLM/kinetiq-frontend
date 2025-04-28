@@ -193,7 +193,7 @@ const Leads = () => {
               </Button>
 
               <Button
-                onClick={() => setIsNewCustomerModalOpen(true)}
+                onClick={() => setIsConfirmQualifyOpen(true)}
                 type="primary"
                 className="w-full sm:w-[200px] py-2"
               >
