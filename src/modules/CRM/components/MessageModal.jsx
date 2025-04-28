@@ -8,7 +8,7 @@ import Button from "../../Sales/components/Button.jsx";
 import InputField from "../../Sales/components/InputField.jsx";
 import TextField from "./TextField.jsx";
 
-const MessageModal = ({ isOpen, onClose, campaign }) => {
+const MessageModal = ({ isOpen, onClose, campaign = {}, contacts }) => {
   const { showAlert } = useAlert();
 
   const modalRef = useRef(null);
@@ -28,11 +28,16 @@ const MessageModal = ({ isOpen, onClose, campaign }) => {
     setIsValidationVisible(true);
     if (errorCount === 0) {
       // Send message here
-
-      console.log("Campaign: " + campaign.campaign_name);
-      console.log("Sending message type: " + campaign.type);
-      console.log("Subject: " + subject);
-      console.log("Message: " + message);
+      if (campaign) {
+        console.log("Campaign: " + campaign.campaign_name);
+        console.log("Sending message type: " + campaign.type);
+        console.log("Subject: " + subject);
+        console.log("Message: " + message);
+      } else {
+        console.log("Sending message to: " + contacts[0]);
+        console.log("Subject: " + subject);
+        console.log("Message: " + message);
+      }
 
       // Reset form fields
       setSubject("");
