@@ -82,7 +82,7 @@ const BlanketAgreementDetailsModal = ({
           subtotal: quotationInfo?.statement?.subtotal,
 
           items: quotationInfo?.statement?.items.map((item) => ({
-            product: item.product.product_id,
+            inventory_item: item.inventory_item.inventory_item_id,
             quantity: item.quantity,
             unit_price: item.total_price,
             discount: item.discount,

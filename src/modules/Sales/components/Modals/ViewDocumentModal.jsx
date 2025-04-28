@@ -6,8 +6,9 @@ import { BASE_API_URL, GET } from "../../api/api";
 import { useAlert } from "../Context/AlertContext";
 import loading from "../Assets/kinetiq-loading.gif";
 import Button from "../Button";
-import { Table } from "lucide-react";
-import html2pdf from "html2pdf.js";
+import { MessageCircleReplyIcon, Table } from "lucide-react";
+import html2canvas from "html2canvas-pro";
+import { jsPDF } from "jspdf";
 
 const Header = () => {
   return (
@@ -357,29 +358,89 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
 
   const downloadPDF = async () => {
     const element = document.getElementById("document-content");
-
     if (!element) return;
 
-    const opt = {
-      margin: 1,
-      filename: `${documentToView}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
-        scale: 2,
+    try {
+      // 1) Render the entire element to one big canvas
+      const canvas = await html2canvas(element, {
+        scale: 1.5,
         logging: false,
         useCORS: true,
-      },
-      jsPDF: {
+        backgroundColor: "#ffffff",
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById("document-content");
+          clonedElement
+            .querySelectorAll('[class*="bg-"], [class*="text-"]')
+            .forEach((el) => {
+              const style = window.getComputedStyle(el);
+              el.style.backgroundColor = style.backgroundColor;
+              el.style.color = style.color;
+            });
+        },
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      const pdf = new jsPDF({
+        orientation: "portrait",
         unit: "in",
         format: "a4",
-        orientation: "portrait",
-      },
-    };
+      });
 
-    try {
-      const pdf = await html2pdf().set(opt).from(element).save();
+      // 2) PDF page size & margins in inches
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 0.5;
+      const usableW = pageW - 2 * margin;
+      const usableH = pageH - 2 * margin;
+
+      // 3) Compute the image’s size in inches (full width keeps aspect)
+      const imgW = usableW;
+      const imgH = (canvas.height * imgW) / canvas.width;
+
+      // 4) Figure out how many “strips” in pixels we need
+      //    pixels-per-inch = canvas.width(px) / imgW(in)
+      const pxPerInch = canvas.width / imgW;
+      const usableHPx = usableH * pxPerInch;
+      const totalPages = Math.ceil(canvas.height / usableHPx);
+
+      // 5) For each page, copy just that slice of the big canvas…
+      for (let page = 0; page < totalPages; page++) {
+        if (page > 0) pdf.addPage();
+
+        // how tall this slice really is (last page might be shorter)
+        const sliceHeightPx = Math.min(
+          usableHPx,
+          canvas.height - page * usableHPx
+        );
+
+        // create a temporary canvas to hold one slice
+        const sliceCanvas = document.createElement("canvas");
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = sliceHeightPx;
+        const ctx = sliceCanvas.getContext("2d");
+
+        // copy slice from the big canvas
+        ctx.drawImage(
+          canvas,
+          0,
+          page * usableHPx,
+          canvas.width,
+          sliceHeightPx,
+          0,
+          0,
+          canvas.width,
+          sliceHeightPx
+        );
+
+        // convert slice to image and draw at (margin, margin)
+        const sliceData = sliceCanvas.toDataURL("image/jpeg", 1.0);
+        const sliceHIn = sliceHeightPx / pxPerInch;
+        pdf.addImage(sliceData, "JPEG", margin, margin, imgW, sliceHIn);
+      }
+
+      pdf.save(`${documentToView}.pdf`);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       showAlert({
         type: "error",
         title: "Error generating PDF",
@@ -475,6 +536,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                 <div
                   id="document-content"
                   className="flex flex-col gap-4 text-sm"
+                  style={{
+                    pageBreakAfter: "always",
+                    pageBreakInside: "avoid",
+                  }}
                 >
                   <Header />
                   <div className="text-center">
@@ -1178,7 +1243,7 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               )}
             <div className="mt-10 justify-center items-center text-center">
               <button
-                className="py-1 px-6 font-medium transition-all duration-300 ease-in-out transform bg-[#00A8A8] text-white hover:bg-[#008080] rounded-md hover:shadow-lg"
+                className="py-1 px-6 cursor-pointer font-medium transition-all duration-300 ease-in-out transform bg-[#00A8A8] text-white hover:bg-[#008080] rounded-md hover:shadow-lg"
                 onClick={downloadPDF}
               >
                 Download
