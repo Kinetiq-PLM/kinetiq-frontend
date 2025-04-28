@@ -36,7 +36,7 @@ const Leads = () => {
   const queryClient = useQueryClient();
 
   const customersQuery = useQuery({
-    queryKey: ["customerPartners"],
+    queryKey: ["leads"],
     queryFn: async () => await GET("sales/customer?type=Lead"),
     retry: 2,
   });
@@ -109,8 +109,8 @@ const Leads = () => {
         customer_type: "Prospect",
       });
       showAlert({ type: "success", title: "Lead qualified successfully." });
-      queryClient.invalidateQueries(["customerPartners"]);
-      queryClient.refetchQueries(["customerPartners"]);
+      queryClient.invalidateQueries(["leads"]);
+      queryClient.refetchQueries(["leads"]);
     } catch (error) {
       showAlert({ type: "error", title: "Could not qualify lead." });
     }

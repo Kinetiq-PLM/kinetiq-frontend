@@ -19,15 +19,16 @@ export default function ProspectTab({ setSelected }) {
   const [customers, setCustomers] = useState([]);
 
   const customersQuery = useQuery({
-    queryKey: ["customerPartners"],
-    queryFn: async () => await GET("misc/business-partners?category=Customer"),
+    queryKey: ["prospects"],
+    queryFn: async () => await GET("sales/customer?type=Prospect"),
     retry: 2,
   });
   const columns = [
-    { key: "partner_id", label: "Partner ID" },
     { key: "customer_id", label: "Customer ID" },
     { key: "customer_name", label: "Customer Name" },
-    { key: "contact_info", label: "Contact Information" },
+    { key: "contact_person", label: "Contact Person" },
+    { key: "email_address", label: "Email Address" },
+    { key: "phone_number", label: "Phone" },
   ];
 
   const dateFilters = [
@@ -66,10 +67,16 @@ export default function ProspectTab({ setSelected }) {
   useEffect(() => {
     if (customersQuery.status === "success") {
       const data = customersQuery.data.map((customer) => ({
-        partner_id: customer.partner_id,
         customer_id: customer.customer_id,
-        customer_name: customer.partner_name,
-        contact_info: customer.contact_info,
+        customer_name: customer.name,
+        phone_number: customer.phone_number,
+        email_address: customer.email_address,
+        contact_person: customer.contact_person,
+        postal_code: customer.postal_code,
+        address_line1: customer.address_line1,
+        address_line2: customer.address_line2,
+        city: customer.city,
+        country: customer.country,
       }));
       setCustomers(data);
       setIsLoading(false);
