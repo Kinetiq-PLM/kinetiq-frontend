@@ -46,6 +46,7 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
       });
     },
     onSettled: () => {
+      queryClient.invalidateQueries(["customers", "customerPartners"]);
       queryClient.refetchQueries(["customers", "customerPartners"]);
     },
   });

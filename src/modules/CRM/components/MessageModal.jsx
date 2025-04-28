@@ -38,11 +38,16 @@ const MessageModal = ({ isOpen, onClose, campaign = {}, contacts }) => {
         console.log("Subject: " + subject);
         console.log("Message: " + message);
         try {
+          emailjs.init("tJ0nVArt2LV_fm1Vv");
           emailjs.send("service_4tsfjrp", "template_c7ez4jz", {
             subject,
             name: contacts[0]?.contact_person,
             content: message,
             email: contacts[0]?.email_address,
+          });
+          showAlert({
+            type: "success",
+            title: "Message sent.",
           });
         } catch (error) {
           showAlert({
@@ -56,11 +61,6 @@ const MessageModal = ({ isOpen, onClose, campaign = {}, contacts }) => {
       setSubject("");
       setMessage("");
       setIsValidationVisible(false);
-
-      showAlert({
-        type: "success",
-        title: "Message sent",
-      });
       onClose();
     } else {
       showAlert({

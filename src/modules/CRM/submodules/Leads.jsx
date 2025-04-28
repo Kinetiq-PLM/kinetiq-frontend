@@ -6,7 +6,7 @@ import Button from "../../Sales/components/Button";
 import Table from "../../Sales/components/Table";
 import Dropdown from "../../Sales/components/Dropdown";
 import { GET, PATCH } from "../../Sales/api/api";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAlert } from "../../Sales/components/Context/AlertContext";
 
@@ -33,6 +33,7 @@ const Leads = () => {
   const [isMessageOpen, setIsMessageOpen] = useState(false); // Message modal open state
 
   const [selected, setSelected] = useState("");
+  const queryClient = useQueryClient();
 
   const customersQuery = useQuery({
     queryKey: ["customerPartners"],
@@ -101,10 +102,18 @@ const Leads = () => {
     }
   }, [customersQuery.data, customersQuery.status]);
 
-  const handleQualification = () => {
+  const handleQualification = async () => {
     // Handle qualification logic here || remove from leads table
-    // const resp = await PATCH(`sales/customer/${}`, {)
-    showAlert({ type: "success", title: "Lead qualified successfully." });
+    try {
+      const resp = await PATCH(`sales/customer/${selected.customer_id}/`, {
+        customer_type: "Prospect",
+      });
+      showAlert({ type: "success", title: "Lead qualified successfully." });
+      queryClient.invalidateQueries(["customerPartners"]);
+      queryClient.refetchQueries(["customerPartners"]);
+    } catch (error) {
+      showAlert({ type: "error", title: "Could not qualify lead." });
+    }
   };
 
   return (
