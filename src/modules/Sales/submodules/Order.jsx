@@ -75,8 +75,8 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     onSuccess: (data, variables, context) => {
       const prods = data.statement.items.map((item) => {
         return {
-          product_id: item.inventory_item.item_id,
-          product_name: item.inventory_item.item_name,
+          product_id: item.inventory_item.item.item_id,
+          product_name: item.inventory_item.item.item_name,
           warehouse: item.inventory_item.warehouse.warehouse_name,
           special_requests: item.special_requests,
           quantity: Number(item.quantity),
@@ -116,6 +116,12 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
+    {
+      key: "warehouse",
+      label: "Warehouse",
+      editable: true,
+      dropdown: true,
+    },
     { key: "special_requests", label: "Specification", editable: canEditTable },
     { key: "quantity", label: "Quantity", editable: canEditTable },
     { key: "selling_price", label: "Price", editable: false },

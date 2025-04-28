@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { TAX_RATE } from "../temp_data/sales_data";
 import { useAlert } from "./Context/AlertContext";
 import { GET } from "../api/api";
+import { useQuery } from "@tanstack/react-query";
 const SalesTable = ({
   columns,
   data,
@@ -20,7 +21,7 @@ const SalesTable = ({
   const [editingCell, setEditingCell] = useState(null);
   const [editValue, setEditValue] = useState("");
   const [tableData, setTableData] = useState(data);
-
+  const [warehouseOptions, setWarehouseOptions] = useState([]); // State for warehouse options
   const tableRef = useRef(null); // Ref for the table container
   const handleRowClick = (row, rowIndex) => {
     if (!editingCell) {
@@ -30,6 +31,44 @@ const SalesTable = ({
       }
     }
   };
+
+  useEffect(() => {
+    const fetchWarehouseOptions = async (productId) => {
+      try {
+        const response = await GET(`sales/products?admin_product=${productId}`);
+        console.log("response:", response);
+        return response.flatMap((item) =>
+          item.inventory_items.map((i) => ({
+            ...i.warehouse,
+            inventory_item_id: i.inventory_item_id,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching warehouse options:", error);
+        return [];
+      }
+    };
+
+    // Get unique product IDs
+    const productIds = [...new Set(data.map((row) => row.product_id))];
+
+    // Fetch warehouse options for each product
+    const loadOptions = async () => {
+      const options = {};
+      for (const productId of productIds) {
+        options[productId] = await fetchWarehouseOptions(productId);
+      }
+      setWarehouseOptions(options);
+    };
+
+    if (productIds.length > 0) {
+      loadOptions();
+    }
+  }, [data]);
+
+  useEffect(() => {
+    console.log("warehouseOptions", warehouseOptions);
+  }, [warehouseOptions]);
 
   const handleCellDoubleClick = (row, rowIndex, columnKey) => {
     const column = columns.find((col) => col.key === columnKey);
@@ -144,35 +183,48 @@ const SalesTable = ({
           : Number(editValue),
     };
 
-    const updatedData = newData.map((item) => {
-      if (editingCell.columnKey === "warehouse") {
-        return { ...item, warehouse: editValue };
-      }
+    const updatedData = newData.map((item, index) => {
+      if (index === rowIndex) {
+        if (editingCell.columnKey === "warehouse") {
+          // Find the selected warehouse option
+          const selectedWarehouse = warehouseOptions[item.product_id]?.find(
+            (option) => option.inventory_item_id.toString() === editValue
+          );
+          return {
+            ...item,
+            warehouse: selectedWarehouse?.warehouse_name || "",
+            inventory_item_id: selectedWarehouse?.inventory_item_id || "",
+          };
+        }
 
-      if (item.special_requests && isQuotation) {
-        return {
-          ...item,
-          selling_price: 0, // Convert to string only for display
-          tax: 0, // Ensure tax is formatted properly
-          total_price: 0, // Calculate total price
-        };
-      } else {
-        const unitPrice =
-          newData[rowIndex].selling_price === 0
-            ? Number(item.backup_price)
-            : item.selling_price; // Keep selling_price as a number
-        const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
-        const total = unitPrice * item.quantity + tax - Number(item.discount);
-        return {
-          ...item,
-          selling_price: unitPrice, // Convert to string only for display
-          tax: tax, // Ensure tax is formatted properly
-          total_price: total, // Calculate total price
-        };
+        if (item.special_requests && isQuotation) {
+          return {
+            ...item,
+            selling_price: 0, // Convert to string only for display
+            tax: 0, // Ensure tax is formatted properly
+            total_price: 0, // Calculate total price
+          };
+        } else {
+          const unitPrice =
+            newData[rowIndex].selling_price === 0
+              ? Number(item.backup_price)
+              : item.selling_price; // Keep selling_price as a number
+          const tax = TAX_RATE * unitPrice * item.quantity; // Correct tax calculation
+          const total = unitPrice * item.quantity + tax - Number(item.discount);
+          return {
+            ...item,
+            selling_price: unitPrice, // Convert to string only for display
+            tax: tax, // Ensure tax is formatted properly
+            total_price: total, // Calculate total price
+          };
+        }
       }
+      return item;
     });
+
     setTableData(updatedData);
     updateData(updatedData);
+    console.log("updatedData", updatedData);
 
     setEditingCell(null);
 
@@ -279,13 +331,18 @@ const SalesTable = ({
                             autoFocus
                           >
                             <option value="" disabled hidden>
-                              Options
+                              Select Warehouse
                             </option>
-                            {column.dropdownOptions.map((option, index) => (
-                              <option key={index} value={option}>
-                                {option}
-                              </option>
-                            ))}
+                            {warehouseOptions[row.product_id]?.map(
+                              (option, index) => (
+                                <option
+                                  key={index}
+                                  value={option.inventory_item_id}
+                                >
+                                  {option.warehouse_name}
+                                </option>
+                              )
+                            )}
                           </select>
                         ) : (
                           <input
