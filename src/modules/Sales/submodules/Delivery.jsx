@@ -66,6 +66,12 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
+    {
+      key: "warehouse",
+      label: "Warehouse",
+      editable: false,
+      dropdown: true,
+    },
     { key: "special_requests", label: "Specification", editable: false },
     { key: "quantity", label: "Quantity" },
     { key: "selling_price", label: "Price", editable: false },
@@ -103,8 +109,11 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             Number(item.quantity) - Number(item.quantity_to_deliver) > 0
         )
         .map((item) => ({
-          product_id: item.product.product_id,
-          product_name: item.product.product_name,
+          product_id: item.inventory_item.item.item_id,
+          product_name: item.inventory_item.item.item_name,
+          warehouse: item.inventory_item.warehouse.warehouse_name,
+          inventory_item: item.inventory_item.inventory_item_id,
+          inventory_item_id: item.inventory_item.inventory_item_id,
           special_requests: item.special_requests,
           quantity: Number(item.quantity) - Number(item.quantity_to_deliver),
           selling_price: Number(item.unit_price),
@@ -194,7 +203,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         preferred_delivery_date: deliveryDate,
         items: products.map((product, index) => {
           return {
-            product: product.product_id,
+            inventory_item: product.inventory_item_id,
             special_requests: product.special_requests,
             quantity: parseInt(product.quantity),
             quantity_to_deliver: parseInt(product.quantity),
@@ -214,6 +223,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         subtotal: Number(deliveryInfo.total_before_discount.toFixed(2)),
       },
     };
+    console.log(request);
     deliveryMutation.mutate(request);
     // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
     setSubmitted(true);

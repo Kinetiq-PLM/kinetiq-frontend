@@ -57,8 +57,11 @@ const OrderedProductList = ({
             Number(item.quantity) - Number(item.quantity_to_deliver) > 0
         )
         .map((item) => ({
-          product_id: item.product.product_id,
-          product_name: item.product.product_name,
+          product_id: item.inventory_item.item.item_id,
+          product_name: item.inventory_item.item.item_name,
+          warehouse: item.inventory_item.warehouse.warehouse_name,
+          inventory_item: item.inventory_item.inventory_item_id,
+          inventory_item_id: item.inventory_item.inventory_item_id,
           quantity: Number(item.quantity) - Number(item.quantity_to_deliver),
           selling_price: Number(item.unit_price),
           discount: Number(item.discount),

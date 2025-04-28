@@ -199,7 +199,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         orderType = "Project-Based";
       }
       return {
-        inventory_item: selectedWarehouse,
+        inventory_item: product.inventory_item_id,
         quantity: parseInt(product.quantity),
         special_requests: product.special_requests
           ? product.special_requests
