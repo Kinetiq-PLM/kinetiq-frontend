@@ -44,7 +44,9 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   // replace current info with selected info
 
   const [address, setAddress] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
+  const [dateIssued, setDateIssued] = useState("");
+  const [dateDelivery, setDateDelivery] = useState("");
+  const [datePosted, setDatePosted] = useState("");
 
   const [selectedProduct, setSelectedProduct] = useState();
   const [selectedCustomer, setSelectedCustomer] = useState("");
@@ -346,9 +348,9 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   useEffect(() => {
     setOrderInfo({
       ...orderInfo,
-      selected_delivery_date: deliveryDate,
+      selected_delivery_date: dateIssued,
     });
-  }, [deliveryDate]);
+  }, [dateIssued]);
 
   const handleClear = () => {
     setProducts([]);
@@ -356,7 +358,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     setSelectedProduct("");
     setSelectedEmployee("");
     setAddress("");
-    setDeliveryDate("");
+    setDateIssued("");
     setCanEditTable(true);
     setOrderInfo({
       customer_id: "",
@@ -432,7 +434,10 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             customerListModal={setIsCustomerListOpen}
             setCustomerInfo={setOrderInfo}
             operationID={orderID}
-            setDeliveryDate={setDeliveryDate}
+            setDateIssued={setDateIssued}
+            setDatePosted={setDatePosted}
+            setDateDelivery={setDateDelivery}
+            dataIssued={dateIssued}
             setAddress={setAddress}
             enabled={canEditTable}
             date={new Date().toISOString().split("T")[0]}
