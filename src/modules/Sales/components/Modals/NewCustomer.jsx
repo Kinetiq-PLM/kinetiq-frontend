@@ -39,14 +39,14 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
   const queryClient = useQueryClient();
   const customerMutation = useMutation({
     mutationFn: async (data) => await POST("sales/customer/", data),
-    onSuccess: (data, variables, context) => {
-      queryClient.refetchQueries(["customers", "customerPartners"]);
-    },
     onError: (error) => {
       showAlert({
         type: "error",
         title: "Failed to add Customer: " + error.message,
       });
+    },
+    onSettled: () => {
+      queryClient.refetchQueries(["customers", "customerPartners"]);
     },
   });
 
@@ -87,7 +87,7 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
         customer_type: customerType,
         status: "Active",
         contact_person: contactPerson,
-        debt: 0,
+        customer_type: "Lead",
       };
       customerMutation.mutate(request);
 

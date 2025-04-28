@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import { useAlert } from "../../Sales/components/Context/AlertContext.jsx";
-
+import emailjs from "@emailjs/browser";
 import Button from "../../Sales/components/Button.jsx";
 import InputField from "../../Sales/components/InputField.jsx";
 import TextField from "./TextField.jsx";
@@ -34,9 +34,22 @@ const MessageModal = ({ isOpen, onClose, campaign = {}, contacts }) => {
         console.log("Subject: " + subject);
         console.log("Message: " + message);
       } else {
-        console.log("Sending message to: " + contacts[0]);
+        console.log("Sending message to: " + contacts[0]?.email_address || "");
         console.log("Subject: " + subject);
         console.log("Message: " + message);
+        try {
+          emailjs.send("service_4tsfjrp", "template_c7ez4jz", {
+            subject,
+            name: contacts[0]?.contact_person,
+            content: message,
+            email: contacts[0]?.email_address,
+          });
+        } catch (error) {
+          showAlert({
+            type: "error",
+            title: "Error sending message.",
+          });
+        }
       }
 
       // Reset form fields
