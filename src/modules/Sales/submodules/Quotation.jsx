@@ -99,6 +99,13 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
+    {
+      key: "warehouse",
+      label: "Warehouse",
+      editable: true,
+      dropdown: true,
+      dropdownOptions: ["a", "b", "c"],
+    },
     { key: "special_requests", label: "Specification" },
     { key: "quantity", label: "Quantity" },
     { key: "selling_price", label: "Price", editable: false },

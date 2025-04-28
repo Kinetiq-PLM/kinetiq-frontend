@@ -1,178 +1,127 @@
-import React, { act } from "react";
-import { useState, useEffect } from "react";
+import React from "react";
+import { useState } from "react";
 import "../styles/Index.css";
-import Dropdown from "../../Sales/components/Dropdown";
+import Heading from "../../Sales/components/Heading";
 import Button from "../../Sales/components/Button";
-import {
-  AlertProvider,
-  useAlert,
-} from "../../Sales/components/Context/AlertContext";
-import TicketInfo from "../components/TicketInfo";
-import EmployeeListModal from "../../Sales/components/Modals/Lists/EmployeeListModal";
-import InputField from "../../Sales/components/InputField";
-import TextField from "../components/TextField";
-import CustomerListModal from "../../Sales/components/Modals/Lists/CustomerList";
+import Table from "../../Sales/components/Table";
+import Dropdown from "../../Sales/components/Dropdown";
+import { AlertProvider } from "../../Sales/components/Context/AlertContext";
+
 import NewCustomerModal from "../../Sales/components/Modals/NewCustomer";
-import { POST } from "../../Sales/api/api";
-import { useMutation } from "@tanstack/react-query";
+import loading from "../../Sales/components/Assets/kinetiq-loading.gif";
 
-import SalesTicketTab from "../components/TicketTabs/SalesTicketTab";
-import ServiceTicketTab from "../components/TicketTabs/ServiceTicketTab";
-
-const Ticket = ({ loadSubModule, setActiveSubModule, employee_id }) => {
-  const { showAlert } = useAlert();
-
-  const [selectedCustomer, setSelectedCustomer] = useState("");
-  const [isCustomerListOpen, setIsCustomerListOpen] = useState(false);
-
+const Leads = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [customers, setCustomers] = useState([]);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchBy, setSearchBy] = useState("customer_name");
+  const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
 
-  const [subject, setSubject] = useState("");
-  const [description, setDescription] = useState("");
-  const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [ticketID, setTicketID] = useState("");
-  const [ticketInfo, setTicketInfo] = useState({
-    customer: "",
-    subject: subject,
-    description: description,
-    type: "",
-    status: "",
-    priority: "",
-    salesrep: employee_id,
-    created_at: new Date().toISOString().split("T")[0],
-  });
-
-  useEffect(() => {
-    setTicketInfo((prev) => ({
-      ...prev,
-      customer: selectedCustomer.customer_id,
-    }));
-  }, [selectedCustomer]);
-
-  // useEffect(() => {
-  //   setTicketInfo((prev) => ({
-  //     ...prev,
-  //     salesrep: employee_id,
-  //   }));
-  // }, [selectedEmployee]);
-
-  const tabs = [
-    {
-      name: "Sales Ticket",
-      component: (
-        <SalesTicketTab
-          setIsEmployeeListOpen={setIsEmployeeListOpen}
-          selectedEmployee={selectedEmployee}
-          selectedCustomer={selectedCustomer}
-          ticketInfo={ticketInfo}
-          setTicketInfo={setTicketInfo}
-          setTicketID={setTicketID}
-        />
-      ),
-    },
-    {
-      name: "Service Ticket",
-      component: (
-        <ServiceTicketTab
-          setIsEmployeeListOpen={setIsEmployeeListOpen}
-          selectedEmployee={selectedEmployee}
-          selectedCustomer={selectedCustomer}
-          ticketInfo={ticketInfo}
-          setTicketInfo={setTicketInfo}
-          setTicketID={setTicketID}
-        />
-      ),
-    },
+  const columns = [
+    { key: "partner_id", label: "Partner ID" },
+    { key: "customer_id", label: "Customer ID" },
+    { key: "customer_name", label: "Customer Name" },
+    { key: "contact_info", label: "Contact Information" },
   ];
 
-  const [activeTab, setActiveTab] = useState(tabs[0].name);
+  const dateFilters = [
+    "Last 30 days",
+    "Last 60 days",
+    "Last 90 days",
+    "All Time",
+  ];
 
-  useEffect(() => {
-    setTicketInfo((prev) => ({
-      ...prev,
-      type: activeTab === "Sales Ticket" ? "sales" : "service",
-    }));
-  }, [activeTab]);
+  const filteredData = customers.filter((customer) => {
+    // Filter by search term
+    if (searchTerm) {
+      const fieldValue = customer[searchBy]?.toString().toLowerCase() || "";
+      if (!fieldValue.includes(searchTerm.toLowerCase())) return false;
+    }
+
+    // Filter by date (assuming date_issued is in YYYY-MM-DD format)
+    if (dateFilter !== "All Time") {
+      const today = new Date();
+      const pastDate = new Date();
+      const days = parseInt(dateFilter.match(/\d+/)[0], 10); // Extract number from filter
+      pastDate.setDate(today.getDate() - days);
+
+      const issuedDate = new Date(customer.date_issued);
+      if (issuedDate < pastDate) return false;
+    }
+
+    return true;
+  });
 
   return (
-    <div className="ticket">
+    <div className="partner-master-data">
+      <NewCustomerModal
+        isOpen={isNewCustomerModalOpen}
+        onClose={() => setIsNewCustomerModalOpen(false)}
+      ></NewCustomerModal>
       <div className="body-content-container">
-        <TicketInfo
-          type={"Ticket"}
-          customer={selectedCustomer}
-          customerListModal={setIsCustomerListOpen}
-          setTicketInfo={setTicketInfo}
-          operationID={ticketID}
-          date={ticketInfo.created_at}
-          ticket={ticketInfo}
+        <Heading
+          Title="Leads"
+          SubTitle="Contacting possible customers and nurturing  business connections."
         />
-
         <main className="">
-          {/* Tab Selector */}
-          <div className="mt-4 flex flex-col md:flex-row lg:hidden md:justify-between md:items-center gap-4">
-            <div>
-              <h4 className="font-medium">Action:</h4>
-            </div>
-            <div className="flex items-center gap-2">
-              <h4 className="text-base font-medium text-gray-400">View:</h4>
-              <div className="w-64">
-                <Dropdown
-                  label=""
-                  options={tabs.map((tab) => tab.name)}
-                  onChange={setActiveTab}
-                  value={activeTab}
-                />
+          <div className="mb-4">
+            {/* Filters & Action */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start w-full">
+              <div className="flex flex-col md:flex-row sm:flex-wrap gap-3 flex-1">
+                {/* Date Filter Dropdown */}
+                <div className="w-full sm:w-[200px]">
+                  <Dropdown
+                    options={dateFilters}
+                    onChange={setDateFilter}
+                    value={dateFilter}
+                  />
+                </div>
+
+                {/* Search Input */}
+                <div className="w-full sm:flex-1 min-w-[250px]">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full h-[40px]"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
               </div>
+
+              {/* Right Side Button */}
+              {/* <div className="w-full sm:w-auto">
+                <Button
+                  onClick={() => setIsNewCustomerModalOpen(true)}
+                  type="primary"
+                  className="w-full sm:w-[200px] py-2"
+                >
+                  New Customer
+                </Button>
+              </div> */}
             </div>
           </div>
 
-          <div className="hidden lg:flex mt-4 border-b border-[#E8E8E8] w-fit gap-2">
-            {tabs.map((tab) => (
-              <Button
-                key={tab.name}
-                type={activeTab === tab.name ? "active" : "link"}
-                onClick={() => setActiveTab(tab.name)}
-              >
-                {tab.name}
-              </Button>
-            ))}
-          </div>
-
-          {/* Active Tab Content */}
-          <div className="mt-6">
-            {tabs.find((tab) => tab.name === activeTab)?.component}
-          </div>
+          {isLoading ? (
+            <div className="w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
+              <Table data={filteredData} columns={columns} />
+            </div>
+          )}
         </main>
-
-        <CustomerListModal
-          isOpen={isCustomerListOpen}
-          onClose={() => setIsCustomerListOpen(false)}
-          newCustomerModal={setIsNewCustomerModalOpen}
-          setCustomer={setSelectedCustomer}
-        ></CustomerListModal>
-        <NewCustomerModal
-          isOpen={isNewCustomerModalOpen}
-          onClose={() => setIsNewCustomerModalOpen(false)}
-        ></NewCustomerModal>
-        {/* <EmployeeListModal
-          isOpen={isEmployeeListOpen}
-          onClose={() => setIsEmployeeListOpen(false)}
-          setEmployee={setSelectedEmployee}
-        ></EmployeeListModal> */}
       </div>
     </div>
   );
 };
 
-const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
+const BodyContent = () => {
   return (
     <AlertProvider>
-      <Ticket
-        loadSubModule={loadSubModule}
-        setActiveSubModule={setActiveSubModule}
-        employee_id={employee_id}
-      />
+      <Leads />
     </AlertProvider>
   );
 };
