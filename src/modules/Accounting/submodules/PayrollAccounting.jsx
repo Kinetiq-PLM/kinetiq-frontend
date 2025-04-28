@@ -70,12 +70,12 @@ const PayrollAccounting = () => {
       try {
 
         // Store the data in a variable
-        const response1 = await fetch(PAYROLL_ENDPOINT);
+        const response = await fetch(PAYROLL_ENDPOINT);
 
 
 
         // Convert the response to JSON then pass to the variable
-        const result = await response1.json();
+        const result = await response.json();
 
 
 
@@ -156,7 +156,7 @@ const PayrollAccounting = () => {
 
     // Call the fetch functions
     fetchPayrollData();
-    fetchPayrollAccountingData
+    fetchPayrollAccountingData();
   }, []);
 
 
