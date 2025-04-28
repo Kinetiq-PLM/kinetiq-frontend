@@ -28,7 +28,7 @@ const MessageModal = ({ isOpen, onClose, campaign = {}, contacts }) => {
     setIsValidationVisible(true);
     if (errorCount === 0) {
       // Send message here
-      if (campaign) {
+      if (campaign && Object.keys(campaign).length > 0) {
         console.log("Campaign: " + campaign.campaign_name);
         console.log("Sending message type: " + campaign.type);
         console.log("Subject: " + subject);

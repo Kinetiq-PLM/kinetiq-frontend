@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import Table from "../../../Sales/components/Table";
 import Dropdown from "../../../Sales/components/Dropdown";
 import Button from "../../../Sales/components/Button";
-import { CUSTOMER_DATA } from "./../../../Sales/temp_data/customer_data";
+import { CUSTOMER_DATA } from "../../../Sales/temp_data/customer_data";
 import { GET } from "../../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "../../../Sales/components/Context/AlertContext";
 
 import loading from "../../../Sales/components/Assets/kinetiq-loading.gif";
 
-export default function VendorTab() {
+export default function CustomerTab({ setSelected }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const { showAlert } = useAlert();
@@ -17,14 +17,16 @@ export default function VendorTab() {
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter
   const [customers, setCustomers] = useState([]);
+
   const customersQuery = useQuery({
-    queryKey: ["vendors"],
-    queryFn: async () => await GET("misc/business-partners?category=Vendor"),
+    queryKey: ["customerPartners"],
+    queryFn: async () => await GET("sales/customer"),
+    retry: 2,
   });
   const columns = [
     { key: "partner_id", label: "Partner ID" },
-    { key: "vendor_code", label: "Vendor Code" },
-    { key: "partner_name", label: "Vendor Name" },
+    { key: "customer_id", label: "Customer ID" },
+    { key: "customer_name", label: "Customer Name" },
     { key: "contact_info", label: "Contact Information" },
   ];
 
@@ -61,22 +63,20 @@ export default function VendorTab() {
     return true;
   });
 
-  const handleClick = () => {
-    console.log("CLICKED");
-  };
-
   useEffect(() => {
     if (customersQuery.status === "success") {
       const data = customersQuery.data.map((customer) => ({
         partner_id: customer.partner_id,
-        vendor_code: customer.vendor_code,
-        partner_name: customer.partner_name,
+        customer_id: customer.customer_id,
+        customer_name: customer.partner_name,
         contact_info: customer.contact_info,
       }));
       setCustomers(data);
       setIsLoading(false);
+    } else if (customersQuery.status === "error") {
+      showAlert({ type: "error", title: "Failed to fetch Customers." });
     }
-  }, [customersQuery.data]);
+  }, [customersQuery.data, customersQuery.status]);
 
   return (
     <section className="h-full">
@@ -84,36 +84,24 @@ export default function VendorTab() {
       <div className="mb-4">
         {/* Filters & Action */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start w-full">
-          <div className="flex flex-col md:flex-row sm:flex-wrap gap-3 flex-1">
-            {/* Date Filter Dropdown */}
-            <div className="w-full sm:w-[200px]">
-              <Dropdown
-                options={dateFilters}
-                onChange={setDateFilter}
-                value={dateFilter}
-              />
-            </div>
-
-            {/* Search By Dropdown */}
-            <div className="w-full sm:w-[200px]">
-              <Dropdown
-                options={searchFields.map((field) => field.label)}
-                onChange={(selected) => {
-                  const field = searchFields.find((f) => f.label === selected);
-                  if (field) setSearchBy(field.key);
-                }}
-                value={searchFields.find((f) => f.key === searchBy)?.label}
-              />
-            </div>
-
+          <div className="flex flex-col md:flex-row sm:flex-wrap gap-3 flex-1 justify-between">
             {/* Search Input */}
-            <div className="w-full sm:flex-1 min-w-[250px]">
+            <div className="w-full sm:flex-1 min-w-[250px] max-w-[600px]">
               <input
                 type="text"
                 placeholder="Search..."
                 className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full h-[40px]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            {/* Date Filter Dropdown */}
+            <div className="w-full sm:w-[200px]">
+              <Dropdown
+                options={dateFilters}
+                onChange={setDateFilter}
+                value={dateFilter}
               />
             </div>
           </div>
@@ -127,7 +115,11 @@ export default function VendorTab() {
         </div>
       ) : (
         <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto">
-          <Table data={filteredQuotations} columns={columns} />
+          <Table
+            data={filteredQuotations}
+            columns={columns}
+            onSelect={setSelected}
+          />
         </div>
       )}
     </section>
