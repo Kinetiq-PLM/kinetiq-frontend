@@ -139,6 +139,7 @@ export default function CampaignContactTab() {
           isOpen={isMessageOpen}
           onClose={() => setIsMessageOpen(false)}
           campaign={selectedCampaign}
+          contacts={contactList}
         ></MessageModal>
 
         <CustomerListModal

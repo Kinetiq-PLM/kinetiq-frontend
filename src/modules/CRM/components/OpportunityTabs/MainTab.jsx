@@ -14,6 +14,7 @@ import OpportunityModal from "../OpportunityModal.jsx";
 import ConfirmDelete from "./../ConfirmDelete";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { InputCustomer } from "./../OpportunityInfo";
+
 export default function MainTab({ employee_id }) {
   const { showAlert } = useAlert();
 
