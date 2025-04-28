@@ -7,6 +7,7 @@ import { useAlert } from "../Context/AlertContext";
 import loading from "../Assets/kinetiq-loading.gif";
 import Button from "../Button";
 import { Table } from "lucide-react";
+import html2pdf from "html2pdf.js";
 
 const Header = () => {
   return (
@@ -354,6 +355,37 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
+  const downloadPDF = async () => {
+    const element = document.getElementById("document-content");
+
+    if (!element) return;
+
+    const opt = {
+      margin: 1,
+      filename: `${documentToView}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+      },
+      jsPDF: {
+        unit: "in",
+        format: "a4",
+        orientation: "portrait",
+      },
+    };
+
+    try {
+      const pdf = await html2pdf().set(opt).from(element).save();
+    } catch (error) {
+      showAlert({
+        type: "error",
+        title: "Error generating PDF",
+      });
+    }
+  };
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
@@ -439,7 +471,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               data.statement &&
               documentToView &&
               documentToView.includes("quotation") && (
-                <div className="flex flex-col gap-4 text-sm">
+                <div
+                  id="document-content"
+                  className="flex flex-col gap-4 text-sm"
+                >
                   <Header />
                   <div className="text-center">
                     <span className="font-light">QUOTATION</span>
@@ -554,7 +589,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               data.statement &&
               documentToView &&
               documentToView.includes("order") && (
-                <div className="flex flex-col gap-4 text-sm">
+                <div
+                  id="document-content"
+                  className="flex flex-col gap-4 text-sm"
+                >
                   <Header />
                   <div className="text-center">
                     <span className="font-light">SALES ORDER</span>
@@ -675,7 +713,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               data.statement &&
               documentToView &&
               documentToView.includes("delivery") && (
-                <div className="flex flex-col gap-4 text-sm">
+                <div
+                  id="document-content"
+                  className="flex flex-col gap-4 text-sm"
+                >
                   <Header />
                   <div className="text-center">
                     <span className="font-light">DELIVERY NOTE</span>
@@ -800,7 +841,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               data.delivery_note &&
               documentToView &&
               documentToView.includes("invoice") && (
-                <div className="flex flex-col gap-4 text-sm">
+                <div
+                  id="document-content"
+                  className="flex flex-col gap-4 text-sm"
+                >
                   <Header />
                   <div className="text-center">
                     <span className="font-light">SALES INVOICE</span>
@@ -946,7 +990,10 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
               data.statement &&
               documentToView &&
               documentToView.includes("agreement") && (
-                <div className="flex flex-col gap-4 text-sm">
+                <div
+                  id="document-content"
+                  className="flex flex-col gap-4 text-sm"
+                >
                   <div className="text-center">
                     <span className="font-light text-lg">
                       BLANKET AGREEMENT
@@ -1127,12 +1174,17 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
                 </div>
               )}
             <div className="mt-10 justify-center items-center text-center">
-              <a
+              <button
                 className="py-1 px-6 font-medium transition-all duration-300 ease-in-out transform bg-[#00A8A8] text-white hover:bg-[#008080] rounded-md hover:shadow-lg"
-                href={`${BASE_API_URL}sales/${documentToView}/document`}
+                onClick={downloadPDF}
               >
                 Download
-              </a>
+              </button>
+              {/* <a
+                className="py-1 px-6 font-medium transition-all duration-300 ease-in-out transform bg-[#00A8A8] text-white hover:bg-[#008080] rounded-md hover:shadow-lg"
+                href={`${BASE_API_URL}sales/${documentToView}/document`}
+              > */}
+              {/* </a> */}
             </div>
           </div>
         )}

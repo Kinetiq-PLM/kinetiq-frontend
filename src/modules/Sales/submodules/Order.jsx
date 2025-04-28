@@ -75,8 +75,8 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     onSuccess: (data, variables, context) => {
       const prods = data.statement.items.map((item) => {
         return {
-          product_id: item.product.product_id,
-          product_name: item.product.product_name,
+          product_id: item.inventory_item.item_id,
+          product_name: item.inventory_item.item_name,
           special_requests: item.special_requests,
           quantity: Number(item.quantity),
           selling_price: Number(item.unit_price),
@@ -122,6 +122,8 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     { key: "discount", label: "Discount" },
     { key: "total_price", label: "Total Price", editable: false },
   ];
+
+  const [selectedWarehouse, setSelectedWarehouse] = useState("");
 
   // the products customer chose
   const [products, setProducts] = useState([]);
@@ -190,7 +192,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         orderType = "Project-Based";
       }
       return {
-        product: product.product_id,
+        inventory_item: selectedWarehouse,
         quantity: parseInt(product.quantity),
         special_requests: product.special_requests
           ? product.special_requests

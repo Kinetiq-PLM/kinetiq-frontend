@@ -455,8 +455,58 @@ function App() {
     "Report Generator": {},
   };
 
+  // const rawPermissions = user?.role?.permissions || "";
+
+  // const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
+  // console.log("Allowed modules:", allowedModules);
+
+  // const filteredModuleFileNames = allowedModules.includes("All")
+  //   ? moduleFileNames
+  //   : Object.fromEntries(
+  //       Object.entries(moduleFileNames).filter(([key]) =>
+  //         allowedModules.includes(key)
+  //       )
+  //     );
+
   const rawPermissions = user?.role?.permissions || "";
-  const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
+
+  // Split permissions and process each entry
+  const permissionEntries = rawPermissions.split(",").map((p) => p.trim());
+
+  // Process modules and submodules
+  const allowedModules = [];
+  const allowedSubmodules = new Map(); // Map to store module -> allowed submodules
+
+  permissionEntries.forEach((entry) => {
+    if (entry === "All") {
+      allowedModules.push("All");
+      return;
+    }
+
+    const [module, submodule] = entry.split("/").map((s) => s.trim());
+
+    if (module) {
+      // If entry ends with /, it's a module-level permission
+      if (entry.endsWith("/")) {
+        allowedModules.push(module);
+      }
+      // If there's a submodule specified
+      else if (submodule) {
+        // Add to allowed submodules map
+        if (!allowedSubmodules.has(module)) {
+          allowedSubmodules.set(module, []);
+        }
+        allowedSubmodules.get(module).push(submodule);
+      }
+      // If no trailing slash and no submodule, it's a module-level permission
+      else {
+        allowedModules.push(module);
+      }
+    }
+  });
+
+  console.log("Allowed modules:", allowedModules);
+  console.log("Allowed submodules:", Object.fromEntries(allowedSubmodules));
 
   const filteredModuleFileNames = allowedModules.includes("All")
     ? moduleFileNames
