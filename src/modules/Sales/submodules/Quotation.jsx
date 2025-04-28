@@ -64,7 +64,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [copyInfo, setCopyInfo] = useState({}); // Info from copyFromModal
 
   const [address, setAddress] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
+  const [dateIssued, setDateIssued] = useState("");
 
   const [selectedProduct, setSelectedProduct] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("");
@@ -248,9 +248,9 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   useEffect(() => {
     setQuotationInfo({
       ...quotationInfo,
-      selected_delivery_date: deliveryDate,
+      selected_delivery_date: dateIssued,
     });
-  }, [deliveryDate]);
+  }, [dateIssued]);
 
   const handleClear = () => {
     setProducts([]);
@@ -258,7 +258,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     setSelectedProduct("");
     setSelectedEmployee("");
     setAddress("");
-    setDeliveryDate("");
+    setDateIssued("");
     setQuotationInfo({
       customer_id: "",
       quotation_id: "",
@@ -324,7 +324,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             customerListModal={setIsCustomerListOpen}
             setCustomerInfo={setQuotationInfo}
             operationID={q_id}
-            setDeliveryDate={setDeliveryDate}
+            setDateIssued={setDateIssued}
             date={new Date().toISOString().split("T")[0]}
             setAddress={setAddress}
           />

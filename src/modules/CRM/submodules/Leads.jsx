@@ -213,6 +213,7 @@ const Leads = () => {
                 onClick={() => setIsConfirmQualifyOpen(true)}
                 type="primary"
                 className="w-full sm:w-[200px] py-2"
+                disabled={selected === ""}
               >
                 Qualify
               </Button>

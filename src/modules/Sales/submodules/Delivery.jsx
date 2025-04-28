@@ -46,6 +46,10 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [address, setAddress] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
 
+  const [dateIssued, setDateIssued] = useState("");
+  const [dateDelivery, setDateDelivery] = useState("");
+  const [datePosted, setDatePosted] = useState("");
+
   const [selectedProduct, setSelectedProduct] = useState();
   const [selectedCustomer, setSelectedCustomer] = useState("");
 
@@ -460,7 +464,10 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             customerListModal={null}
             setCustomerInfo={setDeliveryInfo}
             operationID={deliveryID}
-            setDeliveryDate={setDeliveryDate}
+            setDateIssued={setDateIssued}
+            setDatePosted={setDatePosted}
+            setDateDelivery={setDateDelivery}
+            dataIssued={dateIssued}
             setAddress={setAddress}
           />
         </div>
