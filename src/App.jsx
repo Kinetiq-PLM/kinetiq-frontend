@@ -360,9 +360,12 @@ function App() {
       "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
       "General Ledger Accounts": "GeneralLedgerAccounts",
-      "Accounts Receivable": "AccountsReceivable",
       "Accounts Payable": "AccountsPayable",
+      "Accounts Receivable": "AccountsReceivable",
       "Official Receipts": "OfficialReceipts",
+      "Payroll Accounting": "PayrollAccounting",
+      "Tax and Remittance": "TaxAndRemittance",
+      "Accounts Payable Receipts": "AccountsPayableReceipts",
     },
     "Financials": {
       "Reports": "Reports",
