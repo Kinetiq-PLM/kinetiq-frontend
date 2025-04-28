@@ -215,7 +215,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           }
           // console.log(product);
           return {
-            inventory_item_id: product.inventory_items[0].inventory_item_id, // always select muna pinaka unang warehouse since quotation palang naman
+            inventory_item: product.inventory_items[0].inventory_item_id, // always select muna pinaka unang warehouse since quotation palang naman
             quantity: parseInt(product.quantity),
             special_requests: product.special_requests
               ? product.special_requests
@@ -235,7 +235,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     };
     setPayload({ ...request, name: selectedCustomer.name });
     console.log(request);
-    // quotationMutation.mutate(request);
+    quotationMutation.mutate(request);
   };
 
   useEffect(() => {

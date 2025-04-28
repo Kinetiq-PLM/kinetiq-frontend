@@ -77,6 +77,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         return {
           product_id: item.inventory_item.item_id,
           product_name: item.inventory_item.item_name,
+          warehouse: item.inventory_item.warehouse.warehouse_name,
           special_requests: item.special_requests,
           quantity: Number(item.quantity),
           selling_price: Number(item.unit_price),
