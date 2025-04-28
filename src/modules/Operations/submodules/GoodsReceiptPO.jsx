@@ -125,6 +125,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     contact_person: isCreateMode ? "" : contactPerson,
     buyer: isCreateMode ? "" : selectedData.buyer || "",
     owner: isCreateMode ? employee_id : selectedOwner,
+    delivery_note: isCreateMode ? "" : selectedData.delivery_note || "",
     transaction_id: isCreateMode ? "" : selectedData.transaction_id || "",
     delivery_date: isCreateMode ? today : selectedData.delivery_date || "",
     status: isCreateMode ? "Draft" : selectedStatus,
@@ -1177,6 +1178,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                     <label>Discount Amount</label>
                     <input type="text" value={documentDetails.discount_amount.toFixed(2)} style={{ cursor: 'not-allowed' }} readOnly/>
                   </div>
+
+                  
                   <div className="detail-row">
                     <label>Total</label>
                     <input type="text" value={
@@ -1184,7 +1187,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                     }  
                     style={{ cursor: 'not-allowed' }}
                     readOnly
-                    />
+                    />      
+                    
                   </div>
                   <div className="detail-row">
                     <label>Freight</label>
@@ -1210,8 +1214,20 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                       step="0.01"
                       min="0"
                       max="1000000000"
+                      
+                      
                     />
                   </div>
+
+                  <div className="detail-row">
+  <label>Delivery Note</label>
+  <input
+    type="text"
+    value={documentDetails.delivery_note || ''}
+    onChange={(e) => handleDocumentDetailChange(e, "delivery_note")}
+    maxLength={255}
+  />
+</div>
                 </div>
               )}
             </div>
