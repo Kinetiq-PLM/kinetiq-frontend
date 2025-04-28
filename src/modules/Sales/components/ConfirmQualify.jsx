@@ -86,8 +86,10 @@ const ConfirmClear = ({ isOpen, onClose, action }) => {
         {/* BODY */}
         <div className="px-6 mt-4">
           <div className="my-8 text-center">
-            <p className="mr-2">Are you sure you want to qualify lead?</p>
-            <p className="m-4 text-sm">This will remove them from this list.</p>
+            <p className="mr-2">
+              This will remove them from this list. <br /> Are you sure you want
+              to qualify lead?
+            </p>
           </div>
           <div className="mt-4 flex justify-between">
             <div>
