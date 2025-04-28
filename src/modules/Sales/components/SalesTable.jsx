@@ -13,7 +13,6 @@ const SalesTable = ({
   minWidth = false,
   updateData,
   isQuotation = false,
-  canEditTable,
 }) => {
   const { showAlert } = useAlert();
 
@@ -56,6 +55,7 @@ const SalesTable = ({
     if (!editingCell) return;
 
     const newData = [...tableData];
+
     const newValue =
       editingCell.columnKey === "special_requests"
         ? editValue
@@ -145,6 +145,10 @@ const SalesTable = ({
     };
 
     const updatedData = newData.map((item) => {
+      if (editingCell.columnKey === "warehouse") {
+        return { ...item, warehouse: editValue };
+      }
+
       if (item.special_requests && isQuotation) {
         return {
           ...item,
@@ -265,15 +269,35 @@ const SalesTable = ({
                       }
                     >
                       {isEditing ? (
-                        <input
-                          type="text"
-                          className="w-full max-w-[200px] text-center px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          value={editValue}
-                          onChange={handleEditChange}
-                          onKeyDown={(e) => handleEditKeyDown(e, rowIndex)}
-                          onClick={(e) => e.stopPropagation()}
-                          autoFocus
-                        />
+                        column.dropdown ? (
+                          <select
+                            className="w-full max-w-[200px] text-center px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={editValue}
+                            onChange={handleEditChange}
+                            onKeyDown={(e) => handleEditKeyDown(e, rowIndex)}
+                            onClick={(e) => e.stopPropagation()}
+                            autoFocus
+                          >
+                            <option value="" disabled hidden>
+                              Options
+                            </option>
+                            {column.dropdownOptions.map((option, index) => (
+                              <option key={index} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type="text"
+                            className="w-full max-w-[200px] text-center px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={editValue}
+                            onChange={handleEditChange}
+                            onKeyDown={(e) => handleEditKeyDown(e, rowIndex)}
+                            onClick={(e) => e.stopPropagation()}
+                            autoFocus
+                          />
+                        )
                       ) : typeof row[column.key] === "number" ? (
                         column.key === "quantity" ? (
                           row[column.key]
