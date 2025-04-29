@@ -9,7 +9,7 @@ import { useAlert } from "./components/Context/AlertContext";
 import Dropdown from "./components/Dropdown";
 import { AlertProvider } from "./components/Context/AlertContext";
 
-const Sales = ({ loadSubModule, setActiveSubModule }) => {
+const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const { showAlert } = useAlert();
   const [profitReportData, setProfitReportData] = useState([]);
   const [salesReportData, setSalesReportData] = useState([]);
@@ -17,6 +17,8 @@ const Sales = ({ loadSubModule, setActiveSubModule }) => {
   const [productReportData, setProductReportData] = useState([]);
   const [employeeReportData, setEmployeeReportData] = useState([]);
   const [employeeDealsData, setEmployeeDealsData] = useState([]);
+  const [commissionData, setCommissionData] = useState([]);
+  const [quotaData, setQuotaData] = useState([]);
   const [profitPeriod, setProfitPeriod] = useState("day"); // day, month, year, all
   const [salesPeriod, setSalesPeriod] = useState("day"); // day, month, year, all
   const [salesReportPeriod, setSalesReportPeriod] = useState("Day"); // day, month, year, all
@@ -24,8 +26,12 @@ const Sales = ({ loadSubModule, setActiveSubModule }) => {
   const [totalProfit, setTotalProfit] = useState(0);
   const [totalSold, setTotalSold] = useState(0);
   const [totalOperations, setTotalOperations] = useState(0);
+  const [totalCommissions, setTotalCommissions] = useState(0);
+  const [quotaReached, setQuotaReached] = useState(false);
+  const [quotaRemaining, setQuotaRemaining] = useState(0);
   const [quotaPeriod, setQuotaPeriod] = useState("day"); // day, month, year, all
   const [commissionPeriod, setCommissionPeriod] = useState("day"); // day, month, year, all
+  console.log("employee_id", employee_id);
 
   const profitQuery = useQuery({
     queryKey: ["profits"],
@@ -64,16 +70,25 @@ const Sales = ({ loadSubModule, setActiveSubModule }) => {
       ),
     retry: 2,
   });
+  const commissionQuery = useQuery({
+    queryKey: ["commissions"],
+    queryFn: async () =>
+      await GET(
+        `sales/reporting/commissions?period=${commissionPeriod}&salesrep=${employee_id}`
+      ),
+    retry: 2,
+  });
+  const quotaQuery = useQuery({
+    queryKey: ["quota"],
+    queryFn: async () =>
+      await GET(`sales/reporting/quota?salesrep=${employee_id}`),
+    retry: 2,
+  });
   const colors = ["#c084fc", "#2563eb", "#fb923c", "#22c55e"];
   const options = ["day", "month", "year", "all"];
   const salesOptions = [
     { label: "1D", value: "day" },
     { label: "1M", value: "month" },
-    { label: "1Y", value: "year" },
-    { label: "All", value: "all" },
-  ];
-
-  const quotaOptions = [
     { label: "1Y", value: "year" },
     { label: "All", value: "all" },
   ];
@@ -160,22 +175,59 @@ const Sales = ({ loadSubModule, setActiveSubModule }) => {
       });
     }
   }, [employeeDealsQuery.data, employeeDealsQuery.status]);
+  useEffect(() => {
+    if (commissionQuery.status === "success") {
+      const formattedData = commissionQuery.data.commission_data.map(
+        (item) => ({
+          date: new Date(item.date),
+          commission: Number(item.commission), // Ensure commission is a number
+        })
+      );
+      setCommissionData(formattedData);
+      setTotalCommissions(commissionQuery.data.total_commission);
+    } else if (commissionQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Failed to fetch Top Employee Deals Report.",
+      });
+    }
+  }, [commissionQuery.data, commissionQuery.status]);
 
   useEffect(() => {
-    profitQuery.refetch();
+    if (quotaQuery.status === "success") {
+      const formattedData = quotaQuery.data.daily_progress.map((item) => ({
+        date: new Date(item.date),
+        orders: Number(item.orders), // Ensure commission is a number
+      }));
+      setQuotaData(formattedData);
+      setQuotaReached(quotaQuery.data.quota_reached);
+      setQuotaRemaining(quotaQuery.data.remaining);
+    } else if (quotaQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Failed to fetch Top Employee Deals Report.",
+      });
+    }
+  }, [quotaQuery.data, quotaQuery.status]);
+
+  useEffect(() => {
+    (async () => await profitQuery.refetch())();
   }, [profitPeriod]);
 
   useEffect(() => {
-    salesQuery.refetch();
+    (async () => await salesQuery.refetch())();
   }, [salesPeriod]);
 
   useEffect(() => {
-    employeeQuery.refetch();
+    (async () => await employeeQuery.refetch())();
   }, [salesReportPeriod]);
 
   useEffect(() => {
-    employeeDealsQuery.refetch();
+    (async () => await employeeDealsQuery.refetch())();
   }, [dealsPeriod]);
+  useEffect(() => {
+    (async () => await commissionQuery.refetch())();
+  }, [commissionPeriod]);
 
   return (
     <div className="reporting">
@@ -214,7 +266,13 @@ const Sales = ({ loadSubModule, setActiveSubModule }) => {
                         : value.toLocaleDateString(),
                   },
                 ]}
-                series={[{ dataKey: "profit" }]}
+                series={[
+                  {
+                    dataKey: "profit",
+                    color: "#16a34a",
+                    curve: "linear",
+                  },
+                ]}
                 margin={{ top: 35, bottom: 45, left: 70, right: 50 }}
               />
               <div className="flex justify-center ">
@@ -300,17 +358,25 @@ const Sales = ({ loadSubModule, setActiveSubModule }) => {
                     dataKey: "quotations",
                     label: "Quotations",
                     color: "#c084fc",
+                    curve: "linear",
                   },
-                  { dataKey: "orders", label: "Orders", color: "#fb923c" },
+                  {
+                    dataKey: "orders",
+                    label: "Orders",
+                    color: "#fb923c",
+                    curve: "linear",
+                  },
                   {
                     dataKey: "invoices",
                     label: "Invoices",
                     color: "#22c55e",
+                    curve: "linear",
                   },
                   {
                     dataKey: "deliveries",
                     label: "Deliveries",
                     color: "#2563eb",
+                    curve: "linear",
                   },
                 ]}
                 margin={{ top: 20, bottom: 80, left: 50, right: 50 }}
@@ -461,27 +527,33 @@ const Sales = ({ loadSubModule, setActiveSubModule }) => {
               </h1>
               <div className="justify-center items-center border-[#f3f4f6] rounded-lg border-2 p-4">
                 <div className="flex flex-col gap-2 px-4 font-medium">
-                  <span>Commissions</span>
+                  <span>Total Commission</span>
                   <span className="text-3xl">
-                    {totalProfit.toLocaleString("en-US", {
+                    {totalCommissions.toLocaleString("en-US", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
                   </span>
                   <LineChart
                     height={325}
-                    dataset={profitReportData}
+                    dataset={commissionData}
                     xAxis={[
                       {
                         dataKey: "date",
                         scaleType: "time",
                         valueFormatter: (value) =>
-                          profitPeriod === "day"
+                          commissionPeriod === "day"
                             ? value.toLocaleString().split(",")[1]
                             : value.toLocaleDateString(),
                       },
                     ]}
-                    series={[{ dataKey: "profit" }]}
+                    series={[
+                      {
+                        dataKey: "commission",
+                        color: "#8979FF",
+                        curve: "linear",
+                      },
+                    ]}
                     margin={{ top: 35, bottom: 45, left: 70, right: 50 }}
                   />
                   <div className="flex justify-center ">
@@ -519,51 +591,33 @@ const Sales = ({ loadSubModule, setActiveSubModule }) => {
             {/* Quota vs Completed Order Report */}
             <div className="bg-white rounded-lg p-6 shadow flex flex-col gap-2">
               <h1 className="font-bold text-2xl text-[#1c1c1c] mb-1">
-                Quota vs Completed Order Report
+                Quota Report
               </h1>
-              <div className="justify-center items-center  border-[#f3f4f6] rounded-lg border-2">
-                <div className="flex flex-col gap-2 font-medium mx-6 mt-5">
-                  <form className="bg-[#f3f4f6] p-2 rounded-lg w-fit self-end">
-                    {quotaOptions.map((option) => {
-                      return (
-                        <label key={option.label}>
-                          <input
-                            type="radio"
-                            name="time_range"
-                            value={option.value}
-                            className="hidden"
-                            checked={quotaPeriod === option.value}
-                            onChange={() => setQuotaPeriod(option.value)}
-                          />
-                          <span
-                            className={`px-4 py-1 rounded-md cursor-pointer ${
-                              quotaPeriod === option.value
-                                ? "bg-white text-black font-medium shadow"
-                                : "text-gray-500"
-                            }`}
-                          >
-                            {option.label}
-                          </span>
-                        </label>
-                      );
-                    })}
-                  </form>
+              <div className="justify-center items-center border-[#f3f4f6] rounded-lg border-2 p-4">
+                <div className="flex flex-col gap-2 px-4 font-medium">
+                  <span>Orders Remaining to Hit Quota</span>
+                  <span className="text-3xl">
+                    {quotaRemaining.toLocaleString("en-US")}
+                  </span>
                 </div>
                 <LineChart
                   height={350}
-                  dataset={salesReportData}
+                  dataset={quotaData}
                   xAxis={[
                     {
                       dataKey: "date",
                       scaleType: "time",
-                      valueFormatter: (value) =>
-                        quotaPeriod === "day"
-                          ? value.toLocaleString().split(",")[1]
-                          : value.toLocaleDateString(),
+                      valueFormatter: (value) => value.toLocaleDateString(),
                     },
                   ]}
-                  series={[]}
-                  margin={{ top: 20, bottom: 80, left: 50, right: 50 }}
+                  series={[
+                    {
+                      dataKey: "orders",
+                      color: "#8979FF",
+                      curve: "linear",
+                    },
+                  ]}
+                  margin={{ top: 30, bottom: 30, left: 50, right: 50 }}
                   slotProps={{
                     legend: {
                       direction: "row", // Align items in a row
@@ -694,12 +748,13 @@ const Sales = ({ loadSubModule, setActiveSubModule }) => {
   );
 };
 
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   return (
     <AlertProvider>
       <Sales
         loadSubModule={loadSubModule}
         setActiveSubModule={setActiveSubModule}
+        employee_id={employee_id}
       />
     </AlertProvider>
   );
