@@ -261,15 +261,20 @@ const SalesInfo = ({
         <Information label="Name" value={customer.name} />
         <Information label="Country" value={customer.country} />
         <Information label="Number" value={customer.phone_number} />
-        <DateIssuedSelector
-          customer={customer}
-          setDateIssued={(value) => {
-            setIssuedDateLocal(value);
-            setDateIssued(value);
-          }}
-          label={"Date Issued"}
-          defaultDate={date}
-        />
+
+        {type !== "Quotation" ? (
+          <DateIssuedSelector
+            customer={customer}
+            setDateIssued={(value) => {
+              setIssuedDateLocal(value);
+              setDateIssued(value);
+            }}
+            label={"Date Issued"}
+            defaultDate={date}
+          />
+        ) : (
+          ""
+        )}
       </div>
 
       <div className="lg:max-w-[100px] xl:max-w-none flex-1 hidden lg:block"></div>
@@ -283,6 +288,20 @@ const SalesInfo = ({
           customer={customer}
           setCustomerAddress={setAddress}
         />
+
+        {type == "Quotation" ? (
+          <DateIssuedSelector
+            customer={customer}
+            setDateIssued={(value) => {
+              setIssuedDateLocal(value);
+              setDateIssued(value);
+            }}
+            label={"Date Issued"}
+            defaultDate={date}
+          />
+        ) : (
+          ""
+        )}
 
         {setDatePosted !== "" ? (
           <DatePostedSelector
