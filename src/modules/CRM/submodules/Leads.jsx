@@ -109,8 +109,7 @@ const Leads = () => {
         customer_type: "Prospect",
       });
       showAlert({ type: "success", title: "Lead qualified successfully." });
-      queryClient.invalidateQueries(["leads"]);
-      queryClient.refetchQueries(["leads"]);
+      await queryClient.refetchQueries(["leads"]);
     } catch (error) {
       showAlert({ type: "error", title: "Could not qualify lead." });
     }

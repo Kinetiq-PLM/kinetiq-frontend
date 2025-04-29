@@ -36,12 +36,12 @@ const BlanketAgreementDetailsModal = ({
 
   const agreementMutation = useMutation({
     mutationFn: async (data) => await POST(`sales/agreement/`, data),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       showAlert({
         type: "success",
         title: "New Agreement Created",
       });
-      queryClient.refetchQueries(["agreements"]);
+      await queryClient.refetchQueries(["agreements"]);
       onClose();
     },
     onError: (error) => {

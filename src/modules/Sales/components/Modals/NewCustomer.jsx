@@ -45,9 +45,8 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
         title: "Failed to add Customer: " + error.message,
       });
     },
-    onSettled: () => {
-      queryClient.invalidateQueries(["leads"]);
-      queryClient.refetchQueries(["customers"]);
+    onSettled: async () => {
+      await queryClient.refetchQueries(["customers"]);
     },
   });
 
