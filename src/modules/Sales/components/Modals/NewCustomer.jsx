@@ -85,7 +85,6 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
         postal_code: postalCode,
         address_line1: mainAddress,
         address_line2: secondaryAddress,
-        customer_type: customerType,
         status: "Active",
         contact_person: contactPerson,
         customer_type: "Lead",
