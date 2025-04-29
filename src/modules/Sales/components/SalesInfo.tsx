@@ -151,7 +151,7 @@ const DatePostedSelector = ({
 
   const handleDateChange = (event) => {
     const selectedDate = event.target.value;
-    setDate(selectedDate);
+    setDatePosted(selectedDate);
     //setDatePosted(selectedDate);
   };
 

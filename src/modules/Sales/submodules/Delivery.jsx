@@ -80,7 +80,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     { key: "quantity", label: "Quantity" },
     { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
-    { key: "discount", label: "Discount" },
+    { key: "discount", label: "Discount", editable: false },
     { key: "total_price", label: "Total Price", editable: false },
   ];
 
@@ -154,6 +154,16 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     mutationFn: async (data) => await POST("sales/delivery/", data),
     onSuccess: (data, variables, context) => {
       setDeliveryID(data.delivery_note_id);
+      showAlert({
+        type: "success",
+        title: "Delivery Submitted",
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title: "An error occurred while creating delivery: " + error.message,
+      });
     },
   });
 
@@ -204,7 +214,8 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         order_id,
         shipping_method: "Standard", // drop down needed
         shipment_status: "Pending",
-        preferred_delivery_date: deliveryDate,
+        posting_date: datePosted,
+        preferred_delivery_date: dateDelivery,
         items: products.map((product, index) => {
           return {
             inventory_item: product.inventory_item_id,
@@ -231,10 +242,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     deliveryMutation.mutate(request);
     // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
     setSubmitted(true);
-    showAlert({
-      type: "success",
-      title: "Delivery Submitted",
-    });
   };
 
   const transferData = () => {

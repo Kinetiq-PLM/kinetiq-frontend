@@ -113,6 +113,16 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     mutationFn: async (data) => await POST("sales/order/", data),
     onSuccess: (data, variables, context) => {
       setOrderID(data.order_id);
+      showAlert({
+        type: "success",
+        title: "Order Submitted",
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title: "An error occurred while creating order: " + error.message,
+      });
     },
   });
 
@@ -220,6 +230,8 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         agreement_id,
         order_date: new Date().toISOString(),
         order_type: orderType,
+        posting_date: datePosted,
+        delivery_date: dateDelivery,
         items,
       },
       statement_data: {
@@ -234,10 +246,6 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     console.log(request);
 
     orderMutation.mutate(request);
-    showAlert({
-      type: "success",
-      title: "Order Submitted",
-    });
   };
 
   // For copy from feature
