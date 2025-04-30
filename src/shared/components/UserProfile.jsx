@@ -345,9 +345,15 @@ const BodyContent = ({ employee_id }) => {
               <strong>&gt;&nbsp;Module Permissions:</strong>
             </p>
             <p>
-              {Array.isArray(permissions)
+              {
+              /*Array.isArray(permissions)
                 ? permissions.join(", ")
-                : permissions}
+                : permissions*/
+                permissions.split(',').map((perm, i, arr) => {
+                  const [main, sub] = perm.split('/')
+                  return sub?sub:main + (i<arr.length-1?',':'')
+                })
+              }
             </p>
           </div>
         </div>

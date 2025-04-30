@@ -390,6 +390,9 @@ function App() {
       "Accounts Receivable": "AccountsReceivable",
       "Accounts Payable": "AccountsPayable",
       "Official Receipts": "OfficialReceipts",
+      "Tax and Remittances":"TaxAndRemittances",
+      "Payroll Receipts":"PayrollReceipts",
+      "Accounts Payable Receipts":"AccountsPayableReceipts",
     },
     "Financials": {
       "Reports": "Reports",
@@ -468,6 +471,7 @@ function App() {
       "Tasks": "TaskMonitoring",
       "Report Monitoring": "Reports",
       "Warranty Monitoring": "Warranties",
+      "Project Cost":"ProjectCost",
     },
     "Human Resources": {
       "Employees": "Employees",
@@ -488,7 +492,32 @@ function App() {
 
   const rawPermissions = user?.role?.permissions || "";
   const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
+  console.log('raw permissions...')
+  console.log(rawPermissions)
+  console.log("allowed modules...")
+  console.log(allowedModules)
 
+  const filteredModuleFileNames = {};
+
+  allowedModules.forEach((permission) => {
+    const [main, sub] = permission.split('/')
+
+    if (!filteredModuleFileNames[main]) {
+      filteredModuleFileNames[main] = {};
+    }
+
+    if (!sub) {
+      filteredModuleFileNames[main] = {
+      ...moduleSubmoduleFileNames[main]
+      }
+    } else {
+      filteredModuleFileNames[main][sub] = moduleSubmoduleFileNames[main][sub]
+    }
+  });
+
+  console.log('filtered modules...')
+  console.log(filteredModuleFileNames)
+/*
   const filteredModuleFileNames = allowedModules.includes("All")
     ? moduleFileNames
     : Object.fromEntries(
@@ -496,11 +525,15 @@ function App() {
         allowedModules.includes(key)
       )
     );
+*/
 
   const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
     id: module,
-    icon: `/icons/module-icons/${filteredModuleFileNames[module]}.png`,
+    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
   }));
+
+  console.log('module icons...')
+  console.log(modulesIcons)
 
   return (
     <div className="shell">
