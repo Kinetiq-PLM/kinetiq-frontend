@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../Sales/styles/Index.css";
 import { useState } from "react";
 import { BarChart, LineChart, PieChart } from "@mui/x-charts";
@@ -12,10 +12,13 @@ import {
 } from "recharts";
 
 import Heading from "../Sales/components/Heading";
-
+import { useAlert } from "../Sales/components/Context/AlertContext";
 import StatusByOwnerChart from "./components/StatusByOwnerChart";
+import { useQuery } from "@tanstack/react-query";
+import { GET } from "../Sales/api/api";
 
 const generateDummyData = (range) => {
+  const { showAlert } = useAlert();
   const now = new Date();
   const data = [];
 
@@ -63,7 +66,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [totalRevenue, setTotalRevenue] = useState(6900000);
 
   const [salesPeriod, setSalesPeriod] = useState("day");
-  const conversionData = generateDummyData(salesPeriod);
+  const [conversionData, setConversionData] = useState([]);
 
   const ownerStatusData = [
     { owner: "Gary V", leadIn: 70, contact: 100, closed: 180 },
@@ -118,7 +121,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     { label: "1D", value: "day" },
     { label: "1M", value: "month" },
     { label: "1Y", value: "year" },
-    { label: "Max", value: "max" },
+    { label: "All", value: "all" },
   ];
 
   const pipelineData = [
@@ -135,6 +138,56 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
       value: totalClosed,
     },
   ];
+
+  const conversionQuery = useQuery({
+    queryKey: ["conversionData"],
+    queryFn: async () =>
+      await GET(`crm/reporting/conversion?period=${salesPeriod}`),
+  });
+
+  const dashboardQuery = useQuery({
+    queryKey: ["dashboardData"],
+    queryFn: async () => await GET(`crm/reporting/dashboard`),
+  });
+
+  useEffect(() => {
+    if (dashboardQuery.status === "success") {
+      setTotalLeads(dashboardQuery.data.leads_count);
+      setTotalProspects(dashboardQuery.data.prospects_count);
+      setTotalOpportunities(dashboardQuery.data.total_opportunities);
+      setTotalClosed(dashboardQuery.data.closed_opportunities);
+      setTotalActiveCampaigns(dashboardQuery.data.active_campaigns_count);
+    } else if (dashboardQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Error fetching dashboard data:" + dashboardQuery.error,
+      });
+    }
+  }, [dashboardQuery.data, dashboardQuery.status]);
+
+  useEffect(() => {
+    if (conversionQuery.status === "success") {
+      const data = conversionQuery.data.customer_data.map((item) => ({
+        date: new Date(item.date),
+        leads: item.leads,
+        prospects: item.prospects,
+        opportunities: item.opportunities,
+        won: item.won,
+      }));
+      setConversionData(data);
+      setAvgDealAmount(conversionQuery.data.average_value);
+      setTotalRevenue(conversionQuery.data.total_profit);
+    } else if (conversionQuery.status === "error") {
+      showAlert({
+        type: "error",
+        title: "Error fetching conversion data:" + conversionQuery.error,
+      });
+    }
+  }, [conversionQuery.data, conversionQuery.status]);
+
+  useEffect(() => {
+    (async () => await conversionQuery.refetch())();
+  }, [salesPeriod]);
 
   return (
     <div className="reporting">
@@ -219,8 +272,9 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                           value: totalLeads,
                           color: "#2563EB",
                           label: `Not Converted (${(
-                            (49 / (totalProspects + totalLeads)) *
-                            100
+                            100 -
+                            (totalProspects / (totalProspects + totalLeads)) *
+                              100
                           ).toFixed(1)}%)`,
                         },
                       ],
@@ -265,8 +319,8 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                           value: totalProspects,
                           color: "#2563EB",
                           label: `Not Converted (${(
-                            (49 / (totalClosed + totalProspects)) *
-                            100
+                            100 -
+                            (totalClosed / (totalClosed + totalLeads)) * 100
                           ).toFixed(1)}%)`,
                         },
                       ],
@@ -435,8 +489,8 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                         curve: "linear",
                       },
                       {
-                        dataKey: "closed",
-                        label: "Closed Won",
+                        dataKey: "won",
+                        label: "Opportunities Won",
                         color: "#22c55e",
                         curve: "linear",
                       },

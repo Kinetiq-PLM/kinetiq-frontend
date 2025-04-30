@@ -188,7 +188,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     } else if (commissionQuery.status === "error") {
       showAlert({
         type: "error",
-        title: "Failed to fetch Top Employee Deals Report.",
+        title: "Failed to fetch Commissions Report.",
       });
     }
   }, [commissionQuery.data, commissionQuery.status]);
@@ -205,7 +205,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     } else if (quotaQuery.status === "error") {
       showAlert({
         type: "error",
-        title: "Failed to fetch Top Employee Deals Report.",
+        title: "Failed to fetch Quota Report.",
       });
     }
   }, [quotaQuery.data, quotaQuery.status]);
@@ -430,7 +430,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
               </div>
             </div>
             {/*  Personal Business Expenses REPORT */}
-            <div className="bg-white rounded-lg p-6 shadow flex flex-col gap-3">
+            {/* <div className="bg-white rounded-lg p-6 shadow flex flex-col gap-3">
               <h1 className="font-bold text-2xl text-[#1c1c1c]">
                 Personal Business Expenses
               </h1>
@@ -457,7 +457,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                   margin={{ top: 20, bottom: 70, left: 50, right: 50 }}
                 />
               </div>
-            </div>
+            </div> */}
             {/*  PRODUCT REPORT */}
             <div className="bg-white rounded-lg p-6 shadow flex flex-col gap-3">
               <h1 className="font-bold text-2xl text-[#1c1c1c]">
@@ -488,7 +488,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
               </div>
             </div>
             {/*  Sales Team Business Expenses REPORT */}
-            <div className="bg-white rounded-lg p-6 shadow flex flex-col gap-3">
+            {/* <div className="bg-white rounded-lg p-6 shadow flex flex-col gap-3">
               <h1 className="font-bold text-2xl text-[#1c1c1c]">
                 Sales Team Business Expenses
               </h1>
@@ -515,7 +515,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                   margin={{ top: 20, bottom: 70, left: 50, right: 50 }}
                 />
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* BIG Reports */}
