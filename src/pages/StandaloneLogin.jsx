@@ -95,9 +95,11 @@ export default function StandaloneLogin() {
 
       if (data.success) {
         localStorage.setItem('login_attempts', '0');
-        console.log("Login successful:", data);
-        localStorage.setItem("user", JSON.stringify(data.data));
-        navigate("/");
+        //console.log("Login successful:", data);
+        //localStorage.setItem("user", JSON.stringify(data.data));
+        setLoginError("");
+        setView("mfa");
+        //navigate("/");
       }
     } catch (err) {
       if (err.response && err.response.data) {
@@ -126,24 +128,31 @@ export default function StandaloneLogin() {
   };
 
 
-  const generateAndSendCode = async (email) => {
+  const generateAndSendCode = async (email, kinetiq_email, isConfirmCode) => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     localStorage.setItem("reset_code", code);
     localStorage.setItem("reset_email", email);
     console.log("Generated code:", code);
+    
+    const templateStr = isConfirmCode
+    ? "confirm_code_template"
+    : "reset_code_template";
 
     try {
-      emailjs.send("service_fpuj34n", "template_vcrih1l", {
-        code: code,
-        email: email,
-        kinetiq_email: resetData.kinetiq_email,
-      });
-      console.log("Email sent successfully! to: ", email);
+      // emailjs.send("service_fpuj34n", templateStr, {
+      //   code: code,
+      //   email: email,
+      //   kinetiq_email: kinetiq_email,
+      // });
+      console.log(`${templateStr} sent succe  ssfully! to: ${email} `);
       
     } catch (err) {
       console.error("Failed to send email:", err);
       alert("Error sending reset code.");
     }
+
+
+    
   };
 
   const checkEmail = async (email) => {
@@ -234,6 +243,7 @@ export default function StandaloneLogin() {
                 {view === "login" && "Login"}
                 {view === "forgot" && "Forgot your password?"}
                 {view === "reset" && "Reset your password"}
+                {view === "mfa" && "Confirm your Identity"}
               </h2>
 
 
@@ -281,6 +291,140 @@ export default function StandaloneLogin() {
                 </>
               )}
 
+              { /* ----------------- MF ----------------- */}
+              {view === "mfa" && (
+                <>
+                  <p className="login-pass-details">Enter your email. <br></br>
+                    We’ll send a code to confirm your identity.</p>
+                  
+                  <form
+                    className="email-form"
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const isValidEmail = /^[^\s@]+@[^\s@]+\.(com)$/.test(resetData.valid_email);
+                      if (!isValidEmail) {
+                        setLoginError("* Please enter a valid email address *");
+                        return;
+                      }
+                      setLoginError(""); // clear any old error
+                      generateAndSendCode(resetData.valid_email, resetData.kinetiq_email, true); // send the code to the email
+                      setView("mfaVerify");
+                    
+                    }}
+                  >
+                    <h4>Valid Email: </h4>
+                    <input
+                      type="email"
+                      name="username"
+                      placeholder="Enter your email"
+                      value={resetData.valid_email}
+                      onChange={(e) => {
+                        setResetData({ ...resetData, valid_email: e.target.value });
+                        setLoginError("");
+                      }}
+                      required
+                      style={{ color: 'gray' }}
+                    />
+                    
+                    {loginError && <p className="login-error">{loginError}</p>}
+                    <div className="button-back-container">
+
+                      <button type="submit" className="login-btn">
+                        Send Code
+                      </button>
+
+                      <button
+                        type="button"
+                        className="back-btn"
+                        onClick={() => {
+                          setLoginError("");
+                          setView("login");
+                        }}
+                      >
+                        Back
+                      </button>
+                    </div>
+                  </form>
+                </>
+              )}
+
+                {view === "mfaVerify" && (
+                  <>
+                    <h2>Enter Your Code</h2>
+                    <p className="login-pass-details">
+                      We’ve sent a 6-digit code to <strong>{resetData.valid_email}</strong>.
+                    </p>
+                    <form
+                      className="code-form"
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        // grab the input named "code" directly from the form
+                        const code = e.target.elements.code.value.trim();
+                        const savedCode = localStorage.getItem("reset_code");
+
+                        if (code === savedCode) {  
+                          try{
+                            const response = await axios.post("https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/login/", {
+                              email: credentials.email,
+                              password: credentials.password,
+                            });
+                      
+                            const data = response.data;
+                            if (data.success) {
+                              localStorage.setItem('login_attempts', '0');
+                              console.log("Login successful:", data);
+                              localStorage.setItem("user", JSON.stringify(data.data));
+                              navigate("/");
+                            }
+                          }
+                          catch (e) {
+                            console.error("Login error:", e);
+                            alert("Something went wrong. Please try again.");
+                          }
+                  
+                        } else {
+                          setLoginError("* Incorrect code, please try again *");
+                        }
+                      }}
+                    >
+                      <label>
+                        Confirmation Code:
+                        <input
+                          type="text"
+                          name="code"
+                          placeholder="123456"
+                          maxLength={6}
+                          required
+                          // optional: force numeric keyboard on mobile
+                          inputMode="numeric"
+                          pattern="\d{6}"
+                        />
+                      </label>
+                      {loginError && <p className="login-error">{loginError}</p>}
+                      <div className="button-back-container">
+
+                        <button type="submit" className="login-btn">
+                          Verify Code
+                        </button>
+
+                        <button
+                          type="button"
+                          className="back-btn"
+                          onClick={() => {
+                            setLoginError("");
+                            setView("login");
+                            credentials.email = "";
+                            credentials.password = "";
+                          }}
+                        >
+                          Back to login
+                        </button>
+                      </div>
+                    </form>
+                  </>
+                )}
+
+
               { /* ----------------- FORGORR ----------------- */}
               {view === "forgot" && (
                 <>
@@ -309,7 +453,7 @@ export default function StandaloneLogin() {
                       }
                       setLoginError(""); // clear any old error
 
-                      generateAndSendCode(resetData.valid_email); // send the code to the email
+                      generateAndSendCode(resetData.valid_email, resetData.kinetiq_email); // send the code to the email
                       setView("reset");
 
                     }}
