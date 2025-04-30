@@ -101,9 +101,6 @@ const CustomerListModal = ({
           customer.customer_type.toLowerCase() == customerFilter.toLowerCase()
       );
 
-    console.log(customers[0].customer_type.toLowerCase());
-    console.log(customerFilter.toLowerCase());
-
     setFilteredData(filteredData);
   };
 
