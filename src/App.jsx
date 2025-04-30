@@ -34,6 +34,33 @@ function App() {
   // landing page
   const [showLanding, setShowLanding] = useState(true);
 
+  // log out at time out
+  useEffect(() => {
+    let logoutTimeout;
+  
+    const resetTimeout = () => {
+      if (logoutTimeout) clearTimeout(logoutTimeout);
+      logoutTimeout = setTimeout(() => {
+        console.log("No activity detected for 10 minutes. Logging out.");
+        handleLogout();
+      }, 30 * 60 * 1000); // 30 minutes
+    };
+  
+    const activityEvents = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+    activityEvents.forEach(event =>
+      window.addEventListener(event, resetTimeout)
+    );
+  
+    resetTimeout();
+  
+    return () => {
+      clearTimeout(logoutTimeout);
+      activityEvents.forEach(event =>
+        window.removeEventListener(event, resetTimeout)
+      );
+    };
+  }, []);
+
   useEffect(() => {
     if (activeModule || activeSubModule || showUserProfile) {
       setShowLanding(false);
