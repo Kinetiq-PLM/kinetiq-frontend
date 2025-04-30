@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 const InputCustomer = ({
   label,
   value = "",
-  customerListModal,
+  handleCustomerSelection,
   enabled = true,
 }) => {
   return (
@@ -13,7 +13,7 @@ const InputCustomer = ({
         className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded overflow-hidden"
         onClick={() => {
           if (enabled) {
-            customerListModal(true);
+            handleCustomerSelection();
           }
         }}
       >
@@ -221,6 +221,7 @@ const SalesInfo = ({
   operationID,
   setAddress,
   setDateIssued,
+  handleCustomerSelection,
   setDatePosted = "",
   setDateDelivery = "",
   enabled = true,
@@ -253,7 +254,7 @@ const SalesInfo = ({
           <InputCustomer
             label="Customer"
             value={customer.customer_id}
-            customerListModal={customerListModal}
+            handleCustomerSelection={handleCustomerSelection}
             enabled={enabled}
           />
         )}

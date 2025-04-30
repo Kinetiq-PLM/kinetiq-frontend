@@ -13,7 +13,7 @@ import loading from "../../Assets/kinetiq-loading.gif";
 
 const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
   const { showAlert } = useAlert();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // setEmployee is used to set the selected customer in the parent component
   // setSelectedCustomer is used to set the selected customer in this component
@@ -139,6 +139,13 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
                 setFilteredData(filteredData);
               }}
             />
+            <div className="w-full sm:w-[200px]">
+              {/* <Dropdown
+                options={customerTypes}
+                onChange={setCustomerFilter}
+                value={customerFilter}
+              /> */}
+            </div>
           </div>
           {isLoading ? (
             <div className="h-[300px] rounded-md flex justify-center items-center">

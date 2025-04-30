@@ -18,7 +18,7 @@ const CustomerListModal = ({
   isNewCustomerModalOpen,
   onClose,
   setCustomer,
-  newCustomerModal,
+  employee = null,
   duplicates = [],
 }) => {
   const { showAlert } = useAlert();
@@ -38,6 +38,7 @@ const CustomerListModal = ({
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
 
+  // USE employee to fetch the customer data if employee is not null
   const customersQuery = useQuery({
     queryKey: ["customers"],
     queryFn: async () =>
@@ -100,9 +101,6 @@ const CustomerListModal = ({
         (customer) =>
           customer.customer_type.toLowerCase() == customerFilter.toLowerCase()
       );
-
-    console.log(customers[0].customer_type.toLowerCase());
-    console.log(customerFilter.toLowerCase());
 
     setFilteredData(filteredData);
   };
