@@ -218,7 +218,6 @@ const SalesInfo = ({
   type,
   customerListModal,
   customer,
-  setCustomerInfo,
   operationID,
   setAddress,
   setDateIssued,
