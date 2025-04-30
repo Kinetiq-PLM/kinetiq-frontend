@@ -17,53 +17,15 @@ import StatusByOwnerChart from "./components/StatusByOwnerChart";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../Sales/api/api";
 
-const generateDummyData = (range) => {
-  const { showAlert } = useAlert();
-  const now = new Date();
-  const data = [];
-
-  const steps = {
-    day: 12, // hourly data for 1 day
-    month: 30, // daily
-    year: 12, // monthly
-    max: 6, // yearly
-  };
-
-  const stepCount = steps[range];
-
-  for (let i = 0; i < stepCount; i++) {
-    let date;
-    if (range === "day") {
-      date = new Date(now.getTime() - (stepCount - i) * 60 * 60 * 1000);
-    } else if (range === "month") {
-      date = new Date(now.getTime() - (stepCount - i) * 24 * 60 * 60 * 1000);
-    } else if (range === "year") {
-      date = new Date(now.getFullYear(), now.getMonth() - (stepCount - i), 1);
-    } else {
-      date = new Date(now.getFullYear() - (stepCount - i), 0, 1);
-    }
-
-    data.push({
-      date,
-      leads: 100 + Math.round(Math.random() * 100),
-      prospects: 80 + Math.round(Math.random() * 100),
-      opportunities: 40 + Math.round(Math.random() * 60),
-      closed: 20 + Math.round(Math.random() * 40),
-    });
-  }
-
-  return data;
-};
-
 const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
-  const [totalLeads, setTotalLeads] = useState(365);
-  const [totalProspects, setTotalProspects] = useState(28);
-  const [totalActiveCampaigns, setTotalActiveCampaigns] = useState(12);
-  const [totalOpportunities, setTotalOpportunities] = useState(5);
-  const [totalClosed, setTotalClosed] = useState(912);
+  const [totalLeads, setTotalLeads] = useState(0);
+  const [totalProspects, setTotalProspects] = useState(0);
+  const [totalActiveCampaigns, setTotalActiveCampaigns] = useState(0);
+  const [totalOpportunities, setTotalOpportunities] = useState(0);
+  const [totalClosed, setTotalClosed] = useState(0);
 
-  const [avgDealAmount, setAvgDealAmount] = useState(120000);
-  const [totalRevenue, setTotalRevenue] = useState(6900000);
+  const [avgDealAmount, setAvgDealAmount] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
 
   const [salesPeriod, setSalesPeriod] = useState("day");
   const [conversionData, setConversionData] = useState([]);
