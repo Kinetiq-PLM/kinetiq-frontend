@@ -391,6 +391,20 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     if (selectedCustomer != "") setCanClear(true);
   }, [selectedCustomer]);
 
+  function handleCustomerSelection() {
+    const isSalesRep = false; // Replace with actual condition to check if the user is a sales rep
+    if (isSalesRep) {
+      setIsCustomerListOpen(true);
+    } else {
+      setIsEmployeeListOpen(true);
+    }
+  }
+
+  useEffect(() => {
+    if (!selectedEmployee) return;
+    setIsCustomerListOpen(true);
+  }, [selectedEmployee]);
+
   return (
     <div className="quotation">
       <div className="body-content-container">
@@ -402,11 +416,19 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
         <CustomerListModal
           isOpen={isCustomerListOpen}
+          isNewCustomerModalOpen={isNewCustomerModalOpen}
           onClose={() => setIsCustomerListOpen(false)}
           newCustomerModal={setIsNewCustomerModalOpen}
-          setSelectedCustomer={setSelectedCustomer}
           setCustomer={setSelectedCustomer}
+          employee={selectedEmployee}
         ></CustomerListModal>
+
+        <EmployeeListModal
+          isOpen={isEmployeeListOpen}
+          onClose={() => setIsEmployeeListOpen(false)}
+          setEmployee={setSelectedEmployee}
+        ></EmployeeListModal>
+
         <ProductListModal
           isOpen={isProductListOpen}
           onClose={() => setIsProductListOpen(false)}
@@ -431,11 +453,6 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           onClose={() => setIsBlanketAgreementListOpen(false)}
           setBlanketAgreement={setSelectedBlanketAgreement}
         ></BlanketAgreementListModal>
-        {/* <EmployeeListModal
-          isOpen={isEmployeeListOpen}
-          onClose={() => setIsEmployeeListOpen(false)}
-          setEmployee={setSelectedEmployee}
-        ></EmployeeListModal> */}
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -451,6 +468,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             setAddress={setAddress}
             enabled={canEditTable}
             date={new Date().toISOString().split("T")[0]}
+            handleCustomerSelection={handleCustomerSelection}
           />
         </div>
         {/* TABLE */}

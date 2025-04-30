@@ -419,6 +419,20 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     if (selectedCustomer != "") setCanClear(true);
   }, [selectedCustomer]);
 
+  function handleCustomerSelection() {
+    const isSalesRep = false; // Replace with actual condition to check if the user is a sales rep
+    if (isSalesRep) {
+      setIsCustomerListOpen(true);
+    } else {
+      setIsEmployeeListOpen(true);
+    }
+  }
+
+  useEffect(() => {
+    if (!selectedEmployee) return;
+    setIsCustomerListOpen(true);
+  }, [selectedEmployee]);
+
   return (
     <div className="delivery">
       <div className="body-content-container">
@@ -430,11 +444,18 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
         <CustomerListModal
           isOpen={isCustomerListOpen}
+          isNewCustomerModalOpen={isNewCustomerModalOpen}
           onClose={() => setIsCustomerListOpen(false)}
           newCustomerModal={setIsNewCustomerModalOpen}
-          setSelectedCustomer={setSelectedCustomer}
           setCustomer={setSelectedCustomer}
+          employee={selectedEmployee}
         ></CustomerListModal>
+
+        <EmployeeListModal
+          isOpen={isEmployeeListOpen}
+          onClose={() => setIsEmployeeListOpen(false)}
+          setEmployee={setSelectedEmployee}
+        ></EmployeeListModal>
 
         <NewCustomerModal
           isOpen={isNewCustomerModalOpen}
@@ -456,12 +477,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           setInitialProducts={setInitialProducts}
           order={selectedOrder}
         />
-        {/* 
-        <EmployeeListModal
-          isOpen={isEmployeeListOpen}
-          onClose={() => setIsEmployeeListOpen(false)}
-          setEmployee={setSelectedEmployee}
-        ></EmployeeListModal> */}
 
         {/* DETAILS */}
         <div>
@@ -476,6 +491,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             setDateDelivery={setDateDelivery}
             dataIssued={dateIssued}
             setAddress={setAddress}
+            handleCustomerSelection={handleCustomerSelection}
           />
         </div>
         {/* TABLE */}
