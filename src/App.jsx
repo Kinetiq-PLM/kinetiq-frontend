@@ -37,7 +37,7 @@ function App() {
   // log out at time out
   useEffect(() => {
     let logoutTimeout;
-  
+
     const resetTimeout = () => {
       if (logoutTimeout) clearTimeout(logoutTimeout);
       logoutTimeout = setTimeout(() => {
@@ -45,17 +45,23 @@ function App() {
         handleLogout();
       }, 30 * 60 * 1000); // 30 minutes
     };
-  
-    const activityEvents = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
-    activityEvents.forEach(event =>
+
+    const activityEvents = [
+      "mousemove",
+      "mousedown",
+      "keypress",
+      "scroll",
+      "touchstart",
+    ];
+    activityEvents.forEach((event) =>
       window.addEventListener(event, resetTimeout)
     );
-  
+
     resetTimeout();
-  
+
     return () => {
       clearTimeout(logoutTimeout);
-      activityEvents.forEach(event =>
+      activityEvents.forEach((event) =>
         window.removeEventListener(event, resetTimeout)
       );
     };
@@ -393,6 +399,9 @@ function App() {
       "Accounts Receivable": "AccountsReceivable",
       "Accounts Payable": "AccountsPayable",
       "Official Receipts": "OfficialReceipts",
+      "Tax and Remittances": "TaxAndRemittances",
+      "Payroll Receipts": "PayrollReceipts",
+      "Accounts Payable Receipts": "AccountsPayableReceipts",
     },
     Financials: {
       Reports: "Reports",
@@ -467,6 +476,7 @@ function App() {
       Tasks: "TaskMonitoring",
       "Report Monitoring": "Reports",
       "Warranty Monitoring": "Warranties",
+      "Project Cost": "ProjectCost",
     },
     "Human Resources": {
       Employees: "Employees",
@@ -496,57 +506,49 @@ function App() {
   //     );
 
   const rawPermissions = user?.role?.permissions || "";
+  const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
+  console.log("raw permissions...");
+  console.log(rawPermissions);
+  console.log("allowed modules...");
+  console.log(allowedModules);
 
-  // Split permissions and process each entry
-  const permissionEntries = rawPermissions.split(",").map((p) => p.trim());
+  const filteredModuleFileNames = {};
 
-  // Process modules and submodules
-  const allowedModules = [];
-  const allowedSubmodules = new Map(); // Map to store module -> allowed submodules
+  allowedModules.forEach((permission) => {
+    const [main, sub] = permission.split("/");
 
-  permissionEntries.forEach((entry) => {
-    if (entry === "All") {
-      allowedModules.push("All");
-      return;
+    if (!filteredModuleFileNames[main]) {
+      filteredModuleFileNames[main] = {};
     }
 
-    const [module, submodule] = entry.split("/").map((s) => s.trim());
-
-    if (module) {
-      // If entry ends with /, it's a module-level permission
-      if (entry.endsWith("/")) {
-        allowedModules.push(module);
-      }
-      // If there's a submodule specified
-      else if (submodule) {
-        // Add to allowed submodules map
-        if (!allowedSubmodules.has(module)) {
-          allowedSubmodules.set(module, []);
-        }
-        allowedSubmodules.get(module).push(submodule);
-      }
-      // If no trailing slash and no submodule, it's a module-level permission
-      else {
-        allowedModules.push(module);
-      }
+    if (!sub) {
+      filteredModuleFileNames[main] = {
+        ...moduleSubmoduleFileNames[main],
+      };
+    } else {
+      filteredModuleFileNames[main][sub] = moduleSubmoduleFileNames[main][sub];
     }
   });
 
-  console.log("Allowed modules:", allowedModules);
-  console.log("Allowed submodules:", Object.fromEntries(allowedSubmodules));
-
+  console.log("filtered modules...");
+  console.log(filteredModuleFileNames);
+  /*
   const filteredModuleFileNames = allowedModules.includes("All")
     ? moduleFileNames
     : Object.fromEntries(
-        Object.entries(moduleFileNames).filter(([key]) =>
-          allowedModules.includes(key)
-        )
-      );
+      Object.entries(moduleFileNames).filter(([key]) =>
+        allowedModules.includes(key)
+      )
+    );
+*/
 
   const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
     id: module,
-    icon: `/icons/module-icons/${filteredModuleFileNames[module]}.png`,
+    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
   }));
+
+  console.log("module icons...");
+  console.log(modulesIcons);
 
   return (
     <div className="shell">
