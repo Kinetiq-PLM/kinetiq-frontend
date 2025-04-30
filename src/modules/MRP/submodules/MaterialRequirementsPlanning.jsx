@@ -527,7 +527,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const filteredData = getFilteredData();
 
     const mergedRows2 = getFilteredData()
-  .map(item => {
+    .map(item => {
     const number = item.number || "";
     const type = item.type || "Unknown";
     const details = item.details || "—";
@@ -654,19 +654,18 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     ))}
                     </div>
 
-                    <div
-                    style={{display: 'flex', justifyContent: 'space-between', marginTop: 'auto', flexWrap: 'wrap', gap: 10,}}>
-                    <button onClick={() => setIsOpen(false)} style={buttonStyle2('#fff', '#A4A4A4')}>
-                        <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
-                        <span style={{ color: '#969696' }}>Back</span>
-                    </button>
+                    <div style={{display: 'flex', justifyContent: 'space-between', marginTop: 'auto', flexWrap: 'wrap', gap: 10,}}>
+                        <button onClick={() => setIsOpen(false)} style={buttonStyle2('#fff', '#A4A4A4')}>
+                            <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
+                            <span style={{ color: '#969696' }}>Back</span>
+                        </button>
 
-                    <button
-                        onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false); fetchPrincipalDetails(item.serviceorderID); setSelectedRowData(item);}}
-                        style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
-                        <span>Next</span>
-                        <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
-                    </button>
+                        <button
+                            onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false); fetchPrincipalDetails(item.serviceorderID); setSelectedRowData(item);}}
+                            style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                            <span>Next</span>
+                            <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
+                        </button>
                     </div>
                 </div>
                 </div>
