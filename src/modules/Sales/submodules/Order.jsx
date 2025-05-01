@@ -151,6 +151,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
   // the products customer chose
   const [products, setProducts] = useState([]);
+  const [isSalesRep, setIsSalesRep] = useState(false);
 
   const [orderInfo, setOrderInfo] = useState({
     customer_id: "",
@@ -239,7 +240,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
       },
       statement_data: {
         customer: selectedCustomer.customer_id,
-        salesrep: employee_id,
+        salesrep: selectedEmployee ? selectedEmployee.employee_id : employee_id,
         total_amount: Number(parseFloat(orderInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(orderInfo.discount).toFixed(2)),
         subtotal: Number(orderInfo.total_before_discount.toFixed(2)),
@@ -250,6 +251,23 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
     orderMutation.mutate(request);
   };
+
+  useEffect(() => {
+    const get = async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (["REG-2504-6039"].includes(res.position_id) || res.is_supervisor) {
+          setIsSalesRep(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee: " + err.message,
+        });
+      }
+    };
+    get();
+  }, []);
 
   // For copy from feature
   useEffect(() => {
@@ -395,17 +413,11 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   }, [selectedCustomer]);
 
   function handleCustomerSelection() {
-    if (IS_SALES_REP) {
-      setIsCustomerListOpen(true);
-    } else {
-      setIsEmployeeListOpen(true);
-    }
-  }
-
-  useEffect(() => {
-    if (!selectedEmployee) return;
     setIsCustomerListOpen(true);
-  }, [selectedEmployee]);
+    // } else {
+    //   setIsEmployeeListOpen(true);
+    // }
+  }
 
   return (
     <div className="quotation">
@@ -425,11 +437,11 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           employee={selectedEmployee}
         ></CustomerListModal>
 
-        <EmployeeListModal
+        {/* <EmployeeListModal
           isOpen={isEmployeeListOpen}
           onClose={() => setIsEmployeeListOpen(false)}
           setEmployee={setSelectedEmployee}
-        ></EmployeeListModal>
+        ></EmployeeListModal> */}
 
         <ProductListModal
           isOpen={isProductListOpen}
@@ -514,12 +526,14 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
               <p className="">Sales Rep ID</p>
               <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
                 <p className="text-sm">
-                  {IS_SALES_REP ? employee_id : "PLACEHOLDER"}
+                  {selectedEmployee
+                    ? selectedEmployee.employee_id
+                    : employee_id}
                 </p>
               </div>
             </div>
 
-            {IS_SALES_REP ? (
+            {isSalesRep ? (
               ""
             ) : (
               <div className="flex mb-2 w-full mt-4 gap-4 items-center">

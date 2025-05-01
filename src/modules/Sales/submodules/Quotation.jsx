@@ -21,11 +21,16 @@ import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
 import { useMutation } from "@tanstack/react-query";
-import { POST } from "../api/api";
+import { GET, POST } from "../api/api";
 
 import generateRandomID from "../components/GenerateID";
 
-const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
+const Quotation = ({
+  loadSubModule,
+  setActiveSubModule,
+  employee_id,
+  position_id,
+}) => {
   // TEMPORARY CONSTANT VALUE FOR EMPLOYEE LOGGED IN
   const IS_SALES_REP = true;
 
@@ -53,6 +58,24 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   });
 
   const [copyToModal, setCopyToModal] = useState("");
+  const [isSalesRep, setIsSalesRep] = useState(false);
+
+  useEffect(() => {
+    const get = async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (res.position_id === "REG-2504-6039" || res.is_supervisor) {
+          setIsSalesRep(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee data.",
+        });
+      }
+    };
+    get();
+  }, []);
   // save current info to local storage
   // navigate to selected modal
   // use local storage to populate the fields
@@ -284,7 +307,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   }, [selectedCustomer]);
 
   function handleCustomerSelection() {
-    if (IS_SALES_REP) {
+    if (isSalesRep) {
       setIsCustomerListOpen(true);
     } else {
       setIsEmployeeListOpen(true);
@@ -372,6 +395,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                   setCanClear(true);
                   setIsProductListOpen(true);
                 }}
+                disabled={!isSalesRep}
               >
                 Add Item
               </Button>
@@ -381,14 +405,14 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             </div>
 
             {/* Employee ID Input */}
-            {/* <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+            <div className="flex mb-2 w-full mt-4 gap-4 items-center">
               <p className="">Sales Rep ID</p>
               <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
-                <p className="text-sm">
-                  {IS_SALES_REP ? employee_id : "PLACEHOLDER"}
-                </p>
+                <p className="text-sm">{employee_id}</p>
               </div>
             </div>
+
+            {/*
 
             {IS_SALES_REP ? (
               ""
@@ -403,7 +427,12 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto gap-2 flex">
-              <Button type="primary" className="" onClick={handleSubmit}>
+              <Button
+                type="primary"
+                className=""
+                onClick={handleSubmit}
+                disabled={!isSalesRep}
+              >
                 Submit Quotation
               </Button>
               <Button
@@ -479,13 +508,19 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   );
 };
 
-const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
+const BodyContent = ({
+  loadSubModule,
+  setActiveSubModule,
+  employee_id,
+  position_id,
+}) => {
   return (
     <AlertProvider>
       <Quotation
         loadSubModule={loadSubModule}
         setActiveSubModule={setActiveSubModule}
         employee_id={employee_id}
+        position_id={position_id}
       />
     </AlertProvider>
   );

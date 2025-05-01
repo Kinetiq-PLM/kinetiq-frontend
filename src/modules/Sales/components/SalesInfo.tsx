@@ -136,23 +136,21 @@ const DatePostedSelector = ({
   customer,
   setDatePosted,
   disabled = false,
+  defaultDate = new Date().toISOString().split("T")[0], // Convert to YYYY-MM-DD format
 }) => {
-  // Calculate the default date (3 days from today)
+  const [date, setDate] = useState(customer.posted_date || defaultDate);
 
-  // Initialize state with the customer's delivery date or default date
-  const [date, setDate] = useState(customer.posted_date);
-
-  // Effect to set the default date when the component mounts
   useEffect(() => {
-    if (!customer.delivery_date) {
-      //setDatePosted(defaultDate);
+    if (!customer.posted_date) {
+      setDate(defaultDate); // Update local state
+      setDatePosted(defaultDate);
     }
-  }, []); // Runs only once on mount
+  }, [customer.posted_date, defaultDate, setDatePosted]);
 
   const handleDateChange = (event) => {
     const selectedDate = event.target.value;
+    setDate(selectedDate); // Update local state
     setDatePosted(selectedDate);
-    //setDatePosted(selectedDate);
   };
 
   return (
@@ -160,9 +158,9 @@ const DatePostedSelector = ({
       <p className="w-[150px]">{label}</p>
       <input
         type="date"
-        className="border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded cursor-pointer  text-sm disabled:cursor-default disabled:bg-[#f7f7f7]"
+        className="border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded cursor-pointer text-sm disabled:cursor-default disabled:bg-[#f7f7f7]"
         onChange={handleDateChange}
-        value={date} // Restrict to at least 3 days from now
+        value={date}
         disabled={disabled}
       />
     </div>
