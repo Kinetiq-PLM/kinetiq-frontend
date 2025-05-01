@@ -14,7 +14,9 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaArrowRight,
-  FaExclamationCircle
+  FaExclamationCircle,
+  FaBoxOpen,
+  FaBoxes
 } from "react-icons/fa";
 
 const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSave, onStatusUpdate }) => {
@@ -27,6 +29,8 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     total_packing_cost: 0
   });
   const [maxItemsCount, setMaxItemsCount] = useState(0);
+  // Add a state for total quantity
+  const [totalItemsQuantity, setTotalItemsQuantity] = useState(0);
   
   // Accordion state for collapsible sections
   const [expandedSections, setExpandedSections] = useState({
@@ -34,7 +38,8 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     pickingInfo: true,
     employee: true,
     packingType: true,
-    costs: true
+    costs: true,
+    items: true
   });
   
   // Check if packing list is already packed or shipped (both are final states for this module)
@@ -80,6 +85,23 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     }
   }, [packingList]);
 
+  // Add this useEffect to calculate total quantity when the packing list changes
+  useEffect(() => {
+    if (packingList?.items_details?.length > 0) {
+      // Calculate total quantity from item details
+      const totalQty = packingList.items_details.reduce((sum, item) => {
+        return sum + (parseInt(item.quantity) || 0);
+      }, 0);
+      
+      setTotalItemsQuantity(totalQty);
+      
+      // If total_items_packed is null, initialize it with total quantity
+      if (!packingList.total_items_packed || packingList.total_items_packed === null) {
+        handleInputChange('total_items_packed', totalQty);
+      }
+    }
+  }, [packingList]);
+
   // Toggle section expansion
   const toggleSection = (section) => {
     setExpandedSections({
@@ -93,11 +115,11 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     // Don't update if packed or shipped
     if (isNotEditable) return;
     
-    // For total_items_packed, limit to the max items count from picking list
+    // For total_items_packed, limit to the total quantity
     if (field === 'total_items_packed') {
       const numValue = parseInt(value) || 0;
-      // Ensure value doesn't exceed the max items count
-      const limitedValue = Math.min(numValue, maxItemsCount);
+      // Ensure value doesn't exceed the total items quantity
+      const limitedValue = Math.min(numValue, totalItemsQuantity);
       
       setEditedValues(prev => ({
         ...prev,
@@ -281,14 +303,108 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     if (packingCost.material_cost > 0) totalScore++;
     if (packingCost.labor_cost > 0) totalScore++;
     
-    // Add factor for packed items (as a percentage of max items)
+    // Add factor for packed items (as a percentage of total quantity)
     const currentItemsCount = editedValues.total_items_packed || packingList.total_items_packed || 0;
-    if (maxItemsCount > 0) {
-      const itemsPercentage = currentItemsCount / maxItemsCount;
+    if (totalItemsQuantity > 0) {
+      const itemsPercentage = currentItemsCount / totalItemsQuantity;
       totalScore += itemsPercentage; // This will add up to 1.0 for 100% packed
     }
     
     return (totalScore / maxScore) * 100;
+  };
+
+  // Render items section
+  const renderItemsSection = () => {
+    // Group items by warehouse
+    const warehouseGroups = [];
+    const warehouseMap = {};
+    let totalQuantity = 0;
+    
+    // Check if we have item details
+    if (packingList?.items_details?.length) {
+      // Group items by warehouse
+      packingList.items_details.forEach(item => {
+        const warehouseId = item.warehouse_id || 'unknown';
+        totalQuantity += parseInt(item.quantity) || 0;
+        
+        if (!warehouseMap[warehouseId]) {
+          const group = {
+            warehouseId,
+            warehouseName: item.warehouse_name || 'Unknown Warehouse',
+            items: [],
+            totalQuantity: 0
+          };
+          warehouseMap[warehouseId] = group;
+          warehouseGroups.push(group);
+        }
+        warehouseMap[warehouseId].items.push(item);
+        warehouseMap[warehouseId].totalQuantity += parseInt(item.quantity) || 0;
+      });
+    }
+  
+    const hasMultipleWarehouses = warehouseGroups.length > 1;
+  
+    return (
+      <div className="items-section">
+        <h4 className="section-title">
+          <FaBoxOpen className="section-icon" />
+          Items to Pack ({packingList?.items_details?.length || 0} items, {totalQuantity} units)
+        </h4>
+  
+        {warehouseGroups.length > 0 ? (
+          warehouseGroups.map((group, groupIndex) => (
+            <div key={group.warehouseId} className="warehouse-group">
+              <h5 className="warehouse-name">
+                <FaWarehouse className="warehouse-icon" /> {group.warehouseName}
+                <span className="warehouse-items-count">
+                  {group.items.length} item{group.items.length !== 1 ? 's' : ''}, {group.totalQuantity} units
+                </span>
+              </h5>
+              
+              <div className="items-table-container">
+                <table className="items-table">
+                  <thead>
+                    <tr>
+                      <th>Item Name</th>
+                      <th>Item Number</th>
+                      <th>Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {group.items.map((item, itemIndex) => (
+                      <tr key={itemIndex}>
+                        <td>{item.item_name}</td>
+                        <td>{item.item_no || '-'}</td>
+                        <td>{item.quantity}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {groupIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
+            </div>
+          ))
+        ) : (
+          <div className="items-table-container">
+            <table className="items-table">
+              <thead>
+                <tr>
+                  <th>Item Name</th>
+                  <th>Item Number</th>
+                  <th>Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colSpan="3" className="no-data">No items to display</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    );
   };
   
   return (
@@ -344,8 +460,8 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                     </div>
                     <div className="info-item">
                       <span className="info-label">
-                        Packed Items Count
-                        <span className="items-max-info">(Max: {maxItemsCount})</span>
+                        Packed Items Quantity
+                        <span className="items-max-info">(Max: {totalItemsQuantity})</span>
                       </span>
                       {isNotEditable ? (
                         <span className="info-value">{packingList.total_items_packed || '0'}</span>
@@ -357,20 +473,20 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                             value={editedValues.total_items_packed || packingList.total_items_packed || ''}
                             onChange={(e) => handleInputChange('total_items_packed', parseInt(e.target.value) || 0)}
                             min="0"
-                            max={maxItemsCount}
+                            max={totalItemsQuantity}
                           />
                           <div className="slider-container">
                             <input
                               type="range"
                               min="0"
-                              max={maxItemsCount}
+                              max={totalItemsQuantity}
                               value={editedValues.total_items_packed || packingList.total_items_packed || 0}
                               onChange={(e) => handleInputChange('total_items_packed', parseInt(e.target.value))}
                               className="range-slider"
                             />
                             <div className="range-labels">
                               <span>0</span>
-                              <span>{maxItemsCount}</span>
+                              <span>{totalItemsQuantity}</span>
                             </div>
                           </div>
                         </div>
@@ -569,6 +685,28 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                       )}
                     </div>
                   )}
+                </div>
+              )}
+            </div>
+
+            {/* Items Section */}
+            <div className="accordion-section">
+              <div 
+                className="accordion-header" 
+                onClick={() => toggleSection('items')}
+                aria-expanded={expandedSections.items}
+              >
+                <div className="accordion-title">
+                  <FaBoxes className="section-icon" /> Packing Items
+                </div>
+                <div className="accordion-toggle">
+                  {expandedSections.items ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
+              </div>
+              
+              {expandedSections.items && (
+                <div className="accordion-content">
+                  {renderItemsSection()}
                 </div>
               )}
             </div>

@@ -2020,3 +2020,104 @@
     border-radius: 4px;
   }
 }
+
+/* Add these styles to your frontend/src/modules/Distribution/styles/Packing.css */
+
+.packing .items-section {
+  margin-top: 1rem;
+}
+
+.packing .section-title {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.packing .section-icon {
+  margin-right: 0.5rem;
+  color: #00a8a8;
+}
+
+.packing .warehouse-group {
+  margin-bottom: 1.5rem;
+}
+
+.packing .warehouse-name {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.5rem 0;
+}
+
+.packing .warehouse-icon {
+  margin-right: 0.5rem;
+  color: #28a745;
+}
+
+.packing .warehouse-items-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  background-color: #e8f8ee;
+  color: #28a745;
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.packing .warehouse-divider {
+  border-top: 1px dashed #e0e0e0;
+  margin: 1rem 0;
+}
+
+.packing .items-table-container {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.packing .items-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.packing .items-table th {
+  text-align: left;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.packing .items-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+.packing .items-table .no-data {
+  text-align: center;
+  padding: 1rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.packing .item-count-badge {
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: 5px;
+}
+
+.packing .items-section .section-title {
+  margin-bottom: 1rem;
+}
+
+.packing .warehouse-items-count {
+  background-color: #f0f8ff;
+  border: 1px solid #b8d0e8;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  margin-left: 8px;
+  color: #0066cc;
+}
