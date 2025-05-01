@@ -307,11 +307,7 @@ const Quotation = ({
   }, [selectedCustomer]);
 
   function handleCustomerSelection() {
-    if (isSalesRep) {
-      setIsCustomerListOpen(true);
-    } else {
-      setIsEmployeeListOpen(true);
-    }
+    setIsCustomerListOpen(true);
   }
 
   useEffect(() => {
