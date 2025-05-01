@@ -95,11 +95,11 @@ export default function StandaloneLogin() {
 
       if (data.success) {
         localStorage.setItem('login_attempts', '0');
-        //console.log("Login successful:", data);
-        //localStorage.setItem("user", JSON.stringify(data.data));
+        console.log("Login successful:", data);
+        localStorage.setItem("user", JSON.stringify(data.data));
         setLoginError("");
-        setView("mfa");
-        //navigate("/");
+        //setView("mfa");
+        navigate("/");
       }
     } catch (err) {
       if (err.response && err.response.data) {
