@@ -1,6 +1,6 @@
 .accounting-table .table-container {
   width: 100%;
-  height: 60vh;
+  max-height: 60vh;
   overflow-y: auto;
   overflow-x: auto;
   position: relative;
@@ -11,7 +11,7 @@
 .accounting-table table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 .accounting-table thead {
@@ -48,7 +48,7 @@ tr:hover {
 
 .accounting-table th,
 td {
-  white-space: normal;
+  white-space: nowrap;
   word-wrap: break-word;
   overflow: hidden;
 }

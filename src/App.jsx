@@ -388,12 +388,12 @@ function App() {
       "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
       "General Ledger Accounts": "GeneralLedgerAccounts",
-      "Accounts Receivable": "AccountsReceivable",
-      "Accounts Payable": "AccountsPayable",
+      // "Accounts Payable": "AccountsPayable",
+      // "Accounts Receivable": "AccountsReceivable",
       "Official Receipts": "OfficialReceipts",
-      "Tax and Remittances":"TaxAndRemittances",
-      "Payroll Receipts":"PayrollReceipts",
-      "Accounts Payable Receipts":"AccountsPayableReceipts",
+      "Payroll Accounting": "PayrollAccounting",
+      "Tax and Remittance": "TaxAndRemittance",
+      "Accounts Payable Receipts": "AccountsPayableReceipts",
     },
     "Financials": {
       "Reports": "Reports",
@@ -460,6 +460,7 @@ function App() {
     "MRP": {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
       "Bills Of Material": "BillsOfMaterial",
+      "Product Materials": "ProductMaterials",
     },
     "Project Management": {
       "Project List": "Project List",
