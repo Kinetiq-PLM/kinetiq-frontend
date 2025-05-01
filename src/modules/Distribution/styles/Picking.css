@@ -1758,13 +1758,14 @@
 .picking .items-table {
   width: 100%;
   border-collapse: collapse;
+  text-align: center;
 }
 
 .picking .items-table th {
   padding: 12px 16px;
   background-color: #f8f9fa;
   border-bottom: 1px solid #e0e0e0;
-  text-align: left;
+  text-align: center;
   font-size: 0.85rem;
   font-weight: 500;
   color: #495057;
@@ -1775,6 +1776,7 @@
   border-bottom: 1px solid #e9ecef;
   font-size: 0.9rem;
   color: #212529;
+  text-align: center;
 }
 
 .picking .items-table tr:last-child td {
@@ -1840,4 +1842,105 @@
     padding: 10px 8px;
     font-size: 0.8rem;
   }
+}
+
+.warehouse-group {
+  margin-bottom: 1.5rem;
+}
+
+.warehouse-name {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border-left: 3px solid #00a8a8;
+}
+
+.warehouse-icon {
+  margin-right: 0.5rem;
+}
+
+.warehouse-divider {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px dashed #e0e0e0;
+}
+
+/* Add to your Picking.css file */
+.picking-progress {
+  margin: 15px 0;
+}
+
+.progress-bar-container {
+  height: 15px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  text-align: center;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.warehouse-progress {
+  font-size: 0.8em;
+  margin-left: 10px;
+  color: #666;
+}
+
+.item-toggle-button {
+  padding: 5px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9em;
+}
+
+.item-toggle-button.pick {
+  background-color: #e0f2f1;
+  color: #00796b;
+}
+
+.item-toggle-button.unpick {
+  background-color: #f1f8e9;
+  color: #558b2f;
+}
+
+.item-toggle-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.picked-status {
+  color: #4caf50;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.not-picked-status {
+  color: #ff9800;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.picked-row {
+  background-color: #f1f8e9 !important;
 }

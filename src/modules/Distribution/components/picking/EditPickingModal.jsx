@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/Picking.css';
+import { FaRegSquare, FaCheckSquare, FaWarehouse, FaBoxOpen, FaClock } from 'react-icons/fa';
 
 const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, warehouses, onStatusUpdate }) => {
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [modified, setModified] = useState(false);
   const [activeTab, setActiveTab] = useState('general'); // Add state for tab navigation
+  const [pickingItems, setPickingItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [pickingProgress, setPickingProgress] = useState(0);
   
   // Check if picking list is completed
   const isCompleted = pickingList?.picked_status === 'Completed';
@@ -114,6 +118,143 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     }
   };
   
+  // Function to render items tab with warehouse grouping
+  const renderItemsTab = () => {
+    // Group items by warehouse
+    const warehouseGroups = [];
+    const warehouseMap = {};
+
+    // Show loading indicator
+    if (loading) {
+      return (
+        <div className="items-section loading">
+          <div className="spinner"></div>
+          <p>Loading items...</p>
+        </div>
+      );
+    }
+
+    // Use pickingItems if available, otherwise fall back to items_details
+    const items = pickingItems.length > 0 ? pickingItems : 
+      (pickingList?.items_details?.length ? pickingList.items_details : []);
+
+    // Only process if we have items
+    if (items.length) {
+      // Group items by warehouse
+      items.forEach(item => {
+        const warehouseId = item.warehouse_id || 'unknown';
+        if (!warehouseMap[warehouseId]) {
+          const group = {
+            warehouseId,
+            warehouseName: item.warehouse_name || 'Unknown Warehouse',
+            items: []
+          };
+          warehouseMap[warehouseId] = group;
+          warehouseGroups.push(group);
+        }
+        warehouseMap[warehouseId].items.push(item);
+      });
+    }
+
+    const hasMultipleWarehouses = warehouseGroups.length > 1;
+
+    return (
+      <div className="items-section">
+        <h4 className="section-title">
+          <span className="section-icon">📦</span>
+          Items to Pick ({items.length})
+        </h4>
+
+        {/* Add progress bar */}
+        <div className="picking-progress">
+          <div className="progress-bar-container">
+            <div className="progress-bar" style={{ width: `${pickingProgress}%` }}></div>
+          </div>
+          <div className="progress-text">{pickingProgress}% completed</div>
+        </div>
+
+        {warehouseGroups.length > 0 ? (
+          warehouseGroups.map((group, groupIndex) => (
+            <div key={group.warehouseId} className="warehouse-group">
+              <h5 className="warehouse-name">
+                <FaWarehouse className="warehouse-icon" /> {group.warehouseName}
+                <span className="warehouse-progress">
+                  {group.items.filter(item => item.is_picked).length} / {group.items.length} items picked
+                </span>
+              </h5>
+              
+              <div className="items-table-container">
+                <table className="items-table">
+                  <thead>
+                    <tr>
+                      <th>Status</th>
+                      <th>Item Name</th>
+                      <th>Quantity</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {group.items.map((item, index) => (
+                      <tr key={item.inventory_item_id || index} 
+                          className={`${index % 2 === 0 ? 'even-row' : 'odd-row'} ${item.is_picked ? 'picked-row' : ''}`}>
+                        <td>
+                          {item.is_picked ? 
+                            <span className="picked-status">Picked</span> : 
+                            <span className="not-picked-status">Not Picked</span>
+                          }
+                        </td>
+                        <td>{item.item_name || 'Unknown Item'}</td>
+                        <td className="centered-cell">{item.quantity || 0}</td>
+                        <td>
+                          {!isCompleted && (
+                            <button 
+                              className={`item-toggle-button ${item.is_picked ? 'unpick' : 'pick'}`}
+                              onClick={() => toggleItemPicked(item)}
+                              disabled={!selectedEmployee}
+                            >
+                              {item.is_picked ? 
+                                <>
+                                  <FaCheckSquare /> Unpick
+                                </> : 
+                                <>
+                                  <FaRegSquare /> Mark as Picked
+                                </>
+                              }
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {groupIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
+            </div>
+          ))
+        ) : (
+          <div className="items-table-container">
+            <table className="items-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Item Name</th>
+                  <th>Quantity</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colSpan="4" className="no-data">No items to display</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    );
+  };
+  
   if (!pickingList) return null;
 
   // Get employee name from ID
@@ -155,6 +296,90 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     }
     
     return 'Not assigned';
+  };
+
+  // Function to fetch picking items
+  const fetchPickingItems = async () => {
+    if (!pickingList) return;
+    
+    try {
+      setLoading(true);
+      // First try to get existing items
+      let response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/items/`);
+      let data = await response.json();
+      
+      // If no items exist yet, create them
+      if (!response.ok || data.length === 0) {
+        await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/create-items/`, {
+          method: 'POST'
+        });
+        
+        // Fetch again after creating
+        response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/items/`);
+        data = await response.json();
+      }
+      
+      setPickingItems(data);
+      
+      // Calculate progress
+      const totalItems = data.length;
+      const pickedItems = data.filter(item => item.is_picked).length;
+      setPickingProgress(totalItems > 0 ? Math.round((pickedItems / totalItems) * 100) : 0);
+      
+    } catch (err) {
+      console.error('Error fetching picking items:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch picking items when picking list changes
+  useEffect(() => {
+    if (pickingList && pickingList.picked_status === 'In Progress') {
+      fetchPickingItems();
+    }
+  }, [pickingList]);
+
+  // Function to toggle item picked status
+  const toggleItemPicked = async (item) => {
+    if (isCompleted) return;
+    
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/picking-items/${item.picking_item_id}/update/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          is_picked: !item.is_picked,
+          picked_by: selectedEmployee,
+          picked_at: !item.is_picked ? new Date().toISOString() : null,
+          quantity_picked: !item.is_picked ? item.quantity : 0,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update item status');
+      }
+      
+      // Update local state
+      const updatedItem = await response.json();
+      setPickingItems(prev => prev.map(i => 
+        i.picking_item_id === updatedItem.picking_item_id ? updatedItem : i
+      ));
+      
+      // Recalculate progress
+      const updatedItems = pickingItems.map(i => 
+        i.picking_item_id === updatedItem.picking_item_id ? updatedItem : i
+      );
+      const totalItems = updatedItems.length;
+      const pickedItems = updatedItems.filter(i => i.is_picked).length;
+      setPickingProgress(totalItems > 0 ? Math.round((pickedItems / totalItems) * 100) : 0);
+      
+    } catch (err) {
+      console.error('Error updating item status:', err);
+      alert('Failed to update item status');
+    }
   };
 
   return (
@@ -359,55 +584,8 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
             </>
           )}
 
-          {/* Items Tab Content */}
-          {activeTab === 'items' && (
-            <div className="items-section">
-              <h4 className="section-title">
-                <span className="section-icon">📦</span>
-                Items to Pick ({pickingList.items_details?.length || 0})
-              </h4>
-              
-              <div className="items-table-container">
-                <table className="items-table">
-                  <thead>
-                    <tr>
-                      <th>Item No.</th>
-                      <th>Item Name</th>
-                      <th>Quantity</th>
-                      <th>Warehouse</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pickingList.items_details && pickingList.items_details.length > 0 ? (
-                      pickingList.items_details.map((item, index) => (
-                        <tr key={item.inventory_item_id} className={index % 2 === 0 ? 'even-row' : 'odd-row'}>
-                          <td>{item.item_no || '-'}</td>
-                          <td>{item.item_name || 'Unknown Item'}</td>
-                          <td className="centered-cell">{item.quantity || 0}</td>
-                          <td>{item.warehouse_name || '-'}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="4" className="no-data">No items to display</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              
-              {/* Show warning if items are from multiple warehouses */}
-              {pickingList.items_details && 
-               new Set(pickingList.items_details.map(item => item.warehouse_id)).size > 1 && (
-                <div className="multi-warehouse-warning">
-                  <span className="warning-icon">⚠️</span>
-                  <span className="warning-text">
-                    This order contains items from multiple warehouses. Items may need to be picked from different locations.
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
+          {/* Items Tab Content - Using the new grouping function */}
+          {activeTab === 'items' && renderItemsTab()}
         </div>
         
         <div className="modal-footer">

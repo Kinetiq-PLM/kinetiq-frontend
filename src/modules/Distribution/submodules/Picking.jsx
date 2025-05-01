@@ -175,60 +175,76 @@ const Picking = () => {
     }
   };
   
-  // Handle status update - Modified to remove warehouse selection logic
-  const handleStatusUpdate = async (list, newStatus, employeeId) => {
-    try {
-      // Build the update object
-      const updateData = {
-        picked_status: newStatus === 'Completed' ? 'In Progress' : newStatus // Don't set Completed yet
-      };
+  // Modify your handleStatusUpdate function
+
+const handleStatusUpdate = async (list, newStatus, employeeId) => {
+  try {
+    // Check if all items are picked when trying to complete
+    if (newStatus === 'Completed') {
+      // Fetch picking items
+      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/items/`);
+      const items = await response.json();
       
-      // Add employee if it changed
-      if (employeeId && employeeId !== list.picked_by) {
-        updateData.picked_by = employeeId;
+      // Check if all items are picked
+      const allPicked = items.length > 0 && items.every(item => item.is_picked);
+      
+      if (!allPicked) {
+        toast.error("Cannot complete picking: Not all items have been picked");
+        return;
       }
-      
-      // Always make the API call when status changes (or when completing)
-      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updateData),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update picking list status');
-      }
-  
-      // Find the warehouse name for display purposes
-      const warehouseName = warehouses.find(w => w.id === list.warehouse_id)?.name || list.warehouse_name;
-  
-      // Update the selectedList with the new values so completion modal has the latest data
-      setSelectedList(prev => ({
-        ...prev,
-        picked_by: employeeId || prev.picked_by,
-        warehouse_name: warehouseName,
-        picked_status: updateData.picked_status
-      }));
-      
-      // Refresh the list after successful update (only if not going to completion)
-      if (newStatus !== 'Completed') {
-        setRefreshTrigger(prev => prev + 1);
-        setShowEditModal(false);
-        toast.info(`Status updated to ${newStatus}`);
-      }
-      
-      // If trying to mark as Completed, show the completion modal
-      if (newStatus === 'Completed') {
-        setShowEditModal(false);
-        setShowCompletionModal(true);
-      }
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
     }
-  };
+  
+    // Build the update object
+    const updateData = {
+      picked_status: newStatus === 'Completed' ? 'In Progress' : newStatus // Don't set Completed yet
+    };
+    
+    // Add employee if it changed
+    if (employeeId && employeeId !== list.picked_by) {
+      updateData.picked_by = employeeId;
+    }
+    
+    // Always make the API call when status changes (or when completing)
+    const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update picking list status');
+    }
+
+    // Find the warehouse name for display purposes
+    const warehouseName = warehouses.find(w => w.id === list.warehouse_id)?.name || list.warehouse_name;
+
+    // Update the selectedList with the new values so completion modal has the latest data
+    setSelectedList(prev => ({
+      ...prev,
+      picked_by: employeeId || prev.picked_by,
+      warehouse_name: warehouseName,
+      picked_status: updateData.picked_status
+    }));
+    
+    // Refresh the list after successful update (only if not going to completion)
+    if (newStatus !== 'Completed') {
+      setRefreshTrigger(prev => prev + 1);
+      setShowEditModal(false);
+      toast.info(`Status updated to ${newStatus}`);
+    }
+    
+    // If trying to mark as Completed, show the completion modal
+    if (newStatus === 'Completed') {
+      setShowEditModal(false);
+      setShowCompletionModal(true);
+    }
+  } catch (err) {
+    toast.error(`Error: ${err.message}`);
+  }
+};
   
   // Handle completion confirmation
   const handleConfirmCompletion = async () => {

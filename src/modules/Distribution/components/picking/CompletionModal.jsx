@@ -56,8 +56,8 @@ const CompletionModal = ({ show, pickingList, onClose, onConfirm, employees, war
   };
 
   return (
-    <div className={`modal ${show ? 'show' : ''}`} onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()} aria-labelledby="modal-title">
+    <div className={`picking modal-overlay ${show ? 'show' : ''}`} onClick={onClose}>
+      <div className="modal-content improved" onClick={(e) => e.stopPropagation()} aria-labelledby="modal-title">
         <div className="modal-header">
           <h3 id="modal-title">
             <FaClipboardCheck className="title-icon" />
