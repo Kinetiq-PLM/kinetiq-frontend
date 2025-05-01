@@ -27,7 +27,7 @@ import generateRandomID from "../components/GenerateID";
 
 const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   // TEMPORARY CONSTANT VALUE FOR EMPLOYEE LOGGED IN
-  const IS_SALES_REP = false;
+  const IS_SALES_REP = true;
 
   const { showAlert } = useAlert();
   const copyFromOptions = [];
@@ -381,7 +381,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             </div>
 
             {/* Employee ID Input */}
-            <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+            {/* <div className="flex mb-2 w-full mt-4 gap-4 items-center">
               <p className="">Sales Rep ID</p>
               <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
                 <p className="text-sm">
@@ -399,7 +399,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                   <p className="text-sm">{employee_id || ""}</p>
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto gap-2 flex">
