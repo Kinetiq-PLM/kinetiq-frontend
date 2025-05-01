@@ -1,7 +1,7 @@
 import React from 'react';
 import "../../styles/DeliveryReceiptPDF.css";
 
-const DeliveryReceiptPDF = React.forwardRef(({ receipt, shipment, customer }, ref) => {
+const DeliveryReceiptPDF = React.forwardRef(({ receipt, shipment, customer, employees = [] }, ref) => {
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -16,6 +16,19 @@ const DeliveryReceiptPDF = React.forwardRef(({ receipt, shipment, customer }, re
     }).format(date);
   };
 
+  // Format currency
+  const formatCurrency = (amount) => {
+    if (amount === null || amount === undefined) return '₱0.00';
+    return `₱${parseFloat(amount).toFixed(2)}`;
+  };
+
+  // Helper for employee names
+  const getEmployeeName = (employeeId) => {
+    if (!employeeId) return '-';
+    const employee = employees.find(emp => emp.employee_id === employeeId);
+    return employee ? employee.full_name : employeeId;
+  };
+
   // Get package details from shipment data
   const getPackageDetails = () => {
     if (!shipment || !shipment.packing_list_info) {
@@ -24,7 +37,7 @@ const DeliveryReceiptPDF = React.forwardRef(({ receipt, shipment, customer }, re
     
     return {
       quantity: shipment.packing_list_info.total_items_packed || 1,
-      description: `${shipment.packing_list_info.packing_type || 'Box'} - ${shipment.tracking_number || ''}`,
+      description: shipment.packing_list_info.packing_type || 'Box',
       piecesPerPackage: 1, // Default
       numberOfPackages: shipment.packing_list_info.total_items_packed || 1
     };
@@ -36,15 +49,12 @@ const DeliveryReceiptPDF = React.forwardRef(({ receipt, shipment, customer }, re
   const getDestinationParts = () => {
     if (!shipment || !shipment.destination_location) {
       return {
-        address: 'N/A',
-        cityStateZip: 'N/A'
+        fullAddress: 'N/A'
       };
     }
     
-    const parts = shipment.destination_location.split(',');
     return {
-      address: parts[0].trim(),
-      cityStateZip: parts.slice(1).join(',').trim()
+      fullAddress: shipment.destination_location
     };
   };
 
@@ -94,6 +104,67 @@ const DeliveryReceiptPDF = React.forwardRef(({ receipt, shipment, customer }, re
           </div>
         </div>
         
+        {/* Shipment Information */}
+        <div className="info-card">
+          <div className="card-header">
+            <h2>Shipment Information</h2>
+          </div>
+          <div className="card-content">
+            <div className="info-grid">
+              <div className="info-column">
+                <div className="info-item">
+                  <span className="label">Tracking No:</span>
+                  <span className="value">{shipment?.tracking_number || 'N/A'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="label">Ship Date:</span>
+                  <span className="value">{formatDate(shipment?.shipment_date) || 'N/A'}</span>
+                </div>
+              </div>
+              <div className="info-column">
+                <div className="info-item">
+                  <span className="label">Est. Arrival:</span>
+                  <span className="value">{formatDate(shipment?.estimated_arrival_date) || 'N/A'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="label">Delivery Date:</span>
+                  <span className="value">{formatDate(shipment?.actual_arrival_date) || 'Pending'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="label">Carrier:</span>
+                  <span className="value">
+                    {shipment?.carrier_name || 
+                     (shipment?.carrier_id ? getEmployeeName(shipment.carrier_id) : 'Not Assigned')}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Source Warehouses */}
+        <div className="info-card">
+          <div className="card-header">
+            <h2>Source Warehouses</h2>
+          </div>
+          <div className="card-content">
+            <div className="info-grid">
+              {shipment?.source_warehouses && shipment.source_warehouses.map((warehouse, index) => (
+                <div className="info-item" key={index}>
+                  <span className="label">Warehouse {index + 1}:</span>
+                  <span className="value">{warehouse.location}</span>
+                </div>
+              ))}
+              {(!shipment?.source_warehouses || shipment.source_warehouses.length === 0) && (
+                <div className="info-item">
+                  <span className="label">Source:</span>
+                  <span className="value">No warehouse information available</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
         {/* Customer Information */}
         <div className="info-card">
           <div className="card-header">
@@ -107,57 +178,77 @@ const DeliveryReceiptPDF = React.forwardRef(({ receipt, shipment, customer }, re
                   <span className="value">{customer?.name || 'PhilCare Medical Supplies'}</span>
                 </div>
                 <div className="info-item">
-                  <span className="label">Phone:</span>
-                  <span className="value">{customer?.phone || 'N/A'}</span>
-                </div>
-              </div>
-              <div className="info-column">
-                <div className="info-item">
-                  <span className="label">Address:</span>
-                  <span className="value">{destinationParts.address || '678 Care Avenue'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="label">City/State/Zip:</span>
-                  <span className="value">{destinationParts.cityStateZip || 'Unit 4B, Quezon City, Manila, 1110, Philippines'}</span>
+                  <span className="label">Delivered To:</span>
+                  <span className="value">{destinationParts.fullAddress}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-        {/* Shipment Details */}
+        {/* Item Details Table */}
         <div className="info-card">
           <div className="card-header">
-            <h2>Shipment Details</h2>
+            <h2>Item Details</h2>
           </div>
           <div className="card-content">
             <table className="shipment-table">
               <thead>
                 <tr>
+                  <th>Item No</th>
+                  <th>Item Name</th>
                   <th>Quantity</th>
-                  <th>Description</th>
-                  <th>Pieces per Package</th>
-                  <th>Number of Packages</th>
+                  <th>Source Warehouse</th>
+                </tr>
+              </thead>
+              <tbody>
+                {shipment?.items_details?.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.item_no || 'N/A'}</td>
+                    <td>{item.item_name || 'Unknown Item'}</td>
+                    <td>{item.quantity || '0'}</td>
+                    <td>{item.warehouse_name || 'N/A'}</td>
+                  </tr>
+                )) || (
+                  <tr>
+                    <td colSpan="4" className="empty-message">No items available</td>
+                  </tr>
+                )}
+                {(!shipment?.items_details || shipment.items_details.length === 0) && (
+                  <tr className="empty-row">
+                    <td colSpan="4"></td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        {/* Package Summary */}
+        <div className="info-card">
+          <div className="card-header">
+            <h2>Package Summary</h2>
+          </div>
+          <div className="card-content">
+            <table className="shipment-table">
+              <thead>
+                <tr>
+                  <th>Package Type</th>
+                  <th>Total Items</th>
+                  <th>Packing Type</th>
+                  <th>Packed By</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>{packageDetails.quantity || '1'}</td>
-                  <td>{packageDetails.description || 'Box - TRK5-bb1289'}</td>
-                  <td>{packageDetails.piecesPerPackage || '1'}</td>
-                  <td>{packageDetails.numberOfPackages || '1'}</td>
-                </tr>
-                <tr className="empty-row">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr className="empty-row">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <td>{packageDetails.description || 'Standard Package'}</td>
+                  <td>{packageDetails.quantity || '0'}</td>
+                  <td>{shipment?.packing_list_info?.packing_type || 'Standard'}</td>
+                  <td>
+                    {shipment?.packing_list_info?.packed_by_name || 
+                     (shipment?.packing_list_info?.packed_by ? 
+                      getEmployeeName(shipment.packing_list_info.packed_by) : 'N/A')}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -169,6 +260,9 @@ const DeliveryReceiptPDF = React.forwardRef(({ receipt, shipment, customer }, re
           <div className="signature-area">
             <div className="signature-box">
               <div className="signature-label">Received By (Signature)</div>
+              {receipt?.signature && !receipt.signature.startsWith('data:') && (
+                <div className="signature-text">{receipt.signature}</div>
+              )}
             </div>
             <div className="date-box">
               <div className="date-line"></div>
@@ -179,6 +273,12 @@ const DeliveryReceiptPDF = React.forwardRef(({ receipt, shipment, customer }, re
             <div className="total-box">
               <div className="total-label">Total Packages</div>
               <div className="total-value">{packageDetails.numberOfPackages || '1'}</div>
+              {receipt?.total_amount > 0 && (
+                <>
+                  <div className="total-label" style={{marginTop: '10px'}}>Delivery Fee</div>
+                  <div className="total-value" style={{fontSize: '18px'}}>{formatCurrency(receipt?.total_amount)}</div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -191,6 +291,13 @@ const DeliveryReceiptPDF = React.forwardRef(({ receipt, shipment, customer }, re
           </svg>
           <span>This delivery contains medical supplies. Please handle with care and store according to proper healthcare guidelines.</span>
         </div>
+        
+        {/* Receipt Status */}
+        {receipt?.receipt_status && (
+          <div className={`receipt-status-indicator ${receipt.receipt_status.toLowerCase()}`}>
+            {receipt.receipt_status}
+          </div>
+        )}
       </div>
     </div>
   );

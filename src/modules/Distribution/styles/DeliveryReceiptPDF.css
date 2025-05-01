@@ -305,3 +305,50 @@
       margin: 0.5cm;
     }
   }
+
+  /* Additional styles for DeliveryReceiptPDF.css */
+
+/* Signature text */
+.delivery-receipt-pdf .signature-text {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 24px;
+  color: #00a8a8;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Empty message for tables */
+.delivery-receipt-pdf .empty-message {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+  padding: 20px;
+}
+
+/* Receipt status indicator */
+.delivery-receipt-pdf .receipt-status-indicator {
+  margin-top: 20px;
+  padding: 8px 12px;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+
+.delivery-receipt-pdf .receipt-status-indicator.received {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.delivery-receipt-pdf .receipt-status-indicator.rejected {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.delivery-receipt-pdf .receipt-status-indicator.pending {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}

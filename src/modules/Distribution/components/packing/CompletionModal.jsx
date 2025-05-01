@@ -98,7 +98,7 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
                   </div>
                 </div>
                 
-                <div className="detail-row">
+                {/* <div className="detail-row">
                   <div className="detail-item full-width">
                     <span className="detail-label">Total Cost</span>
                     <div className="detail-value-with-icon">
@@ -106,7 +106,7 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
                       <span className="cost-value">{formatCurrency(packingList.total_packing_cost)}</span>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
             
@@ -160,7 +160,7 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
                 
                 <div className="workflow-connector"></div>
                 
-                <div className="workflow-step">
+                {/* <div className="workflow-step">
                   <div className="step-number">4</div>
                   <div className="step-content">
                     <div className="step-icon-container">
@@ -170,7 +170,7 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
                       Create shipping cost and operational cost records
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
             

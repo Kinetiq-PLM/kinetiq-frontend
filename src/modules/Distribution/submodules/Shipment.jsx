@@ -700,6 +700,7 @@ const Shipment = () => {
             shipment={selectedShipment}
             onSave={handleUpdateDeliveryReceipt}
             onCancel={() => setShowDeliveryReceiptModal(false)}
+            employees={employees}
           />
         )}
         

@@ -4,7 +4,7 @@ import DeliveryReceiptPDF from './DeliveryReceiptPDF';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
+const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [deliveryReceipt, setDeliveryReceipt] = useState(null);
   const [error, setError] = useState(null);
@@ -489,10 +489,11 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
       {/* Hidden PDF component for generation */}
       <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
         <DeliveryReceiptPDF 
-          ref={pdfRef} 
-          receipt={deliveryReceipt} 
-          shipment={shipment} 
-          customer={customerData} 
+          ref={pdfRef}
+          receipt={deliveryReceipt}
+          shipment={shipment}
+          customer={customerData}
+          employees={employees} // Add this prop
         />
       </div>
     </div>

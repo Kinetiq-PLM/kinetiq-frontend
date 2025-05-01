@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { 
   FaUser, 
   FaBox, 
-  FaMoneyBillWave, 
   FaClipboardCheck, 
   FaInfoCircle, 
   FaTags,
@@ -13,7 +12,6 @@ import {
   FaShippingFast,
   FaChevronDown,
   FaChevronUp,
-  FaArrowRight,
   FaExclamationCircle,
   FaBoxOpen,
   FaBoxes
@@ -22,13 +20,9 @@ import {
 const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSave, onStatusUpdate }) => {
   // State for edited values
   const [editedValues, setEditedValues] = useState({});
-  // State for the current packing cost values
-  const [packingCost, setPackingCost] = useState({
-    material_cost: 0,
-    labor_cost: 0,
-    total_packing_cost: 0
-  });
+  // Remove packingCost state as we're removing cost functionality
   const [maxItemsCount, setMaxItemsCount] = useState(0);
+  
   // Add a state for total quantity
   const [totalItemsQuantity, setTotalItemsQuantity] = useState(0);
   
@@ -38,7 +32,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     pickingInfo: true,
     employee: true,
     packingType: true,
-    costs: true,
     items: true
   });
   
@@ -46,17 +39,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
   const isPacked = packingList?.packing_status === 'Packed';
   const isShipped = packingList?.packing_status === 'Shipped';
   const isNotEditable = isPacked || isShipped;
-  
-  // Load packing cost data from packingList when modal opens
-  useEffect(() => {
-    if (packingList && packingList.packing_cost_info) {
-      setPackingCost({
-        material_cost: packingList.packing_cost_info.material_cost || 0,
-        labor_cost: packingList.packing_cost_info.labor_cost || 0,
-        total_packing_cost: packingList.packing_cost_info.total_packing_cost || 0
-      });
-    }
-  }, [packingList]);
   
   useEffect(() => {
     // If we have picking_list_id, fetch the items_count to use as max value
@@ -135,33 +117,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     }));
   };
   
-  // Handle cost input changes
-  const handleCostChange = (field, value) => {
-    // Don't update if packed or shipped
-    if (isNotEditable) return;
-    
-    const numericValue = parseFloat(value);
-    
-    // Update local state for display
-    setPackingCost(prev => {
-      const newCost = {
-        ...prev,
-        [field]: isNaN(numericValue) ? 0 : numericValue
-      };
-      
-      // Calculate total automatically
-      newCost.total_packing_cost = newCost.material_cost + newCost.labor_cost;
-      
-      return newCost;
-    });
-    
-    // Also add to editedValues for saving
-    setEditedValues(prev => ({
-      ...prev,
-      [field]: isNaN(numericValue) ? 0 : numericValue
-    }));
-  };
-  
   // Handle save button click
   const handleSave = () => {
     if (isNotEditable) return;
@@ -173,12 +128,14 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return Object.keys(editedValues).length > 0;
   };
   
-  // Format currency
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-PH', {
-      style: 'currency',
-      currency: 'PHP'
-    }).format(value);
+  // Format for display purposes only
+  const formatDate = (dateStr) => {
+    if (!dateStr) return 'Not set';
+    try {
+      return new Date(dateStr).toLocaleDateString();
+    } catch (e) {
+      return dateStr;
+    }
   };
   
   // Get appropriate action label based on status
@@ -223,11 +180,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
       return true;
     }
     
-    // Make sure there are valid costs
-    if (packingCost.material_cost <= 0 && packingCost.labor_cost <= 0) {
-      return true;
-    }
-    
     return false;
   };
   
@@ -245,10 +197,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
       return 'Please select a packing type';
     }
     
-    if (packingCost.material_cost <= 0 && packingCost.labor_cost <= 0) {
-      return 'Please enter valid packing costs';
-    }
-    
     return '';
   };
   
@@ -263,9 +211,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
         ...editedValues,
         packed_by: editedValues.packed_by || packingList.packed_by,
         packing_type: editedValues.packing_type || packingList.packing_type,
-        material_cost: packingCost.material_cost,
-        labor_cost: packingCost.labor_cost,
-        total_packing_cost: packingCost.total_packing_cost
       };
       
       // Call onStatusUpdate with all the edited values
@@ -292,16 +237,14 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return `status-badge status-${status.toLowerCase()}`;
   };
   
-  // Get completion percentage based on filled fields
+  // Get completion percentage based on filled fields - updated without cost factors
   const getCompletionPercentage = () => {
     let totalScore = 0;
-    let maxScore = 5; // Now including 5 factors (4 original + items packed)
+    let maxScore = 3; // Now only 3 factors (employee, packing type, items packed)
     
-    // Original factors
+    // Required factors
     if (editedValues.packed_by || packingList.packed_by) totalScore++;
     if (editedValues.packing_type || packingList.packing_type) totalScore++;
-    if (packingCost.material_cost > 0) totalScore++;
-    if (packingCost.labor_cost > 0) totalScore++;
     
     // Add factor for packed items (as a percentage of total quantity)
     const currentItemsCount = editedValues.total_items_packed || packingList.total_items_packed || 0;
@@ -381,7 +324,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                   </tbody>
                 </table>
               </div>
-              
               {groupIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
             </div>
           ))
@@ -496,7 +438,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                       <div className="info-item">
                         <span className="info-label">Packing Date</span>
                         <div className="info-value-with-icon">
-                          {/* <FaCalendarAlt className="info-icon" /> */}
                           <span>{new Date(packingList.packing_date).toLocaleDateString()}</span>
                         </div>
                       </div>
@@ -609,85 +550,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                 </div>
               )}
             </div>
-            
-            {/* Packing Cost Section */}
-            <div className="accordion-section">
-              <div 
-                className="accordion-header" 
-                onClick={() => toggleSection('costs')}
-                aria-expanded={expandedSections.costs}
-              >
-                <div className="accordion-title">
-                  <FaMoneyBillWave className="section-icon" /> Packing Costs
-                  {!isNotEditable && (packingCost.material_cost <= 0 && packingCost.labor_cost <= 0) && 
-                    <span className="required-indicator">*</span>
-                  }
-                </div>
-                <div className="accordion-toggle">
-                  {expandedSections.costs ? <FaChevronUp /> : <FaChevronDown />}
-                </div>
-              </div>
-              
-              {expandedSections.costs && (
-                <div className="accordion-content">
-                  {isNotEditable ? (
-                    <div className="cost-display">
-                      <div className="cost-info-row">
-                        <span className="cost-label">Material Cost:</span>
-                        <span className="cost-value">{formatCurrency(packingCost.material_cost)}</span>
-                      </div>
-                      <div className="cost-info-row">
-                        <span className="cost-label">Labor Cost:</span>
-                        <span className="cost-value">{formatCurrency(packingCost.labor_cost)}</span>
-                      </div>
-                      <div className="cost-total-row">
-                        <span className="cost-total-label">Total Cost:</span>
-                        <span className="cost-total-value">
-                          {formatCurrency(packingCost.total_packing_cost)}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="cost-editing">
-                      <div className="cost-input-row">
-                        <label className="cost-label">Material Cost:</label>
-                        <input
-                          type="number"
-                          className="cost-input"
-                          value={packingCost.material_cost}
-                          onChange={(e) => handleCostChange('material_cost', e.target.value)}
-                          step="0.01"
-                          min="0"
-                          disabled={isNotEditable}
-                        />
-                      </div>
-                      <div className="cost-input-row">
-                        <label className="cost-label">Labor Cost:</label>
-                        <input
-                          type="number"
-                          className="cost-input"
-                          value={packingCost.labor_cost}
-                          onChange={(e) => handleCostChange('labor_cost', e.target.value)}
-                          step="0.01"
-                          min="0"
-                          disabled={isNotEditable}
-                        />
-                      </div>
-                      <div className="cost-total-row">
-                        <span className="cost-total-label">Total Cost:</span>
-                        <span className="cost-total-value">
-                          {formatCurrency(packingCost.total_packing_cost)}
-                        </span>
-                      </div>
-                      
-                      {(packingCost.material_cost <= 0 && packingCost.labor_cost <= 0) && (
-                        <div className="field-hint">At least one cost value must be greater than zero</div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
 
             {/* Items Section */}
             <div className="accordion-section">
@@ -755,14 +617,10 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                       </div>
                       <div className="next-step-item">
                         <div className="step-indicator">2</div>
-                        <span>The packing costs will be recorded</span>
-                      </div>
-                      <div className="next-step-item">
-                        <div className="step-indicator">3</div>
                         <span>A new shipment record will be created automatically</span>
                       </div>
                       <div className="next-step-item">
-                        <div className="step-indicator">4</div>
+                        <div className="step-indicator">3</div>
                         <span>The item will move to the shipping stage</span>
                       </div>
                     </div>

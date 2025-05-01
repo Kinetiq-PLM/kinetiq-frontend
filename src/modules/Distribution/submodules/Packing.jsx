@@ -1,4 +1,3 @@
-// Packing.jsx
 import React, { useState, useEffect } from "react";
 import "../styles/Packing.css";
 import PackingTable from "../components/packing/PackingTable";
@@ -276,7 +275,7 @@ const Packing = () => {
         {/* Add ToastContainer component */}
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} 
           newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
-
+        
         {/* Filters Row */}
         <div className="filters-row">
           <div className="search-container">

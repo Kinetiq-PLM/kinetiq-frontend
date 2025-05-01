@@ -3389,3 +3389,128 @@
     margin: 2px auto 0;
   }
 }
+
+/* Tab styles */
+.modal-tabs {
+  display: flex;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 1rem;
+}
+
+.tab-button {
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  color: #495057;
+  display: flex;
+  align-items: center;
+}
+
+.tab-button.active {
+  color: #00a8a8;
+  border-bottom: 2px solid #00a8a8;
+}
+
+.tab-icon {
+  margin-right: 0.5rem;
+}
+
+/* Items section styles */
+.items-section {
+  margin-top: 0.5rem;
+}
+
+.items-section .section-title {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.section-icon {
+  margin-right: 0.5rem;
+  color: #00a8a8;
+}
+
+.warehouse-group {
+  margin-bottom: 1.5rem;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.warehouse-name {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.warehouse-icon {
+  margin-right: 0.5rem;
+  color: #28a745;
+}
+
+.warehouse-items-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  background-color: #e8f8ee;
+  color: #28a745;
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.warehouse-divider {
+  border-top: 1px dashed #e0e0e0;
+  margin: 1rem 0;
+}
+
+.items-table-container {
+  overflow-x: auto;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.items-table th {
+  text-align: left;
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.items-table td {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+.no-items-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #6c757d;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #dee2e6;
+}
