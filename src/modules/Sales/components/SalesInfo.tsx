@@ -93,9 +93,7 @@ const DateIssuedSelector = ({
   customer,
   setDateIssued,
   disabled = true,
-  defaultDate = new Date(Date.now() * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split("T")[0],
+  defaultDate = new Date().toISOString().split("T")[0],
 }) => {
   // Calculate the default date (3 days from today)
 
@@ -226,6 +224,7 @@ const SalesInfo = ({
   date = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
     .toISOString()
     .split("T")[0],
+  dateIssued = new Date().toISOString().split("T")[0],
 }) => {
   const [issuedDateLocal, setIssuedDateLocal] = useState(
     customer.issued_date || date
@@ -268,7 +267,7 @@ const SalesInfo = ({
               setDateIssued(value);
             }}
             label={"Date Issued"}
-            defaultDate={date}
+            defaultDate={dateIssued}
           />
         ) : (
           ""
@@ -295,7 +294,7 @@ const SalesInfo = ({
               setDateIssued(value);
             }}
             label={"Date Issued"}
-            defaultDate={date}
+            defaultDate={dateIssued}
           />
         ) : (
           ""
