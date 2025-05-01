@@ -1,48 +1,29 @@
-// ProjectManagement.jsx with improved API integration, autocomplete, and Project Summary
-import React, { useState, useEffect } from "react";
+// ProjectManagement.jsx
+import React, { useState, useEffect, useRef } from "react";
+import { Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Chart, registerables } from 'chart.js';
 import "./styles/ProjectManagement.css";
 import axios from "axios";
-import { debounce } from 'lodash'; // You'll need to install lodash: npm install lodash
+
+ChartJS.register(ArcElement, Tooltip);
+Chart.register(...registerables);
 axios.defaults.baseURL = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev';
 const BodyContent = () => {
+    const [selectedProject, setSelectedProject] = useState(null);
+    const [projectDetail, setProjectDetail] = useState(null);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [overdueTasks, setOverdueTasks] = useState([]);
     const [todayTasks, setTodayTasks] = useState([]);
-    const [dataExternal, setDataExternal] = useState([]);
-    const [dataInternal, setDataInternal] = useState([]);
     const [projectSummary, setProjectSummary] = useState([]);
+    const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+    const [detailError, setDetailError] = useState(null);
   
-    const [selectedNav3, setSelectedNav3] = useState('All3');
-    const [selectedNav2, setSelectedNav2] = useState('Internal Project');
-    const [showAddProjectForm, setShowAddProjectForm] = useState(false);
-    const [selectedNavplan, setSelectedNavplan] = useState("External");
-  
-    // External project form state
-    const [newProjectIDExternal, setNewProjectIDExternal] = useState("");
-    const [selectedProjectMilestoneExternal, setSelectedProjectMilestoneExternal] = useState("");
-    const [newStartDateExternal, setNewStartDateExternal] = useState("");
-    const [newEndDateExternal, setNewEndDateExternal] = useState("");
-    const [newProjectIssueExternal, setNewProjectIssueExternal] = useState("");
-    const [newProjectWarrantyIDExternal, setNewProjectWarrantyIDExternal] = useState("");
-  
-    // Internal project form state
-    const [newProjectIDInternal, setNewProjectIDInternal] = useState("");
-    const [newStartDateInternal, setNewStartDateInternal] = useState("");
-    const [newEndDateInternal, setNewEndDateInternal] = useState("");
-    const [newProjectIssueInternal, setNewProjectIssueInternal] = useState("");
-    const [newProjectRequestIDInternal, setNewProjectRequestIDInternal] = useState("");
-    
-    // Search results state
-    const [externalProjectSearchResults, setExternalProjectSearchResults] = useState([]);
-    const [internalProjectSearchResults, setInternalProjectSearchResults] = useState([]);
-    const [warrantySearchResults, setWarrantySearchResults] = useState([]);
-    const [projectRequestSearchResults, setProjectRequestSearchResults] = useState([]);
+    const [selectedProjectType, setSelectedProjectType] = useState('All');
     
     // Loading states
     const [isLoading, setIsLoading] = useState({
         overdueTasks: false,
         todayTasks: false,
-        externalProjects: false,
-        internalProjects: false,
         projectSummary: false
     });
     
@@ -50,55 +31,18 @@ const BodyContent = () => {
     const [errors, setErrors] = useState({
         overdueTasks: null,
         todayTasks: null,
-        externalProjects: null,
-        internalProjects: null,
         projectSummary: null
     });
   
+    const chartRef = useRef(null);
+    const chartInstance = useRef(null);
+    
     // Fetch data on component mount
     useEffect(() => {
         fetchOverdueTasks();
         fetchTodayTasks();
-        fetchExternalProjects();
-        fetchInternalProjects();
         fetchProjectSummary();
     }, []);
-  
-    const fetchInitialExternalProjects = async () => {
-      try {
-          const response = await axios.get('/api/search-external-project/');
-          setExternalProjectSearchResults(response.data);
-      } catch (error) {
-          console.error("Error fetching initial external projects:", error);
-      }
-  };
-  
-  const fetchInitialInternalProjects = async () => {
-      try {
-          const response = await axios.get('/api/search-internal-project/');
-          setInternalProjectSearchResults(response.data);
-      } catch (error) {
-          console.error("Error fetching initial internal projects:", error);
-      }
-  };
-  
-  const fetchInitialWarranties = async () => {
-      try {
-          const response = await axios.get('/api/search-warranty/');
-          setWarrantySearchResults(response.data);
-      } catch (error) {
-          console.error("Error fetching initial warranties:", error);
-      }
-  };
-  
-  const fetchInitialProjectRequests = async () => {
-      try {
-          const response = await axios.get('/api/search-project-request/');
-          setProjectRequestSearchResults(response.data);
-      } catch (error) {
-          console.error("Error fetching initial project requests:", error);
-      }
-  };
 
     const fetchOverdueTasks = async () => {
         setIsLoading(prev => ({ ...prev, overdueTasks: true }));
@@ -127,37 +71,12 @@ const BodyContent = () => {
             setIsLoading(prev => ({ ...prev, todayTasks: false }));
         }
     };
-  
-    const fetchExternalProjects = async () => {
-        setIsLoading(prev => ({ ...prev, externalProjects: true }));
-        try {
-            const response = await axios.get('/api/external-projects/');
-            setDataExternal(response.data);
-            setErrors(prev => ({ ...prev, externalProjects: null }));
-        } catch (error) {
-            console.error("Error fetching external projects:", error);
-            setErrors(prev => ({ ...prev, externalProjects: "Failed to load external projects" }));
-        } finally {
-            setIsLoading(prev => ({ ...prev, externalProjects: false }));
-        }
-    };
-  
-    const fetchInternalProjects = async () => {
-        setIsLoading(prev => ({ ...prev, internalProjects: true }));
-        try {
-            const response = await axios.get('/api/internal-projects/');
-            setDataInternal(response.data);
-            setErrors(prev => ({ ...prev, internalProjects: null }));
-        } finally {
-            setIsLoading(prev => ({ ...prev, internalProjects: false }));
-        }
-    };
     
     const fetchProjectSummary = async () => {
       setIsLoading(prev => ({ ...prev, projectSummary: true }));
       try {
           const response = await axios.get('/api/project-summary/');
-          console.log("Project summary data:", response.data); // Add this for debugging
+          console.log("Project summary data:", response.data);
           setProjectSummary(response.data);
           setErrors(prev => ({ ...prev, projectSummary: null }));
       } catch (error) {
@@ -166,758 +85,581 @@ const BodyContent = () => {
       } finally {
           setIsLoading(prev => ({ ...prev, projectSummary: false }));
       }
-  };
+    };
   
-    
-    // Debounced search functions
-    const searchExternalProjects = debounce(async (query) => {
-        if (!query) {
-            setExternalProjectSearchResults([]);
-            return;
-        }
+    const fetchProjectDetail = async (project) => {
+        setIsLoadingDetail(true);
+        setDetailError(null);
         
         try {
-            const response = await axios.get(`/api/search-external-project/?query=${query}`);
-            setExternalProjectSearchResults(response.data);
+            const response = await axios.get(`/api/project-detail/${project.type}/${project.id}/`);
+            setProjectDetail(response.data);
         } catch (error) {
-            console.error("Error searching external projects:", error);
-            setExternalProjectSearchResults([]);
+            console.error("Error fetching project details:", error);
+            setDetailError(error.response?.data?.error || "Failed to load project details");
+        } finally {
+            setIsLoadingDetail(false);
         }
-    }, 300);
+    };
     
-    const searchInternalProjects = debounce(async (query) => {
-        if (!query) {
-            setInternalProjectSearchResults([]);
-            return;
-        }
-        
-        try {
-            const response = await axios.get(`/api/search-internal-project/?query=${query}`);
-            setInternalProjectSearchResults(response.data);
-        } catch (error) {
-            console.error("Error searching internal projects:", error);
-            setInternalProjectSearchResults([]);
-        }
-    }, 300);
-    
-    const searchWarranties = debounce(async (query) => {
-        if (!query) {
-            setWarrantySearchResults([]);
-            return;
-        }
-        
-        try {
-            const response = await axios.get(`/api/search-warranty/?query=${query}`);
-            setWarrantySearchResults(response.data);
-        } catch (error) {
-            console.error("Error searching warranties:", error);
-            setWarrantySearchResults([]);
-        }
-    }, 300);
-    
-    const searchProjectRequests = debounce(async (query) => {
-        if (!query) {
-            setProjectRequestSearchResults([]);
-            return;
-        }
-        
-        try {
-            const response = await axios.get(`/api/search-project-request/?query=${query}`);
-            setProjectRequestSearchResults(response.data);
-        } catch (error) {
-            console.error("Error searching project requests:", error);
-            setProjectRequestSearchResults([]);
-        }
-    }, 300);
-  
-const handleNavClickdash = (nav) => {
-    setSelectedNavplan(nav);
-    
-    if (nav === "External") {
-        fetchInitialExternalProjects();
-        fetchInitialWarranties();
-    } else {
-        fetchInitialInternalProjects();
-        fetchInitialProjectRequests();
-    }
-};
+    const handleProjectRowClick = (project) => {
+        setSelectedProject(project);
+        fetchProjectDetail(project);
+        setShowDetailsModal(true);
+    };
 
-  
-    const handleNavClick = (navItem) => {
-        setSelectedNav2(navItem);
+    const closeDetailsModal = () => {
+        setShowDetailsModal(false);
+        setProjectDetail(null);
     };
-  
-    const handleNavClick2 = (navItem) => {
-        setSelectedNav3(navItem);
+
+    const filteredProjects = projectSummary.filter(project => 
+        selectedProjectType === 'All' || project.type === selectedProjectType
+    );
+
+    // Chart data
+    const progressPercentage = 60;
+    const pendingCount = 7;
+    const needActionCount = 12;
+    const weeklyImprovement = 37; 
+
+    const chartData = {
+        datasets: [
+            {
+                data: [progressPercentage, 100 - progressPercentage],
+                backgroundColor: ['#087D7D', '#E8E8E8'],
+                borderWidth: 0,
+                circumference: 270, 
+                rotation: 225, 
+            },
+        ],
     };
-  
-    const handleAddProjectClick = () => {
-      setShowAddProjectForm(true);
-      
-      // Fetch initial data for the forms
-      if (selectedNavplan === "External") {
-          fetchInitialExternalProjects();
-          fetchInitialWarranties();
-      } else {
-          fetchInitialInternalProjects();
-          fetchInitialProjectRequests();
+
+    const chartOptions = {
+        cutout: '80%',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            tooltip: {
+                enabled: false,
+            },
+            legend: {
+                display: false,
+            },
+        },
+    };
+
+    const delayedPercentage = 2;
+    const chartData3 = {
+        datasets: [
+            {
+                data: [delayedPercentage, 100 - delayedPercentage],
+                backgroundColor: ['#00A8A8', '#E8E8E8'],
+                borderWidth: 0,
+                circumference: 270, 
+                rotation: 225, 
+            },
+        ],
+    };
+
+    const chartOptions3 = {
+        cutout: '80%',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            tooltip: {
+                enabled: false,
+            },
+            legend: {
+                display: false,
+            },
+        },
+    };
+
+    const ongoingPercentage = 15;
+    const chartData2 = {
+        datasets: [
+            {
+                data: [ongoingPercentage, 100 - ongoingPercentage],
+                backgroundColor: ['#469FC2', '#E8E8E8'],
+                borderWidth: 0,
+                circumference: 270, 
+                rotation: 225, 
+            },
+        ],
+    };
+
+    const chartOptions2 = {
+        cutout: '80%',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            tooltip: {
+                enabled: false,
+            },
+            legend: {
+                display: false,
+            },
+        },
+    };
+
+    const completedPercentage = 25;
+    const chartData5 = {
+        datasets: [
+            {
+                data: [completedPercentage, 100 - completedPercentage],
+                backgroundColor: ['#00A8A8', '#E8E8E8'],
+                borderWidth: 0,
+                circumference: 270, 
+                rotation: 225, 
+            },
+        ],
+    };
+
+    const chartOptions5 = {
+        cutout: '80%',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            tooltip: {
+                enabled: false,
+            },
+            legend: {
+                display: false,
+            },
+        },
+    };
+
+    useEffect(() => {
+      if (chartInstance.current) {
+        chartInstance.current.destroy();
       }
-  };
-  
-    const handleAddExternalProject = async (e) => {
-        e.preventDefault();
-        try {
-            const projectData = {
-                project_id: newProjectIDExternal,
-                project_milestone: selectedProjectMilestoneExternal,
-                start_date: newStartDateExternal,
-                estimated_end_date: newEndDateExternal,
-                project_warranty_id: newProjectWarrantyIDExternal,
-                project_issue: newProjectIssueExternal
-            };
-            
-            await axios.post('/api/create-external-project/', projectData);
-            await fetchExternalProjects(); // Refresh the list after adding
-            await fetchProjectSummary(); // Also refresh the summary
-            setShowAddProjectForm(false);
-            resetExternalForm();
-        } catch (error) {
-            console.error("Error creating external project:", error);
-            alert("Failed to create external project. Please try again.");
+
+      const ctx = chartRef.current.getContext('2d');
+      
+      chartInstance.current = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+          datasets: [
+            {
+              label: 'Complete',
+              data: [5, 7, 12, 14, 15, 20],
+              backgroundColor: 'rgba(20, 162, 160, 1)',
+              borderColor: 'rgba(20, 162, 160, 1)',
+              fill: 'origin',
+              tension: 0.4,
+            },
+            {
+              label: 'Incomplete',
+              data: [5, 10, 15, 20, 23, 30],
+              backgroundColor: 'rgba(173, 238, 238, 0.7)',
+              borderColor: 'rgba(173, 238, 238, 1)',
+              fill: 'origin',
+              tension: 0.4,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              grid: {
+                display: false,
+              }
+            },
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(200, 200, 200, 0.3)',
+              },
+              ticks: {
+                stepSize: 5
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              align: 'end',
+              labels: {
+                usePointStyle: true,
+                boxWidth: 10
+              }
+            },
+            title: {
+              display: true,
+              align: 'start',
+              font: {
+                size: 16,
+                weight: 'bold'
+              },
+              padding: {
+                top: 10,
+                bottom: 20
+              }
+            }
+          },
+          elements: {
+            line: {
+              tension: 0.4
+            }
+          }
         }
-    };
-  
-    const handleAddInternalProject = async (e) => {
-        e.preventDefault();
-        try {
-            const projectData = {
-                project_id: newProjectIDInternal,
-                start_date: newStartDateInternal,
-                estimated_end_date: newEndDateInternal,
-                project_issue: newProjectIssueInternal,
-                project_request_id: newProjectRequestIDInternal
-            };
-            
-            await axios.post('/api/create-internal-project/', projectData);
-            await fetchInternalProjects(); // Refresh the list after adding
-            await fetchProjectSummary(); // Also refresh the summary
-            setShowAddProjectForm(false);
-            resetInternalForm();
-        } catch (error) {
-            console.error("Error creating internal project:", error);
-            alert("Failed to create internal project. Please try again.");
+      });
+
+      // Cleanup function
+      return () => {
+        if (chartInstance.current) {
+          chartInstance.current.destroy();
         }
-    };
-  
-    const resetExternalForm = () => {
-        setNewProjectIDExternal("");
-        setSelectedProjectMilestoneExternal("");
-        setNewStartDateExternal("");
-        setNewEndDateExternal("");
-        setNewProjectWarrantyIDExternal("");
-        setNewProjectIssueExternal("");
-        setExternalProjectSearchResults([]);
-        setWarrantySearchResults([]);
-    };
-  
-    const resetInternalForm = () => {
-        setNewProjectIDInternal("");
-        setNewStartDateInternal("");
-        setNewEndDateInternal("");
-        setNewProjectIssueInternal("");
-        setNewProjectRequestIDInternal("");
-        setInternalProjectSearchResults([]);
-        setProjectRequestSearchResults([]);
-    };
-  
-    const handleCancelAddProject = () => {
-        setShowAddProjectForm(false);
-        resetExternalForm();
-        resetInternalForm();
-    };
+      };
+    }, []);
     
-    // Handle project ID search input
-    const handleExternalProjectIDChange = (e) => {
-        const value = e.target.value;
-        setNewProjectIDExternal(value);
-        searchExternalProjects(value);
-    };
-    
-    const handleInternalProjectIDChange = (e) => {
-        const value = e.target.value;
-        setNewProjectIDInternal(value);
-        searchInternalProjects(value);
-    };
-    
-    // Handle warranty ID search input
-    const handleWarrantyIDChange = (e) => {
-        const value = e.target.value;
-        setNewProjectWarrantyIDExternal(value);
-        searchWarranties(value);
-    };
-    
-    // Handle project request ID search input
-    const handleProjectRequestIDChange = (e) => {
-        const value = e.target.value;
-        setNewProjectRequestIDInternal(value);
-        searchProjectRequests(value);
-    };
-    
-    // Select a project from search results
-    const selectExternalProject = (project) => {
-        setNewProjectIDExternal(project.project_id);
-        setExternalProjectSearchResults([]);
-    };
-    
-    const selectInternalProject = (project) => {
-        setNewProjectIDInternal(project.intrnl_project_id);
-        setInternalProjectSearchResults([]);
-    };
-    
-    // Select a warranty from search results
-    const selectWarranty = (warranty) => {
-        setNewProjectWarrantyIDExternal(warranty.id);
-        setWarrantySearchResults([]);
-    };
-    
-    // Select a project request from search results
-    const selectProjectRequest = (request) => {
-        setNewProjectRequestIDInternal(request.project_request_id);
-        setProjectRequestSearchResults([]);
-    };
     return (
         <div className="project-management-container">
-            {!showAddProjectForm ? (
-                <div className="dashboard-view">
-                    {/* Header Section */}
-                    <div className="dashboard-header">
-                        <h1 className="dashboard-title">Project Overview</h1>
-                        <button className="new-task-btn">+ New Task</button>
-                    </div>
-
-                    {/* Main Dashboard Sections */}
-                    <div className="dashboard-sections">
-                        {/* Overdue Tasks Section */}
-                        <div className="dashboard-section overdue-tasks-section">
-                            <div className="section-header">
-                                <h2>Overdue Tasks</h2>
-                            </div>
-                            <div className="section-content">
-                                <table className="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Overdue</th>
-                                            <th>Task</th>
-                                            <th>Deadline</th>
-                                            <th>Employee</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {console.log("printing overduetasks var:")}
-                                        {console.log(overdueTasks)}
-                                        {isLoading.overdueTasks ? (
-                                            <tr><td colSpan="4" className="loading-cell">Loading...</td></tr>
-                                        ) : errors.overdueTasks ? (
-                                            <tr><td colSpan="4" className="error-cell">Error: {errors.overdueTasks}</td></tr>
-                                        ) : overdueTasks.length === 0 ? (
-                                            <tr><td colSpan="4" className="no-data-cell">No overdue tasks</td></tr>
-                                        ) : (
-                                            overdueTasks.map((item, index) => (
-                                                <tr key={index}>
-                                                    <td className="due"><b>{item.Overdue}</b></td>
-                                                    <td>{item.Task}</td>
-                                                    <td>{item.Deadline}</td>
-                                                    <td>{item.Employee}</td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {/* Today's Tasks Section */}
-                        <div className="dashboard-section todays-tasks-section">
-                            <div className="section-header">
-                                <h2>Today's Tasks</h2>
-                            </div>
-                            <div className="section-content">
-                                <div className="task-tabs">
-                                    <button
-                                        className={`task-tab ${selectedNav3 === 'All3' ? 'active' : ''}`}
-                                        onClick={() => handleNavClick2('All3')}
-                                    >
-                                        All
-                                    </button>
-                                    <button
-                                        className={`task-tab ${selectedNav3 === 'Important' ? 'active' : ''}`}
-                                        onClick={() => handleNavClick2('Important')}
-                                    >
-                                        Important
-                                    </button>
-                                    <button
-                                        className={`task-tab ${selectedNav3 === 'Notes' ? 'active' : ''}`}
-                                        onClick={() => handleNavClick2('Notes')}
-                                    >
-                                        Notes
-                                    </button>
-                                    <button
-                                        className={`task-tab ${selectedNav3 === 'Links' ? 'active' : ''}`}
-                                        onClick={() => handleNavClick2('Links')}
-                                    >
-                                        Links
-                                    </button>
-                                </div>
-
-                                {selectedNav3 === 'All3' && (
-                                    <div className="task-list-container">
-                                        {isLoading.todayTasks ? (
-                                            <div className="loading-cell">Loading...</div>
-                                        ) : errors.todayTasks ? (
-                                            <div className="error-cell">Error: {errors.todayTasks}</div>
-                                        ) : todayTasks.length === 0 ? (
-                                            <div className="no-data-cell">No tasks for today</div>
-                                        ) : (
-                                            <form className="task-list-form">
-                                                {todayTasks.map((task, index) => (
-                                                    <div key={index} className="task-item">
-                                                        <input 
-                                                            type="checkbox" 
-                                                            id={`task-${index}`} 
-                                                            name={`task-${index}`} 
-                                                        />
-                                                        <label htmlFor={`task-${index}`}>{task.Task}</label>
-                                                    </div>
-                                                ))}
-                                            </form>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Project Summary Section */}
-                        <div className="dashboard-section project-summary-section">
-                            <div className="section-header">
-                                <h2>Project Summary</h2>
-                            </div>
-                            <div className="section-content">
-                                <table className="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Project ID</th>
-                                            <th>Type</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {isLoading.projectSummary ? (
-                                            <tr><td colSpan="6" className="loading-cell">Loading...</td></tr>
-                                        ) : errors.projectSummary ? (
-                                            <tr><td colSpan="6" className="error-cell">Error: {errors.projectSummary}</td></tr>
-                                        ) : projectSummary.length === 0 ? (
-                                            <tr><td colSpan="6" className="no-data-cell">No projects found</td></tr>
-                                        ) : (
-                                            projectSummary.map((project, index) => (
-                                                <tr key={index} className={project.issue ? "has-issue" : ""}>
-                                                    <td>{project.id}</td>
-                                                    <td><b>{project.projectId}</b></td>
-                                                    <td>{project.type}</td>
-                                                    <td>{project.startDate}</td>
-                                                    <td>{project.endDate}</td>
-                                                    <td>
-                                                        {project.issue ? 
-                                                            <span className="status-badge issue">Has Issues</span> : 
-                                                            <span className="status-badge ok">On Track</span>
-                                                        }
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {/* Projects Section */}
-                        <div className="dashboard-section projects-section">
-                            <div className="section-header">
-                                <div className="project-type-tabs">
-                                    <button
-                                        className={`project-tab ${selectedNav2 === "Internal Project" ? "active" : ""}`}
-                                        onClick={() => handleNavClick("Internal Project")}
-                                    >
-                                        Internal Projects
-                                    </button>
-                                    <button
-                                        className={`project-tab ${selectedNav2 === "External Project" ? "active" : ""}`}
-                                        onClick={() => handleNavClick("External Project")}
-                                    >
-                                        External Projects
-                                    </button>
-                                </div>
-                                <button className="add-project-btn" onClick={handleAddProjectClick}>
-                                    + Add Project
-                                </button>
-                            </div>
-                            <div className="section-content">
-                                {selectedNav2 === "External Project" && (
-                                    <div className="table-container">
-                                        <table className="data-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Project Tracking ID</th>
-                                                    <th>Project ID</th>
-                                                    <th>Project Milestone</th>
-                                                    <th>Start Date</th>
-                                                    <th>Est. End Date</th>
-                                                    <th>Project Warranty ID</th>
-                                                    <th>Project Issue</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {isLoading.externalProjects ? (
-                                                    <tr><td colSpan="7" className="loading-cell">Loading...</td></tr>
-                                                ) : errors.externalProjects ? (
-                                                    <tr><td colSpan="7" className="error-cell">Error: {errors.externalProjects}</td></tr>
-                                                ) : dataExternal.length === 0 ? (
-                                                    <tr><td colSpan="7" className="no-data-cell">No external projects</td></tr>
-                                                ) : (
-                                                    dataExternal.map((item, index) => (
-                                                        <tr key={index} className={item.ProjectIssue ? "has-issue" : ""}>
-                                                            <td>{item.ProjectTrackingID}</td>
-                                                            <td><b>{item.ProjectID}</b></td>
-                                                            <td>{item.ProjectMilestone}</td>
-                                                            <td>{item.StartDate}</td>
-                                                            <td>{item.EstimatedEndDate}</td>
-                                                            <td>{item.ProjectWarrantyStatus}</td>
-                                                            <td>{item.ProjectIssue}</td>
-                                                        </tr>
-                                                    ))
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-                                {selectedNav2 === "Internal Project" && (
-                                    <div className="table-container">
-                                        <table className="data-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Project Tracking ID</th>
-                                                    <th>Project ID</th>
-                                                    <th>Start Date</th>
-                                                    <th>Est. End Date</th>
-                                                    <th>Project Issue</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {isLoading.internalProjects ? (
-                                                    <tr><td colSpan="5" className="loading-cell">Loading...</td></tr>
-                                                ) : errors.internalProjects ? (
-                                                    <tr><td colSpan="5" className="error-cell">Error: {errors.internalProjects}</td></tr>
-                                                ) : dataInternal.length === 0 ? (
-                                                    <tr><td colSpan="5" className="no-data-cell">No internal projects</td></tr>
-                                                ) : (
-                                                    dataInternal.map((item, index) => (
-                                                        <tr key={index} className={item.ProjectIssue ? "has-issue" : ""}>
-                                                            <td>{item.ProjectTrackingID}</td>
-                                                            <td><b>{item.ProjectID}</b></td>
-                                                            <td>{item.StartDate}</td>
-                                                            <td>{item.EstimatedEndDate}</td>
-                                                            <td>{item.ProjectIssue}</td>
-                                                        </tr>
-                                                    ))
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+            <div className="dashboard-view">
+                {/* Header Section */}
+                <div className="dashboard-header">
+                    <h1 className="dashboard-title">Project Overview</h1>
                 </div>
-            ) : (
-                <div className="add-project-modal">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>New Project Plan</h2>
+
+                {/* Main Dashboard Sections */}
+                <div className="dashboard-sections">
+                    <div className="dashboard-section overall-progress-section">
+                        <div className="section-header">
+                            <h2><b>Overall Progress</b></h2>
+                        </div>
+                        <div className="chart-wrapper">
+                            <div className="doughnut-wrapper">
+                                <Doughnut data={chartData} options={chartOptions} />
+                                <div className="progress-text">
+                                    <div className="progress-percentage">{progressPercentage}%</div>
+                                    <div className="progress-label">Activity Progress</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="stats-container">
+                            <div className="stat-box">
+                                <div className="stat-value">{pendingCount}</div>
+                                <div className="stat-label">Pending</div>
+                            </div>
+                            <div className="divider"></div>
+                            <div className="stat-box">
+                                <div className="stat-value">{needActionCount}</div>
+                                <div className="stat-label">Need Action</div>
+                            </div>
+                        </div>
+
+                        <div className="improvement-text">
+                            You completed <strong>{weeklyImprovement}%</strong> more task this week
+                        </div>
+                    </div>
+                    <div className="dashboard-column">
+                    <div className="dashboard-section-monitoring">
+                        <div className="dashboard-section existing-project-section">
+                            <div className="section-header">
+                                <h2><b>Existing Project</b></h2>
+                            </div>
+                        </div>
+
+                        <div className="dashboard-section ongoing-project-section">
+                            <div className="section-header">
+                                <h2><b>Ongoing</b></h2>
+                            </div>
+                            <div className="chart-wrapper">
+                            <div className="doughnut-wrapper">
+                                <Doughnut data={chartData2} options={chartOptions2} />
+                                <div className="progress-text">
+                                    <div className="progress-percentage">{ongoingPercentage}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                        <div className="dashboard-section delayed-project-section">
+                            <div className="section-header">
+                                <h2><b>Delayed</b></h2>
+                            </div>
+                            <div className="chart-wrapper">
+                            <div className="doughnut-wrapper">
+                                <Doughnut data={chartData3} options={chartOptions3} />
+                                <div className="progress-text">
+                                    <div className="progress-percentage">{delayedPercentage}</div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div className="dashboard-section completed-project-section">
+                            <div className="section-header">
+                                <h2><b>Completed</b></h2>
+                            </div>
+                            <div className="chart-wrapper">
+                            <div className="doughnut-wrapper">
+                                <Doughnut data={chartData5} options={chartOptions5} />
+                                <div className="progress-text">
+                                    <div className="progress-percentage">{completedPercentage}</div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <div className="dashboard-section task-completion-section">
+                        <div className="section-header">
+                            <h2><b>Task Completion Overtime</b></h2>
+                        </div>
+
+                        <div className="chart-wrapper2">
+                            <canvas ref={chartRef}></canvas>
+                        </div>
+                    </div>
+                    </div>
+                    {/* Overdue Tasks Section */}
+                    <div className="dashboard-section overdue-tasks-section">
+                        <div className="section-header">
+                            <h2>Overdue Task</h2>
+                        </div>
+                        <div className="section-content">
+                            <table className="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Overdue</th>
+                                        <th>Task</th>
+                                        <th>Deadline</th>
+                                        <th>Employee</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {isLoading.overdueTasks ? (
+                                        <tr><td colSpan="4" className="loading-cell">Loading...</td></tr>
+                                    ) : errors.overdueTasks ? (
+                                        <tr><td colSpan="4" className="error-cell">Error: {errors.overdueTasks}</td></tr>
+                                    ) : overdueTasks.length === 0 ? (
+                                        <tr><td colSpan="4" className="no-data-cell">No overdue tasks</td></tr>
+                                    ) : (
+                                        overdueTasks.map((item, index) => (
+                                            <tr key={index}>
+                                                <td className="due"><b>{item.Overdue}</b></td>
+                                                <td>{item.Task}</td>
+                                                <td>{item.Deadline}</td>
+                                                <td>{item.Employee}</td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Today's Tasks Section */}
+                    <div className="dashboard-section todays-tasks-section">
+                        <div className="section-header">
+                            <h2>Today's Tasks</h2>
+                        </div>
+                        <div className="section-content">
+                            <div className="task-list-container">
+                                {isLoading.todayTasks ? (
+                                    <div className="loading-cell">Loading...</div>
+                                ) : errors.todayTasks ? (
+                                    <div className="error-cell">Error: {errors.todayTasks}</div>
+                                ) : todayTasks.length === 0 ? (
+                                    <div className="no-data-cell">No tasks for today</div>
+                                ) : (
+                                    <form className="task-list-form">
+                                        {todayTasks.map((task, index) => (
+                                            <div key={index} className="task-item">
+                                                <input 
+                                                    type="checkbox" 
+                                                    id={`task-${index}`} 
+                                                    name={`task-${index}`} 
+                                                />
+                                                <label htmlFor={`task-${index}`}>{task.Task}</label>
+                                            </div>
+                                        ))}
+                                    </form>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Project Summary Section */}
+                    <div className="dashboard-section project-summary-section">
+                        <div className="section-header">
+                            <h2>Project Summary</h2>
                             <div className="project-type-tabs">
                                 <button
-                                    className={`project-tab ${selectedNavplan === "Internal" ? "active" : ""}`}
-                                    onClick={() => handleNavClickdash("Internal")}
+                                    className={`project-tab ${selectedProjectType === 'All' ? 'active' : ''}`}
+                                    onClick={() => setSelectedProjectType('All')}
+                                >
+                                    All Projects
+                                </button>
+                                <button
+                                    className={`project-tab ${selectedProjectType === 'Internal' ? 'active' : ''}`}
+                                    onClick={() => setSelectedProjectType('Internal')}
                                 >
                                     Internal
                                 </button>
                                 <button
-                                    className={`project-tab ${selectedNavplan === "External" ? "active" : ""}`}
-                                    onClick={() => handleNavClickdash("External")}
+                                    className={`project-tab ${selectedProjectType === 'External' ? 'active' : ''}`}
+                                    onClick={() => setSelectedProjectType('External')}
                                 >
                                     External
                                 </button>
                             </div>
                         </div>
+                        <div className="section-content">
+                            <table className="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Project Tracking ID</th>
+                                        <th>Project ID</th>
+                                        <th>Type</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {isLoading.projectSummary ? (
+                                        <tr><td colSpan="6" className="loading-cell">Loading...</td></tr>
+                                    ) : errors.projectSummary ? (
+                                        <tr><td colSpan="6" className="error-cell">Error: {errors.projectSummary}</td></tr>
+                                    ) : filteredProjects.length === 0 ? (
+                                        <tr><td colSpan="6" className="no-data-cell">No projects found</td></tr>
+                                    ) : (
+                                        filteredProjects.map((project, index) => (
+                                            <tr 
+                                                key={index} 
+                                                className={`${project.issue ? "has-issue" : ""} clickable-row`}
+                                                onClick={() => handleProjectRowClick(project)}
+                                            >
+                                                <td>{project.id}</td>
+                                                <td><b>{project.projectId}</b></td>
+                                                <td>{project.type}</td>
+                                                <td>{project.startDate}</td>
+                                                <td>{project.endDate}</td>
+                                                <td>
+                                                    {project.issue ? 
+                                                        <span className="status-badge issue">Has Issues</span> : 
+                                                        <span className="status-badge ok">On Track</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            {showDetailsModal && selectedProject && (
+                <div className="project-details-modal">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2>Project Details</h2>
+                            <button className="close-button" onClick={closeDetailsModal}>×</button>
+                        </div>
                         <div className="modal-body">
-                            <h3 className="section-title">Project Tracking</h3>
-                            
-                            {selectedNavplan === "External" && (
-                                <form onSubmit={handleAddExternalProject} className="project-form">
-                                    <div className="form-row">
-                                        <div className="form-column">
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Project ID*
-                                                </label>
-                                                <div className="search-container">
-                                                    <input 
-                                                        className="form-input"
-                                                        type="text"
-                                                        placeholder="Project ID"
-                                                        value={newProjectIDExternal}
-                                                        onChange={handleExternalProjectIDChange}
-                                                        onFocus={() => fetchInitialExternalProjects()}
-                                                        required
-                                                    />
-                                                    {externalProjectSearchResults.length > 0 && (
-                                                        <div className="search-results">
-                                                            {externalProjectSearchResults.map((project, index) => (
-                                                                <div 
-                                                                    key={index} 
-                                                                    className="search-result-item"
-                                                                    onClick={() => selectExternalProject(project)}
-                                                                >
-                                                                    {project.project_id}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
+                            {isLoadingDetail ? (
+                                <div className="loading-cell">Loading project details...</div>
+                            ) : detailError ? (
+                                <div className="error-cell">Error: {detailError}</div>
+                            ) : projectDetail ? (
+                                <div className="project-details-grid">
+                                    {/* External Project */}
+                                    {selectedProject.type === 'External' && (
+                                        <>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project Tracking ID:</span>
+                                                <span className="detail-value">{projectDetail.project_tracking_id}</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project ID:</span>
+                                                <span className="detail-value">{projectDetail.project_id}</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project Type:</span>
+                                                <span className="detail-value">External</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Start Date:</span>
+                                                <span className="detail-value">{projectDetail.start_date}</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Estimated End Date:</span>
+                                                <span className="detail-value">{projectDetail.estimated_end_date}</span>
+                                            </div>
+                                            <div className="detail-item full-width">
+                                                <span className="detail-label">Project Milestone:</span>
+                                                <span className="detail-value">{projectDetail.project_milestone}</span>
+                                            </div>
+                                            {projectDetail.project_warranty_id && (
+                                                <div className="detail-item">
+                                                    <span className="detail-label">Project Warranty ID:</span>
+                                                    <span className="detail-value">{projectDetail.project_warranty_id}</span>
                                                 </div>
-                                            </div>
-                                            
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Project Milestone
-                                                </label>
-                                                <select
-                                                    className="form-input"
-                                                    value={selectedProjectMilestoneExternal}
-                                                    onChange={(e) => setSelectedProjectMilestoneExternal(e.target.value)}
-                                                    required
-                                                >
-                                                    <option value="">Choose Project Milestone</option>
-                                                    <option value="Project Initiation Completed">Project Initiation Completed</option>
-                                                    <option value="Project Initiation Ongoing">Project Initiation Ongoing</option>
-                                                    <option value="Project Initiation Rejected">Project Initiation Rejected</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Start Date
-                                                </label>
-                                                <input
-                                                    className="form-input"
-                                                    type="date"
-                                                    value={newStartDateExternal}
-                                                    onChange={(e) => setNewStartDateExternal(e.target.value)}
-                                                    required
-                                                />
-                                            </div>
-                                            
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Est. End Date
-                                                </label>
-                                                <input
-                                                    className="form-input"
-                                                    type="date"
-                                                    value={newEndDateExternal}
-                                                    onChange={(e) => setNewEndDateExternal(e.target.value)}
-                                                    required
-                                                />
-                                            </div>
-                                            
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Project Warranty ID
-                                                </label>
-                                                <div className="search-container">
-                                                    <input
-                                                        className="form-input"
-                                                        type="text"
-                                                        placeholder="Insert Warranty ID"
-                                                        value={newProjectWarrantyIDExternal}
-                                                        onChange={handleWarrantyIDChange}
-                                                        onFocus={() => fetchInitialWarranties()}
-                                                    />
-                                                    {warrantySearchResults.length > 0 && (
-                                                        <div className="search-results">
-                                                            {warrantySearchResults.map((warranty, index) => (
-                                                                <div 
-                                                                    key={index} 
-                                                                    className="search-result-item"
-                                                                    onClick={() => selectWarranty(warranty)}
-                                                                >
-                                                                    {warranty.id} - {warranty.coverage_years} years
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
+                                            )}
+                                            {projectDetail.project_issue && (
+                                                <div className="detail-item full-width">
+                                                    <span className="detail-label">Project Issue:</span>
+                                                    <span className="detail-value">{projectDetail.project_issue}</span>
                                                 </div>
+                                            )}
+                                        </>
+                                    )}
+
+                                    {/* Internal Project */}
+                                    {selectedProject.type === 'Internal' && (
+                                        <>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project Tracking ID:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_project_tracking_id}</span>
                                             </div>
-                                        </div>
-                                        
-                                        <div className="form-column">
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Project Issue
-                                                </label>
-                                                <textarea
-                                                    className="form-textarea"
-                                                    placeholder="Add Project Issue"
-                                                    value={newProjectIssueExternal}
-                                                    onChange={(e) => setNewProjectIssueExternal(e.target.value)}
-                                                    rows="10"
-                                                />
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project ID:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_project_id}</span>
                                             </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="form-actions">
-                                        <button type="button" className="cancel-btn" onClick={handleCancelAddProject}>
-                                            Cancel
-                                        </button>
-                                        <button type="submit" className="save-btn">
-                                            Save Project
-                                        </button>
-                                    </div>
-                                </form>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project Type:</span>
+                                                <span className="detail-value">Internal</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Start Date:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_start_date}</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Estimated End Date:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_estimated_end_date}</span>
+                                            </div>
+                                            {projectDetail.intrnl_project_issue && (
+                                                <div className="detail-item full-width">
+                                                    <span className="detail-label">Project Issue:</span>
+                                                    <span className="detail-value">{projectDetail.intrnl_project_issue}</span>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="no-data-cell">No detailed information available for this project.</div>
                             )}
-                            
-                            {selectedNavplan === "Internal" && (
-                                <form onSubmit={handleAddInternalProject} className="project-form">
-                                    <div className="form-row">
-                                        <div className="form-column">
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Project ID*
-                                                </label>
-                                                <div className="search-container">
-                                                    <input 
-                                                        className="form-input"
-                                                        type="text"
-                                                        placeholder="Project ID"
-                                                        value={newProjectIDInternal}
-                                                        onChange={handleInternalProjectIDChange}
-                                                        onFocus={() => fetchInitialInternalProjects()}
-                                                        required
-                                                    />
-                                                    {internalProjectSearchResults.length > 0 && (
-                                                        <div className="search-results">
-                                                            {internalProjectSearchResults.map((project, index) => (
-                                                                <div 
-                                                                    key={index} 
-                                                                    className="search-result-item"
-                                                                    onClick={() => selectInternalProject(project)}
-                                                                >
-                                                                    {project.intrnl_project_id}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Project Request ID
-                                                </label>
-                                                <div className="search-container">
-                                                    <input
-                                                        className="form-input"
-                                                        type="text"
-                                                        placeholder="Insert Project Request ID"
-                                                        value={newProjectRequestIDInternal}
-                                                        onChange={handleProjectRequestIDChange}
-                                                        onFocus={() => fetchInitialProjectRequests()}
-                                                    />
-                                                    {projectRequestSearchResults.length > 0 && (
-                                                        <div className="search-results">
-                                                            {projectRequestSearchResults.map((request, index) => (
-                                                                <div 
-                                                                    key={index} 
-                                                                    className="search-result-item"
-                                                                    onClick={() => selectProjectRequest(request)}
-                                                                >
-                                                                    {request.project_request_id} - {request.project_name}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Start Date
-                                                </label>
-                                                <input
-                                                    className="form-input"
-                                                    type="date"
-                                                    value={newStartDateInternal}
-                                                    onChange={(e) => setNewStartDateInternal(e.target.value)}
-                                                    required
-                                                />
-                                            </div>
-                                            
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Est. End Date
-                                                </label>
-                                                <input
-                                                    className="form-input"
-                                                    type="date"
-                                                    value={newEndDateInternal}
-                                                    onChange={(e) => setNewEndDateInternal(e.target.value)}
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="form-column">
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    Project Issue
-                                                </label>
-                                                <textarea
-                                                    className="form-textarea"
-                                                    placeholder="Add Project Issue"
-                                                    value={newProjectIssueInternal}
-                                                    onChange={(e) => setNewProjectIssueInternal(e.target.value)}
-                                                    rows="10"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="form-actions">
-                                        <button type="button" className="cancel-btn" onClick={handleCancelAddProject}>
-                                            Cancel
-                                        </button>
-                                        <button type="submit" className="save-btn">
-                                            Save Project
-                                        </button>
-                                    </div>
-                                </form>
-                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <button className="cancel-btn" onClick={closeDetailsModal}>Close</button>
                         </div>
                     </div>
                 </div>
             )}
         </div>
-    );};
+    );
+};
+
 export default BodyContent;

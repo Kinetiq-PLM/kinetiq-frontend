@@ -473,6 +473,8 @@ function App() {
       "Report Monitoring": "Reports",
       "Warranty Monitoring": "Warranties",
       "Project Cost":"ProjectCost",
+      "Reports": "GenerateReports",
+      "Warranty Monitoring":"Warranties",
     },
     "Human Resources": {
       "Employees": "Employees",

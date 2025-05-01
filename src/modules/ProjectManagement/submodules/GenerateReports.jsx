@@ -1806,12 +1806,6 @@ Process Phase as soon as possible.`;
             <thead>
               <tr>
                 <th>
-                  <input 
-                    type="checkbox" 
-                    onChange={handleSelectAll}
-                    checked={selectedReports.length === filteredReports.length && filteredReports.length > 0}
-                    disabled={loading || filteredReports.length === 0}
-                  />
                 </th>
                 <th>Project ID</th>
                 <th>Internal Project ID</th>

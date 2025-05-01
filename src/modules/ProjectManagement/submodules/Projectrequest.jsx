@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Projectrequest.css";
 
-
 axios.defaults.baseURL = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev';
 
 const BodyContent = () => {
-  
+  // State variables remain unchanged
   const [newInternalprojectname, setNewInternalprojectname] = useState("");
   const [newInternalrequestdate, setNewInternalrequestdate] = useState("");
   const [newInternalstartingdate, setNewInternalstartingdate] = useState("");
@@ -16,7 +15,6 @@ const BodyContent = () => {
   const [newInternalbudgetdescription, setNewInternalbudgetdescription] = useState("");
   const [newInternalprojectdescription, setNewInternalprojectdescription] = useState("");
   
-  
   const [showReportList, setShowReportList] = useState(false);
   const [currentForm, setCurrentForm] = useState(1);
   const [reportData, setReportData] = useState([]);
@@ -24,18 +22,16 @@ const BodyContent = () => {
   const [loading, setLoading]= useState (false);
   const [submitLoading, setSubmitLoading] = useState(false);
   
-  
   const [employeeSuggestions, setEmployeeSuggestions] = useState([]);
   const [departmentSuggestions, setDepartmentSuggestions] = useState([]);
   const [showEmployeeSuggestions, setShowEmployeeSuggestions] = useState(false);
   const [showDepartmentSuggestions, setShowDepartmentSuggestions] = useState(false);
 
-  
+  // All functions remain unchanged
   useEffect(() => {
     fetchProjectRequests();
   }, []);
 
-  
   const fetchProjectRequests = async () => {
     setLoading(true);
     try {
@@ -49,7 +45,6 @@ const BodyContent = () => {
     }
   };
 
-  
   const searchEmployees = async (query) => {
     if (query.length < 2) {
       setEmployeeSuggestions([]);
@@ -67,7 +62,6 @@ const BodyContent = () => {
     }
   };
 
-  
   const searchDepartments = async (query) => {
     if (query.length < 2) {
       setDepartmentSuggestions([]);
@@ -85,33 +79,28 @@ const BodyContent = () => {
     }
   };
 
-  
   const handleEmployeeInputChange = (e) => {
     const value = e.target.value;
     setNewInternalemployeeid(value);
     searchEmployees(value);
   };
 
-  
   const handleDepartmentInputChange = (e) => {
     const value = e.target.value;
     setNewInternaldepartmentid(value);
     searchDepartments(value);
   };
 
-  
   const selectEmployee = (employee) => {
     setNewInternalemployeeid(employee.employee_id);
     setShowEmployeeSuggestions(false);
   };
 
-  
   const selectDepartment = (department) => {
     setNewInternaldepartmentid(department.dept_id);
     setShowDepartmentSuggestions(false);
   };
 
-  
   const handleFirstSubmitprojrequest = async (e) => {
     e.preventDefault();
     setSubmitLoading(true);
@@ -133,9 +122,7 @@ const BodyContent = () => {
       const response = await axios.post('/api/project_request/project-requests/', projectRequestData);
       console.log("Project request created:", response.data);
       
-      
       await fetchProjectRequests();
-      
       
       setShowReportList(true);
       setCurrentForm(null);
@@ -150,7 +137,6 @@ const BodyContent = () => {
     }
   };
 
-  
   const resetForm = () => {
     setNewInternalprojectname("");
     setNewInternalrequestdate("");
@@ -162,13 +148,11 @@ const BodyContent = () => {
     setNewInternalprojectdescription("");
   };
 
-  
   const handleBackClick = () => {
     setShowReportList(false);
     setCurrentForm(1);
   };
 
-  
   const handleRemoveReports = async () => {
     if (selectedReports.length === 0) {
       alert("Please select at least one project request to remove.");
@@ -181,13 +165,11 @@ const BodyContent = () => {
     
     setLoading(true);
     try {
-      
       for (const index of selectedReports) {
         const projectId = reportData[index].project_request_id;
         console.log(`Deleting project request with ID: ${projectId}`);
         await axios.delete(`/api/project_request/project-requests/${projectId}/`);
       }
-      
       
       await fetchProjectRequests();
       setSelectedReports([]);
@@ -200,7 +182,6 @@ const BodyContent = () => {
     }
   };
 
-  
   const handleCheckboxChange = (index) => {
     if (selectedReports.includes(index)) {
       setSelectedReports(selectedReports.filter((i) => i !== index));
@@ -209,7 +190,6 @@ const BodyContent = () => {
     }
   };
 
-  
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
