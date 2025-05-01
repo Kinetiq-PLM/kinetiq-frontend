@@ -86,7 +86,7 @@ const CashFlowCard = ({ data }) => {
                 return [value, name];
               }}
               wrapperStyle={{
-                backgroundColor: '#88B4B4', 
+                backgroundColor: '#00A8A8', 
                 borderRadius: '10px', 
                 padding: '5px', 
               }}
@@ -96,23 +96,23 @@ const CashFlowCard = ({ data }) => {
             }}
             />
             <Legend verticalAlign="top" align="center" wrapperStyle={{ top: 15, left: 0, padding: '20px' }} content={renderLegend} />
-            <Bar dataKey="outflow" stackId="a" fill="#787878" name="Outflow" radius={[2, 2, 0, 0]} />
-            <Bar dataKey="inflow" stackId="a" fill="#00BBBB" name="Inflow" radius={[2, 2, 0, 0]} />
-            <Bar dataKey="net" stackId="a" fill="#DAE4E4" name="Net" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="outflow" stackId="a" fill="#ACC3C3" name="Outflow" radius={[2, 2, 0, 0]} />
+            <Bar dataKey="inflow" stackId="a" fill="#00A8A8" name="Inflow" radius={[2, 2, 0, 0]} />
+            <Bar dataKey="net" stackId="a" fill="#C9E7E5" name="Net" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
       <div className="summary-numbers" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ position: 'absolute', top: '-15px', left: '10px', width: 'calc(100% - 20px)', height: '2px', backgroundColor: '#00BBBB' }}></div>
+        <div style={{ position: 'absolute', top: '-15px', left: '10px', width: 'calc(100% - 20px)', height: '2px', backgroundColor: '#00A8A8' }}></div>
         <div className="summary-item" style={{ position: 'relative' }}>
           <div className="summary-label">INFLOW</div>
           <div className="summary-value">₱{inflowTotal.toLocaleString()}</div>
-          <div style={{ position: 'absolute', right: '-10px', top: '50%', transform: 'translateY(-50%)', width: '1px', height: '50px', backgroundColor: '#00BBBB' }}></div>
+          <div style={{ position: 'absolute', right: '-10px', top: '50%', transform: 'translateY(-50%)', width: '1px', height: '50px', backgroundColor: '#00A8A8' }}></div>
         </div>
         <div className="summary-item" style={{ position: 'relative' }}>
           <div className="summary-label">OUTFLOW</div>
           <div className="summary-value">-₱{outflowTotal.toLocaleString()}</div>
-          <div style={{ position: 'absolute', right: '-10px', top: '50%', transform: 'translateY(-50%)', width: '1px', height: '50px', backgroundColor: '#00BBBB' }}></div>
+          <div style={{ position: 'absolute', right: '-10px', top: '50%', transform: 'translateY(-50%)', width: '1px', height: '50px', backgroundColor: '#00A8A8' }}></div>
         </div>
         <div className="summary-item">
           <div className="summary-label">NET</div>
@@ -173,10 +173,10 @@ const InvoiceCollections = () => {
 };
 
     const categories = [
-        { name: 'Payroll', amount: 120080, color: '#00BBBB' },
-        { name: 'Marketing', amount: 60040, color: '#68A0F2' },
-        { name: 'Rent or Lease', amount: 40530, color: '#E6D064' },
-        { name: 'Miscellaneous', amount: 20416, color: '#E96062' },
+        { name: 'Payroll', amount: 120080, color: '#00A8A8' },
+        { name: 'Marketing', amount: 60040, color: '#469FC2' },
+        { name: 'Rent or Lease', amount: 40530, color: '#dad891' },
+        { name: 'Miscellaneous', amount: 20416, color: '#da9191' },
         { name: 'Other Expenses', amount: 90060, color: '#D3D3D3' },
     ];
 
@@ -421,7 +421,7 @@ const BodyContent = () => {
                                             />
                                             <Bar
                                                 dataKey="amount"
-                                                fill="#00BBBB"
+                                                fill="#00A8A8"
                                                 label={({ value, x, y, width, height }) => (
                                                     <text
                                                         x={x + width - 5}
@@ -474,7 +474,7 @@ const BodyContent = () => {
                                             />
                                             <Bar
                                                 dataKey="amount"
-                                                fill="#E96062"
+                                                fill="#da9191"
                                                 label={({ value, x, y, width, height }) => (
                                                     <text
                                                         x={x + width - 5}
@@ -551,8 +551,8 @@ const BodyContent = () => {
                                 <BarChart data={data} margin={{ top: 10, right: 20, left: 15, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="currentBarGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#469FC2" stopOpacity={100} />
-                                            <stop offset="100%" stopColor="#F7FFFE" stopOpacity={100} />
+                                            <stop offset="0%" stopColor="#00A8A8" stopOpacity={100} />
+                                            <stop offset="100%" stopColor="#C9E7E5" stopOpacity={100} />
                                         </linearGradient>
                                         <linearGradient id="previousBarGradient" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="0%" stopColor="#C9E7E5" stopOpacity={100} />
@@ -607,8 +607,8 @@ const BodyContent = () => {
           endAngle={-270}
           labelLine={false}
         >
-          <Cell key="previous" fill="#F4E1AE" />
-          <Cell key="current" fill="#A0D3E8" />
+          <Cell key="previous" fill="#C9E7E5" />
+          <Cell key="current" fill="#00A8A8" />
         </Pie>
       </PieChart>
     </ResponsiveContainer>

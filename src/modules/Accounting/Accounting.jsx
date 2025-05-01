@@ -17,7 +17,7 @@ import {
   Line,
   CartesianGrid,
 } from "recharts";
-import Button from "./components/Button";
+import Button from "./components/button/Button";
 
 // Professional color palette
 const COLORS = [

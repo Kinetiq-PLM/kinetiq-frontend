@@ -17,7 +17,7 @@
   box-shadow: 0px 4px 7.5px 1px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   text-align: center;
-  
+  gap: 20px;
 }
 
 .mrp .title {
@@ -30,20 +30,28 @@
   padding-bottom: 1rem;
 }
 
-.mrp .card-container {
+/* Overall Horizontal Layout: Left Cards + Right Graph */
+.mrp-navigation-graph {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 50px;
+  align-items: flex-start;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
-.mrp .card {
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1 / 1;
-  background: white;
-  box-shadow: 0px 4px 7.5px 1px rgba(0, 0, 0, 0.25);
+/* LEFT SIDE - Vertical Card Stack */
+.card-container-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Smaller gap for tighter stacking */
+}
+
+.card {
+  width: 350px;
+  height: 130px;
+  background-color: white;
   border-radius: 20px;
+  box-shadow: 0px 4px 7.5px 1px rgba(0, 0, 0, 0.25);
   position: relative;
   display: flex;
   align-items: center;
@@ -53,61 +61,154 @@
   transition: transform 0.3s ease-in-out;
 }
 
-.mrp .card:hover {
+.card-container-vertical .card {
+  margin-bottom: 20px; /* Space between the cards */
+}
+
+.card:hover {
   transform: scale(1.05);
 }
 
-.mrp .card img {
+.card img {
   width: 100%;
   height: 100%;
   opacity: 0.5;
   object-fit: cover;
 }
 
-.mrp .card-text {
+.card-text {
   position: absolute;
   text-align: center;
   color: #585757;
   font-size: clamp(20px, 4vw, 30px);
   font-weight: 500;
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  padding: 10px;
 }
 
-.mrp .material:hover,
-.mrp .bills:hover {
-  transform: scale(1.1);
+/* RIGHT SIDE - Graph Card */
+.graph-card {
+  width: 550px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0px 4px 7.5px 1px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+.overview-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
 
+/* Doughnut Chart */
+.doughnut {
+  position: relative;
+  width: 290px;
+  height: 290px;
+  margin-bottom: 20px;
+}
 
+.circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(#4DB6AC 80%, #B2DFDB 20%);
+  position: relative;
+}
+
+.inner-circle {
+  width: 60%;
+  height: 60%;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 80% and 20% labels */
+.percent-label-80, .percent-label-20 {
+  position: absolute;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.percent-label-80 {
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.percent-label-20 {
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Graph Legend under the chart */
+.overview-legend {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  align-items: center;
+}
+
+.legend-box {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.legend-box.complete {
+  background-color: #B2DFDB;
+}
+
+.legend-box.not-complete {
+  background-color: #4DB6AC;
+}
+
+/* Custom Scroll for Table Scrollbar */
+.mrp-table-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mrp-table-scroll::-webkit-scrollbar-thumb {
+  background-color: #00A8A8;
+  border-radius: 4px;
+}
+
+.mrp-table-scroll::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+
+/* Responsive breakpoints */
 @media (max-width: 1140px) {
   .mrp .body-content-container {
     padding: 2rem;
   }
 
-
-  .mrp .card-container {
+  .mrp-navigation-graph {
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
   }
 
-  .mrp .card {
-    max-width: 100%;
+  .card-container-vertical {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .mrp .card-text {
-    font-size: 30px;
+  .graph-card {
+    width: 90%;
   }
-
-  
-  .mrp .mrp-table-scroll {
-    max-height: 70vh;
-    overflow-y: auto;
-    padding-bottom: 1rem;
-  }
-  
 }
 
 @media (max-width: 480px) {
@@ -119,21 +220,28 @@
     padding: 3rem;
   }
 
-  .mrp .card-text {
+  .card-text {
     font-size: 18px;
   }
-}
 
-.mrp .mrp-table-scroll::-webkit-scrollbar {
-  width: 8px;
-}
+  .card{
+    width: 260px;
+  }
 
-.mrp .mrp-table-scroll::-webkit-scrollbar-thumb {
-  background-color: #00A8A8;
-  border-radius: 4px;
-}
+  .doughnut {
+    position: relative;
+    width: 190px;
+    height: 190px;
+    margin-bottom: 20px;
+  }
 
-.mrp .mrp-table-scroll::-webkit-scrollbar-track {
-  background-color: #f0f0f0;
-}
+  .overview-title{
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
 
+  .overview-legend{
+    font-size: 14px;
+  }
+}

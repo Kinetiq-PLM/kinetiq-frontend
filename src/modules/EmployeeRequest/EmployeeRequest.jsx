@@ -1,13 +1,13 @@
 import React from "react";
-import "../styles/PayrollReceipts.css";
+import "./styles/EmployeeRequest.css";
 
 const BodyContent = () => {
     return (
-        <div className="pay-rec">
+        <div className="emp-req">
             <div className="body-content-container">
-                <p>Hello Payroll Receipts submodule!</p>
+                <p>Hello Employee Request Module!</p>
                 <p>Fill this container with your elements, change the display if need be.</p>
-                <p>If you're going to style with css, use your unique namespace '.pay-rec' at the start.</p>
+                <p>If you're going to style with css, use your unique namespace '.emp-req' at the start.</p>
             </div>
         </div>
     );

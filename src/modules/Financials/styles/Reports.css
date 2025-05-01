@@ -43,8 +43,8 @@
 
 .reports .tabs button:hover,
 .reports .tabs .active {
-  color: #14b8a6;
-  border-bottom: 2px solid #14b8a6;
+  color: #00A8A8;
+  border-bottom: 2px solid #00A8A8;
 }
 
 .reports .tab-navigation {
@@ -169,7 +169,7 @@
 }
 
 .reports .collected {
-  background-color: #00BBBB;
+  background-color: #00A8A8;
   color: white;
   border-radius: 10px 0 0 10px;
   width: 33.33%;
@@ -182,13 +182,13 @@
 }
 
 .reports .open-invoices {
-  background-color: #E6D064;
+  background-color: #dad891;
   color: white;
   width: 33.33%;
 }
 
 .reports .overdue {
-  background-color: #E96062;
+  background-color: #da9191;
   color: white;
   border-radius:  0 10px 10px 0 ;
   width: 33.33%;
@@ -482,7 +482,7 @@
 }
 
 .reports .period-covered {
-  background-color: #6cb3d0;
+  background-color: #00A8A8;
   padding: 18px 30px;
   width: 200px;
   border-top-left-radius: 20px;
@@ -529,7 +529,7 @@
 
 .reports .infocard-4-header-row {
   display: flex;
-  background-color: #469FC2;
+  background-color: #00A8A8;
   color: rgb(255, 255, 255);
   
   border-radius: 20px;
@@ -544,7 +544,7 @@
 
 .reports .infocard-4-header-row-bottom {
   display: flex;
-  background-color: #469FC2;
+  background-color: #00A8A8;
   color: white;
   padding: 10px;
   text-align: left;
@@ -631,9 +631,9 @@
 }
 
 .reports .income-statement-table tbody th {
-  background-color: #6CB3D0;
+  background-color: #47b3b3e1;
   font-weight: bold;
-  color: #fff;
+  color: #ffffff;
   text-indent: 30px;
 }
 
@@ -661,7 +661,7 @@
 
 .reports .financial-table thead tr:first-of-type + tr th,
 .reports .income-statement-table thead tr {
-  background-color: #469fc2;
+  background-color: #00A8A8;
   color: white;
 }
 
@@ -785,7 +785,7 @@
     z-index: 1;
   }
   .reports .period-covered {
-    background-color: #6cb3d0;
+    background-color: #47b3b3e1;
     padding: 21px 30px;
     width: 200px;
     margin-top: 60px;
@@ -795,7 +795,7 @@
   }
   
   .reports .february-2023 {
-    background-color: #dec47d;
+    background-color: #ACC3C3;
     padding: 21px 70px;
     text-align: center;
     left: -55px;

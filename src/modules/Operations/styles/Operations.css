@@ -1,14 +1,10 @@
-/* REMINDER! All of your elements must use your unique namespace '.ops' at the start to avoid leaking */
-
-
-.ops {
+.operations {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
-
-.ops .body-content-container {
+.operations .body-content-container {
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
@@ -19,61 +15,190 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  min-width: 40rem;
+  min-width: 40rem;   
   min-height: 30rem;
 }
 
-
-.ops .ops-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
+.operations-container {
+  width: 100%;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  color: #066;
+  position: relative;
+  min-height: 600px;
 }
 
-
-.ops .ops-subtitle {
-  color: #999;
-  font-size: 0.95rem;
+.operations-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   margin-bottom: 2rem;
 }
 
-
-.ops .ops-grid-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  margin-top: 2rem;
+.operations-welcome-text {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
 }
 
+.operations-total-box {
+  background-color: #52c2c2;
+  color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 500px;
+  margin-bottom: 2rem;
+}
 
+.operations-total-label {
+  font-weight: 500;
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
 
+.operations-total-amount {
+  font-size: 2rem;
+  font-weight: 700;
+}
 
-.ops .ops-row {
+.operations-main {
   display: flex;
-  gap: 1rem;
-  justify-content: center;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 520px;
+}
+
+.operations-status-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.operations-status-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.operations-status-cards {
+  display: flex;
+  flex-direction: row;
+  gap: 0.8rem;
+  margin-top: 1rem;
   flex-wrap: wrap;
 }
 
-
-.ops .ops-card {
-  background-color: #f9f9f9;
-  border: none;
-  border-radius: 0.75rem; /* adjusted from 1rem */
-  padding: 2.5rem 3rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-  min-width: 240px;
+.operations-status-card {
+  padding: 1.2rem;
+  border-radius: 8px;
   text-align: center;
+  width: 120px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+.operations-draft-card {
+  background-color: #c1f0f0;
+}
 
-.ops .ops-card:hover {
-  background-color: #00a8a8;
-  color: white;
-  transform: translateY(-4px);
+.operations-open-card {
+  background-color: #e6ffff;
+}
+
+.operations-closed-card {
+  background-color: #a7e9f0;
+}
+
+.operations-cancelled-card {
+  background-color: #e0f8ff;
+}
+
+.operations-status-count {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #066;
+}
+
+.operations-status-label {
+  font-size: 1rem;
+  color: #066;
+}
+
+.operations-chart-section {
+  position: absolute;
+  top: 0rem;
+  right: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 600px;
+  user-select: none;
+}
+
+.operations-chart-section .recharts-wrapper {
+  outline: none !important;
+}
+
+.operations-chart-section .recharts-sector {
+  outline: none !important;
+  cursor: default;
+}
+
+@media screen and (max-width: 1200px) {
+  .operations-chart-section {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin-top: 2rem;
+    width: 100%;
+    min-width: unset;
+  }
+
+  .operations-main {
+    margin-top: 2rem;
+  }
+
+  .operations-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .operations-total-box {
+    width: 100%;
+    max-width: 350px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .operations-status-cards {
+    justify-content: center;
+  }
+
+  .operations-status-card {
+    width: calc(50% - 0.4rem);
+    min-width: 150px;
+  }
+
+  .operations-container {
+    padding: 1rem;
+  }
+}
+
+.operations-breadcrumb {
+  text-align: right;
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.operations-chart-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #066;
+  margin-top: -1rem;
+}
+
+.operations-timestamp {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.3rem;
 }
