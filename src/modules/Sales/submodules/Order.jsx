@@ -25,6 +25,9 @@ import { useMutation } from "@tanstack/react-query";
 import { GET, POST } from "../api/api.jsx";
 
 const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
+  // TEMPORARY CONSTANT VALUE FOR EMPLOYEE LOGGED IN
+  const IS_SALES_REP = false;
+
   const { showAlert } = useAlert();
 
   const copyFromOptions = ["Quotation", "Blanket Agreement"];
@@ -391,6 +394,19 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     if (selectedCustomer != "") setCanClear(true);
   }, [selectedCustomer]);
 
+  function handleCustomerSelection() {
+    if (IS_SALES_REP) {
+      setIsCustomerListOpen(true);
+    } else {
+      setIsEmployeeListOpen(true);
+    }
+  }
+
+  useEffect(() => {
+    if (!selectedEmployee) return;
+    setIsCustomerListOpen(true);
+  }, [selectedEmployee]);
+
   return (
     <div className="quotation">
       <div className="body-content-container">
@@ -402,11 +418,19 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
         <CustomerListModal
           isOpen={isCustomerListOpen}
+          isNewCustomerModalOpen={isNewCustomerModalOpen}
           onClose={() => setIsCustomerListOpen(false)}
           newCustomerModal={setIsNewCustomerModalOpen}
-          setSelectedCustomer={setSelectedCustomer}
           setCustomer={setSelectedCustomer}
+          employee={selectedEmployee}
         ></CustomerListModal>
+
+        <EmployeeListModal
+          isOpen={isEmployeeListOpen}
+          onClose={() => setIsEmployeeListOpen(false)}
+          setEmployee={setSelectedEmployee}
+        ></EmployeeListModal>
+
         <ProductListModal
           isOpen={isProductListOpen}
           onClose={() => setIsProductListOpen(false)}
@@ -431,11 +455,6 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           onClose={() => setIsBlanketAgreementListOpen(false)}
           setBlanketAgreement={setSelectedBlanketAgreement}
         ></BlanketAgreementListModal>
-        {/* <EmployeeListModal
-          isOpen={isEmployeeListOpen}
-          onClose={() => setIsEmployeeListOpen(false)}
-          setEmployee={setSelectedEmployee}
-        ></EmployeeListModal> */}
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -451,6 +470,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             setAddress={setAddress}
             enabled={canEditTable}
             date={new Date().toISOString().split("T")[0]}
+            handleCustomerSelection={handleCustomerSelection}
           />
         </div>
         {/* TABLE */}
@@ -491,11 +511,24 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
             {/* Employee ID Input */}
             <div className="flex mb-2 w-full mt-4 gap-4 items-center">
-              <p className="">Employee ID</p>
-              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded">
-                <p className="text-sm">{employee_id || ""}</p>
+              <p className="">Sales Rep ID</p>
+              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                <p className="text-sm">
+                  {IS_SALES_REP ? employee_id : "PLACEHOLDER"}
+                </p>
               </div>
             </div>
+
+            {IS_SALES_REP ? (
+              ""
+            ) : (
+              <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+                <p className="">Processor ID</p>
+                <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                  <p className="text-sm">{employee_id || ""}</p>
+                </div>
+              </div>
+            )}
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto gap-2 flex">

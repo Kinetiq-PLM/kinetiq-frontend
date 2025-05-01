@@ -26,6 +26,9 @@ import { POST } from "../api/api";
 import generateRandomID from "../components/GenerateID";
 
 const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
+  // TEMPORARY CONSTANT VALUE FOR EMPLOYEE LOGGED IN
+  const IS_SALES_REP = true;
+
   const { showAlert } = useAlert();
   const copyFromOptions = [];
   const copyToOptions = ["Order"];
@@ -281,8 +284,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   }, [selectedCustomer]);
 
   function handleCustomerSelection() {
-    const isSalesRep = false; // Replace with actual condition to check if the user is a sales rep
-    if (isSalesRep) {
+    if (IS_SALES_REP) {
       setIsCustomerListOpen(true);
     } else {
       setIsEmployeeListOpen(true);
@@ -379,21 +381,25 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             </div>
 
             {/* Employee ID Input */}
-            <div className="flex mb-2 w-full mt-4 gap-4 items-center">
-              <p className="">Employee ID</p>
+            {/* <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+              <p className="">Sales Rep ID</p>
               <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
-                <p className="text-sm">{employee_id || ""}</p>
+                <p className="text-sm">
+                  {IS_SALES_REP ? employee_id : "PLACEHOLDER"}
+                </p>
               </div>
             </div>
-            {/* <div className="flex items-center gap-2">
-              <p className="text-gray-700 text-sm">Employee ID</p>
-              <input
-                type="text"
-                className="border border-gray-400 flex-1 p-1 h-[30px] max-w-[250px] rounded"
-                onChange={(e) => setSelectedEmployee(e.target.value)}
-                value={selectedEmployee || ""}
-              ></input>
-            </div> */}
+
+            {IS_SALES_REP ? (
+              ""
+            ) : (
+              <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+                <p className="">Processor ID</p>
+                <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                  <p className="text-sm">{employee_id || ""}</p>
+                </div>
+              </div>
+            )} */}
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto gap-2 flex">
