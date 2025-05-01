@@ -14,6 +14,7 @@ import loading from "../../Assets/kinetiq-loading.gif";
 const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
+  const SALES_POSITION_ID = "REG-2504-6039"; // Sales Rep position ID
 
   // setEmployee is used to set the selected customer in the parent component
   // setSelectedCustomer is used to set the selected customer in this component
@@ -44,14 +45,14 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
 
   const handleSearchAndFilter = () => {
     if (employeesQuery.status !== "success") return;
-
+    console.log("Employees: ", employeesQuery.data);
     try {
       const filteredData = employeesQuery.data
         .filter((employee) => employee.name.toLowerCase().includes(searchTerm))
         .filter(
           (employee) =>
-            employee.employee_type.toLowerCase() ===
-              employeeFilter.toLowerCase() || employeeFilter === "All"
+            employee.position_id.toLowerCase() ===
+              SALES_POSITION_ID.toLowerCase() || employeeFilter === "All"
         );
 
       setFilteredData(filteredData);
