@@ -391,6 +391,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     setAddress("");
     setDateIssued("");
     setCanEditTable(true);
+    setOrderID("");
     setOrderInfo({
       customer_id: "",
       quotation_id: "",

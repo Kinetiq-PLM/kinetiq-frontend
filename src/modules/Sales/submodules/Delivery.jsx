@@ -402,6 +402,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     setSelectedEmployee("");
     setAddress("");
     setDeliveryDate("");
+    setDeliveryID("");
     setDeliveryInfo({
       customer_id: "",
       order_id: "",
