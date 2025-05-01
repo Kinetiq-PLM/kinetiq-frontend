@@ -5,7 +5,7 @@ import Search from "../components/search/Search";
 import Button from "../components/button/Button";
 import NotifModal from "../components/modalNotif/NotifModal";
 
-const AccountsPayableReceipt = () => {
+const TaxAndRemittance = () => {
   const [data, setData] = useState([]); // State to store table data
   const [isLoading, setIsLoading] = useState(true); // State to manage loading state
   const [validation, setValidation] = useState({
@@ -70,7 +70,7 @@ const AccountsPayableReceipt = () => {
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      <p className="ml-4 text-gray-600">Loading Account payable receipt data...</p>
+      <p className="ml-4 text-gray-600">Loading Tax and Remittance data...</p>
     </div>
   );
 
@@ -78,16 +78,20 @@ const AccountsPayableReceipt = () => {
     <div className="accountsPayable">
       <div className="body-content-container">
         <div className="title-subtitle-container">
-          <h1 className="subModule-title">Accounts Payable Receipt</h1>
+          <h1 className="subModule-title">Tax and Remittance</h1>
         </div>
 
         <div className="parent-component-container">
           <div className="component-container">
             <Search />
           </div>
+
+          <div className="component-container">
+            <Button name="Update" variant="standard2" />
+          </div>
         </div>
 
-        {/* Accounts Payable Receipt Table */}
+        {/* Tax and Remittance Table */}
         <div className="title-subtitle-container">
           {isLoading ? (
             <LoadingSpinner />
@@ -110,4 +114,4 @@ const AccountsPayableReceipt = () => {
   );
 };
 
-export default AccountsPayableReceipt;
+export default TaxAndRemittance;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Button from "../Button";
+import Button from "../button/Button";
 
 const NotifModal = ({ isOpen, onClose, type = "success", title, message }) => {
   const [showModal, setShowModal] = useState(isOpen);

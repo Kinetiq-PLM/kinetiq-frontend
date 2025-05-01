@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
-import Table from "../components/Table";
-import Search from "../components/Search";
-import Button from "../components/Button";
-import Dropdown from "../components/Dropdown";
-import CreateReceiptModal from "../components/CreateReceiptModal";
+import Table from "../components/table/Table";
+import Search from "../components/search/Search";
+import Button from "../components/button/Button";
+import Dropdown from "../components/dropdown/Dropdown";
+import CreateReceiptModal from "../components/officialReceiptModal/CreateReceiptModal";
 import NotifModal from "../components/modalNotif/NotifModal";
 import axios from "axios";
 
@@ -72,16 +72,17 @@ const OfficialReceipts = () => {
   };
 
   const columns = [
-    "OR ID",
+    "Official Receipt ID",
     "Invoice ID",
     "Customer ID",
-    "OR Date",
+    "Official Receipt Date",
     "Settled Amount",
     "Remaining Amount",
     "Payment Method",
     "Reference #",
     "Created By",
   ];
+
   const [data, setData] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [searching, setSearching] = useState("");

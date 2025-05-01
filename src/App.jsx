@@ -370,6 +370,7 @@ function App() {
     "Project Request": "ProjectRequest",
     "Workforce Request": "WorkforceRequest",
     "Job Posting": "JobPosting",
+    "Employee Request": "EmployeeRequest",
   };
 
   const moduleSubmoduleFileNames = {
@@ -396,11 +397,11 @@ function App() {
       "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
       "General Ledger Accounts": "GeneralLedgerAccounts",
-      "Accounts Receivable": "AccountsReceivable",
-      "Accounts Payable": "AccountsPayable",
+      // "Accounts Payable": "AccountsPayable",
+      // "Accounts Receivable": "AccountsReceivable",
       "Official Receipts": "OfficialReceipts",
-      "Tax and Remittances": "TaxAndRemittances",
-      "Payroll Receipts": "PayrollReceipts",
+      "Payroll Accounting": "PayrollAccounting",
+      "Tax and Remittance": "TaxAndRemittance",
       "Accounts Payable Receipts": "AccountsPayableReceipts",
     },
     Financials: {
@@ -468,6 +469,7 @@ function App() {
     MRP: {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
       "Bills Of Material": "BillsOfMaterial",
+      "Product Materials": "ProductMaterials",
     },
     "Project Management": {
       "Project List": "Project List",
@@ -489,7 +491,11 @@ function App() {
       "Employee Performance": "EmployeePerformance",
       "Employee Salary": "EmployeeSalary",
     },
-    "Report Generator": {},
+    "Employee Request": {
+      "Resignation Request": "ResignationRequest",
+      "Overtime Request": "OvertimeRequest",
+      "Leave Request": "LeaveRequest",
+    },
   };
 
   // const rawPermissions = user?.role?.permissions || "";
