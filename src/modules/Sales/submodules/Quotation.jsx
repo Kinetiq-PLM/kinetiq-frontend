@@ -285,6 +285,7 @@ const Quotation = ({
     setSelectedEmployee("");
     setAddress("");
     setDateIssued("");
+    setQ_id("");
     setQuotationInfo({
       customer_id: "",
       quotation_id: "",
