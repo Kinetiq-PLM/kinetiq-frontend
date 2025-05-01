@@ -57,6 +57,7 @@ const [internalProjectStatusOptions, setInternalProjectStatusOptions] = useState
   
     
   const [message, setMessage] = useState({ text: "", type: "" });
+  axios.defaults.baseURL = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev';
 
   useEffect(() => {
     const fetchDropdownData = async () => {

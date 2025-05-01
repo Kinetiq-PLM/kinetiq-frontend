@@ -24,7 +24,7 @@ import SalesDropup from "../components/SalesDropup.jsx";
 import { useMutation } from "@tanstack/react-query";
 import { GET, POST } from "../api/api.jsx";
 
-const Order = ({ loadSubModule, setActiveSubModule }) => {
+const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const { showAlert } = useAlert();
 
   const copyFromOptions = ["Quotation", "Blanket Agreement"];
@@ -59,6 +59,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [isEmployeeListOpen, setIsEmployeeListOpen] = useState(false);
 
+  const [canEditTable, setCanEditTable] = useState(true);
   const [isBlanketAgreementListOpen, setIsBlanketAgreementListOpen] =
     useState(false);
   const [selectedBlanketAgreement, setSelectedBlanketAgreement] =
@@ -114,8 +115,8 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
-    { key: "special_requests", label: "Specification" },
-    { key: "quantity", label: "Quantity" },
+    { key: "special_requests", label: "Specification", editable: canEditTable },
+    { key: "quantity", label: "Quantity", editable: canEditTable },
     { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
     { key: "discount", label: "Discount" },
@@ -210,9 +211,10 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
       },
       statement_data: {
         customer: selectedCustomer.customer_id,
-        salesrep: selectedEmployee.employee_id,
+        salesrep: employee_id,
         total_amount: Number(parseFloat(orderInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(orderInfo.discount).toFixed(2)),
+        subtotal: Number(orderInfo.total_before_discount.toFixed(2)),
         total_tax: Number(parseFloat(orderInfo.total_tax).toFixed(2)),
       },
     };
@@ -248,6 +250,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
         transferID: selectedQuotation.quotation_id,
         transferOperation: "quotation",
       });
+      setCanEditTable(false);
     } else if (
       copyFromModal === "Blanket Agreement" &&
       selectedBlanketAgreement
@@ -303,12 +306,12 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     ).toFixed(2);
 
     const totalDiscount = products.reduce(
-      (acc, product) => acc + product.discount,
+      (acc, product) => acc + Number(product.discount),
       0
     );
 
     const totalPrice =
-      Number(totalBeforeDiscount) - Number(totalDiscount) + Number(totalTax);
+      Number(totalBeforeDiscount) + Number(totalTax) - Number(totalDiscount);
     const order = {
       ...orderInfo,
       customer_id: selectedCustomer.customer_id,
@@ -345,6 +348,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
     setSelectedEmployee("");
     setAddress("");
     setDeliveryDate("");
+    setCanEditTable(true);
     setOrderInfo({
       customer_id: "",
       quotation_id: "",
@@ -398,6 +402,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
           isOpen={isQuotationListOpen}
           onClose={() => setIsQuotationListOpen(false)}
           setQuotation={setSelectedQuotation}
+          query={"status=Ready"}
         ></QuotationListModal>
 
         <BlanketAgreementListModal
@@ -405,11 +410,11 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
           onClose={() => setIsBlanketAgreementListOpen(false)}
           setBlanketAgreement={setSelectedBlanketAgreement}
         ></BlanketAgreementListModal>
-        <EmployeeListModal
+        {/* <EmployeeListModal
           isOpen={isEmployeeListOpen}
           onClose={() => setIsEmployeeListOpen(false)}
           setEmployee={setSelectedEmployee}
-        ></EmployeeListModal>
+        ></EmployeeListModal> */}
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -420,6 +425,8 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
             operationID={orderID}
             setDeliveryDate={setDeliveryDate}
             setAddress={setAddress}
+            enabled={canEditTable}
+            date={new Date().toISOString().split("T")[0]}
           />
         </div>
         {/* TABLE */}
@@ -430,6 +437,7 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
             updateData={setProducts}
             onSelect={setSelectedProduct}
             minWidth={true}
+            isQuotation={canEditTable}
           />
         </section>
 
@@ -444,10 +452,15 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
                   setCanClear(true);
                   setIsProductListOpen(true);
                 }}
+                disabled={!canEditTable}
               >
                 Add Item
               </Button>
-              <Button type="outline" onClick={() => handleDelete()}>
+              <Button
+                type="outline"
+                onClick={() => handleDelete()}
+                disabled={!canEditTable}
+              >
                 Delete Item
               </Button>
             </div>
@@ -455,18 +468,8 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
             {/* Employee ID Input */}
             <div className="flex mb-2 w-full mt-4 gap-4 items-center">
               <p className="">Employee ID</p>
-              <div
-                className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center h-[30px] rounded"
-                onClick={() => setIsEmployeeListOpen(true)}
-              >
-                <p className="text-sm">
-                  {selectedEmployee ? selectedEmployee.employee_id : ""}
-                </p>
-                <img
-                  src="/icons/information-icon.svg"
-                  className="h-[15px]"
-                  alt="info icon"
-                />
+              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded">
+                <p className="text-sm">{employee_id || ""}</p>
               </div>
             </div>
 
@@ -539,12 +542,13 @@ const Order = ({ loadSubModule, setActiveSubModule }) => {
   );
 };
 
-const BodyContent = ({ loadSubModule, setActiveSubModule }) => {
+const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   return (
     <AlertProvider>
       <Order
         loadSubModule={loadSubModule}
         setActiveSubModule={setActiveSubModule}
+        employee_id={employee_id}
       />
     </AlertProvider>
   );

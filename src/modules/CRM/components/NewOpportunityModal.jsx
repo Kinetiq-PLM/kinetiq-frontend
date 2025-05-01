@@ -20,7 +20,7 @@ const NewOpportunityModal = ({
   onClose,
   setCanSave,
   selectedCustomer,
-  selectedEmployee,
+  employee_id,
 }) => {
   const { showAlert } = useAlert();
 
@@ -43,6 +43,8 @@ const NewOpportunityModal = ({
   const [grossProfit, setGrossProfit] = useState("");
   const [grossProfitTotal, setGrossProfitTotal] = useState("");
   const [interestLevel, setInterestLevel] = useState("");
+  const [probability, setProbability] = useState("");
+
   const opportunityMutation = useMutation({
     mutationFn: async (data) => await POST(`crm/opportunities/`, data),
     onSuccess: (data) => {
@@ -59,6 +61,7 @@ const NewOpportunityModal = ({
       });
     },
   });
+
   // ========== DATA ==========
 
   const [isValidationVisible, setIsValidationVisible] = useState(false);
@@ -70,6 +73,7 @@ const NewOpportunityModal = ({
       validateStartDate,
       validateEndDate,
       validateStatus,
+      validateProbability,
       validateEstimatedValue,
       validateWeightedAmount,
       validateGrossProfit,
@@ -91,13 +95,14 @@ const NewOpportunityModal = ({
       const request = {
         customer: selectedCustomer.customer_id,
         partner: selectedCustomer.partner.partner_id,
-        salesrep: selectedEmployee.employee_id,
+        salesrep: employee_id,
         starting_date: startDate,
         expected_closed_date: endDate,
         estimated_value: estimatedValue,
         weighted_amount: weightedAmount,
         gross_profit_percentage: grossProfit,
         gross_profit_total: grossProfitTotal,
+        probability_percentage: probability,
         stage,
         status,
         description,
@@ -115,6 +120,7 @@ const NewOpportunityModal = ({
       setWeightedAmount("");
       setGrossProfit("");
       setGrossProfitTotal("");
+      setProbability("");
       setInterestLevel("");
       setIsValidationVisible(false);
       setCanSave(true);
@@ -126,6 +132,13 @@ const NewOpportunityModal = ({
         title: "Please complete the form correctly.",
       });
     }
+  };
+
+  const validateProbability = () => {
+    if (!probability.trim()) {
+      return "Probability is required.";
+    }
+    return "";
   };
 
   const validateDescription = () => {
@@ -272,12 +285,29 @@ const NewOpportunityModal = ({
     setWeightedAmount("");
     setGrossProfitTotal("");
     setInterestLevel("");
+    setProbability("");
     setIsValidationVisible(false);
   }, [isOpen]);
 
   useEffect(() => {
-    setGrossProfitTotal(Number(estimatedValue) * (Number(grossProfit) / 100));
+    const estimated = parseFloat(estimatedValue.toString().replace(/,/g, ""));
+    const profit = parseFloat(grossProfit.toString().replace(/,/g, ""));
+
+    if (!isNaN(estimated) && !isNaN(profit)) {
+      setGrossProfitTotal((estimated * (profit / 100)).toFixed(2));
+    } else {
+      setGrossProfitTotal("");
+    }
   }, [grossProfit, estimatedValue]);
+
+  useEffect(() => {
+    const gp = parseFloat(grossProfitTotal.replace(/,/g, ""));
+    const prob = parseFloat(probability.replace(/,/g, ""));
+    if (!isNaN(grossProfitTotal) && !isNaN(prob)) {
+      setWeightedAmount((gp * (prob / 100)).toFixed(2));
+    }
+  }, [probability, grossProfitTotal]);
+
   if (!isOpen) return null;
 
   return (
@@ -374,11 +404,12 @@ const NewOpportunityModal = ({
                 isValidationVisible={isValidationVisible}
               />
               <NumberInputField
-                label={"Weighted Amount"}
-                value={weightedAmount}
-                setValue={setWeightedAmount}
-                validation={validateWeightedAmount}
+                label={"Probability"}
+                value={probability}
+                setValue={setProbability}
+                validation={validateProbability}
                 isValidationVisible={isValidationVisible}
+                isPercent={true}
               />
             </div>
             <div className="flex gap-2">
@@ -395,6 +426,16 @@ const NewOpportunityModal = ({
                 value={grossProfitTotal}
                 disabled={true}
               />
+            </div>
+            <div className="flex gap-2">
+              <NumberInputField
+                label={"Weighted Amount"}
+                value={weightedAmount}
+                setValue={setWeightedAmount}
+                validation={validateWeightedAmount}
+                isValidationVisible={isValidationVisible}
+              />
+              <div className="flex-1"></div>
             </div>
             <Dropup
               label="Level of Interest"

@@ -47,7 +47,7 @@ const BodyContent = () => {
     };
   }, [showAddForm]);
 
-  const fetchWarranties = async (url = '/api/warranties/') => {
+  const fetchWarranties = async (url = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev/api/warranties/') => {
     setIsLoading(true);
     try {
       const response = await axios.get(url);

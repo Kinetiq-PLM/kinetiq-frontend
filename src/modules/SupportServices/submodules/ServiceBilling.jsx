@@ -12,7 +12,7 @@ import { GET } from "../api/api"
 import { PATCH } from "../api/api"
 import { POST } from "../api/api"
 
-const ServiceBilling = () => {
+const ServiceBilling = ({employee_id}) => {
   // State for contracts
   const [billings, setBillings] = useState([])
   const [showUpdateModal, setShowUpdateModal] = useState(false)
@@ -26,7 +26,12 @@ const ServiceBilling = () => {
 
   const fetchBillings = async () => {
     try {
-      const data = await GET("service-billings/");
+      // this filters out billings so that only the service billings assigned to the one currently logged in will show:
+      // const data = await GET(`billing/billings/technician/HR-EMP-2025-8d9f9b/`);
+      const data = await GET(`billing/billings/technician/${employee_id}/`);
+
+      // all billings version:
+      // const data = await GET("billing/");
       setBillings(data);
     } catch (error) {
       console.error("Error fetching billings:", error)
@@ -99,7 +104,7 @@ const ServiceBilling = () => {
     console.log("Updating billing:", billingData)
 
     try {
-      await PATCH(`service-billing/${billingId}/update/`, billingData);
+      await PATCH(`billing/${billingId}/`, billingData);
       setShowUpdateModal(false);
       fetchBillings();
     } catch (error) {
@@ -126,7 +131,7 @@ const ServiceBilling = () => {
   const handleCreateBilling = async (billingData) => {
     console.log("Creating billing:", billingData)
     try {
-      const data = await POST("service-billings/", billingData);
+      const data = await POST("billing/", billingData);
       console.log("Service billing created successfully:", data);
       setShowCreateModal(false);
       fetchBillings();
@@ -225,6 +230,7 @@ const ServiceBilling = () => {
           onClose={() => setShowUpdateModal(false)}
           onUpdate={handleUpdateBilling}
           billing={selectedBilling}
+          technician={employee_id}
         />
       )}
 
@@ -233,6 +239,7 @@ const ServiceBilling = () => {
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
           onCreate={handleCreateBilling}
+          technician={employee_id}
         />
       )}
 

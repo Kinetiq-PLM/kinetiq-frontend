@@ -11,6 +11,8 @@ import Button from "../../Button";
 import { GET } from "../../../api/api.jsx";
 import { useQuery } from "@tanstack/react-query";
 
+import loading from "../../Assets/kinetiq-loading.gif";
+
 const DeliveredList = ({
   isOpen,
   onClose,
@@ -25,6 +27,7 @@ const DeliveredList = ({
   // ALL DELIVERED ORDERS TO THE CUSTOMER
   // console.log("Customer ID:", customerID);
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [delivery_list, set_delivery_list] = useState([]);
 
@@ -108,7 +111,7 @@ const DeliveredList = ({
       const data = deliveryQuery.data.map((delivery) => ({
         ...delivery,
         delivery_note_id: delivery.delivery_note_id,
-        customer_name: delivery.statement.customer.name,
+        customer_name: delivery.statement?.customer?.name,
         date_shipped: new Date(delivery.shipping_date).toLocaleString(),
         delivered_date: new Date(
           delivery.actual_delivery_date
@@ -116,6 +119,7 @@ const DeliveredList = ({
       }));
       set_delivery_list(data);
       setFilteredData(data);
+      setIsLoading(false);
     } else if (deliveryQuery.status === "error") {
       showAlert({
         type: "error",
@@ -143,7 +147,7 @@ const DeliveredList = ({
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Deliveries
+            List of Deliveries
           </h2>
         </div>
 
@@ -174,13 +178,19 @@ const DeliveredList = ({
               }}
             />
           </div>
-          <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
-            <Table
-              columns={columns}
-              data={filteredData}
-              onSelect={setSelectedDelivery}
-            />
-          </div>
+          {isLoading ? (
+            <div className="h-[300px] rounded-md flex justify-center items-center">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
+              <Table
+                columns={columns}
+                data={filteredData}
+                onSelect={setSelectedDelivery}
+              />
+            </div>
+          )}
           <div className="mt-4 flex justify-between">
             <div>
               <Button

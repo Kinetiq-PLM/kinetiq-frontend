@@ -1,18 +1,29 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-const InputCustomer = ({ label, value = "", customerListModal }) => {
+const InputCustomer = ({
+  label,
+  value = "",
+  customerListModal,
+  enabled = true,
+}) => {
   return (
     <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
-      <p className="flex-1">{label}</p>
+      <p className="w-[150px]">{label}</p>
       <div
-        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded"
-        onClick={() => customerListModal(true)}
+        className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded overflow-hidden"
+        onClick={() => {
+          if (enabled) {
+            customerListModal(true);
+          }
+        }}
       >
-        <p className="text-sm">{value}</p>
+        <p className="text-sm truncate overflow-hidden whitespace-nowrap flex-1">
+          {value}
+        </p>
         <img
           src="/icons/information-icon.svg"
-          className="h-[15px]"
+          className="h-[15px] ml-2 flex-shrink-0"
           alt="info icon"
         />
       </div>
@@ -21,8 +32,8 @@ const InputCustomer = ({ label, value = "", customerListModal }) => {
 };
 const Information = ({ label, value = "" }) => {
   return (
-    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
-      <p className="flex-1">{label}</p>
+    <div className="flex justify-end mb-2 w-full flex-col sm:flex-row">
+      <p className="w-[150px]">{label}</p>
       <div
         className={`border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded overflow-x-auto whitespace-nowrap ${
           value === "" ? "bg-[#f7f7f7]" : ""
@@ -56,10 +67,10 @@ const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
 
   return (
     <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
-      <p className="flex-1">{label}</p>
+      <p className="w-[150px]">{label}</p>
       {customer ? (
         <select
-          className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white rounded cursor-pointer text-sm"
+          className="border border-[#9a9a9a] flex-1 p-1 h-[30px] bg-white rounded cursor-pointer text-sm truncate"
           onChange={handleAddressChange}
           value={address || ""}
         >
@@ -71,18 +82,23 @@ const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
         </select>
       ) : (
         <div
-          className={`border border-[#9a9a9a] flex-1 p-1 min-h-[30px] bg-[#f7f7f7]`}
+          className={`border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded bg-[#f7f7f7]`}
         ></div>
       )}
     </div>
   );
 };
 
-const DateSelector = ({ label, customer, setDeliveryDate, disabled }) => {
-  // Calculate the default date (3 days from today)
-  const defaultDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+const DateSelector = ({
+  label,
+  customer,
+  setDeliveryDate,
+  disabled,
+  defaultDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
     .toISOString()
-    .split("T")[0];
+    .split("T")[0],
+}) => {
+  // Calculate the default date (3 days from today)
 
   // Initialize state with the customer's delivery date or default date
   const [date, setDate] = useState(customer.delivery_date || defaultDate);
@@ -102,10 +118,10 @@ const DateSelector = ({ label, customer, setDeliveryDate, disabled }) => {
 
   return (
     <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
-      <p className="flex-1">{label}</p>
+      <p className="w-[150px]">{label}</p>
       <input
         type="date"
-        className="border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded cursor-pointer disabled:cursor-default disabled:bg-[#f7f7f7]"
+        className="border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded cursor-pointer  text-sm disabled:cursor-default disabled:bg-[#f7f7f7]"
         onChange={handleDateChange}
         value={date}
         min={defaultDate} // Restrict to at least 3 days from now
@@ -123,6 +139,10 @@ const SalesInfo = ({
   operationID,
   setAddress,
   setDeliveryDate,
+  enabled = true,
+  date = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0],
 }) => {
   let id = "";
   if (type === "Quotation") {
@@ -136,33 +156,35 @@ const SalesInfo = ({
   }
 
   return (
-    <section className="flex justify-between gap-6 flex-col md:flex-row">
-      <div className="h-full w-full flex flex-col items-center">
+    <section className="flex flex-col md:flex-row md:gap-6">
+      {/* Left Column */}
+      <div className="flex flex-1 flex-col items-center space-y-2">
         {type === "Delivery" ? (
-          <Information label={"Customer ID"} value={customer.customer_id} />
+          <Information label="Customer ID" value={customer.customer_id} />
         ) : (
           <InputCustomer
-            label={"Customer"}
+            label="Customer"
             value={customer.customer_id}
             customerListModal={customerListModal}
+            enabled={enabled}
           />
         )}
-        <Information label={"Name"} value={customer.name} />
-        <Information label={"Country"} value={customer.country} />
-        <Information label={"Number"} value={customer.phone_number} />
+        <Information label="Name" value={customer.name} />
+        <Information label="Country" value={customer.country} />
+        <Information label="Number" value={customer.phone_number} />
       </div>
-      <div className="w-full hidden xl:block"></div>
-      <div className="h-full w-full flex flex-col items-center">
+
+      <div className="lg:max-w-[100px] xl:max-w-none flex-1 hidden lg:block"></div>
+
+      {/* Right Column */}
+      <div className="flex flex-1 flex-col items-center space-y-2">
         <Information label={`${type} ID`} value={operationID} />
-        {/* Generate a random ID */}
-        <Information label={"Status"} value={customer.status} />
-        {/* Current status of the customer: Active or Inactive, after a transaction update to Active  */}
+        <Information label="Status" value={customer.status} />
         <AddressDropbar
-          label={"Address"}
+          label="Address"
           customer={customer}
           setCustomerAddress={setAddress}
         />
-        {/* Dropdown to select address 1 or 2 */}
         <DateSelector
           customer={customer}
           setDeliveryDate={setDeliveryDate}
@@ -171,9 +193,9 @@ const SalesInfo = ({
               ? "Date Issued"
               : "Delivery Date"
           }
+          defaultDate={date}
           disabled={["Quotation", "Order"].includes(type)}
         />
-        {/* Date Selector*/}
       </div>
     </section>
   );

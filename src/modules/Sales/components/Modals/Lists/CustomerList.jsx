@@ -9,6 +9,8 @@ import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../../api/api";
 
+import loading from "../../Assets/kinetiq-loading.gif";
+
 const CustomerListModal = ({
   isOpen,
   isNewCustomerModalOpen,
@@ -18,6 +20,7 @@ const CustomerListModal = ({
   duplicates = [],
 }) => {
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   // setSelectedCustomer is used to set the selected customer in this component
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -73,6 +76,7 @@ const CustomerListModal = ({
     if (customersQuery.status === "success") {
       setFilteredData(customersQuery.data);
       setCustomers(customersQuery.data);
+      setIsLoading(false);
     } else if (customersQuery.status === "error") {
       showAlert({
         type: "error",
@@ -127,7 +131,7 @@ const CustomerListModal = ({
         {/* HEADER */}
         <div className="w-full bg-[#EFF8F9] py-[20px] px-[30px] border-b border-[#cbcbcb]">
           <h2 id="modal-title" className="text-xl font-semibold">
-            List Of Business Partners
+            List of Business Partners
           </h2>
         </div>
 
@@ -158,13 +162,19 @@ const CustomerListModal = ({
               }}
             />
           </div>
-          <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
-            <Table
-              columns={columns}
-              data={filteredData}
-              onSelect={setSelectedCustomer}
-            />
-          </div>
+          {isLoading ? (
+            <div className="h-[300px] rounded-md flex justify-center items-center">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="h-[300px] overflow-auto border border-[#CBCBCB] rounded-md">
+              <Table
+                columns={columns}
+                data={filteredData}
+                onSelect={setSelectedCustomer}
+              />
+            </div>
+          )}
           <div className="mt-4 flex justify-between">
             <div>
               <Button

@@ -20,7 +20,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
 
   const fetchItems= async () => {
     try {
-      const data = await GET("items/");
+      const data = await GET("order/inventory/items/");
       setItems(data);
     } catch (error) {
       console.error("Error fetching items:", error);
@@ -36,15 +36,15 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
   };
 
   const handleSelectItem = (item) => {
-    setItemId(item.item_id);
-    setItemName(item.item_name || "");
+    setItemId(item.inventory_item_id);
+    setItemName(item?.material?.material_name || item?.productdocu?.product?.product_name || "");
 
     setItemsDropdown(false);
   };
 
   const handleSelectItemInventory = (item) => {
-    setItemId(item.item?.item_id);
-    setItemName(item.item?.item_name || "");
+    setItemId(item.inventory_item_id);
+    setItemName(item?.material?.material_name || item?.productdocu?.product?.product_name || "");
   };
 
   const handleViewInventory = () => {
@@ -60,7 +60,6 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
 
     onAdd({
       item_id: itemId,
-      principal_item_id: principalItemId,
       item_quantity: quantity,
       item_price: "0.00",
       total_price: "0.00",
@@ -128,11 +127,11 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
                     {items.length > 0 ? (
                       items
                         .filter((item) =>
-                          item.item_id.toLowerCase().includes(itemId.toLowerCase())
+                          item.inventory_item_id.toLowerCase().includes(itemId.toLowerCase())
                         )
                         .map((item) => (
-                          <li key={item.item_id} onClick={() => handleSelectItem(item)}>
-                            {item.item_id}
+                          <li key={item.inventory_item_id} onClick={() => handleSelectItem(item)}>
+                            {item.inventory_item_id}
                           </li>
                         ))
                     ) : (

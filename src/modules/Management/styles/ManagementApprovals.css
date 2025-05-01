@@ -1,48 +1,22 @@
+/* ManagementApprovals.css */
+
 .approvals-container {
-  background-color: white;
   padding: 20px;
-  font-family: sans-serif;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+background-color: white;
 }
 
 .header {
   display: flex;
-  align-items: center;
+  justify-content: flex-end;
   margin-bottom: 20px;
 }
 
-.management-text, .approvals-text {
-  font-weight: bold;
+.search-bar,
+.notification,
+.user-profile {
+  margin-left: 10px;
 }
-
-.search-bar {
-  margin-left: auto;
-}
-
-.search-bar input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.notification, .user-profile {
-  margin-left: 20px;
-}
-
-.content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-h1 {
-  margin-bottom: 20px;
-}
-
-.search-id {
-  margin-bottom: 20px;
+ .content {
 }
 
 .search-id input {
@@ -51,22 +25,17 @@ h1 {
   border-radius: 4px;
 }
 
-.filter-options {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.filter-options select {
+ .filter-options select {
   padding: 8px;
+  margin-right: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
   margin-bottom: 20px;
 }
 
@@ -79,47 +48,92 @@ h1 {
   margin-bottom: 5px;
 }
 
-.form-group input, .form-group select, .form-group textarea {
+.form-group input,
+.form-group select,
+.form-group textarea {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-.remarks {
-  grid-column: 1 / -1; /* Span all columns */
+.remarks textarea {
+  min-height: 100px;
 }
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+ justify-content: flex-end;
 }
 
-.back-button, .save-button {
-  padding: 10px 20px;
+.form-actions button {
+  padding: 10px 15px;
+  margin-left: 10px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
 .back-button {
-  background-color: #e0e0e0;
+  background-color: #f0f0f0;
 }
 
 .save-button {
-  background-color: #00bcd4;
+  background-color: #4CAF50;
   color: white;
 }
 
-/* Color-coded Status Dropdown */
-.form-group select option[value="approved"] {
-  color: green;
+/* Approval List Table */
+.Full-list {
+  margin-top: 20px;
 }
 
-.form-group select option[value="pending"] {
-  color: orange;
+.requests-table-container {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.form-group select option[value="denied"] {
-  color: red;
+.requests-table-container th,
+.requests-table-container td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.requests-table-container th {
+  background-color: #f2f2f2;
+}
+
+.requests-table-container tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Scrollbar for the status-select-container */
+.status-select-container {
+  max-height: 150px; /* Adjust as needed */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.status-select-container select {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+}
+
+/* Scrollbar for the table body */
+.table-body-scroll {
+  overflow-y: auto;
+  max-height: 300px; /* Adjust as needed */
+}
+
+/* Custom scrollbar styling (Webkit browsers like Chrome, Safari) */
+.requests-table-container::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.requests-table-container::-webkit-scrollbar-thumb {
+  background-color: #00A8A8; /* Color of the scrollbar thumb */
+  border-radius: 4px; /* Rounded corners for the scrollbar thumb */
 }

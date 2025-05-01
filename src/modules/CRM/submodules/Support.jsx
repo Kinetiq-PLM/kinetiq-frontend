@@ -13,8 +13,13 @@ import TICKET_LIST_DATA from "../../Sales/temp_data/ticket_list";
 import { GET } from "../../Sales/api/api";
 import { useQuery } from "@tanstack/react-query";
 import { useAlert } from "../../Sales/components/Context/AlertContext";
-const Support = () => {
+
+import loading from "../../Sales/components/Assets/kinetiq-loading.gif";
+
+const Support = ({ employee_id }) => {
   const showAlert = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("All Time"); // Default date filter
@@ -25,7 +30,7 @@ const Support = () => {
   const [isTicketResolveOpen, setIsTicketResolveOpen] = useState(false);
   const ticketQuery = useQuery({
     queryKey: ["tickets"],
-    queryFn: async () => await GET("crm/ticket"),
+    queryFn: async () => await GET(`crm/ticket?salesrep=${employee_id}`),
   });
   const columns = [
     { key: "ticket_id", label: "Ticket ID" },
@@ -85,6 +90,7 @@ const Support = () => {
         employee_name: `${ticket.salesrep.first_name} ${ticket.salesrep.last_name}`,
       }));
       setTicketList(data);
+      setIsLoading(false);
     } else if (ticketQuery.status === "error") {
       showAlert({
         type: "error",
@@ -118,71 +124,84 @@ const Support = () => {
         />
 
         <main className="mt-4">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-            {/* Filters */}
-            <div className="flex flex-1/2 items-center space-x-2 gap-2 w-fit flex-wrap-reverse">
-              {/* Date Filter Dropdown */}
-              <div className="w-full max-w-[200px]">
-                <Dropdown
-                  options={dateFilters}
-                  onChange={setDateFilter}
-                  value={dateFilter}
-                />
+          {/* Header Section */}
+          <div className="mb-4">
+            {/* Filters & Action */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start w-full">
+              {/* Left Side Filters */}
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 flex-1">
+                {/* Date Filter Dropdown */}
+                <div className="w-full sm:w-[200px]">
+                  <Dropdown
+                    options={dateFilters}
+                    onChange={setDateFilter}
+                    value={dateFilter}
+                  />
+                </div>
+
+                {/* Search By Dropdown */}
+                <div className="w-full sm:w-[200px]">
+                  <Dropdown
+                    options={searchFields.map((field) => field.label)}
+                    onChange={(selected) => {
+                      const field = searchFields.find(
+                        (f) => f.label === selected
+                      );
+                      if (field) setSearchBy(field.key);
+                    }}
+                    value={searchFields.find((f) => f.key === searchBy)?.label}
+                  />
+                </div>
+
+                {/* Search Input */}
+                <div className="w-full sm:flex-1">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full h-[40px]"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
               </div>
 
-              {/* Search By Dropdown */}
-              <div className="w-full max-w-[200px]">
-                <Dropdown
-                  options={searchFields.map((field) => field.label)}
-                  onChange={(selected) => {
-                    const field = searchFields.find(
-                      (f) => f.label === selected
-                    );
-                    if (field) setSearchBy(field.key);
-                  }}
-                  value={searchFields.find((f) => f.key === searchBy)?.label}
-                />
+              {/* Right Side Button */}
+              <div className="w-full sm:w-auto">
+                <Button
+                  onClick={() => setIsTicketDetailOpen(true)}
+                  type="primary"
+                  className={"!max-w-[200px] py-2 flex-1"}
+                  disabled={!selectedTicket}
+                >
+                  View Details
+                </Button>
               </div>
+            </div>
+          </div>
 
-              {/* Search Input */}
-              <input
-                type="text"
-                placeholder="Search..."
-                className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-[600px]"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+          {isLoading ? (
+            <div className="w-full text-center min-h-[350px] h-[500px] rounded-md mt-2 table-layout overflow-auto justify-center items-center flex">
+              <img src={loading} alt="loading" className="h-[100px]" />
+            </div>
+          ) : (
+            <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[570px] rounded-md mt-2 table-layout overflow-auto">
+              <Table
+                data={filteredTickets}
+                columns={columns}
+                onSelect={setSelectedTicket}
               />
             </div>
-
-            {/* Action Button */}
-            <Button
-              type="primary"
-              onClick={() => setIsTicketDetailOpen(true)}
-              className={"w-[200px] py-2"}
-              disabled={!selectedTicket}
-            >
-              View Details
-            </Button>
-          </div>
-
-          {/* Table Section */}
-          <div className="border border-[#CBCBCB] w-full min-h-[350px] h-[570px] rounded-md mt-2 table-layout overflow-auto">
-            <Table
-              data={filteredTickets}
-              columns={columns}
-              onSelect={setSelectedTicket}
-            />
-          </div>
+          )}
         </main>
       </div>
     </div>
   );
 };
 
-const BodyContent = () => {
+const BodyContent = ({ employee_id }) => {
   return (
     <AlertProvider>
-      <Support />
+      <Support employee_id={employee_id} />
     </AlertProvider>
   );
 };

@@ -1,0 +1,71 @@
+/* REMINDER! All of your elements must use your unique namespace '.stocklvl' at the start to avoid leaking */
+
+.selflife {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.selflife .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 2rem 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+    overflow-y: auto;
+  }
+
+  .selflife .body-content-container::-webkit-scrollbar {
+    width: 8px; /* Scrollbar width */
+    background: #e5e7eb;
+  }
+  
+  .selflife .body-content-container::-webkit-scrollbar-thumb {
+    background: rgb(168, 168, 168); /* Scrollbar color */
+    border-radius: 6px; 
+  }
+  
+  .selflife .body-content-container::-webkit-scrollbar-thumb:hover {
+    background: #c1c3c6;
+  }
+   
+
+  .selflife .warehouse-filter::-webkit-scrollbar {
+    width: 12px; /* Scrollbar width */
+    background: #e5e7eb;
+  }
+  
+  .selflife .warehouse-filter::-webkit-scrollbar-thumb {
+    background: rgb(168, 168, 168); /* Scrollbar color */
+    border-radius: 6px; 
+  }
+  
+  .selflife .warehouse-filter::-webkit-scrollbar-thumb:hover {
+    background: #c1c3c6;
+  }
+  
+
+  .selflife .expiry-table-container::-webkit-scrollbar {
+    width: 6px; /* Scrollbar width */
+    height: 6px;
+  }
+  
+  .selflife .expiry-table-container::-webkit-scrollbar-thumb {
+    background: #00A8A8; /* Scrollbar color */
+    border-radius: 6px; 
+    height: 5rem;
+    width: 5rem;
+  }
+  
+  .selflife .expiry-table-container::-webkit-scrollbar-thumb:hover {
+    background: #c1c3c6;
+  }

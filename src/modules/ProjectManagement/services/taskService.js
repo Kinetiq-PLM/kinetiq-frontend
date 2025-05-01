@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/project-tasks/api';
+const API_URL = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev/project-tasks/api';
 
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';

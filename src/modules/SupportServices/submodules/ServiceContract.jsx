@@ -26,7 +26,7 @@ const ServiceContract = () => {
 
   const fetchContracts = async () => {
     try {
-      const data = await GET("service-contracts/");
+      const data = await GET("contract/");
       setContracts(data);
     } catch (error) {
       console.error("Error fetching contracts:", error)
@@ -99,7 +99,7 @@ const ServiceContract = () => {
     console.log("Updating contract:", contractData)
 
     try {
-      await PATCH(`update-contract/${contractId}/`, contractData);
+      await PATCH(`contract/${contractId}/`, contractData);
       setShowUpdateModal(false);
       fetchContracts();
     } catch (error) {
@@ -127,7 +127,7 @@ const ServiceContract = () => {
   const handleCreateContract = async (contractData) => {
     console.log("Creating contract:", contractData)
     try {
-      const data = await POST("/service-contracts/", contractData);
+      const data = await POST("contract/", contractData);
       console.log("Contract created successfully:", data);
       setShowCreateModal(false);
       fetchContracts();

@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 
-const Table = ({ columns, data, onSelect = () => {}, minWidth = false }) => {
+const Table = ({
+  columns,
+  data,
+  onSelect = () => {},
+  minWidth = false,
+  setIsDocumentModalOpen = null,
+  setDocument = null,
+}) => {
   const [selectedRow, setSelectedRow] = useState(null);
 
   const handleRowClick = (row) => {
@@ -39,6 +46,7 @@ const Table = ({ columns, data, onSelect = () => {}, minWidth = false }) => {
                 onClick={() => handleRowClick(row)}
               >
                 {columns.map((column, colIndex) => {
+                  if (column.key === "document_link") return null;
                   if (column.key !== "document") {
                     return (
                       <td key={colIndex} className="px-4 py-3 text-center">
@@ -46,14 +54,25 @@ const Table = ({ columns, data, onSelect = () => {}, minWidth = false }) => {
                       </td>
                     );
                   } else {
+                    if (row[column.key]) {
+                      return (
+                        <td key={colIndex} className="px-4 py-3 text-center">
+                          <a
+                            onClick={() => {
+                              setIsDocumentModalOpen(true);
+                              setDocument(row.endpoint);
+                            }}
+                            // href={row.document_link}
+                            className="underline text-[#00a8a8]"
+                          >
+                            View
+                          </a>
+                        </td>
+                      );
+                    }
                     return (
                       <td key={colIndex} className="px-4 py-3 text-center">
-                        <a
-                          href={row[column.key]}
-                          className="underline text-[#00a8a8]"
-                        >
-                          View
-                        </a>
+                        <a className="text-[#00a8a8]">Unavailable</a>
                       </td>
                     );
                   }

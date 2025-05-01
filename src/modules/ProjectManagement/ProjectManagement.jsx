@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "./styles/ProjectManagement.css";
 import axios from "axios";
 import { debounce } from 'lodash'; // You'll need to install lodash: npm install lodash
-
+axios.defaults.baseURL = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev';
 const BodyContent = () => {
     const [overdueTasks, setOverdueTasks] = useState([]);
     const [todayTasks, setTodayTasks] = useState([]);
@@ -413,6 +413,8 @@ const handleNavClickdash = (nav) => {
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {console.log("printing overduetasks var:")}
+                                        {console.log(overdueTasks)}
                                         {isLoading.overdueTasks ? (
                                             <tr><td colSpan="4" className="loading-cell">Loading...</td></tr>
                                         ) : errors.overdueTasks ? (

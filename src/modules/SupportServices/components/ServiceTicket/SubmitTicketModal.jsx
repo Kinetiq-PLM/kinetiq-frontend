@@ -7,7 +7,7 @@ import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 
 import { GET } from "../../api/api"
 
-const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
+const SubmitTicketModal = ({ isOpen, onClose, onSubmit, user_id, employee_id }) => {
   const [customers, setCustomers] = useState([]);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [technicians, setTechnicians] = useState([]);
@@ -24,12 +24,15 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
   const [createdAt, setCreatedAt] = useState(() => {
     return new Date().toISOString().split("T")[0]; // yyyy/mm/dd
   });
-  const [ticketType, setTicketType] = useState("")
+  const [ticketType, setTicketType] = useState("Service")
+  const [userId, setUserId] = useState("")
+
+  
 
   // fetches a list of customers
   const fetchCustomers = async () => {
     try {
-      const response = await GET("/customers/");
+      const response = await GET("ticket/tickets/customers/");
       console.log("asdasd", response)
       setCustomers(response);
     } catch (error) {
@@ -54,11 +57,21 @@ const SubmitTicketModal = ({ isOpen, onClose, onSubmit }) => {
 // fetches a list of techs
 const fetchTechnicians = async () => {
   try {
-    const response = await GET("/technicians/");
+    const response = await GET("call/calls/help-desks/"); // filter out only help desk technicians
     console.log("techs", response)
     setTechnicians(response);
   } catch (error) {
     console.error("Error fetching technicians:", error);
+  }
+};
+
+const fetchUserId = async (techId) => {
+  try {
+    const response = await GET(`call/calls/user/${techId}`); 
+    setUserId(response.user_id);
+    console.log("user id", response.user_id)
+  } catch (error) {
+    console.error("Error fetching user:", error);
   }
 };
 
@@ -71,6 +84,7 @@ const handleToggleDropdownTech = () => {
 };
 
 const handleSelectTechnician = (technician) => {
+  fetchUserId(technician.employee_id)
   setTechnicianId(technician.employee_id); 
   setDropdownOpenT(false); 
 };
@@ -101,6 +115,8 @@ const handleSelectType = (selectedType) => {
   const prioRef = useRef(null);
 
   useEffect(() => {
+    // setTechnicianId(employee_id); // set the technician id to the one currently logged in
+
     const handleClickOutside = (event) => {
       if (customerRef.current && !customerRef.current.contains(event.target)) {
         setDropdownOpen(false);
@@ -128,11 +144,12 @@ const handleSelectType = (selectedType) => {
       priority: priority,
       subject: subject,
       description: description,
-      type: ticketType
+      type: ticketType,
+      salesrep_id: technicianId,
+      userId: userId
     })
     setCustomerId("");
     setName("");
-    setTechnicianId("");
     setPriority("");
     setSubject("");
     setDescription("");
@@ -204,11 +221,11 @@ const handleSelectType = (selectedType) => {
                     id="ticketType"
                     value={ticketType}
                     readOnly
-                    onChange={(e) => setTicketType(e.target.value)}
+                    // onChange={(e) => setTicketType(e.target.value)}
                     placeholder="Select ticket type"
                   />
-                  <span className="select-arrow" onClick={handleTypeDropdown}>▼</span>
-                  {isDropdownOpenType && (
+                  {/* <span className="select-arrow" onClick={handleTypeDropdown}>▼</span> */}
+                  {/* {isDropdownOpenType && (
                     <ul className="dropdown-list">
                       {["Service", "Sales"].map((type) => (
                         <li key={type} onClick={() => handleSelectType(type)}>
@@ -216,7 +233,7 @@ const handleSelectType = (selectedType) => {
                         </li>
                       ))}
                     </ul>
-                  )}
+                  )} */}
                 </div>   
               </div>         
               
@@ -244,6 +261,7 @@ const handleSelectType = (selectedType) => {
                   <input
                     type="text"
                     id="technicianId"
+                    // readOnly
                     value={technicianId}
                     onChange={(e) => {
                       setTechnicianId(e.target.value);
@@ -269,7 +287,7 @@ const handleSelectType = (selectedType) => {
                             <li>No technicians ID found</li>
                           )}
                         </ul>
-                      )}
+                      )}  
                 </div>
               </div>
             </div>

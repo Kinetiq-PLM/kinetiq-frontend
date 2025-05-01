@@ -7,7 +7,6 @@ import ServiceTicketIcon from "/icons/SupportServices/ServiceTicket.png"
 import { GET } from "../../api/api"
 
 const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
-  console.log("aaaa tx data", ticket)
   const [technicians, setTechnicians] = useState([]);
   const [isTechDropdown, setOpenTechDD] = useState(false);
   const [products, setProducts] = useState([]);
@@ -22,6 +21,8 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   const [technicianId, setTechnicianId] = useState("");
   const [technicianName, setTechnicianName] = useState("");
   const [callType, setCallType] = useState("");
+  const [priority, setPriority] = useState("");
+  const [userId, setUserId] = useState("")
 
   useEffect(() => {
     if (ticket) {
@@ -29,6 +30,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
       setCustomerId(ticket.customer?.customer_id || ""); 
       setName(ticket.customer?.name || ""); 
       setEmailAddress(ticket.customer?.email_address || ""); 
+      setPriority(ticket.priority || ""); 
     }
   }, [ticket]);
 
@@ -38,7 +40,9 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
       product_id: productId,
       customer_id: customerId,
       technician: technicianId,
-      call_type: callType
+      call_type: callType, 
+      priority_level: priority,
+      userId: userId
     })
 
     // reset form
@@ -55,11 +59,24 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   // fetches a list of techs
   const fetchTechnicians = async () => {
     try {
-      const response = await GET("/technicians/");
+      // this list all employees:
+      // const response = await GET("call/calls/technicians/");
+      // only list supp specialists:
+      const response = await GET("call/calls/support-specialists/");
       console.log("techs", response)
       setTechnicians(response);
     } catch (error) {
       console.error("Error fetching technicians:", error);
+    }
+  };
+
+  const fetchUserId = async (techId) => {
+    try {
+      const response = await GET(`call/calls/user/${techId}`); 
+      setUserId(response.user_id);
+      console.log("user id", response.user_id)
+    } catch (error) {
+      console.error("Error fetching user:", error);
     }
   };
 
@@ -72,6 +89,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   };
 
   const handleSelectTechnician = (technician) => {
+    fetchUserId(technician.employee_id)
     setTechnicianId(technician.employee_id); 
     setTechnicianName(technician.first_name + " " + technician.last_name); 
     setOpenTechDD(false); 
@@ -92,7 +110,7 @@ const QueueTicketModal = ({ isOpen, onClose, onQueue, ticket }) => {
   // fetches a list of products
   const fetchProducts = async () => {
     try {
-      const response = await GET("/products/");
+      const response = await GET("call/calls/products/");
       console.log("prods", response)
       setProducts(response);
     } catch (error) {

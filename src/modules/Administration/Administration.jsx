@@ -1,190 +1,296 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import CountUp from "react-countup";
+import {
+  AppstoreOutlined,
+  ToolOutlined,
+  ShoppingOutlined,
+  ExperimentOutlined,
+  UserOutlined,
+  ShopOutlined,
+  HomeOutlined,
+  FileTextOutlined,
+  FileSearchOutlined,
+  LoadingOutlined,
+  DollarOutlined
+} from "@ant-design/icons";
+
+// Import API services
+import { 
+  userAPI, 
+  roleAPI,
+  policiesAPI, 
+  assetsAPI, 
+  productsAPI, 
+  rawMaterialsAPI, 
+  businessPartnerAPI,
+  vendorAPI,
+  auditLogAPI,
+  currencyAPI,
+  warehouseAPI
+} from "../Administration/api/api";
 
 const Administration = ({ setActiveSubModule, loadSubModule }) => {
-    return (
-        <div className="admin">
-            <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Admin</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  // State variables for dashboard data
+  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState(0);
+  const [assets, setAssets] = useState(0);
+  const [products, setProducts] = useState(0);
+  const [rawMaterials, setRawMaterials] = useState(0);
+  const [partners, setPartners] = useState(0);
+  const [vendors, setVendors] = useState(0);
+  const [policies, setPolicies] = useState(0);
+  const [auditLogs, setAuditLogs] = useState(0);
+  const [warehouses, setWarehouses] = useState(0);
+  const [exchangeRate, setExchangeRate] = useState(0);
+  const [currency, setCurrency] = useState("PHP");
 
-                    {/* USER */}
-                    <Card title="User" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("User");
-                                loadSubModule("User");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["User Id", "Email", "Date", "Category"]}
-                                data={[
-                                    ["User_01", "user01@mail.com", "2025-04-12", "Admin"],
-                                    ["User_02", "user02@mail.com", "2025-04-10", "Employee Benefits"],
-                                    ["User_03", "user03@mail.com", "2025-04-08", "HR"],
-                                ]}
-                                withCheckbox={true}
-                                highlightDisabledRow={true}
-                                badge={true}
-                            />
-                        </div>
-                    </Card>
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch all data in parallel
+        const [
+          usersData,
+          assetsData,
+          productsData,
+          rawMaterialsData,
+          partnersData,
+          vendorsData,
+          policiesData,
+          logsData,
+          warehousesData,
+          currenciesData
+        ] = await Promise.all([
+          userAPI.getUsers(),
+          assetsAPI.getAssets(),
+          productsAPI.getProducts(),
+          rawMaterialsAPI.getRawMaterials(),
+          businessPartnerAPI.getBusinessPartners(),
+          vendorAPI.getVendors(),
+          policiesAPI.getPolicies(),
+          auditLogAPI.getAuditLogs(),
+          warehouseAPI.getWarehouses(),
+          currencyAPI.getActiveCurrencies()
+        ]);
 
-                    {/* ITEM MASTERLIST */}
-                    <Card title="Item Masterlist" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("Item Masterlist");
-                                loadSubModule("Item Masterlist");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["Item ID", "Item Name", "Item Type", "Status"]}
-                                data={[
-                                    ["Item001", "Screw", "Assets", "Active"],
-                                    ["Item002", "Glue", "Product", "Inactive"],
-                                    ["Item003", "Wires", "Raw Materials", "Pending"],
-                                ]}
-                            />
-                        </div>
-                    </Card>
+        // Set state with fetched data counts
+        setUsers(usersData.count || usersData.length || 0);
+        setAssets(assetsData.count || assetsData.length || 0);
+        setProducts(productsData.count || productsData.length || 0);
+        setRawMaterials(rawMaterialsData.count || rawMaterialsData.length || 0);
+        setPartners(partnersData.count || partnersData.length || 0);
+        setVendors(vendorsData.count || vendorsData.length || 0);
+        setPolicies(policiesData.count || policiesData.length || 0);
+        setAuditLogs(logsData.count || logsData.length || 0);
+        setWarehouses(warehousesData.count || warehousesData.length || 0);
 
-                    {/* BUSINESS PARTNER MASTERLIST */}
-                    <Card title="Business Partner Masterlist" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("Business Partner Masterlist");
-                                loadSubModule("Business Partner Masterlist");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["Partner ID", "Vendor Code", "Partner Name", "Category"]}
-                                data={[
-                                    ["BP_01", "V001", "Acme Corp", "Vendor"],
-                                    ["BP_02", "V002", "Beta Ltd", "Customer"],
-                                    ["BP_03", "V003", "Gamma Inc", "Employee"],
-                                ]}
-                            />
-                        </div>
-                    </Card>
+        // Find USD exchange rate
+        const usdCurrency = currenciesData.results?.find(c => c.currency_name === "USD") || 
+                           currenciesData.find(c => c.currency_name === "USD");
+        
+        if (usdCurrency) {
+          setExchangeRate(usdCurrency.exchange_rate || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        // Set loading to false immediately after data is fetched
+        setLoading(false);
+      }
+    };
 
-                    {/* AUDIT LOGS */}
-                    <Card title="Audit Logs" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("Audit Logs");
-                                loadSubModule("Audit Logs");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["Log ID", "User ID", "Action", "Timestamp"]}
-                                data={[
-                                    ["LOG-20250412", "User01", "Login", "2025-04-12 09:00"],
-                                    ["LOG-20250411", "User02", "Edit", "2025-04-11 14:30"],
-                                    ["LOG-20250410", "User03", "Delete", "2025-04-10 18:15"],
-                                ]}
-                                withCheckbox={true}
-                                badge={true}
-                            />
-                        </div>
-                    </Card>
+    fetchDashboardData();
+  }, []);
 
-                    {/* POLICY */}
-                    <Card title="Policy" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("Policy");
-                                loadSubModule("Policy");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["Policy ID", "Policy Name", "Description"]}
-                                data={[
-                                    ["POL001", "Code of Conduct", "Workplace behavior standards."],
-                                    ["POL002", "Leave Policy", "Annual leave regulations."],
-                                    ["POL003", "IT Usage", "Acceptable use of systems."],
-                                ]}
-                            />
-                        </div>
-                    </Card>
+  // Function to navigate to modules
+  const handleClick = (module, tab = null) => {
+    setActiveSubModule(module);
+    loadSubModule(module);
+    if (tab) {
+      setTimeout(() => {
+        const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
+        if (tabBtn) tabBtn.click();
+      }, 100);
+    }
+  };
 
-                    {/* CURRENCY */}
-                    <Card title="Currency" clickable={true}>
-                        <div
-                            onClick={() => {
-                                setActiveSubModule("Currency");
-                                loadSubModule("Currency");
-                            }}
-                            className="cursor-pointer"
-                        >
-                            <Table
-                                headers={["Country", "Apr 10", "Apr 11"]}
-                                data={[
-                                    ["UNITED STATES", "0.915", "0.916"],
-                                    ["JAPAN", "0.915", "0.915"],
-                                    ["UNITED KINGDOM", "0.915", "0.915"],
-                                ]}
-                            />
-                        </div>
-                    </Card>
+  return (
+    <div className="admin">
+        <div className="admin custom-scroll">
+          {/* Dashboard Title */}
+          <h1 className="text-2xl font-bold mb-6 w-full text-center flex items-center justify-center">
+            <span className="text-[#00A8A8] mr-2">Administration</span> Dashboard
+          </h1>
 
-                </div>
+          {loading ? (
+            <div className="admin body-content-container flex items-center justify-center">
+              <LoadingOutlined className="text-[#00A8A8] text-4xl" />
+              <p className="ml-3">Loading dashboard data...</p>
             </div>
+          ) : (
+            <>
+              {/* Top Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-4">
+                <div onClick={() => handleClick("User")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-teal-200">
+                  <div className="flex items-center">
+                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                      <UserOutlined className="text-2xl text-[#00A8A8]" />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">User & Roles</p>
+                      <p className="text-2xl font-bold"><CountUp end={users} duration={1.5} /></p>
+                      <p className="text-sm text-gray-500">Employees</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div onClick={() => handleClick("Currency")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-blue-200">
+                    <div className="flex items-center">
+                        <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                        <DollarOutlined className="text-2xl text-[#00A8A8]" />
+                        </div>
+                        <div>
+                        <p className="text-gray-600 font-medium mb-1">Exchange Rate (PHP to USD)</p>
+                        <p className="text-2xl font-bold">₱ <CountUp end={exchangeRate} decimals={6} duration={1.5} preserveValue={true} /></p>
+                        <p className="text-sm text-gray-500 flex items-center">
+                            Latest Rate 
+                            <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Live</span>
+                        </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div onClick={() => handleClick("Warehouse")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-teal-200">
+                  <div className="flex items-center">
+                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                      <HomeOutlined className="text-2xl text-[#00A8A8]" />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">Warehouse</p>
+                      <p className="text-2xl font-bold"><CountUp end={warehouses} duration={1.5} /></p>
+                      <p className="text-sm text-gray-500">Locations</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Middle Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-4">
+                <div onClick={() => handleClick("Item Masterlist")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-sky-200">
+                  <div className="flex items-center">
+                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                      <AppstoreOutlined className="text-2xl text-[#00A8A8]" />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">Item Masterlist</p>
+                      <p className="text-2xl font-bold"><CountUp end={assets + products + rawMaterials} duration={1.5} /></p>
+                      <p className="text-sm text-gray-500">Records</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <div onClick={() => handleClick("Item Masterlist", "Assets")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-amber-200">
+                    <div className="flex items-center">
+                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
+                        <ToolOutlined className="text-xl text-[#00A8A8]" />
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-medium mb-1">Assets</p>
+                        <p className="text-xl font-bold"><CountUp end={assets} duration={1.5} /></p>
+                        <p className="text-xs text-gray-500">Records</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div onClick={() => handleClick("Item Masterlist", "Product")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-green-200">
+                    <div className="flex items-center">
+                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
+                        <ShoppingOutlined className="text-xl text-[#00A8A8]" />
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-medium mb-1">Products</p>
+                        <p className="text-xl font-bold"><CountUp end={products} duration={1.5} /></p>
+                        <p className="text-xs text-gray-500">Records</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div onClick={() => handleClick("Item Masterlist", "Raw Materials")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-yellow-200">
+                    <div className="flex items-center">
+                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
+                        <ExperimentOutlined className="text-xl text-[#00A8A8]" />
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-medium mb-1">Raw Materials</p>
+                        <p className="text-xl font-bold"><CountUp end={rawMaterials} duration={1.5} /></p>
+                        <p className="text-xs text-gray-500">Records</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <div onClick={() => handleClick("Business Partner Masterlist")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-indigo-200">
+                    <div className="flex items-center">
+                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
+                        <UserOutlined className="text-xl text-[#00A8A8]" />
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-medium mb-1">Business Partner Masterlist</p>
+                        <p className="text-xl font-bold"><CountUp end={partners} duration={1.5} /></p>
+                        <p className="text-xs text-gray-500">Partners</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div onClick={() => handleClick("Business Partner Masterlist", "Vendor")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-purple-200">
+                    <div className="flex items-center">
+                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
+                        <ShopOutlined className="text-xl text-[#00A8A8]" />
+                      </div>
+                      <div>
+                        <p className="text-gray-600 font-medium mb-1">Vendors</p>
+                        <p className="text-xl font-bold"><CountUp end={vendors} duration={1.5} /></p>
+                        <p className="text-xs text-gray-500">Partners</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                <div onClick={() => handleClick("Policy")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-gray-200">
+                  <div className="flex items-center">
+                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                      <FileTextOutlined className="text-2xl text-[#00A8A8]" />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">Policy</p>
+                      <p className="text-2xl font-bold"><CountUp end={policies} duration={1.5} /></p>
+                      <p className="text-sm text-gray-500">Documents</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div onClick={() => handleClick("Audit Logs")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-red-200">
+                  <div className="flex items-center">
+                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
+                      <FileSearchOutlined className="text-2xl text-[#00A8A8]" />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">Audit Logs</p>
+                      <p className="text-2xl font-bold"><CountUp end={auditLogs} duration={1.5} /></p>
+                      <p className="text-sm text-gray-500">System Records</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
-    );
+      </div>
+  );
 };
-
-const Card = ({ title, children, onClick, clickable = false }) => (
-    <div
-        className={`bg-white shadow-md rounded-lg p-6 relative overflow-hidden ${clickable ? "cursor-pointer hover:shadow-lg transition" : ""
-            }`}
-        onClick={clickable ? onClick : undefined}
-    >
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">{title}</h3>
-        <div>{children}</div>
-    </div>
-);
-
-const Table = ({ headers, data, withCheckbox = false, highlightDisabledRow = false, badge = false }) => (
-    <table className="w-full border-collapse border border-gray-200 rounded-lg">
-        <thead>
-            <tr className="bg-gray-100 text-gray-700">
-                {headers.map((header, index) => (
-                    <th key={index} className="p-3 border border-gray-200 text-left font-medium text-sm">
-                        {header}
-                    </th>
-                ))}
-            </tr>
-        </thead>
-        <tbody>
-            {data.map((row, rowIndex) => (
-                <tr key={rowIndex} className="border border-gray-200 odd:bg-gray-50 hover:bg-gray-100">
-                    {withCheckbox && (
-                        <td className="p-3 border border-gray-200 flex items-center">
-                            <input type="checkbox" className="h-4 w-4" onClick={(e) => e.stopPropagation()} />
-                        </td>
-                    )}
-                    {row.map((cell, cellIndex) => (
-                        <td key={cellIndex} className={`p-3 border border-gray-200 text-sm ${highlightDisabledRow && rowIndex === 2 ? 'text-gray-400 border-gray-300' : 'text-gray-700'
-                            }`}>
-                            {badge && cellIndex === 0 ? (
-                                <span className={`px-2 py-1 border rounded-lg ${rowIndex === 2 ? 'text-gray-400 border-gray-300' : 'text-teal-600 border-teal-400'
-                                    }`}>
-                                    {cell}
-                                </span>
-                            ) : (
-                                cell
-                            )}
-                        </td>
-                    ))}
-                </tr>
-            ))}
-        </tbody>
-    </table>
-);
 
 export default Administration;

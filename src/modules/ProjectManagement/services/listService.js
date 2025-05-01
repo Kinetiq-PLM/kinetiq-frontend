@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create a more robust axios instance
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev',
   timeout: 60000, // 60 seconds
   headers: {
     'Content-Type': 'application/json'

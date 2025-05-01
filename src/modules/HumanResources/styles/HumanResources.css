@@ -1,26 +1,28 @@
 /* REMINDER! All of your elements must use your unique namespace '.hr' at the start to avoid leaking */
 
+/* Base styles (mobile-first approach) */
 .hr {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
-/* Main content container */
+/* Main content container - adjust height to be flexible */
 .hr .hr-body-content-container {
   width: 100%;
-  height: 38.1rem; /* Fixed height */
+  height: 100%;
+  max-width: 1600px; /* Add max-width to match other modules */
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
-  padding: 1rem;
+  padding: 1rem; /* Increase padding to match other modules */
   box-shadow: 0 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
-  min-width: 40rem;
+  min-width: 40rem; /* Match other modules */
   min-height: 30rem;
   box-sizing: border-box;
-  overflow: hidden; /* Prevents child elements from exceeding height */
+  overflow: hidden;
 }
 
 /* Dashboard heading */
@@ -29,70 +31,134 @@
 }
 
 .hr-dashboard h2 {
-  position: sticky;
   top: 0;
-  background-color: white;
-  padding: 1rem 0;
+  padding: 0.75rem 0;
   margin: 0;
-  margin-bottom: 1.5rem;
-  z-index: 10;
-  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
 }
 
-/* Layout */
+/* Layout - Mobile first (stacked) */
 .hr-layout {
   display: flex;
-  gap: 2rem;
-  align-items: stretch; /* Ensures both columns align vertically */
-  margin-bottom: 2rem;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: stretch;
+  margin-bottom: 1.5rem;
 }
 
 .hr-left-column {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
+  width: 100%;
 }
 
-.hr-interview-calendar {
-  flex: 1;
+/* Calendar styling */
+.hr-layout > .hr-calendar {
+  width: 100%;
+  max-height: none;
+  border: 1px solid #cdcdcd;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  border: 1px solid #cdcdcd;
 }
 
-/* Summary container */
+/* Add these styles to better size the internal calendar components */
+.hr-calendar-grid {
+  flex: 1;
+  min-height: 0; /* Allows the grid to shrink if needed */
+}
+
+/* Adjust holidays list to take less vertical space */
+.hr-calendar-holidays {
+  padding: 0 1rem;
+  margin-top: 0.5rem;
+}
+
+.hr-calendar-holidays h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.hr-calendar-holidays ul {
+  max-height: 120px; /* Reduce from 160px */
+}
+
+.hr-calendar-holidays li {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* Style for the Calendar heading that was inside the container */
+.hr-layout > h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+/* Summary container - Mobile first */
 .hr-summary-container {
   display: flex;
+  flex-direction: column;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #cdcdcd;
-
   background: #fff;
 }
 
 .hr-summary-total {
   background-color: #00a9ac;
   color: white;
-  padding: 2rem;
-  width: 220px;
+  padding: 1.5rem;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
 
+.hr-summary-total:hover {
+  opacity: 0.9;
+  background-color: rgba(0, 0, 0, 0.02);
+  transition: background-color 0.2s;
+}
+
 .hr-summary-details {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  padding: 1.5rem 2rem;
-  flex: 1;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
 }
 
 .hr-detail-box {
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.hr-detail-box:hover {
+  opacity: 0.9;
+  background-color: rgba(0, 0, 0, 0.02);
+  transition: background-color 0.2s;
+}
+
+.hr-detail-box:after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #00b0b5;
+  transition: width 0.2s;
+}
+
+.hr-detail-box:hover:after {
+  width: 100%;
 }
 
 .hr-label {
@@ -112,13 +178,13 @@
 /* Candidates section */
 .hr-candidates-section {
   background: #fff;
-  padding: 1.25rem;
+  padding: 1rem;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  height: 250px;
-  overflow-y: auto;
+  height: auto;
+  max-height: 24.5rem;
+  overflow-y: visible;
   border: 1px solid #cdcdcd;
-
 }
 
 .hr-candidates-section table {
@@ -134,64 +200,37 @@
   text-align: left;
 }
 
-/* Interview section */
-.hr-interview-calendar {
-  background: #fff;
-  padding: 1.25rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.hr-calendar-box {
-  height: 250px;
-  background-color: #f3f3f3;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-style: italic;
-  color: #777;
-}
-
-.hr-interview-item {
-  display: flex;
-  justify-content: space-between;
-  background-color: #eefbfd;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  align-items: center;
-}
-
-.hr-tag {
-  background-color: #c0f0f2;
-  color: #007b80;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  margin-right: 0.5rem;
-}
-
 /* Leave requests section */
 .hr-leave-requests-section {
   background: #fff;
-  padding: 1.25rem;
+  padding: 1rem;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   border: 1px solid #cdcdcd;
 }
 
 .hr-leave-requests-table {
-  max-height: 250px;
-  overflow-y: auto;
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-top: 0.5rem;
 }
 
 .hr-leave-requests-table table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
+}
+
+.hr-leave-requests-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #f3f9fa;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
 }
 
 .hr-leave-requests-table th,
@@ -201,18 +240,28 @@
   text-align: left;
 }
 
-.hr-leave-requests-table select {
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background-color: white;
+/* Update scrollbar styling to match performance table */
+.hr-leave-requests-table::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-leave-requests-table::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-leave-requests-table::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* Scrollable dashboard content */
 .hr-dashboard-scrollable {
   flex: 1;
+  display: flex; /* Add display flex */
+  flex-direction: column; /* Add flex-direction */
   overflow-y: auto;
-  padding: 0 1.5rem 1.5rem; /* Remove top padding since it's handled by h2 */
+  padding: 1.5rem; /* Standardize padding */
   box-sizing: border-box;
 }
 
@@ -229,7 +278,6 @@
   background-color: #f3f9fa;
   position: sticky;
   top: 0;
-  z-index: 1;
 }
 /* Leave type tags */
 .hr-tag.sick {
@@ -288,3 +336,181 @@
   background-color: #e2e3e5;
   color: #343a40;
 }
+
+/* Performance table scrollable styling */
+.hr-performance-table-container {
+  width: 100%;
+  height: auto;
+  max-height: 20rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.hr-performance-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.hr-performance-table-container thead {
+  position: sticky;
+  top: 0;
+  background-color: #f3f9fa;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+}
+
+/* Keep scrollbar styling only on the container */
+.hr-performance-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-performance-table-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.hr-performance-table-container::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Rating tag styles */
+.hr-tag.rating-5 {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.hr-tag.rating-4 {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.hr-tag.rating-3 {
+  background-color: #e2e3e5;
+  color: #343a40;
+}
+
+.hr-tag.rating-2 {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.hr-tag.rating-1 {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+/* Section header with View All button */
+.hr-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.hr-section-header h3 {
+  margin: 0;
+}
+
+.hr-view-all-btn {
+  background-color: transparent;
+  border: none;
+  color: #00b0b5;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  white-space: nowrap;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.hr-view-all-btn:hover {
+  background-color: rgba(0, 176, 181, 0.1);
+  text-decoration: underline;
+}
+
+/* Calendar container adjustments */
+.hr-calendar-container {
+  width: 550px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tablet breakpoint (768px) */
+@media (min-width: 768px) {
+  .hr .hr-body-content-container {
+    padding: 1rem;
+  }
+
+  .hr-dashboard h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hr-summary-details {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .hr-candidates-section,
+  .hr-leave-requests-section {
+    padding: 1.25rem;
+  }
+
+  .hr-dashboard-scrollable {
+    padding: 0 1.25rem 1.25rem;
+  }
+}
+
+/* Larger tablet/small desktop breakpoint (992px) */
+@media (min-width: 992px) {
+  .hr-summary-container {
+    flex-direction: row;
+  }
+
+  .hr-summary-total {
+    width: 220px;
+    padding: 2rem;
+  }
+
+  .hr-summary-details {
+    padding: 1.5rem 2rem;
+  }
+}
+
+/* Desktop breakpoint (1200px) */
+@media (min-width: 1200px) {
+  .hr .hr-body-content-container {
+    padding: 1rem;
+    max-width: 1600px;
+  }
+
+  .hr-layout {
+    flex-direction: row;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .hr-layout > .hr-calendar {
+    width: 550px;
+    max-height: none; /* or use calc(100vh - 200px) */
+  }
+
+  .hr-performance-table-container {
+    max-height: 20rem; /* Change to max-height instead of height */
+    height: auto;
+  }
+
+  .hr-candidates-section {
+    max-height: 24.5rem; /* Change to max-height instead of height */
+    height: auto;
+  }
+}
+
+/* Tag styles and other styles remain unchanged */
+/* Keeping existing scrollbar styles, section headers, and status tags */

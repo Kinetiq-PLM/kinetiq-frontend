@@ -14,8 +14,9 @@ import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 import { GET } from "../api/api"
 import { PATCH } from "../api/api"
 import { POST } from "../api/api"
+import { POST_NOTIF } from "../api/api"
 
-const ServiceCall = () => {
+const ServiceCall = ({user_id, employee_id}) => {
   // State for service calls
   const [serviceCalls, setServiceCalls] = useState([])
   const [filterBy, setFilterBy] = useState("")
@@ -30,11 +31,17 @@ const ServiceCall = () => {
   const [selectedCall, setSelectedCall] = useState(null)
   const [showErrorModal, setShowErrorModal] = useState(false)
   const [errorModalMessage, setErrorModalMessage] = useState("")
+  const [management, setManagement] = useState([])
 
   // Fetch service calls from API (mock function)
   const fetchServiceCalls = async () => {
     try {
-      const data = await GET("service-calls/");
+      // this filters out service calls so that only the service calls assigned to the one currently logged in will show:
+      // const data = await GET(`call/calls/technician/HR-EMP-2025-a66f9c/`);
+      const data = await GET(`call/calls/technician/${employee_id}/`);
+
+      // all calls version:
+      // const data = await GET("call/");
       setServiceCalls(data);
     } catch (error) {
       console.error("Error fetching service calls:", error)
@@ -43,6 +50,7 @@ const ServiceCall = () => {
 
   useEffect(() => {
     fetchServiceCalls();
+    fetchManagement();
   }, []);
 
   // table row clicking func
@@ -75,7 +83,7 @@ const ServiceCall = () => {
     console.log("Updating service call with:", updatedData);
 
     try {
-      await PATCH(`/service-calls/${serviceCallId}/update/`, updatedData);
+      await PATCH(`call/${serviceCallId}/`, updatedData);
       setShowWithContractModal(false);
       setShowResolutionModal(false);
       fetchServiceCalls();
@@ -134,16 +142,82 @@ const ServiceCall = () => {
     setShowResolutionModal(true);
   }
 
-  const handleSubmitReq = async (reqData) => {
-    // submit req
-    console.log("Queueing ticket:", reqData)
+  const updateCallStatus = async (serviceCallId) => {
+    const updatedData = {
+      call_status: "Closed"
+    }
+
+    console.log("Updating service call:", serviceCallId);
 
     try {
-      const data = await POST("/create-request/", reqData);
+      await PATCH(`call/${serviceCallId}/`, updatedData);
+      fetchServiceCalls();
+      console.log("Updated service call successfully.")
+  } catch (error) {
+      let firstError = "An unknown error occurred.";
+      if (error && typeof error === "object") {
+        const keys = Object.keys(error);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          const firstValue = error[firstKey];
+          if (Array.isArray(firstValue)) {
+            firstError = `${firstKey}: ${firstValue[0]}`;
+          }
+        } else if (typeof error.detail === "string") {
+          firstError = error.detail;
+        }
+      }
+
+      console.error("Error updating service call:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
+  }
+  }
+
+  const fetchManagement = async () => {
+    try {
+      const data = await GET("call/calls/management-employees/");
+      const userIds = data.map(user => user.user_id);
+      setManagement(userIds);
+    } catch (error) {
+      console.error("Error fetching management employees:", error)
+    }
+  }
+
+  const handleSubmitReq = async (reqData) => {
+    // submit req
+    console.log("Submitting request:", reqData)
+
+    const notifData = {
+      module: "Support & Services",
+      submodule: "Service Request",
+      recipient_id: reqData.userId,
+      msg: "New service request submitted for you to review."
+    }
+    
+    const notifDataManagement = {
+      module: "Support & Services",
+      submodule: "Service Request",
+      recipient_ids: management,
+      msg: "New service request submitted for you to review."
+    }
+    console.log(notifDataManagement)
+
+    const { userId, ...reqPayload } = reqData;
+    console.log("Sending notif:", notifData)
+    try {
+      const data = await POST("request/", reqPayload);
       console.log("Service request created successfully:", data);
+
+      const notif_data = await POST_NOTIF("send-notif/", notifData);
+      console.log("Notification sent successfully:", notif_data);
+
+      const notif_data_batch = await POST_NOTIF("send-notif-batch/", notifDataManagement);
+      console.log("Notification sent successfully:", notif_data_batch);
+
+      updateCallStatus(data.service_call?.service_call_id);
       setShowRequestModal(false);
       setShowResolutionModal(true);
-      fetchServiceCalls();
     } catch (error) {
       let firstError = "An unknown error occurred.";
       if (error && typeof error === "object") {
@@ -170,11 +244,11 @@ const ServiceCall = () => {
     console.log("Submitting warranty renewal:", renData)
 
     try {
-      const data = await POST("create-renewal/", renData);
+      const data = await POST("renewal/", renData);
       console.log("Warranty renewal created successfully:", data);
+      updateCallStatus(data.service_call?.service_call_id);
       setShowRenewalModal(false);
       setShowResolutionModal(true);
-      fetchServiceCalls();
     } catch (error) {
       let firstError = "An unknown error occurred.";
       if (error && typeof error === "object") {
@@ -200,7 +274,7 @@ const ServiceCall = () => {
     { value: "all", label: "All" },
     { value: "open", label: "Open" },
     { value: "closed", label: "Closed" },
-    { value: "pending", label: "Pending" },
+    { value: "in progress", label: "In Progress" },
     { value: "low", label: "Low" },
     { value: "medium", label: "Medium" },
     { value: "high", label: "High" },
@@ -213,7 +287,7 @@ const ServiceCall = () => {
     let matchesFilter = true
     if (filterBy === "open" && call.call_status !== "Open") matchesFilter = false
     if (filterBy === "closed" && call.call_status !== "Closed") matchesFilter = false
-    if (filterBy === "pending" && call.call_status !== "Pending") matchesFilter = false
+    if (filterBy === "in progress" && call.call_status !== "In Progress") matchesFilter = false
     if (filterBy === "low" && call.priority_level !== "Low") matchesFilter = false
     if (filterBy === "medium" && call.priority_level !== "Medium") matchesFilter = false
     if (filterBy === "high" && call.priority_level !== "High") matchesFilter = false

@@ -3,7 +3,7 @@ import axios from "axios";
 import "../styles/Projectrequest.css";
 
 
-axios.defaults.baseURL = 'http://localhost:8000';
+axios.defaults.baseURL = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev';
 
 const BodyContent = () => {
   

@@ -63,7 +63,7 @@ const CreateContractModal = ({ isOpen, onClose, onCreate }) => {
   // fetches additional services
   const fetchStatementItems = async () => {
     try {
-    const response = await GET(`/statement-items/`); 
+    const response = await GET(`contract/contracts/statement-items/`); 
     //console.log("statement-items", response)
     setStatementItems(response);
   } catch (error) {
@@ -105,7 +105,7 @@ const fetchAddServices = async (additionalServiceId) => {
     console.log("Fetching additional services for ID:", additionalServiceId);
     if (!additionalServiceId) return; 
 
-    const response = await GET(`contracts/${additionalServiceId}/`);
+    const response = await GET(`contract/contracts-add-services/${additionalServiceId}/`);
     console.log("Fetched additional services:", response);
     setAdditionalServices(response);
   } catch (error) {

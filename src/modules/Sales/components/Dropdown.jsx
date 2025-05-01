@@ -65,7 +65,9 @@ const Dropdown = ({
           className="flex justify-between items-center py-2 px-3 bg-white border border-gray-200 rounded-md cursor-pointer select-none box-border"
           onClick={toggleDropdown}
         >
-          <div className="text-gray-600">{selectedOption || placeholder}</div>
+          <div className="text-gray-600 truncate">
+            {selectedOption || placeholder}
+          </div>
           <div
             className={`transition-transform duration-200 ${
               isOpen ? "transform rotate-180" : ""
@@ -90,7 +92,7 @@ const Dropdown = ({
           </div>
         </div>
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md mt-1 max-h-[200px] overflow-y-auto z-10 shadow-md">
+          <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md mt-1 max-h-[200px] overflow-y-auto z-100 shadow-md">
             {options.map((option, index) => (
               <div
                 key={index}
