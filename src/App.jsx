@@ -360,7 +360,8 @@ function App() {
     "Purchase Request": "PurchaseRequest",
     "Project Request": "ProjectRequest",
     "Workforce Request": "WorkforceRequest",
-    "Job Posting": "JobPosting"
+    "Job Posting": "JobPosting",
+    "Employee Request": "EmployeeRequest"
   };
 
   const moduleSubmoduleFileNames = {
@@ -485,6 +486,11 @@ function App() {
       "Employee Salary": "EmployeeSalary"
     },
     "Report Generator": {
+    },
+    "Employee Request": {
+      "Resignation Request": "ResignationRequest",
+      "Overtime Request": "OvertimeRequest",
+      "Leave Request": "LeaveRequest"
     },
   };
 
