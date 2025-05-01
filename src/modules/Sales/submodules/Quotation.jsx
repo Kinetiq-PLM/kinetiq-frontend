@@ -285,6 +285,7 @@ const Quotation = ({
     setSelectedEmployee("");
     setAddress("");
     setDateIssued("");
+    setQ_id("");
     setQuotationInfo({
       customer_id: "",
       quotation_id: "",
@@ -307,11 +308,7 @@ const Quotation = ({
   }, [selectedCustomer]);
 
   function handleCustomerSelection() {
-    if (isSalesRep) {
-      setIsCustomerListOpen(true);
-    } else {
-      setIsEmployeeListOpen(true);
-    }
+    setIsCustomerListOpen(true);
   }
 
   useEffect(() => {
@@ -367,7 +364,7 @@ const Quotation = ({
             setCustomerInfo={setQuotationInfo}
             operationID={q_id}
             setDateIssued={setDateIssued}
-            date={new Date().toISOString().split("T")[0]}
+            dateIssued={new Date().toISOString().split("T")[0]}
             setAddress={setAddress}
             handleCustomerSelection={handleCustomerSelection}
           />

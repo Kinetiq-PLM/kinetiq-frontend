@@ -402,6 +402,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     setSelectedEmployee("");
     setAddress("");
     setDeliveryDate("");
+    setDeliveryID("");
     setDeliveryInfo({
       customer_id: "",
       order_id: "",
@@ -500,6 +501,11 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             setDatePosted={setDatePosted}
             setDateDelivery={setDateDelivery}
             dataIssued={dateIssued}
+            date={
+              new Date(Date.now() + +3 * 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split("T")[0]
+            }
             setAddress={setAddress}
             handleCustomerSelection={handleCustomerSelection}
           />
