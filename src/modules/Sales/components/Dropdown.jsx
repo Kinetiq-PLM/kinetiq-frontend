@@ -13,6 +13,7 @@ const Dropdown = ({
     return "";
   },
   isValidationVisible = false,
+  isDisabled = false,
 }) => {
   const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +55,7 @@ const Dropdown = ({
   };
 
   return (
-    <div className="flex-1 text-sm" style={{ width }}>
+    <div className={`flex-1 text-sm`} style={{ width }}>
       {label && (
         <div className="mb-2 text-gray-900">
           {label} <span className="text-red-900 ml-1">*</span>{" "}

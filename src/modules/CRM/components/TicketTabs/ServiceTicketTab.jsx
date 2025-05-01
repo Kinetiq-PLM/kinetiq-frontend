@@ -9,7 +9,6 @@ import { useMutation } from "@tanstack/react-query";
 
 const ServiceTicketTab = ({
   setIsEmployeeListOpen,
-  selectedEmployee,
   selectedCustomer,
   ticketInfo,
   setTicketInfo,

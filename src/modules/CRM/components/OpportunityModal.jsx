@@ -48,8 +48,8 @@ const OpportunityModal = ({
   const opportunityMutation = useMutation({
     mutationFn: async (data) =>
       await PATCH(`crm/opportunities/${details.opportunity_id}/`, data),
-    onSuccess: (data) => {
-      queryClient.refetchQueries(["customerOpps"]);
+    onSuccess: async (data) => {
+      await queryClient.refetchQueries(["customerOpps"]);
       showAlert({
         type: "success",
         title: "Opportunity updated.",

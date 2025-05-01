@@ -4,7 +4,6 @@ const InputField = ({
   label,
   value = "",
   setValue = () => {},
-  onChange = () => {},
   validation = () => {
     return "";
   },
