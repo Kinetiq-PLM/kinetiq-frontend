@@ -1142,7 +1142,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         ) : (
                           invoices.map((invoice) => (
                             <option key={invoice.invoice_id} value={invoice.invoice_id}>
-                              {invoice.invoice_id})
+                              {invoice.invoice_id}
                             </option>
                           ))
                         )}
@@ -1292,6 +1292,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                     <th>Item Name</th>
                     <th>Quantity</th>
                     <th>Unit Price</th>
+                    <th>Discount</th>
                     <th>Total</th>
                   </tr>
                 </thead>
@@ -1356,6 +1357,17 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         />
                       </td>
                       <td readOnly style={{ cursor: 'not-allowed' }}>
+                      <td>
+                         <input
+                         type="number"
+    min="0"
+    max="100"
+    step="0.01"
+    placeholder="0.00"
+    value={item.discount || ""}
+    onChange={(e) => handleInputChange(e, index, "discount")}
+  />
+</td>
                         {(() => {
                           const total = (item.quantity * item.cost) || 0;
                           if (total > 1000000000) {

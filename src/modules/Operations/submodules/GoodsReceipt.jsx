@@ -131,6 +131,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     initialAmount: initialAmount || 0,
     tax_rate: isCreateMode ? 0 : selectedData.tax_rate || 0,
     tax_amount: isCreateMode ? 0 : selectedData.tax_amount || 0,
+    delivery_note: isCreateMode ? "" : selectedData.delivery_note || "",
     discount_rate: isCreateMode ? 0 : selectedData.discount_rate || 0,
     discount_amount: isCreateMode ? 0 : selectedData.discount_amount || 0,
     freight: isCreateMode ? 0 : selectedData.freight || 0,
@@ -1076,6 +1077,15 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                       readOnly
                     />
                   </div>
+                  <div className="detail-row">
+  <label>Delivery Note</label>
+  <input
+    type="text"
+    value={documentDetails.delivery_note || ''}
+    onChange={(e) => handleDocumentDetailChange(e, "delivery_note")}
+    maxLength={255}
+  />
+</div>
                 </div>
               )}
             </div>
