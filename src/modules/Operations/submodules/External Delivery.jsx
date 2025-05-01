@@ -196,6 +196,7 @@ const TabSystem = () => {
                                             <th>Issued By</th>
                                             <th>Item Name</th>
                                             <th>Quantity</th>
+                                            <th>Warehouse Location</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -211,6 +212,7 @@ const TabSystem = () => {
                                                     <td>{row.issued_by}</td>
                                                     <td>{row.item_name}</td>
                                                     <td>{row.item_quantity}</td>
+                                                    <td>{row.warehouselocation}</td> 
                                                 </tr>
                                             ))
                                         ) : (
