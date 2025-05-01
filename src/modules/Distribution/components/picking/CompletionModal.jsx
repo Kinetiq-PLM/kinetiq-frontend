@@ -13,7 +13,7 @@ import {
 } from 'react-icons/fa';
 import '../../styles/Picking.css';
 
-const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCancel }) => {
+const CompletionModal = ({ show, pickingList, onClose, onConfirm, employees, warehouses }) => {
   // Function to get employee name from ID
   const getEmployeeName = (employeeId) => {
     if (!employeeId) return 'Not assigned';
@@ -21,15 +21,33 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
     return employee ? employee.full_name : employeeId;
   };
 
-  // Function to get warehouse name from ID
-  const getWarehouseName = (warehouseId) => {
-    // First try to use the name directly from the picking list if available
+  // Updated warehouse display function
+  const getWarehouseDisplay = () => {
+    // If there's a warehouse name in the picking list, use it
     if (pickingList.warehouse_name) return pickingList.warehouse_name;
+    if (pickingList.warehouse_id) {
+      const warehouse = warehouses.find(wh => wh.id === pickingList.warehouse_id);
+      if (warehouse) return warehouse.name;
+    }
     
-    // Otherwise look up the name from the warehouses array
-    if (!warehouseId) return 'Not assigned';
-    const warehouse = warehouses?.find(wh => wh.id === warehouseId);
-    return warehouse ? warehouse.name : warehouseId;
+    // Check for multiple warehouses in items
+    if (pickingList.items_details && pickingList.items_details.length > 0) {
+      const uniqueWarehouses = new Set(
+        pickingList.items_details
+          .filter(item => item.warehouse_id || item.warehouse_name)
+          .map(item => item.warehouse_id || item.warehouse_name)
+      );
+      
+      if (uniqueWarehouses.size > 1) {
+        return "Multiple Warehouses";
+      } else if (uniqueWarehouses.size === 1) {
+        // Get the first (and only) warehouse name
+        return pickingList.items_details.find(item => item.warehouse_name)?.warehouse_name || 
+               Array.from(uniqueWarehouses)[0] || 'Not assigned';
+      }
+    }
+    
+    return 'Not assigned';
   };
 
   // Function to get delivery type icon
@@ -38,8 +56,8 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
   };
 
   return (
-    <div className="picking modal-overlay" onClick={onCancel}>
-      <div className="completion-modal improved" onClick={e => e.stopPropagation()} aria-labelledby="modal-title">
+    <div className={`modal ${show ? 'show' : ''}`} onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()} aria-labelledby="modal-title">
         <div className="modal-header">
           <h3 id="modal-title">
             <FaClipboardCheck className="title-icon" />
@@ -47,7 +65,7 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
           </h3>
           <button 
             className="close-button" 
-            onClick={onCancel} 
+            onClick={onClose} 
             aria-label="Close modal"
           >
             &times;
@@ -94,7 +112,7 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
                     <span className="detail-label">Warehouse</span>
                     <div className="detail-value-with-icon">
                       <FaWarehouse className="detail-icon" />
-                      {getWarehouseName(pickingList.warehouse_id)}
+                      {getWarehouseDisplay()}
                     </div>
                   </div>
                   <div className="detail-item">
@@ -111,7 +129,7 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
                     <span className="detail-label">Items Count</span>
                     <div className="detail-value-with-icon">
                       <FaBoxes className="detail-icon" />
-                      <span className="count-badge">{pickingList.items_count || 0}</span>
+                      <span className="count-badge">{pickingList.items_details?.length || 0}</span>
                     </div>
                   </div>
                   <div className="detail-item">
@@ -178,7 +196,7 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
         <div className="modal-footer">
           <button 
             className="cancel-button"
-            onClick={onCancel}
+            onClick={onClose}
           >
             Cancel
           </button>

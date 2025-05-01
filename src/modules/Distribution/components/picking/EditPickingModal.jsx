@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/Picking.css';
 
-const EditPickingModal = ({ 
-  pickingList, 
-  employees, 
-  warehouses, 
-  onClose, 
-  onSave,
-  onStatusUpdate 
-}) => {
+const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, warehouses, onStatusUpdate }) => {
   const [selectedEmployee, setSelectedEmployee] = useState('');
-  const [selectedWarehouse, setSelectedWarehouse] = useState('');
   const [modified, setModified] = useState(false);
+  const [activeTab, setActiveTab] = useState('general'); // Add state for tab navigation
   
   // Check if picking list is completed
   const isCompleted = pickingList?.picked_status === 'Completed';
@@ -20,7 +13,6 @@ const EditPickingModal = ({
   useEffect(() => {
     if (pickingList) {
       setSelectedEmployee(pickingList.picked_by || '');
-      setSelectedWarehouse(pickingList.warehouse_id || '');
       setModified(false);
     }
   }, [pickingList]);
@@ -28,12 +20,6 @@ const EditPickingModal = ({
   // Handle employee selection
   const handleEmployeeChange = (e) => {
     setSelectedEmployee(e.target.value);
-    setModified(true);
-  };
-  
-  // Handle warehouse selection
-  const handleWarehouseChange = (e) => {
-    setSelectedWarehouse(e.target.value);
     setModified(true);
   };
   
@@ -50,9 +36,7 @@ const EditPickingModal = ({
       updates.picked_by = selectedEmployee;
     }
     
-    if (selectedWarehouse !== pickingList.warehouse_id && pickingList.is_external) {
-      updates.warehouse_id = selectedWarehouse;
-    }
+    // Removed warehouse update logic since warehouse is predetermined
     
     onSave(pickingList, updates);
   };
@@ -89,11 +73,6 @@ const EditPickingModal = ({
   const isStatusUpdateDisabled = () => {
     // Always need an employee assigned
     if (!selectedEmployee) {
-      return true;
-    }
-    
-    // For external deliveries, also need a warehouse
-    if (pickingList.is_external && !selectedWarehouse) {
       return true;
     }
     
@@ -149,8 +128,37 @@ const EditPickingModal = ({
     return warehouse ? warehouse.name : 'Not assigned';
   };
   
+  // Updated warehouse display function
+  const getWarehouseDisplay = () => {
+    // If there's a warehouse name in the picking list, use it
+    if (pickingList.warehouse_name) return pickingList.warehouse_name;
+    if (pickingList.warehouse_id) {
+      const warehouse = warehouses.find(wh => wh.id === pickingList.warehouse_id);
+      if (warehouse) return warehouse.name;
+    }
+    
+    // Check for multiple warehouses in items
+    if (pickingList.items_details && pickingList.items_details.length > 0) {
+      const uniqueWarehouses = new Set(
+        pickingList.items_details
+          .filter(item => item.warehouse_id || item.warehouse_name)
+          .map(item => item.warehouse_id || item.warehouse_name)
+      );
+      
+      if (uniqueWarehouses.size > 1) {
+        return "Multiple Warehouses";
+      } else if (uniqueWarehouses.size === 1) {
+        // Get the first (and only) warehouse name
+        return pickingList.items_details.find(item => item.warehouse_name)?.warehouse_name || 
+               Array.from(uniqueWarehouses)[0] || 'Not assigned';
+      }
+    }
+    
+    return 'Not assigned';
+  };
+
   return (
-    <div className="picking modal-overlay" onClick={onClose}>
+    <div className={`picking modal-overlay ${show ? 'show' : ''}`} onClick={onClose}>
       <div className="edit-picking-modal improved" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title-container">
@@ -161,191 +169,243 @@ const EditPickingModal = ({
         </div>
         
         <div className="modal-body">
-          {/* Status indicator - New addition */}
+          {/* Status indicator */}
           <div className={`status-indicator status-${pickingList.picked_status?.toLowerCase().replace(' ', '-')}`}>
             <span className="status-icon">{getStatusIcon(pickingList.picked_status)}</span>
             <span className="status-text">{pickingList.picked_status}</span>
           </div>
 
-          {/* Main information panel */}
-          <div className="info-panel">
-            <h4 className="section-title">General Information</h4>
-            <div className="picking-details enhanced">
-              <div className="detail-row">
-                <div className="detail-item">
-                  <span className="detail-label">Delivery Type</span>
-                  <span className="detail-value">
-                    <span className="icon">{getDeliveryTypeIcon(pickingList.delivery_type)}</span>
-                    {pickingList.is_external ? 'External' : 'Internal'} - 
-                    {getDeliveryTypeDisplay(pickingList.delivery_type)}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Delivery ID</span>
-                  <span className="detail-value highlight">{pickingList.delivery_id || '-'}</span>
-                </div>
-              </div>
-              
-              <div className="detail-row">
-                <div className="detail-item">
-                  <span className="detail-label">Date Picked</span>
-                  <span className="detail-value">{formatDate(pickingList.picked_date)}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Items Count</span>
-                  <span className="detail-value count-badge">{pickingList.items_count || 0}</span>
-                </div>
-              </div>
-            </div>
+          {/* Tab Navigation */}
+          <div className="modal-tabs">
+            <button 
+              className={`tab-button ${activeTab === 'general' ? 'active' : ''}`}
+              onClick={() => setActiveTab('general')}
+            >
+              <span className="tab-icon">ℹ️</span>
+              General Info
+            </button>
+            <button 
+              className={`tab-button ${activeTab === 'items' ? 'active' : ''}`}
+              onClick={() => setActiveTab('items')}
+            >
+              <span className="tab-icon">📦</span>
+              Items ({pickingList.items_details?.length || 0})
+            </button>
           </div>
-          
-          {/* Assignment sections */}
-          <div className="assignment-sections">
-            {/* Employee Assignment Section */}
-            <div className="edit-section">
-              <h4 className="section-title">
-                <span className="section-icon">👤</span>
-                Assign Employee
-                {!isCompleted && <span className="required-indicator">*</span>}
-              </h4>
-              
-              {isCompleted ? (
-                <div className="employee-display">
-                  <span className="employee-value">
-                    {getEmployeeName(pickingList.picked_by)}
-                  </span>
-                </div>
-              ) : (
-                <div className="employee-selection improved">
-                  <select 
-                    className="employee-dropdown"
-                    value={selectedEmployee}
-                    onChange={handleEmployeeChange}
-                    disabled={isCompleted}
-                    required
-                  >
-                    <option value="">Select an employee...</option>
-                    {employees.map(employee => (
-                      <option key={employee.employee_id} value={employee.employee_id}>
-                        {employee.full_name}
-                      </option>
-                    ))}
-                  </select>
-                  {!selectedEmployee && !isCompleted && (
-                    <div className="field-hint">Employee assignment is required</div>
-                  )}
-                </div>
-              )}
-            </div>
-            
-            {/* Warehouse Section */}
-            <div className="edit-section">
-              <h4 className="section-title">
-                <span className="section-icon">🏢</span>
-                Warehouse
-                {!isCompleted && pickingList.is_external && <span className="required-indicator">*</span>}
-              </h4>
-              
-              {pickingList.is_external && !isCompleted ? (
-                <div className="warehouse-selection improved">
-                  <select 
-                    className="warehouse-dropdown"
-                    value={selectedWarehouse}
-                    onChange={handleWarehouseChange}
-                    disabled={isCompleted}
-                    required={pickingList.is_external}
-                  >
-                    <option value="">Select a warehouse...</option>
-                    {warehouses.map(warehouse => (
-                      <option key={warehouse.id} value={warehouse.id}>
-                        {warehouse.name}
-                      </option>
-                    ))}
-                  </select>
-                  {!selectedWarehouse && pickingList.is_external && !isCompleted && (
-                    <div className="field-hint">Warehouse selection is required for external deliveries</div>
-                  )}
-                </div>
-              ) : (
-                <div className="warehouse-display">
-                  <div className="warehouse-info">
-                    <span className="warehouse-value">
-                      {pickingList.is_external 
-                        ? getWarehouseName(pickingList.warehouse_id)
-                        : pickingList.warehouse_name || 'Not assigned'}
-                    </span>
-                    {!pickingList.is_external && (
-                      <div className="warehouse-note">
-                        <small>For internal deliveries, warehouse is automatically assigned</small>
-                      </div>
-                    )}
+
+          {/* General Tab Content */}
+          {activeTab === 'general' && (
+            <>
+              {/* Main information panel */}
+              <div className="info-panel">
+                <h4 className="section-title">General Information</h4>
+                <div className="picking-details enhanced">
+                  <div className="detail-row">
+                    <div className="detail-item">
+                      <span className="detail-label">Delivery Type</span>
+                      <span className="detail-value">
+                        <span className="icon">{getDeliveryTypeIcon(pickingList.delivery_type)}</span>
+                        {pickingList.is_external ? 'External' : 'Internal'} - 
+                        {getDeliveryTypeDisplay(pickingList.delivery_type)}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-label">Delivery ID</span>
+                      <span className="detail-value highlight">{pickingList.delivery_id || '-'}</span>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Status Workflow Section */}
-          {!isCompleted && (
-            <div className="edit-section status-workflow-section">
-              <h4 className="section-title">
-                <span className="section-icon">📋</span>
-                Workflow Actions
-              </h4>
-              
-              <div className="status-workflow">
-                <div className="workflow-steps">
-                  <div className={`workflow-step ${pickingList.picked_status === 'Not Started' ? 'current' : 'complete'}`}>
-                    <div className="step-indicator">1</div>
-                    <div className="step-label">Not Started</div>
-                  </div>
-                  <div className="workflow-connector"></div>
-                  <div className={`workflow-step ${pickingList.picked_status === 'In Progress' ? 'current' : (pickingList.picked_status === 'Completed' ? 'complete' : '')}`}>
-                    <div className="step-indicator">2</div>
-                    <div className="step-label">In Progress</div>
-                  </div>
-                  <div className="workflow-connector"></div>
-                  <div className={`workflow-step ${pickingList.picked_status === 'Completed' ? 'current' : ''}`}>
-                    <div className="step-indicator">3</div>
-                    <div className="step-label">Completed</div>
-                  </div>
-                </div>
-                
-                <div className="status-action">
-                  <button 
-                    className={`status-update-button status-${getNextStatus(pickingList.picked_status)?.toLowerCase().replace(' ', '-')}`}
-                    onClick={() => onStatusUpdate(
-                      pickingList, 
-                      getNextStatus(pickingList.picked_status), 
-                      selectedEmployee, 
-                      selectedWarehouse
-                    )}
-                    disabled={isStatusUpdateDisabled()}
-                  >
-                    <span className="button-icon">
-                      {pickingList.picked_status === 'Not Started' ? '▶' : '✓'}
-                    </span>
-                    {getStatusActionLabel(pickingList.picked_status)}
-                  </button>
                   
-                  {isStatusUpdateDisabled() && (
-                    <div className="validation-message">
-                      {!selectedEmployee ? 'Please assign an employee to start picking' : 
-                      (pickingList.is_external && !selectedWarehouse) ? 'Please select a warehouse for this external delivery' : ''}
+                  <div className="detail-row">
+                    <div className="detail-item">
+                      <span className="detail-label">Date Picked</span>
+                      <span className="detail-value">{formatDate(pickingList.picked_date)}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-label">Items Count</span>
+                      <span className="detail-value count-badge">{pickingList.items_details?.length || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Assignment sections */}
+              <div className="assignment-sections">
+                {/* Employee Assignment Section */}
+                <div className="edit-section">
+                  <h4 className="section-title">
+                    <span className="section-icon">👤</span>
+                    Assign Employee
+                    {!isCompleted && <span className="required-indicator">*</span>}
+                  </h4>
+                  
+                  {isCompleted ? (
+                    <div className="employee-display">
+                      <span className="employee-value">
+                        {getEmployeeName(pickingList.picked_by)}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="employee-selection improved">
+                      <select 
+                        className="employee-dropdown"
+                        value={selectedEmployee}
+                        onChange={handleEmployeeChange}
+                        disabled={isCompleted}
+                        required
+                      >
+                        <option value="">Select an employee...</option>
+                        {employees.map(employee => (
+                          <option key={employee.employee_id} value={employee.employee_id}>
+                            {employee.full_name}
+                          </option>
+                        ))}
+                      </select>
+                      {!selectedEmployee && !isCompleted && (
+                        <div className="field-hint">Employee assignment is required</div>
+                      )}
                     </div>
                   )}
                 </div>
+                
+                {/* Warehouse Section - Display Only */}
+                <div className="edit-section">
+                  <h4 className="section-title">
+                    <span className="section-icon">🏢</span>
+                    Warehouse
+                  </h4>
+                  
+                  <div className="warehouse-display">
+                    <div className="warehouse-info">
+                      <span className="warehouse-value">
+                        {/* Use the updated warehouse display function */}
+                        {getWarehouseDisplay()}
+                      </span>
+                      <div className="warehouse-note">
+                        <small>Warehouse is predetermined by the module sending the delivery request</small>
+                        {pickingList.items_details && 
+                         new Set(pickingList.items_details.map(item => item.warehouse_id || item.warehouse_name)).size > 1 && (
+                          <div className="warehouse-warning">
+                            <small><strong>Note:</strong> This order includes items from multiple warehouses</small>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+              
+              {/* Status Workflow Section */}
+              {!isCompleted && (
+                <div className="edit-section status-workflow-section">
+                  <h4 className="section-title">
+                    <span className="section-icon">📋</span>
+                    Workflow Actions
+                  </h4>
+                  
+                  <div className="status-workflow">
+                    <div className="workflow-steps">
+                      <div className={`workflow-step ${pickingList.picked_status === 'Not Started' ? 'current' : 'complete'}`}>
+                        <div className="step-indicator">1</div>
+                        <div className="step-label">Not Started</div>
+                      </div>
+                      <div className="workflow-connector"></div>
+                      <div className={`workflow-step ${pickingList.picked_status === 'In Progress' ? 'current' : (pickingList.picked_status === 'Completed' ? 'complete' : '')}`}>
+                        <div className="step-indicator">2</div>
+                        <div className="step-label">In Progress</div>
+                      </div>
+                      <div className="workflow-connector"></div>
+                      <div className={`workflow-step ${pickingList.picked_status === 'Completed' ? 'current' : ''}`}>
+                        <div className="step-indicator">3</div>
+                        <div className="step-label">Completed</div>
+                      </div>
+                    </div>
+                    
+                    <div className="status-action">
+                      <button 
+                        className={`status-update-button status-${getNextStatus(pickingList.picked_status)?.toLowerCase().replace(' ', '-')}`}
+                        onClick={() => onStatusUpdate(
+                          pickingList, 
+                          getNextStatus(pickingList.picked_status), 
+                          selectedEmployee, 
+                          null // No longer passing warehouse ID
+                        )}
+                        disabled={isStatusUpdateDisabled()}
+                      >
+                        <span className="button-icon">
+                          {pickingList.picked_status === 'Not Started' ? '▶' : '✓'}
+                        </span>
+                        {getStatusActionLabel(pickingList.picked_status)}
+                      </button>
+                      
+                      {isStatusUpdateDisabled() && (
+                        <div className="validation-message">
+                          {!selectedEmployee ? 'Please assign an employee to start picking' : ''}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Completed Message */}
+              {isCompleted && (
+                <div className="completed-section">
+                  <div className="completed-message">
+                    <span className="completed-icon">✅</span>
+                    This picking list was completed on {formatDate(pickingList.picked_date)}
+                  </div>
+                </div>
+              )}
+            </>
           )}
-          
-          {/* Completed Message */}
-          {isCompleted && (
-            <div className="completed-section">
-              <div className="completed-message">
-                <span className="completed-icon">✅</span>
-                This picking list was completed on {formatDate(pickingList.picked_date)}
+
+          {/* Items Tab Content */}
+          {activeTab === 'items' && (
+            <div className="items-section">
+              <h4 className="section-title">
+                <span className="section-icon">📦</span>
+                Items to Pick ({pickingList.items_details?.length || 0})
+              </h4>
+              
+              <div className="items-table-container">
+                <table className="items-table">
+                  <thead>
+                    <tr>
+                      <th>Item No.</th>
+                      <th>Item Name</th>
+                      <th>Quantity</th>
+                      <th>Warehouse</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pickingList.items_details && pickingList.items_details.length > 0 ? (
+                      pickingList.items_details.map((item, index) => (
+                        <tr key={item.inventory_item_id} className={index % 2 === 0 ? 'even-row' : 'odd-row'}>
+                          <td>{item.item_no || '-'}</td>
+                          <td>{item.item_name || 'Unknown Item'}</td>
+                          <td className="centered-cell">{item.quantity || 0}</td>
+                          <td>{item.warehouse_name || '-'}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="no-data">No items to display</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
+              
+              {/* Show warning if items are from multiple warehouses */}
+              {pickingList.items_details && 
+               new Set(pickingList.items_details.map(item => item.warehouse_id)).size > 1 && (
+                <div className="multi-warehouse-warning">
+                  <span className="warning-icon">⚠️</span>
+                  <span className="warning-text">
+                    This order contains items from multiple warehouses. Items may need to be picked from different locations.
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -354,7 +414,7 @@ const EditPickingModal = ({
           <button className="cancel-button" onClick={onClose}>
             {isCompleted ? 'Close' : 'Cancel'}
           </button>
-          {!isCompleted && (
+          {!isCompleted && activeTab === 'general' && (
             <button 
               className="save-button" 
               onClick={handleSave}

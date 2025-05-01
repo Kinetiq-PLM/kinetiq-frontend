@@ -1,0 +1,307 @@
+.delivery-receipt-pdf {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    color: #333;
+    background-color: white;
+    box-sizing: border-box;
+  }
+  
+  .delivery-receipt-pdf .receipt-container {
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eaeaea;
+    position: relative;
+  }
+  
+  /* Header Styles */
+  .delivery-receipt-pdf .header-flex {
+    display: flex;
+    position: relative;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  
+  .delivery-receipt-pdf .logo-section {
+    flex: 0 0 auto;
+    margin-right: 20px;
+  }
+  
+  .delivery-receipt-pdf .company-logo {
+    width: 100px;
+    height: auto;
+  }
+  
+  .delivery-receipt-pdf .title-section {
+    flex: 1;
+  }
+  
+  .delivery-receipt-pdf .receipt-title {
+    color: #00a8a8;
+    margin: 0 0 5px 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  
+  .delivery-receipt-pdf .receipt-details {
+    margin-top: 5px;
+  }
+  
+  .delivery-receipt-pdf .receipt-row {
+    display: flex;
+    align-items: center;
+    line-height: 1.4;
+  }
+  
+  .delivery-receipt-pdf .detail-label {
+    font-weight: normal;
+    color: #555;
+    margin-right: 5px;
+  }
+  
+  .delivery-receipt-pdf .detail-value {
+    color: #333;
+  }
+  
+  /* QA Badge */
+  .delivery-receipt-pdf .qa-badge {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #f0f9f9;
+    padding: 4px 8px;
+    border-radius: 15px;
+  }
+  
+  .delivery-receipt-pdf .badge-circle {
+    background-color: #00a8a8;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  
+  .delivery-receipt-pdf .badge-text {
+    font-size: 11px;
+    color: #00a8a8;
+    font-weight: 600;
+  }
+  
+  /* Divider Line */
+  .delivery-receipt-pdf .divider-line {
+    height: 1px;
+    background-color: #00a8a8;
+    margin: 15px 0;
+  }
+  
+  /* Company Info */
+  .delivery-receipt-pdf .company-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .delivery-receipt-pdf .company-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #00a8a8;
+  }
+  
+  .delivery-receipt-pdf .company-contact {
+    display: flex;
+    align-items: center;
+    color: #555;
+    font-size: 14px;
+  }
+  
+  .delivery-receipt-pdf .company-contact svg {
+    color: #00a8a8;
+    margin-right: 5px;
+  }
+  
+  /* Info Cards */
+  .delivery-receipt-pdf .info-card {
+    margin-bottom: 20px;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #eaeaea;
+  }
+  
+  .delivery-receipt-pdf .card-header {
+    background-color: #00a8a8;
+    padding: 8px 12px;
+  }
+  
+  .delivery-receipt-pdf .card-header h2 {
+    color: white;
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  
+  .delivery-receipt-pdf .card-content {
+    padding: 15px;
+    background-color: #f9f9f9;
+  }
+  
+  /* Customer Info Grid */
+  .delivery-receipt-pdf .info-grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .delivery-receipt-pdf .info-column {
+    flex: 1;
+    min-width: 250px;
+  }
+  
+  .delivery-receipt-pdf .info-item {
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  
+  .delivery-receipt-pdf .label {
+    display: inline-block;
+    width: 100px;
+    font-weight: 600;
+    color: #555;
+  }
+  
+  .delivery-receipt-pdf .value {
+    color: #333;
+  }
+  
+  /* Shipment Table */
+  .delivery-receipt-pdf .shipment-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .delivery-receipt-pdf .shipment-table th {
+    background-color: #00a8a8;
+    color: white;
+    padding: 8px;
+    text-align: left;
+    font-weight: normal;
+    font-size: 14px;
+  }
+  
+  .delivery-receipt-pdf .shipment-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    background-color: white;
+  }
+  
+  .delivery-receipt-pdf .empty-row td {
+    height: 30px;
+    background-color: #f9f9f9;
+  }
+  
+  /* Footer Section */
+  .delivery-receipt-pdf .footer-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .delivery-receipt-pdf .signature-area {
+    display: flex;
+    flex: 0 0 65%;
+  }
+  
+  .delivery-receipt-pdf .signature-box {
+    border: 1px solid #ddd;
+    padding: 15px;
+    flex: 0 0 60%;
+    margin-right: 10px;
+  }
+  
+  .delivery-receipt-pdf .signature-label {
+    font-size: 13px;
+    color: #555;
+    text-align: center;
+  }
+  
+  .delivery-receipt-pdf .date-box {
+    flex: 0 0 35%;
+  }
+  
+  .delivery-receipt-pdf .date-line {
+    border-bottom: 1px solid #999;
+    height: 25px;
+    margin-bottom: 5px;
+  }
+  
+  .delivery-receipt-pdf .date-label {
+    font-size: 13px;
+    color: #555;
+    text-align: center;
+  }
+  
+  .delivery-receipt-pdf .total-area {
+    flex: 0 0 30%;
+  }
+  
+  .delivery-receipt-pdf .total-box {
+    border: 1px solid #00a8a8;
+    padding: 10px;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+  
+  .delivery-receipt-pdf .total-label {
+    font-weight: 600;
+    color: #00a8a8;
+    margin-bottom: 5px;
+  }
+  
+  .delivery-receipt-pdf .total-value {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  /* Healthcare Note */
+  .delivery-receipt-pdf .healthcare-note {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    border-left: 3px solid #00a8a8;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: #555;
+  }
+  
+  .delivery-receipt-pdf .check-icon {
+    color: #00a8a8;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  
+  /* Print Styles */
+  @media print {
+    .delivery-receipt-pdf {
+      padding: 0;
+      margin: 0;
+      max-width: 100%;
+    }
+    
+    .delivery-receipt-pdf .receipt-container {
+      box-shadow: none;
+      border: none;
+    }
+    
+    @page {
+      size: A4;
+      margin: 0.5cm;
+    }
+  }

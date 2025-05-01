@@ -22,7 +22,7 @@ const ExternalDelivery = () => {
     const fetchDeliveryOrders = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/delivery-orders/');
+        const response = await fetch('http://127.0.0.1:8000/api/delivery-orders/');
         
         if (!response.ok) {
           throw new Error('Failed to fetch delivery orders');

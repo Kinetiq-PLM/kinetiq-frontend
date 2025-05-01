@@ -136,7 +136,7 @@
 .packing .stats-row {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: .5rem;
   flex-wrap: wrap;
 }
 

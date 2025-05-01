@@ -136,7 +136,7 @@
 .picking .stats-row {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: .5rem;
   flex-wrap: wrap;
 }
 
@@ -1698,5 +1698,146 @@
   .picking .sort-icon {
     display: block;
     margin: 2px auto 0;
+  }
+}
+
+/* Add these styles to the end of your Picking.css file */
+
+/* Modal Tab Navigation */
+.picking .modal-tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 16px;
+}
+
+.picking .tab-button {
+  padding: 10px 16px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.picking .tab-button:hover {
+  color: #00a8a8;
+  background-color: #f8f9fa;
+}
+
+.picking .tab-button.active {
+  color: #00a8a8;
+  border-bottom: 2px solid #00a8a8;
+}
+
+.picking .tab-icon {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+/* Items Section */
+.picking .items-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.picking .items-table-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.picking .items-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.picking .items-table th {
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.picking .items-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.9rem;
+  color: #212529;
+}
+
+.picking .items-table tr:last-child td {
+  border-bottom: none;
+}
+
+.picking .items-table .even-row {
+  background-color: #fff;
+}
+
+.picking .items-table .odd-row {
+  background-color: #f8f9fa;
+}
+
+.picking .items-table .centered-cell {
+  text-align: center;
+}
+
+.picking .items-table .no-data {
+  text-align: center;
+  padding: 24px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Multi-warehouse warning */
+.picking .multi-warehouse-warning {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 6px;
+  color: #856404;
+}
+
+.picking .warning-icon {
+  font-size: 1.2rem;
+  margin-right: 12px;
+}
+
+.picking .warning-text {
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .picking .modal-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  
+  .picking .tab-button {
+    flex: 1;
+    justify-content: center;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 576px) {
+  .picking .items-table th,
+  .picking .items-table td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
   }
 }

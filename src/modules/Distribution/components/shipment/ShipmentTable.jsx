@@ -7,7 +7,7 @@ const ShipmentTable = ({ shipments, onShipmentSelect, selectedShipment, carriers
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(7);
+  const [itemsPerPage] = useState(8);
   
   // Handle sort change
   const handleSort = (field) => {

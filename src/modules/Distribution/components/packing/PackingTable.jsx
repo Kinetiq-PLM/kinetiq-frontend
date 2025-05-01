@@ -8,7 +8,7 @@ const PackingTable = ({ packingLists, onListSelect, selectedList, employees }) =
   
   // Add pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(8);
+  const [itemsPerPage] = useState(10);
   
   // Handle sort change
   const handleSort = (field) => {

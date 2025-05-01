@@ -38,7 +38,7 @@ const Rework = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/reworks/');
+        const response = await fetch('http://127.0.0.1:8000/api/reworks/');
         
         if (!response.ok) {
           if (response.status === 401) {
@@ -61,7 +61,7 @@ const Rework = () => {
 
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
+        const response = await fetch('http://127.0.0.1:8000/api/employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -170,7 +170,7 @@ const Rework = () => {
     if (!selectedRework) return;
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/reworks/${selectedRework.rework_id}/assign/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/reworks/${selectedRework.rework_id}/assign/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -209,7 +209,7 @@ const Rework = () => {
     if (!selectedRework) return;
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/reworks/${selectedRework.rework_id}/complete/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/reworks/${selectedRework.rework_id}/complete/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -248,7 +248,7 @@ const Rework = () => {
   // Handle status update
   const handleStatusUpdate = async (rework, newStatus) => {
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/reworks/${rework.rework_id}/update-status/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/reworks/${rework.rework_id}/update-status/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

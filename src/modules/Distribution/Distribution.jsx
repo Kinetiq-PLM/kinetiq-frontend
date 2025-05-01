@@ -1131,11 +1131,11 @@ const Distribution = ({ loadSubModule, setActiveSubModule }) => {
           pickingListsResponse,
           reworksResponse
         ] = await Promise.all([
-          fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/shipments/'),
-          fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/delivery-orders/'),
-          fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/'),
-          fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/'),
-          fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/reworks/')
+          fetch('http://127.0.0.1:8000/api/shipments/'),
+          fetch('http://127.0.0.1:8000/api/delivery-orders/'),
+          fetch('http://127.0.0.1:8000/api/packing-lists/'),
+          fetch('http://127.0.0.1:8000/api/picking-lists/'),
+          fetch('http://127.0.0.1:8000/api/reworks/')
         ]);
         
         if (!shipmentsResponse.ok) throw new Error('Failed to fetch shipments');

@@ -34,7 +34,7 @@ const Packing = () => {
       try {
         setLoading(true);
         setError(null); // Reset error state
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/');
+        const response = await fetch('http://127.0.0.1:8000/api/packing-lists/');
         
         if (!response.ok) {
           if (response.status === 401) {
@@ -57,7 +57,7 @@ const Packing = () => {
 
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
+        const response = await fetch('http://127.0.0.1:8000/api/employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -73,7 +73,7 @@ const Packing = () => {
 
     const fetchPackingTypes = async () => {
       try {
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-types/');
+        const response = await fetch('http://127.0.0.1:8000/api/packing-types/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -147,7 +147,7 @@ const Packing = () => {
     }
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${list.packing_list_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -182,7 +182,7 @@ const Packing = () => {
         
         // Only send non-empty updates to backend
         if (Object.keys(updateData).length > 0) {
-          const updateResponse = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${list.packing_list_id}/update/`, {
+          const updateResponse = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -209,7 +209,7 @@ const Packing = () => {
       }
       
       // For other status changes, just update the status
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${list.packing_list_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -239,7 +239,7 @@ const Packing = () => {
     if (!selectedList) return;
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${selectedList.packing_list_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${selectedList.packing_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

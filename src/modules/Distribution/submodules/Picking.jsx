@@ -34,8 +34,8 @@ const Picking = () => {
       try {
         setLoading(true);
         setError(null);
-        // const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/');
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/');
+        // const response = await fetch('http://127.0.0.1:8000/api/picking-lists/');
+        const response = await fetch('http://127.0.0.1:8000/api/picking-lists/');
         
         if (!response.ok) {
           if (response.status === 401) {
@@ -58,7 +58,7 @@ const Picking = () => {
   
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
+        const response = await fetch('http://127.0.0.1:8000/api/employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -74,7 +74,7 @@ const Picking = () => {
   
     const fetchWarehouses = async () => {
       try {
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouses/');
+        const response = await fetch('http://127.0.0.1:8000/api/warehouses/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -93,7 +93,7 @@ const Picking = () => {
     fetchPickingLists();
     fetchEmployees();
     
-    // Then fetch warehouses separately (and don't derive from picking lists)
+    // Still fetch warehouses for display purposes
     fetchWarehouses();
   }, [refreshTrigger]);
   
@@ -152,7 +152,7 @@ const Picking = () => {
     }
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -175,26 +175,21 @@ const Picking = () => {
     }
   };
   
-  // Handle status update
-  const handleStatusUpdate = async (list, newStatus, employeeId, warehouseId) => {
+  // Handle status update - Modified to remove warehouse selection logic
+  const handleStatusUpdate = async (list, newStatus, employeeId) => {
     try {
       // Build the update object
       const updateData = {
         picked_status: newStatus === 'Completed' ? 'In Progress' : newStatus // Don't set Completed yet
       };
       
-      // Add employee and warehouse if they changed
+      // Add employee if it changed
       if (employeeId && employeeId !== list.picked_by) {
         updateData.picked_by = employeeId;
       }
       
-      // Always update warehouse if this is an external delivery and the warehouse changed
-      if (list.is_external && warehouseId && warehouseId !== list.warehouse_id) {
-        updateData.warehouse_id = warehouseId;
-      }
-  
       // Always make the API call when status changes (or when completing)
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${list.picking_list_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${list.picking_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -207,14 +202,13 @@ const Picking = () => {
         throw new Error(errorData.error || 'Failed to update picking list status');
       }
   
-      // Find the warehouse name for the updated warehouse ID
-      const warehouseName = warehouses.find(w => w.id === (warehouseId || list.warehouse_id))?.name || list.warehouse_name;
+      // Find the warehouse name for display purposes
+      const warehouseName = warehouses.find(w => w.id === list.warehouse_id)?.name || list.warehouse_name;
   
       // Update the selectedList with the new values so completion modal has the latest data
       setSelectedList(prev => ({
         ...prev,
         picked_by: employeeId || prev.picked_by,
-        warehouse_id: warehouseId || prev.warehouse_id,
         warehouse_name: warehouseName,
         picked_status: updateData.picked_status
       }));
@@ -241,17 +235,13 @@ const Picking = () => {
     if (!selectedList || !showCompletionModal) return;
     
     try {
-      // Get the current employee and warehouse selections from the modal
-      // Since the modal is closed at this point, we'll use the selectedList data
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${selectedList.picking_list_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${selectedList.picking_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           picked_status: 'Completed'
-          // We don't include employee/warehouse here because the completion modal
-          // is shown after the edit modal is closed, so any changes were already saved
         }),
       });
       
