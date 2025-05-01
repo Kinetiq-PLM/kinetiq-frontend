@@ -15,9 +15,9 @@ const BodyContent = ({ onClose }) => {
     name: "",
     department: "",
     email: "",
-    requestType: "Material", // Default to Material
+    requestType: "Assets", // Default to Material
     dateRequested: format(new Date(), "yyyy-MM-dd"),
-    dateValid: "",
+    dateValid: format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
     documentDate: format(new Date(), "yyyy-MM-dd"),
     employeeId: "",
     items: [],
@@ -243,9 +243,9 @@ const BodyContent = ({ onClose }) => {
       name: "",
       department: "",
       email: "",
-      requestType: "Material",
+      requestType: "Assets",
       dateRequested: format(new Date(), "yyyy-MM-dd"),
-      dateValid: "",
+      dateValid: format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
       documentDate: format(new Date(), "yyyy-MM-dd"),
       employeeId: "",
       items: [],
@@ -261,32 +261,39 @@ const BodyContent = ({ onClose }) => {
             <h1>PURCHASE REQUEST FORM</h1>
           </div>
 
-          <div className="form-content">
-            <div className="form-section">
+            <div className="form-content">
+              <div className="form-section">
               <div className="form-group">
                 <label>
                   Name<span className="required">*</span>
                 </label>
-                <select name="employeeId" value={formData.employeeId} onChange={handleEmployeeChange}>
-                  <option value="">Select employee</option>
-                  {employees.map((emp) => (
-                    <option key={emp.employee_id} value={emp.employee_id}>
-                      {emp.first_name} {emp.last_name}
-                    </option>
-                  ))}
-                </select>
+                <input
+                  type="text"
+                  value={
+                    (() => {
+                      const storedUser = localStorage.getItem("user");
+                      if (!storedUser) return "";
+                      const user = JSON.parse(storedUser);
+                      return `${user.first_name} ${user.last_name}`;
+                    })()
+                  }
+                  disabled
+                />
               </div>
 
               <div className="form-group">
                 <label>Email Address</label>
-                <input type="email" name="email" value={formData.email} onChange={handleInputChange} />
-              </div>
-
-              <div className="form-group">
-                <label>
-                  Department<span className="required">*</span>
-                </label>
-                <input type="text" name="department" value={formData.department} readOnly />
+                <input
+                  type="email"
+                  value={(() => {
+                    const storedUser = localStorage.getItem("user");
+                    if (!storedUser) return "";
+                    const user = JSON.parse(storedUser);
+                    return user.email || "";
+                  })()}
+                  disabled
+                  className="readonly-input"
+                />
               </div>
 
               <div className="form-group">
@@ -304,8 +311,8 @@ const BodyContent = ({ onClose }) => {
                     }))
                   }}
                 >
-                  <option value="Material">Material</option>
                   <option value="Assets">Assets</option>
+                  <option value="Material">Material</option>
                 </select>
               </div>
             </div>
