@@ -42,8 +42,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
     const [totalLaborCost, setTotalLaborCost] = useState(0);
     const [totalOrderCost, setTotalOrderCost] = useState(0);
-    //const baseurl = "http://127.0.0.1:8000";
-    const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
+    const baseurl = "http://127.0.0.1:8000";
+    //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
 
 
@@ -291,10 +291,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
             const formattedData = data.map((item, index) => ({
                 no: index + 1,
-                prin_material_id: item.material_id,
+                prin_material_id: item.item_id,
                 prin_uom: item.unit_of_measure,
                 prin_item_name: item.item_name,
-                prin_item_id: item.item_id,
                 prin_quantity: item.item_quantity,
                 prin_itemcost: parseFloat(item.item_price),
                 prin_totalitemcost: parseFloat(item.total_item_price)
