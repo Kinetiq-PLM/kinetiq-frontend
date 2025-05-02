@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 
 import { useAlert } from "../../Sales/components/Context/AlertContext.jsx";
-
+import emailjs from "@emailjs/browser";
 import Button from "../../Sales/components/Button.jsx";
 import InputField from "../../Sales/components/InputField.jsx";
 import TextField from "./TextField.jsx";
 
-const MessageModal = ({ isOpen, onClose, campaign }) => {
+const MessageModal = ({ isOpen, onClose, campaign = {}, contacts }) => {
   const { showAlert } = useAlert();
 
   const modalRef = useRef(null);
@@ -28,21 +28,39 @@ const MessageModal = ({ isOpen, onClose, campaign }) => {
     setIsValidationVisible(true);
     if (errorCount === 0) {
       // Send message here
-
-      console.log("Campaign: " + campaign.campaign_name);
-      console.log("Sending message type: " + campaign.type);
-      console.log("Subject: " + subject);
-      console.log("Message: " + message);
+      if (campaign && Object.keys(campaign).length > 0) {
+        console.log("Campaign: " + campaign.campaign_name);
+        console.log("Sending message type: " + campaign.type);
+        console.log("Subject: " + subject);
+        console.log("Message: " + message);
+      } else {
+        console.log("Sending message to: " + contacts[0]?.email_address || "");
+        console.log("Subject: " + subject);
+        console.log("Message: " + message);
+        try {
+          emailjs.init("tJ0nVArt2LV_fm1Vv");
+          emailjs.send("service_4tsfjrp", "template_c7ez4jz", {
+            subject,
+            name: contacts[0]?.contact_person,
+            content: message,
+            email: contacts[0]?.email_address,
+          });
+          showAlert({
+            type: "success",
+            title: "Message sent.",
+          });
+        } catch (error) {
+          showAlert({
+            type: "error",
+            title: "Error sending message.",
+          });
+        }
+      }
 
       // Reset form fields
       setSubject("");
       setMessage("");
       setIsValidationVisible(false);
-
-      showAlert({
-        type: "success",
-        title: "Message sent",
-      });
       onClose();
     } else {
       showAlert({

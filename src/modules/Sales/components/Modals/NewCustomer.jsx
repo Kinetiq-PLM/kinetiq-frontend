@@ -39,14 +39,14 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
   const queryClient = useQueryClient();
   const customerMutation = useMutation({
     mutationFn: async (data) => await POST("sales/customer/", data),
-    onSuccess: (data, variables, context) => {
-      queryClient.refetchQueries(["customers", "customerPartners"]);
-    },
     onError: (error) => {
       showAlert({
         type: "error",
         title: "Failed to add Customer: " + error.message,
       });
+    },
+    onSettled: async () => {
+      await queryClient.refetchQueries(["customers"]);
     },
   });
 
@@ -63,7 +63,7 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
       validatePostalCode,
       validateMainAddress,
       validateSecondaryAddress,
-      validateCustomerType,
+      // validateCustomerType,
     ];
 
     const errorCount = validators.reduce(
@@ -84,10 +84,9 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
         postal_code: postalCode,
         address_line1: mainAddress,
         address_line2: secondaryAddress,
-        customer_type: customerType,
         status: "Active",
         contact_person: contactPerson,
-        debt: 0,
+        customer_type: "Lead",
       };
       customerMutation.mutate(request);
 
@@ -337,14 +336,14 @@ const NewCustomerModal = ({ isOpen, onClose }) => {
               validation={validateSecondaryAddress}
               isValidationVisible={isValidationVisible}
             />
-            <Dropdown
+            {/* <Dropdown
               label="Customer Type"
               options={CustomerTypes}
               onChange={setCustomerType}
               value={customerType}
               validation={validateCustomerType}
               isValidationVisible={isValidationVisible}
-            />
+            /> */}
           </form>
 
           <div className="flex justify-between">

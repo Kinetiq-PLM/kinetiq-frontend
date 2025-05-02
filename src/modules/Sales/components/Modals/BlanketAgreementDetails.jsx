@@ -36,12 +36,12 @@ const BlanketAgreementDetailsModal = ({
 
   const agreementMutation = useMutation({
     mutationFn: async (data) => await POST(`sales/agreement/`, data),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       showAlert({
         type: "success",
         title: "New Agreement Created",
       });
-      queryClient.refetchQueries(["agreements"]);
+      await queryClient.refetchQueries(["agreements"]);
       onClose();
     },
     onError: (error) => {
@@ -79,8 +79,10 @@ const BlanketAgreementDetailsModal = ({
           total_amount: quotationInfo?.statement?.total_amount,
           discount: quotationInfo?.statement?.discount,
           total_tax: quotationInfo?.statement?.total_tax,
+          subtotal: quotationInfo?.statement?.subtotal,
+
           items: quotationInfo?.statement?.items.map((item) => ({
-            product: item.product.product_id,
+            inventory_item: item.inventory_item.inventory_item_id,
             quantity: item.quantity,
             unit_price: item.total_price,
             discount: item.discount,

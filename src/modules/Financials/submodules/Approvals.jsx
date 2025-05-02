@@ -815,15 +815,15 @@ Rejected <span className="status-circle rejected"></span>
 </InfoCard>
 <InfoCard className="filter-infocard">
 <div className="filter-controls">
-<input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+<input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}style={{ border: '1px solid gray' }} />
 <div className="filter-group">
-<select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+<select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}style={{ border: '1px solid gray' }}>
 <option value="All Time">All Time</option>
 <option value="Last 30 days">Last 30 days</option>
 <option value="Last 7 days">Last 7 days</option>
 
 </select>
-<select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
+<select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}style={{ border: '1px solid gray' }}>
 <option value="All">Filter By</option>
 <option value="lowest amount">Lowest Amount</option>
 <option value="highest amount">Highest Amount</option>
@@ -1057,14 +1057,14 @@ Rejected <span className="status-circle rejected"></span>
 </InfoCard>
 <InfoCard className="filter-infocard">
 <div className="filter-controls">
-<input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+<input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ border: '1px solid gray' }}/>
 <div className="filter-group">
-<select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+<select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}style={{ border: '1px solid gray' }}>
 <option value="Last 30 days">Last 30 days</option>
 <option value="Last 7 days">Last 7 days</option>
 <option value="All Time">All Time</option>
 </select>
-<select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
+<select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}style={{ border: '1px solid gray' }}>
 <option value="All">Filter By</option>
 <option value="lowest amount">Lowest Amount</option>
 <option value="highest amount">Highest Amount</option>

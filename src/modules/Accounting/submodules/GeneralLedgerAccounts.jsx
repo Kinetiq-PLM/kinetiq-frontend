@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
-import Table from "../components/Table";
-import Search from "../components/Search";
-import Dropdown from "../components/Dropdown";
-import Button from "../components/Button";
-import CreateGLAccountModal from "../components/CreateGLAccountModal";
+import Table from "../components/table/Table";
+import Search from "../components/search/Search";
+import Dropdown from "../components/dropdown/Dropdown";
+import Button from "../components/button/Button";
+import CreateGLAccountModal from "../components/glAccountsModal/CreateGLAccountModal";
 import NotifModal from "../components/modalNotif/NotifModal";
 import axios from "axios";
 
 const GeneralLedgerAccounts = () => {
+
+  // Column names for the table
   const columns = [
     "GL Account ID",
     "Account Name",
@@ -17,18 +19,29 @@ const GeneralLedgerAccounts = () => {
     "Status",
     "Created at",
   ];
+
+
+  // State variables
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
+
   const [statusFilter, setStatusFilter] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    rowIndex: null,
+    newStatus: null,
+  });
+
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
     title: "",
     message: "",
   });
+
 
   // API endpoint
   const API_URL =
@@ -44,8 +57,9 @@ const GeneralLedgerAccounts = () => {
     try {
       const response = await axios.get(GL_ACCOUNTS_ENDPOINT);
       console.log("API Response (fetchData):", response.data);
-      setData(
-        response.data.map((entry) => [
+
+      const sortedData = response.data
+        .map((entry) => [
           entry.gl_account_id || "-",
           entry.account_name || "-",
           entry.account_code || "-",
@@ -53,7 +67,9 @@ const GeneralLedgerAccounts = () => {
           entry.status || "-",
           entry.created_at ? new Date(entry.created_at).toLocaleString() : "-",
         ])
-      );
+        .sort((a, b) => a[0].localeCompare(b[0])); // Sort by GL Account ID
+
+      setData(sortedData);
       setIsLoading(false); // Set loading to false when fetching is done
     } catch (error) {
       console.error(
@@ -71,21 +87,13 @@ const GeneralLedgerAccounts = () => {
     }
   };
 
+
   useEffect(() => {
     fetchData();
   }, []);
 
-  const handleSort = () => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-    const sortedData = [...data].sort((a, b) => {
-      return newSortOrder === "asc"
-        ? a[5].localeCompare(b[5])
-        : b[5].localeCompare(a[5]);
-    });
-    setData(sortedData);
-  };
 
+  // Status filter function
   const handleStatusFilter = (status) => {
     setStatusFilter(status === "" ? "All" : status);
   };
@@ -199,6 +207,25 @@ const GeneralLedgerAccounts = () => {
     }
   };
 
+
+  // Sorting function
+  const handleSort = (value) => {
+    let sortedData = [...data];
+
+    if (value === "Default") {
+      sortedData.sort((a, b) => a[0].localeCompare(b[0]));
+    } else if (value === "Date Ascending") {
+      sortedData.sort((a, b) => a[5].localeCompare(b[5]));
+    } else if (value === "Date Descending") {
+      sortedData.sort((a, b) => b[5].localeCompare(a[5]));
+    }
+
+    setData(sortedData);
+  };
+
+
+
+  // Filter data based on search input and status filter
   const filteredData = data.filter((row) => {
     const matchesSearch = [row[0], row[1], row[2], row[3], row[4], row[5]]
       .filter(Boolean)
@@ -214,6 +241,52 @@ const GeneralLedgerAccounts = () => {
     return matchesSearch && matchesStatus;
   });
 
+
+  // Handle status toggle function
+  const handleStatusToggle = (rowIndex) => {
+    const currentRow = filteredData[rowIndex];
+    const currentStatus = currentRow[4];
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+
+    setStatusModal({ isOpen: true, rowIndex, newStatus });
+  };
+
+
+  const confirmStatusChange = async () => {
+    const { rowIndex, newStatus } = statusModal;
+    const glAccountID = filteredData[rowIndex][0];
+
+    try {
+      await axios.patch(`${GL_ACCOUNTS_ENDPOINT}${glAccountID}/`, { status: newStatus });
+      fetchData(); // Refresh data
+      setValidation({
+        isOpen: true,
+        type: "success",
+        title: "Status Updated",
+        message: `Status successfully changed to ${newStatus}`,
+      });
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setValidation({
+        isOpen: true,
+        type: "error",
+        title: "Update Failed",
+        message: "Failed to update status. Try again later.",
+      });
+    } finally {
+      setStatusModal({ isOpen: false, rowIndex: null, newStatus: null });
+    }
+  };
+
+  const cancelStatusChange = () => {
+    setStatusModal({ isOpen: false, rowIndex: null, newStatus: null });
+  };
+
+
+
+
+
+
   // Loading spinner component
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
@@ -221,6 +294,7 @@ const GeneralLedgerAccounts = () => {
       <p className="ml-4 text-gray-600">Loading general ledger accounts data...</p>
     </div>
   );
+
 
   return (
     <div className="generalLedgerAccounts">
@@ -232,11 +306,13 @@ const GeneralLedgerAccounts = () => {
         <div className="parent-component-container">
           <div className="component-container">
             <Dropdown
-              options={["Ascending", "Descending"]}
+              options={["Default", "Date Ascending", "Date Descending"]}
               style="selection"
-              defaultOption="Sort by Date.."
-              onChange={handleSort}
+              defaultOption="Sort by date.."
+              onChange={(value) => handleSort(value)}
             />
+
+
             <Dropdown
               options={["All", "Active", "Inactive"]}
               style="selection"
@@ -262,7 +338,7 @@ const GeneralLedgerAccounts = () => {
         {isLoading ? (
           <LoadingSpinner />
         ) : (
-          <Table data={filteredData} columns={columns} enableCheckbox={false} />
+          <Table data={filteredData} columns={columns} enableCheckbox={false} handleStatusToggle={handleStatusToggle} />
         )}
       </div>
 
@@ -283,6 +359,23 @@ const GeneralLedgerAccounts = () => {
           message={validation.message}
         />
       )}
+
+      {statusModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 space-y-4">
+            <h2 className="text-xl font-semibold text-gray-800">Change Status</h2>
+            <p className="text-gray-600">
+              Are you sure you want to change the status to{" "}
+              <span className="font-bold">{statusModal.newStatus}</span>?
+            </p>
+            <div className="flex justify-end gap-4">
+              <Button name="Cancel" variant="standard1" onclick={cancelStatusChange} />
+              <Button name="Confirm" variant="standard2" onclick={confirmStatusChange} />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

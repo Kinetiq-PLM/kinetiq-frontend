@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const InputCustomer = ({
   label,
   value = "",
-  customerListModal,
+  handleCustomerSelection,
   enabled = true,
 }) => {
   return (
@@ -14,7 +13,7 @@ const InputCustomer = ({
         className="border border-[#9a9a9a] flex-1 cursor-pointer p-1 flex hover:border-[#969696] transition-all duration-300 justify-between transform hover:opacity-60 items-center min-h-[30px] rounded overflow-hidden"
         onClick={() => {
           if (enabled) {
-            customerListModal(true);
+            handleCustomerSelection();
           }
         }}
       >
@@ -89,31 +88,32 @@ const AddressDropbar = ({ label, customer, setCustomerAddress }) => {
   );
 };
 
-const DateSelector = ({
+const DateIssuedSelector = ({
   label,
   customer,
-  setDeliveryDate,
-  disabled,
-  defaultDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+  setDateIssued,
+  disabled = true,
+  defaultDate = new Date(Date.now() * 24 * 60 * 60 * 1000)
     .toISOString()
     .split("T")[0],
 }) => {
   // Calculate the default date (3 days from today)
 
   // Initialize state with the customer's delivery date or default date
-  const [date, setDate] = useState(customer.delivery_date || defaultDate);
+  const [date, setDate] = useState(customer.issued_date || defaultDate);
 
   // Effect to set the default date when the component mounts
   useEffect(() => {
-    if (!customer.delivery_date) {
-      setDeliveryDate(defaultDate);
+    if (!customer.issued_date) {
+      setDateIssued(defaultDate);
     }
+    console.log("customer.issued_date", defaultDate);
   }, []); // Runs only once on mount
 
   const handleDateChange = (event) => {
     const selectedDate = event.target.value;
     setDate(selectedDate);
-    setDeliveryDate(selectedDate);
+    setDateIssued(selectedDate);
   };
 
   return (
@@ -131,19 +131,106 @@ const DateSelector = ({
   );
 };
 
+const DatePostedSelector = ({
+  label,
+  customer,
+  setDatePosted,
+  disabled = false,
+  defaultDate = new Date().toISOString().split("T")[0], // Convert to YYYY-MM-DD format
+}) => {
+  const [date, setDate] = useState(customer.posted_date || defaultDate);
+
+  useEffect(() => {
+    if (!customer.posted_date) {
+      setDate(defaultDate); // Update local state
+      setDatePosted(defaultDate);
+    }
+  }, [customer.posted_date, defaultDate, setDatePosted]);
+
+  const handleDateChange = (event) => {
+    const selectedDate = event.target.value;
+    setDate(selectedDate); // Update local state
+    setDatePosted(selectedDate);
+  };
+
+  return (
+    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
+      <p className="w-[150px]">{label}</p>
+      <input
+        type="date"
+        className="border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded cursor-pointer text-sm disabled:cursor-default disabled:bg-[#f7f7f7]"
+        onChange={handleDateChange}
+        value={date}
+        disabled={disabled}
+      />
+    </div>
+  );
+};
+
+const DateDeliverySelector = ({
+  label,
+  customer,
+  setDateDelivery,
+  disabled = false,
+  dateIssued,
+  defaultDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0],
+}) => {
+  const [date, setDate] = useState(customer.delivery_date || defaultDate);
+
+  useEffect(() => {
+    if (!customer.delivery_date) {
+      setDateDelivery(defaultDate);
+    }
+  }, []);
+
+  const handleDateChange = (event) => {
+    const selectedDate = event.target.value;
+
+    if (new Date(selectedDate) < new Date(dateIssued)) {
+      alert("Delivery Date cannot be before the Date Issued.");
+      return; // Don't allow setting wrong date
+    }
+
+    setDate(selectedDate);
+    setDateDelivery(selectedDate);
+  };
+
+  return (
+    <div className="flex justify-between mb-2 w-full flex-col sm:flex-row">
+      <p className="w-[150px]">{label}</p>
+      <input
+        type="date"
+        className="border border-[#9a9a9a] flex-1 p-1 min-h-[30px] rounded cursor-pointer text-sm disabled:cursor-default disabled:bg-[#f7f7f7]"
+        onChange={handleDateChange}
+        value={date}
+        min={dateIssued} // force user to pick at least issued date
+        disabled={disabled}
+      />
+    </div>
+  );
+};
+
 const SalesInfo = ({
   type,
   customerListModal,
   customer,
-  setCustomerInfo,
   operationID,
   setAddress,
-  setDeliveryDate,
+  setDateIssued,
+  handleCustomerSelection,
+  setDatePosted = "",
+  setDateDelivery = "",
   enabled = true,
   date = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
     .toISOString()
     .split("T")[0],
 }) => {
+  const [issuedDateLocal, setIssuedDateLocal] = useState(
+    customer.issued_date || date
+  );
+
   let id = "";
   if (type === "Quotation") {
     id = "quotation_id";
@@ -165,13 +252,27 @@ const SalesInfo = ({
           <InputCustomer
             label="Customer"
             value={customer.customer_id}
-            customerListModal={customerListModal}
+            handleCustomerSelection={handleCustomerSelection}
             enabled={enabled}
           />
         )}
         <Information label="Name" value={customer.name} />
         <Information label="Country" value={customer.country} />
         <Information label="Number" value={customer.phone_number} />
+
+        {type !== "Quotation" ? (
+          <DateIssuedSelector
+            customer={customer}
+            setDateIssued={(value) => {
+              setIssuedDateLocal(value);
+              setDateIssued(value);
+            }}
+            label={"Date Issued"}
+            defaultDate={date}
+          />
+        ) : (
+          ""
+        )}
       </div>
 
       <div className="lg:max-w-[100px] xl:max-w-none flex-1 hidden lg:block"></div>
@@ -185,17 +286,41 @@ const SalesInfo = ({
           customer={customer}
           setCustomerAddress={setAddress}
         />
-        <DateSelector
-          customer={customer}
-          setDeliveryDate={setDeliveryDate}
-          label={
-            ["Quotation", "Order"].includes(type)
-              ? "Date Issued"
-              : "Delivery Date"
-          }
-          defaultDate={date}
-          disabled={["Quotation", "Order"].includes(type)}
-        />
+
+        {type == "Quotation" ? (
+          <DateIssuedSelector
+            customer={customer}
+            setDateIssued={(value) => {
+              setIssuedDateLocal(value);
+              setDateIssued(value);
+            }}
+            label={"Date Issued"}
+            defaultDate={date}
+          />
+        ) : (
+          ""
+        )}
+
+        {setDatePosted !== "" ? (
+          <DatePostedSelector
+            customer={customer}
+            setDatePosted={setDatePosted}
+            label={"Date Posted"}
+          />
+        ) : (
+          ""
+        )}
+        {setDateDelivery !== "" ? (
+          <DateDeliverySelector
+            customer={customer}
+            setDateDelivery={setDateDelivery}
+            label={"Date Delivery"}
+            defaultDate={date}
+            dateIssued={issuedDateLocal} // <-- use locally tracked issued date
+          />
+        ) : (
+          ""
+        )}
       </div>
     </section>
   );

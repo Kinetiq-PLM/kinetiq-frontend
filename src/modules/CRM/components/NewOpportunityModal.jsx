@@ -47,8 +47,8 @@ const NewOpportunityModal = ({
 
   const opportunityMutation = useMutation({
     mutationFn: async (data) => await POST(`crm/opportunities/`, data),
-    onSuccess: (data) => {
-      queryClient.refetchQueries(["customerOpps"]);
+    onSuccess: async (data) => {
+      await queryClient.refetchQueries(["customerOpps"]);
       showAlert({
         type: "success",
         title: "Opportunity created.",

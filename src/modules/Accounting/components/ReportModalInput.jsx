@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./ModalInput.css";
-import Button from "../components/Button";
-import Dropdown from "../components/Dropdown";
+import Button from "../components/button/Button";
+import Dropdown from "../components/dropdown/Dropdown";
 import { accounts, subAccounts } from "../submodules/ListOfAccounts";
-import Forms from "./Forms";
+import Forms from "./forms/Forms";
 
 const ReportModalInput = ({ isModalOpen, closeModal, reportForm, handleInputChange, handleSubmit, }) => {
   // Use state

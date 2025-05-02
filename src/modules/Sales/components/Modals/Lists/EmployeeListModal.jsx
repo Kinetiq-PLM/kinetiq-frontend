@@ -8,12 +8,13 @@ import Table from "../../Table";
 import Button from "../../Button";
 import { useQuery } from "@tanstack/react-query";
 import { GET } from "../../../api/api";
-
+import Dropdown from "../../Dropdown.jsx";
 import loading from "../../Assets/kinetiq-loading.gif";
 
 const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
+  const SALES_POSITION_ID = "REG-2504-6039"; // Sales Rep position ID
 
   // setEmployee is used to set the selected customer in the parent component
   // setSelectedCustomer is used to set the selected customer in this component
@@ -21,10 +22,14 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
 
   // Filtered data is used to filter the data based on the search term
   const [filteredData, setFilteredData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [employeeFilter, setEmployeeFilter] = useState("All"); // Default date filter
   const [employees, setEmployees] = useState([]);
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
+
+  const employeeOptions = ["All", "Sales Rep"];
 
   const employeesQuery = useQuery({
     queryKey: ["employees"],
@@ -37,6 +42,27 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
     { key: "employee_id", label: "Employee ID" },
     { key: "name", label: "Name" }, // Company Name
   ];
+
+  const handleSearchAndFilter = () => {
+    if (employeesQuery.status !== "success") return;
+    console.log("Employees: ", employeesQuery.data);
+    try {
+      const filteredData = employeesQuery.data
+        .filter((employee) => employee.name.toLowerCase().includes(searchTerm))
+        .filter(
+          (employee) =>
+            employee.position_id.toLowerCase() ===
+              SALES_POSITION_ID.toLowerCase() || employeeFilter === "All"
+        );
+
+      setFilteredData(filteredData);
+    } catch (error) {
+      showAlert({
+        type: "error",
+        title: "An error occurred while filtering the data: " + error.message,
+      });
+    }
+  };
 
   const handleConfirm = () => {
     if (selectedEmployee) {
@@ -55,6 +81,7 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
       setFilteredData(employeesQuery.data);
       setEmployees(employeesQuery.data);
       setIsLoading(false);
+      console.log("Employees: ", employeesQuery.data);
     } else if (employeesQuery.status === "error") {
       showAlert({
         type: "error",
@@ -91,6 +118,10 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    handleSearchAndFilter();
+  }, [employeeFilter]);
+
   if (!isOpen) return null;
 
   return (
@@ -125,20 +156,26 @@ const EmployeeListModal = ({ isOpen, onClose, setEmployee }) => {
 
         {/* BODY */}
         <div className="px-6 mt-4">
-          <div className="mb-4 flex items-center">
+          <div className="mb-4 flex items-center gap-4">
             <p className="mr-2">Search:</p>
             <input
               type="text"
               placeholder="Search..."
               className="w-full px-2 py-1 border border-gray-300 rounded-md max-w-[300px]"
               onChange={(e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                const filteredData = employees.filter((employee) =>
-                  employee.name.toLowerCase().includes(searchTerm)
-                );
-                setFilteredData(filteredData);
+                (e) => {
+                  setSearchTerm(e.target.value);
+                  handleSearchAndFilter();
+                };
               }}
             />
+            <div className="w-full sm:w-[200px]">
+              <Dropdown
+                options={employeeOptions}
+                onChange={setEmployeeFilter}
+                value={employeeFilter}
+              />
+            </div>
           </div>
           {isLoading ? (
             <div className="h-[300px] rounded-md flex justify-center items-center">
