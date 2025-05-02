@@ -165,6 +165,12 @@ const Picking = () => {
         throw new Error(errorData.error || 'Failed to update picking list');
       }
       
+      // Update the selectedList with the new values
+      setSelectedList(prev => ({
+        ...prev,
+        ...updates
+      }));
+      
       // Refresh the list after successful update
       setRefreshTrigger(prev => prev + 1);
       setShowEditModal(false);

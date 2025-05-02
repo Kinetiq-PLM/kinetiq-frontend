@@ -13,6 +13,14 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
   // Check if picking list is completed
   const isCompleted = pickingList?.picked_status === 'Completed';
   
+  // Initialize selectedEmployee when pickingList changes
+  useEffect(() => {
+    if (pickingList) {
+      setSelectedEmployee(pickingList.picked_by || '');
+      setModified(false); // Reset modified state when picking list changes
+    }
+  }, [pickingList]);
+  
   // Fetch picking items when picking list changes
   useEffect(() => {
     if (pickingList && (pickingList.picked_status === 'In Progress' || pickingList.picked_status === 'Completed')) {
@@ -353,6 +361,57 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     if (isCompleted) return;
     
     try {
+      // Check if employee has changed but hasn't been saved
+      if (selectedEmployee !== pickingList.picked_by) {
+        // First save the employee change
+        const saveResponse = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/update/`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            picked_by: selectedEmployee
+          }),
+        });
+        
+        if (!saveResponse.ok) {
+          throw new Error('Failed to save employee assignment');
+        }
+        
+        // Update local state to match what was saved
+        pickingList.picked_by = selectedEmployee;
+        setModified(false);
+      }
+      
+      // Check if the picking list is still in "Not Started" status
+      // If so, automatically update to "In Progress" first
+      if (pickingList.picked_status === 'Not Started') {
+        const statusUpdateResponse = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/update/`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            picked_status: 'In Progress',
+            picked_by: selectedEmployee
+          }),
+        });
+        
+        if (!statusUpdateResponse.ok) {
+          throw new Error('Failed to update picking list status to In Progress');
+        }
+        
+        // Update local state
+        pickingList.picked_status = 'In Progress';
+        
+        // If this is the first time moving to "In Progress", we need to create picking items
+        await fetchPickingItems();
+        
+        // Notify the parent component about status change
+        onStatusUpdate(pickingList, 'In Progress', selectedEmployee, null);
+      }
+      
+      // Now update the item status
       const response = await fetch(`http://127.0.0.1:8000/api/picking-items/${item.picking_item_id}/update/`, {
         method: 'PUT',
         headers: {
@@ -391,7 +450,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
       
     } catch (err) {
       console.error('Error updating item status:', err);
-      alert('Failed to update item status');
+      alert('Error: ' + err.message);
     }
   };
 
