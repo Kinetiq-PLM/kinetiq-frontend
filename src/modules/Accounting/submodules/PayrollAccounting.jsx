@@ -293,6 +293,7 @@ const PayrollAccounting = () => {
               columns={payrollAccounting_columns}
               data={payrollAccountingData}
               handlePrintRow={handlePrintRow}
+              showPrintButton={true}
             />
 
           )}
