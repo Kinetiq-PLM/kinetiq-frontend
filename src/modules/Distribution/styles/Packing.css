@@ -2122,3 +2122,165 @@
   color: #0066cc;
 }
 
+/* Add this to your CSS file */
+.warehouse-group {
+  margin-bottom: 20px;
+}
+
+.warehouse-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f5f7f9;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.warehouse-icon {
+  margin-right: 8px;
+  color: #3d5170;
+}
+
+.warehouse-items-count {
+  font-size: 0.85em;
+  color: #6c757d;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.warehouse-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.pack-button, .unpack-button {
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  background: none;
+  border: 1px solid #ddd;
+}
+
+.pack-button {
+  color: #28a745;
+  border-color: #28a745;
+}
+
+.unpack-button {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.pack-button:hover {
+  background-color: #28a745;
+  color: white;
+}
+
+.unpack-button:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.packed-quantity-cell {
+  min-width: 120px;
+}
+
+.packed-quantity-input-group {
+  display: flex;
+  align-items: center;
+}
+
+.packed-quantity-input {
+  width: 60px;
+  text-align: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.quantity-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  background-color: #e9ecef;
+}
+
+.packing-status-cell {
+  width: 130px;
+}
+
+.status-indicator {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.status-indicator.packed {
+  background-color: #d1e7dd;
+  color: #0a3622;
+}
+
+.status-indicator.partial {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.status-indicator.unpacked {
+  background-color: #f8d7da;
+  color: #58151c;
+}
+
+tr.fully-packed {
+  background-color: rgba(209, 231, 221, 0.3);
+}
+
+tr.partially-packed {
+  background-color: rgba(255, 243, 205, 0.3);
+}
+
+.packing-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.pack-action-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  border: none;
+}
+
+.pack-all {
+  background-color: #28a745;
+  color: white;
+}
+
+.unpack-all {
+  background-color: #6c757d;
+  color: white;
+}
+
+.pack-action-button:hover:not(:disabled) {
+  opacity: 0.9;
+}

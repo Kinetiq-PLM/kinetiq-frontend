@@ -26,6 +26,9 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
   // Add a state for total quantity
   const [totalItemsQuantity, setTotalItemsQuantity] = useState(0);
   
+  // New state to track packed items by warehouse and inventory item
+  const [packedItems, setPackedItems] = useState({});
+  
   // Accordion state for collapsible sections
   const [expandedSections, setExpandedSections] = useState({
     info: true,
@@ -64,6 +67,49 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
       };
       
       fetchPickingListDetails();
+    }
+  }, [packingList]);
+
+  useEffect(() => {
+    if (packingList?.items_details) {
+      // Initialize the packed items state based on current data
+      const initialPackedItems = {};
+      
+      // First, check if there's a saved total_items_packed value
+      const savedTotalPacked = packingList.total_items_packed || 0;
+      let hasPackedItems = savedTotalPacked > 0;
+      
+      packingList.items_details.forEach(item => {
+        const warehouseId = item.warehouse_id || 'unknown';
+        const itemId = item.inventory_item_id;
+        
+        if (!initialPackedItems[warehouseId]) {
+          initialPackedItems[warehouseId] = {};
+        }
+        
+        // Set initial packed quantity based on:
+        // 1. If status is Packed/Shipped, use full quantity
+        // 2. If we have total_items_packed > 0 but status is still pending, 
+        //    use full quantity (this is the key change)
+        // 3. Otherwise, assume nothing is packed
+        const isPacked = ['Packed', 'Shipped'].includes(packingList.packing_status);
+        const maxQuantity = parseInt(item.quantity) || 0;
+        
+        // This is the key change: if we have items packed, use the full quantity per item
+        const packedQty = isPacked || hasPackedItems ? maxQuantity : 0;
+        
+        initialPackedItems[warehouseId][itemId] = {
+          packedQuantity: packedQty,
+          maxQuantity: maxQuantity,
+          itemName: item.item_name,
+          itemNo: item.item_no
+        };
+      });
+      
+      setPackedItems(initialPackedItems);
+      
+      // Calculate initial total packed items
+      updateTotalItemsPacked(initialPackedItems);
     }
   }, [packingList]);
 
@@ -117,10 +163,27 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     }));
   };
   
-  // Handle save button click
+  // Update the handleSave function
   const handleSave = () => {
     if (isNotEditable) return;
-    onSave(packingList, editedValues);
+    
+    // Calculate the total packed items directly from the packedItems state
+    let totalPacked = 0;
+    Object.values(packedItems).forEach(warehouseItems => {
+      Object.values(warehouseItems).forEach(item => {
+        totalPacked += item.packedQuantity;
+      });
+    });
+    
+    // Ensure the total_items_packed is included in the updates
+    const updatedValues = {
+      ...editedValues,
+      total_items_packed: totalPacked,
+      packed_items_data: packedItems
+    };
+    
+    // Call the parent component's save function
+    onSave(packingList, updatedValues);
   };
   
   // Helper to check if the values have changed
@@ -163,41 +226,36 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return packingList.packing_status === 'Pending';
   };
   
-  // Check if status update button should be disabled
+  // Check if all required fields are filled and status can be updated to packed
   const isStatusUpdateDisabled = () => {
-    // Always require 100% completion before allowing status update
-    if (getCompletionPercentage() < 100) {
-      return true;
-    }
+    if (isNotEditable) return true;
     
-    // Need an employee assigned
-    if (!editedValues.packed_by && !packingList.packed_by) {
-      return true;
-    }
+    // Check if all required fields are filled
+    if (!editedValues.packed_by && !packingList.packed_by) return true;
+    if (!editedValues.packing_type && !packingList.packing_type) return true;
     
-    // Need a packing type selected
-    if (!editedValues.packing_type && !packingList.packing_type) {
-      return true;
-    }
+    // Check if at least some items are packed
+    const currentPackedCount = editedValues.total_items_packed || packingList.total_items_packed || 0;
+    if (currentPackedCount <= 0) return true;
     
     return false;
   };
   
-  // Get validation message for status update
+  // Get validation message for status update button
   const getValidationMessage = () => {
-    if (getCompletionPercentage() < 100) {
-      return 'All required fields must be completed (100%)';
-    }
-    
     if (!editedValues.packed_by && !packingList.packed_by) {
-      return 'Please assign an employee for packing';
+      return "Employee assignment is required";
     }
-    
     if (!editedValues.packing_type && !packingList.packing_type) {
-      return 'Please select a packing type';
+      return "Packing type is required";
     }
     
-    return '';
+    const currentPackedCount = editedValues.total_items_packed || packingList.total_items_packed || 0;
+    if (currentPackedCount <= 0) {
+      return "At least one item must be packed";
+    }
+    
+    return "";
   };
   
   // Handle status update button click
@@ -256,12 +314,109 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return (totalScore / maxScore) * 100;
   };
 
+  // Function to handle changes to packed quantities
+  const handlePackedQuantityChange = (warehouseId, itemId, value) => {
+    // Don't update if packed or shipped
+    if (isNotEditable) return;
+    
+    // Parse the input value as an integer
+    const newQuantity = parseInt(value) || 0;
+    
+    // Ensure the quantity doesn't exceed the maximum available quantity
+    const maxQty = packedItems[warehouseId]?.[itemId]?.maxQuantity || 0;
+    const validatedQuantity = Math.min(Math.max(0, newQuantity), maxQty);
+    
+    // Update the packed items state
+    setPackedItems(prev => ({
+      ...prev,
+      [warehouseId]: {
+        ...prev[warehouseId],
+        [itemId]: {
+          ...prev[warehouseId][itemId],
+          packedQuantity: validatedQuantity
+        }
+      }
+    }));
+    
+    // Update the total_items_packed
+    const updatedPackedItems = {
+      ...packedItems,
+      [warehouseId]: {
+        ...(packedItems[warehouseId] || {}),
+        [itemId]: {
+          ...(packedItems[warehouseId]?.[itemId] || {}),
+          packedQuantity: validatedQuantity
+        }
+      }
+    };
+    updateTotalItemsPacked(updatedPackedItems);
+  };
+  
+  // Function to update the total_items_packed based on all packed items
+  const updateTotalItemsPacked = (packedItemsData) => {
+    let total = 0;
+    
+    // Sum up all packed quantities across all warehouses and items
+    Object.values(packedItemsData).forEach(warehouseItems => {
+      Object.values(warehouseItems).forEach(item => {
+        total += item.packedQuantity;
+      });
+    });
+    
+    // Update the edited values with the new total
+    handleInputChange('total_items_packed', total);
+  };
+  
+  // Add helpers for bulk actions
+  const markAllItemsInWarehouse = (warehouseId, isPack) => {
+    if (isNotEditable) return;
+    
+    const warehouseItems = packedItems[warehouseId];
+    if (!warehouseItems) return;
+    
+    const updatedWarehouseItems = {};
+    Object.entries(warehouseItems).forEach(([itemId, itemData]) => {
+      updatedWarehouseItems[itemId] = {
+        ...itemData,
+        packedQuantity: isPack ? itemData.maxQuantity : 0
+      };
+    });
+    
+    const updatedPackedItems = {
+      ...packedItems,
+      [warehouseId]: updatedWarehouseItems
+    };
+    
+    setPackedItems(updatedPackedItems);
+    updateTotalItemsPacked(updatedPackedItems);
+  };
+  
+  // Handle marking all items as packed or unpacked
+  const markAllItems = (isPack) => {
+    if (isNotEditable) return;
+    
+    const updatedPackedItems = {};
+    Object.entries(packedItems).forEach(([warehouseId, warehouseItems]) => {
+      updatedPackedItems[warehouseId] = {};
+      Object.entries(warehouseItems).forEach(([itemId, itemData]) => {
+        updatedPackedItems[warehouseId][itemId] = {
+          ...itemData,
+          packedQuantity: isPack ? itemData.maxQuantity : 0
+        };
+      });
+    });
+    
+    setPackedItems(updatedPackedItems);
+    updateTotalItemsPacked(updatedPackedItems);
+  };
+
   // Render items section
   const renderItemsSection = () => {
     // Group items by warehouse
     const warehouseGroups = [];
     const warehouseMap = {};
     let totalQuantity = 0;
+    let totalPackedQuantity = 0;
     
     // Check if we have item details
     if (packingList?.items_details?.length) {
@@ -270,18 +425,24 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
         const warehouseId = item.warehouse_id || 'unknown';
         totalQuantity += parseInt(item.quantity) || 0;
         
+        // Calculate current packed quantity from our tracking state
+        const packedQty = packedItems[warehouseId]?.[item.inventory_item_id]?.packedQuantity || 0;
+        totalPackedQuantity += packedQty;
+        
         if (!warehouseMap[warehouseId]) {
           const group = {
             warehouseId,
             warehouseName: item.warehouse_name || 'Unknown Warehouse',
             items: [],
-            totalQuantity: 0
+            totalQuantity: 0,
+            totalPackedQuantity: 0
           };
           warehouseMap[warehouseId] = group;
           warehouseGroups.push(group);
         }
         warehouseMap[warehouseId].items.push(item);
         warehouseMap[warehouseId].totalQuantity += parseInt(item.quantity) || 0;
+        warehouseMap[warehouseId].totalPackedQuantity += packedQty;
       });
     }
   
@@ -291,8 +452,27 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
       <div className="items-section">
         <h4 className="section-title">
           <FaBoxOpen className="section-icon" />
-          Items to Pack ({packingList?.items_details?.length || 0} items, {totalQuantity} units)
+          Items to Pack ({packingList?.items_details?.length || 0} items, {totalPackedQuantity}/{totalQuantity} units packed)
         </h4>
+  
+        {!isNotEditable && (
+          <div className="packing-actions">
+            <button 
+              className="pack-action-button pack-all" 
+              onClick={() => markAllItems(true)} 
+              disabled={isNotEditable}
+            >
+              <FaCheckDouble /> Pack All Items
+            </button>
+            <button 
+              className="pack-action-button unpack-all" 
+              onClick={() => markAllItems(false)} 
+              disabled={isNotEditable}
+            >
+              <FaBoxOpen /> Unpack All Items
+            </button>
+          </div>
+        )}
   
         {warehouseGroups.length > 0 ? (
           warehouseGroups.map((group, groupIndex) => (
@@ -300,8 +480,28 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
               <h5 className="warehouse-name">
                 <FaWarehouse className="warehouse-icon" /> {group.warehouseName}
                 <span className="warehouse-items-count">
-                  {group.items.length} item{group.items.length !== 1 ? 's' : ''}, {group.totalQuantity} units
+                  {group.items.length} item{group.items.length !== 1 ? 's' : ''}, 
+                  {group.totalPackedQuantity}/{group.totalQuantity} units packed
                 </span>
+                
+                {!isNotEditable && (
+                  <div className="warehouse-actions">
+                    <button 
+                      className="pack-button" 
+                      onClick={() => markAllItemsInWarehouse(group.warehouseId, true)}
+                      disabled={isNotEditable}
+                    >
+                      Pack All
+                    </button>
+                    <button 
+                      className="unpack-button" 
+                      onClick={() => markAllItemsInWarehouse(group.warehouseId, false)}
+                      disabled={isNotEditable}
+                    >
+                      Unpack All
+                    </button>
+                  </div>
+                )}
               </h5>
               
               <div className="items-table-container">
@@ -310,17 +510,62 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                     <tr>
                       <th>Item Name</th>
                       <th>Item Number</th>
-                      <th>Quantity</th>
+                      <th>Available Qty</th>
+                      {!isNotEditable && <th>Packed Qty</th>}
+                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {group.items.map((item, itemIndex) => (
-                      <tr key={itemIndex}>
-                        <td>{item.item_name}</td>
-                        <td>{item.item_no || '-'}</td>
-                        <td>{item.quantity}</td>
-                      </tr>
-                    ))}
+                    {group.items.map((item, itemIndex) => {
+                      const warehouseId = group.warehouseId;
+                      const itemId = item.inventory_item_id;
+                      const packedQuantity = packedItems[warehouseId]?.[itemId]?.packedQuantity || 0;
+                      const maxQuantity = parseInt(item.quantity) || 0;
+                      const isFullyPacked = packedQuantity === maxQuantity;
+                      const isPartiallyPacked = packedQuantity > 0 && packedQuantity < maxQuantity;
+                      
+                      return (
+                        <tr key={itemIndex} className={isFullyPacked ? 'fully-packed' : (isPartiallyPacked ? 'partially-packed' : '')}>
+                          <td>{item.item_name}</td>
+                          <td>{item.item_no || '-'}</td>
+                          <td>{maxQuantity}</td>
+                          {!isNotEditable ? (
+                            <td className="packed-quantity-cell">
+                              <div className="packed-quantity-input-group">
+                                <button 
+                                  className="quantity-btn" 
+                                  onClick={() => handlePackedQuantityChange(warehouseId, itemId, (packedQuantity - 1))} 
+                                  disabled={packedQuantity <= 0 || isNotEditable}
+                                >−</button>
+                                <input
+                                  type="number"
+                                  className="packed-quantity-input"
+                                  value={packedQuantity}
+                                  onChange={(e) => handlePackedQuantityChange(warehouseId, itemId, e.target.value)}
+                                  min="0"
+                                  max={maxQuantity}
+                                  disabled={isNotEditable}
+                                />
+                                <button 
+                                  className="quantity-btn" 
+                                  onClick={() => handlePackedQuantityChange(warehouseId, itemId, (packedQuantity + 1))} 
+                                  disabled={packedQuantity >= maxQuantity || isNotEditable}
+                                >+</button>
+                              </div>
+                            </td>
+                          ) : null}
+                          <td className="packing-status-cell">
+                            {isFullyPacked ? (
+                              <span className="status-indicator packed">Fully Packed</span>
+                            ) : isPartiallyPacked ? (
+                              <span className="status-indicator partial">Partially Packed</span>
+                            ) : (
+                              <span className="status-indicator unpacked">Not Packed</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -405,34 +650,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                         Packed Items Quantity
                         <span className="items-max-info">(Max: {totalItemsQuantity})</span>
                       </span>
-                      {isNotEditable ? (
-                        <span className="info-value">{packingList.total_items_packed || '0'}</span>
-                      ) : (
-                        <div className="items-count-input-container">
-                          <input
-                            type="number"
-                            className="form-control"
-                            value={editedValues.total_items_packed || packingList.total_items_packed || ''}
-                            onChange={(e) => handleInputChange('total_items_packed', parseInt(e.target.value) || 0)}
-                            min="0"
-                            max={totalItemsQuantity}
-                          />
-                          <div className="slider-container">
-                            <input
-                              type="range"
-                              min="0"
-                              max={totalItemsQuantity}
-                              value={editedValues.total_items_packed || packingList.total_items_packed || 0}
-                              onChange={(e) => handleInputChange('total_items_packed', parseInt(e.target.value))}
-                              className="range-slider"
-                            />
-                            <div className="range-labels">
-                              <span>0</span>
-                              <span>{totalItemsQuantity}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                      <span className="info-value">{editedValues.total_items_packed || packingList.total_items_packed || '0'}</span>
                     </div>
                     {packingList.packing_date && (
                       <div className="info-item">

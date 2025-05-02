@@ -402,7 +402,7 @@ const ShipmentModal = ({
 
   // Function to get different colors for multiple routes
   const getRouteColor = (index) => {
-    const colors = ["#00a8a8", "#ff7043", "#5c6bc0", "#66bb6a", "#ffa726", "#8d6e63"];
+    const colors = ["#0aaceb","#00a8a8", "#ff7043", "#5c6bc0", "#66bb6a", "#ffa726"];
     return colors[index % colors.length];
   };
 
@@ -1208,7 +1208,7 @@ const ShipmentModal = ({
                                 options={{
                                   suppressMarkers: true,
                                   polylineOptions: {
-                                    strokeColor: "#00a8a8",
+                                    strokeColor: "#0f53ff",
                                     strokeOpacity: 0.8,
                                     strokeWeight: 5,
                                   }
