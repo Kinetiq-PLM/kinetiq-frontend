@@ -20,8 +20,8 @@ const ShipmentModal = ({
     weight_kg: shipment.shipping_cost_info?.weight_kg || 0,
     distance_km: shipment.shipping_cost_info?.distance_km || 0,
     cost_per_kg: shipment.shipping_cost_info?.cost_per_kg || 150,
-    cost_per_km: shipment.shipping_cost_info?.cost_per_km || 20,
-    additional_cost: shipment.operational_cost_info?.additional_cost || 0,
+    cost_per_km: shipment.shipping_cost_info?.cost_per_km || 20
+    // additional_cost removed
   });
 
   // Form validation state
@@ -450,13 +450,10 @@ const ShipmentModal = ({
     return (weight * costPerKg) + (distance * costPerKm);
   };
   
-  // Calculate total operational cost
+  // Calculate total operational cost - MODIFIED to remove packing and additional costs
   const calculateOperationalCost = () => {
-    const additionalCost = parseFloat(formData.additional_cost) || 0;
-    const shippingCost = calculateShippingCost();
-    const packingCost = shipment.packing_list_info?.packing_cost_info?.total_packing_cost || 0;
-    
-    return additionalCost + shippingCost + packingCost;
+    // Only include shipping cost
+    return calculateShippingCost();
   };
   
   // Format currency
@@ -596,19 +593,29 @@ const ShipmentModal = ({
       formData.cost_per_km != shipment.shipping_cost_info?.cost_per_km;
     
     if (shippingCostChanged) {
+      // Calculate shipping cost once to ensure it's a valid number
+      const shippingCost = calculateShippingCost();
+      
       updates.shipping_cost = {
-        weight_kg: parseFloat(formData.weight_kg),
-        distance_km: parseFloat(formData.distance_km),
-        cost_per_kg: parseFloat(formData.cost_per_kg),
-        cost_per_km: parseFloat(formData.cost_per_km),
-        total_shipping_cost: calculateShippingCost()
+        weight_kg: parseFloat(formData.weight_kg) || 0,
+        distance_km: parseFloat(formData.distance_km) || 0,
+        cost_per_kg: parseFloat(formData.cost_per_kg) || 0,
+        cost_per_km: parseFloat(formData.cost_per_km) || 0,
+        total_shipping_cost: shippingCost
+      };
+      
+      // When shipping cost changes, also update operational cost
+      updates.operational_cost = {
+        additional_cost: 0,
+        total_operational_cost: shippingCost
       };
     }
     
+    // Remove this section entirely
     // Check if additional cost has changed
-    if (formData.additional_cost != shipment.operational_cost_info?.additional_cost) {
-      updates.additional_cost = parseFloat(formData.additional_cost);
-    }
+    // if (formData.additional_cost != shipment.operational_cost_info?.additional_cost) {
+    //   updates.additional_cost = parseFloat(formData.additional_cost);
+    // }
     
     // Save changes
     onSave(shipment, updates);
@@ -637,6 +644,9 @@ const ShipmentModal = ({
       return;
     }
     
+    // Calculate the shipping cost once to ensure it's a valid number
+    const shippingCost = calculateShippingCost();
+    
     onShip(shipment, {
       carrier_id: formData.carrier_id,
       shipping_cost_info: {
@@ -644,11 +654,11 @@ const ShipmentModal = ({
         distance_km: parseFloat(formData.distance_km) || 0,
         cost_per_kg: parseFloat(formData.cost_per_kg) || 0,
         cost_per_km: parseFloat(formData.cost_per_km) || 0,
-        total_shipping_cost: calculateShippingCost()
+        total_shipping_cost: shippingCost
       },
       operational_cost_info: {
-        additional_cost: parseFloat(formData.additional_cost) || 0,
-        total_operational_cost: calculateOperationalCost()
+        additional_cost: 0,
+        total_operational_cost: shippingCost
       }
     });
   };
@@ -1498,39 +1508,10 @@ const ShipmentModal = ({
                         {formatCurrency(calculateShippingCost())}
                       </span>
                     </div>
-                    <div className="cost-input-row" style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      marginBottom: '0.5rem'
-                    }}>
-                      <span className="cost-label">Packing Cost:</span>
-                      <span className="cost-value">
-                        {formatCurrency(shipment.packing_list_info?.packing_cost_info?.total_packing_cost || 0)}
-                      </span>
-                    </div>
-                    <div className="cost-input-row" style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      marginBottom: '0.5rem',
-                      alignItems: 'center'
-                    }}>
-                      <span className="cost-label">Additional Cost:</span>
-                      <input
-                        type="number"
-                        className="cost-input"
-                        name="additional_cost"
-                        value={formData.additional_cost}
-                        onChange={handleInputChange}
-                        min="0"
-                        step="0.01"
-                        disabled={!isShipmentEditable}
-                        style={{ 
-                          width: '150px',
-                          textAlign: 'right',
-                          padding: '0.5rem'
-                        }}
-                      />
-                    </div>
+                    
+                    {/* Removed packing cost row */}
+                    {/* Removed additional cost row */}
+                    
                     <div className="cost-total-row" style={{ 
                       display: 'flex', 
                       justifyContent: 'space-between',
@@ -1539,13 +1520,13 @@ const ShipmentModal = ({
                       borderRadius: '4px',
                       marginTop: '0.75rem'
                     }}>
-                      <span className="cost-total-label" style={{ fontWeight: '600' }}>Total Operational Cost:</span>
+                      <span className="cost-total-label" style={{ fontWeight: '600' }}>Total Cost:</span>
                       <span className="cost-total-value" style={{ 
                         fontWeight: '700',
                         fontSize: '1.1rem',
                         color: '#00a8a8'
                       }}>
-                        {formatCurrency(calculateOperationalCost())}
+                        {formatCurrency(calculateShippingCost())}
                       </span>
                     </div>
                   </div>

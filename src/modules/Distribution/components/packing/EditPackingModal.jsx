@@ -75,10 +75,6 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
       // Initialize the packed items state based on current data
       const initialPackedItems = {};
       
-      // First, check if there's a saved total_items_packed value
-      const savedTotalPacked = packingList.total_items_packed || 0;
-      let hasPackedItems = savedTotalPacked > 0;
-      
       packingList.items_details.forEach(item => {
         const warehouseId = item.warehouse_id || 'unknown';
         const itemId = item.inventory_item_id;
@@ -87,16 +83,25 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           initialPackedItems[warehouseId] = {};
         }
         
-        // Set initial packed quantity based on:
-        // 1. If status is Packed/Shipped, use full quantity
-        // 2. If we have total_items_packed > 0 but status is still pending, 
-        //    use full quantity (this is the key change)
-        // 3. Otherwise, assume nothing is packed
         const isPacked = ['Packed', 'Shipped'].includes(packingList.packing_status);
         const maxQuantity = parseInt(item.quantity) || 0;
         
-        // This is the key change: if we have items packed, use the full quantity per item
-        const packedQty = isPacked || hasPackedItems ? maxQuantity : 0;
+        // Check if we have saved packed items data
+        let packedQty = 0;
+        
+        if (packingList.packed_items_data && 
+            packingList.packed_items_data[warehouseId] && 
+            packingList.packed_items_data[warehouseId][itemId]) {
+          // Use the exact quantity from saved data
+          packedQty = parseInt(packingList.packed_items_data[warehouseId][itemId].packedQuantity) || 0;
+        } else if (isPacked) {
+          // If fully packed/shipped status, use max quantity
+          packedQty = maxQuantity;
+        } else if (packingList.total_items_packed > 0) {
+          // For partially packed items without specific data, distribute evenly
+          // This is a fallback and shouldn't be needed if packed_items_data is working
+          packedQty = Math.min(Math.round(packingList.total_items_packed / packingList.items_details.length), maxQuantity);
+        }
         
         initialPackedItems[warehouseId][itemId] = {
           packedQuantity: packedQty,
@@ -264,11 +269,21 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     
     const nextStatus = getNextStatus();
     if (nextStatus) {
+      // Calculate the total packed items directly from the packedItems state
+      let totalPacked = 0;
+      Object.values(packedItems).forEach(warehouseItems => {
+        Object.values(warehouseItems).forEach(item => {
+          totalPacked += item.packedQuantity || 0;
+        });
+      });
+      
       // Create an object with all current edited values
       const updatedValues = {
         ...editedValues,
         packed_by: editedValues.packed_by || packingList.packed_by,
         packing_type: editedValues.packing_type || packingList.packing_type,
+        total_items_packed: totalPacked,
+        packed_items_data: packedItems
       };
       
       // Call onStatusUpdate with all the edited values

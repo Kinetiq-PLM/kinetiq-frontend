@@ -130,7 +130,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     // Group items by warehouse
     const warehouseGroups = [];
     const warehouseMap = {};
-
+  
     // Show loading indicator
     if (loading) {
       return (
@@ -140,11 +140,43 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         </div>
       );
     }
+  
+    // If status is "Not Started", show instruction message
+    if (pickingList.picked_status === 'Not Started') {
+      return (
+        <div className="items-section not-started">
+          <div className="info-message">
+            <FaClock className="info-icon" />
+            <h4>Picking Not Started Yet</h4>
+            <p>To view and pick items, please:</p>
+            <ol>
+              <li>Go to the General Info tab</li>
+              <li>Assign an employee</li>
+              <li>Click "Start Picking" button</li>
+            </ol>
+            <p>Or simply try to mark an item as picked and the system will automatically update the status.</p>
+          </div>
+        </div>
+      );
+    }
 
+    // If no employee is assigned, show a message
+    if (!selectedEmployee) {
+      return (
+        <div className="items-section no-employee">
+          <div className="warning-message">
+            <FaClock className="warning-icon" />
+            <h4>Employee Assignment Required</h4>
+            <p>Please assign an employee in the General Info tab before picking items.</p>
+          </div>
+        </div>
+      );
+    }
+  
     // Use pickingItems if available, otherwise fall back to items_details
     const items = pickingItems.length > 0 ? pickingItems : 
       (pickingList?.items_details?.length ? pickingList.items_details : []);
-
+  
     // Only process if we have items
     if (items.length) {
       // Group items by warehouse
@@ -162,16 +194,16 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         warehouseMap[warehouseId].items.push(item);
       });
     }
-
+  
     const hasMultipleWarehouses = warehouseGroups.length > 1;
-
+  
     return (
       <div className="items-section">
         <h4 className="section-title">
           <span className="section-icon">📦</span>
           Items to Pick ({items.length})
         </h4>
-
+  
         {/* Add progress bar */}
         {isCompleted ? (
           <div className="picking-progress">
@@ -188,7 +220,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
             <div className="progress-text">{pickingProgress}% completed</div>
           </div>
         )}
-
+  
         {warehouseGroups.length > 0 ? (
           warehouseGroups.map((group, groupIndex) => (
             <div key={group.warehouseId} className="warehouse-group">
