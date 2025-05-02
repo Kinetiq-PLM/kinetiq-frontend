@@ -30,7 +30,7 @@ const TaxAndRemittance = () => {
   const API_URL =
     import.meta.env.VITE_API_URL ||
     "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
-  const TAXREMITTANCE_ENDPOINT = `${API_URL}/api/tax_and_remittances/`;
+  const TAXREMITTANCE_ENDPOINT = `${API_URL}/api/payroll-remittances/`;
 
   const fetchTaxRemittanceData = async () => {
     try {
