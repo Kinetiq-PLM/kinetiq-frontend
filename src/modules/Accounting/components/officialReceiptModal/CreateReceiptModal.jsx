@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "./ModalInput.css";
-import Button from "./Button";
-import Forms from "./Forms";
-import Dropdown from "./Dropdown";
+import "../ModalInput.css";
+import Button from "../button/Button";
+import Forms from "../forms/Forms";
+import Dropdown from "../dropdown/Dropdown";
 
 const CreateReceiptModal = ({
   isModalOpen,

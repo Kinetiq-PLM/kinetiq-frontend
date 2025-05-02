@@ -25,6 +25,9 @@ import { useMutation } from "@tanstack/react-query";
 import { GET, POST } from "../api/api.jsx";
 
 const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
+  // TEMPORARY CONSTANT VALUE FOR EMPLOYEE LOGGED IN
+  const IS_SALES_REP = false;
+
   const { showAlert } = useAlert();
 
   const copyFromOptions = ["Quotation", "Blanket Agreement"];
@@ -44,7 +47,9 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   // replace current info with selected info
 
   const [address, setAddress] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
+  const [dateIssued, setDateIssued] = useState("");
+  const [dateDelivery, setDateDelivery] = useState("");
+  const [datePosted, setDatePosted] = useState("");
 
   const [selectedProduct, setSelectedProduct] = useState();
   const [selectedCustomer, setSelectedCustomer] = useState("");
@@ -75,8 +80,11 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     onSuccess: (data, variables, context) => {
       const prods = data.statement.items.map((item) => {
         return {
-          product_id: item.product.product_id,
-          product_name: item.product.product_name,
+          product_id: item.inventory_item.item.item_id,
+          product_name: item.inventory_item.item.item_name,
+          warehouse: item.inventory_item.warehouse.warehouse_name,
+          inventory_item: item.inventory_item.inventory_item_id,
+          inventory_item_id: item.inventory_item.inventory_item_id,
           special_requests: item.special_requests,
           quantity: Number(item.quantity),
           selling_price: Number(item.unit_price),
@@ -108,6 +116,16 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     mutationFn: async (data) => await POST("sales/order/", data),
     onSuccess: (data, variables, context) => {
       setOrderID(data.order_id);
+      showAlert({
+        type: "success",
+        title: "Order Submitted",
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title: "An error occurred while creating order: " + error.message,
+      });
     },
   });
 
@@ -115,6 +133,12 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
+    {
+      key: "warehouse",
+      label: "Warehouse",
+      editable: true,
+      dropdown: true,
+    },
     { key: "special_requests", label: "Specification", editable: canEditTable },
     { key: "quantity", label: "Quantity", editable: canEditTable },
     { key: "selling_price", label: "Price", editable: false },
@@ -123,8 +147,11 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     { key: "total_price", label: "Total Price", editable: false },
   ];
 
+  const [selectedWarehouse, setSelectedWarehouse] = useState("");
+
   // the products customer chose
   const [products, setProducts] = useState([]);
+  const [isSalesRep, setIsSalesRep] = useState(false);
 
   const [orderInfo, setOrderInfo] = useState({
     customer_id: "",
@@ -190,7 +217,7 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         orderType = "Project-Based";
       }
       return {
-        product: product.product_id,
+        inventory_item: product.inventory_item_id,
         quantity: parseInt(product.quantity),
         special_requests: product.special_requests
           ? product.special_requests
@@ -207,11 +234,13 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         agreement_id,
         order_date: new Date().toISOString(),
         order_type: orderType,
+        posting_date: datePosted,
+        delivery_date: dateDelivery,
         items,
       },
       statement_data: {
         customer: selectedCustomer.customer_id,
-        salesrep: employee_id,
+        salesrep: selectedEmployee ? selectedEmployee.employee_id : employee_id,
         total_amount: Number(parseFloat(orderInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(orderInfo.discount).toFixed(2)),
         subtotal: Number(orderInfo.total_before_discount.toFixed(2)),
@@ -221,11 +250,24 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     console.log(request);
 
     orderMutation.mutate(request);
-    showAlert({
-      type: "success",
-      title: "Order Submitted",
-    });
   };
+
+  useEffect(() => {
+    const get = async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (["REG-2504-6039"].includes(res.position_id) || res.is_supervisor) {
+          setIsSalesRep(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee: " + err.message,
+        });
+      }
+    };
+    get();
+  }, []);
 
   // For copy from feature
   useEffect(() => {
@@ -337,9 +379,9 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   useEffect(() => {
     setOrderInfo({
       ...orderInfo,
-      selected_delivery_date: deliveryDate,
+      selected_delivery_date: dateIssued,
     });
-  }, [deliveryDate]);
+  }, [dateIssued]);
 
   const handleClear = () => {
     setProducts([]);
@@ -347,8 +389,9 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     setSelectedProduct("");
     setSelectedEmployee("");
     setAddress("");
-    setDeliveryDate("");
+    setDateIssued("");
     setCanEditTable(true);
+    setOrderID("");
     setOrderInfo({
       customer_id: "",
       quotation_id: "",
@@ -370,6 +413,13 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     if (selectedCustomer != "") setCanClear(true);
   }, [selectedCustomer]);
 
+  function handleCustomerSelection() {
+    setIsCustomerListOpen(true);
+    // } else {
+    //   setIsEmployeeListOpen(true);
+    // }
+  }
+
   return (
     <div className="quotation">
       <div className="body-content-container">
@@ -381,11 +431,19 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
         <CustomerListModal
           isOpen={isCustomerListOpen}
+          isNewCustomerModalOpen={isNewCustomerModalOpen}
           onClose={() => setIsCustomerListOpen(false)}
           newCustomerModal={setIsNewCustomerModalOpen}
-          setSelectedCustomer={setSelectedCustomer}
           setCustomer={setSelectedCustomer}
+          employee={selectedEmployee}
         ></CustomerListModal>
+
+        {/* <EmployeeListModal
+          isOpen={isEmployeeListOpen}
+          onClose={() => setIsEmployeeListOpen(false)}
+          setEmployee={setSelectedEmployee}
+        ></EmployeeListModal> */}
+
         <ProductListModal
           isOpen={isProductListOpen}
           onClose={() => setIsProductListOpen(false)}
@@ -410,11 +468,6 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           onClose={() => setIsBlanketAgreementListOpen(false)}
           setBlanketAgreement={setSelectedBlanketAgreement}
         ></BlanketAgreementListModal>
-        {/* <EmployeeListModal
-          isOpen={isEmployeeListOpen}
-          onClose={() => setIsEmployeeListOpen(false)}
-          setEmployee={setSelectedEmployee}
-        ></EmployeeListModal> */}
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -423,10 +476,18 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             customerListModal={setIsCustomerListOpen}
             setCustomerInfo={setOrderInfo}
             operationID={orderID}
-            setDeliveryDate={setDeliveryDate}
+            setDateIssued={setDateIssued}
+            setDatePosted={setDatePosted}
+            setDateDelivery={setDateDelivery}
+            dataIssued={dateIssued}
             setAddress={setAddress}
             enabled={canEditTable}
-            date={new Date().toISOString().split("T")[0]}
+            date={
+              new Date(Date.now() + +3 * 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split("T")[0]
+            }
+            handleCustomerSelection={handleCustomerSelection}
           />
         </div>
         {/* TABLE */}
@@ -467,11 +528,26 @@ const Order = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
             {/* Employee ID Input */}
             <div className="flex mb-2 w-full mt-4 gap-4 items-center">
-              <p className="">Employee ID</p>
-              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded">
-                <p className="text-sm">{employee_id || ""}</p>
+              <p className="">Sales Rep ID</p>
+              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                <p className="text-sm">
+                  {selectedEmployee
+                    ? selectedEmployee.employee_id
+                    : employee_id}
+                </p>
               </div>
             </div>
+
+            {isSalesRep ? (
+              ""
+            ) : (
+              <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+                <p className="">Processor ID</p>
+                <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                  <p className="text-sm">{employee_id || ""}</p>
+                </div>
+              </div>
+            )}
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto gap-2 flex">

@@ -25,7 +25,7 @@ const TicketResolve = ({ isOpen, onClose, ticket, setIsTicketDetailOpen }) => {
       await PATCH(`crm/ticket/${ticket.ticket_id}/`, {
         status: "Closed",
       });
-      queryClient.refetchQueries(["tickets"]);
+      await queryClient.refetchQueries(["tickets"]);
       showAlert({
         type: "success",
         title: "Ticket resolved.",

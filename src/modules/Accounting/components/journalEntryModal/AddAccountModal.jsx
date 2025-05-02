@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "./ModalInput.css";
-import Button from "./Button";
-import Dropdown from "./Dropdown";
-import Search from "./Search";
-import NotifModal from "./modalNotif/NotifModal";
+import "../ModalInput.css";
+import Button from "../button/Button";
+import Dropdown from "../dropdown/Dropdown";
+import Search from "../search/Search";
+import NotifModal from "../modalNotif/NotifModal";
 import axios from "axios";
 
 const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {

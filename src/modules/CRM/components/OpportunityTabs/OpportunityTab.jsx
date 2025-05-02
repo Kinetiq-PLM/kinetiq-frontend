@@ -12,7 +12,7 @@ import loading from "../../../Sales/components/Assets/kinetiq-loading.gif";
 export default function OpportunityTab({ setActiveTab, employee_id }) {
   const [isLoading, setIsLoading] = useState(true);
 
-  const showAlert = useAlert();
+  const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("customer_name"); // Default search field
   const [dateFilter, setDateFilter] = useState("Last 30 days"); // Default date filter

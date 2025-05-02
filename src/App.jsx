@@ -35,6 +35,33 @@ function App() {
   // landing page
   const [showLanding, setShowLanding] = useState(true);
 
+  // log out at time out
+  useEffect(() => {
+    let logoutTimeout;
+  
+    const resetTimeout = () => {
+      if (logoutTimeout) clearTimeout(logoutTimeout);
+      logoutTimeout = setTimeout(() => {
+        console.log("No activity detected for 10 minutes. Logging out.");
+        handleLogout();
+      }, 30 * 60 * 1000); // 30 minutes
+    };
+  
+    const activityEvents = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+    activityEvents.forEach(event =>
+      window.addEventListener(event, resetTimeout)
+    );
+  
+    resetTimeout();
+  
+    return () => {
+      clearTimeout(logoutTimeout);
+      activityEvents.forEach(event =>
+        window.removeEventListener(event, resetTimeout)
+      );
+    };
+  }, []);
+
   useEffect(() => {
     if (activeModule || activeSubModule || showUserProfile) {
       setShowLanding(false);
@@ -361,9 +388,12 @@ function App() {
       "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
       "General Ledger Accounts": "GeneralLedgerAccounts",
-      "Accounts Receivable": "AccountsReceivable",
-      "Accounts Payable": "AccountsPayable",
+      // "Accounts Payable": "AccountsPayable",
+      // "Accounts Receivable": "AccountsReceivable",
       "Official Receipts": "OfficialReceipts",
+      "Payroll Accounting": "PayrollAccounting",
+      "Tax and Remittance": "TaxAndRemittance",
+      "Accounts Payable Receipts": "AccountsPayableReceipts",
     },
     "Financials": {
       "Reports": "Reports",
@@ -390,18 +420,14 @@ function App() {
       Quotation: "Quotation",
       Order: "Order",
       Delivery: "Delivery",
-      // Invoice: "Invoice",
-      // "Blanket Agreement": "BlanketAgreement",
-      "Master List": "MasterList",
-      Reporting: "Reporting",
-      // Return: "Return",
+      Transactions: "Transactions",
     },
     CRM: {
-      Ticket: "Ticket",
-      Campaign: "Campaign",
-      "Partner Master Data": "PartnerMasterData",
+      Leads: "Leads",
       Opportunity: "Opportunity",
-      Support: "Support",
+      Campaign: "Campaign",
+      Contacts: "Contacts",
+      Cases: "Cases",
     },
     "Support & Services": {
       "Service Ticket": "ServiceTicket",
@@ -434,6 +460,7 @@ function App() {
     "MRP": {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
       "Bills Of Material": "BillsOfMaterial",
+      "Product Materials": "ProductMaterials",
     },
     "Project Management": {
       "Project List": "Project List",
@@ -442,6 +469,7 @@ function App() {
       "Tasks": "TaskMonitoring",
       "Report Monitoring": "Reports",
       "Warranty Monitoring": "Warranties",
+      "Project Cost":"ProjectCost",
     },
     "Human Resources": {
       "Employees": "Employees",
@@ -467,7 +495,32 @@ function App() {
 
   const rawPermissions = user?.role?.permissions || "";
   const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
+  console.log('raw permissions...')
+  console.log(rawPermissions)
+  console.log("allowed modules...")
+  console.log(allowedModules)
 
+  const filteredModuleFileNames = {};
+
+  allowedModules.forEach((permission) => {
+    const [main, sub] = permission.split('/')
+
+    if (!filteredModuleFileNames[main]) {
+      filteredModuleFileNames[main] = {};
+    }
+
+    if (!sub) {
+      filteredModuleFileNames[main] = {
+      ...moduleSubmoduleFileNames[main]
+      }
+    } else {
+      filteredModuleFileNames[main][sub] = moduleSubmoduleFileNames[main][sub]
+    }
+  });
+
+  console.log('filtered modules...')
+  console.log(filteredModuleFileNames)
+/*
   const filteredModuleFileNames = allowedModules.includes("All")
     ? moduleFileNames
     : Object.fromEntries(
@@ -475,11 +528,15 @@ function App() {
         allowedModules.includes(key)
       )
     );
+*/
 
   const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
     id: module,
-    icon: `/icons/module-icons/${filteredModuleFileNames[module]}.png`,
+    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
   }));
+
+  console.log('module icons...')
+  console.log(modulesIcons)
 
   return (
     <div className="shell">
