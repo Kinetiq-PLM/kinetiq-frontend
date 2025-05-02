@@ -1,7 +1,7 @@
 // components/shipment/FailedShipmentsTable.jsx
 import React, { useState } from 'react';
 
-const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipment, carriers, employees, getEmployeeFullName }) => {
+const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipment, carriers, employees, getEmployeeFullName, getReadableShipmentType }) => { // Add getReadableShipmentType to props
   const [sortField, setSortField] = useState('failure_date');
   const [sortDirection, setSortDirection] = useState('desc');
   
@@ -214,7 +214,8 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
                         : failedShipment.failure_reason)
                       : 'N/A'}
                   </td>
-                  <td className="centered-cell">{failedShipment.shipment_details?.delivery_type || 'Unknown'}</td>
+                  {/* Pass shipment_details to the helper function */}
+                  <td className="centered-cell">{getReadableShipmentType(failedShipment.shipment_details)}</td> 
                   <td className={`status-cell ${getResolutionStatusClass(failedShipment.resolution_status)}`}>
                     {failedShipment.resolution_status}
                   </td>

@@ -1,7 +1,7 @@
 // components/shipment/ShipmentTable.jsx
 import React, { useState } from 'react';
 
-const ShipmentTable = ({ shipments, onShipmentSelect, selectedShipment, carriers, employees, getEmployeeFullName }) => {
+const ShipmentTable = ({ shipments, onShipmentSelect, selectedShipment, carriers, employees, getEmployeeFullName, getReadableShipmentType }) => {
   const [sortField, setSortField] = useState('shipment_id');
   const [sortDirection, setSortDirection] = useState('asc');
   
@@ -204,7 +204,7 @@ const ShipmentTable = ({ shipments, onShipmentSelect, selectedShipment, carriers
                   <td>{getCarrierName(shipment.carrier_id)}</td>
                   <td>{formatDate(shipment.shipment_date)}</td>
                   <td>{formatDate(shipment.estimated_arrival_date)}</td>
-                  <td className="centered-cell">{shipment.delivery_type || 'Unknown'}</td>
+                  <td className="centered-cell">{getReadableShipmentType(shipment)}</td> {/* Pass the whole shipment object */}
                   <td className={`status-cell ${getStatusClass(shipment.shipment_status)}`}>
                     {shipment.shipment_status}
                   </td>
