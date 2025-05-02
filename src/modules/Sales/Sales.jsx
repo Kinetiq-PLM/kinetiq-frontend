@@ -395,7 +395,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         </div>
 
         {/* SECOND ROW */}
-        <div className="flex gap-4 flex-col lg:flex-row">
+        <div className="flex gap-4 flex-col xl:flex-row">
           {/* Short Reports */}
           <div className="flex gap-4 flex-2/6 flex-col">
             {/* Customer Report */}
@@ -479,7 +479,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                   ]}
                   slotProps={{
                     legend: {
-                      direction: "row", // Align items in a row
+                      direction: "column", // Align items in a row
                       position: { vertical: "bottom", horizontal: "middle" }, // Move to the bottom center
                     },
                   }}
