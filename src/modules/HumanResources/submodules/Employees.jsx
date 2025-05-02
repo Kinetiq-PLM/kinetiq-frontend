@@ -66,6 +66,21 @@ const Employees = () => {
   // The position currently being edited
   const [editingPosition, setEditingPosition] = useState(null);
 
+  // State for resignations
+  const [resignations, setResignations] = useState([]);
+  const [showAddResignationModal, setShowAddResignationModal] = useState(false);
+  const [showEditResignationModal, setShowEditResignationModal] = useState(false);
+  const [editingResignation, setEditingResignation] = useState(null);
+
+  // Default state for new resignation
+  const [newResignation, setNewResignation] = useState({
+    employee_id: "",
+    notice_period_days: "",
+    hr_approver_id: "",
+    approval_status: "Pending", // Default value
+    clearance_status: "Not Started" // Default value
+  });
+
   /*************************************
    * Shared UI States
    *************************************/
@@ -566,6 +581,20 @@ const Employees = () => {
     fetchDepartmentSuperiors(); 
   }, []);
 
+  useEffect(() => {
+    const fetchResignations = async () => {
+      try {
+        const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+        setResignations(resignationsRes.data);
+      } catch (err) {
+        console.error("Error fetching resignations:", err);
+        showToast("Failed to fetch resignations", false);
+      }
+    };
+
+    fetchResignations();
+  }, []);
+
   /***************************************************************************
    * Searching + Debounce
    ***************************************************************************/
@@ -625,6 +654,133 @@ const Employees = () => {
 
     return { paginated, totalPages, totalCount: filtered.length };
   };
+
+  const renderPagination = (totalPages) => (
+    <div className="hr-employee-pagination">
+      <button 
+        className="hr-employee-pagination-arrow" 
+        onClick={() => setCurrentPage(1)} 
+        disabled={currentPage === 1}
+      >
+        &#171; {/* Double left arrow */}
+      </button>
+      
+      <button 
+        className="hr-employee-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+        disabled={currentPage === 1}
+      >
+        &#8249; {/* Single left arrow */}
+      </button>
+      
+      <div className="hr-employee-pagination-numbers">
+        {(() => {
+          const pageNumbers = [];
+          const maxVisiblePages = 5;
+          
+          if (totalPages <= maxVisiblePages + 2) {
+            // Show all pages if there are few
+            for (let i = 1; i <= totalPages; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+          } else {
+            // Always show first page
+            pageNumbers.push(
+              <button
+                key={1}
+                className={1 === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(1)}
+              >
+                1
+              </button>
+            );
+            
+            // Calculate range around current page
+            let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+            
+            // Adjust if we're near the end
+            if (endPage - startPage < maxVisiblePages - 1) {
+              startPage = Math.max(2, endPage - maxVisiblePages + 1);
+            }
+            
+            // Add ellipsis after first page if needed
+            if (startPage > 2) {
+              pageNumbers.push(<span key="ellipsis1" className="hr-employee-pagination-ellipsis">...</span>);
+            }
+            
+            // Add middle pages
+            for (let i = startPage; i <= endPage; i++) {
+              pageNumbers.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? "active" : ""}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+            
+            // Add ellipsis before last page if needed
+            if (endPage < totalPages - 1) {
+              pageNumbers.push(<span key="ellipsis2" className="hr-employee-pagination-ellipsis">...</span>);
+            }
+            
+            // Always show last page
+            pageNumbers.push(
+              <button
+                key={totalPages}
+                className={totalPages === currentPage ? "active" : ""}
+                onClick={() => setCurrentPage(totalPages)}
+              >
+                {totalPages}
+              </button>
+            );
+          }
+          
+          return pageNumbers;
+        })()}
+      </div>
+      
+      <button 
+        className="hr-employee-pagination-arrow" 
+        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+        disabled={currentPage === totalPages}
+      >
+        &#8250; {/* Single right arrow */}
+      </button>
+      
+      <button 
+        className="hr-employee-pagination-arrow" 
+        onClick={() => setCurrentPage(totalPages)} 
+        disabled={currentPage === totalPages}
+      >
+        &#187; {/* Double right arrow */}
+      </button>
+      
+      <select
+        className="hr-employee-pagination-size"
+        value={itemsPerPage}
+        onChange={(e) => {
+          setItemsPerPage(parseInt(e.target.value));
+          setCurrentPage(1);
+        }}
+      >
+        <option value={5}>5</option>
+        <option value={10}>10</option>
+        <option value={20}>20</option>
+      </select>
+    </div>
+  );
 
   /***************************************************************************
    * 3) Employees CRUD: Add, Edit, Archive, Unarchive
@@ -1338,6 +1494,171 @@ const Employees = () => {
   };
 
   /***************************************************************************
+   * 5) Resignations CRUD: Add, Edit, View
+   ***************************************************************************/
+
+  // Handle form input changes
+  const handleResignationChange = (e) => {
+    const { name, value } = e.target;
+    setNewResignation(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle resignation submission
+  const handleResignationSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      // Validate required fields
+      if (!newResignation.employee_id || !newResignation.notice_period_days) {
+        showToast("Please fill all required fields", false);
+        return;
+      }
+      
+      // Send resignation data to the API
+      await axios.post(
+        "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/", 
+        newResignation
+      );
+      
+      showToast("Resignation created successfully", true);
+      setShowAddResignationModal(false);
+      
+      // Refresh resignations
+      const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+      setResignations(resignationsRes.data);
+    } catch (err) {
+      console.error("Error creating resignation:", err.response?.data || err);
+      const errorMessage = err.response?.data?.detail || 
+                         Object.values(err.response?.data || {}).flat().join(", ") || 
+                         "Failed to create resignation";
+      showToast(errorMessage, false);
+    }
+  };
+
+  // Handle edit resignation modal
+  const handleEditResignation = (resignation) => {
+    setEditingResignation({
+      ...resignation
+    });
+    setShowEditResignationModal(true);
+    setDotsMenuOpen(null);
+  };
+
+  // Handle resignation edit submission
+  const handleEditResignationSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.patch(
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${editingResignation.resignation_id}/`, 
+        editingResignation
+      );
+      
+      showToast("Resignation updated successfully", true);
+      setShowEditResignationModal(false);
+      
+      // Refresh resignations
+      const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+      setResignations(resignationsRes.data);
+    } catch (err) {
+      console.error("Error updating resignation:", err.response?.data || err);
+      const errorMessage = err.response?.data?.detail || 
+                         Object.values(err.response?.data || {}).flat().join(", ") || 
+                         "Failed to update resignation";
+      showToast(errorMessage, false);
+    }
+  };
+
+  // Handle view resignation details
+  const handleViewResignationDetails = (resignation) => {
+    console.log("Viewing resignation details:", resignation);
+    setDotsMenuOpen(null);
+  };
+
+  // 3) Resignations Table
+  const renderResignationsTable = (rawData) => {
+    const { paginated, totalPages } = filterAndPaginate(rawData);
+    
+    if (loading) return <div className="hr-employee-no-results">Loading resignations...</div>;
+    if (!paginated.length) return <div className="hr-employee-no-results">No resignations found.</div>;
+    
+    return (
+      <>
+        <div className="hr-employee-table-wrapper">
+          <div className="hr-employee-table-scrollable">
+            <table className="hr-employee-table">
+              <thead>
+                <tr>
+                  <th>Resignation ID</th>
+                  <th>Employee ID</th>
+                  <th>Submission Date</th>
+                  <th>Notice Period (Days)</th>
+                  <th>HR Approver</th>
+                  <th>Approval Status</th>
+                  <th>Clearance Status</th>
+                  <th>Created At</th>
+                  <th>Updated At</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.map((resignation, index) => (
+                  <tr key={resignation.resignation_id}>
+                    <td>{resignation.resignation_id}</td>
+                    <td>{resignation.employee_id}</td>
+                    <td>{resignation.submission_date}</td>
+                    <td>{resignation.notice_period_days}</td>
+                    <td>{resignation.hr_approver_id || "—"}</td>
+                    <td>
+                      <span className={`hr-tag ${resignation.approval_status.toLowerCase()}`}>
+                        {resignation.approval_status}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`hr-tag ${resignation.clearance_status.toLowerCase().replace(/\s+/g, '-')}`}>
+                        {resignation.clearance_status}
+                      </span>
+                    </td>
+                    <td>{resignation.created_at}</td>
+                    <td>{resignation.updated_at}</td>
+                    <td className="hr-employee-actions">
+                      <div
+                        className="hr-employee-dots"
+                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                      >
+                        ⋮
+                        {dotsMenuOpen === index && (
+                          <div className="hr-employee-dropdown">
+                            <div
+                              className="hr-employee-dropdown-item"
+                              onClick={() => handleEditResignation(resignation)}
+                            >
+                              Edit
+                            </div>
+                            <div
+                              className="hr-employee-dropdown-item"
+                              onClick={() => handleViewResignationDetails(resignation)}
+                            >
+                              View Details
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {renderPagination(totalPages)}
+      </>
+    );
+  };
+
+  /***************************************************************************
    * Render Table for Employees or Positions
    ***************************************************************************/
 
@@ -1904,6 +2225,12 @@ const Employees = () => {
                   )}
                 </>
               )}
+
+              {activeTab === "Resignations" && (
+                <button className="hr-employee-add-btn" onClick={() => setShowAddResignationModal(true)}>
+                  + Add Resignation
+                </button>
+              )}
             </div>
           </div>
 
@@ -1932,6 +2259,15 @@ const Employees = () => {
               >
                 Positions <span className="hr-employee-count">{positions.length}</span>
               </button>
+              <button
+                className={activeTab === "Resignations" ? "active" : ""}
+                onClick={() => {
+                  setActiveTab("Resignations");
+                  setCurrentPage(1);
+                }}
+              >
+                Resignations <span className="hr-employee-count">{resignations.length}</span>
+              </button>
             </div>
           </div>
 
@@ -1942,10 +2278,12 @@ const Employees = () => {
                   showArchived ? archivedEmployees : employees,
                   showArchived
                 )
-              : renderPositionsTable(
+              : activeTab === "Positions"
+              ? renderPositionsTable(
                   showArchived ? archivedPositions : positions,
                   showArchived
-                )}
+                )
+              : activeTab === "Resignations" && renderResignationsTable(resignations)}
           </div>
         </div>
       </div>
@@ -1968,6 +2306,17 @@ const Employees = () => {
                 />
               </div>
               
+              {/* System Timestamps */}
+              <div className="form-group">
+                <label>Created At</label>
+                <input
+                  type="text"
+                  value={newEmployee.created_at}
+                  disabled
+                  placeholder="Auto-generated"
+                />
+              </div>
+              
               {/* Department Selection */}
               <div className="form-group">
                 <label>Department</label>
@@ -1980,7 +2329,6 @@ const Employees = () => {
                       ...prev,
                       dept_id: e.target.value,
                       dept_name: selectedDept?.dept_name || ""
-                      // Position fields are no longer reset
                     }));
                   }}
                   required
@@ -2019,7 +2367,7 @@ const Employees = () => {
                 </select>
               </div>
 
-              {/* Personal Information */}
+              {/* Personal Information - First Name and Last Name now properly side by side */}
               <div className="form-group">
                 <label>First Name *</label>
                 <input
@@ -2111,17 +2459,6 @@ const Employees = () => {
                       value: e.target.checked
                     }
                   })}
-                />
-              </div>
-
-              {/* System Timestamps */}
-              <div className="form-group">
-                <label>Created At</label>
-                <input
-                  type="text"
-                  value={newEmployee.created_at}
-                  disabled
-                  placeholder="Auto-generated"
                 />
               </div>
 
@@ -2703,6 +3040,186 @@ const Employees = () => {
                 No
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== Resignations: Add Modal ========== */}
+      {showAddResignationModal && (
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
+            <h3>Add New Resignation</h3>
+            <form onSubmit={handleResignationSubmit} className="hr-employee-modal-form hr-two-col">
+              <div className="form-column">
+                <div className="form-group">
+                  <label>Employee *</label>
+                  <select 
+                    name="employee_id" 
+                    value={newResignation.employee_id} 
+                    onChange={handleResignationChange}
+                    required
+                  >
+                    <option value="">-- Select Employee --</option>
+                    {Array.isArray(employees) ? employees.map(emp => (
+                      <option key={emp.employee_id} value={emp.employee_id}>
+                        {emp.first_name} {emp.last_name}
+                      </option>
+                    )) : <option value="">No employees available</option>}
+                  </select>
+                </div>
+                
+                <div className="form-group">
+                  <label>Notice Period (Days) *</label>
+                  <input 
+                    type="number" 
+                    name="notice_period_days" 
+                    value={newResignation.notice_period_days} 
+                    onChange={handleResignationChange}
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="form-column">
+                <div className="form-group">
+                  <label>HR Approver</label>
+                  <select 
+                    name="hr_approver_id" 
+                    value={newResignation.hr_approver_id} 
+                    onChange={handleResignationChange}
+                  >
+                    <option value="">-- Select HR Approver --</option>
+                    {Array.isArray(employees) ? employees
+                      .filter(employee => 
+                        employee.dept_name === "Human Resources" || 
+                        employee.dept_id === "HR-DEPT-2025-e9fa93" ||
+                        employee.dept?.dept_name === "Human Resources" || 
+                        employee.dept?.dept_id === "HR-DEPT-2025-e9fa93"
+                      )
+                      .map(employee => (
+                        <option key={employee.employee_id} value={employee.employee_id}>
+                          {employee.first_name} {employee.last_name}
+                        </option>
+                    )) : <option value="">No HR employees available</option>}
+                  </select>
+                </div>
+                
+                <div className="form-group">
+                  <label>Approval Status</label>
+                  <select
+                    name="approval_status"
+                    value={newResignation.approval_status || "Pending"}
+                    onChange={handleResignationChange}
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    
+                  </select>
+                </div>
+                
+                <div className="form-group">
+                  <label>Clearance Status</label>
+                  <select
+                    name="clearance_status"
+                    value={newResignation.clearance_status || "Not Started"}
+                    onChange={handleResignationChange}
+                  >
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="hr-employee-modal-buttons">
+                <button type="submit" className="submit-btn">Submit</button>
+                <button 
+                  type="button" 
+                  className="hr-employee-cancel-btn" 
+                  onClick={() => setShowAddResignationModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========== Resignations: Edit Modal ========== */}
+      {showEditResignationModal && editingResignation && (
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
+            <h3>Edit Resignation</h3>
+            <form onSubmit={handleEditResignationSubmit} className="hr-employee-modal-form hr-two-col">
+              <div className="form-column">
+                <div className="form-group">
+                  <label>Employee ID</label>
+                  <input 
+                    type="text"
+                    value={editingResignation.employee_id || ""}
+                    disabled
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Notice Period (Days)</label>
+                  <input 
+                    type="number"
+                    value={editingResignation.notice_period_days || ""}
+                    disabled
+                  />
+                </div>
+              </div>
+              
+              <div className="form-column">
+                <div className="form-group">
+                  <label>Approval Status *</label>
+                  <select
+                    name="approval_status"
+                    value={editingResignation.approval_status || "Pending"}
+                    onChange={(e) => setEditingResignation({
+                      ...editingResignation,
+                      approval_status: e.target.value
+                    })}
+                    required
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    
+                  </select>
+                </div>
+                
+                <div className="form-group">
+                  <label>Clearance Status *</label>
+                  <select
+                    name="clearance_status"
+                    value={editingResignation.clearance_status || "Not Started"}
+                    onChange={(e) => setEditingResignation({
+                      ...editingResignation,
+                      clearance_status: e.target.value
+                    })}
+                    required
+                  >
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="hr-employee-modal-buttons">
+                <button type="submit" className="submit-btn">Save Changes</button>
+                <button 
+                  type="button" 
+                  className="hr-employee-cancel-btn" 
+                  onClick={() => setShowEditResignationModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

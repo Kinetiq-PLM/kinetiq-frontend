@@ -11,10 +11,7 @@ const Recruitment = () => {
   const [archivedCandidates, setArchivedCandidates] = useState([]);
   const [jobPostings, setJobPostings] = useState([]);
   const [archivedJobPostings, setArchivedJobPostings] = useState([]);
-  const [resignations, setResignations] = useState([]);
   const [showAddJobModal, setShowAddJobModal] = useState(false);
-  const [showAddResignationModal, setShowAddResignationModal] = useState(false); // New state for resignation modal
-  const [showEditResignationModal, setShowEditResignationModal] = useState(false); // New state for editing resignation
   const [showDocumentsModal, setShowDocumentsModal] = useState(false);
   const [showInterviewDetailsModal, setShowInterviewDetailsModal] = useState(false);
   const [showOfferDetailsModal, setShowOfferDetailsModal] = useState(false);
@@ -40,16 +37,6 @@ const Recruitment = () => {
     duration_days: "",
     posting_status: "Draft" // Default status
   });
-
-  const [newResignation, setNewResignation] = useState({
-    employee_id: "",
-    notice_period_days: "",
-    hr_approver_id: "",
-    approval_status: "Pending", // Default value
-    clearance_status: "Not Started" // Default value
-  });
-
-  const [editingResignation, setEditingResignation] = useState(null);
 
   const [newCandidate, setNewCandidate] = useState({
     job_id: "",
@@ -123,8 +110,6 @@ const Recruitment = () => {
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/job_posting/job_postings/archived/")
         ]);
 
-        const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
-
         // New fetch calls for departments, positions, and employees - THIS WAS MISSING
         const [deptsRes, positionsRes, employeesRes] = await Promise.all([
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/"),
@@ -147,7 +132,6 @@ const Recruitment = () => {
         setArchivedCandidates(archivedCandidatesRes.data);
         setJobPostings(jobPostingsRes.data);
         setArchivedJobPostings(archivedJobPostingsRes.data);
-        setResignations(resignationsRes.data);
         setDepartments(departmentsData);
         setPositions(positionsData);
         setEmployees(employeesData); // Add this line to save employees
@@ -363,45 +347,6 @@ const Recruitment = () => {
     }
   };
 
-  const handleEditResignation = (resignation) => {
-    // Create a copy of the resignation to edit
-    setEditingResignation({
-      ...resignation
-    });
-    setShowEditResignationModal(true);
-    setDotsMenuOpen(null);
-  };
-
-  const handleViewResignationDetails = (resignation) => {
-    // View resignation details logic
-    console.log("Viewing resignation details:", resignation);
-    setDotsMenuOpen(null);
-  };
-
-  const handleEditResignationSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // Update resignation logic here
-      await axios.patch(
-        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${editingResignation.resignation_id}/`, 
-        editingResignation
-      );
-      
-      showToast("Resignation updated successfully", true);
-      setShowEditResignationModal(false);
-      
-      // Refresh resignations
-      const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
-      setResignations(resignationsRes.data);
-    } catch (err) {
-      console.error("Error updating resignation:", err.response?.data || err);
-      const errorMessage = err.response?.data?.detail || 
-                         Object.values(err.response?.data || {}).flat().join(", ") || 
-                         "Failed to update resignation";
-      showToast(errorMessage, false);
-    }
-  };
-
   const handleEditCandidateSubmit = async (e) => {
     e.preventDefault();
     
@@ -571,12 +516,20 @@ const Recruitment = () => {
     let filtered = data;
     if (searchTerm) {
       filtered = data.filter(item => {
-        // Adjust these properties based on your data structure
+        // These properties are appropriate for both candidates and job postings
         return (
-          (item.resignation_id?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.employee_id?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.approval_status?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (item.clearance_status?.toLowerCase().includes(searchTerm.toLowerCase()))
+          // For job postings
+          (item.job_id?.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.position_title?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.dept_id?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.posting_status?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.employment_type?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          // For candidates
+          (item.candidate_id?.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.first_name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.last_name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.email?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.application_status?.toLowerCase().includes(searchTerm.toLowerCase()))
         );
       });
     }
@@ -585,9 +538,11 @@ const Recruitment = () => {
     if (sortField !== 'all') {
       filtered = [...filtered].sort((a, b) => {
         if (sortField === 'id') {
-          return a.resignation_id?.localeCompare(b.resignation_id);
+          // Use job_id or candidate_id depending on what's available
+          return (a.job_id || a.candidate_id || '')?.toString().localeCompare((b.job_id || b.candidate_id || '')?.toString());
         } else if (sortField === 'status') {
-          return a.approval_status?.localeCompare(b.approval_status);
+          // Use posting_status or application_status depending on what's available
+          return (a.posting_status || a.application_status || '')?.localeCompare((b.posting_status || b.application_status || ''));
         }
         return 0;
       });
@@ -913,81 +868,6 @@ const Recruitment = () => {
     );
   };
 
-  const renderResignationsTable = (data) => {
-    const { paginated, totalPages } = filterAndPaginate(data);
-    if (loading) return <div className="recruitment-loading">Loading...</div>;
-    if (!paginated.length) return <div className="recruitment-no-results">No resignations found</div>;
-    
-    return (
-      <>
-        <div className="recruitment-table-wrapper">
-          <div className="recruitment-table-scrollable">
-            <table className="recruitment-table">
-              <thead>
-                <tr>
-                  <th>Resignation ID</th>
-                  <th>Employee ID</th>
-                  <th>Submission Date</th>
-                  <th>Notice Period (Days)</th>
-                  <th>HR Approver</th>
-                  <th>Approval Status</th>
-                  <th>Clearance Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map((resignation, index) => (
-                  <tr key={resignation.resignation_id}>
-                    <td>{resignation.resignation_id}</td>
-                    <td>{resignation.employee_id}</td>
-                    <td>{resignation.submission_date ? new Date(resignation.submission_date).toLocaleDateString() : 'N/A'}</td>
-                    <td>{resignation.notice_period_days || 'N/A'}</td>
-                    <td>{resignation.hr_approver_id || 'Pending'}</td>
-                    <td>
-                      <span className={`recruitment-tag ${resignation.approval_status ? resignation.approval_status.toLowerCase() : 'unknown'}`}>
-                        {resignation.approval_status || 'Unknown'}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`recruitment-tag ${resignation.clearance_status ? resignation.clearance_status.toLowerCase() : 'unknown'}`}>
-                        {resignation.clearance_status || 'Unknown'}
-                      </span>
-                    </td>
-                    <td className="recruitment-actions">
-                      <div
-                        className="recruitment-dots"
-                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                      >
-                        ⋮
-                        {dotsMenuOpen === index && (
-                          <div className="recruitment-dropdown">
-                            <div 
-                              className="recruitment-dropdown-item"
-                              onClick={() => handleEditResignation(resignation)}
-                            >
-                              Edit
-                            </div>
-                            <div 
-                              className="recruitment-dropdown-item"
-                              onClick={() => handleViewResignationDetails(resignation)}
-                            >
-                              View Details
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        {renderPagination(totalPages)}
-      </>
-    );
-  };
-
   const renderPagination = (totalPages) => {
     return (
       <div className="recruitment-pagination">
@@ -1145,15 +1025,6 @@ const handleAddClick = () => {
       posting_status: null
     });
     setShowAddJobModal(true);
-  } else if (activeTab === "Resignations") {
-    setNewResignation({
-      employee_id: "",
-      notice_period_days: "",
-      hr_approver_id: "",
-      approval_status: "Pending",
-      clearance_status: "Not Started"
-    });
-    setShowAddResignationModal(true);
   } else if (activeTab === "Candidates") {
     handleAddCandidate();
   }
@@ -1222,14 +1093,6 @@ const handleJobPostingChange = (e) => {
       [name]: value
     }));
   }
-};
-
-const handleResignationChange = (e) => {
-  const { name, value } = e.target;
-  setNewResignation(prev => ({
-    ...prev,
-    [name]: value
-  }));
 };
 
 const handleCandidateChange = (e) => {
@@ -1488,37 +1351,6 @@ const handleJobPostingSubmit = async (e) => {
     const errorMessage = err.response?.data?.detail || 
                        Object.values(err.response?.data || {}).flat().join(", ") || 
                        "Failed to create job posting";
-    showToast(errorMessage, false);
-  }
-};
-
-const handleResignationSubmit = async (e) => {
-  e.preventDefault();
-  
-  try {
-    // Validate required fields
-    if (!newResignation.employee_id || !newResignation.notice_period_days) {
-      showToast("Please fill all required fields", false);
-      return;
-    }
-    
-    // Send resignation data to the API
-    const response = await axios.post(
-      "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/", 
-      newResignation
-    );
-    
-    showToast("Resignation created successfully", true);
-    setShowAddResignationModal(false);
-    
-    // Refresh resignations
-    const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
-    setResignations(resignationsRes.data);
-  } catch (err) {
-    console.error("Error creating resignation:", err.response?.data || err);
-    const errorMessage = err.response?.data?.detail || 
-                       Object.values(err.response?.data || {}).flat().join(", ") || 
-                       "Failed to create resignation";
     showToast(errorMessage, false);
   }
 };
@@ -1802,14 +1634,8 @@ const submitCandidateForm = async (e) => {
                   <FiPlus className="icon" /> Add Job Posting
                 </button>
               )}
-
-              {activeTab === "Resignations" && (
-                <button className="recruitment-add-btn" onClick={handleAddClick}>
-                  <FiPlus className="icon" /> Add Resignation
-                </button>
-              )}
               
-              {activeTab !== "Resignations" && (
+              {activeTab !== "Job Postings" && (
                 <button
                   className="recruitment-add-btn"
                   onClick={() => setShowArchived(!showArchived)}
@@ -1860,23 +1686,12 @@ const submitCandidateForm = async (e) => {
               >
                 Job Postings <span className="recruitment-count">{jobPostings.length}</span>
               </button>
-              <button
-                className={activeTab === "Resignations" ? "active" : ""}
-                onClick={() => {
-                  setActiveTab("Resignations");
-                  setShowArchived(false);
-                  setCurrentPage(1);
-                }}
-              >
-                Resignations <span className="recruitment-count">{resignations.length}</span>
-              </button>
             </div>
           </div>
 
           <div className="recruitment-table-container">
             {activeTab === "Candidates" && renderCandidatesTable(showArchived ? archivedCandidates : candidates, showArchived)}
             {activeTab === "Job Postings" && renderJobPostingsTable(showArchived ? archivedJobPostings : jobPostings, showArchived)}
-            {activeTab === "Resignations" && renderResignationsTable(resignations)}
           </div>
         </div>
       </div>
@@ -2065,189 +1880,6 @@ const submitCandidateForm = async (e) => {
         </div>
       )}
 
-      {showAddResignationModal && (
-        <div className="recruitment-modal-overlay">
-          <div className="recruitment-modal">
-            <h3>Add New Resignation</h3>
-            <form onSubmit={handleResignationSubmit} className="recruitment-form">
-              <div className="recruitment-form-two-columns">
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>Employee *</label>
-                    <select 
-                      name="employee_id" 
-                      value={newResignation.employee_id} 
-                      onChange={handleResignationChange}
-                      required
-                    >
-                      <option value="">-- Select Employee --</option>
-                      {Array.isArray(employees) ? employees.map(emp => (
-                        <option key={emp.employee_id} value={emp.employee_id}>
-                          {emp.first_name} {emp.last_name}
-                        </option>
-                      )) : <option value="">No employees available</option>}
-                    </select>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Notice Period (Days) *</label>
-                    <input 
-                      type="number" 
-                      name="notice_period_days" 
-                      value={newResignation.notice_period_days} 
-                      onChange={handleResignationChange}
-                      min="1"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>HR Approver</label>
-                    <select 
-                      name="hr_approver_id" 
-                      value={newResignation.hr_approver_id} 
-                      onChange={handleResignationChange}
-                    >
-                      <option value="">-- Select HR Approver --</option>
-                      {Array.isArray(employees) ? employees
-                        .filter(employee => 
-                          employee.dept_name === "Human Resources" || 
-                          employee.dept_id === "HR-DEPT-2025-e9fa93" ||
-                          employee.dept?.dept_name === "Human Resources" || 
-                          employee.dept?.dept_id === "HR-DEPT-2025-e9fa93"
-                        )
-                        .map(employee => (
-                          <option key={employee.employee_id} value={employee.employee_id}>
-                            {employee.first_name} {employee.last_name}
-                          </option>
-                      )) : <option value="">No HR employees available</option>}
-                    </select>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Approval Status</label>
-                    <select
-                      name="approval_status"
-                      value={newResignation.approval_status || "Pending"}
-                      onChange={handleResignationChange}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Clearance Status</label>
-                    <select
-                      name="clearance_status"
-                      value={newResignation.clearance_status || "Not Started"}
-                      onChange={handleResignationChange}
-                    >
-                      <option value="Not Started">Not Started</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="recruitment-modal-buttons">
-                <button type="submit" className="submit-btn">Submit</button>
-                <button 
-                  type="button" 
-                  className="cancel-btn" 
-                  onClick={() => setShowAddResignationModal(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {showEditResignationModal && editingResignation && (
-        <div className="recruitment-modal-overlay">
-          <div className="recruitment-modal">
-            <h3>Edit Resignation</h3>
-            <form onSubmit={handleEditResignationSubmit} className="recruitment-form">
-              <div className="recruitment-form-two-columns">
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>Employee ID</label>
-                    <input 
-                      type="text"
-                      value={editingResignation.employee_id || ""}
-                      disabled
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Notice Period (Days)</label>
-                    <input 
-                      type="number"
-                      value={editingResignation.notice_period_days || ""}
-                      disabled
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>Approval Status *</label>
-                    <select
-                      name="approval_status"
-                      value={editingResignation.approval_status || "Pending"}
-                      onChange={(e) => setEditingResignation({
-                        ...editingResignation,
-                        approval_status: e.target.value
-                      })}
-                      required
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Clearance Status *</label>
-                    <select
-                      name="clearance_status"
-                      value={editingResignation.clearance_status || "Not Started"}
-                      onChange={(e) => setEditingResignation({
-                        ...editingResignation,
-                        clearance_status: e.target.value
-                      })}
-                      required
-                    >
-                      <option value="Not Started">Not Started</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Completed">Completed</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="recruitment-modal-buttons">
-                <button type="submit" className="submit-btn">Save Changes</button>
-                <button 
-                  type="button" 
-                  className="cancel-btn" 
-                  onClick={() => setShowEditResignationModal(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Documents Modal */}
       {showDocumentsModal && viewingDocuments && (
         <div className="recruitment-modal-overlay" onClick={() => setShowDocumentsModal(false)}>
           <div className="recruitment-modal" onClick={e => e.stopPropagation()}>

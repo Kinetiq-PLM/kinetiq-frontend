@@ -354,6 +354,54 @@
   color: #cc0000;
 }
 
+/* Resignation Status Tags */
+.hr-tag.pending {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.hr-tag.approved {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.hr-tag.rejected {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.hr-tag.not-started,
+.hr-tag.in-progress {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.hr-tag.completed {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.hr-tag.unknown {
+  background-color: #e2e3e5;
+  color: #41464b;
+}
+
+/* Clearance Status Pills for Resignation */
+.hr-tag.cleared {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.hr-tag.pending-clearance {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.hr-tag.rejected-clearance {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
 /* ---------------------------------------------------------
    PAGINATION - ENHANCED VERSION
    --------------------------------------------------------- */
@@ -634,6 +682,12 @@
   margin-bottom: 1.5rem;
 }
 
+.hr-two-col .hr-employee-modal-buttons {
+  grid-column: 1 / -1; /* Make buttons span all columns */
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
 /* Make buttons span full width */
 .hr-two-col-buttons {
   grid-column: 1 / -1; /* Span all columns */
@@ -641,6 +695,60 @@
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1.5rem;
+}
+
+/* ---------------------------------------------------------
+   BULK ACTIONS
+   --------------------------------------------------------- */
+/* Bulk Actions Container for Resignations */
+.hr-employee-bulk-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.hr-employee-bulk-action-btn {
+  background-color: teal;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hr-employee-bulk-action-btn:hover {
+  background-color: #008080cc;
+}
+
+/* ---------------------------------------------------------
+   FORM HELP TEXT
+   --------------------------------------------------------- */
+/* Form Help Text */
+.input-help-text {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* ---------------------------------------------------------
+   RESUME INFORMATION
+   --------------------------------------------------------- */
+/* Resume Information Container */
+.resume-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.current-resume {
+  display: flex;
+  align-items: center;
+  background-color: #f9fafb;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
 }
 
 /* ---------------------------------------------------------
