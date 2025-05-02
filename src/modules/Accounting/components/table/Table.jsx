@@ -56,7 +56,17 @@ const Table = ({ columns, data, enableCheckbox, handleStatusToggle }) => {
                                             <div
                                                 className={
                                                     isStatusColumn
-                                                        ? (cell === "Active" ? "status-active" : "status-inactive")
+                                                        ? cell === "Active"
+                                                            ? "status-active"
+                                                            : cell === "Inactive"
+                                                                ? "status-inactive"
+                                                                : cell === "Draft"
+                                                                    ? "status-draft"
+                                                                    : cell === "Processing"
+                                                                        ? "status-processing"
+                                                                        : cell === "Completed"
+                                                                            ? "status-completed"
+                                                                            : ""
                                                         : ""
                                                 }
                                                 onClick={() => isStatusColumn && handleStatusToggle(rowIndex)}
@@ -64,6 +74,7 @@ const Table = ({ columns, data, enableCheckbox, handleStatusToggle }) => {
                                             >
                                                 {isStatusColumn ? cell : formattedCell}
                                             </div>
+
                                         </td>
                                     );
                                 })}
