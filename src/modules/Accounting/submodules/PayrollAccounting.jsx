@@ -6,9 +6,9 @@ import Button from "../components/button/Button";
 import Search from "../components/search/Search";
 
 const PayrollAccounting = () => {
-  const [payrollData, setPayrollData] = useState([]); // State to store table data
-  const [payrollAccountingData, setPayrollAccountingData] = useState([]); // State to store table data
-  const [isLoading, setIsLoading] = useState(true); // State to manage loading state
+  const [payrollData, setPayrollData] = useState([]);
+  const [payrollAccountingData, setPayrollAccountingData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "",
@@ -16,8 +16,10 @@ const PayrollAccounting = () => {
     message: "",
   });
 
+  // Updated columns to match PayrollJournalView fields
   const payroll_columns = [
-    "Payroll ID",
+    "Payroll Accounting ID",
+    "Payroll HR ID",
     "Employee ID",
     "Pay Period Start",
     "Pay Period End",
@@ -28,6 +30,7 @@ const PayrollAccounting = () => {
     "Holiday Pay",
     "Bonus Pay",
     "13th Month Pay",
+    "Total Bonuses",
     "Gross Pay",
     "SSS Contribution",
     "Philhealth Contribution",
@@ -39,8 +42,8 @@ const PayrollAccounting = () => {
     "Total Deductions",
     "Net Pay",
     "Status",
-    "Created At",
-    "Updated At",
+    "Date Approved",
+    "Reference Number",
   ];
 
   const payrollAccounting_columns = [
@@ -53,35 +56,28 @@ const PayrollAccounting = () => {
     "Status",
   ];
 
-
   // API Endpoint
   const API_URL =
     import.meta.env.VITE_API_URL ||
     "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
-  const PAYROLL_ENDPOINT = `${API_URL}/api/payrolls/`;
-  const PAYROLL_ACCOUNTING_ENDPOINT = `${API_URL}/api/payroll_accounting/`;
-
+  const PAYROLL_ENDPOINT = `${API_URL}/api/payroll-journal/`; // Updated to payroll-journal
+  const PAYROLL_ACCOUNTING_ENDPOINT = `${API_URL}/api/payroll-accounting/`;
 
   // Fetch data from the API
   useEffect(() => {
-
     // Fetch payroll data
     const fetchPayrollData = async () => {
       try {
-
-        // Store the data in a variable
         const response = await fetch(PAYROLL_ENDPOINT);
-
-
-
-        // Convert the response to JSON then pass to the variable
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const result = await response.json();
-
-
 
         // Transform the data to match the table structure
         const transformedData = result.map((item) => [
-          item.payroll_id,
+          item.payroll_accounting_id,
+          item.payroll_hr_id,
           item.employee_id,
           item.pay_period_start,
           item.pay_period_end,
@@ -92,6 +88,7 @@ const PayrollAccounting = () => {
           item.holiday_pay,
           item.bonus_pay,
           item.thirteenth_month_pay,
+          item.total_bonuses,
           item.gross_pay,
           item.sss_contribution,
           item.philhealth_contribution,
@@ -103,13 +100,13 @@ const PayrollAccounting = () => {
           item.total_deductions,
           item.net_pay,
           item.status,
-          item.created_at,
-          item.updated_at,
+          item.date_approved,
+          item.reference_number,
         ]);
 
-        setPayrollData(transformedData); // Set the transformed data to state
+        setPayrollData(transformedData);
       } catch (error) {
-        console.error("Error fetching payroll data:", error); // Log any errors
+        console.error("Error fetching payroll data:", error);
         setValidation({
           isOpen: true,
           type: "error",
@@ -117,15 +114,17 @@ const PayrollAccounting = () => {
           message: "Failed to fetch payroll data. Please try again later.",
         });
       } finally {
-        setIsLoading(false); // Set loading to false after data is fetched
+        setIsLoading(false);
       }
     };
-
 
     // Fetch payroll accounting data
     const fetchPayrollAccountingData = async () => {
       try {
         const response = await fetch(PAYROLL_ACCOUNTING_ENDPOINT);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const result = await response.json();
 
         const transformedData = result.map((item) => [
@@ -138,10 +137,9 @@ const PayrollAccounting = () => {
           item.status,
         ]);
 
-        setPayrollAccountingData(transformedData); // Set the transformed data to state
-
+        setPayrollAccountingData(transformedData);
       } catch (error) {
-        console.error("Error fetching payroll accounting data:", error); // Log any errors
+        console.error("Error fetching payroll accounting data:", error);
         setValidation({
           isOpen: true,
           type: "error",
@@ -149,16 +147,13 @@ const PayrollAccounting = () => {
           message: "Failed to fetch payroll accounting data. Please try again later.",
         });
       } finally {
-        setIsLoading(false); // Set loading to false after data is fetched
+        setIsLoading(false);
       }
-    }
+    };
 
-
-    // Call the fetch functions
     fetchPayrollData();
     fetchPayrollAccountingData();
   }, []);
-
 
   // Loading spinner component
   const LoadingSpinner = () => (
@@ -168,6 +163,23 @@ const PayrollAccounting = () => {
     </div>
   );
 
+  const printPayrollContent = () => {
+    const printContents = document.getElementById("printable-payroll").innerHTML;
+    const originalContents = document.body.innerHTML;
+    const originalScroll = window.scrollY;
+
+    document.body.innerHTML = printContents;
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.overflow = "visible";
+
+    setTimeout(() => {
+      window.print();
+      document.body.innerHTML = originalContents;
+      window.scrollTo(0, originalScroll);
+      window.location.reload();
+    }, 200);
+  };
 
   return (
     <div className="accountsPayable">
@@ -176,7 +188,6 @@ const PayrollAccounting = () => {
           <h1 className="subModule-title">Payroll Accounting</h1>
         </div>
 
-
         <div className="parent-component-container">
           <div className="component-container">
             <Search />
@@ -184,28 +195,26 @@ const PayrollAccounting = () => {
 
           <div className="component-container">
             <Button name="Update" variant="standard2" />
-            <Button name="Print PDF" variant="standard2" />
+            <Button name="Print PDF" variant="standard2" onclick={printPayrollContent} />
           </div>
         </div>
-
 
         {/* Payroll Accounting Data */}
         <div className="title-subtitle-container">
           {isLoading ? (
-            <LoadingSpinner /> 
+            <LoadingSpinner />
           ) : (
             <Table columns={payrollAccounting_columns} data={payrollAccountingData} />
           )}
         </div>
 
-        <div className="my-20"> </div>
-
+        <div className="my-20"></div>
 
         {/* Payroll Data */}
         <div className="title-subtitle-container">
           <h1 className="subModule-title">Payroll</h1>
           {isLoading ? (
-            <LoadingSpinner /> 
+            <LoadingSpinner />
           ) : (
             <Table columns={payroll_columns} data={payrollData} />
           )}
@@ -221,6 +230,62 @@ const PayrollAccounting = () => {
           message={validation.message}
         />
       )}
+
+      {/* Printable Container */}
+      <div id="printable-payroll" style={{ display: "none" }}>
+        <div className="a4-container">
+          <div className="header">
+            <img src="/icons/Kinetiq-Logo.png" alt="Kinetiq Logo" className="logo" />
+            <h1>Payroll Accounting Report</h1>
+            <p>Generated on: {new Date().toLocaleDateString()}</p>
+            <p>Company Name: Your Company Name</p>
+            <p>Address: Your Company Address, City, Country</p>
+            <p>Contact: your.email@example.com | +123456789</p>
+          </div>
+
+          <h2>Payroll Accounting</h2>
+          <table className="print-table">
+            <thead>
+              <tr>
+                {payrollAccounting_columns.map((col, index) => (
+                  <th key={index}>{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {payrollAccountingData.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {row.map((cell, cellIndex) => (
+                    <td key={cellIndex}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="page-break"></div>
+
+          <h2>Payroll Details</h2>
+          <table className="print-table">
+            <thead>
+              <tr>
+                {payroll_columns.map((col, index) => (
+                  <th key={index}>{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {payrollData.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {row.map((cell, cellIndex) => (
+                    <td key={cellIndex}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
