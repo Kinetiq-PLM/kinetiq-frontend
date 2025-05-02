@@ -98,11 +98,9 @@ const InternalDelivery = () => {
               className="status-filter"
             >
               <option value="All">All</option>
-              <option value="Created">Created</option>
+              <option value="Created">Pending</option>
               <option value="Approved">Approved</option>
-              <option value="Processing">Processing</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Cancelled">Cancelled</option>
+              <option value="Rejected">Rejected</option>
             </select>
           </div>
         </div>

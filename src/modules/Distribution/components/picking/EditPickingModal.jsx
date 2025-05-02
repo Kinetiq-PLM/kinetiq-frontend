@@ -13,11 +13,10 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
   // Check if picking list is completed
   const isCompleted = pickingList?.picked_status === 'Completed';
   
-  // Set initial values when picking list changes
+  // Fetch picking items when picking list changes
   useEffect(() => {
-    if (pickingList) {
-      setSelectedEmployee(pickingList.picked_by || '');
-      setModified(false);
+    if (pickingList && (pickingList.picked_status === 'In Progress' || pickingList.picked_status === 'Completed')) {
+      fetchPickingItems();
     }
   }, [pickingList]);
   
@@ -166,12 +165,21 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         </h4>
 
         {/* Add progress bar */}
-        <div className="picking-progress">
-          <div className="progress-bar-container">
-            <div className="progress-bar" style={{ width: `${pickingProgress}%` }}></div>
+        {isCompleted ? (
+          <div className="picking-progress">
+            <div className="progress-bar-container">
+              <div className="progress-bar" style={{ width: '100%' }}></div>
+            </div>
+            <div className="progress-text">All items have been picked</div>
           </div>
-          <div className="progress-text">{pickingProgress}% completed</div>
-        </div>
+        ) : (
+          <div className="picking-progress">
+            <div className="progress-bar-container">
+              <div className="progress-bar" style={{ width: `${pickingProgress}%` }}></div>
+            </div>
+            <div className="progress-text">{pickingProgress}% completed</div>
+          </div>
+        )}
 
         {warehouseGroups.length > 0 ? (
           warehouseGroups.map((group, groupIndex) => (
@@ -204,7 +212,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
                           }
                         </td>
                         <td>{item.item_name || 'Unknown Item'}</td>
-                        <td className="centered-cell">{item.quantity || 0}</td>
+                        <td className="centered-cell">{parseInt(item.quantity) || 0}</td>
                         <td>
                           {!isCompleted && (
                             <button 
@@ -362,19 +370,24 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         throw new Error('Failed to update item status');
       }
       
-      // Update local state
+      // Update local state with the new item data
       const updatedItem = await response.json();
-      setPickingItems(prev => prev.map(i => 
-        i.picking_item_id === updatedItem.picking_item_id ? updatedItem : i
-      ));
       
-      // Recalculate progress
+      // Create a new array with the updated item
       const updatedItems = pickingItems.map(i => 
         i.picking_item_id === updatedItem.picking_item_id ? updatedItem : i
       );
+      
+      // Update the picking items state
+      setPickingItems(updatedItems);
+      
+      // Calculate progress based on the updated items array
       const totalItems = updatedItems.length;
       const pickedItems = updatedItems.filter(i => i.is_picked).length;
-      setPickingProgress(totalItems > 0 ? Math.round((pickedItems / totalItems) * 100) : 0);
+      const newProgress = totalItems > 0 ? Math.round((pickedItems / totalItems) * 100) : 0;
+      
+      // Update the progress state
+      setPickingProgress(newProgress);
       
     } catch (err) {
       console.error('Error updating item status:', err);

@@ -172,7 +172,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
                       formatID(order.stock_transfer_id, "stock")}
                   </td>
                   <td className={`status-cell status-${order.order_status?.toLowerCase() || 'created'}`}>
-                    {order.order_status || "Created"}
+                    {order.order_status === "Created" ? "Pending" : (order.order_status || "Pending")}
                   </td>
                   <td className="centered-cell">{order.is_project_based ? "Yes" : "No"}</td>
                   <td className="centered-cell">{order.is_partial_delivery ? "Yes" : "No"}</td>
