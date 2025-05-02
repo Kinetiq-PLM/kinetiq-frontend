@@ -211,7 +211,7 @@ const PurchaseCredMemoForm = ({ memoData, onClose }) => {
                 </div>
 
                 {/* Main Content */}
-<div className="content">
+<div className="purchcred-content">
     {/* Company and Customer Info */}
     <div className="info-section">
         <div className="company-info">

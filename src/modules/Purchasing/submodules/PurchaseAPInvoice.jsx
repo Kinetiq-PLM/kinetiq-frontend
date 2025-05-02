@@ -3,7 +3,7 @@ import "../styles/PurchaseAPInvoice.css";
 import axios from "axios";
 import PurchaseAPInvoiceForm from "./PurchaseAPInvoiceForm";
 
-const PurchaseAPInvoiceBody = () => {
+const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
     const [invoices, setInvoices] = useState([]);
     const [filteredInvoices, setFilteredInvoices] = useState([]);
     const [selectedInvoice, setSelectedInvoice] = useState(null); // Selected invoice
@@ -24,10 +24,10 @@ const PurchaseAPInvoiceBody = () => {
 
     const statusOptions = [
         "All",
-        "Rejected",
-        "Completed",
-        "Approved",
-        "Pending"
+        "Over Due",
+        "Paid",
+        "Received",
+        "Forwarded"
     ];
 
     useEffect(() => {
@@ -132,10 +132,15 @@ const PurchaseAPInvoiceBody = () => {
         setSelectedInvoice(invoice); // Set the selected invoice
     };
 
-    // Add back button handler to toggle dashboard
+    // Back button handler to toggle dashboard
     const handleBackToDashboard = () => {
-        const event = new CustomEvent('purchasing-back-to-dashboard');
-        window.dispatchEvent(event);
+        if (onBackToDashboard) {
+            onBackToDashboard();
+        } else {
+            // Fallback to the old method if prop is not provided
+            const event = new CustomEvent('purchasing-back-to-dashboard');
+            window.dispatchEvent(event);
+        }
     };
 
     return (

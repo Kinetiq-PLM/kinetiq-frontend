@@ -4,7 +4,7 @@
     height: 100%;
 }
 
-.purchquote .body-content-container {
+.purchquote .purchquote-body-content-container {
     width: 100%;
     height: 100%;
     border-radius: 0.5rem;
@@ -92,6 +92,15 @@
     min-width: 210px;
 }
 
+.purchquote-no-data{
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px;
+    grid-column: 1 / -1;
+      
+}
+
 .purchquote .date-option {
     padding: 0.75rem 1rem;
     transition: background-color 0.2s ease;
@@ -103,6 +112,63 @@
 }
 
 .purchquote .date-option:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+
+.purchquote .purchquote-status-filter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    min-width: 210px;
+    box-sizing: border-box;
+    background: #fff;
+    justify-content: center;
+}
+
+.purchquote .purchquote-status-filter span:first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100px;
+}
+
+.purchquote .status-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.purchquote .purchquote-status-options-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 210px;
+}
+
+.purchquote .status-option {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.purchquote .status-option:hover {
+    background-color: rgba(0, 168, 168, 0.05);
+    color: #00A8A8;
+}
+
+.purchquote .status-option:not(:last-child) {
     border-bottom: 1px solid #eee;
 }
 
@@ -159,7 +225,7 @@
 
 .purchquote .purchquote-table-scrollable {
     width: 100%;
-    max-height: 50vh;
+    max-height: auto;
     overflow-x: auto;
     overflow-y: auto;
     scrollbar-width: thin;
@@ -200,10 +266,8 @@
 .status-approved,
 .status-pending,
 .status-rejected,
-.status-completed,
-.status-open,
-.status-cancelled,
-.status-draft {
+.status-quotation-sent,
+.status-quotationsent {
   border-radius: 12px !important;
   padding: 2px 10px !important;
   font-size: 0.85em;
@@ -212,84 +276,38 @@
 }
 
 .status-approved {
-  color: #155724;
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
+  color: #2d5016;
+  background-color: #93c47d;
+  border: 1px solid #81b366;
 }
 
 .status-pending {
   color: #856404;
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
+  background-color: #ffe599;
+  border: 1px solid #ffd966;
 }
 
 .status-rejected {
   color: #721c24;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
+  background-color: #e06666;
+  border: 1px solid #cc4c4c;
 }
 
-.status-completed {
-  color: #0c5460;
-  background-color: #d1ecf1;
-  border: 1px solid #bee5eb;
+.status-quotation-sent {
+  color: #856404;
+  background-color: #fff2cc;
+  border: 1px solid #ffe599;
 }
 
-.status-open {
-  color: #2e7d32;
-  background-color: #e8f5e9;
-  border: 1px solid #c3e6cb;
+.status-quotationsent {
+  color: #856404;
+  background-color: #fff2cc;
+  border: 1px solid #ffe599;
 }
 
-.status-cancelled {
-  color: #c62828;
-  background-color: #ffebee;
-  border: 1px solid #f5c6cb;
-}
 
-.status-draft {
-  color: #f57c00;
-  background-color: #fff3e0;
-  border: 1px solid #ffeeba;
-}
 
-.purchquote .purchquote-new-form,
-.purchquote .purchquote-compare,
-.purchquote .purchquote-send-to {
-    padding: 0.5rem 1.5rem;
-    border-radius: 0.25rem;
-    border: none;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.2s ease;
-}
 
-.purchquote .purchquote-new-form {
-    background-color: #00A8A8;
-    color: white;
-}
-
-.purchquote .purchquote-new-form:hover {
-    background-color: #008080;
-}
-
-.purchquote .purchquote-compare {
-    background-color: #e0e0e0;
-    color: #333;
-}
-
-.purchquote .purchquote-compare:hover {
-    background-color: #d0d0d0;
-}
-
-.purchquote .purchquote-send-to {
-    background-color: #00A8A8;
-    color: white;
-}
-
-.purchquote .purchquote-send-to:hover {
-    background-color: #008080;
-}
 
 .purchquote .purchquote-footer {
     position: relative;
