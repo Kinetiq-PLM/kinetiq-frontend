@@ -280,7 +280,8 @@ const PayrollAccounting = () => {
           </div>
 
           <div className="component-container">
-            <Button name="Update" variant="standard2" />
+          <Button name="Update" variant="standard2" onClick={handleUpdateStatus} />
+
           </div>
         </div>
 

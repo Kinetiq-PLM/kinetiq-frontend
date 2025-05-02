@@ -411,7 +411,7 @@ const OfficialReceipts = () => {
             />
           </div>
         </div>
-        <Table data={filteredData} columns={columns} enableCheckbox={false} />
+        <Table data={filteredData} columns={columns} showPrintButton={true} />
       </div>
       {modalOpen && (
         <CreateReceiptModal
