@@ -281,7 +281,6 @@ const PayrollAccounting = () => {
 
           <div className="component-container">
             <Button name="Update" variant="standard2" />
-            <Button name="Print PDF" variant="standard2" onclick={printPayrollContent} />
           </div>
         </div>
 
