@@ -8,6 +8,8 @@ import Search from "../components/search/Search";
 const PayrollAccounting = () => {
   const [payrollData, setPayrollData] = useState([]);
   const [payrollAccountingData, setPayrollAccountingData] = useState([]);
+  const [selectedPayrollAccountingRow, setSelectedPayrollAccountingRow] = useState(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [validation, setValidation] = useState({
     isOpen: false,
@@ -163,7 +165,49 @@ const PayrollAccounting = () => {
     </div>
   );
 
+  const handlePrintRow = (rowData) => {
+    const printWindow = window.open('', '_blank');
+    const html = `
+        <html>
+            <head>
+                <title>Payroll Row</title>
+                <style>
+                    body { font-family: sans-serif; padding: 20px; }
+                    table { width: 100%; border-collapse: collapse; }
+                    td, th { border: 1px solid #ccc; padding: 8px; }
+                </style>
+            </head>
+            <body>
+                <h2>Payroll Row Details</h2>
+                <table>
+                    <tbody>
+                        ${payrollAccounting_columns.map((col, index) => `
+                            <tr>
+                                <th>${col}</th>
+                                <td>${rowData[index]}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    }
+                </script>
+            </body>
+        </html>
+    `;
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
+
+
   const printPayrollContent = () => {
+    if (!selectedPayrollAccountingRow) {
+      alert("Please select a row to print.");
+      return;
+    }
+
     const printContents = document.getElementById("printable-payroll").innerHTML;
     const originalContents = document.body.innerHTML;
     const originalScroll = window.scrollY;
@@ -180,6 +224,7 @@ const PayrollAccounting = () => {
       window.location.reload();
     }, 200);
   };
+
 
   return (
     <div className="accountsPayable">
@@ -204,7 +249,12 @@ const PayrollAccounting = () => {
           {isLoading ? (
             <LoadingSpinner />
           ) : (
-            <Table columns={payrollAccounting_columns} data={payrollAccountingData} />
+            <Table
+              columns={payrollAccounting_columns}
+              data={payrollAccountingData}
+              handlePrintRow={handlePrintRow}
+            />
+
           )}
         </div>
 
@@ -216,7 +266,12 @@ const PayrollAccounting = () => {
           {isLoading ? (
             <LoadingSpinner />
           ) : (
-            <Table columns={payroll_columns} data={payrollData} />
+            <Table
+              columns={payrollAccounting_columns}
+              data={payrollAccountingData}
+              onRowSelect={(rowData) => setSelectedPayrollAccountingRow(rowData)}
+            />
+
           )}
         </div>
       </div>
@@ -253,13 +308,18 @@ const PayrollAccounting = () => {
               </tr>
             </thead>
             <tbody>
-              {payrollAccountingData.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {row.map((cell, cellIndex) => (
-                    <td key={cellIndex}>{cell}</td>
+              {selectedPayrollAccountingRow ? (
+                <tr>
+                  {selectedPayrollAccountingRow.map((cell, index) => (
+                    <td key={index}>{cell}</td>
                   ))}
                 </tr>
-              ))}
+              ) : (
+                <tr>
+                  <td colSpan={payrollAccounting_columns.length}>No row selected</td>
+                </tr>
+              )}
+
             </tbody>
           </table>
 
