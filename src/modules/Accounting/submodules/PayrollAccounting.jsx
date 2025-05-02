@@ -165,41 +165,82 @@ const PayrollAccounting = () => {
     </div>
   );
 
+
+  
   const handlePrintRow = (rowData) => {
     const printWindow = window.open('', '_blank');
+
     const html = `
-        <html>
-            <head>
-                <title>Payroll Row</title>
-                <style>
-                    body { font-family: sans-serif; padding: 20px; }
-                    table { width: 100%; border-collapse: collapse; }
-                    td, th { border: 1px solid #ccc; padding: 8px; }
-                </style>
-            </head>
-            <body>
-                <h2>Payroll Row Details</h2>
-                <table>
-                    <tbody>
-                        ${payrollAccounting_columns.map((col, index) => `
-                            <tr>
-                                <th>${col}</th>
-                                <td>${rowData[index]}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <script>
-                    window.onload = function() {
-                        window.print();
-                    }
-                </script>
-            </body>
-        </html>
+    <html>
+      <head>
+        <title>Payroll Row</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #ffffff;
+            color: #333333;
+          }
+          .container {
+            max-width: 700px;
+            margin: 0 auto;
+          }
+          h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          th, td {
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            text-align: left;
+          }
+          tr:nth-child(odd) {
+            background-color: #f9f9f9;
+          }
+          tr:nth-child(even) {
+            background-color: #ffffff;
+          }
+          .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 30px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Payroll Record</h1>
+          <table>
+            <tbody>
+              ${payrollAccounting_columns.map((col, i) => `
+                <tr>
+                  <td><strong>${col}</strong></td>
+                  <td>${rowData[i] ?? '-'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="footer">
+            Printed on ${new Date().toLocaleString()}
+          </div>
+        </div>
+        <script>
+          window.onload = () => window.print();
+        </script>
+      </body>
+    </html>
     `;
+
     printWindow.document.write(html);
     printWindow.document.close();
-  };
+};
 
 
   const printPayrollContent = () => {
@@ -285,67 +326,6 @@ const PayrollAccounting = () => {
           message={validation.message}
         />
       )}
-
-      {/* Printable Container */}
-      <div id="printable-payroll" style={{ display: "none" }}>
-        <div className="a4-container">
-          <div className="header">
-            <img src="/icons/Kinetiq-Logo.png" alt="Kinetiq Logo" className="logo" />
-            <h1>Payroll Accounting Report</h1>
-            <p>Generated on: {new Date().toLocaleDateString()}</p>
-            <p>Company Name: Your Company Name</p>
-            <p>Address: Your Company Address, City, Country</p>
-            <p>Contact: your.email@example.com | +123456789</p>
-          </div>
-
-          <h2>Payroll Accounting</h2>
-          <table className="print-table">
-            <thead>
-              <tr>
-                {payrollAccounting_columns.map((col, index) => (
-                  <th key={index}>{col}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {selectedPayrollAccountingRow ? (
-                <tr>
-                  {selectedPayrollAccountingRow.map((cell, index) => (
-                    <td key={index}>{cell}</td>
-                  ))}
-                </tr>
-              ) : (
-                <tr>
-                  <td colSpan={payrollAccounting_columns.length}>No row selected</td>
-                </tr>
-              )}
-
-            </tbody>
-          </table>
-
-          <div className="page-break"></div>
-
-          <h2>Payroll Details</h2>
-          <table className="print-table">
-            <thead>
-              <tr>
-                {payroll_columns.map((col, index) => (
-                  <th key={index}>{col}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {payrollData.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {row.map((cell, cellIndex) => (
-                    <td key={cellIndex}>{cell}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 };
