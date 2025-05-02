@@ -11,7 +11,7 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-const PurchaseOrdStatBody = () => {
+const PurchaseOrdStatBody = ({ onBackToDashboard }) => {
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,10 +34,10 @@ const PurchaseOrdStatBody = () => {
   ];
   const statusOptions = [
     "All",
-    "Approved",
-    "Pending",
     "Completed",
-    "Rejected"
+    "Ordered",
+    "Received",
+    "Returned"
   ];
 
   const handleDateOptionSelect = (option) => {
@@ -113,8 +113,13 @@ const PurchaseOrdStatBody = () => {
   }, []);
 
   const handleBackToDashboard = () => {
-    const event = new CustomEvent('purchasing-back-to-dashboard');
-    window.dispatchEvent(event);
+    if (onBackToDashboard) {
+      onBackToDashboard();
+    } else {
+      // Fallback to the old method if prop is not provided
+      const event = new CustomEvent('purchasing-back-to-dashboard');
+      window.dispatchEvent(event);
+    }
   };
 
   const handleRowClick = async (order) => {
@@ -167,7 +172,7 @@ const PurchaseOrdStatBody = () => {
         document_date={orderDetails.document_date}
         document_no={orderDetails.document_no}
         delivery_loc={orderDetails.delivery_loc}
-        onClose={handleBackToDashboard}
+        onBackToOrdStat={() => setOrderDetails(null)}
       />
     );
   }
@@ -278,7 +283,7 @@ const PurchaseOrdStatBody = () => {
                 </div>
               )) : (
                 <div className="purchordstat-row">
-                  <div style={{ gridColumn: 'span 7', textAlign: 'center', width: '100%' }}>
+                  <div style={{ gridColumn: '1 / -1', textAlign: 'center', width: '100%', fontSize: '1rem', fontWeight: 'bold', padding: '10px' }}>
                     No purchase orders found
                   </div>
                 </div>

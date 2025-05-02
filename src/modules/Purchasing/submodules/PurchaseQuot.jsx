@@ -7,10 +7,11 @@ const PurchaseQuotBody = ({ onBackToDashboard }) => {
     const [showDateDropdown, setShowDateDropdown] = useState(false);
     const [selectedDate, setSelectedDate] = useState("Last 30 days");
     const [searchTerm, setSearchTerm] = useState("");
-    const [showNewForm, setShowNewForm] = useState(false);
     const [quotations, setQuotations] = useState([]);
     const [selectedQuotation, setSelectedQuotation] = useState(null); // Store the selected quotation
     const [view, setView] = useState("list"); // Manage the current view (list, form, or order status)
+    const [showStatusFilter, setShowStatusFilter] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState("All");
 
     const timeOptions = [
         "Last 30 days",
@@ -19,6 +20,8 @@ const PurchaseQuotBody = ({ onBackToDashboard }) => {
         "Last 3 days",
         "Last 1 day",
     ];
+    
+    const statusOptions = ["All", "Approved", "Quotation Sent", "Pending", "Rejected"];
 
     useEffect(() => {
         fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/")
@@ -48,16 +51,28 @@ const PurchaseQuotBody = ({ onBackToDashboard }) => {
         setShowDateDropdown(false);
     };
 
+    const handleStatusSelect = (status) => {
+        setSelectedStatus(status);
+        setShowStatusFilter(false);
+      };
+
     const handleRowClick = (quotation) => {
         setSelectedQuotation(quotation); // Store the selected quotation
         setView("form"); // Switch to the PurchForQuotForm view
     };
 
     const filteredQuotations = filterByDate(selectedDate)
-        .filter((q) =>
-            q.document_no.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (q.status && q.status.toLowerCase().includes(searchTerm.toLowerCase()))
-        )
+        .filter((q) => {
+            // Filter by search term
+            const matchesSearch = 
+                q.document_no.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (q.status && q.status.toLowerCase().includes(searchTerm.toLowerCase()));
+            
+            // Filter by status
+            const matchesStatus = selectedStatus === "All" || q.status === selectedStatus;
+            
+            return matchesSearch && matchesStatus;
+        })
         .sort((a, b) => {
             // Convert document numbers to numbers for proper numeric sorting
             const docA = parseInt(a.document_no, 10);
@@ -68,7 +83,7 @@ const PurchaseQuotBody = ({ onBackToDashboard }) => {
     return (
         <div className="purchquote">
             {view === "list" ? (
-                <div className="body-content-container">
+                <div className="purchquote-body-content-container">
                     <div className="purchquote-header">
                         <button className="purchquote-back" onClick={onBackToDashboard}>← Back</button>
                         <div className="purchquote-filters">
@@ -92,6 +107,26 @@ const PurchaseQuotBody = ({ onBackToDashboard }) => {
                                             </div>
                                         ))}
                                     </div>
+                                )}
+                            </div>
+                            <div
+                                className="purchquote-status-filter"
+                                onClick={() => setShowStatusFilter(!showStatusFilter)}
+                            >
+                                <span>Filter by: {selectedStatus}</span>
+                                <span>▼</span>
+                                {showStatusFilter && (
+                                <div className="status-options-dropdown">
+                                    {statusOptions.map((status) => (
+                                    <div
+                                        key={status}
+                                        className="status-option"
+                                        onClick={() => handleStatusSelect(status)}
+                                    >
+                                        {status}
+                                    </div>
+                                    ))}
+                                </div>
                                 )}
                             </div>
                             <div className="purchquote-search">
@@ -124,7 +159,7 @@ const PurchaseQuotBody = ({ onBackToDashboard }) => {
                                             <div>{q.document_no}</div>
                                             <div>{q.quotation_id}</div>
                                             <div>
-                                                <span className={`status-${q.status?.toLowerCase()}`}>{q.status}</span>
+                                                <span className={`status-${q.status?.toLowerCase().replace(/\s+/g, '-')}`}>{q.status}</span>
                                             </div>
                                             <div>{q.document_date ? new Date(q.document_date).toLocaleDateString() : ''}</div>
                                         </div>

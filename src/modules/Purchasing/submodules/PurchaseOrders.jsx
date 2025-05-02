@@ -10,7 +10,7 @@ const PurchaseOrderUI = ({
   document_date, 
   delivery_loc,
   items = [],
-  onClose,
+  onBackToOrdStat,
 }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [summaryData, setSummaryData] = useState({
@@ -553,7 +553,7 @@ const PurchaseOrderUI = ({
       <div className="purchord-scrollable-wrapper">
       <div className="body-content-container">
   <div className="purchord-header">
-    <button className="purchord-back-button" onClick={onClose}>← Back</button>
+    <button className="purchord-back-button" onClick={onBackToOrdStat}>← Back</button>
     <h2 className="purchord-title">Purchase Order</h2>
     <button 
       className="purchord-qc-button" 

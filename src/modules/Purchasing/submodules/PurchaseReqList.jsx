@@ -17,9 +17,8 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
   const [sortOrder, setSortOrder] = useState("newest"); // Default to newest
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
-  const statusOptions = ["All", "Approved", "Pending", "Completed", "Rejected"];
+  const statusOptions = ["All", "Acknowledged", "Finished", "Approved", "Pending", "Returned", "Rejected", "Cancelled", "Expired"];
 
-  // Fetch purchase requests and employee data from the API
   useEffect(() => {
     const fetchPurchaseRequests = async () => {
       try {

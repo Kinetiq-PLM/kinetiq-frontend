@@ -118,7 +118,7 @@
 
 .purchordstat-table-scrollable {
   width: 100%;
-  max-height: 50vh;
+  max-height: 61vh;
   overflow-x: auto;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -169,7 +169,7 @@
 }
 
 .purchordstat-row:hover {
-  background: #f5f7fa;
+  background-color: rgba(0, 168, 168, 0.05);
 }
 
 .purchordstat-checkbox {
@@ -230,9 +230,9 @@
 }
 
 /* Status color badges */
-.status-approved,
-.status-pending,
-.status-rejected,
+.status-returned,
+.status-received,
+.status-ordered,
 .status-completed {
   border-radius: 12px;
   padding: 2px 10px;
@@ -241,24 +241,24 @@
   display: inline-block;
 }
 
-.status-approved {
-  color: #155724;
-  background-color: #d4edda;
+.status-returned {
+  color: #721c24;
+  background-color: #e06666;
   border: 1px solid #c3e6cb;
 }
-.status-pending {
-  color: #856404;
-  background-color: #fff3cd;
+.status-received {
+  color: #721c24;
+  background-color: #f6b26b;
   border: 1px solid #ffeeba;
 }
-.status-rejected {
-  color: #721c24;
-  background-color: #f8d7da;
+.status-ordered {
+  color: #856404;
+  background-color: #ffe599;
   border: 1px solid #f5c6cb;
 }
 .status-completed {
-  color: #0c5460;
-  background-color: #d1ecf1;
+  color: #2d5016;
+  background-color: #93c47d;
   border: 1px solid #bee5eb;
 }
 

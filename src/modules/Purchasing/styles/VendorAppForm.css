@@ -1,3 +1,24 @@
+.vendorappform {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.vendorappform .body-content-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 40rem;
+    min-height: 30rem;
+}
+
 .org-type-dropdown {
     position: relative;
     width: 100%;
@@ -42,7 +63,7 @@
 
 .vendorappform-scrollable-wrapper {
     width: 100%;
-    max-height: 80vh;
+    max-height: auto;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
@@ -55,27 +76,6 @@
     justify-content: flex-start !important;
     min-width: 0 !important;
     min-height: 0 !important;
-}
-
-.vendorappform {
-    display: flex;
-    width: 100%;
-    height: 100%;
-}
-
-.vendorappform .body-content-container {
-    width: 100%;
-    height: 100%;
-    border-radius: 0.5rem;
-    background-color: white;
-    padding: 1rem;
-    box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 40rem;
-    min-height: 30rem;
 }
 
 .vendorappform-header {
