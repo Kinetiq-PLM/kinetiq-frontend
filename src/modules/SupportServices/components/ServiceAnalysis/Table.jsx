@@ -1,48 +1,40 @@
 "use client"
 
-const Table = ({ analyses, onRowClick, onViewAnalysis, selectedAnalysis }) => {
+const Table = ({ requests, onRowClick, selectedRequest }) => {
   return (
     <div className="table-container">
         <table className="analyses-table">
           <thead>
             <tr>
-              <th>Analysis ID</th>
               <th>Request ID</th>
-              <th>Technician Name</th>
-              <th>Analysis Date</th>
-              <th>Analysis Status</th>
-              <th>Analysis Description</th>
-              <th>Labor Cost</th>
+              <th>Call ID</th>
+              <th>Request Date</th>
+              <th>Type</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            {analyses.length > 0 ? (
-              analyses.map((analysis, index) => (
+            {requests.length > 0 ? (
+              requests.map((request, index) => (
                 <tr 
-                  key={analysis.analysis_id || `analysis-${index}`}
+                  key={request.service_request_id || `request-${index}`} 
                   className={`${
-                    selectedAnalysis?.analysis_id === analysis.analysis_id ? "selected-row" : ""
+                    selectedRequest?.service_request_id === request.service_request_id ? "selected-row" : ""
                   } ${index % 2 !== 0 ? "alternate-row" : ""}`}
-                  onClick={() => onRowClick(analysis)}
+                  onClick={() => onRowClick(request)} // makes table row clickable, function update the state fields
                   style={{ cursor: "pointer" }} 
                 >
-                      <td>{analysis.analysis_id}</td>
-                      <td>{analysis.service_request?.service_request_id || "None"}</td>
-                      <td>{analysis.technician ? `${analysis.technician.first_name || ""} ${analysis.technician.last_name || ""}`.trim() : "Unknown"}</td>
-                      <td>{analysis.analysis_date || "Null"}</td>
-                      <td>{analysis.analysis_status}</td>
-                      <td>
-                        <button className="view-button" onClick={() => onViewAnalysis(analysis)}>
-                          View
-                        </button>
-                      </td>
-                      <td>{analysis.labor_cost || "None"}</td>
+                  <td>{request.service_request_id}</td>
+                  <td>{request.service_call ? request.service_call.service_call_id : "Null"}</td>
+                  <td>{request.request_date ? request.request_date: "Null"}</td>
+                  <td>{request.request_type}</td>
+                  <td>{request.request_status}</td>
                 </tr>
               ))
               ) : (
                 <tr>
                   <td colSpan="7" style={{ textAlign: "center", padding: "1rem" }}>
-                    No analyses available
+                    No requests available
                   </td>
                 </tr>
               )}

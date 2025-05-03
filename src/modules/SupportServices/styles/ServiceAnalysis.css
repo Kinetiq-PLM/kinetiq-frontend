@@ -36,6 +36,12 @@
   justify-content: center;
 }
 
+.servanal .filter-tabs-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
 .servanal .tab {
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
@@ -61,6 +67,22 @@
 .servanal .tab-content {
   margin-bottom: 1.5rem;
 }
+
+.servanal .request-tab-content {
+  display: flex;
+  gap: 1rem;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.servanal .input-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+
 
 /* Hide scrollbar arrows unless hovered */
 .servanal .content-scroll-area {
@@ -525,8 +547,47 @@
   resize: none;
 }   
 
+.servanal textarea.description-textarea {
+  height: 12rem !important; /* Match the height of two input fields plus gap */
+}
+
 .servanal .item-list {
   max-height: 100px;
+}
+
+.servanal .modal-form-request {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(7, auto);
+  gap: 1rem 2rem;
+}
+
+.servanal .modal-form-request .status-group {
+  grid-column: 2;
+  grid-row: 5;
+}
+
+.servanal .modal-form-request .type-group {
+  grid-column: 2;
+  grid-row: 6;
+}
+
+.servanal .modal-form-request .description-group {
+  grid-column: 1;
+  grid-row: 6 / span 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.servanal .modal-form-request .remarks-group {
+  grid-column: 2;
+  grid-row: 7;
+}
+
+.servanal .modal-form-request .description-group textarea,
+.servanal .modal-form-request .remarks-group textarea {
+  height: 8rem;
+  flex-grow: 1;
 }
 
 /* Responsive adjustments */
