@@ -1,16 +1,16 @@
 "use client"
 
 import { useRef, useState, useEffect } from "react"
-import "../styles/ServiceAnalysis.css"
+import "../styles/ServiceRequest.css"
 import "../styles/SupportServices.css"
-import ServiceAnalysisIcon from "/icons/SupportServices/ServiceAnalysisIcon.png"
-import Table from "../components/ServiceAnalysis/Table"
+import ServiceRequestIcon from "/icons/SupportServices/ServiceRequestIcon.png"
+import Table from "../components/ServiceRequest/Table"
 import UpdateViewModal from "../components/ServiceRequest/UpdateViewModal"
-import UpdateAnalysisModal from "../components/ServiceAnalysis/UpdateAnalysisModal"
-import AddServiceAnalysisModal from "../components/ServiceAnalysis/AddServiceAnalysisModal"
-import AddItemModal from "../components/ServiceAnalysis/AddItemModal"
-import EditItemModal from "../components/ServiceAnalysis/EditItemModal"
-import ViewInventoryModal from "../components/ServiceAnalysis/ViewInventoryModal"
+import UpdateAnalysisModal from "../components/ServiceRequest/UpdateAnalysisModal"
+import AddServiceAnalysisModal from "../components/ServiceRequest/AddServiceAnalysisModal"
+import AddItemModal from "../components/ServiceRequest/AddItemModal"
+import EditItemModal from "../components/ServiceRequest/EditItemModal"
+import ViewInventoryModal from "../components/ServiceRequest/ViewInventoryModal"
 import SearchIcon from "/icons/SupportServices/SearchIcon.png"
 import CalendarInputIcon from "/icons/SupportServices/CalendarInputIcon.png"
 
@@ -23,13 +23,6 @@ const ServiceRequest = ({employee_id}) => {
   const [activeTab, setActiveTab] = useState("Request")
   const [showErrorModal, setShowErrorModal] = useState(false)
   const [errorModalMessage, setErrorModalMessage] = useState("")
-
-  // table
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filterOptionType, setFilterOptionType] = useState("")
-  const [showFilterOptionsType, setShowFilterOptionsType] = useState(false)
-  const [filterOptionStatus, setFilterOptionStatus] = useState("approved")
-  const [showFilterOptionsStatus, setShowFilterOptionsStatus] = useState(false)
 
   // State for analyses
   const [showUpdateModal, setShowUpdateModal] = useState(false)
@@ -140,8 +133,35 @@ const ServiceRequest = ({employee_id}) => {
         terminationDate: data.contract?.end_date || "",
         laborCost: data.labor_cost || "",
       })
+
+      fetchOrder(data.analysis_id);
+      fetchAfterAnalysis(data.analysis_id);
+
     } catch (error) {
       console.error("Error fetching analysis:", error);
+      if (serviceOrderItems){ setServiceOrderItems([]) }
+      if (serviceOrderInfo){ 
+        setServiceOrderInfo({
+          serviceOrderId: "",
+          orderDate: "",
+          orderTotalPrice: ""
+        });
+      }
+      if (deliveryOrderInfo){ 
+        setDeliveryOrderInfo({
+          deliveryOrderId: "",
+          deliveryDate: "",
+          deliveryStatus: ""
+        });
+      }
+      if (afterAnalysisInfo){ 
+        setAfterAnalysisInfo({
+          afterAnalysisId: "",
+          serviceDate: "",
+          serviceStatus: "",
+          description: ""
+        });
+      }
       setAnalysisInfo({
         analysisId: "",
         analysisDescription: "",
@@ -225,27 +245,8 @@ const handleUpdateAnalysis = async (analysisData) => {
 }
 
 
-  // After Analysis state
-  const [afterAnalysisInfo, setAfterAnalysisInfo] = useState({
-    afterAnalysisId: "",
-    analysisId: "",
-    serviceStatus: "",
-    serviceDate: "",
-    description: "",
-  })
-  
-  // Delivery Order state
-  const [deliveryOrderInfo, setDeliveryOrderInfo] = useState({
-    deliveryOrderId: "",
-    customerId: "",
-    serviceOrderId: "",
-    name: "",
-    deliveryDate: "",
-    address: "",
-    deliveryStatus: "",
-  })
-
-  // Service order items
+  // service order tab
+  // service order items table
   const [serviceOrderItems, setServiceOrderItems] = useState([])
   
   // Service order information
@@ -253,82 +254,8 @@ const handleUpdateAnalysis = async (analysisData) => {
     serviceOrderId: "",
     orderDate: "",
     orderTotalPrice: "",
+    orderAnalysisId: "",
   })
-
-  
-
-  
-
-    // useEffect(() => {
-    //   if (activeTab === "Delivery Order") {
-    //     setDeliveryOrderInfo((prev) => ({
-    //       ...prev,
-    //       ...(selectedAnalysis?.analysis_id && {
-    //         customerId: selectedAnalysis.customer?.customer_id || "",
-    //         name: selectedAnalysis.customer?.name || "",
-    //         address: selectedAnalysis.customer
-    //           ? `${selectedAnalysis.customer.address_line1 || ""} ${selectedAnalysis.customer.address_line2 || ""}`.trim()
-    //           : "",
-    //       }),
-    //       ...(serviceOrderInfo?.serviceOrderId && {
-    //         serviceOrderId: serviceOrderInfo?.serviceOrderId || "",
-    //       }),
-    //     }));
-    //   }
-    // }, [activeTab, selectedAnalysis, serviceOrderInfo]);
-
-    // useEffect(() => {
-    //   if (activeTab === "After Analysis" && selectedAnalysis) {
-    //     setAfterAnalysisInfo((prev) => ({
-    //       ...prev,
-    //       analysisId: selectedAnalysis.analysis_id,
-    //     }));
-    //   }
-    // }, [activeTab, selectedAnalysis]);
-
-
-  // row clicking 
-  const handleRowClick = async (request) => {
-    try {
-      const data = await GET(`request/${request.service_request_id}`); 
-      console.log("Fetched data:", data);
-
-      setSelectedRequest(data);
-
-      setCustomerInfo({
-        requestId: data.service_request_id || "",
-        requestDescription: data.request_description || "",
-        requestRemarks: data.request_remarks || "",
-        customerId: data.customer?.customer_id || "",
-        name: data.customer?.name || "",
-        address: data.customer ? `${data.customer.address_line1 || ""} ${data.customer.address_line2 || ""}`.trim() : "",
-        phoneNumber: data.customer?.phone_number || "",
-        emailAddress: data.customer?.email_address || "",
-        requestStatus: data.request_status || ""
-      })
-
-      fetchAnalysis(request.service_request_id)
-
-      // setDeliveryOrderInfo({
-      //   customerId: data.customer?.customer_id || "",
-      //   name: data.customer?.name || "",
-      //   address: data.customer
-      //     ? `${data.customer.address_line1 || ""} ${data.customer.address_line2 || ""}`.trim()
-      //     : "",
-      //   serviceOrderId: serviceOrderInfo?.serviceOrderId || "",
-      // });
-
-      // setAfterAnalysisInfo({
-      //   analysisId: data.analysis_id
-      // });
-
-      // fetchOrder(data.analysis_id);
-      // fetchAfterAnalysis(data.analysis_id);
-
-    } catch (error) {
-      console.error("Error fetching service request details:", error);
-    }
-  };
 
   const fetchOrder = async (analysisId) => {
     try {
@@ -355,11 +282,8 @@ const handleUpdateAnalysis = async (analysisData) => {
         serviceOrderId: data?.service_order_id || "",
         orderDate: formattedDate,
         orderTotalPrice: data?.order_total_price || "",
+        orderAnalysisId: analysisId || "",
       });
-
-      setDeliveryOrderInfo({
-        serviceOrderId: data?.service_order_id || "",
-      })
 
       fetchServiceOrderItems(data?.service_order_id);
       fetchDeliveryOrder(data?.service_order_id);
@@ -374,7 +298,6 @@ const handleUpdateAnalysis = async (analysisData) => {
       if (serviceOrderItems){ setServiceOrderItems([]) }
       if (deliveryOrderInfo){ 
         setDeliveryOrderInfo({
-          serviceOrderId: "",
           deliveryOrderId: "",
           deliveryDate: "",
           deliveryStatus: "",
@@ -382,6 +305,12 @@ const handleUpdateAnalysis = async (analysisData) => {
       
     }
   };
+
+  const handleEditItem = (item) => {
+    if (activeTab === "Service Order") {
+      setShowEditItemModal(true)
+    }
+  }
 
   const fetchServiceOrderItems = async (serviceOrderId) => {
     try {
@@ -392,122 +321,20 @@ const handleUpdateAnalysis = async (analysisData) => {
     }
   };
 
-  const fetchDeliveryOrder = async (serviceOrderId) => {
-    try {
-      const data = await GET(`delivery/order/${serviceOrderId}/`);
-      setDeliveryOrderInfo((prevState) => ({
-        ...prevState,  
-        deliveryOrderId: data?.delivery_order_id || prevState.deliveryOrderId,
-        deliveryDate: data?.delivery_date || prevState.deliveryDate,
-        deliveryStatus: data?.delivery_status || prevState.deliveryStatus,
-      }));
-    } catch (error) {
-      console.error("Error fetching delivery order:", error);
-      setDeliveryOrderInfo((prevState) => ({
-        ...prevState,  
-        deliveryOrderId: "",
-        deliveryDate: "",
-        deliveryStatus: "",
-      }));
+  // Handle view inventory
+  const handleViewInventory = () => {
+    if (activeTab === "Service Order") {
+      setShowViewInventoryModal(true)
     }
-  };
-
-  const fetchAfterAnalysis = async (analysisId) => {
-    try {
-      const data = await GET(`after-analysis/analysis/${analysisId}/`);
-
-      setAfterAnalysisInfo({
-        afterAnalysisId: data?.analysis_sched_id || "",
-        serviceStatus: data?.service_status || "",
-        serviceDate: data.service_date || "",
-        description: data.description || "",
-      });
-
-    } catch (error) {
-      console.error("Error fetching after analysis:", error);
-      setAfterAnalysisInfo({
-        afterAnalysisId: "",
-        serviceStatus: "",
-        serviceDate: "",
-        description: "",
-      });
-    }
-  };
-  
-  const [isOpenStatusDD, setOpenStatusDD] = useState(false);
-
-  const handleToggleDropdownStatus = () => {
-    setOpenStatusDD(!isOpenStatusDD);
-  };
-  
-  const handleSelectStatus = (status) => {
-    setDeliveryOrderInfo((prevState) => ({
-      ...prevState,  
-      deliveryStatus: status,
-    }));
-    setOpenStatusDD(false); 
-  };
-
-  const [isOpenAfterStatusDD, setOpenAfterStatusDD] = useState(false);
-
-  const handleToggleDropdownAfterStatus = () => {
-    setOpenAfterStatusDD(!isOpenAfterStatusDD);
-  };
-
-  const handleSelectAfterStatus = (status) => {
-    setAfterAnalysisInfo((prevState) => ({
-      ...prevState,  
-      serviceStatus: status,
-    }));
-    setOpenAfterStatusDD(false); 
-  };
-
-  const statusRef = useRef(null);
-  const afterStatusRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (statusRef.current && !statusRef.current.contains(event.target)) {
-        setOpenStatusDD(false); // Close the dropdown
-      }
-      if (afterStatusRef.current && !afterStatusRef.current.contains(event.target)) {
-        setOpenAfterStatusDD(false); // Close the dropdown
-      }
-    };
-  
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-
-    const toggleDatePicker = () => {
-      const dateInput = document.getElementById("deliveryDate");
-      if (isPickerOpen) {
-        dateInput.blur(); 
-      } else {
-        dateInput.showPicker(); 
-      }
-      
-      setIsPickerOpen(!isPickerOpen); 
-    };
-
-    const toggleDateAfterPicker = () => {
-      const dateInput = document.getElementById("serviceDate");
-      if (isPickerOpen) {
-        dateInput.blur(); 
-      } else {
-        dateInput.showPicker(); 
-      }
-      
-      setIsPickerOpen(!isPickerOpen); 
-    };
-  
+  }
   const handleAddOrder = async () => {
-    const orderData = {
-      analysis_id: selectedAnalysis.analysis_id,
+    if (analysisInfo.analysisId === ""){
+      setErrorModalMessage("Request ID has no connected analysis data yet! Cannot add service order!")
+      setShowErrorModal(true);  
+      return
+    }
+    const orderData = { 
+      analysis_id: analysisInfo.analysisId,
       customer_id: customerInfo.customerId,
     }
 
@@ -515,7 +342,7 @@ const handleUpdateAnalysis = async (analysisData) => {
       try {
         const data = await POST("order/", orderData);
         console.log("Service order created successfully:", data);
-        fetchOrder(selectedAnalysis.analysis_id);
+        fetchOrder(analysisInfo.analysisId);
         setSuccessModalMessage("Service order created successfully!"); 
         setShowSuccessModal(true);  
     } catch (error) {
@@ -578,7 +405,7 @@ const handleUpdateAnalysis = async (analysisData) => {
       fetchServiceOrderItems(serviceOrderInfo.serviceOrderId);
       
       try {
-        const fetchedData = await GET(`order/orders/${selectedAnalysis.analysis_id}/`);
+        const fetchedData = await GET(`order/orders/${serviceOrderInfo.orderAnalysisId}/`);
         const data = fetchedData[0] || {};
         setServiceOrderInfo({
           ...serviceOrderInfo,
@@ -628,7 +455,7 @@ const handleUpdateAnalysis = async (analysisData) => {
       fetchServiceOrderItems(serviceOrderInfo.serviceOrderId);
 
       try {
-        const fetchedData = await GET(`order/orders/${selectedAnalysis.analysis_id}/`);
+        const fetchedData = await GET(`order/orders/${serviceOrderInfo.orderAnalysisId}/`);
         const data = fetchedData[0] || {};
         setServiceOrderInfo({
           ...serviceOrderInfo,
@@ -663,40 +490,84 @@ const handleUpdateAnalysis = async (analysisData) => {
   }
   }
 
-  // Handle edit item
-  const handleEditItem = (item) => {
-    if (activeTab === "Service Order") {
-      setShowEditItemModal(true)
-    }
-  }
+  
+  // Delivery Order tab
+  const [deliveryOrderInfo, setDeliveryOrderInfo] = useState({
+    deliveryOrderId: "",
+    deliveryDate: "",
+    deliveryStatus: "",
+  })
 
-  // Handle view inventory
-  const handleViewInventory = () => {
-    if (activeTab === "Service Order") {
-      setShowViewInventoryModal(true)
-    }
-  }
-
-  const [distrib, setDistrib] = useState([])
-
-  const fetchDistrib = async () => {
+  const fetchDeliveryOrder = async (serviceOrderId) => {
     try {
-      const data = await GET("call/calls/distrib-manager/");
-      const userIds = data.map(user => user.user_id);
-      setDistrib(userIds);
+      const data = await GET(`delivery/order/${serviceOrderId}/`);
+      setDeliveryOrderInfo((prevState) => ({
+        ...prevState,  
+        deliveryOrderId: data?.delivery_order_id || prevState.deliveryOrderId,
+        deliveryDate: data?.delivery_date || prevState.deliveryDate,
+        deliveryStatus: data?.delivery_status || prevState.deliveryStatus,
+      }));
     } catch (error) {
-      console.error("Error fetching material planners:", error)
+      console.error("Error fetching delivery order:", error);
+      setDeliveryOrderInfo((prevState) => ({
+        ...prevState,  
+        deliveryOrderId: "",
+        deliveryDate: "",
+        deliveryStatus: "",
+      }));
     }
-  }
+  };
+
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+
+    const toggleDatePicker = () => {
+      const dateInput = document.getElementById("deliveryDate");
+      if (isPickerOpen) {
+        dateInput.blur(); 
+      } else {
+        dateInput.showPicker(); 
+      }
+      
+      setIsPickerOpen(!isPickerOpen); 
+    };
+
+    const toggleDateAfterPicker = () => {
+      const dateInput = document.getElementById("serviceDate");
+      if (isPickerOpen) {
+        dateInput.blur(); 
+      } else {
+        dateInput.showPicker(); 
+      }
+      
+      setIsPickerOpen(!isPickerOpen); 
+    };
+
+    const [distrib, setDistrib] = useState([])
+
+    const fetchDistrib = async () => {
+      try {
+        const data = await GET("call/calls/distrib-manager/");
+        const userIds = data.map(user => user.user_id);
+        setDistrib(userIds);
+      } catch (error) {
+        console.error("Error fetching material planners:", error)
+      }
+    }
+  
 
   const createDeliveryOrder  = async () => {
     if (activeTab === "Delivery Order") {
+      if (serviceOrderInfo.serviceOrderId === ""){
+        setErrorModalMessage("Request ID has no connected service order data yet! Cannot add delivery order!")
+        setShowErrorModal(true);  
+        return
+      }
       const newDeliveryOrderInfo  = {
-        customer_id: deliveryOrderInfo.customerId || "",
-        customer_address: deliveryOrderInfo.address || "",
+        customer_id: customerInfo.customerId || "",
+        customer_address: customerInfo.address || "",
         delivery_status: deliveryOrderInfo.deliveryStatus,
         delivery_date: deliveryOrderInfo.deliveryDate,
-        service_order_id: deliveryOrderInfo.serviceOrderId,
+        service_order_id: serviceOrderInfo.serviceOrderId,
       }
       console.log("Creating delivery order:", newDeliveryOrderInfo )
 
@@ -775,6 +646,37 @@ const handleUpdateAnalysis = async (analysisData) => {
     }
   }
 
+
+  // After Analysis tab
+  const [afterAnalysisInfo, setAfterAnalysisInfo] = useState({
+    afterAnalysisId: "",
+    serviceStatus: "",
+    serviceDate: "",
+    description: "",
+  })
+  
+  const fetchAfterAnalysis = async (analysisId) => {
+    try {
+      const data = await GET(`after-analysis/analysis/${analysisId}/`);
+
+      setAfterAnalysisInfo({
+        afterAnalysisId: data?.analysis_sched_id || "",
+        serviceStatus: data?.service_status || "",
+        serviceDate: data.service_date || "",
+        description: data.description || "",
+      });
+
+    } catch (error) {
+      console.error("Error fetching after analysis:", error);
+      setAfterAnalysisInfo({
+        afterAnalysisId: "",
+        serviceStatus: "",
+        serviceDate: "",
+        description: "",
+      });
+    }
+  };
+
   const updateAfterAnalysis  = async () => {
     const afterAnalysisId = afterAnalysisInfo.afterAnalysisId
     if (!afterAnalysisId) {
@@ -792,7 +694,7 @@ const handleUpdateAnalysis = async (analysisData) => {
     try {
         const data = await PATCH (`after-analysis/${afterAnalysisId}/`, afterAnalysisData);
         console.log("After analysis sched update successfully:", data);
-        fetchAfterAnalysis(selectedAnalysis.analysis_id);
+        fetchAfterAnalysis(analysisInfo.analysisId);
         setSuccessModalMessage("After analysis schedule updated successfully!"); 
         setShowSuccessModal(true);  
     } catch (error) {
@@ -813,18 +715,18 @@ const handleUpdateAnalysis = async (analysisData) => {
 
   const createAfterAnalysis  = async () => {
     const afterAnalysisData = {
-      analysis_id: selectedAnalysis.analysis_id,
+      analysis_id: analysisInfo.analysisId,
       service_status: afterAnalysisInfo.serviceStatus,
       service_date: afterAnalysisInfo.serviceDate,
       description: afterAnalysisInfo.description,
-      technician_id: selectedAnalysis?.technician?.employee_id
+      technician_id: employee_id
     }
 
     console.log("Creating after analysis sched:", afterAnalysisData)
       try {
         const data = await POST("after-analysis/", afterAnalysisData);
         console.log("After analysis sched created successfully:", data);
-        fetchAfterAnalysis(selectedAnalysis.analysis_id);
+        fetchAfterAnalysis(analysisInfo.analysisId);
         setSuccessModalMessage("After analysis scheduled successfully!"); 
         setShowSuccessModal(true);  
     } catch (error) {
@@ -847,13 +749,95 @@ const handleUpdateAnalysis = async (analysisData) => {
     }
   }
 
+  // row clicking 
+  const handleRowClick = async (request) => {
+    try {
+      const data = await GET(`request/${request.service_request_id}`); 
+      console.log("Fetched data:", data);
+
+      setSelectedRequest(data);
+
+      setCustomerInfo({
+        requestId: data.service_request_id || "",
+        requestDescription: data.request_description || "",
+        requestRemarks: data.request_remarks || "",
+        customerId: data.customer?.customer_id || "",
+        name: data.customer?.name || "",
+        address: data.customer ? `${data.customer.address_line1 || ""} ${data.customer.address_line2 || ""}`.trim() : "",
+        phoneNumber: data.customer?.phone_number || "",
+        emailAddress: data.customer?.email_address || "",
+        requestStatus: data.request_status || ""
+      })
+
+      fetchAnalysis(request.service_request_id)
+
+    } catch (error) {
+      console.error("Error fetching service request details:", error);
+    }
+  };
+
+  
+  
+  const [isOpenStatusDD, setOpenStatusDD] = useState(false);
+
+  const handleToggleDropdownStatus = () => {
+    setOpenStatusDD(!isOpenStatusDD);
+  };
+  
+  const handleSelectStatus = (status) => {
+    setDeliveryOrderInfo((prevState) => ({
+      ...prevState,  
+      deliveryStatus: status,
+    }));
+    setOpenStatusDD(false); 
+  };
+
+  const [isOpenAfterStatusDD, setOpenAfterStatusDD] = useState(false);
+
+  const handleToggleDropdownAfterStatus = () => {
+    setOpenAfterStatusDD(!isOpenAfterStatusDD);
+  };
+
+  const handleSelectAfterStatus = (status) => {
+    setAfterAnalysisInfo((prevState) => ({
+      ...prevState,  
+      serviceStatus: status,
+    }));
+    setOpenAfterStatusDD(false); 
+  };
+
+  const statusRef = useRef(null);
+  const afterStatusRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (statusRef.current && !statusRef.current.contains(event.target)) {
+        setOpenStatusDD(false); // Close the dropdown
+      }
+      if (afterStatusRef.current && !afterStatusRef.current.contains(event.target)) {
+        setOpenAfterStatusDD(false); // Close the dropdown
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // use effects
   useEffect(() => {
     fetchRequests();
-    //fetchAnalyses();
     fetchMRP();
     fetchDistrib();
   }, []);
+
+  
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filterOptionType, setFilterOptionType] = useState("")
+  const [showFilterOptionsType, setShowFilterOptionsType] = useState(false)
+  const [filterOptionStatus, setFilterOptionStatus] = useState("approved")
+  const [showFilterOptionsStatus, setShowFilterOptionsStatus] = useState(false)
 
   // filtering
   const filterOptionsStatus = [
@@ -908,15 +892,15 @@ const handleUpdateAnalysis = async (analysisData) => {
   });
 
   return (
-    <div className="serv servanal">
+    <div className="serv servrequ">
       <div className="body-content-container">
         <div className="header">
           <div className="icon-container">
-            <img src={ServiceAnalysisIcon || "/placeholder.svg?height=24&width=24"} alt="Service Analysis" />
+            <img src={ServiceRequestIcon  || "/placeholder.svg?height=24&width=24"} alt="Service Request" />
           </div>
           <div className="title-container">
-            <h2>Service Analysis</h2>
-            <p className="subtitle">Optimizing Service Operations Through Detailed Analysis</p>
+            <h2>Service Request</h2>
+            <p className="subtitle">Optimizing Service Operations Through Detailed Request</p>
           </div>
         </div>
 
@@ -1070,7 +1054,7 @@ const handleUpdateAnalysis = async (analysisData) => {
             <div className="request-tab-content">
               <div className="input-column">
                 <div className="form-group">
-                  <label htmlFor="customerId">Request ID</label>
+                  <label htmlFor="requestId">Request ID</label>
                   <input
                     type="text"
                     id="requestId"
@@ -1254,6 +1238,17 @@ const handleUpdateAnalysis = async (analysisData) => {
           {activeTab === "Service Order" && (
             <div className="tab-content">
               <div className="form-row">
+              <div className="form-group">
+                  <label htmlFor="requestId">Request ID</label>
+                  <input
+                    type="text"
+                    id="requestId"
+                    value={customerInfo.requestId}
+                    readOnly
+                    onChange={(e) => setCustomerInfo({ ...customerInfo, requestId: e.target.value })}
+                    placeholder="Enter request ID"
+                  />
+                </div>
                 <div className="form-group">
                   <label htmlFor="serviceOrderId">Service Order ID</label>
                   <input
@@ -1263,17 +1258,8 @@ const handleUpdateAnalysis = async (analysisData) => {
                     value={serviceOrderInfo.serviceOrderId}
                     onChange={(e) => setServiceOrderInfo({ ...serviceOrderInfo, serviceOrderId: e.target.value })}
                     placeholder="No service order issued yet..."
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="orderDate">Order Date</label>
-                  <input
-                    type="text"
-                    id="orderDate"
-                    readOnly
-                    value={serviceOrderInfo.orderDate}
-                    onChange={(e) => setServiceOrderInfo({ ...serviceOrderInfo, orderDate: e.target.value })}
-                    placeholder="dd/mm/yy"
+                    disabled={serviceOrderInfo.serviceOrderId == ""} 
+                    className={serviceOrderInfo.serviceOrderId == "" ? "disabled-input" : ""}
                   />
                 </div>
               </div>
@@ -1287,6 +1273,7 @@ const handleUpdateAnalysis = async (analysisData) => {
                         <th>Item ID</th>
                         <th>Item Name</th>
                         <th>Quantity</th>
+                        <th>Warehouse Name</th>
                         <th>Unit Price</th>
                         <th>Total Price</th>
                         <th>Principal Item ID</th>
@@ -1304,6 +1291,7 @@ const handleUpdateAnalysis = async (analysisData) => {
                             <td>{item.item?.inventory_item_id || ""}</td>
                             <td>{item.item_name || ""}</td>
                             <td>{item.item_quantity}</td>
+                            <td>{item.warehouse?.warehouse_name || ""}</td>
                             <td>{item.item_price}</td>
                             <td>{item.total_price}</td>
                             <td>{item.principal_item?.principal_item_id || ""}</td>
@@ -1346,6 +1334,19 @@ const handleUpdateAnalysis = async (analysisData) => {
                     </div>
                   </div>
                   <div className="items-button-right">
+                  <div className="form-group">
+                    <label htmlFor="orderDate">Order Date</label>
+                    <input
+                      type="text"
+                      id="orderDate"
+                      readOnly
+                      value={serviceOrderInfo.orderDate}
+                      onChange={(e) => setServiceOrderInfo({ ...serviceOrderInfo, orderDate: e.target.value })}
+                      placeholder="dd/mm/yy"
+                      disabled={serviceOrderInfo.serviceOrderId == ""} 
+                      className={serviceOrderInfo.serviceOrderId == "" ? "disabled-input" : ""}
+                    />
+                  </div>
                     <div className="form-group">
                       <label htmlFor="orderTotalPrice">Service Order Total Price</label>
                       <input
@@ -1355,6 +1356,8 @@ const handleUpdateAnalysis = async (analysisData) => {
                         value={serviceOrderInfo.orderTotalPrice}
                         onChange={(e) => setOrderTotalPrice({ ...serviceOrderInfo, orderTotalPrice: e.target.value })}
                         placeholder="₱ 0.00"
+                        disabled={serviceOrderInfo.serviceOrderId == ""} 
+                        className={serviceOrderInfo.serviceOrderId == "" ? "disabled-input" : ""}
                       />
                   </div>
                   </div>
@@ -1363,7 +1366,6 @@ const handleUpdateAnalysis = async (analysisData) => {
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
                   <button 
                     className="add-button"
-                    disabled={serviceOrderInfo.serviceOrderId !== "" || !selectedAnalysis }
                     onClick={handleAddOrder}
                   >
                     Add
@@ -1377,53 +1379,43 @@ const handleUpdateAnalysis = async (analysisData) => {
             <div className="tab-content">
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="deliveryOrderId">Delivery Order ID</label>
+                <label htmlFor="requestId">Request ID</label>
                   <input
                     type="text"
-                    id="deliveryOrderId"
+                    id="requestId"
+                    value={customerInfo.requestId}
                     readOnly
-                    value={deliveryOrderInfo.deliveryOrderId}
-                    onChange={(e) => setDeliveryOrderInfo({ ...deliveryOrderInfo, deliveryOrderId: e.target.value })}
-                    placeholder="No delivery order issued yet..."
+                    onChange={(e) => setCustomerInfo({ ...customerInfo, requestId: e.target.value })}
+                    placeholder="Enter request ID"
                   />
                 </div>
                 <div className="form-group">
+                  <label htmlFor="deliveryOrderId">Delivery Order ID</label>
+                    <input
+                      type="text"
+                      id="deliveryOrderId"
+                      readOnly
+                      value={deliveryOrderInfo.deliveryOrderId}
+                      onChange={(e) => setDeliveryOrderInfo({ ...deliveryOrderInfo, deliveryOrderId: e.target.value })}
+                      placeholder="No delivery order issued yet..."
+                      disabled={deliveryOrderInfo.deliveryOrderId == ""} 
+                      className={deliveryOrderInfo.deliveryOrderId == "" ? "disabled-input" : ""}
+                    />
+                </div>
+              </div>
+
+              <div className="form-row">
+              <div className="form-group">
                   <label htmlFor="customerId">Customer ID</label>
                   <input
                     type="text"
                     id="customerId"
-                    value={deliveryOrderInfo.customerId}
-                    onChange={(e) => setDeliveryOrderInfo({ ...deliveryOrderInfo, customerId: e.target.value })}
+                    value={customerInfo.customerId}
+                    readOnly
+                    onChange={(e) => setCustomerInfo({ ...customerInfo, customerId: e.target.value })}
                     placeholder="Enter customer ID"
                   />
                 </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="serviceOrderId">Service Order ID</label>
-                  <input
-                    type="text"
-                    id="serviceOrderId"
-                    value={deliveryOrderInfo.serviceOrderId}
-                    readOnly
-                    onChange={(e) => setDeliveryOrderInfo({ ...deliveryOrderInfo, serviceOrderId: e.target.value })}
-                    placeholder="Enter service order ID"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="name">Name</label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={deliveryOrderInfo.name}
-                    onChange={(e) => setDeliveryOrderInfo({ ...deliveryOrderInfo, name: e.target.value })}
-                    placeholder="Enter name"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="deliveryDate">Delivery Date <span className="required">*</span></label>
                   <div className="date-input-wrapper">
@@ -1443,19 +1435,20 @@ const handleUpdateAnalysis = async (analysisData) => {
                     />
                   </div>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="address">Address</label>
-                  <input
-                    type="text"
-                    id="address"
-                    value={deliveryOrderInfo.address}
-                    onChange={(e) => setDeliveryOrderInfo({ ...deliveryOrderInfo, address: e.target.value })}
-                    placeholder="Enter address"
-                  />
-                </div>
               </div>
 
               <div className="form-row">
+              <div className="form-group">
+                  <label htmlFor="name">Customer Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    value={customerInfo.name}
+                    readOnly
+                    onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
+                    placeholder="Enter customer name"
+                  />
+                </div>
                 <div className="form-group">
                   <label htmlFor="deliveryStatus">Delivery Status <span className="required">*</span></label>
                   <div className="select-wrapper" ref={statusRef}>
@@ -1478,6 +1471,20 @@ const handleUpdateAnalysis = async (analysisData) => {
                     </ul>
                   )}
                   </div>
+                </div>
+              </div>
+
+              <div className="form-row">
+              <div className="form-group">
+                  <label htmlFor="address">Customer Address</label>
+                  <input
+                    type="text"
+                    id="address"
+                    value={customerInfo.address}
+                    readOnly
+                    onChange={(e) => setCustomerInfo({ ...customerInfo, address: e.target.value })}
+                    placeholder="Enter customer address"
+                  />
                 </div>
                 <div className="form-group">
                   <div className="buttons-container-right-delorder">
@@ -1509,6 +1516,17 @@ const handleUpdateAnalysis = async (analysisData) => {
           {activeTab === "After Analysis" && (
             <div className="tab-content">
               <div className="form-row">
+              <div className="form-group">
+                  <label htmlFor="requestId">Request ID</label>
+                  <input
+                    type="text"
+                    id="requestId"
+                    value={customerInfo.requestId}
+                    readOnly
+                    onChange={(e) => setCustomerInfo({ ...customerInfo, requestId: e.target.value })}
+                    placeholder="Enter request ID"
+                  />
+                </div>
                 <div className="form-group">
                   <label htmlFor="afterAnalysisId">After Analysis ID</label>
                   <input
@@ -1518,17 +1536,8 @@ const handleUpdateAnalysis = async (analysisData) => {
                     value={afterAnalysisInfo.afterAnalysisId}
                     onChange={(e) => setAfterAnalysisInfo({ ...afterAnalysisInfo, afterAnalysisId: e.target.value })}
                     placeholder="No after analysis scheduled yet..."
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="analysisId">Analysis ID</label>
-                  <input
-                    type="text"
-                    id="analysisId"
-                    readOnly
-                    value={afterAnalysisInfo.analysisId}
-                    onChange={(e) => setAfterAnalysisInfo({ ...afterAnalysisInfo, analysisId: e.target.value })}
-                    placeholder="Enter analysis ID"
+                      disabled={afterAnalysisInfo.afterAnalysisId == ""} 
+                      className={afterAnalysisInfo.afterAnalysisId == "" ? "disabled-input" : ""}
                   />
                 </div>
               </div>

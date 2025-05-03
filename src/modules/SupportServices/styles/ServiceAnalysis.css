@@ -197,7 +197,12 @@
 }
 
 
-/* Service Order Items styling */
+/* SERVICE ORDER TAB STYLING */
+
+.servanal .items-button-right {
+  display: flex;
+  gap: 1rem;
+}
 
 .servanal .service-order-items-section {
   margin-top: 1.5rem;
@@ -322,6 +327,11 @@
   cursor: not-allowed;
 }
 
+
+.servanal .inventory-filter-container {
+  margin-bottom: 1rem !important;
+  margin-top: 0rem !important;
+}
 /* Inventory modal styling */
 .servanal .inventory-table-container {
   width: 100%;
@@ -387,18 +397,7 @@
   margin-top: 0.5rem;
   text-align: left;
   display: flex;
-  gap: 1rem;
-}
-
-.servanal .inventory-request-section p {
-  font-size: 0.875rem;
-  color: #666;
-}
-
-.servanal .request-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  justify-content: space-between;
 }
 
 .servanal .inventory-buttons-left {
@@ -747,11 +746,8 @@
   color: #f44336;
 }
 
-.servanal .add-cancel-button,
-.servanal .edit-cancel-button {
+.servanal .add-cancel-button{
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-left: 124px;
-  margin-top: 1.5rem;
 }

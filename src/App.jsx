@@ -432,9 +432,8 @@ function App() {
     "Support & Services": {
       "Service Ticket": "ServiceTicket",
       "Service Call": "ServiceCall",
-      "Service Request": "ServiceRequest",
       "Warranty Renewal": "WarrantyRenewal",
-      "Service Analysis": "ServiceAnalysis",
+      "Service Request": "ServiceRequest",
       "Service Billing": "ServiceBilling",
       "Service Report": "ServiceReport",
       "Service Contract": "ServiceContract",
