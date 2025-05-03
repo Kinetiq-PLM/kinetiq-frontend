@@ -9,7 +9,7 @@
 .accounting-table table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto;
+  table-layout: fixed;
   font-family: 'Inter', sans-serif;
 }
 
@@ -23,12 +23,19 @@
 
 .accounting-table th,
 .accounting-table td {
-  white-space: nowrap;
+  /* Removed white-space: nowrap */
   padding: 0.75rem 1rem;
   font-size: clamp(12px, 1.2vw, 14px);
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
+
+  /* NEW: Allow text to wrap and break */
+  word-break: break-word;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 500px; /* Optional: limit cell width */
 }
+
 
 .accounting-table th {
   font-weight: 600;
