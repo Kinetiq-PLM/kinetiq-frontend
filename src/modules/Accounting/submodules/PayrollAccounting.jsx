@@ -56,12 +56,14 @@ const PayrollAccounting = () => {
     "Status",
   ];
 
+
   // API Endpoint
   const API_URL =
     import.meta.env.VITE_API_URL ||
     "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const PAYROLL_ENDPOINT = `${API_URL}/api/payroll-journal/`; // Updated to payroll-journal
   const PAYROLL_ACCOUNTING_ENDPOINT = `${API_URL}/api/payroll-accounting/`;
+
 
   // Fetch data from the API
   useEffect(() => {
@@ -73,6 +75,8 @@ const PayrollAccounting = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
+
+
 
         // Transform the data to match the table structure
         const transformedData = result.map((item) => [
@@ -90,7 +94,7 @@ const PayrollAccounting = () => {
           item.thirteenth_month_pay,
           item.total_bonuses,
           item.gross_pay,
-          item.sss_contribution,  
+          item.sss_contribution,
           item.philhealth_contribution,
           item.pagibig_contribution,
           item.tax,
@@ -118,6 +122,7 @@ const PayrollAccounting = () => {
       }
     };
 
+
     // Fetch payroll accounting data
     const fetchPayrollAccountingData = async () => {
       try {
@@ -126,6 +131,9 @@ const PayrollAccounting = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
+
+        // Sort data by date_approved (latest first)
+        result.sort((a, b) => new Date(b.date_approved) - new Date(a.date_approved));
 
         const transformedData = result.map((item) => [
           item.payroll_accounting_id,
@@ -159,7 +167,7 @@ const PayrollAccounting = () => {
   // Handle row selection
   const handlePrintRow = (rowData) => {
     const printWindow = window.open('', '_blank');
-  
+
     const html = `
     <!DOCTYPE html>
     <html>
@@ -284,7 +292,7 @@ const PayrollAccounting = () => {
       </body>
     </html>
     `;
-  
+
     printWindow.document.write(html);
     printWindow.document.close();
   };

@@ -37,6 +37,8 @@ const TaxAndRemittance = () => {
       const response = await fetch(TAXREMITTANCE_ENDPOINT);
       const result = await response.json();
 
+      result.sort((a, b) => new Date(b.date_approved) - new Date(a.date_approved));
+
       const transformedData = result.map((item) => [
         item.remittance_id,
         item.employee_id,
