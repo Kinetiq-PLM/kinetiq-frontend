@@ -359,9 +359,7 @@ const OfficialReceipts = () => {
     return 0; // fail-safe
   });
 
-
-
-
+  // Filter data based on search input
   const filteredData = sortedData.filter((row) =>
     [row[0], row[1], row[2], row[6], row[7], row[8]]
       .filter(Boolean)
@@ -370,7 +368,85 @@ const OfficialReceipts = () => {
       .includes(searching.toLowerCase())
   );
 
-
+  const handlePrintRow = (rowData) => {
+    const printWindow = window.open('', '_blank');
+  
+    const html = `
+    <html>
+      <head>
+        <title>Payroll Row</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #ffffff;
+            color: #333333;
+          }
+          .container {
+            max-width: 700px;
+            margin: 0 auto;
+          }
+          h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          th, td {
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            text-align: left;
+          }
+          tr:nth-child(odd) {
+            background-color: #f9f9f9;
+          }
+          tr:nth-child(even) {
+            background-color: #ffffff;
+          }
+          .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 30px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Receipt</h1>
+          <table>
+            <tbody>
+              ${columns.map((col, i) => `
+                <tr>
+                  <td><strong>${col}</strong></td>
+                  <td>${rowData[i] ?? '-'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="footer">
+            Printed on ${new Date().toLocaleString()}
+          </div>
+        </div>
+        <script>
+          window.onload = () => {
+            window.print();
+          };
+          window.onafterprint = () => {
+            window.close();
+          };
+        </script>
+      </body>
+    </html>
+    `;
+  
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
 
 
   return (
@@ -411,7 +487,7 @@ const OfficialReceipts = () => {
             />
           </div>
         </div>
-        <Table data={filteredData} columns={columns} showPrintButton={true} />
+        <Table data={filteredData} columns={columns} handlePrintRow={handlePrintRow} showPrintButton={true} />
       </div>
       {modalOpen && (
         <CreateReceiptModal
