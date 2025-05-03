@@ -6,10 +6,8 @@ import Button from "../components/button/Button";
 import Search from "../components/search/Search";
 
 const PayrollAccounting = () => {
-  const [payrollData, setPayrollData] = useState([]);
   const [payrollAccountingData, setPayrollAccountingData] = useState([]);
-  const [selectedPayrollAccountingRow, setSelectedPayrollAccountingRow] = useState(null);
-
+  const [payrollData, setPayrollData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [validation, setValidation] = useState({
     isOpen: false,
@@ -92,7 +90,7 @@ const PayrollAccounting = () => {
           item.thirteenth_month_pay,
           item.total_bonuses,
           item.gross_pay,
-          item.sss_contribution,
+          item.sss_contribution,  
           item.philhealth_contribution,
           item.pagibig_contribution,
           item.tax,
@@ -157,19 +155,11 @@ const PayrollAccounting = () => {
     fetchPayrollAccountingData();
   }, []);
 
-  // Loading spinner component
-  const LoadingSpinner = () => (
-    <div className="flex justify-center items-center p-8 mt-30">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      <p className="ml-4 text-gray-600">Loading payroll data...</p>
-    </div>
-  );
 
-
-  
+  // Handle row selection
   const handlePrintRow = (rowData) => {
     const printWindow = window.open('', '_blank');
-
+  
     const html = `
     <html>
       <head>
@@ -232,40 +222,29 @@ const PayrollAccounting = () => {
           </div>
         </div>
         <script>
-          window.onload = () => window.print();
+          window.onload = () => {
+            window.print();
+          };
+          window.onafterprint = () => {
+            window.close();
+          };
         </script>
       </body>
     </html>
     `;
-
+  
     printWindow.document.write(html);
     printWindow.document.close();
-};
-
-
-  const printPayrollContent = () => {
-    if (!selectedPayrollAccountingRow) {
-      alert("Please select a row to print.");
-      return;
-    }
-
-    const printContents = document.getElementById("printable-payroll").innerHTML;
-    const originalContents = document.body.innerHTML;
-    const originalScroll = window.scrollY;
-
-    document.body.innerHTML = printContents;
-    document.body.style.margin = "0";
-    document.body.style.padding = "0";
-    document.body.style.overflow = "visible";
-
-    setTimeout(() => {
-      window.print();
-      document.body.innerHTML = originalContents;
-      window.scrollTo(0, originalScroll);
-      window.location.reload();
-    }, 200);
   };
 
+
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center p-8 mt-30">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-gray-600">Loading payroll data...</p>
+    </div>
+  );
 
   return (
     <div className="accountsPayable">
@@ -280,7 +259,7 @@ const PayrollAccounting = () => {
           </div>
 
           <div className="component-container">
-          <Button name="Update" variant="standard2" onClick={handleUpdateStatus} />
+            <Button name="Update" variant="standard2" />
 
           </div>
         </div>
@@ -311,7 +290,6 @@ const PayrollAccounting = () => {
             <Table
               columns={payrollAccounting_columns}
               data={payrollAccountingData}
-              onRowSelect={(rowData) => setSelectedPayrollAccountingRow(rowData)}
             />
 
           )}
