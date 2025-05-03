@@ -41,17 +41,13 @@
   font-weight: 600;
 }
 
-.accounting-table th:hover {
+.accounting-table tbody th:hover {
   background-color: #e2e8f0;
   cursor: pointer;
 }
 
 .accounting-table td {
   font-weight: 400;
-}
-
-.accounting-table tr:hover {
-  background-color: #f1f5f9;
 }
 
 .accounting-table .selected-row {
