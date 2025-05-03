@@ -149,13 +149,15 @@ const BodyContent = () => {
       item.glAccountId,
       item.accountName,
       item.journalId,
+      item.debit,
+      item.credit,
       item.date,
       item.description,
     ]
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
-    return searchContent.includes(searching.toLowerCase());
+    return searchContent.includes(searching.trim().toLowerCase()); // with .trim() it fixes the space error
   });
 
   const totalDebit = filteredData.reduce((sum, item) => sum + (parseFloat(item.debit) || 0), 0);
