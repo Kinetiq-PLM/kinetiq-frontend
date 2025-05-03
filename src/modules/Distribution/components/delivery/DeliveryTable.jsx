@@ -174,7 +174,11 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
                   <td className={`status-cell status-${order.order_status?.toLowerCase() || 'created'}`}>
                     {order.order_status === "Created" ? "Pending" : (order.order_status || "Pending")}
                   </td>
-                  <td className="centered-cell">{order.is_project_based ? "Yes" : "No"}</td>
+                  <td className="centered-cell">
+                    {typeof order.is_project_based === 'boolean' 
+                      ? (order.is_project_based ? "Yes" : "No") 
+                      : (order.is_project_based === "Project Based" ? "Yes" : "No")}
+                  </td>
                   <td className="centered-cell">{order.is_partial_delivery ? "Yes" : "No"}</td>
                   <td>{formatID(order.del_order_id, "delivery")}</td>
                   {/* TEMPORARY: Approval button - Comment these lines to remove the button */}
