@@ -3,7 +3,7 @@
 const Table = ({ requests, onRowClick, selectedRequest }) => {
   return (
     <div className="table-container">
-        <table className="analyses-table">
+        <table className="request-table">
           <thead>
             <tr>
               <th>Request ID</th>

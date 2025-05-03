@@ -89,9 +89,10 @@ const ServiceRequest = ({employee_id}) => {
     console.log("Updating request:", updatedRequest)
 
     try {
-      await PATCH(`request/${requestId}/`, updatedRequest);
+      const data = await PATCH(`request/${requestId}/`, updatedRequest);
       setShowEditReqModal(false);
       fetchRequests();
+      handleRowClick(data);
     } catch (error) {
       let firstError = "An unknown error occurred.";
       if (error && typeof error === "object") {
@@ -113,6 +114,18 @@ const ServiceRequest = ({employee_id}) => {
     }
   }
 
+  // analysis tab
+  const [analysisInfo, setAnalysisInfo] = useState({
+    analysisId: "",
+    analysisDescription: "",
+    analysisStatus: "",
+    analysisDate: "",
+    productId: "",
+    productName: "",
+    contractId: "",
+    terminationDate: "",
+    laborCost: "",
+  })
 
   // After Analysis state
   const [afterAnalysisInfo, setAfterAnalysisInfo] = useState({
@@ -886,6 +899,7 @@ const ServiceRequest = ({employee_id}) => {
 
         <div className="divider"></div>
 
+        {/* #### TABS #### */} 
         <div className="fixed-tabs-container">
           <div className="tabs-container">
           <div className={`tab ${activeTab === "Request" ? "active" : ""}`} onClick={() => setActiveTab("Request")}>
@@ -916,6 +930,8 @@ const ServiceRequest = ({employee_id}) => {
         </div>
 
         <div className="content-scroll-area">
+
+          {/* #### REQUEST TAB #### */} 
           {activeTab === "Request" && (
             <div className="tab-content">
             <div className="request-tab-content">
@@ -925,16 +941,16 @@ const ServiceRequest = ({employee_id}) => {
                   <input
                     type="text"
                     id="customerId"
-                    value={customerInfo.customerId}
+                    value={customerInfo.requestId}
                     readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, requestId: e.target.value })}
                     placeholder="Enter request ID"
                   />
                 </div>
                 <div className="form-group description-group">
-                  <label htmlFor="customerId">Request Description</label>
+                  <label htmlFor="requestDescription">Request Description</label>
                   <textarea
-                    id="customerId"
+                    id="requestDescription"
                     value={customerInfo.requestDescription}
                     readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, requestDescription: e.target.value })}
@@ -943,10 +959,10 @@ const ServiceRequest = ({employee_id}) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="customerId">Request Remarks</label>
+                  <label htmlFor="requestRemarks">Request Remarks</label>
                   <input
                     type="text"
-                    id="customerId"
+                    id="requestRemarks"
                     value={customerInfo.requestRemarks}
                     readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, requestRemarks: e.target.value })}
@@ -967,10 +983,10 @@ const ServiceRequest = ({employee_id}) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="customerId">Name</label>
+                  <label htmlFor="name">Name</label>
                   <input
                     type="text"
-                    id="customerId"
+                    id="name"
                     value={customerInfo.name}
                     readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
@@ -978,10 +994,10 @@ const ServiceRequest = ({employee_id}) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="customerId">Address</label>
+                  <label htmlFor="address">Address</label>
                   <input
                     type="text"
-                    id="customerId"
+                    id="address"
                     value={customerInfo.address}
                     readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, address: e.target.value })}
@@ -989,10 +1005,10 @@ const ServiceRequest = ({employee_id}) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="customerId">Email Address</label>
+                  <label htmlFor="emailAddress">Email Address</label>
                   <input
                     type="text"
-                    id="customerId"
+                    id="emailAddress"
                     value={customerInfo.emailAddress}
                     readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, emailAddress: e.target.value })}
@@ -1000,10 +1016,10 @@ const ServiceRequest = ({employee_id}) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="customerId">Phone Number</label>
+                  <label htmlFor="phoneNumber">Phone Number</label>
                   <input
                     type="text"
-                    id="customerId"
+                    id="phoneNumber"
                     value={customerInfo.phoneNumber}
                     readOnly
                     onChange={(e) => setCustomerInfo({ ...customerInfo, phoneNumber: e.target.value })}
@@ -1024,6 +1040,153 @@ const ServiceRequest = ({employee_id}) => {
                 </div>
               </div>
           )}
+
+          {/* #### ANALYSIS TAB #### */} 
+          {activeTab === "Analysis" && (
+            <div className="tab-content">
+            <div className="request-tab-content">
+              <div className="input-column">
+                <div className="form-group">
+                  <label htmlFor="customerId">Request ID</label>
+                  <input
+                    type="text"
+                    id="requestId"
+                    value={customerInfo.requestId}
+                    readOnly
+                    onChange={(e) => setCustomerInfo({ ...customerInfo, requestId: e.target.value })}
+                    placeholder="Enter request ID"
+                  />
+                </div>
+                <div className="form-group description-group">
+                  <label htmlFor="analysisDescription">Analysis Description</label>
+                  <textarea
+                    id="analysisDescription"
+                    value={analysisInfo.analysisId ? analysisInfo.analysisDescription : ""} 
+                    readOnly
+                    onChange={(e) => setAnalysisInfo({ ...analysisInfo, analysisDescription: e.target.value })}
+                    placeholder={
+                      analysisInfo.analysisId === ""
+                        ? "No added analysis data for this request yet..."
+                        : "Analysis description"
+                    }
+                    disabled={analysisInfo.analysisId == ""} 
+                    className={analysisInfo.analysisId == "" ? "disabled-input" : ""}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="analysisStatus">Analysis Status</label>
+                  <input
+                    type="text"
+                    id="analysisStatus"
+                    value={analysisInfo.analysisStatus}
+                    readOnly
+                    onChange={(e) => setAnalysisInfo({ ...analysisInfo, analysisStatus: e.target.value })}
+                    placeholder="Analysis status"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="analysisDate">Analysis Date</label>
+                  <input
+                    type="text"
+                    id="analysisDate"
+                    value={analysisInfo.analysisDate}
+                    readOnly
+                    onChange={(e) => setAnalysisInfo({ ...analysisInfo, analysisDate: e.target.value })}
+                    placeholder="Select analysis date"
+                  />
+                </div>
+              </div>
+              <div className="input-column">
+              <div className="form-group">
+                  <label htmlFor="analysisId">Analysis ID</label>
+                  <input
+                    type="text"
+                    id="analysisId"
+                    value={analysisInfo.analysisId}
+                    readOnly
+                    onChange={(e) => setAnalysisInfo({ ...analysisInfo, analysisId: e.target.value })}
+                    placeholder="Enter analysis ID"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="productId">Product ID</label>
+                  <input
+                    type="text"
+                    id="productId"
+                    value={analysisInfo.productId}
+                    readOnly
+                    onChange={(e) => setAnalysisInfo({ ...analysisInfo, productId: e.target.value })}
+                    placeholder="Enter product ID"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="productName">Product Name</label>
+                  <input
+                    type="text"
+                    id="productName"
+                    value={analysisInfo.productName}
+                    readOnly
+                    onChange={(e) => setAnalysisInfo({ ...analysisInfo, productName: e.target.value })}
+                    placeholder="Enter product name"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="contractId">Contract ID</label>
+                  <input
+                    type="text"
+                    id="contractId"
+                    value={analysisInfo.contractId}
+                    readOnly
+                    onChange={(e) => setAnalysisInfo({ ...analysisInfo, contractId: e.target.value })}
+                    placeholder="Enter contract ID"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="terminationDate">Termination Date</label>
+                  <input
+                    type="text"
+                    id="terminationDate"
+                    value={analysisInfo.terminationDate}
+                    readOnly
+                    onChange={(e) => setAnalysisInfo({ ...analysisInfo, terminationDate: e.target.value })}
+                    placeholder="Enter termination date"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="laborCost">Labor Cost</label>
+                  <input
+                    type="text"
+                    id="laborCost"
+                    value={analysisInfo.laborCost}
+                    readOnly
+                    onChange={(e) => setAnalysisInfo({ ...analysisInfo, laborCost: e.target.value })}
+                    placeholder="Enter labor cost"
+                  />
+                </div>
+              </div> 
+              </div> 
+              <div className="buttons-container-right">
+                <button 
+                  type="button" 
+                  className={`update-button ${selectedRequest ? "clickable" : "disabled"}`}
+                  onClick={handleEditClick}
+                  disabled={!selectedRequest}
+                >
+                  Edit
+                </button> 
+                <button 
+                  type="button" 
+                  className={`update-button ${selectedRequest ? "clickable" : "disabled"}`}
+                  onClick={handleEditClick}
+                  disabled={!selectedRequest}
+                >
+                  Add
+                </button>  
+                </div>
+              
+              </div>
+          )}
+
 
           {activeTab === "Service Order" && (
             <div className="tab-content">
