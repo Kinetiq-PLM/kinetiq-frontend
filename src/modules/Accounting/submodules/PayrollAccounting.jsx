@@ -4,10 +4,12 @@ import NotifModal from "../components/modalNotif/NotifModal";
 import Table from "../components/table/Table";
 import Button from "../components/button/Button";
 import Search from "../components/search/Search";
+import { data } from "autoprefixer";
 
 const PayrollAccounting = () => {
   const [payrollAccountingData, setPayrollAccountingData] = useState([]);
   const [payrollData, setPayrollData] = useState([]);
+  const [searching, setSearching] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [validation, setValidation] = useState({
     isOpen: false,
@@ -298,6 +300,16 @@ const PayrollAccounting = () => {
   };
 
 
+  // Search Filter based on columns
+  const filteredData = payrollAccountingData.filter((row) =>
+    [row[0], row[1], row[2], row[3], row[4], row[5]]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(searching.toLowerCase())
+  );
+
+
   // Loading spinner component
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
@@ -315,7 +327,12 @@ const PayrollAccounting = () => {
 
         <div className="parent-component-container">
           <div className="component-container">
-            <Search />
+          <Search
+            type="text"
+            placeholder="Search Record..."
+            value={searching}
+            onChange={(e) => setSearching(e.target.value)}
+          />
           </div>
 
           <div className="component-container">
@@ -331,7 +348,7 @@ const PayrollAccounting = () => {
           ) : (
             <Table
               columns={payrollAccounting_columns}
-              data={payrollAccountingData}
+              data={filteredData}
               handlePrintRow={handlePrintRow}
               showPrintButton={true}
             />
