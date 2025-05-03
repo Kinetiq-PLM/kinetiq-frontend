@@ -7,6 +7,7 @@ import NotifModal from "../components/modalNotif/NotifModal";
 
 const AccountsPayableReceipt = () => {
   const [data, setData] = useState([]); // State to store table data
+  const [searching, setSearching] = useState("");
   const [isLoading, setIsLoading] = useState(true); // State to manage loading state
   const [validation, setValidation] = useState({
     isOpen: false,
@@ -68,6 +69,15 @@ const AccountsPayableReceipt = () => {
     fetchTaxRemittanceData();
   }, []);
 
+  // Search Filter based on columns
+  const filteredData = data.filter((row) =>
+    [row[0], row[1], row[2], row[3], row[4], row[5]]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(searching.toLowerCase())
+  );
+
   // Loading spinner component
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
@@ -85,7 +95,12 @@ const AccountsPayableReceipt = () => {
 
         <div className="parent-component-container">
           <div className="component-container">
-            <Search />
+          <Search
+            type="text"
+            placeholder="Search Record..."
+            value={searching}
+            onChange={(e) => setSearching(e.target.value)}
+          />
           </div>
         </div>
 
@@ -94,7 +109,7 @@ const AccountsPayableReceipt = () => {
           {isLoading ? (
             <LoadingSpinner />
           ) : (
-            <Table columns={columns} data={data} />
+            <Table columns={columns} data={filteredData} />
           )}
         </div>
       </div>
