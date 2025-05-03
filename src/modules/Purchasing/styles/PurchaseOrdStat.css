@@ -242,24 +242,24 @@
 }
 
 .status-returned {
-  color: #721c24;
-  background-color: #e06666;
-  border: 1px solid #c3e6cb;
+  color: #dc2626;
+  background-color: #fee2e2;
+  border: 1px solid #fee2e2;
 }
 .status-received {
-  color: #721c24;
-  background-color: #f6b26b;
-  border: 1px solid #ffeeba;
+  color: #856404;
+  background-color: #fff2cc;
+  border: 1px solid #ffe599;
 }
 .status-ordered {
-  color: #856404;
-  background-color: #ffe599;
-  border: 1px solid #f5c6cb;
+  color: #155724;
+  background-color: #d9ead3;
+  border: 1px solid #d9ead3;
 }
 .status-completed {
-  color: #2d5016;
-  background-color: #93c47d;
-  border: 1px solid #bee5eb;
+  color: #1976d2;
+  background-color: #e3f2fd;
+  border: 1px solid #e3f2fd;
 }
 
 .purchordstat-footer {

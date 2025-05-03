@@ -299,9 +299,9 @@
 }
 
 /* Status color badges */
-.status-approved,
-.status-forwarded,
-.status-under {
+.credmemo .status-approved,
+.credmemo .status-forwarded,
+.credmemo .status-under {
   border-radius: 12px;
   padding: 2px 10px;
   font-size: 0.85em;
@@ -309,20 +309,20 @@
   display: inline-block;
 }
 
-.status-approved {
+.credmemo .status-approved {
   color: #155724;
-  background-color: #f6b26b;
-  border: 1px solid #c3e6cb;
+  background-color: #d9ead3;
+  border: 1px solid #d9ead3;
 }
-.status-forwarded {
-  color: #856404;
-  background-color: #93c47d;
-  border: 1px solid #ffeeba;
+.credmemo .status-forwarded {
+  color: #0284c7;
+  background-color: #e0f2fe;
+  border: 1px solid #e0f2fe;
 }
-.status-under {
-  color: #721c24;
-  background-color: #ffe599;
-  border: 1px solid #f5c6cb;
+.credmemo .status-under {
+  color: #d97706;
+  background-color:#fef3c7;
+  border: 1px solid #fef3c7;
 }
 
 .credmemo .credmemo-footer {
