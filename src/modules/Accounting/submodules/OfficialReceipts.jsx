@@ -368,56 +368,106 @@ const OfficialReceipts = () => {
       .includes(searching.toLowerCase())
   );
 
+  // Handle row selection
   const handlePrintRow = (rowData) => {
     const printWindow = window.open('', '_blank');
   
     const html = `
+    <!DOCTYPE html>
     <html>
       <head>
-        <title>Payroll Row</title>
+        <title>Kinetiq - PLM - Official Receipt</title>
         <style>
+          @page {
+            size: letter;
+            margin: 0.5in;
+          }
           body {
             font-family: Arial, sans-serif;
-            padding: 40px;
+            padding: 0;
+            margin: 0;
             background-color: #ffffff;
             color: #333333;
           }
           .container {
-            max-width: 700px;
+            max-width: 100%;
             margin: 0 auto;
           }
-          h1 {
-            text-align: center;
+          .header {
+            border-bottom: 2px solid #0055a5;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .logo {
             font-size: 24px;
-            margin-bottom: 30px;
+            font-weight: bold;
+            color: #0055a5;
+          }
+          .logo-subtitle {
+            font-size: 14px;
+            color: #777;
+          }
+          .document-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #0055a5;
           }
           table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin: 20px 0;
           }
           th, td {
-            padding: 12px 15px;
-            border: 1px solid #ccc;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
             text-align: left;
           }
-          tr:nth-child(odd) {
+          tr:nth-child(even) {
             background-color: #f9f9f9;
           }
-          tr:nth-child(even) {
-            background-color: #ffffff;
-          }
           .footer {
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
             text-align: center;
             font-size: 12px;
             color: #777;
-            margin-top: 30px;
+          }
+          .confidential {
+            color: #cc0000;
+            font-style: italic;
+            margin-bottom: 10px;
+          }
+          .watermark {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 100px;
+            color: rgba(0, 0, 0, 0.03);
+            transform: rotate(-45deg);
+            z-index: -1;
           }
         </style>
       </head>
       <body>
+        <div class="watermark">COPY</div>
         <div class="container">
-          <h1>Receipt</h1>
+          <div class="header">
+            <div>
+              <div class="logo">Kinetiq - PLM</div>
+              <div class="logo-subtitle">Medical Equipment Manufacturing Company.</div>
+            </div>
+          </div>
+  
+          <div class="document-title">OFFICIAL RECEIPT</div>
+          
           <table>
             <tbody>
               ${columns.map((col, i) => `
@@ -428,8 +478,10 @@ const OfficialReceipts = () => {
               `).join('')}
             </tbody>
           </table>
+  
           <div class="footer">
-            Printed on ${new Date().toLocaleString()}
+            <div>Kinetiq - PLM</div>
+            <div>Printed on ${new Date().toLocaleString()}</div>
           </div>
         </div>
         <script>
