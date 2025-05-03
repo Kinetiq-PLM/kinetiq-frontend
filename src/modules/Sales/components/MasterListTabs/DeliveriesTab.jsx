@@ -91,7 +91,7 @@ export default function BlanketAgreementsTab({
       const data = deliveryQuery.data.map((delivery) => ({
         id: delivery.delivery_note_id,
         customer_id: delivery.statement?.customer?.customer_id,
-        order_id: delivery.order ? delivery.order?.order_id : null,
+        order_id: delivery.order ? delivery.order : null,
         tracking_num: delivery.tracking_num,
         shipping_method: delivery.shipping_method,
         customer_name: delivery.statement?.customer?.name,
