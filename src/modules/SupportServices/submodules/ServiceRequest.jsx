@@ -21,7 +21,8 @@ import { POST_NOTIF } from "../api/api"
 
 const ServiceRequest = ({employee_id}) => {
   const [activeTab, setActiveTab] = useState("Request")
-
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorModalMessage, setErrorModalMessage] = useState("")
 
   // table
   const [searchQuery, setSearchQuery] = useState("")
@@ -30,25 +31,20 @@ const ServiceRequest = ({employee_id}) => {
   const [filterOptionStatus, setFilterOptionStatus] = useState("approved")
   const [showFilterOptionsStatus, setShowFilterOptionsStatus] = useState(false)
 
-  // request tab
-  const [requests, setRequests] = useState([])
-  const [selectedRequest, setSelectedRequest] = useState(null)
-  const [showEditReqModal, setShowEditReqModal] = useState(false)
-
   // State for analyses
-  const [analyses, setAnalyses] = useState([])
   const [showUpdateModal, setShowUpdateModal] = useState(false)
-  const [showAddModal, setShowAddModal] = useState(false)
   const [showAddItemModal, setShowAddItemModal] = useState(false)
   const [showEditItemModal, setShowEditItemModal] = useState(false)
   const [showViewInventoryModal, setShowViewInventoryModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
-  const [showErrorModal, setShowErrorModal] = useState(false)
-  const [errorModalMessage, setErrorModalMessage] = useState("")
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [successModalMessage, setSuccessModalMessage] = useState("")
 
   // request tab
+  const [requests, setRequests] = useState([])
+  const [selectedRequest, setSelectedRequest] = useState(null)
+  const [showEditReqModal, setShowEditReqModal] = useState(false)
+  
   const [customerInfo, setCustomerInfo] = useState({
     requestId: "",
     requestDescription: "",
@@ -58,6 +54,7 @@ const ServiceRequest = ({employee_id}) => {
     address: "",
     phoneNumber: "",
     emailAddress: "",
+    requestStatus: ""
   })
 
   const fetchRequests = async () => {
@@ -115,6 +112,7 @@ const ServiceRequest = ({employee_id}) => {
   }
 
   // analysis tab
+  const [showAddModal, setShowAddModal] = useState(false)
   const [analysisInfo, setAnalysisInfo] = useState({
     analysisId: "",
     analysisDescription: "",
@@ -126,6 +124,106 @@ const ServiceRequest = ({employee_id}) => {
     terminationDate: "",
     laborCost: "",
   })
+
+  const fetchAnalysis = async (requestId) => {
+    try {
+      const data = await GET(`analysis/request/${requestId}/`);
+
+      setAnalysisInfo({
+        analysisId: data.analysis_id || "",
+        analysisDescription: data.analysis_description || "",
+        analysisStatus: data.analysis_status || "",
+        analysisDate: data.analysis_date || "",
+        productId: data.product?.item_id || "",
+        productName: data.product?.item_name ||  "",
+        contractId: data.contract?.contract_id || "",
+        terminationDate: data.contract?.end_date || "",
+        laborCost: data.labor_cost || "",
+      })
+    } catch (error) {
+      console.error("Error fetching analysis:", error);
+      setAnalysisInfo({
+        analysisId: "",
+        analysisDescription: "",
+        analysisStatus: "",
+        analysisDate: "",
+        productId: "",
+        productName: "",
+        contractId: "",
+        terminationDate: "",
+        laborCost: "",
+      })
+    }
+  };
+
+  const handleAddAnalysis = () => {
+    if (customerInfo.requestStatus !== "Approved") {
+      setErrorModalMessage("Cannot schedule a service analysis for a request that is not approved yet!"); 
+      setShowErrorModal(true);  
+    } else {  
+      setShowAddModal(true); // Open modal
+    }
+    
+  }
+
+  const handleCreateAnalysis = async (analysisData) => {
+    console.log("Creating analysis:", analysisData)
+    try {
+      const data = await POST("analysis/", analysisData);
+      console.log("Analysis created successfully:", data);
+      setShowAddModal(false);
+      fetchAnalysis(data.service_request.service_request_id)
+  } catch (error) {
+    let firstError = "An unknown error occurred.";
+    if (error && typeof error === "object") {
+      const keys = Object.keys(error);
+      if (keys.length > 0) {
+        const firstKey = keys[0];
+        const firstValue = error[firstKey];
+        if (Array.isArray(firstValue)) {
+          firstError = `${firstKey}: ${firstValue[0]}`;
+        }
+      } else if (typeof error.detail === "string") {
+        firstError = error.detail;
+      }
+    }
+    console.error("Error submitting analysis:", error.message);
+    setErrorModalMessage(firstError); 
+    setShowErrorModal(true);  
+  }
+}
+
+const handleUpdateAnalysis = async (analysisData) => {
+  const analysisId = analysisData.analysis_id;
+  if (!analysisId) {
+    console.error("Error: analysis_id is undefined");
+    return;
+  }
+  console.log("Updating analysis:", analysisData)
+  try {
+    const data = await PATCH(`analysis/${analysisId}/`, analysisData);
+    setShowUpdateModal(false);
+    fetchAnalysis(data.service_request.service_request_id)
+  } catch (error) {
+    let firstError = "An unknown error occurred.";
+    if (error && typeof error === "object") {
+      const keys = Object.keys(error);
+      if (keys.length > 0) {
+        const firstKey = keys[0];
+        const firstValue = error[firstKey];
+        if (Array.isArray(firstValue)) {
+          firstError = `${firstKey}: ${firstValue[0]}`;
+        }
+      } else if (typeof error.detail === "string") {
+        firstError = error.detail;
+      }
+    }
+      console.error("Error updating service analysis:", error.message);
+      setErrorModalMessage(firstError); 
+      setShowErrorModal(true);  
+  }
+}
+
 
   // After Analysis state
   const [afterAnalysisInfo, setAfterAnalysisInfo] = useState({
@@ -157,19 +255,7 @@ const ServiceRequest = ({employee_id}) => {
     orderTotalPrice: "",
   })
 
-  const fetchAnalyses = async () => {
-    try {
-      // this filters out analyses so that only the service analyses assigned to the one currently logged in will show:
-      //const data = await GET(`analysis/analyses/technician/HR-EMP-2025-8d9f9b/`);
-      const data = await GET(`analysis/analyses/technician/${employee_id}/`);
-
-      // all analyses version:
-      // const data = await GET("analysis/");
-      setAnalyses(data);
-    } catch (error) {
-      console.error("Error fetching analyses:", error)
-    }
-  }
+  
 
   
 
@@ -218,7 +304,10 @@ const ServiceRequest = ({employee_id}) => {
         address: data.customer ? `${data.customer.address_line1 || ""} ${data.customer.address_line2 || ""}`.trim() : "",
         phoneNumber: data.customer?.phone_number || "",
         emailAddress: data.customer?.email_address || "",
+        requestStatus: data.request_status || ""
       })
+
+      fetchAnalysis(request.service_request_id)
 
       // setDeliveryOrderInfo({
       //   customerId: data.customer?.customer_id || "",
@@ -415,73 +504,7 @@ const ServiceRequest = ({employee_id}) => {
       
       setIsPickerOpen(!isPickerOpen); 
     };
-
-  // Handle view analysis
-  const handleViewAnalysis = (analysis) => {
-      setSelectedAnalysis(analysis)
-      setShowUpdateModal(true)
-  }
-
-  // Handle update analysis
-  const handleUpdateAnalysis = async (analysisData) => {
-    const analysisId = analysisData.analysis_id;
-    if (!analysisId) {
-      console.error("Error: analysis_id is undefined");
-      return;
-    }
-    console.log("Updating analysis:", analysisData)
-    try {
-      await PATCH(`analysis/${analysisId}/`, analysisData);
-      setShowUpdateModal(false);
-      fetchAnalyses();
-    } catch (error) {
-      let firstError = "An unknown error occurred.";
-      if (error && typeof error === "object") {
-        const keys = Object.keys(error);
-        if (keys.length > 0) {
-          const firstKey = keys[0];
-          const firstValue = error[firstKey];
-          if (Array.isArray(firstValue)) {
-            firstError = `${firstKey}: ${firstValue[0]}`;
-          }
-        } else if (typeof error.detail === "string") {
-          firstError = error.detail;
-        }
-      }
-        console.error("Error updating service analysis:", error.message);
-        setErrorModalMessage(firstError); 
-        setShowErrorModal(true);  
-    }
-  }
-
-  // Handle create analysis
-  const handleCreateAnalysis = async (analysisData) => {
-      console.log("Creating analysis:", analysisData)
-      try {
-        const data = await POST("analysis/", analysisData);
-        console.log("Analysis created successfully:", data);
-        setShowAddModal(false);
-        fetchAnalyses();
-    } catch (error) {
-      let firstError = "An unknown error occurred.";
-      if (error && typeof error === "object") {
-        const keys = Object.keys(error);
-        if (keys.length > 0) {
-          const firstKey = keys[0];
-          const firstValue = error[firstKey];
-          if (Array.isArray(firstValue)) {
-            firstError = `${firstKey}: ${firstValue[0]}`;
-          }
-        } else if (typeof error.detail === "string") {
-          firstError = error.detail;
-        }
-      }
-      console.error("Error submitting analysis:", error.message);
-      setErrorModalMessage(firstError); 
-      setShowErrorModal(true);  
-    }
-  }
-
+  
   const handleAddOrder = async () => {
     const orderData = {
       analysis_id: selectedAnalysis.analysis_id,
@@ -1081,7 +1104,12 @@ const ServiceRequest = ({employee_id}) => {
                     value={analysisInfo.analysisStatus}
                     readOnly
                     onChange={(e) => setAnalysisInfo({ ...analysisInfo, analysisStatus: e.target.value })}
-                    placeholder="Analysis status"
+                    placeholder={
+                      analysisInfo.analysisId === ""
+                        ? "No added analysis data for this request yet..."
+                        : "Analysis status"
+                    }
+                    className={analysisInfo.analysisId == "" ? "disabled-input" : ""}
                   />
                 </div>
                 <div className="form-group">
@@ -1092,7 +1120,12 @@ const ServiceRequest = ({employee_id}) => {
                     value={analysisInfo.analysisDate}
                     readOnly
                     onChange={(e) => setAnalysisInfo({ ...analysisInfo, analysisDate: e.target.value })}
-                    placeholder="Select analysis date"
+                    placeholder={
+                      analysisInfo.analysisId === ""
+                        ? "No added analysis data for this request yet..."
+                        : "Select analysis date"
+                    }
+                    className={analysisInfo.analysisId == "" ? "disabled-input" : ""}
                   />
                 </div>
               </div>
@@ -1105,7 +1138,12 @@ const ServiceRequest = ({employee_id}) => {
                     value={analysisInfo.analysisId}
                     readOnly
                     onChange={(e) => setAnalysisInfo({ ...analysisInfo, analysisId: e.target.value })}
-                    placeholder="Enter analysis ID"
+                    placeholder={
+                      analysisInfo.analysisId === ""
+                        ? "No added analysis data for this request yet..."
+                        : "Enter analysis ID"
+                    }
+                    className={analysisInfo.analysisId == "" ? "disabled-input" : ""}
                   />
                 </div>
                 <div className="form-group">
@@ -1116,7 +1154,12 @@ const ServiceRequest = ({employee_id}) => {
                     value={analysisInfo.productId}
                     readOnly
                     onChange={(e) => setAnalysisInfo({ ...analysisInfo, productId: e.target.value })}
-                    placeholder="Enter product ID"
+                    placeholder={
+                      analysisInfo.analysisId === ""
+                        ? "No added analysis data for this request yet..."
+                        : "Enter product ID"
+                    }
+                    className={analysisInfo.analysisId == "" ? "disabled-input" : ""}
                   />
                 </div>
                 <div className="form-group">
@@ -1127,7 +1170,12 @@ const ServiceRequest = ({employee_id}) => {
                     value={analysisInfo.productName}
                     readOnly
                     onChange={(e) => setAnalysisInfo({ ...analysisInfo, productName: e.target.value })}
-                    placeholder="Enter product name"
+                    placeholder={
+                      analysisInfo.analysisId === ""
+                        ? "No added analysis data for this request yet..."
+                        : "Enter product name"
+                    }
+                    className={analysisInfo.analysisId == "" ? "disabled-input" : ""}
                   />
                 </div>
                 <div className="form-group">
@@ -1138,7 +1186,12 @@ const ServiceRequest = ({employee_id}) => {
                     value={analysisInfo.contractId}
                     readOnly
                     onChange={(e) => setAnalysisInfo({ ...analysisInfo, contractId: e.target.value })}
-                    placeholder="Enter contract ID"
+                    placeholder={
+                      analysisInfo.analysisId === ""
+                        ? "No added analysis data for this request yet..."
+                        : "Enter contract ID"
+                    }
+                    className={analysisInfo.analysisId == "" ? "disabled-input" : ""}
                   />
                 </div>
                 <div className="form-group">
@@ -1149,7 +1202,12 @@ const ServiceRequest = ({employee_id}) => {
                     value={analysisInfo.terminationDate}
                     readOnly
                     onChange={(e) => setAnalysisInfo({ ...analysisInfo, terminationDate: e.target.value })}
-                    placeholder="Enter termination date"
+                    placeholder={
+                      analysisInfo.analysisId === ""
+                        ? "No added analysis data for this request yet..."
+                        : "Enter termination date"
+                    }
+                    className={analysisInfo.analysisId == "" ? "disabled-input" : ""}
                   />
                 </div>
                 <div className="form-group">
@@ -1160,7 +1218,12 @@ const ServiceRequest = ({employee_id}) => {
                     value={analysisInfo.laborCost}
                     readOnly
                     onChange={(e) => setAnalysisInfo({ ...analysisInfo, laborCost: e.target.value })}
-                    placeholder="Enter labor cost"
+                    placeholder={
+                      analysisInfo.analysisId === ""
+                        ? "No added analysis data for this request yet..."
+                        : "Enter labor cost"
+                    }
+                    className={analysisInfo.analysisId == "" ? "disabled-input" : ""}
                   />
                 </div>
               </div> 
@@ -1168,19 +1231,19 @@ const ServiceRequest = ({employee_id}) => {
               <div className="buttons-container-right">
                 <button 
                   type="button" 
-                  className={`update-button ${selectedRequest ? "clickable" : "disabled"}`}
-                  onClick={handleEditClick}
-                  disabled={!selectedRequest}
+                  className={`update-button ${selectedRequest &&  analysisInfo.analysisId != "" ? "clickable" : "disabled"}`}
+                  onClick={() => setShowUpdateModal(true)}
+                  disabled={!selectedRequest &&  analysisInfo.analysisId == ""}
                 >
                   Edit
                 </button> 
                 <button 
                   type="button" 
-                  className={`update-button ${selectedRequest ? "clickable" : "disabled"}`}
-                  onClick={handleEditClick}
-                  disabled={!selectedRequest}
+                  className={`update-button ${analysisInfo.analysisId == "" ? "clickable" : "disabled"}`}
+                  onClick={handleAddAnalysis}
+                  disabled={analysisInfo.analysisId != ""}
                 >
-                  Add
+                  Schedule Analysis
                 </button>  
                 </div>
               
@@ -1603,21 +1666,6 @@ const ServiceRequest = ({employee_id}) => {
             selectedRequest={selectedRequest}
           />
 
-          {
-            <div className="buttons-container-right table-buttons">
-              <button 
-                type="button"
-                className={`update-button ${selectedRequest ? "clickable" : "disabled"}`} 
-                onClick={() => setShowUpdateModal(true)}
-                disabled={!selectedRequest}
-              >
-                Update
-              </button>
-              <button className="add-button" onClick={() => setShowAddModal(true)}>
-                Add
-              </button>
-            </div>
-          }
         </div>
       </div>
 
@@ -1631,19 +1679,20 @@ const ServiceRequest = ({employee_id}) => {
         />
       )}
 
-      {showUpdateModal && (
+      {showUpdateModal && (       //analysis edit modal
         <UpdateAnalysisModal
           isOpen={showUpdateModal}
           onClose={() => setShowUpdateModal(false)}
           onUpdate={handleUpdateAnalysis}
-          analysis={selectedRequest}
+          analysis={analysisInfo}
         />
       )}
 
-      {showAddModal && (
+      {showAddModal && (          //analysis add modal
         <AddServiceAnalysisModal
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
+          request={selectedRequest}
           onAdd={handleCreateAnalysis}
           technician={employee_id}
         />

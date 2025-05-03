@@ -545,9 +545,15 @@
 }
 
 .servanal .form-group textarea {
-  height: 13rem;
+  height: 13rem !important;
   resize: none;
 }   
+
+.servanal .description-group textarea {
+  height: 12rem !important;
+  resize: none;
+}  
+
 
 .servanal textarea.description-textarea {
   height: 12rem !important; /* Match the height of two input fields plus gap */
@@ -590,6 +596,11 @@
 .servanal .modal-form-request .remarks-group textarea {
   height: 8rem;
   flex-grow: 1;
+}
+
+.servanal .status-dropdown-list {
+  top: auto !important;
+  bottom: 100% !important;
 }
 
 /* Responsive adjustments */
