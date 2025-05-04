@@ -212,7 +212,7 @@
 
 .purchquote .purchquote-table-header {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
     padding: 1rem;
     background-color: #f8f9fa;
@@ -239,7 +239,7 @@
 
 .purchquote .purchquote-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 2rem;
     padding: 1rem;
     border-bottom: 1px solid #eee;
@@ -331,3 +331,14 @@
     gap: 1rem;
     justify-self: end;
 }
+
+.purchquote-edit-button {
+    padding: 0.3rem 0.8rem;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #00bcd4;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
