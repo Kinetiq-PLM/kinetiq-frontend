@@ -22,13 +22,28 @@ const TaxRemittance = ({ isModalOpen, closeModal, reportForm, handleInputChange,
                         />
                     </div>
                     <div className="modal-body mt-4">
+                        
+
+                        {/* Date */}
+                        <div className="form-group">
+                            <label>Created at..*</label>
+                            <input
+                                type="date"
+                                value={reportForm.startDate}
+                                onChange={(e) => handleInputChange("startDate", e.target.value)}
+                            />
+                        </div>
+
+
                         <div className="flex flex-col gap-y-1">
+                            {/* AP ID */}
                             <Forms
                                 type="text"
                                 formName="Accounts Payable ID*"
                                 placeholder="Enter accounts payable ID"
                             />
 
+                            {/* Invoice ID */}
                             <Forms
                                 type="text"
                                 formName="Invoice ID*"
@@ -36,6 +51,7 @@ const TaxRemittance = ({ isModalOpen, closeModal, reportForm, handleInputChange,
                             />
                         </div>
 
+                        {/* Amount */}
                         <Forms
                             type="number"
                             formName="Amount Paid*"
@@ -58,6 +74,7 @@ const TaxRemittance = ({ isModalOpen, closeModal, reportForm, handleInputChange,
                             />
                         </div>
 
+                        {/* Payment Method */}
                         <div className="flex flex-col md:flex-row md:space-x-5 space-y-5 md:space-y-0">
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium">
@@ -177,6 +194,7 @@ const TaxRemittance = ({ isModalOpen, closeModal, reportForm, handleInputChange,
                             />
                         )}
 
+                        {/* Status  */}
                         <Dropdown
                             style="selection"
                             defaultOption="Update Status..."
