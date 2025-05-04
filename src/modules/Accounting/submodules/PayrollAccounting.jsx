@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
 import NotifModal from "../components/modalNotif/NotifModal";
 import Table from "../components/table/Table";
-import Button from "../components/button/Button";
 import Search from "../components/search/Search";
 import PayrollModal from "../components/payrollAccountingModal/PayrollModal";
 import { data } from "autoprefixer";
