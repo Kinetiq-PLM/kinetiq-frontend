@@ -7,7 +7,7 @@ import InvRestockForm from "./components/InvRestockForm";
 // import InvItemCards from "./components/InvItemCards";
 
 // Define the base URL for your local backend API
-const BASE_API_URL = "https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/api";
+const BASE_API_URL = "https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api";
 
 // --- Helper Function for API Fetching ---
 const fetchData = async (url, setData, setLoading, setError, entityName) => {
