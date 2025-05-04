@@ -16,7 +16,9 @@ const Table = ({ contracts, onRowClick, onViewContract, selectedContract }) => {
             </tr>
           </thead>
           <tbody>
-            {contracts.map((contract, index) => (
+            {[...contracts]
+                .sort((a, b) => new Date(b.date_created) - new Date(a.date_created))
+                .map((contract, index) => (
               <tr 
                 key={contract.contract_id || `contract-${index}`} 
                 className={`${

@@ -16,7 +16,9 @@ const Table = ({ serviceCalls, onRowClick, onViewDetails, selectedCall }) => {
         </thead>
         <tbody>
         {serviceCalls.length > 0 ? (
-          serviceCalls.map((call, index) => (
+          [...serviceCalls]
+            .sort((a, b) => new Date(b.date_created) - new Date(a.date_created))
+            .map((call, index) => (
             <tr 
               key={call.service_call_id || `ticket-${index}`} 
               className={`${

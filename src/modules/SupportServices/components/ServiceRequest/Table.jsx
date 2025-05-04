@@ -6,6 +6,7 @@ const Table = ({ requests, onRowClick, selectedRequest }) => {
         <table className="request-table">
           <thead>
             <tr>
+              <th>Ticket ID</th>
               <th>Request ID</th>
               <th>Call ID</th>
               <th>Request Date</th>
@@ -26,6 +27,7 @@ const Table = ({ requests, onRowClick, selectedRequest }) => {
                   onClick={() => onRowClick(request)} // makes table row clickable, function update the state fields
                   style={{ cursor: "pointer" }} 
                 >
+                  <td>{request.service_call? request.service_call.service_ticket.ticket_id : ""}</td>
                   <td>{request.service_request_id}</td>
                   <td>{request.service_call ? request.service_call.service_call_id : "Null"}</td>
                   <td>{request.request_date ? request.request_date: "Null"}</td>

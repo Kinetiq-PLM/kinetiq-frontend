@@ -169,8 +169,8 @@ const [isRequestDropdown, setRequestDropdown] = useState(false);
 
 const fetchRequests = async () => {
   try {
-    // const response = await GET(`request/requests/technician/${technician}/`);
-    const response = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
+    const response = await GET(`request/requests/technician/${technician}/`);
+    // const response = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
     //const response = await GET(`request/`); 
     console.log("requests", response)
     setRequests(response);
@@ -320,7 +320,7 @@ const handleCreate = () => {
                       if (!formData.requestId) handleToggleRenewals(); 
                     }}
                     placeholder="Renewal ID"
-                    disabled={!!formData.requestId}
+                    disabled={!formData.requestId}
                   />
                   <span
                     className="select-arrow"

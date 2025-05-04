@@ -1557,7 +1557,7 @@ const handleUpdateAnalysis = async (analysisData) => {
                     <span className="select-arrow" onClick={handleToggleDropdownAfterStatus}>▼</span>
                     {isOpenAfterStatusDD && (
                     <ul className="dropdown-list">
-                      {["Scheduled", "Completed", "Cancelled", "In Progress"].map((status) => (
+                      {["Scheduled", "Completed", "In Progress"].map((status) => (
                         <li key={status} onClick={() => handleSelectAfterStatus(status)}>
                           {status}
                         </li>

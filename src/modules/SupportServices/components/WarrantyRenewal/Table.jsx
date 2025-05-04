@@ -6,6 +6,7 @@ const Table = ({ renewals, onRowClick, selectedRenewal }) => {
       <table className="renewals-table">
         <thead>
           <tr>
+            <th>Ticket ID</th>
             <th>Renewal ID</th>
             <th>Call ID</th>
             <th>Contract ID</th>
@@ -17,7 +18,9 @@ const Table = ({ renewals, onRowClick, selectedRenewal }) => {
         </thead>
         <tbody>
           {renewals.length > 0 ? (
-            renewals.map((renewal, index) => (
+             [...renewals]
+             .sort((a, b) => new Date(b.date_created) - new Date(a.date_created))
+             .map((renewal, index) => (
               <tr 
                 key={renewal.renewal_id || `renewal-${index}`} 
                 className={`${
@@ -26,6 +29,7 @@ const Table = ({ renewals, onRowClick, selectedRenewal }) => {
                 onClick={() => onRowClick(renewal)} // makes table row clickable, function update the state fields
                 style={{ cursor: "pointer" }} 
               >
+                  <td>{renewal.service_call  ? renewal.service_call.service_ticket.ticket_id : "Null"}</td>
                   <td>{renewal.renewal_id}</td>
                   <td>{renewal.service_call  ? renewal.service_call.service_call_id : "Null"}</td>
                   <td>{renewal.contract ? renewal.contract.contract_id : "Null"}</td>
