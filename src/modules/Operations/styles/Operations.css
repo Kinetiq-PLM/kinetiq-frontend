@@ -202,3 +202,10 @@
   color: #666;
   margin-top: 0.3rem;
 }
+.operations .loading-center {
+  display: flex;
+  justify-content: center;
+  height: 100vh; /* Full screen height */
+  font-size: 1.2rem;
+  color: #333;
+}

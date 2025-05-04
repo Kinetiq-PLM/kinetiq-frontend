@@ -8,12 +8,11 @@ import { Slide } from 'react-toastify';
 const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
- 
   const [selectedStatus, setSelectedStatus] = useState("Open");
+  const [selectedDelNote, setSelectedDelNote] = useState("Full Delivery");
   const [activeTab, setActiveTab] = useState("document");
   const [showSerialModal, setShowSerialModal] = useState(false);
   const [selectedSerialNumbers, setSelectedSerialNumbers] = useState([]);
-
   const calculateInitialAmount = () => {
     if (isCreateMode) return 0;
     return selectedData.document_items.reduce((sum, item) => {
@@ -21,11 +20,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     }, 0).toFixed(2);
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
-
-
   const statusOptions = ["Open", "Closed", "Cancelled", "Draft"];
-
-
+  const deliveryNoteOptions = ["Partial Delivery", "Full Delivery"];
   const [selectedVendor, setSelectedVendor] = useState("");
   const [selectedOwner, setSelectedOwner] = useState(
       isCreateMode ? employee_id : selectedData.employee_name || employee_id
@@ -43,6 +39,11 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
     }
   }, [selectedData]);
+  useEffect(() => {
+    if (selectedData?.delivery_note) {
+      setSelectedDelNote(selectedData.delivery_note); // Set selectedStatus from selectedData
+    }
+  }, [selectedData]);
 
 
   const fetchVendors = async () => {
@@ -50,23 +51,11 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       setLoading(true);
       const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
       if (!response.ok) throw new Error("Connection to database failed");
-
-
-
-
       const data = await response.json();
-
-
-
-
       if (!Array.isArray(data.vendors)) throw new Error("Invalid goods data format");
       setVendorList(data.vendors);
       if (!Array.isArray(data.employees)) throw new Error("Invalid goods data format");
       setEmployeeList(data.employees)
-
-
-
-
     } catch (error) {
       setError(error.message);
     } finally {
@@ -82,7 +71,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const handleVendorChange = (e) => {
     const vendorName = e.target.value;
     setSelectedVendor(vendorName);
-    const selectedVendorData = vendorList.find(v => v.vendor_name === vendorName);
+    const selectedVendorData = vendorList.find(v => v.company_name === vendorName);
     setVendorID(selectedVendorData ? selectedVendorData.vendor_code : null);
     setContactPerson(selectedVendorData ? selectedVendorData.contact_person : "");
   };
@@ -92,7 +81,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     if (vendorList.length > 0) {
       const matchedVendor = vendorList.find(v => v.vendor_code === selectedData.vendor_code);
       if (matchedVendor) {
-        setSelectedVendor(matchedVendor.vendor_name);
+        setSelectedVendor(matchedVendor.company_name);
         setVendorID(matchedVendor.vendor_code);
         setContactPerson(matchedVendor.contact_person);
       }
@@ -103,16 +92,22 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     }
   }, [vendorList, selectedData.vendor_code, employeeList, selectedData.employee_id]);
 
-
+  
   const [documentItems, setDocumentItems] = useState(
     isCreateMode 
-      ? [{ product_details: {} }] 
+      ? [{}] 
       : [
           ...selectedData.document_items.map(item => ({
-            ...item,
-            product_details: item.product_details || {}
+            content_id: item.content_id,
+            item_id: item.item_id,
+            item_name: item.item_name,
+            unit_of_measure: item.unit_of_measure,
+            quantity: item.quantity,
+            cost: item.item_price || 0, 
+            warehouse_id: item.warehouse_id,
+            item_no: item.item_no 
           })), 
-          { product_details: {} }
+          {}
         ]
   );
 
@@ -120,15 +115,16 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const today = new Date().toISOString().slice(0, 10);
   // Initialize document details differently for create mode
   const [documentDetails, setDocumentDetails] = useState({
+    purchase_id: isCreateMode ? "" : selectedData.purchase_id || null,
     vendor_code: isCreateMode ? "" : vendorID,
-    vendor_name: isCreateMode ? "" : selectedVendor,
+    company_name: isCreateMode ? "" : selectedVendor,
     contact_person: isCreateMode ? "" : contactPerson,
     buyer: isCreateMode ? "" : selectedData.buyer || "",
-    owner: isCreateMode ? employee_id : selectedOwner,
-    delivery_note: isCreateMode ? "" : selectedData.delivery_note || "",
+    owner: isCreateMode ? employee_id : selectedData.owner,
     transaction_id: isCreateMode ? "" : selectedData.transaction_id || "",
     delivery_date: isCreateMode ? today : selectedData.delivery_date || "",
     status: isCreateMode ? "Draft" : selectedStatus,
+    delivery_note: isCreateMode ? "Full Delivery" : selectedDelNote,
     posting_date: isCreateMode ? today  : selectedData.posting_date || "",
     document_no: isCreateMode ? "" : selectedData.document_no || "",
     document_date: isCreateMode ? today  : selectedData.document_date || "",
@@ -172,24 +168,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const handleInputChange = async (e, index, field) => {
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
-
-
-    // Handle date fields
-    if (field === 'manuf_date' || field === 'expiry_date') {
-      updatedItems[index] = {
-        ...currentItem,
-        product_details: {
-          ...(currentItem.product_details || {}),
-          [field]: e.target.value // This will be in YYYY-MM-DD format from the date input
-        }
-      };
-    } else {
-      updatedItems[index][field] = e.target.value;
-    }
+    updatedItems[index][field] = e.target.value;
     setDocumentItems(updatedItems);
-
-
-
 
     // Check if the row is NOT the last row and the item_name was cleared
     if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
@@ -212,7 +192,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       updatedItems.splice(index, 1);
       setDocumentItems(updatedItems);
     }
- 
+
     // If you're editing the last row and it was just filled, add a new row
     if (index === documentItems.length - 1) {
       handleAddRow();
@@ -231,163 +211,47 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     }
   };
   const [isAddingRow, setIsAddingRow] = useState(false);
-  const handleAddRow = async () => {
+
+  const handleAddRow = () => {
     const lastRow = documentItems[documentItems.length - 1];
-   
+    
+    // Only add a new row if the last row is filled (but don't make API calls yet)
     if (isRowFilled(lastRow)) {
-      try {
-        setIsAddingRow(true);
-        if (isCreateMode) {
-          // In create mode, just add the item to state without API calls
-          const updatedItems = [...documentItems];
-          updatedItems[updatedItems.length - 1] = {
-            ...lastRow,
-            // Calculate total for display
-            total: (parseFloat(lastRow.quantity) * (parseFloat(lastRow.cost))).toFixed(2)
-          };
-         
-          // Add new empty row
-          updatedItems.push({
-            item_id: '',
-            item_name: '',
-            unit_of_measure: '',
-            quantity: '',
-            cost: '',
-            warehouse_id: '',
-            product_details: {}
-          });
- 
-          setDocumentItems(updatedItems);
-          return
-        }else{
-        // Prepare the payload
-        const payload = {
-          document_id: selectedData.document_id,
-          quantity: parseInt(lastRow.quantity),
-          cost: parseFloat(lastRow.cost),
-          warehouse_id: lastRow.warehouse_id,
-        };
- 
-        // Set the appropriate item type field
-        if (lastRow.item_id.startsWith("ADMIN-MATERIAL")) {
-          payload.material_id = lastRow.item_id;
-        } else if (lastRow.item_id.startsWith("ADMIN-ASSET")) {
-          payload.asset_id = lastRow.item_id;
-        } else if (lastRow.item_id.startsWith("ADMIN-PROD")) {
-          // First create product docu item
-          const productDocuResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-product-docu-item/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              product_id: lastRow.item_id,
-              document_id: selectedData.document_id,
-              manufacturing_date: lastRow.manufacturing_date,
-              expiry_date: lastRow.manufacturing_date
-            })
-          });
-         
-          if (!productDocuResponse.ok) {
-            const errorData = await productDocuResponse.json();
-            throw new Error(`Create product item ${selectedData.content_id}: ${JSON.stringify(errorData)}`);
-          }
-          const productDocuItem = await productDocuResponse.json();
-          payload.productdocu_id = productDocuItem.productdocu_id;
-        }
- 
-        // Create the document item
-        const createResponse = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/create-items/create-document-item/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
- 
-        if (!createResponse.ok) {
-          const errorData = await createResponse.json();
-          throw new Error(`Create item ${selectedData.content_id}: ${JSON.stringify(errorData)}`);
-        }
-        const createdItem = await createResponse.json();
- 
-        // Update state
-        const freshItems = await reloadDocumentItems();
-     
-        // Find the newly created item by matching properties
-        const newItem = freshItems.find(item =>
-          item.item_id === lastRow.item_id &&
-          item.quantity === parseInt(lastRow.quantity)
-        );
-
-
-
-
-        if (!newItem) {
-          throw new Error('Newly created item not found in reloaded data');
-        }
-
-
-
-
-        // Update state with the fresh data
-        const updatedItems = [...documentItems];
-        updatedItems[updatedItems.length - 1] = {
-          ...lastRow,
-          content_id: newItem.content_id,
-          productdocu_id: newItem.productdocu_id || null
-        };
-       
-        updatedItems.push({
-          item_id: '',
-          item_name: '',
-          unit_of_measure: '',
-          quantity: '',
-          cost: '',
-          warehouse_id: '',
-          product_details: {}
-        });
- 
-        setDocumentItems(updatedItems);
-        const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
-
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-
-        const updatedDoc = await response.json();  
-        updatedDoc.document_items.push({          
-          item_id: '',
-          item_name: '',
-          unit_of_measure: '',
-          quantity: '',
-          cost: '',
-          warehouse_id: ''
-        });
-
-
-        setDocumentItems(updatedDoc.document_items);  
-      }
-      } catch (error) {
-        toast.error(`Failed to add item: ${error.message}`);
-      } finally {
-        setIsAddingRow(false);
-      }
+      const updatedItems = [...documentItems];
+      
+      // Calculate total for the current row
+      updatedItems[updatedItems.length - 1] = {
+        ...lastRow,
+        total: (parseFloat(lastRow.quantity) * parseFloat(lastRow.cost)).toFixed(2)
+      };
+      
+      // Add new empty row with all possible fields
+      updatedItems.push({
+        item_id: '',
+        item_name: '',
+        item_type: '',
+        unit_of_measure: '',
+        quantity: '',
+        cost: '',
+        warehouse_id: '',
+        item_no: ''
+      });
+  
+      setDocumentItems(updatedItems);
     }
   };
  
  
  
   const isRowFilled = (row) => {
-    return (
+    const baseFieldsFilled = (
       row.item_id &&
       row.item_name &&
-      row.unit_of_measure &&
-      (row.item_id.startsWith('ADMIN-PROD') 
-      ? (row.product_details?.manuf_date && row.product_details?.expiry_date)
-      : true) &&
       row.quantity &&
       row.cost &&
       row.warehouse_id
     );
+    return baseFieldsFilled;
   };
 
 
@@ -408,61 +272,70 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   }, []);
  
   const [itemOptions, setItemOptions] = useState([]);
+  const [duplicateDetails, setDuplicateDetails] = useState({});
 
-
-
-
+  // Inside your item fetch useEffect:
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item-data/')
-      .then(res => res.json())
-      .then(data => {
-        const options = [];
-
-
-
-
-        data.products.forEach(prod => {
-          options.push({
-            id: prod.product_id,
-            name: prod.product_name,
-            cost: parseFloat(prod.selling_price),
-            unit: prod.unit_of_measure,
-            type: 'product',
+      fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item/')
+        .then(res => res.json())
+        .then(data => {
+          const typePriority = { product: 1, material: 2, asset: 3 };
+    
+          const filtered = data.filter(item => {
+            const priceValid = item.item_price != null && parseFloat(item.item_price) > 0;
+  
+            const type = item.item_type?.toLowerCase();
+            const isAssetOrMaterial = type?.includes('asset') || type?.includes('material');
+            const hasValidDate = item.purchase_date;
+    
+            return priceValid && (!isAssetOrMaterial || hasValidDate);
           });
-        });
-
-
-
-
-        data.material.forEach(mat => {
-          options.push({
-            id: mat.material_id,
-            name: mat.material_name,
-            cost: parseFloat(mat.cost_per_unit),
-            unit: mat.unit_of_measure,
-            type: 'material',
+    
+          const uniqueMap = new Map();
+          const duplicateDetails = {};
+    
+          filtered.forEach(item => {
+            const id = item.item_id;
+            const price = parseFloat(item.item_price);
+            const date = item.purchase_date;
+    
+            if (!uniqueMap.has(id)) {
+              uniqueMap.set(id, item);
+              duplicateDetails[id] = [{ price, date }];
+            } else {
+              duplicateDetails[id].push({ price, date });
+            }
           });
-        });
-
-
-
-
-        data.asset?.forEach(asset => {
-          options.push({
-            id: asset.asset_id,
-            name: asset.asset_name,
-            cost: parseFloat(asset.purchase_price),
-            unit: "---",
-            type: 'asset',
+    
+          Object.keys(duplicateDetails).forEach(id => {
+            duplicateDetails[id].sort((a, b) => new Date(b.date) - new Date(a.date));
           });
+    
+          setDuplicateDetails(duplicateDetails);
+    
+          const options = Array.from(uniqueMap.values()).map(item => ({
+            id: item.item_id,
+            name: item.item_name,
+            cost: parseFloat(item.item_price),
+            unit: item.unit_of_measure || '---',
+            type: item.item_type?.toLowerCase().includes("asset") ? 'asset' :
+                  item.item_type?.toLowerCase().includes("product") ? 'product' :
+                  'material',
+          }));
+    
+          options.sort((a, b) => {
+            const typeCompare = typePriority[a.type] - typePriority[b.type];
+            if (typeCompare !== 0) return typeCompare;
+            return a.name.localeCompare(b.name);
+          });
+    
+          setItemOptions(options);
         });
-
-
-
-
-        setItemOptions(options);
-      });
-  }, []);
+    }, []);
+  
+  
+  
+  
 
 
 
@@ -562,15 +435,31 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     // Normal item selection
     const selectedItem = itemOptions.find(opt => opt.name === selectedName);
     if (!selectedItem) return;
- 
-    updatedItems[index] = {
-      ...currentItem,
-      item_name: selectedItem.name,
-      item_id: selectedItem.id,
-      cost: selectedItem.cost,
-      unit_of_measure: selectedItem.unit,
-    };
- 
+    const duplicatePrices = duplicateDetails[selectedItem.id] || [];
+    if (duplicatePrices.length <= 1) {
+      updatedItems[index] = {
+        ...currentItem,
+        item_name: selectedItem.name,
+        item_id: selectedItem.id,
+        cost: duplicatePrices[0]?.price || selectedItem.cost,
+        unit_of_measure: selectedItem.unit,
+        available_costs: null // No cost selection needed
+      };
+    } else {
+      const latestPrice = duplicatePrices[0]?.price;
+      updatedItems[index] = {
+        ...currentItem,
+        item_name: selectedItem.name,
+        item_id: selectedItem.id,
+        cost: latestPrice || 0, // Default to latest price if available
+        unit_of_measure: selectedItem.unit,
+        available_costs: duplicatePrices.map(priceObj => ({
+          price: priceObj.price,
+          date: priceObj.date
+        }))
+      };
+    }
+  
     setDocumentItems(updatedItems);
  
     // Add new row if this is the last row and we're selecting an item
@@ -578,10 +467,18 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       handleAddRow();
     }
   };
-
-
-
-
+  const handleCostSelection = (index, selectedPrice) => {
+    const updatedItems = [...documentItems];
+    updatedItems[index].cost = selectedPrice;
+    
+    // Recalculate total for this row
+    updatedItems[index].total = (
+      parseFloat(updatedItems[index].quantity || 0) * 
+      parseFloat(selectedPrice)
+    ).toFixed(2);
+    
+    setDocumentItems(updatedItems);
+  };
   useEffect(() => {
     const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
     const discount_amount = (documentDetails.discount_rate / 100) * initialAmount;
@@ -603,51 +500,53 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     }));
   };
 
-
-
-
- 
- 
- 
   // Add a new function to handle create operation
   const handleCreateDocument = async () => {
     try {
       
       // Prepare the document items for creation
-      const itemsToCreate = documentItems.slice(0, -1); // Exclude the last empty row
-     
+      const itemsToCreate = documentItems
+      .slice(0, -1)
+      .filter(item => isRowFilled(item));
+      if (itemsToCreate.length === 0) {
+        toast.error("Please add at least one valid item before saving");
+        return;
+      }
+      if (!documentDetails.buyer) {
+        toast.error("Buyer information is required");
+        return;
+      }
       // Prepare the payload for the create API
       const payload = {
+        vendor_code: vendorID,
         document_type: "Goods Receipt PO",
+        transaction_id: documentDetails.transaction_id,
+        document_no: documentDetails.document_no,
+        purchase_id: documentDetails?.purchase_id || null,
         status: selectedStatus,
-        vendor_code: vendorID || null,
-        buyer: documentDetails.buyer,
-        employee_id: employee_id,
         delivery_date: documentDetails.delivery_date,
         posting_date: documentDetails.posting_date,
         document_date: documentDetails.document_date,
-        document_no: documentDetails.document_no, // Add document_no from state
-        transaction_id: documentDetails.transaction_id,
-        initial_amount: documentDetails.initialAmount,
-        tax_rate: documentDetails.tax_rate,
-        tax_amount: documentDetails.tax_amount,
-        discount_rate: documentDetails.discount_rate,
-        discount_amount: documentDetails.discount_amount,
-        freight:  parseFloat(parseFloat(documentDetails.freight).toFixed(2)),
-        transaction_cost:  parseFloat(parseFloat(documentDetails.transaction_cost).toFixed(2)),
+        buyer: documentDetails.buyer,
+        owner: documentDetails.owner,
+        delivery_note: selectedDelNote,
+        initial_amount: parseFloat(initialAmount).toFixed(2) || 0, 
+        discount_rate: parseFloat(documentDetails.discount_rate).toFixed(2) || 0,
+        discount_amount: parseFloat(documentDetails.discount_amount).toFixed(2) || 0,
+        freight: parseFloat(documentDetails.freight).toFixed(2) || 0,
+        tax_rate: parseFloat(documentDetails.tax_rate).toFixed(2) || 0,
+        tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
+        transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0,
         document_items: itemsToCreate.map(item => ({
           item_id: item.item_id,
-          item_name: item.item_name,
-          quantity: item.quantity,
-          cost: item.cost,
+          quantity: parseInt(item.quantity, 10),
+          item_price: parseFloat(item.cost) || 0,
+          total: parseFloat(item.total) || 0,
           warehouse_id: item.warehouse_id,
-          batch: item.batch_no || null,
-          ...(item.item_id.startsWith("ADMIN-PROD") && { product_id: item.item_id }),
-          ...(item.item_id.startsWith("ADMIN-ASSET") && { asset_id: item.item_id }),
-          ...(item.item_id.startsWith("ADMIN-MATERIAL") && { material_id: item.item_id }),
+          item_no: null
         }))
       };
-      console.log(payload)
+
       // Call the create API
       const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
         method: 'POST',
@@ -657,16 +556,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         body: JSON.stringify(payload),
       });
 
-
-
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Create failed: ${JSON.stringify(errorData)}`);
       }
-
-
-
 
       const result = await response.json();
       toast.success('Create successful:', result);
@@ -680,24 +573,11 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     }
   };
 
-
-
-
-
-
-
-
   const handleBackWithUpdate = async () => {
     const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
-    const allProductDetails = documentItems.map(item => item.product_details).slice(0, -1);
-    if (!selectedOwner || !documentDetails.buyer){
-      if(!selectedOwner){
-        toast.error("Owner is required")
-        return
-      }else if(!documentDetails.buyer){
-        toast.error("Buyer Required")
-        return
-      }
+    let rowNum = 0
+    if (!selectedOwner){
+      toast.error("Owner is required")
       return
     }else if (updatedDocumentItems.length === 0) {
       toast.error("At least one item is required. Please fill all necessary data");
@@ -706,110 +586,111 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       toast.dismiss()
       toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
       return;
+    }else if (!documentDetails.buyer){
+      toast.dismiss()
+      toast.error("Buyer is required.")
+    }
+    for (let item of updatedDocumentItems){
+      rowNum += 1
+      if (!item.item_id){
+        toast.dismiss()
+        toast.error(`Please add item for Row: ${rowNum}.`);
+        return
+      }else if(!item.quantity){
+        toast.dismiss()
+        toast.error(`Please add quantity for ${item.item_name} (Row: ${rowNum}).`);
+        return
+      }else if(!item.warehouse_id){
+        toast.dismiss()
+        toast.error(`Please add warehouse for ${item.item_name} (Row: ${rowNum}).`)
+        return
+      }
     }
     try {
+      toast.dismiss()
       if (isCreateMode) {
+        toast.loading("Saving changes...")
         await handleCreateDocument();
+        toast.dismiss()
       } else {
-      // Step 1: Update Product Document Items
-      for (let item of updatedDocumentItems) {
-        if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
-        const updatedDocumentItemData = {
-          product_id: item.item_id,
-        };
-        const documentItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/product-docu-item/${item.productdocu_id}/`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedDocumentItemData),
-        });
- 
-        if (!documentItemResponse.ok) {
-          const errorData = await documentItemResponse.json();
-          throw new Error(`Product Items update failed for productdocu_id ${item.productdocu_id}: ${JSON.stringify(errorData)}`);
-        }
-       
-        const documentItemResult = await documentItemResponse.json();
-        console.log('Product Items update successful:', documentItemResult);
-      }}
- 
+        rowNum = 0
+        toast.loading("Saving changes...")
      
- 
-      // Step 3: Update ProductDocuItemData after DocumentItems
-      //id name uom quanity cost total location serial
-      for (let item of updatedDocumentItems) {
-        const updateDocomentItems = {
-          quantity: parseInt(item.quantity) || 0,
-          cost: parseFloat(item.cost) || 0,
-          total: parseFloat(item.quantity * item.cost).toFixed(2) || 0,
-          warehouse_id: item.warehouse_id || "",
-        };
-        if (item.item_id?.startsWith("ADMIN-MATERIAL")) {
-          updateDocomentItems.material_id = item.item_id;
-        } else if (item.item_id?.startsWith("ADMIN-ASSET")) {
-          updateDocomentItems.asset_id = item.item_id;
-        } else if (item.item_id?.startsWith("ADMIN-PROD") && item.productdocu_id) {
-          updateDocomentItems.productdocu_id = item.productdocu_id;
+        for (let item of updatedDocumentItems){
+          rowNum += 1
+          const payload = {
+            document_id: selectedData.document_id,
+            item_id: item.item_id,
+            quantity: parseInt(item.quantity, 10),
+            item_price: parseFloat(item.cost) || 0,
+            total: parseFloat(item.total) || 0,
+            warehouse_id: item.warehouse_id,
+            purchase_date: item.purchase_date,
+            item_no: item?.item_no || null
+          }
+          let itemResponse
+          if (item.content_id){
+            itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(payload),
+            });
+          }else{
+            itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(payload),
+            });
+          }
+          
+          if (!itemResponse.ok) {
+            const errorData = await itemResponse.json();
+            toast.error(`Row ${rowNum}: ${errorData.error || 'Failed to save item.'}`);
+            return;
+          }
         }
-        const productDocuItemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
+        const updatedDocumentsData = {
+          vendor_code: vendorID,
+          document_type: "Goods Receipt PO",
+          transaction_id: documentDetails.transaction_id,
+          document_no: documentDetails.document_no,
+          purchase_id: documentDetails?.purchase_id || null,
+          status: selectedStatus,
+          delivery_date: documentDetails.delivery_date,
+          posting_date: documentDetails.posting_date,
+          document_date: documentDetails.document_date,
+          buyer: documentDetails.buyer,
+          owner: documentDetails.owner,
+          delivery_note: selectedDelNote,
+          initial_amount: parseFloat(initialAmount).toFixed(2) || 0, 
+          discount_rate: parseFloat(documentDetails.discount_rate).toFixed(2) || 0,
+          discount_amount: parseFloat(documentDetails.discount_amount).toFixed(2) || 0,
+          freight: parseFloat(documentDetails.freight).toFixed(2) || 0,
+          tax_rate: parseFloat(documentDetails.tax_rate).toFixed(2) || 0,
+          tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
+          transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0
+        };
+        const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(updateDocomentItems),
+          body: JSON.stringify(updatedDocumentsData),
         });
- 
-        if (!productDocuItemResponse.ok) {
-          const errorData = await productDocuItemResponse.json();
-          throw new Error(`document item update failed for content_id ${item.content_id}: ${JSON.stringify(errorData)}`);
+        if (!goodsTrackingResponse.ok) {
+          const errorData = await goodsTrackingResponse.json();
+          throw new Error(`GoodsTrackingData update failed for document_id ${selectedData.document_id}: ${JSON.stringify(errorData)}`);
         }
- 
-        const productDocuItemResult = await productDocuItemResponse.json();
-        console.log('`document item update successful:', productDocuItemResult);
-      }
-      // Step 2: Update GoodsTrackingData last
-      //vendor code name CP buyer owner
-      //details TransactionID Status DocumentNo DeliveryDate posting date document date
-      //initial amount discount rate discount amount freight tax rate tax amount total
-      const updatedData = {
-        status: selectedStatus,
-        vendor_code: vendorID,
-        buyer: documentDetails.buyer,
-        employee_id: isCreateMode ? employee_id : selectedData?.employee_id || employee_id,
-        transaction_id: documentDetails.transaction_id,
-        document_no: documentDetails.document_no,
-        delivery_date: documentDetails.delivery_date,
-        posting_date: documentDetails.posting_date,
-        document_date: documentDetails.document_date,
-        initial_amount: parseFloat(initialAmount) || 0,
-        discount_rate: parseFloat(documentDetails.discount_rate) || 0,
-        discount_amount: parseFloat(documentDetails.discount_amount).toFixed(2) || 0,
-        tax_rate: parseFloat(documentDetails.tax_rate) || 0,
-        tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
-        freight: parseFloat(documentDetails.freight) || 0,
-        transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0,
-      };
-      const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedData),
-      });
- 
-      if (!goodsTrackingResponse.ok) {
-        const errorData = await goodsTrackingResponse.json();
-        throw new Error(`GoodsTrackingData update failed for document_id ${selectedData.document_id}: ${JSON.stringify(errorData)}`);
-      }
- 
-      const goodsTrackingResult = await goodsTrackingResponse.json();
-      toast.loading("Updating...");
       }
       if (onSuccess) {
-        await onSuccess();  // Refresh the data in GoodsTracking
+        await onSuccess();
+        toast.success("Successfully updated documents.");
+        
       }
- 
       if (onBack) {
         onBack();  // Navigate back to GoodsTracking
       }
@@ -818,16 +699,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       console.log(error.message)
     }
   };
- 
-
-
-
 
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedPO, setSelectedPO] = useState("");
-
-
-
 
   // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
@@ -858,7 +732,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       const selectedPO = await response.json();
       const quotation = selectedPO.quotation_id || {};
       const getVendor = quotation.vendor_code || {};
-      setSelectedVendor(getVendor.vendor_name || "");
+      setSelectedVendor(getVendor.company_name || "");
       setVendorID(getVendor.vendor_code || "");
       setContactPerson(quotation.contact_person || "");
       // Update document details with PO information
@@ -866,7 +740,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       setDocumentDetails(prev => ({
         ...prev,
         vendor_code: getVendor.vendor_code || null,
-        vendor_name: getVendor.vendor_name || null,
+        company_name: getVendor.company_name || null,
         contact_person: quotation.contact_person || null,
         buyer: quotation?.buyer || "",
         owner: quotation.request_id?.employee_name || null,
@@ -926,10 +800,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
   useEffect(() => {
-    if (isCreateMode) {
-      fetchPurchaseOrders();
-    }
-  }, [isCreateMode]);
+    fetchPurchaseOrders();
+  }, []);
  
   useEffect(() => {
       const tax_amount = (documentDetails.tax_rate / 100) * initialAmount;
@@ -960,6 +832,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       setInitialAmount(newInitialAmount);
     }, [documentItems]);
    
+
   return (
     <div className="goods-r-po">
       <div className="body-content-container">
@@ -969,9 +842,24 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           <div className="details-grid">
             <div className="details-section">
             {/* Vendor Code (ID) */}
-              <div className="detail-row">
-                <label>Vendor Code</label>
-                <input type="text" value={vendorID} style={{ cursor: 'not-allowed' }} readOnly/>
+              <div className="detail-row dropdown-scrollbar">
+                <label>Purchase ID</label>
+                <select
+                  value={documentDetails.purchase_id || ""}
+                  onChange={(e) => {
+                    setDocumentDetails(prev => ({
+                      ...prev,
+                      purchase_id: e.target.value
+                    }));
+                  }}
+                >
+                  <option value="">Select Purchase Order</option>
+                  {purchaseOrders.map(po => (
+                    <option key={po.purchase_id} value={po.purchase_id}>
+                      {po.purchase_id} - {po.status} {/* You can format this as needed */}
+                    </option>
+                  ))}
+                </select>
               </div>
               {/* Vendor Name Dropdown */}
               <div className="detail-row dropdown-scrollbar">
@@ -982,8 +870,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                     <option value="">Loading vendors...</option>
                   ) : (
                     vendorList.map((vendor) => (
-                      <option key={vendor.vendor_code} value={vendor.vendor_name}>
-                        {vendor.vendor_name}
+                      <option key={vendor.vendor_code} value={vendor.company_name}>
+                        {vendor.company_name}
                       </option>
                     ))
                   )}
@@ -1220,14 +1108,19 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                   </div>
 
                   <div className="detail-row">
-  <label>Delivery Note</label>
-  <input
-    type="text"
-    value={documentDetails.delivery_note || ''}
-    onChange={(e) => handleDocumentDetailChange(e, "delivery_note")}
-    maxLength={255}
-  />
-</div>
+                  <label>Delivery Note</label>
+                  <select
+                      className="form-select"
+                      value={selectedDelNote}
+                      onChange={(e) => setSelectedDelNote(e.target.value)}
+                    >
+                      {deliveryNoteOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                </div>
                 </div>
               )}
             </div>
@@ -1249,8 +1142,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                     <th>Quantity</th>
                     <th>Cost Per Unit</th>
                     <th>Total</th>
-                    <th>Manufacturing Date</th>
-                    <th>Expiry Date</th>
                     <th>Warehouse Location</th>
                     <th>Batch No.</th>
                     <th>Serial No.</th>
@@ -1318,13 +1209,32 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                         />
                       </td>
                       <td>
-                        <input
-                          type="number"
-                          value={item.cost || ''}
-                          onChange={(e) => handleInputChange(e, index, 'cost')}
-                          readOnly
-                          style={{ cursor: 'not-allowed' }}
-                        />
+                        {item.item_id && duplicateDetails[item.item_id]?.length > 1 ? (
+                          // Show dropdown if item has multiple prices
+                          <select
+                            value={item.cost || ''}
+                            onChange={(e) => handleCostSelection(index, parseFloat(e.target.value))}
+                            required
+                          >
+                            {duplicateDetails[item.item_id].map((costObj, costIndex) => (
+                              <option key={costIndex} value={costObj.price}>
+                                {costObj.price.toFixed(2)} (Purchased: {costObj.date || 'Unknown'})
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          // Show read-only input with first available cost
+                          <input
+                            type="number"
+                            value={
+                              item.cost || 
+                              (item.item_id && duplicateDetails[item.item_id]?.[0]?.price) || 
+                              '0.00'
+                            }
+                            readOnly
+                            style={{ cursor: 'not-allowed' }}
+                          />
+                        )}
                       </td>
                       <td readOnly style={{ cursor: 'not-allowed' }}>
                         {(() => {
@@ -1336,42 +1246,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                           return total.toFixed(2);
                         })()}
                       </td>
-                      <td className="item-date-input">
-                      {!item.item_id?.startsWith('ADMIN-PROD') ? (
-                        <input
-                          type="text"
-                          value="N/A"
-                          readOnly
-                          style={{ cursor: 'not-allowed' }}
-                        />
-                      ) : (
-                        <input
-                          type="date"
-                          value={item.product_details?.manuf_date || ''}
-                          onChange={(e) => {
-                            // The date input always returns YYYY-MM-DD format
-                            handleInputChange(e, index, 'manuf_date');
-                          }}
-                        />
-                      )}
-                    </td>
-                    <td className="item-date-input">
-                      {!item.item_id?.startsWith('ADMIN-PROD') ? (
-                        <input
-                          type="text"
-                          value="N/A"
-                          readOnly
-                          style={{ cursor: 'not-allowed' }}
-                        />
-                      ) : (
-                        <input 
-                          className="custom-date-input"
-                          type="date"
-                          value={item.product_details?.expiry_date || ''}
-                          onChange={(e) => handleInputChange(e, index, 'expiry_date')}
-                        />
-                      )}
-                    </td>
+                      
                       <td>
                         <select
                           value={item.warehouse_id || ''}
@@ -1386,11 +1261,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                         </select>
                       </td>
                       <td readOnly style={{ cursor: 'not-allowed' }}>
-                        {item?.batch_no || "N/A"}
+                        {item?.item_no?.startsWith("BN") ? item.item_no : "N/A"}
                       </td>
                       <td readOnly style={{ cursor: 'not-allowed' }}>
-                        {item?.serial_no || "N/A"}
+                        {item?.item_no?.startsWith("SRL") ? item.item_no : "N/A"}
                       </td>
+
                     </tr>
                   ))}
                 </tbody>
