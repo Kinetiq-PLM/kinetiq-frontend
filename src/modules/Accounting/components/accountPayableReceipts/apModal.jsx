@@ -3,6 +3,7 @@ import "../ModalInput.css";
 import Button from "../button/Button";
 import Forms from "../forms/Forms";
 import Dropdown from "../dropdown/Dropdown";
+import NotifModal from "../modalNotif/NotifModal"; // Adjust the path if needed
 
 const AccountsPayableReceiptModal = ({
   isModalOpen,
@@ -13,6 +14,7 @@ const AccountsPayableReceiptModal = ({
   isCreating,
 }) => {
   const [formData, setFormData] = useState(selectedRow);
+  const [notif, setNotif] = useState({ isOpen: false, type: "", title: "", message: "" });
 
   useEffect(() => {
     if (selectedRow) {
@@ -38,8 +40,8 @@ const AccountsPayableReceiptModal = ({
 
   const handleInputChange = (index, value) => {
     const isFieldEditable = isCreating
-      ? index !== 0 && index !== 6 // Allow all except ap_id and reference_number
-      : index === 7; // Only allow Status in edit mode
+      ? index !== 0 && index !== 6
+      : index === 7;
 
     if (!isFieldEditable) return;
 
@@ -48,27 +50,31 @@ const AccountsPayableReceiptModal = ({
     setFormData(updatedFormData);
   };
 
+  const showValidationError = (message) => {
+    setNotif({
+      isOpen: true,
+      type: "error",
+      title: "Validation Error",
+      message,
+    });
+  };
+
   const handleFormSubmit = () => {
     if (isCreating) {
       if (!formData[1]) {
-        alert("Please enter an Invoice ID.");
-        return;
+        return showValidationError("Please enter an Invoice ID.");
       }
       if (!formData[2] || isNaN(parseFloat(formData[2]))) {
-        alert("Please enter a valid Amount.");
-        return;
+        return showValidationError("Please enter a valid Amount.");
       }
       if (!formData[3]) {
-        alert("Please select a Payment Date.");
-        return;
+        return showValidationError("Please select a Payment Date.");
       }
       if (!formData[4]) {
-        alert("Please select a Payment Method.");
-        return;
+        return showValidationError("Please select a Payment Method.");
       }
       if (!formData[5]) {
-        alert("Please enter a Paid By value.");
-        return;
+        return showValidationError("Please enter a Paid By value.");
       }
     }
     handleSubmit(formData, isCreating);
@@ -77,25 +83,108 @@ const AccountsPayableReceiptModal = ({
   if (!isModalOpen) return null;
 
   return (
-    <div className="accounting-modal">
-      <div className="modal-overlay">
-        <div className="modal-container">
-          <div className="modal-header">
-            <h2>{isCreating ? "Create Receipt Record" : "Edit Receipt Record"}</h2>
-            <img
-              className="cursor-pointer hover:scale-110"
-              src="/accounting/Close.svg"
-              alt="Close"
-              onClick={closeModal}
-            />
-          </div>
-          <div className="modal-body">
-            {columnHeaders.map((header, index) => {
-              const isDisabled = isCreating
-                ? header === "AP ID" || header === "Reference Number"
-                : header !== "Status";
+    <>
+      <NotifModal
+        isOpen={notif.isOpen}
+        type={notif.type}
+        title={notif.title}
+        message={notif.message}
+        onClose={() => setNotif({ ...notif, isOpen: false })}
+      />
 
-              if (header === "AP ID" || header === "Reference Number") {
+      <div className="accounting-modal">
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <h2>{isCreating ? "Create Receipt Record" : "Edit Receipt Record"}</h2>
+              <img
+                className="cursor-pointer hover:scale-110"
+                src="/accounting/Close.svg"
+                alt="Close"
+                onClick={closeModal}
+              />
+            </div>
+            <div className="modal-body">
+              {columnHeaders.map((header, index) => {
+                const isDisabled = isCreating
+                  ? header === "AP ID" || header === "Reference Number"
+                  : header !== "Status";
+
+                if (header === "AP ID" || header === "Reference Number") {
+                  return (
+                    <Forms
+                      key={index}
+                      type="text"
+                      formName={header}
+                      value={formData[index] || ""}
+                      onChange={(e) => handleInputChange(index, e.target.value)}
+                      disabled={true}
+                    />
+                  );
+                }
+
+                if (header === "Payment Method") {
+                  return (
+                    <div key={index} className="flex flex-col gap-2">
+                      <label>{header}</label>
+                      <Dropdown
+                        style="selection"
+                        defaultOption="Select payment method..."
+                        options={["Credit Card", "Bank Transfer", "Cash"]}
+                        value={formData[index]}
+                        onChange={(val) => handleInputChange(index, val)}
+                        disabled={isDisabled}
+                        required={true}
+                      />
+                    </div>
+                  );
+                }
+
+                if (header === "Status") {
+                  return (
+                    <div key={index} className="flex flex-col gap-2">
+                      <label>{header}</label>
+                      <Dropdown
+                        style="selection"
+                        defaultOption="Select status..."
+                        options={["Processing", "Completed"]}
+                        value={formData[index]}
+                        onChange={(val) => handleInputChange(index, val)}
+                        disabled={false}
+                        required={true}
+                      />
+                    </div>
+                  );
+                }
+
+                if (header === "Payment Date") {
+                  return (
+                    <Forms
+                      key={index}
+                      type="date"
+                      formName={header}
+                      value={formData[index] || ""}
+                      onChange={(e) => handleInputChange(index, e.target.value)}
+                      disabled={isDisabled}
+                      required={true}
+                    />
+                  );
+                }
+
+                if (header === "Amount") {
+                  return (
+                    <Forms
+                      key={index}
+                      type="number"
+                      formName={header}
+                      value={formData[index] || ""}
+                      onChange={(e) => handleInputChange(index, e.target.value)}
+                      disabled={isDisabled}
+                      required={true}
+                    />
+                  );
+                }
+
                 return (
                   <Forms
                     key={index}
@@ -103,92 +192,24 @@ const AccountsPayableReceiptModal = ({
                     formName={header}
                     value={formData[index] || ""}
                     onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={true}
-                  />
-                );
-              }
-              if (header === "Payment Method") {
-                return (
-                  <div key={index} className="flex flex-col gap-2">
-                    <label>{header}</label>
-                    <Dropdown
-                      style="selection"
-                      defaultOption="Select payment method..."
-                      options={["Credit Card", "Bank Transfer", "Cash"]}
-                      value={formData[index]}
-                      onChange={(val) => handleInputChange(index, val)}
-                      disabled={isDisabled}
-                      required={true}
-                    />
-                  </div>
-                );
-              }
-              if (header === "Status") {
-                return (
-                  <div key={index} className="flex flex-col gap-2">
-                    <label>{header}</label>
-                    <Dropdown
-                      style="selection"
-                      defaultOption="Select status..."
-                      options={["Processing", "Completed"]}
-                      value={formData[index]}
-                      onChange={(val) => handleInputChange(index, val)}
-                      disabled={false}
-                      required={true}
-                    />
-                  </div>
-                );
-              }
-              if (header === "Payment Date") {
-                return (
-                  <Forms
-                    key={index}
-                    type="date"
-                    formName={header}
-                    value={formData[index] || ""}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
                     disabled={isDisabled}
-                    required={true}
+                    required={header.includes("*")}
                   />
                 );
-              }
-              if (header === "Amount") {
-                return (
-                  <Forms
-                    key={index}
-                    type="number"
-                    formName={header}
-                    value={formData[index] || ""}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={isDisabled}
-                    required={true}
-                  />
-                );
-              }
-              return (
-                <Forms
-                  key={index}
-                  type="text"
-                  formName={header}
-                  value={formData[index] || ""}
-                  onChange={(e) => handleInputChange(index, e.target.value)}
-                  disabled={isDisabled}
-                  required={header.includes("*")}
-                />
-              );
-            })}
-          </div>
-          <div className="modal-footer">
-            <Button name="Cancel" variant="standard1" onclick={closeModal} />
-            <Button
-              name={isCreating ? "Create" : "Save"}
-              variant="standard2"
-              onclick={handleFormSubmit}
-            />
+              })}
+            </div>
+            <div className="modal-footer">
+              <Button name="Cancel" variant="standard1" onclick={closeModal} />
+              <Button
+                name={isCreating ? "Create" : "Save"}
+                variant="standard2"
+                onclick={handleFormSubmit}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
