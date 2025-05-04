@@ -235,14 +235,18 @@ const PayrollModal = ({
 
                 if (header === "Status") {
                   return (
-                    <Forms
-                      key={index}
-                      type="text"
-                      formName={header}
-                      value={formData[index] || ""}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      disabled={false}
+                    <div key={index} className="flex flex-col gap-2">
+                      <label>{header}</label>
+                      <Dropdown
+                        style="selection"
+                        defaultOption="Select status..."
+                        options={["Processing", "Completed"]}
+                        value={formData[index]}
+                        onChange={(val) => handleInputChange(index, val)}
+                        disabled={isDisabled}
+                        required={true}
                     />
+                    </div>
                   );
                 }
 
