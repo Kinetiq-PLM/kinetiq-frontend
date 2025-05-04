@@ -30,6 +30,13 @@ const BodyContent = () => {
   const [refreshAssets, setRefreshAssets] = useState(0);
   const [refreshRawMats, setRefreshRawMats] = useState(0);
 
+  // Holds and Sets Warehouse List from Fetch Warehouse List
+  const [warehouseList, setWarehouseList] = useState([]);
+
+  // Holds and Sets selected Warehouse from Select Component
+  const [selectedWarehouse, setSelectedWarehouse] = useState("");
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const timerId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -42,6 +49,26 @@ const BodyContent = () => {
   useEffect(() => {
     setError(null);
     setLoadingProducts(true);
+
+
+    // Fetch Warehouse List
+    fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setWarehouseList(data);
+        console.log("warehouse list: ", data);
+      })
+      .catch((err) => {
+        console.error("Error Fetching Warehouse List:", err);
+        setError("Failed to load Warehouse List");
+      });
+      
+
 
     // Fetch basic product data
     fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/products/")
@@ -141,6 +168,7 @@ const BodyContent = () => {
       })
       .then((data) => {
         setRawMaterialData(data);
+        
       })
       .catch((err) => {
         console.error("Error fetching raw materials:", err);
@@ -387,7 +415,65 @@ const BodyContent = () => {
 
   return (
     <div className={`inv ${showModal ? "blurred" : ""}`}>
-      <div className="body-content-container ">
+      <div className="body-content-container">
+
+      <div className=" w-full min-h-[200px]">
+        <div className=" w-full min-h-[80px] flex justify-between gap-5">
+          
+
+          <div className="flex-col  w-full">
+            <h2 className="text-cyan-600 text-3xl font-semibold">INVENTORY DASHBOARD</h2>
+            <p className="text-base font-semibold">Selected Warehouse: <span className="font-normal">{selectedWarehouse || "Please Select a Warehouse"}</span></p>
+          </div>
+
+          <div className="mt-2 w-200">
+                  {/* General Warehouse Filter */}
+                  <select
+                    className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
+                    value={selectedWarehouse}
+                    onChange={(e) => setSelectedWarehouse(e.target.value)}
+                    // disabled={loading || error}
+                  >
+                    <option value="">Select Warehouse</option>
+                    {
+                      warehouseList.map((w, index) => {
+                        console.log("Rendering warehouse option:", w); // Log each option
+                        return (
+                          <option
+                            key={w.warehouse_id || index}
+                            value={w.warehouse_location}
+                            className="text-gray-600 cursor-pointer"
+                          >
+                            {w.warehouse_location || `Warehouse ${w.warehouse_id}`}
+                          </option>
+                        );
+                      })
+                    }
+                  </select>
+          </div>
+
+        </div>
+
+        {/* dashboard top boxes */}
+        {/* to center text again on horzontal axis: justify-center */}
+        <div className=" w-full min-h-[100px] flex justify-between gap-10">
+          <div className=" flex items-center justify-start gap-5 rounded-xl p-3 w-full bg-gray-200">
+            <span className="  h-[60px] w-[60px] bg-white"></span>
+            <p className="text-lg font-semibold">Total Items in Inventory</p>
+          </div>
+          <div className=" flex items-center gap-5 rounded-xl p-3 w-full bg-gray-200">
+            <span className="  h-[60px] w-[60px] bg-white"></span>
+            <p className="text-lg font-semibold ">Active Warehouse</p>
+          </div>
+          <div className=" flex items-center gap-5 rounded-xl p-3 w-full bg-gray-200">
+            <span className="  h-[60px] w-[60px] bg-white"></span>
+            <p className="text-lg font-semibold">Transfer Requests</p>
+          </div>
+        </div>
+
+      </div>
+
+
         <InvNav
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -410,7 +496,8 @@ const BodyContent = () => {
           onSelectProduct={setSelectedItem}
         />
 
-        <div className="w-full flex-wrap">
+
+        {/* <div className="w-full flex-wrap"> */}
 
 
           {/* Deprecated Buttons */}
@@ -431,7 +518,7 @@ const BodyContent = () => {
           </div> */}
 
           {/* selected item details for medium screens  & up */}
-          <div className="hidden md:grid md:grid-cols-6 gap-3 min-h-[150px] border border-gray-300 rounded-lg p-4 mt-2 text-sm">
+          {/* <div className="hidden md:grid md:grid-cols-6 gap-3 min-h-[150px] border border-gray-300 rounded-lg p-4 mt-2 text-sm">
             
               {selectedItem ? (
                 <>
@@ -507,10 +594,10 @@ const BodyContent = () => {
               ) : (
                 <p>No item selected</p>
               )}
-          </div>
+          </div> */}
 
           {/* selected item details for BELOW medium screens */}
-          <div className="md:hidden grid grid-cols-2 gap-3 min-h-[150px] border border-gray-300 rounded-lg p-4 mt-2 text-sm">
+          {/* <div className="md:hidden grid grid-cols-2 gap-3 min-h-[150px] border border-gray-300 rounded-lg p-4 mt-2 text-sm">
             
             {selectedItem ? (
               <>
@@ -574,7 +661,7 @@ const BodyContent = () => {
                     </div>
                     
                   </>
-                )}
+                )} */}
                 {/* {Object.entries(selectedItem)
                   .filter(([key]) => !["product_id", "asset_id", "material_id", "item_id", "Minimum Threshold", "Maximum Threshold", "Last Updated"].includes(key))
                   .map(([label, value]) => (
@@ -583,13 +670,13 @@ const BodyContent = () => {
                       <p className="text-[1rem]">{value}</p>
                     </div>
                   ))} */}
-              </>
+              {/* </>
             ) : (
               <p>No item selected</p>
             )}
         </div>
          
-        </div>
+        </div> */}
 
       
       </div>
