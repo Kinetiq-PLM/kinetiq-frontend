@@ -177,33 +177,6 @@ const PayrollAccounting = () => {
     fetchHRPayrollData();
   }, []);
 
-  const handleCheckProcessingStatus = async () => {
-    try {
-      const response = await fetch(PAYROLL_HR_ENDPOINT);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const hasProcessing = result.some((item) => item.status === "Processing");
-      setValidation({
-        isOpen: true,
-        type: hasProcessing ? "success" : "error",
-        title: hasProcessing ? "Processing Found" : "No Processing Found",
-        message: hasProcessing
-          ? "There are payrolls with a 'Processing' status."
-          : "No payrolls with a 'Processing' status were found.",
-      });
-    } catch (error) {
-      console.error("Error checking processing status:", error);
-      setValidation({
-        isOpen: true,
-        type: "error",
-        title: "Error",
-        message: "Failed to check payroll processing status. Please try again later.",
-      });
-    }
-  };
-
   const handlePrintRow = (rowData) => {
     if (rowData[6] === "Processing") {
       setValidation({
@@ -498,11 +471,6 @@ const PayrollAccounting = () => {
             />
           </div>
           <div className="component-container">
-            <Button
-              name="Check Processing Status"
-              variant="standard2"
-              onclick={handleCheckProcessingStatus}
-            />
             <Button
               name="Create New Payroll"
               variant="standard2"
