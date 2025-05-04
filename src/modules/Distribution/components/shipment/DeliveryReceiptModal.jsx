@@ -37,7 +37,7 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) =>
           throw new Error('No delivery receipt found for this shipment');
         }
         
-        const response = await fetch(`http://127.0.0.1:8000/api/delivery-receipts/${shipment.delivery_receipt_id}/`);
+        const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/delivery-receipts/${shipment.delivery_receipt_id}/`);
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -70,7 +70,7 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) =>
   // Function to fetch customer name
   const fetchCustomerName = async (customerId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/customers/${customerId}/`);
+      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/customers/${customerId}/`);
       
       if (!response.ok) {
         console.error('Failed to fetch customer details');
