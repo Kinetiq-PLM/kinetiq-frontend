@@ -19,18 +19,18 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [employeeDealsData, setEmployeeDealsData] = useState([]);
   const [commissionData, setCommissionData] = useState([]);
   const [quotaData, setQuotaData] = useState([]);
-  const [profitPeriod, setProfitPeriod] = useState("day"); // day, month, year, all
-  const [salesPeriod, setSalesPeriod] = useState("day"); // day, month, year, all
-  const [salesReportPeriod, setSalesReportPeriod] = useState("Day"); // day, month, year, all
-  const [dealsPeriod, setDealsPeriod] = useState("Day"); // day, month, year, all
+  const [profitPeriod, setProfitPeriod] = useState("month"); // day, month, year, all
+  const [salesPeriod, setSalesPeriod] = useState("month"); // day, month, year, all
+  const [salesReportPeriod, setSalesReportPeriod] = useState("Month"); // day, month, year, all
+  const [dealsPeriod, setDealsPeriod] = useState("Month"); // day, month, year, all
   const [totalProfit, setTotalProfit] = useState(0);
   const [totalSold, setTotalSold] = useState(0);
   const [totalOperations, setTotalOperations] = useState(0);
   const [totalCommissions, setTotalCommissions] = useState(0);
   const [quotaReached, setQuotaReached] = useState(false);
   const [quotaRemaining, setQuotaRemaining] = useState(0);
-  const [quotaPeriod, setQuotaPeriod] = useState("day"); // day, month, year, all
-  const [commissionPeriod, setCommissionPeriod] = useState("day"); // day, month, year, all
+  const [quotaPeriod, setQuotaPeriod] = useState("month"); // day, month, year, all
+  const [commissionPeriod, setCommissionPeriod] = useState("month"); // day, month, year, all
   console.log("employee_id", employee_id);
 
   const profitQuery = useQuery({
@@ -70,21 +70,23 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
       ),
     retry: 2,
   });
-  const commissionQuery = useQuery({
-    queryKey: ["commissions"],
-    queryFn: async () =>
-      await GET(
-        `sales/reporting/commissions?period=${commissionPeriod}&salesrep=${employee_id}`
-      ),
-    retry: 2,
-  });
-  const quotaQuery = useQuery({
-    queryKey: ["quota"],
-    queryFn: async () =>
-      await GET(`sales/reporting/quota?salesrep=${employee_id}`),
-    retry: 2,
-  });
-  const colors = ["#c084fc", "#2563eb", "#fb923c", "#22c55e"];
+  // const commissionQuery = useQuery({
+  //   queryKey: ["commissions"],
+  //   queryFn: async () => {}
+  //     await GET(
+  //       isSupervisor
+  //         ? `sales/reporting/supervisor-commissions?period=${commissionPeriod}`
+  //         : `sales/reporting/commissions?period=${commissionPeriod}&salesrep=${employee_id}`
+  //     ),
+  //   retry: 2,
+  // });
+  // const quotaQuery = useQuery({
+  //   queryKey: ["quota"],
+  //   queryFn: async () =>
+  //     await GET(`sales/reporting/quota?salesrep=${employee_id}`),
+  //   retry: 2,
+  // });
+  const colors = ["#c084fc", "#2563eb", "#fb923c", "#22c55e", "#0fadaa"];
   const options = ["day", "month", "year", "all"];
   const salesOptions = [
     { label: "1D", value: "day" },
@@ -92,7 +94,25 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     { label: "1Y", value: "year" },
     { label: "All", value: "all" },
   ];
-
+  const [isSupervisor, setIsSupervisor] = useState(false);
+  const [employeeLoading, setEmployeeLoading] = useState(true);
+  const [salesReps, setSalesReps] = useState([]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (res.is_supervisor) {
+          setIsSupervisor(true);
+        }
+        setEmployeeLoading(false);
+      } catch (error) {
+        showAlert({
+          type: "error",
+          title: "Failed to fetch Employee Data.",
+        });
+      }
+    })();
+  }, []);
   useEffect(() => {
     if (profitQuery.status === "success") {
       const data = profitQuery.data.profit_data.map((item) => ({
@@ -176,39 +196,94 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     }
   }, [employeeDealsQuery.data, employeeDealsQuery.status]);
   useEffect(() => {
-    if (commissionQuery.status === "success") {
-      const formattedData = commissionQuery.data.commission_data.map(
-        (item) => ({
-          date: new Date(item.date),
-          commission: Number(item.commission), // Ensure commission is a number
-        })
-      );
-      setCommissionData(formattedData);
-      setTotalCommissions(commissionQuery.data.total_commission);
-    } else if (commissionQuery.status === "error") {
+    if (employeeLoading) return;
+    try {
+      (async () => {
+        if (isSupervisor) {
+          // Transform data to format needed for LineChart
+          const resp = await GET(
+            `sales/reporting/supervisor-commissions?period=${commissionPeriod}`
+          );
+          const formattedData = resp.daily_data.map((day) => ({
+            date: new Date(day.date),
+            ...day.sales_reps.reduce(
+              (acc, rep) => ({
+                ...acc,
+                [rep.name]: rep.commission,
+              }),
+              {}
+            ),
+          }));
+
+          setCommissionData(formattedData);
+          setTotalCommissions(resp.total_period_commission);
+          setSalesReps(resp.sales_reps);
+        } else {
+          const resp = await GET(
+            `sales/reporting/commissions?period=${commissionPeriod}&salesrep=${employee_id}`
+          );
+
+          const formattedData = resp.commission_data.map((item) => ({
+            date: new Date(item.date),
+            commission: Number(item.commission), // Ensure commission is a number
+          }));
+          setCommissionData(formattedData);
+          setTotalCommissions(resp.total_commission);
+        }
+      })();
+    } catch (error) {
       showAlert({
         type: "error",
         title: "Failed to fetch Commissions Report.",
       });
     }
-  }, [commissionQuery.data, commissionQuery.status]);
+  }, [isSupervisor, employeeLoading, commissionPeriod]);
 
   useEffect(() => {
-    if (quotaQuery.status === "success") {
-      const formattedData = quotaQuery.data.daily_progress.map((item) => ({
-        date: new Date(item.date),
-        orders: Number(item.orders), // Ensure commission is a number
-      }));
-      setQuotaData(formattedData);
-      setQuotaReached(quotaQuery.data.quota_reached);
-      setQuotaRemaining(quotaQuery.data.remaining);
-    } else if (quotaQuery.status === "error") {
+    if (employeeLoading) return;
+    try {
+      (async () => {
+        if (isSupervisor) {
+          const resp = await GET(`sales/reporting/supervisor-quota`);
+          const formattedData = resp.period_data.map((day) => ({
+            date: new Date(day.date),
+            // Add total orders for the team
+            totalOrders: day.total_orders,
+            // Add individual rep data
+            ...day.sales_reps.reduce(
+              (acc, rep) => ({
+                ...acc,
+                [rep.name]: rep.orders,
+                [`${rep.name}_quota`]: rep.quota,
+                [`${rep.name}_remaining`]: rep.remaining,
+              }),
+              {}
+            ),
+          }));
+
+          setQuotaData(formattedData);
+          setQuotaRemaining(resp.total_period_quota - resp.total_period_orders);
+          setSalesReps(resp.sales_reps);
+        } else {
+          const resp = await GET(
+            "sales/reporting/quota?salesrep=" + employee_id
+          );
+          const formattedData = resp.daily_progress.map((item) => ({
+            date: new Date(item.date),
+            orders: Number(item.orders), // Ensure commission is a number
+          }));
+          setQuotaData(formattedData);
+          setQuotaReached(resp.quota_reached);
+          setQuotaRemaining(resp.remaining);
+        }
+      })();
+    } catch (error) {
       showAlert({
         type: "error",
         title: "Failed to fetch Quota Report.",
       });
     }
-  }, [quotaQuery.data, quotaQuery.status]);
+  }, [isSupervisor, employeeLoading]);
 
   useEffect(() => {
     (async () => await profitQuery.refetch())();
@@ -225,9 +300,9 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   useEffect(() => {
     (async () => await employeeDealsQuery.refetch())();
   }, [dealsPeriod]);
-  useEffect(() => {
-    (async () => await commissionQuery.refetch())();
-  }, [commissionPeriod]);
+  // useEffect(() => {
+  //   (async () => await commissionQuery.refetch())();
+  // }, [commissionPeriod]);
 
   return (
     <div className="reporting">
@@ -395,7 +470,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         </div>
 
         {/* SECOND ROW */}
-        <div className="flex gap-4 flex-col lg:flex-row">
+        <div className="flex gap-4 flex-col xl:flex-row">
           {/* Short Reports */}
           <div className="flex gap-4 flex-2/6 flex-col">
             {/* Customer Report */}
@@ -479,7 +554,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                   ]}
                   slotProps={{
                     legend: {
-                      direction: "row", // Align items in a row
+                      direction: "column", // Align items in a row
                       position: { vertical: "bottom", horizontal: "middle" }, // Move to the bottom center
                     },
                   }}
@@ -535,7 +610,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                     })}
                   </span>
                   <LineChart
-                    height={325}
+                    height={400}
                     dataset={commissionData}
                     xAxis={[
                       {
@@ -547,14 +622,29 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                             : value.toLocaleDateString(),
                       },
                     ]}
-                    series={[
-                      {
-                        dataKey: "commission",
-                        color: "#8979FF",
-                        curve: "linear",
-                      },
-                    ]}
-                    margin={{ top: 35, bottom: 45, left: 70, right: 50 }}
+                    series={
+                      isSupervisor
+                        ? salesReps.map((name) => ({
+                            dataKey: name,
+                            label: name,
+                            color:
+                              colors[salesReps.indexOf(name) % colors.length],
+                            curve: "linear",
+                            showMark: true,
+                          }))
+                        : [
+                            {
+                              dataKey: "commission",
+                              color: "#8979FF",
+                              curve: "linear",
+                            },
+                          ]
+                    }
+                    margin={
+                      isSupervisor
+                        ? { top: 100, bottom: 45, left: 70, right: 50 }
+                        : { top: 30, bottom: 45, left: 70, right: 50 }
+                    }
                   />
                   <div className="flex justify-center ">
                     <form className="bg-[#f3f4f6] p-2 rounded-lg">
@@ -601,7 +691,7 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                   </span>
                 </div>
                 <LineChart
-                  height={350}
+                  height={450}
                   dataset={quotaData}
                   xAxis={[
                     {
@@ -610,14 +700,39 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                       valueFormatter: (value) => value.toLocaleDateString(),
                     },
                   ]}
-                  series={[
-                    {
-                      dataKey: "orders",
-                      color: "#8979FF",
-                      curve: "linear",
-                    },
-                  ]}
-                  margin={{ top: 30, bottom: 30, left: 50, right: 50 }}
+                  series={
+                    isSupervisor
+                      ? [
+                          // Add total orders line
+                          {
+                            dataKey: "totalOrders",
+                            label: "Team Total",
+                            color: "#8979FF",
+                            curve: "linear",
+                            showMark: true,
+                          },
+                          // Add line for each sales rep
+                          ...salesReps.map((name, index) => ({
+                            dataKey: name,
+                            label: name,
+                            color: colors[index % colors.length],
+                            curve: "linear",
+                            showMark: true,
+                          })),
+                        ]
+                      : [
+                          {
+                            dataKey: "orders",
+                            color: "#8979FF",
+                            curve: "linear",
+                          },
+                        ]
+                  }
+                  margin={
+                    isSupervisor
+                      ? { top: 30, bottom: 100, left: 50, right: 50 }
+                      : { top: 30, bottom: 30, left: 50, right: 50 }
+                  }
                   slotProps={{
                     legend: {
                       direction: "row", // Align items in a row

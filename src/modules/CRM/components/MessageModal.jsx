@@ -33,6 +33,32 @@ const MessageModal = ({ isOpen, onClose, campaign = {}, contacts }) => {
         console.log("Sending message type: " + campaign.type);
         console.log("Subject: " + subject);
         console.log("Message: " + message);
+
+        console.log(contacts);
+        contacts.forEach((contact) => {
+          console.log("Sending message to: " + contact.email_address || "");
+          console.log("Subject: " + subject);
+          console.log("Message: " + message);
+
+          try {
+            emailjs.init("tJ0nVArt2LV_fm1Vv");
+            emailjs.send("service_4tsfjrp", "template_c7ez4jz", {
+              subject: `CAMPAIGN: ${campaign.campaign_name} - ${subject}`,
+              name: contact.contact_person,
+              content: message,
+              email: contact.email_address,
+            });
+            showAlert({
+              type: "success",
+              title: "Message sent.",
+            });
+          } catch (error) {
+            showAlert({
+              type: "error",
+              title: "Error sending message.",
+            });
+          }
+        });
       } else {
         console.log("Sending message to: " + contacts[0]?.email_address || "");
         console.log("Subject: " + subject);
