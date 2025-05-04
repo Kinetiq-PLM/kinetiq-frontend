@@ -98,7 +98,7 @@
 }
 
 .service-report textarea.description-textarea {
-  height: 8.25rem !important; /* Match the height of two input fields plus gap */
+  height: 7.75rem !important; /* Match the height of two input fields plus gap */
 }
 
 .service-report input::placeholder,
@@ -168,7 +168,7 @@
 
 /* Modal specific styles */
 .service-report .modal-form .description-group textarea.description-textarea {
-  height: 14rem !important; /* Match the height to align with the renewal ID field */
+  height: 13rem !important; /* Match the height to align with the renewal ID field */
 }
 
 .service-report .scroll-track {

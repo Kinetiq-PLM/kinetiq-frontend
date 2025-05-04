@@ -320,7 +320,8 @@ const handleCreate = () => {
                       if (!formData.requestId) handleToggleRenewals(); 
                     }}
                     placeholder="Renewal ID"
-                    disabled={!formData.requestId}
+                    disabled={formData.requestId !== ""}
+                    className={formData.renewalId !== "" ? "disabled-input" : ""}
                   />
                   <span
                     className="select-arrow"
@@ -375,9 +376,11 @@ const handleCreate = () => {
                   value={formData.requestId}
                   onChange={(e) => {
                     handleChange(e); 
-                    setRequestDropdown(true);
+                    if (!formData.renewalId) setRequestDropdown(true);
                   }}
-                  onClick={handleToggleRequest}
+                  onClick={() => {
+                    if (!formData.renewalId) handleToggleRequest(); 
+                  }}
                   placeholder="Request id"
                   disabled={formData.renewalId !== ""}
                   className={formData.renewalId !== "" ? "disabled-input" : ""}
