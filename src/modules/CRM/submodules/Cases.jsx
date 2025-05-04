@@ -37,8 +37,8 @@ const Ticket = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     subject: subject,
     description: description,
     type: "",
-    status: "",
-    priority: "",
+    status: "Open",
+    priority: "Low",
     salesrep: employee_id,
     created_at: new Date().toISOString().split("T")[0],
   });
