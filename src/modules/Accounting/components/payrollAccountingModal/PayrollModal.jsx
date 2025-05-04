@@ -23,15 +23,14 @@ const PayrollModal = ({
       // Auto-generate Payroll Accounting ID if creating a new record
       if (isCreating && !updatedRow[0]) {
         const currentYear = new Date().getFullYear();
-        const uniqueId = generateLowercaseId(6); // Generate a 6-character lowercase + numeric ID
+        const uniqueId = generateLowercaseId(6);
         updatedRow[0] = `ACC-PAY-${currentYear}-${uniqueId}`;
       }
 
-      setFormData(updatedRow); // Create a new array to avoid mutation
+      setFormData(updatedRow);
     }
   }, [selectedRow, isCreating]);
 
-  // Helper function to generate lowercase letters + numeric ID
   const generateLowercaseId = (length) => {
     const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
     let result = "";
@@ -42,7 +41,7 @@ const PayrollModal = ({
   };
 
   const generateReferenceNumber = (paymentMethod) => {
-    const randomNum = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+    const randomNum = Math.floor(100000 + Math.random() * 900000);
     switch (paymentMethod) {
       case "Cash":
         return `REF-Cash-${randomNum}`;
@@ -51,7 +50,7 @@ const PayrollModal = ({
       case "Credit Card":
         return `REF-Credit Card-${randomNum}`;
       default:
-        return `REF-Cash-${randomNum}`; // Default if no payment method
+        return `REF-Cash-${randomNum}`;
     }
   };
 
@@ -63,6 +62,13 @@ const PayrollModal = ({
   };
 
   const handleInputChange = (index, value) => {
+    // Prevent updates for disabled fields
+    const isFieldEditable = isCreating
+      ? index !== 0 && index !== 5 // Allow all except Payroll Accounting ID and Reference Number in create mode
+      : index === 6; // Only allow Status (index 6) in edit mode
+
+    if (!isFieldEditable) return;
+
     const updatedFormData = [...formData];
     updatedFormData[index] = value;
 
@@ -125,7 +131,12 @@ const PayrollModal = ({
           </div>
           <div className="modal-body">
             {columnHeaders.map((header, index) => {
-              if (header === "Payroll Accounting ID") {
+              // Determine if the field should be disabled
+              const isDisabled = isCreating
+                ? header === "Payroll Accounting ID" || header === "Reference Number" // Disable auto-generated fields in create mode
+                : header !== "Status"; // Disable all except Status in edit mode
+
+              if (header === "Payroll Accounting ID" || header === "Reference Number") {
                 return (
                   <Forms
                     key={index}
@@ -133,19 +144,7 @@ const PayrollModal = ({
                     formName={header}
                     value={formData[index] || ""}
                     onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={!isCreating} // Editable only when creating
-                  />
-                );
-              }
-              if (header === "Reference Number") {
-                return (
-                  <Forms
-                    key={index}
-                    type="text"
-                    formName={header}
-                    value={formData[index] || ""}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={isNewPayroll || !isCreating}
+                    disabled={true} // Always disabled
                   />
                 );
               }
@@ -160,7 +159,7 @@ const PayrollModal = ({
                         options={payrollHrIds}
                         value={formData[index]}
                         onChange={(val) => handleInputChange(index, val)}
-                        disabled={!isCreating}
+                        disabled={isDisabled}
                         required={true}
                       />
                     ) : (
@@ -169,7 +168,7 @@ const PayrollModal = ({
                         formName={header}
                         value={formData[index]}
                         onChange={(e) => handleInputChange(index, e.target.value)}
-                        disabled={!isCreating}
+                        disabled={isDisabled}
                       />
                     )}
                   </div>
@@ -183,7 +182,7 @@ const PayrollModal = ({
                     formName={header}
                     value={formData[index] || ""}
                     onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={!isCreating}
+                    disabled={isDisabled}
                     required={true}
                   />
                 );
@@ -196,7 +195,7 @@ const PayrollModal = ({
                     formName={header}
                     value={formData[index]}
                     onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={!isCreating}
+                    disabled={isDisabled}
                     required={true}
                   />
                 );
@@ -211,7 +210,7 @@ const PayrollModal = ({
                       options={["Credit Card", "Bank Transfer", "Cash"]}
                       value={formData[index]}
                       onChange={(val) => handleInputChange(index, val)}
-                      disabled={!isCreating}
+                      disabled={isDisabled}
                       required={true}
                     />
                   </div>
@@ -227,6 +226,7 @@ const PayrollModal = ({
                       options={["Processing", "Completed"]}
                       value={formData[index]}
                       onChange={(val) => handleInputChange(index, val)}
+                      disabled={false} // Always editable
                       required={true}
                     />
                   </div>
@@ -239,7 +239,7 @@ const PayrollModal = ({
                   formName={header}
                   value={formData[index]}
                   onChange={(e) => handleInputChange(index, e.target.value)}
-                  disabled={!isCreating}
+                  disabled={isDisabled}
                 />
               );
             })}
