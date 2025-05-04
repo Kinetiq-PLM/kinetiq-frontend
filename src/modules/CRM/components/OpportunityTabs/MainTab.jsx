@@ -223,7 +223,7 @@ export default function MainTab({ employee_id }) {
                     onClick={() => setIsNewOpportunityModalOpen(true)}
                     disabled={!selectedCustomer}
                   >
-                    New Opportunity
+                    New
                   </Button>
 
                   <Button
@@ -231,7 +231,7 @@ export default function MainTab({ employee_id }) {
                     onClick={() => setIsOpportunityModalOpen(true)}
                     disabled={!selectedOpportunity}
                   >
-                    Modify Opportunity
+                    Modify
                   </Button>
 
                   <Button
@@ -239,7 +239,7 @@ export default function MainTab({ employee_id }) {
                     onClick={() => setIsDeleteModalOpen(true)}
                     disabled={!selectedOpportunity}
                   >
-                    Delete Opportunity
+                    Delete
                   </Button>
                 </div>
               </div>

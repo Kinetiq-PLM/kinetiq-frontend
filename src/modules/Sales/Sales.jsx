@@ -19,18 +19,18 @@ const Sales = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [employeeDealsData, setEmployeeDealsData] = useState([]);
   const [commissionData, setCommissionData] = useState([]);
   const [quotaData, setQuotaData] = useState([]);
-  const [profitPeriod, setProfitPeriod] = useState("day"); // day, month, year, all
-  const [salesPeriod, setSalesPeriod] = useState("day"); // day, month, year, all
-  const [salesReportPeriod, setSalesReportPeriod] = useState("Day"); // day, month, year, all
-  const [dealsPeriod, setDealsPeriod] = useState("Day"); // day, month, year, all
+  const [profitPeriod, setProfitPeriod] = useState("month"); // day, month, year, all
+  const [salesPeriod, setSalesPeriod] = useState("month"); // day, month, year, all
+  const [salesReportPeriod, setSalesReportPeriod] = useState("Month"); // day, month, year, all
+  const [dealsPeriod, setDealsPeriod] = useState("Month"); // day, month, year, all
   const [totalProfit, setTotalProfit] = useState(0);
   const [totalSold, setTotalSold] = useState(0);
   const [totalOperations, setTotalOperations] = useState(0);
   const [totalCommissions, setTotalCommissions] = useState(0);
   const [quotaReached, setQuotaReached] = useState(false);
   const [quotaRemaining, setQuotaRemaining] = useState(0);
-  const [quotaPeriod, setQuotaPeriod] = useState("day"); // day, month, year, all
-  const [commissionPeriod, setCommissionPeriod] = useState("day"); // day, month, year, all
+  const [quotaPeriod, setQuotaPeriod] = useState("month"); // day, month, year, all
+  const [commissionPeriod, setCommissionPeriod] = useState("month"); // day, month, year, all
   console.log("employee_id", employee_id);
 
   const profitQuery = useQuery({
