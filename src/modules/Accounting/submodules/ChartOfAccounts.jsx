@@ -132,7 +132,7 @@ const BodyContent = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searching.toLowerCase());
+      .includes(searching.trim().toLowerCase());
     const matchesType = selectedAccountType ? type === selectedAccountType : true;
     return matchesSearch && matchesType;
   });

@@ -76,6 +76,8 @@ const OfficialReceipts = () => {
     "Invoice ID",
     "Customer ID",
     "Official Receipt Date",
+    "Total Amount",
+    "Amount Due",
     "Settled Amount",
     "Remaining Amount",
     "Payment Method",
@@ -142,6 +144,8 @@ const OfficialReceipts = () => {
           entry.invoice_id || "-",
           entry.customer_id || "-",
           entry.or_date ? new Date(entry.or_date).toLocaleString() : "-",
+          entry.total_amount || "-",
+          entry.amount_due || "-",
           entry.settled_amount || "-",
           entry.remaining_amount || "-",
           entry.payment_method || "-",
@@ -359,9 +363,7 @@ const OfficialReceipts = () => {
     return 0; // fail-safe
   });
 
-
-
-
+  // Filter data based on search input
   const filteredData = sortedData.filter((row) =>
     [row[0], row[1], row[2], row[6], row[7], row[8]]
       .filter(Boolean)
@@ -370,7 +372,137 @@ const OfficialReceipts = () => {
       .includes(searching.toLowerCase())
   );
 
-
+  // Handle row selection
+  const handlePrintRow = (rowData) => {
+    const printWindow = window.open('', '_blank');
+  
+    const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Kinetiq - PLM - Official Receipt</title>
+        <style>
+          @page {
+            size: letter;
+            margin: 0.5in;
+          }
+          body {
+            font-family: Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            background-color: #ffffff;
+            color: #333333;
+          }
+          .container {
+            max-width: 100%;
+            margin: 0 auto;
+          }
+          .header {
+            border-bottom: 2px solid #0055a5;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0055a5;
+          }
+          .logo-subtitle {
+            font-size: 14px;
+            color: #777;
+          }
+          .document-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #0055a5;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+          }
+          th, td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+          }
+          tr:nth-child(even) {
+            background-color: #f9f9f9;
+          }
+          .footer {
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+          }
+          .confidential {
+            color: #cc0000;
+            font-style: italic;
+            margin-bottom: 10px;
+          }
+          .watermark {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 100px;
+            color: rgba(0, 0, 0, 0.03);
+            transform: rotate(-45deg);
+            z-index: -1;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="watermark">COPY</div>
+        <div class="container">
+          <div class="header">
+            <div>
+              <div class="logo">Kinetiq - PLM</div>
+              <div class="logo-subtitle">Medical Equipment Manufacturing Company.</div>
+            </div>
+          </div>
+  
+          <div class="document-title">OFFICIAL RECEIPT</div>
+          
+          <table>
+            <tbody>
+              ${columns.map((col, i) => `
+                <tr>
+                  <td><strong>${col}</strong></td>
+                  <td>${rowData[i] ?? '-'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+  
+          <div class="footer">
+            <div>Kinetiq - PLM</div>
+            <div>Printed on ${new Date().toLocaleString()}</div>
+          </div>
+        </div>
+        <script>
+          window.onload = () => {
+            window.print();
+          };
+          window.onafterprint = () => {
+            window.close();
+          };
+        </script>
+      </body>
+    </html>
+    `;
+  
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
 
 
   return (
@@ -405,13 +537,13 @@ const OfficialReceipts = () => {
           </div>
           <div>
             <Button
-              name="Create Receipt"
+              name="Update Receipt"
               variant="standard2"
               onclick={openModal}
             />
           </div>
         </div>
-        <Table data={filteredData} columns={columns} enableCheckbox={false} />
+        <Table data={filteredData} columns={columns} handlePrintRow={handlePrintRow} showPrintButton={true} />
       </div>
       {modalOpen && (
         <CreateReceiptModal

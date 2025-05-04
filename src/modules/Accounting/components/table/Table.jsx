@@ -1,7 +1,17 @@
 import React, { useState } from "react";
-import "./Table.css"; // Ensure this file is updated
+import { Printer, Pencil } from "lucide-react";
+import "./Table.css";
 
-const Table = ({ columns, data, enableCheckbox, handleStatusToggle }) => {
+const Table = ({
+    columns,
+    data,
+    enableCheckbox,
+    handleStatusToggle,
+    handlePrintRow,
+    handleEditRow,
+    showPrintButton,
+    showEditButton
+}) => {
     const [selectedRows, setSelectedRows] = useState([]);
 
     const handleCheckboxChange = (index) => {
@@ -12,17 +22,18 @@ const Table = ({ columns, data, enableCheckbox, handleStatusToggle }) => {
         );
     };
 
-    // Function to format numbers with commas (if it's a valid number)
     const formatNumber = (value) => {
         if (!isNaN(value) && value !== "" && value !== null) {
-            return parseFloat(value).toLocaleString("en-US", { minimumFractionDigits: 2 });
+            return parseFloat(value).toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            });
         }
-        return value; // Return as is if it's not a number
+        return value;
     };
 
     return (
         <div className="accounting-table">
-            <div className={`table-container ${enableCheckbox ? 'checkbox-enabled' : ''}`}>
+            <div className={`table-container ${enableCheckbox ? "checkbox-enabled" : ""}`}>
                 <table>
                     <thead>
                         <tr>
@@ -30,6 +41,7 @@ const Table = ({ columns, data, enableCheckbox, handleStatusToggle }) => {
                             {columns.map((column, index) => (
                                 <th key={index}>{column}</th>
                             ))}
+                            {showPrintButton && <th>Actions</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -56,7 +68,17 @@ const Table = ({ columns, data, enableCheckbox, handleStatusToggle }) => {
                                             <div
                                                 className={
                                                     isStatusColumn
-                                                        ? (cell === "Active" ? "status-active" : "status-inactive")
+                                                        ? cell === "Active"
+                                                            ? "status-active"
+                                                            : cell === "Inactive"
+                                                                ? "status-inactive"
+                                                                : cell === "Draft"
+                                                                    ? "status-draft"
+                                                                    : cell === "Processing"
+                                                                        ? "status-processing"
+                                                                        : cell === "Completed"
+                                                                            ? "status-completed"
+                                                                            : ""
                                                         : ""
                                                 }
                                                 onClick={() => isStatusColumn && handleStatusToggle(rowIndex)}
@@ -67,6 +89,31 @@ const Table = ({ columns, data, enableCheckbox, handleStatusToggle }) => {
                                         </td>
                                     );
                                 })}
+                                {(showPrintButton || showEditButton) && (
+                                    <td className="actions-cell">
+                                        <div className="icon-group">
+                                            {showPrintButton && (
+                                                <Printer
+                                                    size={20}
+                                                    color="#4A90E2"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => handlePrintRow(row)}
+                                                    title="Print Row"
+                                                />
+                                            )}
+                                            {showEditButton && (
+                                                <Pencil
+                                                    size={20}
+                                                    color="#4B5563"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => handleEditRow(row)}
+                                                    title="Edit Row"
+                                                />
+                                            )}
+                                        </div>
+                                    </td>
+                                )}
+
                             </tr>
                         ))}
                     </tbody>
