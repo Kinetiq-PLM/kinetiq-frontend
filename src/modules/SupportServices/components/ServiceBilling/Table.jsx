@@ -17,7 +17,7 @@ const Table = ({ billings, onRowClick, onViewBilling, selectedBilling }) => {
           </thead>
           <tbody>
             {billings.length > 0 ? (
-              billings.map((billing, index) => (
+              [...billings].reverse().map((billing, index) => (
               <tr 
                 key={billing.service_billing_id || `billing-${index}`} 
                 className={`${

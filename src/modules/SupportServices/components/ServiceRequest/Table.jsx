@@ -15,10 +15,12 @@ const Table = ({ requests, onRowClick, selectedRequest }) => {
           </thead>
           <tbody>
             {requests.length > 0 ? (
-              requests.map((request, index) => (
+              [...requests]
+                .sort((a, b) => new Date(b.request_date) - new Date(a.request_date))
+                .map((request, index) => (
                 <tr 
                   key={request.service_request_id || `request-${index}`} 
-                  className={`${
+                  className={`${  
                     selectedRequest?.service_request_id === request.service_request_id ? "selected-row" : ""
                   } ${index % 2 !== 0 ? "alternate-row" : ""}`}
                   onClick={() => onRowClick(request)} // makes table row clickable, function update the state fields
