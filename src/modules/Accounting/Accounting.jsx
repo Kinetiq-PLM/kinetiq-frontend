@@ -85,7 +85,7 @@ const AccountingDashboard = () => {
 
         // Accounts Payable Summary
         if (
-          accountName === "Accounts Payable"
+          accountName === "Accounts Payable" || accountName === "Raw Material Used"
         ) {
           accountsPayableTotal += debit; // Net Payable
         }
