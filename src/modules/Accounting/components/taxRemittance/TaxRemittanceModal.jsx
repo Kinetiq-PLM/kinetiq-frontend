@@ -160,7 +160,7 @@ const TaxRemittanceModal = ({
               }
               if (header === "Employee ID") {
                 return (
-                  <div key={index} className="form-group">
+                  <div key={index} className="flex flex-col gap-y-2">
                     <label>{header}</label>
                     <Dropdown
                       style="selection"
@@ -176,7 +176,7 @@ const TaxRemittanceModal = ({
               }
               if (header === "Deduction Type") {
                 return (
-                  <div key={index} className="form-group">
+                  <div key={index} className="flex flex-col gap-y-2">
                     <label>{header}</label>
                     <Dropdown
                       style="selection"
@@ -192,7 +192,7 @@ const TaxRemittanceModal = ({
               }
               if (header === "Payment Method") {
                 return (
-                  <div key={index} className="form-group">
+                  <div key={index} className="flex flex-col gap-y-2">
                     <label>{header}</label>
                     <Dropdown
                       style="selection"
@@ -208,7 +208,7 @@ const TaxRemittanceModal = ({
               }
               if (header === "Status") {
                 return (
-                  <div key={index} className="form-group">
+                  <div key={index} className="flex flex-col gap-y-2">
                     <label>{header}</label>
                     <Dropdown
                       style="selection"
