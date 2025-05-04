@@ -29,7 +29,7 @@ const BodyContent = () => {
     
 
     useEffect(() => {
-        fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/expiry-report/")
+        fetch("http://127.0.0.1:8000/api/expiry-report/")
             .then((res) => res.json())
             .then((data) => {
                 setExpiringItemsData(data);
@@ -77,11 +77,11 @@ const BodyContent = () => {
     // Filtered Tab Config
     const tableConfig = {
         "Expiring Items": {
-            columns: ["Item Name", "Item Type", "Item Identification", "Expiry Date", "Quantity", "Status"],
+            columns: ["Item Name", "Item Type", "Item No", "Expiry Date", "Quantity", "Status"],
             data: expiringItemsData.map((item) => ({
                 "Item Name": item?.item_name || "---",
                 "Item Type": item?.item_type || "---",
-                "Item Identification": item?.item_management_id || "---",
+                "Item No": item?.item_no || "---",
                 "Expiry Date": item?.expiry,
                 "Quantity": item?.current_quantity,
                 "Status": item?.expiry_report_status,
