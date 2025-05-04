@@ -1,228 +1,110 @@
-import React, { useState, useEffect, useRef } from "react";
+// Enhanced Warranties.jsx
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import "../styles/Warranties.css";
 
 const BodyContent = () => {
   const [warranties, setWarranties] = useState([]);
-  const [selectedWarranties, setSelectedWarranties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newWarranty, setNewWarranty] = useState({
-    project_id: "",
-    warranty_coverage_yr: "1",
-    warranty_start_date: "",
-    warranty_end_date: ""
-  });
   const [error, setError] = useState("");
   const [pagination, setPagination] = useState({
     count: 0,
     next: null,
     previous: null
   });
-  
-  const [projectSuggestions, setProjectSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-  const suggestionRef = useRef(null);
-  const formRef = useRef(null);
+  //const [selectedWarranties, setSelectedWarranties] = useState([]);
+  const [statusCounts, setStatusCounts] = useState({
+    active: 0,
+    expired: 0,
+    pending: 0
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [isSearching, setIsSearching] = useState(false);
 
-  useEffect(() => {
-    fetchWarranties();
-    
-    // Load project suggestions when the form is shown
-    if (showAddForm) {
-      fetchProjectSuggestions("PROJ");
-    }
-    
-    const handleClickOutside = (event) => {
-      if (suggestionRef.current && !suggestionRef.current.contains(event.target)) {
-        setShowSuggestions(false);
-      }
-    };
-    
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showAddForm]);
-
-  const fetchWarranties = async (url = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev/api/warranties/') => {
+  const fetchWarranties = useCallback(async (url = '/api/warranties/') => {
     setIsLoading(true);
     try {
       const response = await axios.get(url);
       
       if (response.data.results !== undefined) {
-        setWarranties(response.data.results);
+        const warrantiesWithNames = await Promise.all(
+          response.data.results.map(async (warranty) => {
+            try {
+              const projectResponse = await axios.get(`/api/warranties/project-warranty-details/${warranty.project_id}/`);
+              return {
+                ...warranty,
+                ext_project_name: projectResponse.data.project_name || `Project ${warranty.project_id}`,
+                warranty_status: projectResponse.data.warranty_status || 'Pending'
+              };
+            } catch (error) {
+              console.error(`Error fetching details for project ${warranty.project_id}:`, error);
+              return {
+                ...warranty,
+                ext_project_name: `Project ${warranty.project_id}`,
+                warranty_status: 'Pending'
+              };
+            }
+          })
+        );
+        
+        setWarranties(warrantiesWithNames);
         setPagination({
           count: response.data.count,
           next: response.data.next,
           previous: response.data.previous
         });
       } else {
-        setWarranties(response.data);
+        const warrantiesWithNames = await Promise.all(
+          response.data.map(async (warranty) => {
+            try {
+              const projectResponse = await axios.get(`/api/warranties/project-warranty-details/${warranty.project_id}/`);
+              return {
+                ...warranty,
+                ext_project_name: projectResponse.data.project_name || `Project ${warranty.project_id}`,
+                warranty_status: projectResponse.data.warranty_status || 'Pending'
+              };
+            } catch (error) {
+              return {
+                ...warranty,
+                ext_project_name: `Project ${warranty.project_id}`,
+                warranty_status: 'Pending'
+              };
+            }
+          })
+        );
+        
+        setWarranties(warrantiesWithNames);
       }
       
       setError("");
-    } catch (err) {
-      console.error("Error fetching warranties:", err);
-      setError("Failed to load warranties. Please check the console for details.");
+    } catch (error) {
+      console.error("Error fetching warranties:", error);
+      setError("Failed to load warranties. Please try refreshing the page.");
     } finally {
       setIsLoading(false);
+      setIsSearching(false);
     }
-  };
+  }, []);
 
-  const fetchProjectSuggestions = async (query) => {
-    console.log("Fetching project suggestions for:", query);
-    setIsLoadingSuggestions(true);
-    
-    try {
-      // Use the correct API endpoint
-      const response = await axios.get(`/api/project-autocomplete/?query=${query}`);
-      console.log("Project suggestions response:", response.data);
+  useEffect(() => {
+    fetchWarranties();
+  }, [fetchWarranties]);
+
+  useEffect(() => {
+    // Calculate status counts whenever warranties change
+    if (warranties.length > 0) {
+      const counts = warranties.reduce((acc, warranty) => {
+        const status = warranty.warranty_status?.toLowerCase() || '';
+        if (status.includes('active')) acc.active++;
+        else if (status.includes('expired')) acc.expired++;
+        else acc.pending++;
+        return acc;
+      }, { active: 0, expired: 0, pending: 0 });
       
-      if (response.data && response.data.length > 0) {
-        setProjectSuggestions(response.data);
-        setShowSuggestions(true);
-      } else {
-        setProjectSuggestions([]);
-        setShowSuggestions(false);
-      }
-    } catch (err) {
-      console.error("Error fetching project suggestions:", err);
-      setProjectSuggestions([]);
-    } finally {
-      setIsLoadingSuggestions(false);
+      setStatusCounts(counts);
     }
-  };
-
-  const handleProjectInputChange = (e) => {
-    const value = e.target.value;
-    setNewWarranty(prev => ({ ...prev, project_id: value }));
-    
-    if (value.length >= 2) {
-      fetchProjectSuggestions(value);
-    } else {
-      setProjectSuggestions([]);
-      setShowSuggestions(false);
-    }
-  };
-
-  const handleProjectSelect = (projectId) => {
-    setNewWarranty(prev => ({ ...prev, project_id: projectId }));
-    setShowSuggestions(false);
-  };
-
-  const handleCheckboxChange = (warrantyId) => {
-    setSelectedWarranties(prev => {
-      if (prev.includes(warrantyId)) {
-        return prev.filter(id => id !== warrantyId);
-      } else {
-        return [...prev, warrantyId];
-      }
-    });
-  };
-
-  const handleSelectAll = (e) => {
-    if (e.target.checked) {
-      const allIds = warranties.map(warranty => warranty.project_warranty_id);
-      setSelectedWarranties(allIds);
-    } else {
-      setSelectedWarranties([]);
-    }
-  };
-
-  const handleDeleteWarranties = async () => {
-    if (selectedWarranties.length === 0) {
-      setError("Please select at least one warranty to delete");
-      return;
-    }
-
-    try {
-      await axios.delete('/api/warranties/bulk-delete/', {
-        data: { ids: selectedWarranties }
-      });
-      
-      setWarranties(prev => prev.filter(
-        warranty => !selectedWarranties.includes(warranty.project_warranty_id)
-      ));
-      setSelectedWarranties([]);
-      setError("");
-    } catch (err) {
-      console.error("Error deleting warranties:", err);
-      setError("Failed to delete warranties. Please try again.");
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewWarranty(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    if (name === "warranty_start_date" || name === "warranty_coverage_yr") {
-      const startDate = new Date(name === "warranty_start_date" ? value : newWarranty.warranty_start_date);
-      const years = parseInt(name === "warranty_coverage_yr" ? value : newWarranty.warranty_coverage_yr);
-      
-      if (!isNaN(startDate.getTime()) && !isNaN(years)) {
-        const endDate = new Date(startDate);
-        endDate.setFullYear(endDate.getFullYear() + years);
-        
-        setNewWarranty(prev => ({
-          ...prev,
-          warranty_end_date: endDate.toISOString().split('T')[0]
-        }));
-      }
-    }
-  };
-
-  const handleAddWarranty = async (e) => {
-    e.preventDefault();
-    
-    try {
-      console.log("Sending warranty data:", newWarranty);
-      
-    const formattedWarranty = {
-      ...newWarranty,
-      warranty_start_date: newWarranty.warranty_start_date, // Should be in YYYY-MM-DD format
-      warranty_end_date: newWarranty.warranty_end_date,     // Should be in YYYY-MM-DD format
-      warranty_coverage_yr: parseInt(newWarranty.warranty_coverage_yr)
-    };
-      
-      console.log("Formatted warranty data:", formattedWarranty);
-      
-      const response = await axios.post('/api/warranties/', formattedWarranty);
-      console.log("Add warranty response:", response.data);
-      
-      setWarranties(prev => [...prev, response.data]);
-      
-      setNewWarranty({
-        project_id: "",
-        warranty_coverage_yr: "1",
-        warranty_start_date: "",
-        warranty_end_date: ""
-      });
-      setShowAddForm(false);
-      setError("");
-    } catch (err) {
-      console.error("Error adding warranty:", err);
-      if (err.response && err.response.data) {
-        console.error("Error details:", err.response.data);
-        
-        if (typeof err.response.data === 'object') {
-          const errorMessages = Object.entries(err.response.data)
-            .map(([field, errors]) => `${field}: ${errors.join(', ')}`)
-            .join('; ');
-          setError(`Failed to add warranty: ${errorMessages}`);
-        } else {
-          setError(`Failed to add warranty: ${err.response.data}`);
-        }
-      } else {
-        setError("Failed to add warranty. Please check your inputs.");
-      }
-    }
-  };
+  }, [warranties]);
 
   const handleNextPage = () => {
     if (pagination.next) {
@@ -236,244 +118,292 @@ const BodyContent = () => {
     }
   };
 
-  const handleDragStart = (e, projectId) => {
-    e.dataTransfer.setData("text/plain", projectId);
-  };
+  // //const toggleWarrantySelection = (warrantyId) => {
+  //   setSelectedWarranties(prev => {
+  //     if (prev.includes(warrantyId)) {
+  //       return prev.filter(id => id !== warrantyId);
+  //     } else {
+  //       return [...prev, warrantyId];
+  //     }
+  //   });
+  // };
 
-  const handleDrop = (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
-    const projectId = e.dataTransfer.getData("text/plain");
-    setNewWarranty(prev => ({ ...prev, project_id: projectId }));
-    setIsDragging(false);
-    e.target.classList.remove('drag-over');
+    setIsSearching(true);
+    
+    // Make API call with search parameter
+    axios.get(`/api/warranties/?search=${encodeURIComponent(searchQuery)}`)
+      .then(async (response) => {
+        const results = response.data.results || response.data;
+        
+        // Process the results
+        const warrantiesWithNames = await Promise.all(
+          results.map(async (warranty) => {
+            try {
+              const projectResponse = await axios.get(`/api/warranties/project-warranty-details/${warranty.project_id}/`);
+              return {
+                ...warranty,
+                ext_project_name: projectResponse.data.project_name || `Project ${warranty.project_id}`,
+                warranty_status: projectResponse.data.warranty_status || 'Pending'
+              };
+            } catch (error) {
+              return {
+                ...warranty,
+                ext_project_name: `Project ${warranty.project_id}`,
+                warranty_status: 'Pending'
+              };
+            }
+          })
+        );
+        
+        setWarranties(warrantiesWithNames);
+        if (response.data.count !== undefined) {
+          setPagination({
+            count: response.data.count,
+            next: response.data.next,
+            previous: response.data.previous
+          });
+        }
+        setIsSearching(false);
+      })
+      .catch(error => {
+        console.error("Error searching warranties:", error);
+        setError("Failed to search warranties. Please try again.");
+        setIsSearching(false);
+      });
+  };
+  const handleFilterChange = (e) => {
+    const status = e.target.value;
+    setFilterStatus(status);
+    
+    if (status === 'all') {
+      fetchWarranties();
+      return;
+    }
+    
+    // Filter by status
+    setIsSearching(true);
+    const filteredWarranties = warranties.filter(warranty => {
+      const warrantyStatus = warranty.warranty_status?.toLowerCase() || '';
+      if (status === 'active' && warrantyStatus.includes('active')) return true;
+      if (status === 'expired' && warrantyStatus.includes('expired')) return true;
+      if (status === 'pending' && 
+          !warrantyStatus.includes('active') && 
+          !warrantyStatus.includes('expired')) return true;
+      return false;
+    });
+    
+    setWarranties(filteredWarranties);
+    setIsSearching(false);
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
+  const getStatusClass = (status) => {
+    const statusLower = status?.toLowerCase() || '';
+    if (statusLower.includes('active')) return 'status-active';
+    if (statusLower.includes('expired')) return 'status-expired';
+    return 'status-pending';
   };
 
-  const handleDragEnter = (e) => {
-    e.preventDefault();
-    e.target.classList.add('drag-over');
-    setIsDragging(true);
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   };
 
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.target.classList.remove('drag-over');
-    setIsDragging(false);
-  };
-
-  const handleFocus = () => {
-    if (newWarranty.project_id.length >= 2) {
-      fetchProjectSuggestions(newWarranty.project_id);
+  const getYearsRemaining = (endDate) => {
+    if (!endDate) return null;
+    
+    const today = new Date();
+    const end = new Date(endDate);
+    
+    // Calculate difference in years
+    const diffTime = end - today;
+    if (diffTime <= 0) return "Expired";
+    
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffYears = Math.floor(diffDays / 365);
+    const remainingDays = diffDays % 365;
+    const diffMonths = Math.floor(remainingDays / 30);
+    
+    // Format the output based on years and months
+    if (diffYears === 0) {
+      return diffMonths === 1 ? "1 month left" : `${diffMonths} months left`;
+    } else if (diffMonths === 0) {
+      return diffYears === 1 ? "1 year left" : `${diffYears} years left`;
+    } else {
+      const yearText = diffYears === 1 ? "1 year" : `${diffYears} years`;
+      const monthText = diffMonths === 1 ? "1 month" : `${diffMonths} months`;
+      return `${yearText}, ${monthText} left`;
     }
   };
 
-
-    return (
-      <div className="body-content-container">
-        <div className="header-section">
-          <h1 className="page-title">Warranty Management</h1>
-          <div className="action-buttons">
-            <button className="btn btn-primary" onClick={() => setShowAddForm(!showAddForm)}>
-              {showAddForm ? "Cancel" : "Add Warranty"}
-            </button>
-            <button className="btn btn-danger" onClick={handleDeleteWarranties}>
-              Delete Selected
-            </button>
-          </div>
-        </div>
+  return (
+    <div className="body-content-container-warranty">
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">Warranty Management</h1>
+      </div>
   
-        {error && <div className="alert alert-error">{error}</div>}
-        
-        {showAddForm && (
-          <div className="card form-card" ref={formRef}>
-            <div className="card-header">
-              <h3>Add New Warranty</h3>
-            </div>
-            <div className="card-body">
-              <form onSubmit={handleAddWarranty}>
-                <div className="form-group">
-                  <label>Project ID:</label>
-                  <div className="autocomplete-container" ref={suggestionRef}>
-                    <input 
-                      type="text" 
-                      name="project_id" 
-                      value={newWarranty.project_id} 
-                      onChange={handleProjectInputChange}
-                      onFocus={handleFocus}
-                      onDrop={handleDrop}
-                      onDragOver={handleDragOver}
-                      onDragEnter={handleDragEnter}
-                      onDragLeave={handleDragLeave}
-                      className={`form-input ${isDragging ? 'drag-over' : ''}`}
-                      placeholder="Type or drag a project ID here"
-                      required 
-                    />
-                    <div className="input-hint">
-                      Type to search for projects or drag from below
-                    </div>
-                    
-                    {isLoadingSuggestions && (
-                      <div className="loading-indicator">Loading projects...</div>
-                    )}
-                    
-                    {showSuggestions && projectSuggestions.length > 0 && (
-                      <ul className="suggestions-dropdown">
-                        {projectSuggestions.map((project, index) => (
-                          <li 
-                            key={index} 
-                            onClick={() => handleProjectSelect(project.project_id)}
-                            className="suggestion-item"
-                          >
-                            <strong>{project.project_id}</strong>
-                            {project.project_name && <span> - {project.project_name}</span>}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Warranty Coverage (Years):</label>
-                    <input 
-                      type="number" 
-                      name="warranty_coverage_yr" 
-                      value={newWarranty.warranty_coverage_yr} 
-                      onChange={handleInputChange} 
-                      min="1"
-                      className="form-input"
-                      required 
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Start Date:</label>
-                    <input 
-                      type="date" 
-                      name="warranty_start_date" 
-                      value={newWarranty.warranty_start_date} 
-                      onChange={handleInputChange} 
-                      className="form-input"
-                      required 
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>End Date:</label>
-                    <input 
-                      type="date" 
-                      name="warranty_end_date" 
-                      value={newWarranty.warranty_end_date} 
-                      onChange={handleInputChange} 
-                      className="form-input"
-                      required 
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-actions">
-                  <button type="submit" className="btn btn-submit">Add Warranty</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-        
-        <div className="data-section">
-          {isLoading ? (
-            <div className="loading-state">
-              <div className="spinner"></div>
-              <p>Loading warranties...</p>
-            </div>
-          ) : (
-            <>
-              <div className="table-responsive">
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th className="checkbox-cell">
-                        <input 
-                          type="checkbox" 
-                          onChange={handleSelectAll} 
-                          checked={selectedWarranties.length === warranties.length && warranties.length > 0}
-                        />
-                      </th>
-                      <th>Warranty ID</th>
-                      <th>Project ID</th>
-                      <th>Coverage (Years)</th>
-                      <th>Start Date</th>
-                      <th>End Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {warranties.length > 0 ? (
-                      warranties.map((warranty) => (
-                        <tr key={warranty.project_warranty_id}>
-                          <td className="checkbox-cell">
-                            <input 
-                              type="checkbox" 
-                              checked={selectedWarranties.includes(warranty.project_warranty_id)} 
-                              onChange={() => handleCheckboxChange(warranty.project_warranty_id)} 
-                            />
-                          </td>
-                          <td>{warranty.project_warranty_id}</td>
-                          <td 
-                            draggable 
-                            onDragStart={(e) => handleDragStart(e, warranty.project_id)}
-                            className="draggable-cell"
-                            title="Drag this project ID to the form"
-                          >
-                            {warranty.project_id}
-                          </td>
-                          <td>{warranty.warranty_coverage_yr}</td>
-                          <td>{new Date(warranty.warranty_start_date).toLocaleDateString()}</td>
-                          <td>{new Date(warranty.warranty_end_date).toLocaleDateString()}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="6" className="no-data">
-                          <div className="empty-state">
-                            <span className="icon">📋</span>
-                            <p>No warranties found</p>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              
-              {(pagination.next || pagination.previous) && (
-                <div className="pagination-controls">
-                  <button 
-                    onClick={handlePreviousPage} 
-                    disabled={!pagination.previous}
-                    className="btn btn-pagination"
-                  >
-                    Previous
-                  </button>
-                  <div className="pagination-info">
-                    Showing {warranties.length} of {pagination.count} warranties
-                  </div>
-                  <button 
-                    onClick={handleNextPage} 
-                    disabled={!pagination.next}
-                    className="btn btn-pagination"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </>
-          )}
+      {error && (
+        <div className="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {error}
+        </div>
+      )}
+      
+      <div className="warranty-stats">
+        <div className="stat-item">
+          <span className="stat-value">{statusCounts.active}</span>
+          <span className="stat-label">Active Warranties</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-value">{statusCounts.expired}</span>
+          <span className="stat-label">Expired Warranties</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-value">{statusCounts.pending}</span>
+          <span className="stat-label">Pending Warranties</span>
         </div>
       </div>
-    );
-  };
-  
-  export default BodyContent;
+      
+      <div className="search-filter-bar">
+        <form className="search-input-container" onSubmit={handleSearch}>
+          <svg className="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search by project ID or name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </form>
+        
+        <select 
+          className="filter-select"
+          value={filterStatus}
+          onChange={handleFilterChange}
+        >
+          <option value="all">All Warranties</option>
+          <option value="active">Active</option>
+          <option value="expired">Expired</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+        
+      <div className="data-section">
+        {isLoading ? (
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Loading warranties...</p>
+          </div>
+        ) : isSearching ? (
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Searching...</p>
+          </div>
+        ) : (
+          <>
+            <div className="table-responsive">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>WARRANTY ID</th>
+                    <th>PROJECT NAME</th>
+                    <th>COVERAGE</th>
+                    <th>START DATE</th>
+                    <th>END DATE</th>
+                    <th>REMAINING</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {warranties.length > 0 ? (
+                    warranties.map((warranty) => (
+                      <tr key={warranty.project_id}>
+                        <td className="warranty-id">
+                          <span className="warranty-code tooltip">
+                            WARR-{String(warranty.project_id).padStart(6, '0')}
+                            <span className="tooltip-text">Warranty ID for {warranty.ext_project_name}</span>
+                          </span>
+                        </td>
+                        <td>{warranty.ext_project_name || `Project ${warranty.project_id}`}</td>
+                        <td>{warranty.warranty_coverage_yr || 'N/A'} {warranty.warranty_coverage_yr === 1 ? 'Year' : 'Years'}</td>
+                        <td>{formatDate(warranty.warranty_start_date)}</td>
+                        <td>{formatDate(warranty.warranty_end_date)}</td>
+                        <td>{getYearsRemaining(warranty.warranty_end_date)}</td>
+                        <td>
+                          <span className={`status-badge ${getStatusClass(warranty.warranty_status)}`}>
+                            {warranty.warranty_status || 'Pending'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="7" className="no-data">
+                        <div className="empty-state">
+                          <span className="icon">📋</span>
+                          <p>No warranties found</p>
+                          {searchQuery && (
+                            <p>Try adjusting your search criteria</p>
+                          )}
+                          <button 
+                            className="add-warranty-btn"
+                            onClick={() => {
+                              setSearchQuery("");
+                              setFilterStatus("all");
+                              fetchWarranties();
+                            }}
+                          >
+                            View All Warranties
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+            {warranties.length > 0 && (pagination.next || pagination.previous) && (
+              <div className="pagination-controls">
+                <button 
+                  onClick={handlePreviousPage} 
+                  disabled={!pagination.previous}
+                  className="pagination-btn"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                  Previous
+                </button>
+                <div className="pagination-info">
+                  Showing {warranties.length} of {pagination.count} warranties
+                </div>
+                <button 
+                  onClick={handleNextPage} 
+                  disabled={!pagination.next}
+                  className="pagination-btn"
+                >
+                  Next
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default BodyContent;

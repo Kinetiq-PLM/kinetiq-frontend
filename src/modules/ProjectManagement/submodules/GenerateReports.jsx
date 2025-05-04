@@ -16,8 +16,6 @@ axios.interceptors.response.use(
   }
 );
 
-axios.defaults.baseURL = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev';
-
 const GenerateReports = () => {
   const [reportData, setReportData] = useState([]);
   const [selectedReports, setSelectedReports] = useState([]);
@@ -1806,12 +1804,6 @@ Process Phase as soon as possible.`;
             <thead>
               <tr>
                 <th>
-                  <input 
-                    type="checkbox" 
-                    onChange={handleSelectAll}
-                    checked={selectedReports.length === filteredReports.length && filteredReports.length > 0}
-                    disabled={loading || filteredReports.length === 0}
-                  />
                 </th>
                 <th>Project ID</th>
                 <th>Internal Project ID</th>
