@@ -4,24 +4,22 @@ import "../styles/VendorAppForm.css";
 
 const VendorAppForm = () => {
     const [formData, setFormData] = useState({
+        vendor_code: "",
+        status: null, // 'status' is set to null by default
         company_name: "",
-        vendor_name: "",
         tax_number: "",
         vendor_address: "",
         tax_exempt: false,
         contact_person: "",
-        fax: "",
-        title: "",
         vendor_email: "",
         phone: "",
         vendor_website: "",
         account_no: "",
         routing_no: "",
-        separate_checks: false,
         purchasing_card: false,
         requestor: "",
         date_requested: "",
-        organization_type: "Corporation", // Default to "Corporation"
+        payment_terms: "Corporation", // Default to "Corporation"
     });
 
     const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
@@ -37,7 +35,7 @@ const VendorAppForm = () => {
     const handleOrgTypeChange = (type) => {
         setFormData((prev) => ({
             ...prev,
-            organization_type: type,
+            payment_terms: type,
         }));
     };
 
@@ -50,39 +48,35 @@ const VendorAppForm = () => {
     };
 
     const handleSubmit = async () => {
-        // Validation: Ensure 'requestor' and other fields are properly populated
+        // Validation: Ensure required fields are properly populated
         if (!formData.requestor.trim()) {
             alert("Please enter the name of the requestor.");
             return;
         }
-
+    
         try {
             const payload = {
-                application_reference: `APP-${Date.now()}`,  // Automatically generated
-                status: null,  // 'status' is set to null by default
-                company_name: formData.company_name,
-                tax_number: formData.tax_number,
-                contact_person: formData.contact_person,
-                title: formData.title,
-                vendor_address: formData.vendor_address,
-                phone: formData.phone,
-                fax: formData.fax,
-                vendor_email: formData.vendor_email,
-                tax_exempt: formData.tax_exempt,
-                vendor_website: formatWebsite(formData.vendor_website),
-                organization_type: formData.organization_type,
-                separate_checks: formData.separate_checks,
-                purchasing_card: formData.purchasing_card,
-                account_no: formData.account_no,
-                routing_no: formData.routing_no,
-                requestor: formData.requestor,
-                date_requested: formData.date_requested ? formData.date_requested : null,
+                vendor_code: formData.vendor_code || "",
+                company_name: formData.company_name || "",
+                tax_number: formData.tax_number || "",
+                contact_person: formData.contact_person || "",
+                vendor_address: formData.vendor_address || "",
+                phone: formData.phone || "",
+                vendor_email: formData.vendor_email || "",
+                tax_exempt: formData.tax_exempt, // Boolean as required
+                purchasing_card: formData.purchasing_card ? "Yes" : "No", // Convert to string
+                account_no: formData.account_no || "",
+                routing_no: formData.routing_no || "",
+                requestor: formData.requestor || "",
+                date_requested: formData.date_requested || null, // Null if not provided
+                payment_terms: formData.payment_terms || null, // Null if not selected
+                status: null, // Default to null
             };
-
+    
             console.log("📤 Submitting Vendor Application Payload:", payload);
-
+    
             const response = await axios.post(
-                "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/VendorApp/create/",
+                "http://127.0.0.1:8000/api/VendorApp/create/",
                 payload
             );
             console.log("✅ Response from server:", response.data);
@@ -113,7 +107,7 @@ const VendorAppForm = () => {
             purchasing_card: false,
             requestor: "",
             date_requested: "",
-            organization_type: "Corporation",
+            payment_terms: "Corporation",
         });
         alert("Form reset.");
     };
@@ -159,25 +153,25 @@ const VendorAppForm = () => {
 
                         {/* Org Type */}
                         <div className="vendorappform-org-type">
-                            <h3 className="vendorappform-section-title">ORGANIZATION TYPE</h3>
+                            <h3 className="vendorappform-section-title">PAYMENT TERMS</h3>
                             <div className="org-type-dropdown">
                                 <button
                                     type="button"
                                     className="org-type-toggle"
                                     onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
                                 >
-                                    {formData.organization_type
-                                        ? formData.organization_type.charAt(0).toUpperCase() +
-                                          formData.organization_type.slice(1).replace("_", " ")
+                                    {formData.payment_terms
+                                        ? formData.payment_terms.charAt(0).toUpperCase() +
+                                          formData.payment_terms.slice(1).replace("_", " ")
                                         : "Select organization type"}
                                     <span className="dropdown-arrow">{orgDropdownOpen ? "▲" : "▼"}</span>
                                 </button>
                                 {orgDropdownOpen && (
                                     <div className="org-type-options">
-                                        {["Corporation", "LLC", "Partnership", "Nonprofit"].map((type) => (
+                                        {["80", "70", "50", "25"].map((type) => (
                                             <div
                                                 key={type}
-                                                className={`org-type-option ${formData.organization_type === type ? "selected" : ""}`}
+                                                className={`org-type-option ${formData.payment_terms === type ? "selected" : ""}`}
                                                 onClick={() => {
                                                     handleOrgTypeChange(type);
                                                     setOrgDropdownOpen(false);

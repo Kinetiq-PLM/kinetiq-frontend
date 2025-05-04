@@ -13,6 +13,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   const [isDownpaymentEnabled, setIsDownpaymentEnabled] = useState(false);
   const [employeeMap, setEmployeeMap] = useState({}); // State to store employee data
   const [isPopupVisible, setIsPopupVisible] = useState(false); // Popup state
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     vendor: "",
     documentNumber: "",
@@ -40,7 +41,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
+        const response = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
         const employeeData = response.data.reduce((map, employee) => {
           const fullName = `${employee.first_name} ${employee.last_name}`.trim();
           map[employee.employee_id] = fullName;
@@ -61,7 +62,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
       if (!requestId) return;
 
       try {
-        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
+        const response = await axios.get("http://127.0.0.1:8000/api/prf/list/");
         const matchingRequest = response.data.find((req) => req.request_id === requestId);
 
         if (matchingRequest?.employee_id) {
@@ -85,7 +86,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   useEffect(() => {
     const fetchVendors = async () => {
       try {
-        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/");
+        const response = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/vendor/list/");
         setVendors(response.data);
       } catch (error) {
         console.error("Error fetching vendors:", error.response?.data || error.message);
@@ -93,36 +94,40 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
     };
 
     const fetchItems = async () => {
-      if (!requestId) {
-        console.warn("No request_id provided. Cannot fetch items.");
-        return;
-    }
-
-    try {
-        const response = await axios.get(`https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/list/`);
-        const filteredItems = response.data.filter((item) => item.request_id === requestId);
-        console.log("Filtered Items:", filteredItems);
-        setItems(filteredItems); // Set only the items related to the request_id
-    } catch (error) {
-        console.error("Error fetching quotation items:", error.response?.data || error.message);
-    }
-    };
-
-    const fetchMaterials = async () => {
       try {
-        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/materials/list/");
-        setMaterials(response.data);
+        let itemsResponse = [];
+        let allItemsResponse = [];
+    
+        if (requestId) {
+          // Fetch items filtered by request_id
+          const response = await axios.get("http://127.0.0.1:8000/api/quotation-content/list/");
+          itemsResponse = response.data.filter((item) => item.request_id === requestId);
+          console.log("Filtered Items by Request ID:", itemsResponse);
+        } else {
+          // Fetch all items from item/list/ endpoint
+          const response = await axios.get("http://127.0.0.1:8000/api/quotation-content/item/list/");
+          itemsResponse = response.data;
+          console.log("Fetched All Items:", itemsResponse);
+        }
+    
+        // Fetch all items to map item_id to item_name
+        const allItemsResponseData = await axios.get("http://127.0.0.1:8000/api/quotation-content/item/list/");
+        allItemsResponse = allItemsResponseData.data;
+    
+        // Map item_name to itemsResponse
+        const mappedItems = itemsResponse.map((item) => {
+          const matchedItem = allItemsResponse.find((i) => i.item_id === item.item_id);
+          return {
+            ...item,
+            item_name: matchedItem ? matchedItem.item_name : "Unknown Item",
+            unit_price: item.unit_price || 0, // Default to 0 if unit_price is missing
+          };
+        });
+    
+        setItems(mappedItems); // Set the items with item_name included
       } catch (error) {
-        console.error("Error fetching materials:", error.response?.data || error.message);
-      }
-    };
-
-    const fetchAssets = async () => {
-      try {
-        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/");
-        setAssets(response.data);
-      } catch (error) {
-        console.error("Error fetching assets:", error.response?.data || error.message);
+        console.error("Error fetching items:", error.response?.data || error.message);
+        setError("Failed to fetch items");
       }
     };
 
@@ -184,7 +189,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
     }));
 }, [items, materials, assets]);
 
-  useEffect(() => {
+useEffect(() => {
   const computeTotalPaymentDue = () => {
     const totalBeforeDiscount = parseFloat(formData.totalAmount) || 0;
     const discount = (parseFloat(formData.discountPercentage) || 0) / 100;
@@ -232,7 +237,7 @@ useEffect(() => {
           value: quotation.downpayment_request || "",
         },
         buyer: quotation.employee_name || "Unknown Employee",
-        owner: selectedVendor?.vendor_name || "n/a", // Set the owner field
+        owner: selectedVendor?.company_name || "n/a", // Set the owner field
       });
 
       if (quotation.request_id) {
@@ -264,7 +269,7 @@ useEffect(() => {
           value: request.downpayment_request || "",
         },
         buyer: request.employee_name || "Unknown Employee",
-        owner: selectedVendor?.vendor_name || "n/a", // Set the owner field
+        owner: selectedVendor?.company_name || "n/a", // Set the owner field
       });
 
       if (request.request_id) {
@@ -288,7 +293,7 @@ const handleInputChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       vendor: value,
-      owner: selectedVendor?.vendor_name || "n/a", // Set the owner field to the vendor_name
+      owner: selectedVendor?.company_name || "n/a", // Set the owner field to the company_name
       contactPerson: selectedVendor?.contact_person || "", // Set the contact person
     }));
   } else {
@@ -304,7 +309,7 @@ const handleInputChange = (e) => {
 useEffect(() => {
   const fetchVendors = async () => {
     try {
-      const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/");
+      const response = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/vendor/list/");
       console.log("Vendors fetched:", response.data); // Debugging
       setVendors(response.data);
     } catch (error) {
@@ -319,6 +324,15 @@ useEffect(() => {
 useEffect(() => {
   console.log("Form Data Updated:", formData); // Debugging
 }, [formData]);
+
+const fetchQuotations = async () => {
+  try {
+    const response = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
+    console.log("Fetched Quotations:", response.data);
+  } catch (error) {
+    console.error("Error fetching quotations:", error.response?.data || error.message);
+  }
+};
 
   const handleSubmit = async () => {
     const payload = {
@@ -347,7 +361,7 @@ useEffect(() => {
 
     try {
       const response = await axios.post(
-        "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/create/",
+        "http://127.0.0.1:8000/api/purchase_quotation/create/",
         payload
       );
       console.log("✅ Response from server:", response.data);
@@ -360,186 +374,212 @@ useEffect(() => {
   };
 
   const handleAddToList = async () => {
-  try {
-    // 1. First get ALL existing quotations to check for duplicates
-    const checkResponse = await axios.get(
-      `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/`
-    );
-    
-    // 2. Find if this exact document_no exists (with same request_id)
-    const existingQuotation = checkResponse.data.find(
-      q => q.document_no === formData.documentNumber && 
-           q.request_id === requestId
-    );
-
-    // 3. Prepare the payload
-    const payload = {
-      document_no: parseInt(formData.documentNumber),
-      status: formData.status || "Pending",
-      valid_date: formData.validUntil || null,
-      document_date: formData.documentDate || null,
-      required_date: formData.requiredDate || null,
-      total_before_discount: formData.totalAmount || null,
-      discount_percent: formData.discountPercentage || null,
-      freight: formData.freight || null,
-      tax: formData.tax || null,
-      total_payment: formData.totalPaymentDue || null,
-      vendor_code: formData.vendor || null,
-      request_id: requestId || null,
-      remarks: formData.remarks || null,
-      delivery_loc: formData.delivery_loc || null,
-      downpayment_request: formData.downpayment_request.enabled
-        ? parseFloat(formData.downpayment_request.value) || 0
-        : null,
-    };
-
-    // 4. Debug log before making the request
-    console.log('Existing quotation check:', {
-      exists: !!existingQuotation,
-      document_no: formData.documentNumber,
-      request_id: requestId
-    });
-
-    let apiResponse;
-    if (existingQuotation) {
-      console.log("Updating existing quotation ID:", existingQuotation.quotation_id);
-      apiResponse = await axios.put(
-        `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/edit/${existingQuotation.quotation_id}/`,
-        payload
+    try {
+      // Check if a quotation already exists for the given request_id
+      const listResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
+      const existingQuotation = listResponse.data.find(
+        (quotation) => quotation.request_id === requestId
       );
-    } else {
-      console.log("Creating new quotation");
-      apiResponse = await axios.post(
-        "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/create/",
-        payload
-      );
-    }
-
-    console.log("API Response:", apiResponse.data);
-    window.location.reload();
-    alert("Quotation added successfully!");
-    
-    return apiResponse.data;
-
-  } catch (error) {
-    console.error("Full error details:", {
-      message: error.message,
-      response: error.response?.data,
-      config: error.config
-    });
-    throw error; // Re-throw to be caught by the calling function
-  }
-};
-
   
-
-const handleSendTo = async () => {
-  try {
-    setIsPopupVisible(false);
-    
-    // First update/create the quotation
-    const quotationResponse = await handleAddToList();
-    
-    if (!quotationResponse?.quotation_id) {
-      throw new Error("Failed to get valid quotation ID");
-    }
-
-    // Prepare purchase order payload with proper data types
-    const poPayload = {
-      quotation_id: quotationResponse.quotation_id,
-      order_date: new Date().toISOString().split('T')[0],
-      delivery_date: formData.deliveryDate || new Date().toISOString().split('T')[0],
-      document_date: formData.documentDate || new Date().toISOString().split('T')[0],
-      status: "Pending"
-    };
-
-    console.log("Purchase Order Payload:", JSON.stringify(poPayload, null, 2));
-
-    // Create purchase order
-    const response = await axios.post(
-      "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/",
-      poPayload,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        }
+      if (existingQuotation) {
+        console.log("Existing Quotation Found:", existingQuotation);
+        return existingQuotation; // Return the existing quotation
       }
-    );
-
-    console.log("Purchase Order Response:", response.data);
-    alert("Purchase order created successfully!");
-
-  } catch (error) {
-    console.error("Purchase Order Error Details:", {
-      message: error.message,
-      responseData: error.response?.data,
-      status: error.response?.status,
-      headers: error.response?.headers,
-      config: error.config
-    });
-    
-    let errorMessage = "Failed to create purchase order. ";
-    if (error.response?.data) {
-      // Display backend validation errors if available
-      errorMessage += JSON.stringify(error.response.data);
+  
+      // If no existing quotation, create a new one
+      const payload = {
+        document_no: parseInt(formData.documentNumber),
+        status: formData.status || "Pending",
+        valid_date: formData.validUntil || null,
+        document_date: formData.documentDate || null,
+        required_date: formData.requiredDate || null,
+        total_before_discount: formData.totalAmount || null,
+        discount_percent: formData.discountPercentage || null,
+        freight: formData.freight || null,
+        tax: formData.tax || null,
+        total_payment: formData.totalPaymentDue || null,
+        vendor_code: formData.vendor || null,
+        request_id: requestId || null,
+        remarks: formData.remarks || null,
+        delivery_loc: formData.delivery_loc || null,
+        downpayment_request: formData.downpayment_request.enabled
+          ? parseFloat(formData.downpayment_request.value) || 0
+          : null,
+      };
+  
+      console.log("Payload being sent:", payload);
+  
+      const createResponse = await axios.post(
+        "http://127.0.0.1:8000/api/purchase_quotation/create/",
+        payload
+      );
+  
+      console.log("New Quotation Created:", createResponse.data);
+      return createResponse.data; // Return the newly created quotation
+    } catch (error) {
+      console.error("Error in handleAddToList:", error.response?.data || error.message);
+      alert("Failed to add or fetch quotation. Check the console for details.");
+      throw error;
     }
-    
-    alert(errorMessage);
-    setIsPopupVisible(true); // Reopen popup to try again
-  }
-};
+  };
   
 
-  const getItemName = (id, type) => {
-    console.log("Getting item name for ID:", id, "Type:", type);
-    if (type === "material") {
-      const material = materials.find((m) => m.material_id === id);
-      return material ? material.material_name : "Unknown Material";
-    } else if (type === "asset") {
-      const asset = assets.find((a) => a.asset_id === id);
-      return asset ? asset.asset_name : "Unknown Asset";
+  const handleSendTo = async () => {
+    try {
+      setIsPopupVisible(false);
+  
+      // Fetch or create the quotation
+      const quotationResponse = await handleAddToList();
+  
+      if (!quotationResponse?.quotation_id) {
+        throw new Error("Failed to get valid quotation ID");
+      }
+  
+      console.log("Fetched Quotation ID:", quotationResponse.quotation_id);
+  
+      // Prepare purchase order payload
+      const poPayload = {
+        quotation_id: quotationResponse.quotation_id,
+        order_date: new Date().toISOString().split("T")[0],
+        delivery_date: formData.deliveryDate || new Date().toISOString().split("T")[0],
+        document_date: formData.documentDate || new Date().toISOString().split("T")[0],
+        status: formData.popupStatus || "Ordered",
+      };
+  
+      console.log("Purchase Order Payload:", JSON.stringify(poPayload, null, 2));
+  
+      // Create purchase order
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/purchase-orders/list/",
+        poPayload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      console.log("Purchase Order Response:", response.data);
+      alert("Purchase order created successfully!");
+    } catch (error) {
+      console.error("Purchase Order Error Details:", {
+        message: error.message,
+        responseData: error.response?.data,
+        status: error.response?.status,
+        headers: error.response?.headers,
+        config: error.config,
+      });
+  
+      let errorMessage = "Failed to create purchase order. ";
+      if (error.response?.data) {
+        errorMessage += JSON.stringify(error.response.data);
+      }
+  
+      alert(errorMessage);
+      setIsPopupVisible(true); // Reopen popup to try again
     }
-    return "Unknown Item";
   };
+  
+
+const getItemName = (id, type) => {
+  if (type === "Raw Material") {
+    const material = materials.find((m) => m.item_id === id);
+    return material ? material.item_name : "Unknown Material";
+  } else if (type === "Asset") {
+    const asset = assets.find((a) => a.item_id === id);
+    return asset ? asset.item_name : "Unknown Asset";
+  }
+  return "Unknown Item";
+};
+
+const handleAmountChange = async (e, index) => {
+  const { value } = e.target;
+  const updatedItems = [...items];
+  updatedItems[index] = { ...updatedItems[index], unit_price: parseFloat(value) || 0 };
+
+  // Calculate the total for the item
+  updatedItems[index].total =
+    (updatedItems[index].unit_price || 0) * (updatedItems[index].purchase_quantity || 0);
+
+  setItems(updatedItems);
+
+  // Optionally update the backend
+  try {
+    const payload = {
+      unit_price: updatedItems[index].unit_price,
+      discount: updatedItems[index].discount || 0, // Include discount if available
+      total: updatedItems[index].total, // Save the total for the item
+    };
+
+    await axios.patch(
+      `http://127.0.0.1:8000/api/quotation-content/update/${updatedItems[index].quotation_content_id}/`,
+      payload
+    );
+
+    console.log("Updated item:", payload);
+  } catch (error) {
+    console.error("Error updating item:", error.response?.data || error.message);
+  }
+};
+
+useEffect(() => {
+  const computeTotalAmount = () => {
+    const total = items.reduce((sum, item) => {
+      const unitPrice = parseFloat(item.unit_price) || 0;
+      const quantity = parseFloat(item.purchase_quantity) || 0;
+      return sum + unitPrice * quantity;
+    }, 0);
+
+    setFormData((prev) => ({
+      ...prev,
+      totalAmount: total.toFixed(2), // Ensure the result is a string with 2 decimal places
+    }));
+  };
+
+  computeTotalAmount();
+}, [items]);
 
   return (
     <div className="purchquoteform">
       <div className="purchquoteform-scrollable-wrapper">
         <div className="body-content-container">
           <div className="purchquoteform-header">
-            <button className="purchquoteform-back" onClick={onClose}>← Back</button>
-            <h2 className="purchquoteform-title">Request For Quotation Form</h2>
-            {formData.status === "Pending" || formData.status === "Rejected" ? (
-              <button
-                className="purchquoteform-send"
-                onClick={handleAddToList}
-              >
-                Add to List
-              </button>
-            ) : (
-              <button
-                className="purchquoteform-send"
-                onClick={() => setIsPopupVisible(true)}
-              >
-                Proceed To Order
-              </button>
-            )}
-          </div>
+  <button className="purchquoteform-back" onClick={onClose}>← Back</button>
+  <h2 className="purchquoteform-title">Request For Quotation Form</h2>
+  {formData.status === "Approved" ? (
+    <button
+      className="purchquoteform-send"
+      onClick={() => setIsPopupVisible(true)} // Proceed to Order
+    >
+      Proceed To Order
+    </button>
+  ) : (
+    <button
+      className="purchquoteform-send"
+      onClick={handleAddToList} // Add to List
+    >
+      Add to List
+    </button>
+  )}
+</div>
 
           <div className="purchquoteform-content">
             <div className="purchquoteform-grid">
-              <div className="form-group">
-                <div className="label-req">
-                <label >Contact Person</label></div>
-                <select name="vendor" value={formData.vendor} onChange={handleInputChange}>
-                  <option value="">Select Vendor</option>
-                  {vendors.map((v) => (
-                    <option key={v.vendor_code} value={v.vendor_code}>
-                      {v.contact_person} - {v.vendor_name}
-                    </option>
-                  ))}
-                </select>
+            <div className="form-group">
+              <div className="label-req">
+                <label>Contact Person</label>
               </div>
+              <select name="vendor" value={formData.vendor} onChange={handleInputChange}>
+              <option value="">Select Vendor</option> {/* Default placeholder option */}
+              {vendors
+                .filter((v) => v.status === "Approved") // Filter vendors with status = "Approved"
+                .map((v) => (
+                  <option key={v.vendor_code} value={v.vendor_code}>
+                    {v.contact_person || "No Contact Person"} {/* Show contact_person */}
+                  </option>
+                ))}
+            </select>
+            </div>
               <div className="form-group">
                 <label>Document Number</label>
                 <input 
@@ -554,11 +594,11 @@ const handleSendTo = async () => {
               <div className="form-group">
                 <div className="label-req">
                 <label>Status</label></div>
-                <select name="status" value={formData.status} onChange={handleInputChange}>
-                  <option value="">Select Status</option>
+                <select name="status" value={formData.status || "Pending"} onChange={handleInputChange} disabled>
                   <option value="Pending">Pending</option>
                   <option value="Approved">Approved</option>
                   <option value="Rejected">Rejected</option>
+                  
                 </select>
               </div>
 
@@ -617,33 +657,36 @@ const handleSendTo = async () => {
             </div>
 
             <div className="purchquoteform-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Item Id</th>
-                    <th>Item Name</th>
-                    <th>Quantity</th>
-                    <th>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item, index) => (
+            <table>
+              <thead>
+                <tr>
+                  <th>Item Id</th>
+                  <th>Item Name</th>
+                  <th>Quantity</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item, index) => {
+                  console.log("Item:", item); // Log each item to verify its structure
+                  return (
                     <tr key={index}>
-                      <td>{item.material_id || item.asset_id}</td>
-                      <td>
-                        {item.material_id
-                          ? getItemName(item.material_id, "material")
-                          : getItemName(item.asset_id, "asset")}
-                      </td>
+                      <td>{item.item_id}</td>
+                      <td>{item.item_name || "Unknown Item"}</td>
                       <td>{item.purchase_quantity}</td>
-                      <td>{item.material_id
-                           ? materials.find((m) => m.material_id === item.material_id)?.cost_per_unit || "N/A"
-                           : assets.find((a) => a.asset_id === item.asset_id)?.purchase_price || "N/A"} </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={item.unit_price !== undefined ? item.unit_price: 0} // Show saved unit_price if it exists
+                          onChange={(e) => handleAmountChange(e, index)}
+                        />
+                      </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
             <div className="purchquoteform-details">
               <div className="details-left">
@@ -789,68 +832,64 @@ const handleSendTo = async () => {
           </div>
 
           {isPopupVisible && (
-  <div className="popup-form">
-    <div className="popup-form-content">
-      <h3>Purchase Order</h3>
-      <br></br>
-      <p>Please confirm delivery details</p>
-      <br></br>
+            <div className="popup-form">
+              <div className="popup-form-content">
+                <h3>Purchase Order</h3>
+                <br />
+                <p>Please confirm delivery details</p>
+                <br />
 
-      {/* Delivery Date Field */}
-      <div className="form-group">
-        <label>Delivery Date</label>
-        <input
-          type="date"
-          name="deliveryDate"
-          value={formData.deliveryDate || ""}
-          onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              deliveryDate: e.target.value,
-            }))
-          }
-        />
-      </div>
-      <br></br>
+                {/* Delivery Date Field */}
+                <div className="form-group">
+                  <label>Delivery Date</label>
+                  <input
+                    type="date"
+                    name="deliveryDate"
+                    value={formData.deliveryDate || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        deliveryDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <br />
 
-      {/* Status Field */}
-      <div className="form-group">
-        <label>Status</label>
-        <select
-          name="popupStatus"
-          value={formData.popupStatus || ""}
-          onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              popupStatus: e.target.value,
-            }))
-          }
-        >
-          <option value="">Select Status</option>
-          <option value="Pending">Pending</option>
-          <option value="Approved">Approved</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-      </div>
+                {/* Status Field */}
+                <div className="form-group">
+                  <label>Status</label>
+                  <select
+                    name="popupStatus"
+                    value={formData.popupStatus || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        popupStatus: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="Ordered">Ordered</option>
+                  </select>
+                </div>
 
-      <div className="popup-buttons">
-                <button 
-                  className="popup-close-button" 
-                  onClick={() => setIsPopupVisible(false)}
-                >
-                  Cancel
-                </button>
-                <button 
-                  className="popup-submit-button" 
-                  onClick={handleSendTo}
-                >
-                  Confirm & Submit
-                </button>
+                <div className="popup-buttons">
+                  <button
+                    className="popup-close-button"
+                    onClick={() => setIsPopupVisible(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="popup-submit-button"
+                    onClick={handleSendTo}
+                  >
+                    Confirm & Submit
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-
+          )}
           <div className="purchquoteform-footer">
           </div>
         </div>

@@ -212,7 +212,7 @@
 
 .purchquote .purchquote-table-header {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
     padding: 1rem;
     background-color: #f8f9fa;
@@ -239,7 +239,7 @@
 
 .purchquote .purchquote-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 2rem;
     padding: 1rem;
     border-bottom: 1px solid #eee;
@@ -263,11 +263,11 @@
 }
 
 /* Consistent status badge styling for PurchaseQuot */
-.status-approved,
-.status-pending,
-.status-rejected,
-.status-quotation-sent,
-.status-quotationsent {
+.purchquote .status-approved,
+.purchquote .status-pending,
+.purchquote .status-rejected,
+.purchquote .status-quotation-sent,
+.purchquote .status-quotationsent {
   border-radius: 12px !important;
   padding: 2px 10px !important;
   font-size: 0.85em;
@@ -275,25 +275,25 @@
   display: inline-block;
 }
 
-.status-approved {
-  color: #2d5016;
-  background-color: #93c47d;
-  border: 1px solid #81b366;
+.purchquote .status-approved {
+  color: #155724;
+  background-color: #d9ead3;
+  border: 1px solid #d9ead3;
 }
 
-.status-pending {
+.purchquote .status-pending {
   color: #856404;
   background-color: #ffe599;
   border: 1px solid #ffd966;
 }
 
-.status-rejected {
-  color: #721c24;
-  background-color: #e06666;
-  border: 1px solid #cc4c4c;
+.purchquote .status-rejected {
+  color: #dc2626;
+  background-color: #fee2e2;
+  border: 1px solid #fee2e2;
 }
 
-.status-quotation-sent {
+.purchquote .status-quotation-sent {
   color: #856404;
   background-color: #fff2cc;
   border: 1px solid #ffe599;
@@ -331,3 +331,14 @@
     gap: 1rem;
     justify-self: end;
 }
+
+.purchquote-edit-button {
+    padding: 0.3rem 0.8rem;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #00bcd4;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }

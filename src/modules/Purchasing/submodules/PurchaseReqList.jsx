@@ -22,24 +22,41 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
   useEffect(() => {
     const fetchPurchaseRequests = async () => {
       try {
-        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
-        const sortedRequests = response.data.sort((a, b) => {
+        // Fetch all purchase requests
+        const prfResponse = await axios.get("http://127.0.0.1:8000/api/prf/list/");
+        const purchaseRequests = prfResponse.data;
+  
+        // Fetch all quotation contents
+        const quotationResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/list/");
+        const quotationContents = quotationResponse.data;
+  
+        // Extract request_ids that have matching quotation_content_id
+        const requestIdsWithQuotation = new Set(quotationContents.map((qc) => qc.request_id));
+  
+        // Filter purchase requests to include only those with matching request_ids
+        const filteredRequests = purchaseRequests.filter((request) =>
+          requestIdsWithQuotation.has(request.request_id)
+        );
+  
+        // Sort filtered requests by document_date (newest first)
+        const sortedRequests = filteredRequests.sort((a, b) => {
           const dateA = new Date(a.document_date);
           const dateB = new Date(b.document_date);
-          return dateB - dateA; // Default to descending order (newest first)
+          return dateB - dateA;
         });
+  
         setPurchaseRequests(sortedRequests);
       } catch (error) {
-        console.error("Error fetching purchase requests:", error);
-        setError("Failed to load purchase requests");
+        console.error("Error fetching purchase requests or quotation contents:", error);
+        setError("Failed to load purchase requests.");
       } finally {
         setLoading(false);
       }
     };
-
+  
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
+        const response = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
         const employeeData = response.data.reduce((map, employee) => {
           const fullName = `${employee.first_name} ${employee.last_name}`.trim();
           map[employee.employee_id] = {
@@ -51,10 +68,10 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
         setEmployeeMap(employeeData);
       } catch (error) {
         console.error("Error fetching employees:", error);
-        setError("Failed to load employee data");
+        setError("Failed to load employee data.");
       }
     };
-
+  
     fetchPurchaseRequests();
     fetchEmployees();
   }, []);

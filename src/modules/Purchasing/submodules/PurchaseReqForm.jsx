@@ -34,7 +34,7 @@ const PurchaseReqForm = ({ onClose }) => {
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
+                const response = await fetch("http://127.0.0.1:8000/api/prf/employees/");
                 const data = await response.json();
                 setEmployees(data);
             } catch {
@@ -48,12 +48,10 @@ const PurchaseReqForm = ({ onClose }) => {
         const fetchItems = async () => {
             setIsLoading(true);
             try {
-                const url = formData.requestType === "Material"
-                    ? "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/materials/list/"
-                    : "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/";
-                const response = await fetch(url);
+                const response = await fetch("http://127.0.0.1:8000/api/quotation-content/item/list/");
                 const data = await response.json();
-                formData.requestType === "Material" ? setMaterials(data) : setAssets(data);
+                setMaterials(data.filter((item) => item.item_type === "Raw Material"));
+                setAssets(data.filter((item) => item.item_type === "Asset"));
             } catch {
                 setError("Failed to fetch items");
             } finally {
@@ -61,7 +59,7 @@ const PurchaseReqForm = ({ onClose }) => {
             }
         };
         fetchItems();
-    }, [formData.requestType]);
+    }, []);
 
     const handleInputChange = (e, index = null) => {
         const { name, value } = e.target;
@@ -89,7 +87,7 @@ const PurchaseReqForm = ({ onClose }) => {
         };
     
         try {
-            const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-order/list/", {
+            const response = await fetch("http://127.0.0.1:8000/api/purchase-order/list/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(purchaseData),
@@ -126,13 +124,13 @@ const PurchaseReqForm = ({ onClose }) => {
                 discount: null,
                 tax_code: "",
                 total: null,
-                material_id: item.material_id || null,
-                asset_id: item.asset_id || null,
+                item_id: item.item_id, // Unified item_id
+                item_type: item.item_type, // Differentiates between Raw Material and Asset
                 request_id: item.request_id,
                 purchase_quantity: item.purchase_quantity,
             };
 
-            const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/create/", {
+            const response = await fetch("http://127.0.0.1:8000/api/quotation-content/create/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
@@ -148,32 +146,55 @@ const PurchaseReqForm = ({ onClose }) => {
     const handleAddRow = async () => {
         // Check if the form is completely filled
         if (!isFormValid()) {
-            setError("Please fill all required fields before adding items.");
-            return;
+          setError("Please fill all required fields before adding items.");
+          return;
         }
-
+      
         try {
-            const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/null/");
-            const data = await res.json();
-            const latest = data[data.length - 1]?.request_id;
-            setLatestRequestId(latest);
-
-            // Now, create the new item after fetching the request_id
-            const newItem = {
-                material_id: formData.requestType === "Material" ? "" : null,
-                asset_id: formData.requestType === "Assets" ? "" : null,
-                purchase_quantity: 1,
-                request_id: latest, // Using the fetched request_id
-            };
-
-            setFormData((prev) => ({
-                ...prev,
-                items: [...prev.items, newItem],
-            }));
-        } catch {
-            setError("Failed to fetch latest request_id");
+          // Fetch all purchase requests
+          const res = await fetch("http://127.0.0.1:8000/api/prf/list/");
+          const data = await res.json();
+      
+          // Filter requests that do not have quotation content
+          const requestsWithoutQuotation = [];
+          for (const request of data) {
+            const checkRes = await fetch(`http://127.0.0.1:8000/api/quotation-content/check/?request_id=${request.request_id}`);
+            const checkData = await checkRes.json();
+      
+            // Only include requests where quotation content does not exist
+            if (!checkData.exists) {
+              requestsWithoutQuotation.push(request);
+            }
+          }
+      
+          if (requestsWithoutQuotation.length === 0) {
+            setError("No available requests without quotation content.");
+            return;
+          }
+      
+          // Get the latest request without quotation content
+          const latestRequest = requestsWithoutQuotation[requestsWithoutQuotation.length - 1];
+          setLatestRequestId(latestRequest.request_id);
+      
+          console.log("Latest Request Without Quotation Content:", latestRequest);
+      
+          // Create a new item for the latest request
+          const newItem = {
+            item_id: "",
+            item_type: formData.requestType, // Use the selected request type
+            purchase_quantity: 1,
+            request_id: latestRequest.request_id, // Associate with the latest request
+          };
+      
+          setFormData((prev) => ({
+            ...prev,
+            items: [...prev.items, newItem],
+          }));
+        } catch (error) {
+          console.error("Error fetching latest request:", error);
+          setError("Failed to fetch the latest request without quotation content.");
         }
-    };
+      };
 
     const isFormValid = () => {
         return formData.employeeId && formData.dateRequested && formData.dateValid && formData.documentDate;
@@ -198,7 +219,7 @@ const PurchaseReqForm = ({ onClose }) => {
                 items: formData.items,
             };
 
-            const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/submit/", {
+            const res = await fetch("http://127.0.0.1:8000/dev/api/prf/submit/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
@@ -354,7 +375,8 @@ const PurchaseReqForm = ({ onClose }) => {
                     <table>
                         <thead>
                             <tr>
-                                <th>{formData.requestType === "Material" ? "Material Name" : "Asset Name"}</th>
+                                <th>Item Name</th>
+                                <th>Item Type</th>
                                 <th>Quantity</th>
                                 <th>Request ID</th>
                                 <th>Action</th>
@@ -365,16 +387,26 @@ const PurchaseReqForm = ({ onClose }) => {
                                 <tr key={index}>
                                     <td>
                                         <select
-                                            name={formData.requestType === "Material" ? "material_id" : "asset_id"}
-                                            value={formData.requestType === "Material" ? item.material_id : item.asset_id}
+                                            name="item_id"
+                                            value={item.item_id}
                                             onChange={(e) => handleInputChange(e, index)}
                                         >
                                             <option value="">Select</option>
-                                            {(formData.requestType === "Material" ? materials : assets).map((entry) => (
-                                                <option key={entry.material_id || entry.asset_id} value={entry.material_id || entry.asset_id}>
-                                                    {entry.material_name || entry.asset_name}
+                                            {(item.item_type === "Raw Material" ? materials : assets).map((entry) => (
+                                                <option key={entry.item_id} value={entry.item_id}>
+                                                    {entry.item_name}
                                                 </option>
                                             ))}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select
+                                            name="item_type"
+                                            value={item.item_type}
+                                            onChange={(e) => handleInputChange(e, index)}
+                                        >
+                                            <option value="Raw Material">Raw Material</option>
+                                            <option value="Asset">Asset</option>
                                         </select>
                                     </td>
                                     <td>
@@ -393,7 +425,7 @@ const PurchaseReqForm = ({ onClose }) => {
                             ))}
                         </tbody>
                     </table>
-                    <button className="add-item-btn" onClick={handleAddRow} disabled={!isSaveClicked}>Add Item</button>
+                    <button className="add-item-btn" onClick={handleAddRow}>Add Item</button>
                 </div>
 
                 <div className="button-container">
@@ -454,7 +486,7 @@ const PurchaseReqForm = ({ onClose }) => {
                                             status: "Pending",
                                         };
 
-                                        const quotationRes = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/create/", {
+                                        const quotationRes = await fetch("http://127.0.0.1:8000/api/purchase_quotation/create/", {
                                             method: "POST",
                                             headers: { "Content-Type": "application/json" },
                                             body: JSON.stringify(quotationPayload),
@@ -482,7 +514,7 @@ const PurchaseReqForm = ({ onClose }) => {
                                             status: purchaseForm.popupStatus || "Pending",
                                         };
 
-                                        const orderRes = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/", {
+                                        const orderRes = await fetch("http://127.0.0.1:8000/api/purchase-orders/list/", {
                                             method: "POST",
                                             headers: { "Content-Type": "application/json" },
                                             body: JSON.stringify(orderPayload),

@@ -15,16 +15,16 @@ const BodyContent = ({ onClose }) => {
     name: "",
     department: "",
     email: "",
-    requestType: "Material", // Default to Material
+    requestType: "Assets", // Default to Material
     dateRequested: format(new Date(), "yyyy-MM-dd"),
-    dateValid: "",
+    dateValid: format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
     documentDate: format(new Date(), "yyyy-MM-dd"),
     employeeId: "",
     items: [],
   });
 
   const [employees, setEmployees] = useState([]);
-  const [materials, setMaterials] = useState([]);
+  const [items, setItems] = useState([]); // Unified list of items
   const [assets, setAssets] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -35,7 +35,7 @@ const BodyContent = ({ onClose }) => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
+        const response = await fetch("http://127.0.0.1:8000/api/prf/employees/");
         const data = await response.json();
         setEmployees(data);
       } catch {
@@ -49,13 +49,9 @@ const BodyContent = ({ onClose }) => {
     const fetchItems = async () => {
       setIsLoading(true);
       try {
-        const url =
-          formData.requestType === "Material"
-            ? "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/materials/list/"
-            : "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/assets/list/";
-        const response = await fetch(url);
+        const response = await fetch("http://127.0.0.1:8000/api/quotation-content/item/list/");
         const data = await response.json();
-        formData.requestType === "Material" ? setMaterials(data) : setAssets(data);
+        setItems(data); // Populate the unified items list
       } catch {
         setError("Failed to fetch items");
       } finally {
@@ -63,7 +59,24 @@ const BodyContent = ({ onClose }) => {
       }
     };
     fetchItems();
-  }, [formData.requestType]);
+  }, []);
+
+  useEffect(() => {
+    // Automatically populate user data on component mount
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setFormData((prev) => ({
+        ...prev,
+        name: `${user.first_name} ${user.last_name}`,
+        email: user.email || "",
+        department: user.department || "", 
+        employeeId: user.employee_id || "", 
+      }));
+    } else {
+      setError("Failed to load user data. Please log in again.");
+    }
+  }, []);
 
   const handleInputChange = (e, index = null) => {
     const { name, value } = e.target;
@@ -93,36 +106,46 @@ const BodyContent = ({ onClose }) => {
     }
   
     try {
-      const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
+      const response = await fetch("http://127.0.0.1:8000/api/prf/list/");
       const data = await response.json();
   
-      // Filter the list to find the matching request
-      const matchingRequest = data.find((request) => {
+      // Filter the list to find matching requests with the same dates
+      const matchingRequests = data.filter((request) => {
         return (
           request.employee_id === formData.employeeId &&
           request.document_date === formData.documentDate &&
           request.valid_date === formData.dateValid &&
-          request.required_date === formData.dateRequested
+          request.required_date === formData.dateRequested &&
+          !request.quotation_content_id // Exclude requests with quotation_content_id
         );
       });
   
-      if (matchingRequest) {
-        console.log("Matching Request:", matchingRequest);
-        setLatestRequestId(matchingRequest.request_id); // Set the matched request_id
+      if (matchingRequests.length > 0) {
+        console.log("Matching Requests Without Quotation Content:", matchingRequests);
   
+        // Sort matching requests by document_date to get the latest one
+        const latestRequest = matchingRequests.reduce((latest, current) => {
+          return new Date(latest.document_date) > new Date(current.document_date) ? latest : current;
+        });
+  
+        console.log("Latest Request Without Quotation Content:", latestRequest);
+  
+        // Add the latest request to the table
         const newItem = {
-          material_id: formData.requestType === "Material" ? "" : null,
-          asset_id: formData.requestType === "Assets" ? "" : null,
+          item_id: "",
+          item_type: formData.requestType,
           purchase_quantity: 1,
-          request_id: matchingRequest.request_id, // Use the matched request_id
+          request_id: latestRequest.request_id,
         };
   
         setFormData((prev) => ({
           ...prev,
           items: [...prev.items, newItem],
         }));
+  
+        setLatestRequestId(latestRequest.request_id); // Set the latest request ID
       } else {
-        setError("No matching request found for the given criteria.");
+        setError("No matching requests found for the given criteria or all have quotation content.");
         setTimeout(() => setError(""), 3000);
       }
     } catch (error) {
@@ -143,30 +166,33 @@ const BodyContent = ({ onClose }) => {
   const createQuotationContent = async (item) => {
     try {
       const data = {
-        unit_price: null,
-        discount: null,
-        tax_code: "",
-        total: null,
-        material_id: item.material_id || null,
-        asset_id: item.asset_id || null,
-        request_id: item.request_id,
-        purchase_quantity: item.purchase_quantity,
+        unit_price: null, // Default to null
+        discount: null, // Default to null
+        tax_code: "", // Default to an empty string
+        item_id: item.item_id || null, // Use item_id from the item
+        request_id: item.request_id || null, // Use request_id from the item
+        purchase_quantity: item.purchase_quantity || null, // Use purchase_quantity from the item
       };
-
-      const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/create/", {
+  
+      console.log("Payload being sent to backend:", data); // Debugging
+  
+      const response = await fetch("http://127.0.0.1:8000/api/quotation-content/create/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-
+  
       if (!response.ok) {
+        const errorDetail = await response.text();
+        console.error("Backend error:", errorDetail);
         throw new Error("Failed to create quotation content");
       }
-
+  
       const result = await response.json();
       console.log("Quotation created:", result);
     } catch (error) {
-      setError(error.message || "Failed to create quotation content");
+      console.error("Error in createQuotationContent:", error.message);
+      throw error; // Re-throw the error to be handled in handleSubmit
     }
   };
 
@@ -174,42 +200,41 @@ const BodyContent = ({ onClose }) => {
     setIsLoading(true);
     try {
       const body = {
-        request_id: "",
-        employee_id: formData.employeeId,
-        approval_id: null,
-        valid_date: formData.dateValid,
-        document_date: formData.documentDate,
-        required_date: formData.dateRequested,
-        quotation_content_id: null,
-        items: formData.items,
-      };
-  
-      const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/submit/", {
+        request_id: latestRequestId || "", // Ensure request_id is set
+        employee_id: formData.employeeId || "",
+        valid_date: formData.dateValid || null,
+        document_date: formData.documentDate || null,
+        required_date: formData.dateRequested || null,
+    };
+
+    console.log("Payload being sent to backend:", body); // Debugging
+
+    const res = await fetch("http://127.0.0.1:8000/api/prf/submit/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-      });
-  
-      if (!res.ok) throw new Error("Fill up the form first");
-  
-      const saved = await res.json();
-      console.log("Saved:", saved);
-  
-      setSuccessMessage("Purchase request saved successfully!");
-      setIsSaveClicked(true);
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
-    } catch (error) {
-      console.log("Error:", error.message); // Log the error
-      setError(error.message);
-      setTimeout(() => {
-        setError("");
-      }, 5000); // Increased timeout duration
-    } finally {
-      setIsLoading(false);
+    });
+
+    if (!res.ok) {
+        const errorDetail = await res.text(); // Log backend error
+        console.error("Backend error:", errorDetail);
+        throw new Error("Fill up the form first");
     }
-  };
+
+    const saved = await res.json();
+    console.log("Saved response:", saved);
+
+    setSuccessMessage("Purchase request saved successfully!");
+    setIsSaveClicked(true);
+    setTimeout(() => setSuccessMessage(""), 3000); // Clear success message after 3 seconds
+} catch (error) {
+    console.error("Error:", error.message); // Log the error
+    setError(error.message);
+    setTimeout(() => setError(""), 5000); // Clear error after 5 seconds
+} finally {
+    setIsLoading(false);
+}
+};
 
   const handleSubmit = async () => {
     if (!latestRequestId) {
@@ -243,9 +268,9 @@ const BodyContent = ({ onClose }) => {
       name: "",
       department: "",
       email: "",
-      requestType: "Material",
+      requestType: "Assets",
       dateRequested: format(new Date(), "yyyy-MM-dd"),
-      dateValid: "",
+      dateValid: format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
       documentDate: format(new Date(), "yyyy-MM-dd"),
       employeeId: "",
       items: [],
@@ -261,51 +286,51 @@ const BodyContent = ({ onClose }) => {
             <h1>PURCHASE REQUEST FORM</h1>
           </div>
 
-          <div className="form-content">
-            <div className="form-section">
+            <div className="form-content">
+              <div className="form-section">
               <div className="form-group">
                 <label>
                   Name<span className="required">*</span>
                 </label>
-                <select name="employeeId" value={formData.employeeId} onChange={handleEmployeeChange}>
-                  <option value="">Select employee</option>
-                  {employees.map((emp) => (
-                    <option key={emp.employee_id} value={emp.employee_id}>
-                      {emp.first_name} {emp.last_name}
-                    </option>
-                  ))}
-                </select>
+                <input
+                  type="text"
+                  value={formData.name}
+                  disabled
+                />
               </div>
 
               <div className="form-group">
                 <label>Email Address</label>
-                <input type="email" name="email" value={formData.email} onChange={handleInputChange} />
+                <input
+                  type="email"
+                  value={formData.email}
+                  disabled
+                  className="readonly-input"
+                />
               </div>
 
               <div className="form-group">
-                <label>
-                  Department<span className="required">*</span>
-                </label>
-                <input type="text" name="department" value={formData.department} readOnly />
-              </div>
+                  <label>Request Type</label>
+                  <select
+                    name="requestType"
+                    value={formData.requestType}
+                    onChange={(e) => {
+                      const newRequestType = e.target.value;
+                      console.log("Selected Request Type:", newRequestType);
 
-              <div className="form-group">
-                <label>Request Type</label>
-                <select
-                  name="requestType"
-                  value={formData.requestType}
-                  onChange={(e) => {
-                    const newRequestType = e.target.value
-                    console.log("Selected Request Type:", newRequestType)
-                    setFormData((prev) => ({
-                      ...prev,
-                      requestType: newRequestType,
-                      items: [],
-                    }))
-                  }}
-                >
-                  <option value="Material">Material</option>
+                      // Update the request type and item_type for all items
+                      setFormData((prev) => ({
+                        ...prev,
+                        requestType: newRequestType,
+                        items: prev.items.map((item) => ({
+                          ...item,
+                          item_type: newRequestType, // Update item_type for all items
+                        })),
+                      }));
+                    }}
+                  >
                   <option value="Assets">Assets</option>
+                  <option value="Material">Material</option>
                 </select>
               </div>
             </div>
@@ -323,7 +348,7 @@ const BodyContent = ({ onClose }) => {
               </div>
               <div className="form-group">
                 <label>
-                  Date Requested<span className="required">*</span>
+                  Date Required<span className="required">*</span>
                 </label>
                 <input type="date" name="dateRequested" value={formData.dateRequested} onChange={handleInputChange} />
               </div>
@@ -344,58 +369,60 @@ const BodyContent = ({ onClose }) => {
             <div className="centered-error-message">{error === "Fill up the form first" && error}</div>
           </div>
 
-           <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>{formData.requestType === "Material" ? "Material Name" : "Asset Name"}</th>
-                  <th>Quantity</th>
-                  <th>Request ID</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {formData.items.map((item, index) => (
-                  <tr key={index}>
-                    <td>
-                      <select
-                        name={formData.requestType === "Material" ? "material_id" : "asset_id"}
-                        value={formData.requestType === "Material" ? item.material_id : item.asset_id}
-                        onChange={(e) => handleInputChange(e, index)}
-                      >
-                        <option value="">Select</option>
-                        {(formData.requestType === "Material" ? materials : assets).map((entry) => (
-                          <option key={entry.material_id || entry.asset_id} value={entry.material_id || entry.asset_id}>
-                            {entry.material_name || entry.asset_name}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        name="purchase_quantity"
-                        value={item.purchase_quantity}
-                        onChange={(e) => handleInputChange(e, index)}
-                      />
-                    </td>
-                    <td>{item.request_id || "N/A"}</td>
-                    <td>
-                      <button className="remove-btn" onClick={() => handleRemoveRow(index)}>
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
+          <div className="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Item Name</th>
+        <th>Quantity</th>
+        <th>Request ID</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {formData.items.map((item, index) => (
+        <tr key={index}>
+          <td>
+            <select
+              name="item_id"
+              value={item.item_id}
+              onChange={(e) => handleInputChange(e, index)}
+            >
+              <option value="">Select</option>
+              {items
+                .filter((entry) => {
+                  // Show Raw Material if requestType is Material, otherwise show Asset
+                  return formData.requestType === "Material"
+                    ? entry.item_type === "Raw Material"
+                    : entry.item_type === "Asset";
+                })
+                .map((entry) => (
+                  <option key={entry.item_id} value={entry.item_id}>
+                    {entry.item_name}
+                  </option>
                 ))}
-              </tbody>
-            </table>
-            <div className="add-item-container">
-              <button className="add-item-btn" onClick={handleAddRow} disabled={!isSaveClicked}>
-                Add Item
-              </button>
-            </div>
-          </div>
-
+            </select>
+          </td>
+          <td>
+            <input
+              type="number"
+              name="purchase_quantity"
+              value={item.purchase_quantity}
+              onChange={(e) => handleInputChange(e, index)}
+            />
+          </td>
+          <td>{item.request_id || "N/A"}</td>
+          <td>
+            <button onClick={() => handleRemoveRow(index)}>Remove</button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <button className="add-item-btn" onClick={handleAddRow} disabled={!isSaveClicked}>
+    Add Item
+  </button>
+</div>
           <div className="button-container">
             <button className="cancel-btn" onClick={handleCancel}>
               Clear
