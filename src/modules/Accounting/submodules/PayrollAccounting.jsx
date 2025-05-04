@@ -4,11 +4,13 @@ import NotifModal from "../components/modalNotif/NotifModal";
 import Table from "../components/table/Table";
 import Button from "../components/button/Button";
 import Search from "../components/search/Search";
+import PayrollModal from "../components/payrollAccountingModal/PayrollModal";
 import { data } from "autoprefixer";
 
 const PayrollAccounting = () => {
   const [payrollAccountingData, setPayrollAccountingData] = useState([]);
   const [payrollData, setPayrollData] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
   const [searching, setSearching] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [validation, setValidation] = useState({
@@ -299,6 +301,10 @@ const PayrollAccounting = () => {
     printWindow.document.close();
   };
 
+  const openModal = () => {
+    setModalOpen(true);
+  }
+
 
   // Search Filter based on columns
   const filteredData = payrollAccountingData.filter((row) =>
@@ -318,12 +324,6 @@ const PayrollAccounting = () => {
     </div>
   );
 
-
-  const handleEditRow = (row) => {
-    // logic to open edit modal, or update state
-    console.log("Edit this row:", row);
-  };
-
   return (
     <div className="accountsPayable">
       <div className="body-content-container">
@@ -340,11 +340,6 @@ const PayrollAccounting = () => {
             onChange={(e) => setSearching(e.target.value)}
           />
           </div>
-
-          <div className="component-container">
-            <Button name="Update" variant="standard2" />
-
-          </div>
         </div>
 
         {/* Payroll Accounting Data */}
@@ -356,7 +351,7 @@ const PayrollAccounting = () => {
               columns={payrollAccounting_columns}
               data={filteredData}
               handlePrintRow={handlePrintRow}
-              handleEditRow={handleEditRow}
+              handleEditRow={openModal}
               showPrintButton={true}
               showEditButton={true}
             />
