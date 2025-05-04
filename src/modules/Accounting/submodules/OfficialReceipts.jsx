@@ -76,6 +76,8 @@ const OfficialReceipts = () => {
     "Invoice ID",
     "Customer ID",
     "Official Receipt Date",
+    "Total Amount",
+    "Amount Due",
     "Settled Amount",
     "Remaining Amount",
     "Payment Method",
@@ -142,6 +144,8 @@ const OfficialReceipts = () => {
           entry.invoice_id || "-",
           entry.customer_id || "-",
           entry.or_date ? new Date(entry.or_date).toLocaleString() : "-",
+          entry.total_amount || "-",
+          entry.amount_due || "-",
           entry.settled_amount || "-",
           entry.remaining_amount || "-",
           entry.payment_method || "-",
@@ -533,7 +537,7 @@ const OfficialReceipts = () => {
           </div>
           <div>
             <Button
-              name="Create Receipt"
+              name="Update Receipt"
               variant="standard2"
               onclick={openModal}
             />
