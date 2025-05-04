@@ -336,7 +336,7 @@ const Journal = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searching.toLowerCase())
+      .includes(searching.trim().toLowerCase())
   );
 
 
