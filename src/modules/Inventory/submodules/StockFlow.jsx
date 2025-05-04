@@ -51,7 +51,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseMovementsView(data);
-                    console.log("Fetched Warehouse Movements Data:", data); 
+                    console.log("Fetched Warehouse Movements Data: ", data); 
                 } catch (err) {
                     setError(err.message);
                 } finally {
@@ -192,8 +192,9 @@ import { ContinuousColorLegend } from "@mui/x-charts";
             
         };
 
-        console.log(stockFlowTableConfigs["Warehouse"])
-        console.log(stockFlowTableConfigs)
+        
+        console.log(stockFlowTableConfigs["Transfer History"])
+        // console.log(stockFlowTableConfigs)
         const activeConfig = stockFlowTableConfigs[activeTab];
        
 
@@ -262,9 +263,10 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                         <div className="stockflow-table w-full h-120 md:flex-1 border border-gray-300 rounded-lg scroll-container overflow-y-auto">
                             {loading ? (
                                 <p className="text-center text-gray-600">Loading data...</p>
-                            ) : error ? (
-                                <p className="text-center text-red-600">{error}</p>
-                            ) : (
+                            ) //: error ? (
+                                //<p className="text-center text-red-600">{error}</p>
+                            //) ERROR RIGHT HERE
+                                : (
                                 <table className="w-full table-layout:fixed text-center cursor-pointer">
                                     <thead className="bg-white sticky left-0 top-0 z-20 ">
                                         <tr className="border-b border-gray-300">
@@ -326,7 +328,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                                             {[
                                                 {label: "Selected Item", value: selectedItem?.item_name || "Unknown"},
                                                 {label: "Item Type", value: selectedItem?.item_type},
-                                                {label: "Item Management", value: selectedItem?.item_management + ": " + selectedItem?.item_management_id},
+                                                {label: "Item Management", value: selectedItem?.item_management + ": " + selectedItem?.item_no},
                                                 {label: "Quantity", value: selectedItem?.current_quantity},
                                                 {label: "Expiry", value: selectedItem?.expiry},
                                                 {label: "Warehouse Location", value: selectedItem?.warehouse_location || "Unknown"}

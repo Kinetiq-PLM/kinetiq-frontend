@@ -4,7 +4,7 @@ import "../styles/InvProductTable.css";
 
 const InvProductTable = ({ columns, data, onSelectProduct }) => {
     return (
-        <div className="border border-gray-300 rounded-lg overflow-hidden w-full h-full">
+        <div className="border border-gray-300 rounded-lg overflow-hidden min-h-[500px] w-full h-full">
             {/* Table Container */}
             <div className="scroll-container overflow-y-auto h-full w-full">
                 <table className="table-auto text-center w-full min-w-max">
