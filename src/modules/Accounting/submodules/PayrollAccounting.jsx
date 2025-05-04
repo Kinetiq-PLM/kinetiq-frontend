@@ -247,11 +247,11 @@ const PayrollAccounting = () => {
           <table>
             <tbody>
               ${payrollAccounting_columns
-                .map(
-                  (col, i) =>
-                    `<tr><td>${col}</td><td>${rowData[i] ?? "-"}</td></tr>`
-                )
-                .join("")}
+        .map(
+          (col, i) =>
+            `<tr><td>${col}</td><td>${rowData[i] ?? "-"}</td></tr>`
+        )
+        .join("")}
             </tbody>
           </table>
         </div>
@@ -277,17 +277,17 @@ const PayrollAccounting = () => {
   const handleCreatePayroll = (isNewPayroll = false) => {
     const initialRow = isNewPayroll
       ? [
-          "", // payroll_accounting_id (generated in PayrollModal)
-          "", // payroll_hr_id
-          "", // date_approved
-          "", // approved_by
-          "", // payment_method
-          "", // reference_number (generated in modal)
-          "Processing", // status
-        ]
+        "", // payroll_accounting_id (generated in PayrollModal)
+        "", // payroll_hr_id
+        "", // date_approved
+        "", // approved_by
+        "", // payment_method
+        "", // reference_number (generated in modal)
+        "Processing", // status
+      ]
       : payrollAccounting_columns.map((col) =>
-          col === "Status" ? "Processing" : ""
-        );
+        col === "Status" ? "Processing" : ""
+      );
     console.log("Creating payroll, isNewPayroll:", isNewPayroll, "initialRow:", initialRow);
     setSelectedRow(initialRow);
     setIsCreating(true);
@@ -318,8 +318,7 @@ const PayrollAccounting = () => {
         const errorData = await response.json();
         console.error("Backend error response:", errorData);
         throw new Error(
-          `HTTP error! status: ${response.status}, message: ${
-            errorData.message || JSON.stringify(errorData)
+          `HTTP error! status: ${response.status}, message: ${errorData.message || JSON.stringify(errorData)
           }`
         );
       }
@@ -330,7 +329,20 @@ const PayrollAccounting = () => {
       setPayrollAccountingData((prevData) =>
         isNewPayroll
           ? [
-              [
+            [
+              newData.payroll_accounting_id,
+              newData.payroll_hr_id,
+              newData.date_approved,
+              newData.approved_by,
+              newData.payment_method,
+              newData.reference_number,
+              newData.status,
+            ],
+            ...prevData,
+          ]
+          : prevData.map((row) =>
+            row[0] === updatedRow[0]
+              ? [
                 newData.payroll_accounting_id,
                 newData.payroll_hr_id,
                 newData.date_approved,
@@ -338,22 +350,9 @@ const PayrollAccounting = () => {
                 newData.payment_method,
                 newData.reference_number,
                 newData.status,
-              ],
-              ...prevData,
-            ]
-          : prevData.map((row) =>
-              row[0] === updatedRow[0]
-                ? [
-                    newData.payroll_accounting_id,
-                    newData.payroll_hr_id,
-                    newData.date_approved,
-                    newData.approved_by,
-                    newData.payment_method,
-                    newData.reference_number,
-                    newData.status,
-                  ]
-                : row
-            )
+              ]
+              : row
+          )
       );
 
       setValidation({
@@ -394,25 +393,6 @@ const PayrollAccounting = () => {
   return (
     <div className="accountsPayable">
       <div className="body-content-container">
-        <div className="flex justify-end mb-4 space-x-2">
-          <Button
-            name="Check Processing Status"
-            variant="standard2"
-            onclick={handleCheckProcessingStatus}
-          />
-          <Button
-            name="Create New Payroll"
-            variant="standard2"
-            onclick={() => handleCreatePayroll(true)}
-          />
-          {hasProcessingStatus && (
-            <Button
-              name="Create Payroll"
-              variant="standard2"
-              onclick={() => handleCreatePayroll(false)}
-            />
-          )}
-        </div>
 
         <div className="title-subtitle-container">
           <h1 className="subModule-title">Payroll Accounting</h1>
@@ -426,6 +406,25 @@ const PayrollAccounting = () => {
               value={searching}
               onChange={(e) => setSearching(e.target.value)}
             />
+          </div>
+          <div className="component-container">
+            <Button
+              name="Check Processing Status"
+              variant="standard2"
+              onclick={handleCheckProcessingStatus}
+            />
+            <Button
+              name="Create New Payroll"
+              variant="standard2"
+              onclick={() => handleCreatePayroll(true)}
+            />
+            {hasProcessingStatus && (
+              <Button
+                name="Create Payroll"
+                variant="standard2"
+                onclick={() => handleCreatePayroll(false)}
+              />
+            )}
           </div>
         </div>
 
@@ -459,33 +458,37 @@ const PayrollAccounting = () => {
         </div>
       </div>
 
-      {modalOpen && (
-        <PayrollModal
-          isModalOpen={modalOpen}
-          closeModal={() => {
-            console.log("Closing modal");
-            setModalOpen(false);
-            setIsCreating(false);
-          }}
-          selectedRow={selectedRow}
-          handleSubmit={(data, isNewPayroll) => handleEditSubmit(data, isNewPayroll)}
-          columnHeaders={payrollAccounting_columns}
-          isCreating={isCreating}
-          payrollHrIds={payrollHrIds}
-          isNewPayroll={isCreating && selectedRow[1] === ""}
-        />
-      )}
+      {
+        modalOpen && (
+          <PayrollModal
+            isModalOpen={modalOpen}
+            closeModal={() => {
+              console.log("Closing modal");
+              setModalOpen(false);
+              setIsCreating(false);
+            }}
+            selectedRow={selectedRow}
+            handleSubmit={(data, isNewPayroll) => handleEditSubmit(data, isNewPayroll)}
+            columnHeaders={payrollAccounting_columns}
+            isCreating={isCreating}
+            payrollHrIds={payrollHrIds}
+            isNewPayroll={isCreating && selectedRow[1] === ""}
+          />
+        )
+      }
 
-      {validation.isOpen && (
-        <NotifModal
-          isOpen={validation.isOpen}
-          onClose={() => setValidation({ ...validation, isOpen: false })}
-          type={validation.type}
-          title={validation.title}
-          message={validation.message}
-        />
-      )}
-    </div>
+      {
+        validation.isOpen && (
+          <NotifModal
+            isOpen={validation.isOpen}
+            onClose={() => setValidation({ ...validation, isOpen: false })}
+            type={validation.type}
+            title={validation.title}
+            message={validation.message}
+          />
+        )
+      }
+    </div >
   );
 };
 
