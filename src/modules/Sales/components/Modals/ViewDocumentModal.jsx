@@ -361,15 +361,15 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
     if (!element) return;
 
     try {
-      // 1) Render the entire element to one big canvas
+      // 1) Render the element to a high-res canvas
       const canvas = await html2canvas(element, {
-        scale: 1.5,
+        scale: 2, // higher quality
         logging: false,
         useCORS: true,
         backgroundColor: "#ffffff",
         onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.getElementById("document-content");
-          clonedElement
+          const clonedEl = clonedDoc.getElementById("document-content");
+          clonedEl
             .querySelectorAll('[class*="bg-"], [class*="text-"]')
             .forEach((el) => {
               const style = window.getComputedStyle(el);
@@ -379,65 +379,87 @@ const ViewDocumentModal = ({ isOpen, onClose, documentToView = null }) => {
         },
       });
 
-      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      // 2) Figure out the scale factor from CSS-pixels → canvas-pixels
+      const scale = canvas.width / element.offsetWidth;
+
+      // 3) Grab every <tr>’s top & bottom, converted into canvas px
+      const tableRowData = [];
+      const elementRect = element.getBoundingClientRect();
+      element.querySelectorAll("table tr").forEach((row) => {
+        const r = row.getBoundingClientRect();
+        const topPx = (r.top - elementRect.top) * scale;
+        const bottomPx = (r.bottom - elementRect.top) * scale;
+        tableRowData.push({
+          top: topPx,
+          bottom: bottomPx,
+          height: r.height * scale,
+        });
+      });
+      tableRowData.sort((a, b) => a.top - b.top);
+
+      // 4) Set up jsPDF
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "in",
         format: "a4",
       });
-
-      // 2) PDF page size & margins in inches
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
-      const margin = 0.5;
+      const margin = 0.5; // inches
       const usableW = pageW - 2 * margin;
       const usableH = pageH - 2 * margin;
-
-      // 3) Compute the image’s size in inches (full width keeps aspect)
-      const imgW = usableW;
-      const imgH = (canvas.height * imgW) / canvas.width;
-
-      // 4) Figure out how many “strips” in pixels we need
-      //    pixels-per-inch = canvas.width(px) / imgW(in)
+      const imgW = usableW; // image width in inches
       const pxPerInch = canvas.width / imgW;
-      const usableHPx = usableH * pxPerInch;
-      const totalPages = Math.ceil(canvas.height / usableHPx);
+      const usableHPx = usableH * pxPerInch; // height in canvas px
 
-      // 5) For each page, copy just that slice of the big canvas…
-      for (let page = 0; page < totalPages; page++) {
-        if (page > 0) pdf.addPage();
+      // 5) Loop, slicing out row-safe chunks
+      let currentY = 0;
+      let pageCount = 0;
+      while (currentY < canvas.height) {
+        if (pageCount > 0) pdf.addPage();
 
-        // how tall this slice really is (last page might be shorter)
-        const sliceHeightPx = Math.min(
-          usableHPx,
-          canvas.height - page * usableHPx
-        );
+        // how much we can draw this page
+        const remainingHeight = canvas.height - currentY;
+        let sliceHeight = Math.min(usableHPx, remainingHeight);
+        const pageBottom = currentY + sliceHeight;
 
-        // create a temporary canvas to hold one slice
-        const sliceCanvas = document.createElement("canvas");
-        sliceCanvas.width = canvas.width;
-        sliceCanvas.height = sliceHeightPx;
-        const ctx = sliceCanvas.getContext("2d");
+        // back off if we’d slice a <tr>
+        for (const row of tableRowData) {
+          if (row.top < pageBottom && row.bottom > pageBottom) {
+            sliceHeight = row.top - currentY;
+            break;
+          }
+        }
 
-        // copy slice from the big canvas
+        // draw that slice into a temp canvas
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = sliceHeight;
+        const ctx = tempCanvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
         ctx.drawImage(
           canvas,
           0,
-          page * usableHPx,
+          currentY,
           canvas.width,
-          sliceHeightPx,
+          sliceHeight,
           0,
           0,
           canvas.width,
-          sliceHeightPx
+          sliceHeight
         );
 
-        // convert slice to image and draw at (margin, margin)
-        const sliceData = sliceCanvas.toDataURL("image/jpeg", 1.0);
-        const sliceHIn = sliceHeightPx / pxPerInch;
-        pdf.addImage(sliceData, "JPEG", margin, margin, imgW, sliceHIn);
+        // add to PDF
+        const imgData = tempCanvas.toDataURL("image/jpeg", 1.0);
+        const sliceHIn = sliceHeight / pxPerInch;
+        pdf.addImage(imgData, "JPEG", margin, margin, imgW, sliceHIn);
+
+        currentY += sliceHeight;
+        pageCount++;
       }
 
+      // 6) Save
       pdf.save(`${documentToView}.pdf`);
     } catch (error) {
       console.error(error);
