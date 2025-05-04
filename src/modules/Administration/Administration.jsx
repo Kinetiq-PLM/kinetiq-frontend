@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import UserManagememnt from  "./submodules/User";
 import CountUp from "react-countup";
 import {
   AppstoreOutlined,
@@ -14,20 +15,22 @@ import {
   DollarOutlined
 } from "@ant-design/icons";
 
+
 // Import API services
-import { 
-  userAPI, 
+import {
+  userAPI,
   roleAPI,
-  policiesAPI, 
-  assetsAPI, 
-  productsAPI, 
-  rawMaterialsAPI, 
+  policiesAPI,
+  assetsAPI,
+  productsAPI,
+  rawMaterialsAPI,
   businessPartnerAPI,
   vendorAPI,
   auditLogAPI,
   currencyAPI,
   warehouseAPI
 } from "../Administration/api/api";
+
 
 const Administration = ({ setActiveSubModule, loadSubModule }) => {
   // State variables for dashboard data
@@ -43,6 +46,7 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
   const [warehouses, setWarehouses] = useState(0);
   const [exchangeRate, setExchangeRate] = useState(0);
   const [currency, setCurrency] = useState("PHP");
+
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -72,6 +76,7 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
           currencyAPI.getActiveCurrencies()
         ]);
 
+
         // Set state with fetched data counts
         setUsers(usersData.count || usersData.length || 0);
         setAssets(assetsData.count || assetsData.length || 0);
@@ -83,10 +88,11 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
         setAuditLogs(logsData.count || logsData.length || 0);
         setWarehouses(warehousesData.count || warehousesData.length || 0);
 
+
         // Find USD exchange rate
-        const usdCurrency = currenciesData.results?.find(c => c.currency_name === "USD") || 
+        const usdCurrency = currenciesData.results?.find(c => c.currency_name === "USD") ||
                            currenciesData.find(c => c.currency_name === "USD");
-        
+       
         if (usdCurrency) {
           setExchangeRate(usdCurrency.exchange_rate || 0);
         }
@@ -98,8 +104,10 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
       }
     };
 
+
     fetchDashboardData();
   }, []);
+
 
   // Function to navigate to modules
   const handleClick = (module, tab = null) => {
@@ -113,184 +121,116 @@ const Administration = ({ setActiveSubModule, loadSubModule }) => {
     }
   };
 
+
   return (
     <div className="admin">
         <div className="admin custom-scroll">
-          {/* Dashboard Title */}
-          <h1 className="text-2xl font-bold mb-6 w-full text-center flex items-center justify-center">
-            <span className="text-[#00A8A8] mr-2">Administration</span> Dashboard
-          </h1>
+          <div className="bg-white shadow-md rounded-lg overflow-y-auto overflow-x-hidden mt-10"
+            style={{
+              width: "calc(100% - 25px)",
+              height: "850px",
+              marginLeft: "10px",
+              transition: "margin-left 1s ease, width 0.3s ease"
+            }}
+          >
+            {/* Dashboard Title */}
+            <h1 className="text-start text-2xl font-bold mb-6 w-full text-center flex ml-10 mt-7">
+              Administration Dashboard
+            </h1>
+            <div className="p-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 ml-10 mr-10">
+              {/* Exchange Rate Card */}
+              <div className="border border-gray-200 rounded-sm shadow-sm p-5 flex items-center gap-4 bg-white bg-white hover:bg-blue-100 cursor-pointer transition duration-300">
+                <div className="text-3xl p-3 rounded-full bg-green-100 text-green-600">
+                  <DollarOutlined />
+                </div>
+                <div>
+                  <p className="font-medium">Exchange Rate (PHP to USD)</p>
+                  <p className="text-2xl font-bold">
+                    {loading ? <LoadingOutlined /> : <CountUp end={exchangeRate} decimals={2} />}
+                  </p>
+                  <p className="text-sm text-gray-500 flex items-center">
+                      Latest Rate
+                      <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Live</span>
+                  </p>
+                </div>
+              </div>
 
-          {loading ? (
-            <div className="admin body-content-container flex items-center justify-center">
-              <LoadingOutlined className="text-[#00A8A8] text-4xl" />
-              <p className="ml-3">Loading dashboard data...</p>
+
+              {/* Item Masterlist */}
+              <div onClick={() => handleClick("Item Masterlist", "Product")} className="cursor-pointer border border-gray-200 rounded-sm shadow-sm p-5 flex items-center gap-4 bg-white bg-white hover:bg-blue-100 cursor-pointer transition duration-300">
+                <div className="text-3xl p-3 rounded-full bg-blue-100 text-blue-600">
+                  <AppstoreOutlined />
+                </div>
+                <div>
+                  <p className="font-medium">Item Masterlist</p>
+                  <p className="text-2xl font-bold">{loading ? <LoadingOutlined /> : products}</p>
+                  <p className="text-sm text-gray-500">Records</p>
+                </div>
+              </div>
+
+
+              {/* Warehouse */}
+              <div onClick={() => handleClick("Warehouse")} className="cursor-pointer border border-gray-200 rounded-sm shadow-sm p-5 flex items-center gap-4 bg-white bg-white hover:bg-blue-100 cursor-pointer transition duration-300">
+                <div className="text-3xl p-3 rounded-full bg-green-100 text-green-600">
+                  <HomeOutlined />
+                </div>
+                <div>
+                  <p className="font-medium">Warehouse</p>
+                  <p className="text-2xl font-bold">{loading ? <LoadingOutlined /> : warehouses}</p>
+                  <p className="text-sm text-gray-500">Records</p>
+                </div>
+              </div>
+
+
+              {/* Policy */}
+              <div onClick={() => handleClick("Policy")} className="cursor-pointer border border-gray-200 rounded-sm shadow-sm p-5 flex items-center gap-4 bg-white bg-white hover:bg-blue-100 cursor-pointer transition duration-300">
+                <div className="text-3xl p-3 rounded-full bg-cyan-100 text-cyan-600">
+                  <FileTextOutlined />
+                </div>
+                <div>
+                  <p className="font-medium">Policy</p>
+                  <p className="text-2xl font-bold">{loading ? <LoadingOutlined /> : policies}</p>
+                  <p className="text-sm text-gray-500">Records</p>
+                </div>
+              </div>
+
+
+              {/* Audit Logs */}
+              <div onClick={() => handleClick("Audit Logs")} className="cursor-pointer border border-gray-200 rounded-sm shadow-sm p-5 flex items-center gap-4 bg-white bg-white hover:bg-blue-100 cursor-pointer transition duration-300">
+                <div className="text-3xl p-3 rounded-full bg-red-100 text-red-600">
+                  <FileSearchOutlined />
+                </div>
+                <div>
+                  <p className="font-medium">Audit Logs</p>
+                  <p className="text-2xl font-bold">{loading ? <LoadingOutlined /> : auditLogs}</p>
+                  <p className="text-sm text-gray-500">Records</p>
+                </div>
+              </div>
+
+
+              {/* Business Partner Masterlist */}
+              <div onClick={() => handleClick("Business Partner Masterlist")} className="cursor-pointer border border-gray-200 rounded-sm shadow-sm p-5 flex items-center gap-4 bg-white bg-white hover:bg-blue-100 cursor-pointer transition duration-300">
+                <div className="text-3xl p-3 rounded-full bg-yellow-100 text-yellow-600">
+                  <UserOutlined />
+                </div>
+                <div>
+                  <p className="font-medium">Business Partner Masterlist</p>
+                  <p className="text-2xl font-bold">{loading ? <LoadingOutlined /> : partners}</p>
+                  <p className="text-sm text-gray-500">Records</p>
+                </div>
+              </div>
             </div>
-          ) : (
-            <>
-              {/* Top Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-4">
-                <div onClick={() => handleClick("User")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-teal-200">
-                  <div className="flex items-center">
-                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
-                      <UserOutlined className="text-2xl text-[#00A8A8]" />
-                    </div>
-                    <div>
-                      <p className="text-gray-600 font-medium mb-1">User & Roles</p>
-                      <p className="text-2xl font-bold"><CountUp end={users} duration={1.5} /></p>
-                      <p className="text-sm text-gray-500">Employees</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div onClick={() => handleClick("Currency")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-blue-200">
-                    <div className="flex items-center">
-                        <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
-                        <DollarOutlined className="text-2xl text-[#00A8A8]" />
-                        </div>
-                        <div>
-                        <p className="text-gray-600 font-medium mb-1">Exchange Rate (PHP to USD)</p>
-                        <p className="text-2xl font-bold">₱ <CountUp end={exchangeRate} decimals={6} duration={1.5} preserveValue={true} /></p>
-                        <p className="text-sm text-gray-500 flex items-center">
-                            Latest Rate 
-                            <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Live</span>
-                        </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div onClick={() => handleClick("Warehouse")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-teal-200">
-                  <div className="flex items-center">
-                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
-                      <HomeOutlined className="text-2xl text-[#00A8A8]" />
-                    </div>
-                    <div>
-                      <p className="text-gray-600 font-medium mb-1">Warehouse</p>
-                      <p className="text-2xl font-bold"><CountUp end={warehouses} duration={1.5} /></p>
-                      <p className="text-sm text-gray-500">Locations</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Middle Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-4">
-                <div onClick={() => handleClick("Item Masterlist")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-sky-200">
-                  <div className="flex items-center">
-                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
-                      <AppstoreOutlined className="text-2xl text-[#00A8A8]" />
-                    </div>
-                    <div>
-                      <p className="text-gray-600 font-medium mb-1">Item Masterlist</p>
-                      <p className="text-2xl font-bold"><CountUp end={assets + products + rawMaterials} duration={1.5} /></p>
-                      <p className="text-sm text-gray-500">Records</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <div onClick={() => handleClick("Item Masterlist", "Assets")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-amber-200">
-                    <div className="flex items-center">
-                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
-                        <ToolOutlined className="text-xl text-[#00A8A8]" />
-                      </div>
-                      <div>
-                        <p className="text-gray-600 font-medium mb-1">Assets</p>
-                        <p className="text-xl font-bold"><CountUp end={assets} duration={1.5} /></p>
-                        <p className="text-xs text-gray-500">Records</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div onClick={() => handleClick("Item Masterlist", "Product")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-green-200">
-                    <div className="flex items-center">
-                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
-                        <ShoppingOutlined className="text-xl text-[#00A8A8]" />
-                      </div>
-                      <div>
-                        <p className="text-gray-600 font-medium mb-1">Products</p>
-                        <p className="text-xl font-bold"><CountUp end={products} duration={1.5} /></p>
-                        <p className="text-xs text-gray-500">Records</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div onClick={() => handleClick("Item Masterlist", "Raw Materials")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-yellow-200">
-                    <div className="flex items-center">
-                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
-                        <ExperimentOutlined className="text-xl text-[#00A8A8]" />
-                      </div>
-                      <div>
-                        <p className="text-gray-600 font-medium mb-1">Raw Materials</p>
-                        <p className="text-xl font-bold"><CountUp end={rawMaterials} duration={1.5} /></p>
-                        <p className="text-xs text-gray-500">Records</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <div onClick={() => handleClick("Business Partner Masterlist")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-indigo-200">
-                    <div className="flex items-center">
-                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
-                        <UserOutlined className="text-xl text-[#00A8A8]" />
-                      </div>
-                      <div>
-                        <p className="text-gray-600 font-medium mb-1">Business Partner Masterlist</p>
-                        <p className="text-xl font-bold"><CountUp end={partners} duration={1.5} /></p>
-                        <p className="text-xs text-gray-500">Partners</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div onClick={() => handleClick("Business Partner Masterlist", "Vendor")} className="admin module-card bg-white rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-purple-200">
-                    <div className="flex items-center">
-                      <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-2 mr-3">
-                        <ShopOutlined className="text-xl text-[#00A8A8]" />
-                      </div>
-                      <div>
-                        <p className="text-gray-600 font-medium mb-1">Vendors</p>
-                        <p className="text-xl font-bold"><CountUp end={vendors} duration={1.5} /></p>
-                        <p className="text-xs text-gray-500">Partners</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                <div onClick={() => handleClick("Policy")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-gray-200">
-                  <div className="flex items-center">
-                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
-                      <FileTextOutlined className="text-2xl text-[#00A8A8]" />
-                    </div>
-                    <div>
-                      <p className="text-gray-600 font-medium mb-1">Policy</p>
-                      <p className="text-2xl font-bold"><CountUp end={policies} duration={1.5} /></p>
-                      <p className="text-sm text-gray-500">Documents</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div onClick={() => handleClick("Audit Logs")} className="admin module-card bg-white rounded-lg p-5 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] shadow-md border border-red-200">
-                  <div className="flex items-center">
-                    <div className="bg-[#00A8A8] bg-opacity-10 rounded-full p-3 mr-4">
-                      <FileSearchOutlined className="text-2xl text-[#00A8A8]" />
-                    </div>
-                    <div>
-                      <p className="text-gray-600 font-medium mb-1">Audit Logs</p>
-                      <p className="text-2xl font-bold"><CountUp end={auditLogs} duration={1.5} /></p>
-                      <p className="text-sm text-gray-500">System Records</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
+            <div className="mt-12 flex ml-10 mr-10">
+              <UserManagememnt />
+            </div>
+          </div>
         </div>
       </div>
   );
 };
 
+
 export default Administration;
+
+
+
