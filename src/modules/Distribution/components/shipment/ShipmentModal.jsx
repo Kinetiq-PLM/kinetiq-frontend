@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GoogleMap, Marker, DirectionsService, DirectionsRenderer, useLoadScript, Polyline } from '@react-google-maps/api';
 import PropTypes from 'prop-types';
+import { FaBox, FaBoxes, FaBoxOpen, FaWarehouse } from "react-icons/fa";
 
 const ShipmentModal = ({ 
   shipment, 
@@ -19,8 +20,8 @@ const ShipmentModal = ({
     weight_kg: shipment.shipping_cost_info?.weight_kg || 0,
     distance_km: shipment.shipping_cost_info?.distance_km || 0,
     cost_per_kg: shipment.shipping_cost_info?.cost_per_kg || 150,
-    cost_per_km: shipment.shipping_cost_info?.cost_per_km || 20,
-    additional_cost: shipment.operational_cost_info?.additional_cost || 0,
+    cost_per_km: shipment.shipping_cost_info?.cost_per_km || 20
+    // additional_cost removed
   });
 
   // Form validation state
@@ -55,6 +56,10 @@ const ShipmentModal = ({
     distance: 0,
     duration: 0
   });
+
+  // Add these new state variables
+  const [warehouseCoordinates, setWarehouseCoordinates] = useState([]);
+  const [multipleRoutes, setMultipleRoutes] = useState([]);
 
   // Map styles and settings
   const mapContainerStyle = {
@@ -91,7 +96,9 @@ const ShipmentModal = ({
                 lat: location.lat(),
                 lng: location.lng()
               };
-              setCoordinates(coordinates);
+              if (setCoordinates) {
+                setCoordinates(coordinates);
+              }
               resolve(coordinates);
             } else {
               console.error(`Geocoding failed for ${locationString}: ${status}`);
@@ -109,14 +116,7 @@ const ShipmentModal = ({
       try {
         let sourceCoords = null;
         let destCoords = null;
-        
-        if (shipment.source_location) {
-          try {
-            sourceCoords = await geocodeLocation(shipment.source_location, setSourceCoordinates);
-          } catch (error) {
-            console.error("Source location geocoding failed:", error);
-          }
-        }
+        const warehouseCoords = [];
         
         if (shipment.destination_location) {
           try {
@@ -126,9 +126,142 @@ const ShipmentModal = ({
           }
         }
         
-        // Get directions if both coordinates are available - use DRIVING as default mode
-        if (sourceCoords && destCoords) {
-          fetchDirections(sourceCoords, destCoords, 'DRIVING');
+        // Check if we have source_warehouses (preferred way to get warehouse data)
+        if (shipment.source_warehouses && shipment.source_warehouses.length > 0) {
+          const warehouses = [];
+          
+          for (const warehouse of shipment.source_warehouses) {
+            try {
+              const coords = await geocodeLocation(warehouse.location, null);
+              if (coords) {
+                warehouses.push({
+                  id: warehouse.id,
+                  location: warehouse.location,
+                  name: warehouse.name,
+                  coordinates: coords
+                });
+                warehouseCoords.push(coords);
+              }
+            } catch (error) {
+              console.error(`Geocoding failed for warehouse ${warehouse.location}:`, error);
+            }
+          }
+          
+          setWarehouseCoordinates(warehouses);
+          
+          // Use the first warehouse as the primary source
+          if (warehouses.length > 0) {
+            sourceCoords = warehouses[0].coordinates;
+            setSourceCoordinates(sourceCoords);
+          }
+        } 
+        // Fallback to items_details if no source_warehouses
+        else if (shipment.items_details && shipment.items_details.length > 0) {
+          const uniqueWarehouses = {};
+          
+          // Extract unique warehouses from items
+          for (const item of shipment.items_details) {
+            if (item.warehouse_name && !uniqueWarehouses[item.warehouse_id]) {
+              uniqueWarehouses[item.warehouse_id] = {
+                id: item.warehouse_id,
+                name: item.warehouse_name,
+                location: item.warehouse_name
+              };
+            }
+          }
+          
+          // Geocode each warehouse location
+          const warehouses = [];
+          
+          for (const warehouseId in uniqueWarehouses) {
+            const warehouse = uniqueWarehouses[warehouseId];
+            try {
+              const coords = await geocodeLocation(warehouse.location, null);
+              if (coords) {
+                warehouses.push({
+                  ...warehouse,
+                  coordinates: coords
+                });
+                warehouseCoords.push(coords);
+              }
+            } catch (error) {
+              console.error(`Geocoding failed for warehouse ${warehouse.location}:`, error);
+            }
+          }
+          
+          setWarehouseCoordinates(warehouses);
+          
+          // Use the first warehouse as the primary source
+          if (warehouses.length > 0) {
+            sourceCoords = warehouses[0].coordinates;
+            setSourceCoordinates(sourceCoords);
+          }
+        } 
+        // Fallback to source_location if no warehouse details
+        else if (shipment.source_location) {
+          try {
+            sourceCoords = await geocodeLocation(shipment.source_location, setSourceCoordinates);
+            if (sourceCoords) {
+              warehouseCoords.push(sourceCoords);
+              setWarehouseCoordinates([{
+                location: shipment.source_location,
+                coordinates: sourceCoords
+              }]);
+            }
+          } catch (error) {
+            console.error("Source location geocoding failed:", error);
+          }
+        }
+        
+        // Calculate routes - handle multiple warehouses
+        if (destCoords && warehouseCoords.length > 0) {
+          // If multiple warehouses, calculate routes for each
+          if (warehouseCoords.length > 1) {
+            const routePromises = warehouseCoords.map(wCoords => 
+              fetchDirectionsPromise(wCoords, destCoords, 'DRIVING')
+            );
+            
+            Promise.allSettled(routePromises).then(results => {
+              const validRoutes = results
+                .filter(r => r.status === 'fulfilled')
+                .map(r => r.value);
+              
+              // Calculate combined metrics for all routes
+              let totalDistance = 0;
+              let maxDuration = 0;
+              
+              validRoutes.forEach(route => {
+                if (route.routes && route.routes[0] && route.routes[0].legs && route.routes[0].legs[0]) {
+                  const leg = route.routes[0].legs[0];
+                  // Add distance to total
+                  totalDistance += leg.distance.value / 1000; // Convert to km
+                  // Keep track of the longest duration
+                  const routeDuration = leg.duration.value / 3600; // Convert to hours
+                  maxDuration = Math.max(maxDuration, routeDuration);
+                }
+              });
+              
+              // Update route metrics with combined values
+              setRouteMetrics({
+                distance: totalDistance.toFixed(2),
+                duration: maxDuration.toFixed(1)
+              });
+              
+              // Update the distance in formData (only if it was 0)
+              if (parseFloat(formData.distance_km) === 0) {
+                setFormData(prev => ({
+                  ...prev,
+                  distance_km: totalDistance.toFixed(2)
+                }));
+              }
+              
+              setMultipleRoutes(validRoutes);
+              setMapLoading(false);
+            });
+          } else {
+            // Single warehouse - use existing logic
+            fetchDirections(sourceCoords, destCoords, 'DRIVING');
+          }
         } else {
           setMapLoading(false);
         }
@@ -141,7 +274,7 @@ const ShipmentModal = ({
     };
     
     initializeLocations();
-  }, [shipment.source_location, shipment.destination_location, isLoaded]);
+  }, [shipment, isLoaded]);
 
   // Add function to fetch directions
   const fetchDirections = useCallback((origin, destination, mode) => {
@@ -236,6 +369,43 @@ const ShipmentModal = ({
     return R * c;
   };
 
+  // Add this Promise-based version of fetchDirections
+  const fetchDirectionsPromise = (origin, destination, mode) => {
+    return new Promise((resolve, reject) => {
+      if (!window.google || !origin || !destination) {
+        reject("Google Maps not loaded or invalid coordinates");
+        return;
+      }
+      
+      const directionsService = new window.google.maps.DirectionsService();
+      
+      directionsService.route(
+        {
+          origin: new window.google.maps.LatLng(origin.lat, origin.lng),
+          destination: new window.google.maps.LatLng(destination.lat, destination.lng),
+          travelMode: window.google.maps.TravelMode[mode],
+          avoidFerries: false,
+          avoidHighways: false,
+          avoidTolls: false,
+          optimizeWaypoints: true
+        },
+        (result, status) => {
+          if (status === window.google.maps.DirectionsStatus.OK) {
+            resolve(result);
+          } else {
+            reject(status);
+          }
+        }
+      );
+    });
+  };
+
+  // Function to get different colors for multiple routes
+  const getRouteColor = (index) => {
+    const colors = ["#0aaceb","#00a8a8", "#ff7043", "#5c6bc0", "#66bb6a", "#ffa726"];
+    return colors[index % colors.length];
+  };
+
   // if need travel mode
   // // Add handler for travel mode change
   // const handleTravelModeChange = (mode) => {
@@ -249,8 +419,14 @@ const ShipmentModal = ({
   // Handle map load
   const onMapLoad = useCallback((map) => {
     // Set appropriate center and zoom based on available coordinates
-    if (destinationCoordinates && sourceCoordinates) {
-      // Create bounds that include both points
+    if (warehouseCoordinates.length > 0 && destinationCoordinates) {
+      // Create bounds that include all warehouses and destination
+      const bounds = new window.google.maps.LatLngBounds();
+      warehouseCoordinates.forEach(warehouse => bounds.extend(warehouse.coordinates));
+      bounds.extend(destinationCoordinates);
+      map.fitBounds(bounds);
+    } else if (destinationCoordinates && sourceCoordinates) {
+      // Create bounds that include both source and destination
       const bounds = new window.google.maps.LatLngBounds();
       bounds.extend(sourceCoordinates);
       bounds.extend(destinationCoordinates);
@@ -262,7 +438,7 @@ const ShipmentModal = ({
     }
     
     setMapLoading(false);
-  }, [sourceCoordinates, destinationCoordinates]);
+  }, [sourceCoordinates, destinationCoordinates, warehouseCoordinates]);
 
   // Calculate shipping cost
   const calculateShippingCost = () => {
@@ -274,13 +450,10 @@ const ShipmentModal = ({
     return (weight * costPerKg) + (distance * costPerKm);
   };
   
-  // Calculate total operational cost
+  // Calculate total operational cost - MODIFIED to remove packing and additional costs
   const calculateOperationalCost = () => {
-    const additionalCost = parseFloat(formData.additional_cost) || 0;
-    const shippingCost = calculateShippingCost();
-    const packingCost = shipment.packing_list_info?.packing_cost_info?.total_packing_cost || 0;
-    
-    return additionalCost + shippingCost + packingCost;
+    // Only include shipping cost
+    return calculateShippingCost();
   };
   
   // Format currency
@@ -420,19 +593,29 @@ const ShipmentModal = ({
       formData.cost_per_km != shipment.shipping_cost_info?.cost_per_km;
     
     if (shippingCostChanged) {
+      // Calculate shipping cost once to ensure it's a valid number
+      const shippingCost = calculateShippingCost();
+      
       updates.shipping_cost = {
-        weight_kg: parseFloat(formData.weight_kg),
-        distance_km: parseFloat(formData.distance_km),
-        cost_per_kg: parseFloat(formData.cost_per_kg),
-        cost_per_km: parseFloat(formData.cost_per_km),
-        total_shipping_cost: calculateShippingCost()
+        weight_kg: parseFloat(formData.weight_kg) || 0,
+        distance_km: parseFloat(formData.distance_km) || 0,
+        cost_per_kg: parseFloat(formData.cost_per_kg) || 0,
+        cost_per_km: parseFloat(formData.cost_per_km) || 0,
+        total_shipping_cost: shippingCost
+      };
+      
+      // When shipping cost changes, also update operational cost
+      updates.operational_cost = {
+        additional_cost: 0,
+        total_operational_cost: shippingCost
       };
     }
     
+    // Remove this section entirely
     // Check if additional cost has changed
-    if (formData.additional_cost != shipment.operational_cost_info?.additional_cost) {
-      updates.additional_cost = parseFloat(formData.additional_cost);
-    }
+    // if (formData.additional_cost != shipment.operational_cost_info?.additional_cost) {
+    //   updates.additional_cost = parseFloat(formData.additional_cost);
+    // }
     
     // Save changes
     onSave(shipment, updates);
@@ -461,6 +644,9 @@ const ShipmentModal = ({
       return;
     }
     
+    // Calculate the shipping cost once to ensure it's a valid number
+    const shippingCost = calculateShippingCost();
+    
     onShip(shipment, {
       carrier_id: formData.carrier_id,
       shipping_cost_info: {
@@ -468,11 +654,11 @@ const ShipmentModal = ({
         distance_km: parseFloat(formData.distance_km) || 0,
         cost_per_kg: parseFloat(formData.cost_per_kg) || 0,
         cost_per_km: parseFloat(formData.cost_per_km) || 0,
-        total_shipping_cost: calculateShippingCost()
+        total_shipping_cost: shippingCost
       },
       operational_cost_info: {
-        additional_cost: parseFloat(formData.additional_cost) || 0,
-        total_operational_cost: calculateOperationalCost()
+        additional_cost: 0,
+        total_operational_cost: shippingCost
       }
     });
   };
@@ -593,6 +779,88 @@ const ShipmentModal = ({
   
   const statusInfo = getStatusInfo(shipment.shipment_status);
   
+  const renderItemsByWarehouses = () => {
+    // Group items by warehouse
+    const warehouseGroups = [];
+    const warehouseMap = {};
+    let totalQuantity = 0;
+    
+    // Check if we have item details
+    if (shipment?.items_details?.length) {
+      // Group items by warehouse
+      shipment.items_details.forEach(item => {
+        const warehouseId = item.warehouse_id || 'unknown';
+        totalQuantity += parseInt(item.quantity) || 0;
+        
+        if (!warehouseMap[warehouseId]) {
+          const group = {
+            warehouseId,
+            warehouseName: item.warehouse_name || 'Unknown Warehouse',
+            items: [],
+            totalQuantity: 0
+          };
+          warehouseMap[warehouseId] = group;
+          warehouseGroups.push(group);
+        }
+        warehouseMap[warehouseId].items.push(item);
+        warehouseMap[warehouseId].totalQuantity += parseInt(item.quantity) || 0;
+      });
+    }
+  
+    const hasMultipleWarehouses = warehouseGroups.length > 1;
+  
+    return (
+      <>
+        <h4 className="section-title">
+          <FaBoxOpen className="section-icon" />
+          Shipment Items ({shipment?.items_details?.length || 0} items, {totalQuantity} units)
+        </h4>
+  
+        {warehouseGroups.length > 0 ? (
+          warehouseGroups.map((group, groupIndex) => (
+            <div key={group.warehouseId} className="warehouse-group">
+              <h5 className="warehouse-name">
+                <FaWarehouse className="warehouse-icon" /> {group.warehouseName}
+                <span className="warehouse-items-count">
+                  {group.items.length} item{group.items.length !== 1 ? 's' : ''}, {group.totalQuantity} units
+                </span>
+              </h5>
+              
+              <div className="items-table-container">
+                <table className="items-table">
+                  <thead>
+                    <tr>
+                      <th>Item Name</th>
+                      <th>Item Number</th>
+                      <th>Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {group.items.map((item, itemIndex) => (
+                      <tr key={itemIndex}>
+                        <td>{item.item_name}</td>
+                        <td>{item.item_no || '-'}</td>
+                        <td>{item.quantity}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {groupIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
+            </div>
+          ))
+        ) : (
+          <div className="items-table-container empty-state">
+            <div className="no-items-message">
+              <FaBoxOpen className="empty-icon" />
+              <p>No item details available for this shipment</p>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
   return (
     <div className="shipment modal-overlay">
       <div className="shipment-modal">
@@ -639,6 +907,13 @@ const ShipmentModal = ({
             onClick={() => setActiveTab('details')}
           >
             Shipment Details
+          </button>
+          <button 
+            className={`tab ${activeTab === 'items' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('items')}
+          >
+            {/* <FaBoxOpen className="tab-icon" /> */}
+            Items ({shipment?.items_details?.length || 0})
           </button>
           <button 
             className={`tab ${activeTab === 'route' ? 'active' : ''}`}
@@ -878,77 +1153,80 @@ const ShipmentModal = ({
                     </div>
                     
                     <div className="map-container" style={{ position: 'relative' }}>
-                      {isLoaded ? (
-                        <GoogleMap
-                          mapContainerStyle={mapContainerStyle}
-                          center={destinationCoordinates || sourceCoordinates || defaultCenter}
-                          zoom={15}
-                          onLoad={onMapLoad}
-                          options={{
-                            fullscreenControl: true,
-                            streetViewControl: false,
-                            mapTypeControl: true,
-                            zoomControl: true
-                          }}
-                        >
-                          {/* Use DirectionsRenderer instead of Polyline when directions are available */}
-                          {directions && (
-                            <DirectionsRenderer
-                              directions={directions}
-                              options={{
-                                suppressMarkers: true, // We'll add our own custom markers
-                                polylineOptions: {
-                                  strokeColor: "#4285F4",
-                                  strokeOpacity: 0.8,
-                                  strokeWeight: 5
-                                }
-                              }}
-                            />
-                          )}
-                          
-                          {/* Fallback to Polyline if directions aren't available */}
-                          {!directions && sourceCoordinates && destinationCoordinates && (
-                            <Polyline
-                              path={[sourceCoordinates, destinationCoordinates]}
-                              options={polylineOptions}
-                            />
-                          )}
-                          
-                          {/* Render source marker */}
-                          {sourceCoordinates && (
-                            <Marker
-                              position={sourceCoordinates}
-                              icon={{
-                                url: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
-                                labelOrigin: new window.google.maps.Point(15, -10)
-                              }}
-                              label={{
-                                text: "Source",
-                                color: "#333",
-                                fontSize: "12px",
-                                fontWeight: "bold"
-                              }}
-                            />
-                          )}
-                          
-                          {/* Render destination marker */}
-                          {destinationCoordinates && (
-                            <Marker
-                              position={destinationCoordinates}
-                              icon={{
-                                url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                                labelOrigin: new window.google.maps.Point(15, -10)
-                              }}
-                              label={{
-                                text: "Destination",
-                                color: "#333",
-                                fontSize: "12px",
-                                fontWeight: "bold"
-                              }}
-                            />
-                          )}
-                        </GoogleMap>
-                      ) : (
+                    {isLoaded ? (
+                          <GoogleMap
+                            mapContainerStyle={mapContainerStyle}
+                            center={destinationCoordinates || sourceCoordinates || defaultCenter}
+                            zoom={14}
+                            onLoad={onMapLoad}
+                          >
+                            {/* For multiple warehouses */}
+                            {warehouseCoordinates.length > 0 && warehouseCoordinates.map((warehouse, index) => (
+                              <Marker
+                                key={`warehouse-${warehouse.id || index}`}
+                                position={warehouse.coordinates}
+                                icon={{
+                                  url: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                                  labelOrigin: new window.google.maps.Point(15, -10)
+                                }}
+                                label={{
+                                  text: `Warehouse ${index + 1}`,
+                                  color: "#333",
+                                  fontSize: "12px",
+                                  fontWeight: "bold"
+                                }}
+                              />
+                            ))}
+                            
+                            {/* Destination marker */}
+                            {destinationCoordinates && (
+                              <Marker
+                                position={destinationCoordinates}
+                                icon={{
+                                  url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                                  labelOrigin: new window.google.maps.Point(15, -10)
+                                }}
+                                label={{
+                                  text: "Destination",
+                                  color: "#333",
+                                  fontSize: "12px",
+                                  fontWeight: "bold"
+                                }}
+                              />
+                            )}
+                            
+                            {/* Render multiple routes */}
+                            {multipleRoutes.length > 0 && multipleRoutes.map((route, index) => (
+                              <DirectionsRenderer
+                                key={`route-${index}`}
+                                directions={route}
+                                options={{
+                                  suppressMarkers: true,
+                                  polylineOptions: {
+                                    strokeColor: getRouteColor(index),
+                                    strokeOpacity: 0.8,
+                                    strokeWeight: 5,
+                                  }
+                                }}
+                              />
+                            ))}
+                            
+                            {/* Render single route */}
+                            {directions && multipleRoutes.length === 0 && (
+                              <DirectionsRenderer
+                                directions={directions}
+                                options={{
+                                  suppressMarkers: true,
+                                  polylineOptions: {
+                                    strokeColor: "#0f53ff",
+                                    strokeOpacity: 0.8,
+                                    strokeWeight: 5,
+                                  }
+                                }}
+                              />
+                            )}
+                          </GoogleMap>
+                        ) : (
                         <div className="map-placeholder" style={{ 
                           height: '300px', 
                           display: 'flex', 
@@ -1230,39 +1508,10 @@ const ShipmentModal = ({
                         {formatCurrency(calculateShippingCost())}
                       </span>
                     </div>
-                    <div className="cost-input-row" style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      marginBottom: '0.5rem'
-                    }}>
-                      <span className="cost-label">Packing Cost:</span>
-                      <span className="cost-value">
-                        {formatCurrency(shipment.packing_list_info?.packing_cost_info?.total_packing_cost || 0)}
-                      </span>
-                    </div>
-                    <div className="cost-input-row" style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      marginBottom: '0.5rem',
-                      alignItems: 'center'
-                    }}>
-                      <span className="cost-label">Additional Cost:</span>
-                      <input
-                        type="number"
-                        className="cost-input"
-                        name="additional_cost"
-                        value={formData.additional_cost}
-                        onChange={handleInputChange}
-                        min="0"
-                        step="0.01"
-                        disabled={!isShipmentEditable}
-                        style={{ 
-                          width: '150px',
-                          textAlign: 'right',
-                          padding: '0.5rem'
-                        }}
-                      />
-                    </div>
+                    
+                    {/* Removed packing cost row */}
+                    {/* Removed additional cost row */}
+                    
                     <div className="cost-total-row" style={{ 
                       display: 'flex', 
                       justifyContent: 'space-between',
@@ -1271,13 +1520,13 @@ const ShipmentModal = ({
                       borderRadius: '4px',
                       marginTop: '0.75rem'
                     }}>
-                      <span className="cost-total-label" style={{ fontWeight: '600' }}>Total Operational Cost:</span>
+                      <span className="cost-total-label" style={{ fontWeight: '600' }}>Total Cost:</span>
                       <span className="cost-total-value" style={{ 
                         fontWeight: '700',
                         fontSize: '1.1rem',
                         color: '#00a8a8'
                       }}>
-                        {formatCurrency(calculateOperationalCost())}
+                        {formatCurrency(calculateShippingCost())}
                       </span>
                     </div>
                   </div>
@@ -1443,6 +1692,12 @@ const ShipmentModal = ({
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'items' && (
+              <div className="items-section">
+                {renderItemsByWarehouses()}
               </div>
             )}
             

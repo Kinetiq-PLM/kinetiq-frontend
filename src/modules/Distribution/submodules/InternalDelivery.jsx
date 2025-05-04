@@ -22,7 +22,7 @@ const InternalDelivery = () => {
     const fetchInternalDeliveryOrders = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/delivery-orders/');
+        const response = await fetch('http://127.0.0.1:8000/api/delivery-orders/');
         
         if (!response.ok) {
           throw new Error('Failed to fetch delivery orders');
@@ -98,11 +98,9 @@ const InternalDelivery = () => {
               className="status-filter"
             >
               <option value="All">All</option>
-              <option value="Created">Created</option>
+              <option value="Created">Pending</option>
               <option value="Approved">Approved</option>
-              <option value="Processing">Processing</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Cancelled">Cancelled</option>
+              <option value="Rejected">Rejected</option>
             </select>
           </div>
         </div>

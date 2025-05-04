@@ -5,7 +5,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
   // State for table management
   const [filteredDeliveries, setFilteredDeliveries] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(9);
+  const [itemsPerPage] = useState(10);
   const [sortField, setSortField] = useState("del_order_id");
   const [sortDirection, setSortDirection] = useState("asc");
 
@@ -97,7 +97,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
       setApproving(delOrderId);
       
       // Send approval request to backend
-      await axios.post('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/approve-order/', { del_order_id: delOrderId });
+      await axios.post('http://127.0.0.1:8000/api/approve-order/', { del_order_id: delOrderId });
       
       // Update the order status in the local state (optimistic update)
       const updatedDeliveries = filteredDeliveries.map(order => {
@@ -172,9 +172,13 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
                       formatID(order.stock_transfer_id, "stock")}
                   </td>
                   <td className={`status-cell status-${order.order_status?.toLowerCase() || 'created'}`}>
-                    {order.order_status || "Created"}
+                    {order.order_status === "Created" ? "Pending" : (order.order_status || "Pending")}
                   </td>
-                  <td className="centered-cell">{order.is_project_based ? "Yes" : "No"}</td>
+                  <td className="centered-cell">
+                    {typeof order.is_project_based === 'boolean' 
+                      ? (order.is_project_based ? "Yes" : "No") 
+                      : (order.is_project_based === "Project Based" ? "Yes" : "No")}
+                  </td>
                   <td className="centered-cell">{order.is_partial_delivery ? "Yes" : "No"}</td>
                   <td>{formatID(order.del_order_id, "delivery")}</td>
                   {/* TEMPORARY: Approval button - Comment these lines to remove the button */}

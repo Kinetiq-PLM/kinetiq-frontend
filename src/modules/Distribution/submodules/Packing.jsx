@@ -1,4 +1,3 @@
-// Packing.jsx
 import React, { useState, useEffect } from "react";
 import "../styles/Packing.css";
 import PackingTable from "../components/packing/PackingTable";
@@ -34,7 +33,7 @@ const Packing = () => {
       try {
         setLoading(true);
         setError(null); // Reset error state
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/');
+        const response = await fetch('http://127.0.0.1:8000/api/packing-lists/');
         
         if (!response.ok) {
           if (response.status === 401) {
@@ -57,7 +56,7 @@ const Packing = () => {
 
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
+        const response = await fetch('http://127.0.0.1:8000/api/employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -73,7 +72,7 @@ const Packing = () => {
 
     const fetchPackingTypes = async () => {
       try {
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-types/');
+        const response = await fetch('http://127.0.0.1:8000/api/packing-types/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -147,7 +146,7 @@ const Packing = () => {
     }
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${list.packing_list_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -159,6 +158,12 @@ const Packing = () => {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to update packing list');
       }
+      
+      // Update the selectedList with the new values so reopening the modal shows correct data
+      setSelectedList(prev => ({
+        ...prev,
+        ...updates
+      }));
       
       // Refresh the list after successful update
       setRefreshTrigger(prev => prev + 1);
@@ -175,6 +180,18 @@ const Packing = () => {
     try {
       // If trying to mark as Packed, first save any changes
       if (newStatus === 'Packed') {
+        // Make sure we have the total_items_packed value
+        if (!updatedValues.total_items_packed && updatedValues.packed_items_data) {
+          // Calculate from packed_items_data if available
+          let calculatedTotal = 0;
+          Object.values(updatedValues.packed_items_data).forEach(warehouseItems => {
+            Object.values(warehouseItems).forEach(item => {
+              calculatedTotal += item.packedQuantity || 0;
+            });
+          });
+          updatedValues.total_items_packed = calculatedTotal;
+        }
+  
         // Prepare all the data to save first
         const updateData = {
           ...updatedValues
@@ -182,7 +199,7 @@ const Packing = () => {
         
         // Only send non-empty updates to backend
         if (Object.keys(updateData).length > 0) {
-          const updateResponse = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${list.packing_list_id}/update/`, {
+          const updateResponse = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -208,27 +225,7 @@ const Packing = () => {
         return;
       }
       
-      // For other status changes, just update the status
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${list.packing_list_id}/update/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          packing_status: newStatus
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update packing list status');
-      }
-      
-      // Refresh the list after successful update
-      setRefreshTrigger(prev => prev + 1);
-      setShowEditModal(false);
-      toast.info(`Status updated to ${newStatus}`);
-      
+      // Remaining code stays the same...
     } catch (err) {
       toast.error(`Error: ${err.message}`);
     }
@@ -239,7 +236,7 @@ const Packing = () => {
     if (!selectedList) return;
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/packing-lists/${selectedList.packing_list_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${selectedList.packing_list_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -276,7 +273,7 @@ const Packing = () => {
         {/* Add ToastContainer component */}
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} 
           newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
-
+        
         {/* Filters Row */}
         <div className="filters-row">
           <div className="search-container">

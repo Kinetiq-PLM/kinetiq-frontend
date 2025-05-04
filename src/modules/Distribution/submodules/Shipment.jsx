@@ -48,7 +48,7 @@ const Shipment = () => {
       try {
         setLoading(true);
         setError(null); // Reset error state
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/shipments/');
+        const response = await fetch('http://127.0.0.1:8000/api/shipments/');
         
         if (!response.ok) {
           if (response.status === 401) {
@@ -77,7 +77,7 @@ const Shipment = () => {
     const fetchFailedShipments = async () => {
       try {
         // Use the dedicated endpoint for failed shipments
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/failed-shipments/');
+        const response = await fetch('http://127.0.0.1:8000/api/failed-shipments/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -96,7 +96,7 @@ const Shipment = () => {
   
     const fetchCarriers = async () => {
       try {
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/carriers/');
+        const response = await fetch('http://127.0.0.1:8000/api/carriers/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -113,7 +113,7 @@ const Shipment = () => {
     // Function to fetch employees
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/');
+        const response = await fetch('http://127.0.0.1:8000/api/employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -139,7 +139,7 @@ const Shipment = () => {
     const fetchFailedShipmentsOnly = async () => {
       try {
         // Use the dedicated endpoint for failed shipments
-        const response = await fetch('https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/failed-shipments/');
+        const response = await fetch('http://127.0.0.1:8000/api/failed-shipments/');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -173,6 +173,31 @@ const Shipment = () => {
   const getEmployeeFullName = (employeeId) => {
     const employee = employees.find(emp => emp.employee_id === employeeId);
     return employee ? employee.full_name : employeeId; // Fallback to ID if employee not found
+  };
+  
+  // Helper function to get readable shipment type based on delivery_id prefix
+  const getReadableShipmentType = (shipment) => {
+    if (!shipment) return 'Unknown'; // Handle case where shipment object is null/undefined
+    
+    const deliveryId = shipment.delivery_id;
+    
+    if (!deliveryId) {
+      // Fallback if delivery_id is missing, maybe use original type or default
+      return shipment.delivery_type || 'Unknown'; 
+    }
+    
+    if (deliveryId.startsWith('SERVICES-DO-')) {
+      return 'External - Service Order';
+    } else if (deliveryId.startsWith('SALES-ORD-')) {
+      return 'External - Sales Order';
+    } else if (deliveryId.startsWith('INV-WM-')) {
+      return 'Internal - Stock Transfer';
+    } else if (deliveryId.startsWith('OPS-DOI-')) {
+      return 'Internal - Content Delivery';
+    } else {
+      // Fallback for unknown prefixes, use original type or default
+      return shipment.delivery_type || 'Unknown Prefix'; 
+    }
   };
   
   // Handle tab change
@@ -281,7 +306,7 @@ const Shipment = () => {
     }
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/shipments/${shipment.shipment_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/shipments/${shipment.shipment_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -309,7 +334,7 @@ const Shipment = () => {
     try {
       // First, save any changes to the shipment
       if (Object.keys(formData).length > 0) {
-        const updateResponse = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/shipments/${shipment.shipment_id}/update/`, {
+        const updateResponse = await fetch(`http://127.0.0.1:8000/api/shipments/${shipment.shipment_id}/update/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -353,7 +378,7 @@ const Shipment = () => {
     if (!selectedShipment) return;
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/shipments/${selectedShipment.shipment_id}/ship/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/shipments/${selectedShipment.shipment_id}/ship/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -394,7 +419,7 @@ const Shipment = () => {
     if (!selectedShipment) return;
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/delivery-receipts/${deliveryReceipt.delivery_receipt_id}/update/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/delivery-receipts/${deliveryReceipt.delivery_receipt_id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -429,7 +454,7 @@ const Shipment = () => {
     if (!selectedShipment) return;
     
     try {
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/shipments/${selectedShipment.shipment_id}/fail/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/shipments/${selectedShipment.shipment_id}/fail/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -649,6 +674,7 @@ const Shipment = () => {
                 carriers={carriers}
                 employees={employees}
                 getEmployeeFullName={getEmployeeFullName}
+                getReadableShipmentType={getReadableShipmentType} // Add this prop
               />
             ) : activeTab === "delivered" ? (
               <DeliveredShipmentsTable
@@ -658,6 +684,7 @@ const Shipment = () => {
                 carriers={carriers}
                 employees={employees}
                 getEmployeeFullName={getEmployeeFullName}
+                getReadableShipmentType={getReadableShipmentType} // Add this prop
               />
             ) : (
               <FailedShipmentsTable 
@@ -667,6 +694,7 @@ const Shipment = () => {
                 carriers={carriers}
                 employees={employees}
                 getEmployeeFullName={getEmployeeFullName}
+                getReadableShipmentType={getReadableShipmentType} // Add this prop
               />
             )}
           </div>
@@ -700,6 +728,7 @@ const Shipment = () => {
             shipment={selectedShipment}
             onSave={handleUpdateDeliveryReceipt}
             onCancel={() => setShowDeliveryReceiptModal(false)}
+            employees={employees}
           />
         )}
         

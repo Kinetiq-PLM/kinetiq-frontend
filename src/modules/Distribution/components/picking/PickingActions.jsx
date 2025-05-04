@@ -2,26 +2,19 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/Picking.css';
 
-const PickingActions = ({ pickingList, employees, warehouses, onAssignEmployee, onUpdateWarehouse, onStatusUpdate }) => {
+const PickingActions = ({ pickingList, onAssignEmployee, onStatusUpdate, employees, warehouses }) => {
   const [selectedEmployee, setSelectedEmployee] = useState('');
-  const [selectedWarehouse, setSelectedWarehouse] = useState('');
   
   // Set initial values when picking list changes
   useEffect(() => {
     if (pickingList) {
       setSelectedEmployee(pickingList.picked_by || '');
-      setSelectedWarehouse(pickingList.warehouse_id || '');
     }
   }, [pickingList]);
   
   // Handle employee selection
   const handleEmployeeChange = (e) => {
     setSelectedEmployee(e.target.value);
-  };
-  
-  // Handle warehouse selection
-  const handleWarehouseChange = (e) => {
-    setSelectedWarehouse(e.target.value);
   };
   
   // Handle assign employee button click
@@ -32,16 +25,6 @@ const PickingActions = ({ pickingList, employees, warehouses, onAssignEmployee, 
     }
     
     onAssignEmployee(pickingList, selectedEmployee);
-  };
-  
-  // Handle update warehouse button click
-  const handleUpdateWarehouse = () => {
-    if (!selectedWarehouse) {
-      alert('Please select a warehouse');
-      return;
-    }
-    
-    onUpdateWarehouse(pickingList, selectedWarehouse);
   };
   
   // Get next status based on current status
@@ -85,6 +68,35 @@ const PickingActions = ({ pickingList, employees, warehouses, onAssignEmployee, 
     }
   };
   
+  // Updated warehouse display function
+  const getWarehouseDisplay = () => {
+    // If there's a warehouse name in the picking list, use it
+    if (pickingList.warehouse_name) return pickingList.warehouse_name;
+    if (pickingList.warehouse_id) {
+      const warehouse = warehouses.find(wh => wh.id === pickingList.warehouse_id);
+      if (warehouse) return warehouse.name;
+    }
+    
+    // Check for multiple warehouses in items
+    if (pickingList.items_details && pickingList.items_details.length > 0) {
+      const uniqueWarehouses = new Set(
+        pickingList.items_details
+          .filter(item => item.warehouse_id || item.warehouse_name)
+          .map(item => item.warehouse_id || item.warehouse_name)
+      );
+      
+      if (uniqueWarehouses.size > 1) {
+        return "Multiple Warehouses";
+      } else if (uniqueWarehouses.size === 1) {
+        // Get the first (and only) warehouse name
+        return pickingList.items_details.find(item => item.warehouse_name)?.warehouse_name || 
+               Array.from(uniqueWarehouses)[0] || 'Not assigned';
+      }
+    }
+    
+    return 'Not assigned';
+  };
+
   if (!pickingList) return null;
   
   return (
@@ -119,7 +131,8 @@ const PickingActions = ({ pickingList, employees, warehouses, onAssignEmployee, 
         </div>
         <div className="detail-item">
           <span className="detail-label">Items Count:</span>
-          <span className="detail-value">{pickingList.items_count || 0}</span>
+          {/* Display count based on items_details array */}
+          <span className="detail-value">{pickingList.items_details?.length || 0}</span>
         </div>
       </div>
       
@@ -148,49 +161,22 @@ const PickingActions = ({ pickingList, employees, warehouses, onAssignEmployee, 
         </div>
       </div>
       
-      {/* Warehouse selection section - Only shown for external orders */}
-      {pickingList.is_external && (
-        <div className="action-section">
-          <h4>Update Warehouse</h4>
-          <div className="warehouse-selection">
-            <select 
-              className="warehouse-dropdown"
-              value={selectedWarehouse}
-              onChange={handleWarehouseChange}
-            >
-              <option value="">Select a warehouse...</option>
-              {warehouses.map(warehouse => (
-                <option key={warehouse.id} value={warehouse.id}>
-                  {warehouse.name}
-                </option>
-              ))}
-            </select>
-            <button 
-              className="update-button"
-              onClick={handleUpdateWarehouse}
-              disabled={!selectedWarehouse}
-            >
-              Update
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {/* For internal orders, just display the warehouse name */}
-      {!pickingList.is_external && (
-        <div className="action-section">
-          <h4>Warehouse</h4>
-          <div className="warehouse-display">
-            <div className="warehouse-info">
-              <span className="warehouse-label">Location:</span>
-              <span className="warehouse-value">{pickingList.warehouse_name || 'Not assigned'}</span>
-              <div className="warehouse-note">
-                <small>Warehouse for internal deliveries is automatically assigned and cannot be modified.</small>
-              </div>
+      {/* Warehouse display section */}
+      <div className="action-section">
+        <h4>Warehouse</h4>
+        <div className="warehouse-display">
+          <div className="warehouse-info">
+            <span className="warehouse-label">Location:</span>
+            <span className="warehouse-value">
+              {/* Use the updated warehouse display function */}
+              {getWarehouseDisplay()}
+            </span>
+            <div className="warehouse-note">
+              <small>Warehouse is predetermined by the module sending the delivery request</small>
             </div>
           </div>
         </div>
-      )}
+      </div>
       
       <div className="action-section">
         <h4>Update Status</h4>

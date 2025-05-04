@@ -8,7 +8,7 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(8);
+  const [itemsPerPage] = useState(10);
   
   // Handle sort change
   const handleSort = (field) => {
@@ -86,6 +86,33 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
     return employee ? employee.full_name : employeeId;
   };
 
+  // New function to determine warehouse display value
+  const getWarehouseDisplay = (list) => {
+    // If there's a warehouse name, return it
+    if (list.warehouse_name) return list.warehouse_name;
+    if (list.warehouse_id) return list.warehouse_id;
+    
+    // If we have items from multiple warehouses
+    if (list.items_details && list.items_details.length > 0) {
+      // Get unique warehouse IDs
+      const uniqueWarehouses = new Set(
+        list.items_details
+          .filter(item => item.warehouse_id || item.warehouse_name)
+          .map(item => item.warehouse_id || item.warehouse_name)
+      );
+      
+      if (uniqueWarehouses.size > 1) {
+        return "Multiple Warehouses";
+      } else if (uniqueWarehouses.size === 1) {
+        // Get the first (and only) warehouse name
+        return list.items_details.find(item => item.warehouse_name)?.warehouse_name || 
+               Array.from(uniqueWarehouses)[0] || '-';
+      }
+    }
+    
+    return '-';
+  };
+
   return (
     <div className="picking-table-container">
       <div className="table-metadata">
@@ -99,6 +126,7 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
         <table className="picking-table">
           <thead>
             <tr>
+              {/* Commented out Picking ID column
               <th 
                 className="sortable" 
                 onClick={() => handleSort('picking_list_id')}
@@ -108,6 +136,9 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
                   <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                 )}
               </th>
+              */}
+              
+              {/* Commented out Order Type column
               <th 
                 className="sortable" 
                 onClick={() => handleSort('is_external')}
@@ -117,24 +148,8 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
                   <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                 )}
               </th>
-              <th 
-                className="sortable" 
-                onClick={() => handleSort('warehouse_name')}
-              >
-                Warehouse
-                {sortField === 'warehouse_name' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th 
-                className="sortable" 
-                onClick={() => handleSort('delivery_type')}
-              >
-                Delivery Type
-                {sortField === 'delivery_type' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
+              */}
+
               <th 
                 className="sortable" 
                 onClick={() => handleSort('delivery_id')}
@@ -144,15 +159,37 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
                   <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                 )}
               </th>
+
               <th 
                 className="sortable" 
-                onClick={() => handleSort('items_count')}
+                onClick={() => handleSort('delivery_type')}
               >
-                Items
-                {sortField === 'items_count' && (
+                Delivery Type
+                {sortField === 'delivery_type' && (
                   <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                 )}
               </th>
+
+              <th 
+                className="sortable" 
+                onClick={() => handleSort('warehouse_name')}
+              >
+                Warehouse
+                {sortField === 'warehouse_name' && (
+                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                )}
+              </th>
+              
+              <th 
+                className="sortable" 
+                onClick={() => handleSort('items_details')}
+              >
+                Items
+                {sortField === 'items_details' && (
+                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                )}
+              </th>
+              
               <th 
                 className="sortable" 
                 onClick={() => handleSort('picked_by')}
@@ -162,6 +199,7 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
                   <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                 )}
               </th>
+              
               <th 
                 className="sortable" 
                 onClick={() => handleSort('picked_status')}
@@ -171,6 +209,7 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
                   <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                 )}
               </th>
+              
               <th 
                 className="sortable" 
                 onClick={() => handleSort('picked_date')}
@@ -190,12 +229,18 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
                   className={`${index % 2 === 0 ? 'even-row' : 'odd-row'} ${selectedList && selectedList.picking_list_id === list.picking_list_id ? 'selected-row' : ''}`}
                   onClick={() => onListSelect(list)}
                 >
+                  {/* Commented out Picking ID cell
                   <td>{list.picking_list_id}</td>
+                  */}
+                  
+                  {/* Commented out Order Type cell
                   <td>{list.is_external ? 'External' : 'Internal'}</td>
-                  <td>{list.warehouse_name || '-'}</td>
-                  <td>{getDeliveryTypeDisplay(list.delivery_type)}</td>
+                  */}
+                  
                   <td>{list.delivery_id || '-'}</td>
-                  <td className="centered-cell">{list.items_count || 0}</td>
+                  <td>{getDeliveryTypeDisplay(list.delivery_type)}</td>
+                  <td>{getWarehouseDisplay(list)}</td>
+                  <td className="centered-cell">{list.items_details?.length || 0}</td>
                   <td>{getEmployeeName(list.picked_by)}</td>
                   <td className={`status-cell ${getStatusClass(list.picked_status)}`}>
                     {list.picked_status || 'Unknown'}
@@ -205,7 +250,7 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               ))
             ) : (
               <tr>
-                <td colSpan={window.innerWidth <= 576 ? 6 : 9} className="no-data">
+                <td colSpan={window.innerWidth <= 576 ? 6 : 7} className="no-data">
                   No picking lists found with the current filters
                 </td>
               </tr>
