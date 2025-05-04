@@ -7,7 +7,8 @@ import InvRestockForm from "./components/InvRestockForm";
 // import InvItemCards from "./components/InvItemCards";
 
 // Define the base URL for your local backend API
-const BASE_API_URL = "https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api";
+const BASE_API_URL = "https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api";
+// const BASE_API_URL = "http://127.0.0.1:8000/api";
 
 // --- Helper Function for API Fetching ---
 const fetchData = async (url, setData, setLoading, setError, entityName) => {
@@ -78,7 +79,7 @@ const BodyContent = () => {
   useEffect(() => {
     // Clear errors before starting fetches for this cycle
     setError(null);
-    fetchData("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/", setWarehouseList, setLoadingWarehouses, setError, "Warehouse List");
+    fetchData("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/", setWarehouseList, setLoadingWarehouses, setError, "Warehouse List");
   }, []); // Runs once
 
   // Fetch Product Data (Aggregated, filtered for stock > 0)

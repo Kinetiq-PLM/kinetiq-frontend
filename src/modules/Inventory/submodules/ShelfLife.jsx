@@ -14,22 +14,22 @@ const BodyContent = () => {
     const [selectedDate, setSelectedDate] = useState("");
 
     // State for selected row
-    const [selectedRow, setSelectedRow] = useState(null); 
+    const [selectedRow, setSelectedRow] = useState(null);
 
     // Tab Management
     const tabs = ["Expiring Items"];
-    const [activeTab, setActiveTab] = useState(tabs[0]);    
+    const [activeTab, setActiveTab] = useState(tabs[0]);
     const onTabChange = (tab) => {
         setActiveTab(tab);
-        setSelectedRow(null); 
+        setSelectedRow(null);
         setSelectedStatus("")
         setSelectedDate("")// Reset selected row when tab changes
     }
 
-    
+
 
     useEffect(() => {
-        fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/expiry-report/")
+        fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/expiry-report/")
             .then((res) => res.json())
             .then((data) => {
                 setExpiringItemsData(data);
@@ -44,7 +44,7 @@ const BodyContent = () => {
 
     // assets fetching
     useEffect(() => {
-        fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/assets-depreciation-report/")
+        fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/assets-depreciation-report/")
             .then((res) => res.json())
             .then((data) => {
                 setAssetsData(data);
@@ -60,7 +60,7 @@ const BodyContent = () => {
 
     // warehouse list fetching
     useEffect(() => {
-        fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/")
+        fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/")
             .then((res) => res.json())
             .then((data) => {
                 setWarehouseList(data);
@@ -98,7 +98,7 @@ const BodyContent = () => {
                 "Status": item?.status,
             })),
         },
-        
+
     }
 
     // Current Config
@@ -107,65 +107,65 @@ const BodyContent = () => {
     const currentData = currentConfig.data || [];
     console.log("Current Config:", currentConfig);
 
-    
+
     const filterByDateRange = (data, range) => {
         const now = new Date(); // Get current date and time
-    
+
         return data.filter((item) => {
             if (!item["Expiry Date"]) return false;
-    
+
             const itemDate = new Date(item["Expiry Date"]); // Convert string to Date object
             if (isNaN(itemDate)) return false; // Skip invalid dates
-    
+
             switch (range) {
                 case "Next 30 Days":
                     return itemDate >= now && itemDate <= new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30);
-                
+
                 case "Next 6 Months":
                     return itemDate >= now && itemDate <= new Date(now.getFullYear(), now.getMonth() + 6, now.getDate());
-    
+
                 case "Within This Year":
                     return itemDate.getFullYear() === now.getFullYear();
-    
+
                 default:
                     return true; // No filtering applied if range is not recognized
             }
         });
     };
-    
+
 
     const filteredData = currentData.filter((item) => {
         const statusMatch = selectedStatus ? item["Status"]?.toLowerCase() === selectedStatus.toLowerCase() : true;
-        console.log("Status Match:", statusMatch, "item status:", item.status, "selected status from filter:",selectedStatus);
+        console.log("Status Match:", statusMatch, "item status:", item.status, "selected status from filter:", selectedStatus);
         const dateMatch = selectedDate ? filterByDateRange([item], selectedDate).length > 0 : true;
         return statusMatch && dateMatch;
     });
 
 
-        // Format time for Philippine Time Zone (UTC+8)
-        const formatPhilippineTime = (date) => {
-            // Adjust for Philippine time (UTC+8)
-            const philippineDate = new Date(Date.UTC(
-              date.getUTCFullYear(),
-              date.getUTCMonth(),
-              date.getUTCDate(),
-              date.getUTCHours() + 8,
-              date.getUTCMinutes(),
-              date.getUTCSeconds()
-            ));
-          
-            const hours24 = philippineDate.getUTCHours();
-            const hours12 = hours24 % 12 || 12; // Convert to 12-hour format
-            const minutes = philippineDate.getUTCMinutes().toString().padStart(2, '0');
-            const seconds = philippineDate.getUTCSeconds().toString().padStart(2, '0');
-            const amPm = hours24 < 12 ? 'AM' : 'PM';
-          
-            const year = philippineDate.getUTCFullYear();
-            const month = (philippineDate.getUTCMonth() + 1).toString().padStart(2, '0');
-            const day = philippineDate.getUTCDate().toString().padStart(2, '0');
-          
-            return `${day}/${month}/${year}, ${hours12}:${minutes} ${amPm} PHT`;
-          };
+    // Format time for Philippine Time Zone (UTC+8)
+    const formatPhilippineTime = (date) => {
+        // Adjust for Philippine time (UTC+8)
+        const philippineDate = new Date(Date.UTC(
+            date.getUTCFullYear(),
+            date.getUTCMonth(),
+            date.getUTCDate(),
+            date.getUTCHours() + 8,
+            date.getUTCMinutes(),
+            date.getUTCSeconds()
+        ));
+
+        const hours24 = philippineDate.getUTCHours();
+        const hours12 = hours24 % 12 || 12; // Convert to 12-hour format
+        const minutes = philippineDate.getUTCMinutes().toString().padStart(2, '0');
+        const seconds = philippineDate.getUTCSeconds().toString().padStart(2, '0');
+        const amPm = hours24 < 12 ? 'AM' : 'PM';
+
+        const year = philippineDate.getUTCFullYear();
+        const month = (philippineDate.getUTCMonth() + 1).toString().padStart(2, '0');
+        const day = philippineDate.getUTCDate().toString().padStart(2, '0');
+
+        return `${day}/${month}/${year}, ${hours12}:${minutes} ${amPm} PHT`;
+    };
     const currentTime = new Date();
 
     // current config
@@ -177,55 +177,54 @@ const BodyContent = () => {
 
                 {/* Flex container seperating nav and main content */}
                 <div className="flex-col flex-wrap w-full min-h-screen space-y-2 px-3 py-[5rem]">
-                    
+
                     <nav className="md:flex flex-1 justify-between items-center p-2">
-                        
+
                         <div className="text-sm text-gray-500 md:order-2">
-                        {formatPhilippineTime(currentTime)}
+                            {formatPhilippineTime(currentTime)}
                         </div>
-                        
+
                         <div className="invNav flex border-b border-gray-300 mt-1 space-x-8 md:order-1">
                             {tabs.map((tab) => (
-                            <span
-                                key={tab}
-                                className={`cursor-pointer text-lg font-semibold transition-colors ${
-                                activeTab === tab
-                                    ? "text-cyan-600 border-b-2 border-cyan-600"
-                                    : "text-gray-500"
-                                }`}
-                                onClick={() => onTabChange(tab)}
-                            >
-                                {tab}
-                            </span>
+                                <span
+                                    key={tab}
+                                    className={`cursor-pointer text-lg font-semibold transition-colors ${activeTab === tab
+                                        ? "text-cyan-600 border-b-2 border-cyan-600"
+                                        : "text-gray-500"
+                                        }`}
+                                    onClick={() => onTabChange(tab)}
+                                >
+                                    {tab}
+                                </span>
                             ))}
                         </div>
-                        
-                        
+
+
                     </nav>
-                    
+
                     {/* FILTER SECTION */}
                     <div className="flex flex-wrap md:max-h-8 space-x-3 space-y-3 mt-1 mb-1 p-1">
                         <select className="w-full md:w-[130px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
                             <option value="">Filter Status</option>
-                                {["Pending", "Approved"].map((s) => (
-                                    <option key={s} value={s}>{s}</option>
-                                ))}
+                            {["Pending", "Approved"].map((s) => (
+                                <option key={s} value={s}>{s}</option>
+                            ))}
                         </select>
 
-                        <select  className="w-full md:w-[130px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
+                        <select className="w-full md:w-[130px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
                             <option value="">Filter Period</option>
-                                {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
-                                    <option key={d} value={d}>{d}</option>
-                                ))}
+                            {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
+                                <option key={d} value={d}>{d}</option>
+                            ))}
                         </select>
 
-                        <select  className="w-full md:w-[150px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer"> 
+                        <select className="w-full md:w-[150px] border border-gray-300 rounded-md p-1 text-gray-500 h-8 text-sm cursor-pointer">
                             <option value="">Filter Warehouse</option>
-                                {warehouseList.map((d) => (
-                                    <option key={d} value={d}>{d.warehouse_location}</option>
-                                ))}
+                            {warehouseList.map((d) => (
+                                <option key={d} value={d}>{d.warehouse_location}</option>
+                            ))}
                         </select>
-                        
+
 
 
                     </div>
@@ -248,7 +247,7 @@ const BodyContent = () => {
                                 <tbody>
                                     {loading ? (
                                         <tr><td colSpan="5" className="p-2 text-gray-400">Loading...</td></tr>
-                                    ) : (                                               
+                                    ) : (
 
                                         filteredData.map((item, index) => (
                                             <tr
@@ -259,7 +258,7 @@ const BodyContent = () => {
                                                 {currentConfig.columns.map((col) => (
                                                     <td key={col} className="p-2">{item[col] || "---"}</td>
                                                 ))}
-                                                
+
                                             </tr>
                                         ))
                                     )}
@@ -292,7 +291,7 @@ const BodyContent = () => {
 
                 </div>
                 {/* End of First Container (Seperating nav and main content) */}
-                
+
             </div>
         </div>
     );
