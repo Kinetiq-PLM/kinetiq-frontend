@@ -25,10 +25,8 @@ const ApprovalTable = ({employee_id}) => {
   const handleCheckboxChange = (index, row) => {
     setSelectedRow(index);
     setSelectedData(row);
-    const warehouse = warehouseList.find(w => w.warehouse_id === row.warehouse_id);
-    setSelectedWarehouse(warehouse ? warehouse.warehouse_location : "");
-
-
+    const warehouse = warehouseList.find(w => w.warehouse_location === row.warehouse_location);
+    setSelectedWarehouse(warehouse?.warehouse_location || "");
   };
 
 
@@ -43,7 +41,19 @@ const ApprovalTable = ({employee_id}) => {
 
 
       if (!Array.isArray(data)) throw new Error("Invalid warehouse format");
-      setWarehouseList(data);
+      const sortedWarehouses = [...data].sort((a, b) => {
+        const getLastWord = (str) => {
+          const words = str.split(/\s+/);
+          return words[words.length - 1];
+        };
+  
+        const lastWordA = getLastWord(a.warehouse_location);
+        const lastWordB = getLastWord(b.warehouse_location);
+  
+        return lastWordA.localeCompare(lastWordB);
+      });
+  
+      setWarehouseList(sortedWarehouses);
 
 
     } catch (error) {
@@ -59,8 +69,8 @@ const ApprovalTable = ({employee_id}) => {
 
   useEffect(() => {
     if (selectedData && warehouseList.length > 0) {
-      const warehouse = warehouseList.find(w => w.warehouse_id === selectedData.warehouse_id);
-      setSelectedWarehouse(warehouse ? warehouse.warehouse_location : "");
+      const warehouse = warehouseList.find(w => w.warehouse_location === selectedData.warehouse_location);
+      setSelectedWarehouse(warehouse?.warehouse_location || "");
     }
   }, [selectedData, warehouseList]);
 
@@ -76,13 +86,21 @@ const ApprovalTable = ({employee_id}) => {
  
           const data = await response.json();
           const reworkorderData = await reworkResponse.json();
-          console.log("Current filteredData:", filteredData);
-console.log("First item quantity:", filteredData[0]?.quantity);
-          console.log(data)
+
           if (!Array.isArray(data) || !Array.isArray(reworkorderData)) {
             throw new Error("Invalid data format");
           }
-          setDeliveryRequest(data);
+          const sortedRequestData = data.sort((a, b) => {
+            // First: items with no warehouse_id come first
+            if (!a.warehouse_location && b.warehouse_location) return -1;
+            if (a.warehouse_location && !b.warehouse_location) return 1;
+          
+            // Then: sort by request_date (convert to Date object if needed)
+            const dateA = new Date(a.request_date);
+            const dateB = new Date(b.request_date);
+            return dateA - dateB;
+          });
+          setDeliveryRequest(sortedRequestData);
           setITReworkOrder(reworkorderData)
       } catch (error) {
           if (error.name !== "AbortError") setError(error.message);
@@ -131,10 +149,12 @@ console.log("First item quantity:", filteredData[0]?.quantity);
     if (!selected) {
       toast.error("Invalid warehouse selection.");
       return;
+    }else{
+      console.log(selected.warehouse_id)
     }
  
     try {
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/update-delivery-request/${selectedData.content_id}/`, {
+      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/update-delivery-request/${selectedData.delivery_id}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -162,60 +182,62 @@ console.log("First item quantity:", filteredData[0]?.quantity);
 
   const handleChange = (e, field) => {
     const newSelectedData = { ...selectedData };
-    newSelectedData.external_module[field] = e.target.value;
- 
-    if (field === 'rework_quantity') {
-      const actualQuantity = newSelectedData.production_order.actual_quantity;
+    if (field === 'quantity') {
+      const actualQuantity = newSelectedData.actual_quantity;
       const reworkQuantity = parseInt(e.target.value);
       
       if (reworkQuantity > actualQuantity) {
-        toast.dismiss()
+        toast.dismiss();
         toast.error('Error: Rework quantity must not be greater than actual quantity.');
         return;
       }
+      
+      newSelectedData.quantity = reworkQuantity;
+    } else if (field === 'reason_rework') {
+      newSelectedData.reason_rework = e.target.value;
     }
- 
+  
     setSelectedData(newSelectedData);
   };
  
   const updateRework = async (data) => {
-    const actualQuantity = selectedData.production_order.actual_quantity;
-    const reworkQuantity = parseInt(selectedData.external_module.rework_quantity);
+    const actualQuantity = selectedData.actual_quantity;
+    const reworkQuantity = Number(selectedData.quantity) || 0;
     try {
-  
       if (reworkQuantity > actualQuantity) {
         toast.dismiss()
         toast.error('Error: Rework quantity must not be greater than actual quantity.');
         fetchDeliveryRequest()
         return;
       }
-      if (data.external_module.reason_rework && (!data.external_module.rework_quantity || data.external_module.rework_quantity <= 0)) {
+      if (data.reason_rework && (!reworkQuantity || reworkQuantity <= 0)) {
         toast.dismiss();
         toast.error("Rework quantity is required when a rework reason is provided.");
         fetchDeliveryRequest()
         return;
       }
-      if (!data.external_module.reason_rework && (data.external_module.rework_quantity < 0)) {
+      if ((!data.reason_rework || data.reason_rework == null) && (data.quantity > 0)) {
         toast.dismiss();
         toast.error("Rework reason is required when a rework quantity is provided.");
         fetchDeliveryRequest()
         return;
       }
+      console.log(data.reason_rework)
       const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/update-rework/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          production_order_detail_id: data.production_order_detail_id,
-          rework_quantity: data.external_module.rework_quantity,
-          reason_rework: data.external_module.reason_rework,
+          production_order_detail_id: data.rework_id,
+          quantity: Number(data.quantity) || 0,  
+          reason_rework: data.reason_rework,
         }),
       });
- 
       if (response.ok) {
         const responseData = await response.json();
         if (responseData.status === 'success') {
+          await fetchDeliveryRequest()
           toast.success('Data updated successfully');
         } else {
           toast.error('Error updating database:', responseData.message);
@@ -289,7 +311,7 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                   <td colSpan="7" className="text-center">Loading...</td>
                 </tr>
               ) : filteredData.map((row, index) => (
-                <tr key={row.external_id}>
+                <tr key={row?.delivery_id || row.rework_id }>
                   <td>
                     <input
                       type="checkbox"
@@ -305,16 +327,16 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                       <td>{row.quantity || 0}</td> 
                       <td>{row.request_date}</td>
                       <td>{row.delivery_type}</td>
-                      <td>{warehouseList.find(w => w.warehouse_id === row.warehouse_id)?.warehouse_location || "N/A"}</td>
+                      <td>{row.warehouse_location}</td>
                       <td>{row.module_name}</td>
                     </>
                   ) : (
                     <>
-                      <td>{row.production_order_detail_id}</td>
-                      <td>{row.product_name}</td>
-                      <td>{row.external_module?.reason_rework || ""}</td>
-                      <td>{row.production_order?.actual_quantity || ""}</td>
-                      <td>{row.external_module?.rework_quantity || ""}</td>
+                      <td>{row?.rework_id || ""}</td>
+                      <td>{row?.product_name || ""}</td>
+                      <td>{row?.reason_rework || ""}</td>
+                      <td>{row?.actual_quantity || ""}</td>
+                      <td>{row?.quantity ?? ""}</td>
                     </>
                   )}
                 </tr>
@@ -384,13 +406,13 @@ console.log("First item quantity:", filteredData[0]?.quantity);
               </div>
               <div className="input-group">
                 <label>Warehouse Location</label>
-                <select valueModul={selectedWarehouse} onChange={(e) => setSelectedWarehouse(e.target.value)}  className="module-dropdown w-40 h-8 border rounded px-2">
+                <select value={selectedWarehouse} onChange={(e) => setSelectedWarehouse(e.target.value)}  className="module-dropdown w-40 h-8 border rounded px-2">
                   <option value="">Select Warehouse</option>
                   {loading ? (
-                    <option value="">Loading vendors...</option>
+                    <option value="">Loading warehouse...</option>
                   ) : (
                     warehouseList.map((warehouse) => (
-                      <option key={warehouse.warehouse_id} value={warehouse.warehouse_location}>
+                      <option key={warehouse.warehouse_location} value={warehouse.warehouse_location}>
                         {warehouse.warehouse_location}
                       </option>
                     ))
@@ -409,7 +431,7 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                 <input 
                   type="text" 
                   className="short-input req-input" 
-                  value={selectedData.production_order_detail_id} 
+                  value={selectedData?.rework_id || ""} 
                   style={{ cursor: 'default' }} readOnly
                 />
               </div>
@@ -418,7 +440,7 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                 <input
                   type="text"
                   className="short-input"
-                  value={selectedData?.external_module?.reason_rework || ''}
+                  value={selectedData?.reason_rework || ''}
                   onChange={(e) => handleChange(e, 'reason_rework')}
                 />
               </div>
@@ -428,7 +450,7 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                   type="text" 
                   className="short-input req-input" 
                   max="10000000"
-                  value={selectedData?.production_order?.actual_quantity || ''} 
+                  value={selectedData?.actual_quantity || ''} 
                   style={{ cursor: 'not-alowed' }}
                   readOnly
                 />
@@ -440,8 +462,13 @@ console.log("First item quantity:", filteredData[0]?.quantity);
                   className="short-input"
                   min="0"
                   max="10000000"
-                  value={selectedData?.external_module?.rework_quantity || ''}
-                  onChange={(e) => handleChange(e, 'rework_quantity')}
+                  value={selectedData?.quantity ?? ''}
+                  onKeyDown={(e) => {
+                    if (e.key === '.') {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(e) => handleChange(e, 'quantity')}
                 />
               </div>
             </div>

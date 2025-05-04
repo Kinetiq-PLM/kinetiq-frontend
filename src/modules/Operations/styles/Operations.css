@@ -125,7 +125,7 @@
 .operations-chart-section {
   position: absolute;
   top: 0rem;
-  right: 3.5rem;
+  right: 0rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -201,4 +201,11 @@
   font-size: 0.9rem;
   color: #666;
   margin-top: 0.3rem;
+}
+.operations .loading-center {
+  display: flex;
+  justify-content: center;
+  height: 100vh; /* Full screen height */
+  font-size: 1.2rem;
+  color: #333;
 }
