@@ -133,12 +133,19 @@ const AccountingDashboard = () => {
         typeCounts[acc.account_type] = (typeCounts[acc.account_type] || 0) + 1;
       });
 
-      const formattedPie = Object.entries(typeCounts).map(([label, value]) => ({
-        name: label,
-        value,
-      }));
+      const formattedPie = [
+        {
+          name: "Accounts Payable",
+          value: parseFloat(accountsPayableTotal.toFixed(2)),
+        },
+        {
+          name: "Accounts Receivable",
+          value: parseFloat(accountsReceivableTotal.toFixed(2)),
+        },
+      ];
 
       setPieData(formattedPie);
+
 
     } catch (error) {
       console.error(
@@ -334,8 +341,9 @@ const AccountingDashboard = () => {
             {/* Pie Chart */}
             <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
               <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                Chart of Accounts Distribution
+                Accounts Payable and Receivable
               </h2>
+
               <ResponsiveContainer width="100%" height={420}>
                 <PieChart>
                   <Pie
@@ -360,7 +368,12 @@ const AccountingDashboard = () => {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value, name) => [`${value} accounts`, name]}
+                    formatter={(value, name) => [
+                      `₱${parseFloat(value).toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                      })}`,
+                      name,
+                    ]}
                     contentStyle={{
                       backgroundColor: "#ffffff",
                       borderRadius: "8px",
@@ -374,13 +387,20 @@ const AccountingDashboard = () => {
                     verticalAlign="bottom"
                     height={48}
                     iconType="circle"
-                    wrapperStyle={{ display: "flex", justifyContent: "center", fontSize: "13px", color: "#4b5563" }}
+                    wrapperStyle={{
+                      display: "flex",
+                      justifyContent: "center",
+                      fontSize: "13px",
+                      color: "#4b5563",
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>
+
               <p className="text-center text-sm text-gray-600 mt-4">
-                This chart shows the relative distribution of account types based on their frequency or balance.
+                This chart shows the relative balances of Accounts Payable and Receivable based on the General Ledger.
               </p>
+
             </div>
 
           </div>
