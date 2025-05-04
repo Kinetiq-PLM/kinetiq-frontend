@@ -42,8 +42,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
     const [totalLaborCost, setTotalLaborCost] = useState(0);
     const [totalOrderCost, setTotalOrderCost] = useState(0);
-    const baseurl = "http://127.0.0.1:8000";
-    //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
+    //const baseurl = "http://127.0.0.1:8000";
+    const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
 
 
