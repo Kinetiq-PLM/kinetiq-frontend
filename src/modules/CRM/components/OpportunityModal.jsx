@@ -97,7 +97,6 @@ const OpportunityModal = ({
       const gp = grossProfitTotal || details.grossProfitTotal;
       const request = {
         customer: selectedCustomer.customer_id,
-        partner: selectedCustomer.partner.partner_id,
         salesrep: selectedEmployee.employee_id,
         starting_date: startDate,
         expected_closed_date: endDate,
