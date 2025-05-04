@@ -286,45 +286,39 @@ const UserManagement = () => {
     
     // Create a set for efficient lookups
     const checkedKeysSet = new Set(actualCheckedKeys);
-    const optimizedPermissions = [];
     
-    // Process each checked key
+    // First, separate parent and child keys
+    const parentKeys = [];
+    const childKeys = [];
+    
     actualCheckedKeys.forEach(key => {
       // Trim any whitespace
       const trimmedKey = key.trim();
       
-      // Skip if this key is already covered by a parent
-      for (const existingKey of optimizedPermissions) {
-        if (trimmedKey.startsWith(existingKey) && trimmedKey !== existingKey) {
-          return; // Skip this key as it's covered by a parent
-        }
-      }
-      
       // Check if this is a parent (has trailing slash)
       if (trimmedKey.endsWith('/')) {
-        // Add this parent key and remove any of its children from the optimized list
-        optimizedPermissions.push(trimmedKey);
-        // Remove any children that might have been added before
-        for (let i = optimizedPermissions.length - 1; i >= 0; i--) {
-          if (optimizedPermissions[i].startsWith(trimmedKey) && optimizedPermissions[i] !== trimmedKey) {
-            optimizedPermissions.splice(i, 1);
-          }
-        }
+        parentKeys.push(trimmedKey);
       } else {
-        // This is a child key, check if we should add it
-        const parts = trimmedKey.split('/');
-        const parentKey = parts.slice(0, -1).join('/') + '/';
-        
-        // Only add if parent is not checked
-        if (!checkedKeysSet.has(parentKey)) {
-          optimizedPermissions.push(trimmedKey);
-        }
+        childKeys.push(trimmedKey);
       }
     });
     
-    roleForm.setFieldsValue({ department_permissions: optimizedPermissions });
+    // Handle parent-child relationships:
+    // 1. First collect all valid permissions without any optimization
+    const allPermissions = [...parentKeys];
+    
+    // 2. Only add child keys if their parent is not selected
+    childKeys.forEach(childKey => {
+      const parentPath = childKey.substring(0, childKey.lastIndexOf('/') + 1);
+      if (!checkedKeysSet.has(parentPath)) {
+        allPermissions.push(childKey);
+      }
+    });
+    
+    // Set the results in the form
+    roleForm.setFieldsValue({ department_permissions: allPermissions });
   };
-
+  
   // Function to convert stored permissions to display checked keys
   const getExpandedCheckedKeys = (permissions) => {
     if (!permissions || !Array.isArray(permissions)) return [];
