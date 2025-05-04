@@ -136,7 +136,7 @@
 .picking .stats-row {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: .5rem;
   flex-wrap: wrap;
 }
 
@@ -1699,4 +1699,248 @@
     display: block;
     margin: 2px auto 0;
   }
+}
+
+/* Add these styles to the end of your Picking.css file */
+
+/* Modal Tab Navigation */
+.picking .modal-tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 16px;
+}
+
+.picking .tab-button {
+  padding: 10px 16px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.picking .tab-button:hover {
+  color: #00a8a8;
+  background-color: #f8f9fa;
+}
+
+.picking .tab-button.active {
+  color: #00a8a8;
+  border-bottom: 2px solid #00a8a8;
+}
+
+.picking .tab-icon {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+/* Items Section */
+.picking .items-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.picking .items-table-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.picking .items-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.picking .items-table th {
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.picking .items-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.9rem;
+  color: #212529;
+  text-align: center;
+}
+
+.picking .items-table tr:last-child td {
+  border-bottom: none;
+}
+
+.picking .items-table .even-row {
+  background-color: #fff;
+}
+
+.picking .items-table .odd-row {
+  background-color: #f8f9fa;
+}
+
+.picking .items-table .centered-cell {
+  text-align: center;
+}
+
+.picking .items-table .no-data {
+  text-align: center;
+  padding: 24px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Multi-warehouse warning */
+.picking .multi-warehouse-warning {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 6px;
+  color: #856404;
+}
+
+.picking .warning-icon {
+  font-size: 1.2rem;
+  margin-right: 12px;
+}
+
+.picking .warning-text {
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .picking .modal-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  
+  .picking .tab-button {
+    flex: 1;
+    justify-content: center;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 576px) {
+  .picking .items-table th,
+  .picking .items-table td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+}
+
+.warehouse-group {
+  margin-bottom: 1.5rem;
+}
+
+.warehouse-name {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border-left: 3px solid #00a8a8;
+}
+
+.warehouse-icon {
+  margin-right: 0.5rem;
+}
+
+.warehouse-divider {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px dashed #e0e0e0;
+}
+
+/* Add to your Picking.css file */
+.picking-progress {
+  margin: 15px 0;
+}
+
+.progress-bar-container {
+  height: 15px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  text-align: center;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.warehouse-progress {
+  font-size: 0.8em;
+  margin-left: 10px;
+  color: #666;
+}
+
+.item-toggle-button {
+  padding: 5px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9em;
+}
+
+.item-toggle-button.pick {
+  background-color: #e0f2f1;
+  color: #00796b;
+}
+
+.item-toggle-button.unpick {
+  background-color: #f1f8e9;
+  color: #558b2f;
+}
+
+.item-toggle-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.picked-status {
+  color: #4caf50;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.not-picked-status {
+  color: #ff9800;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.picked-row {
+  background-color: #f1f8e9 !important;
 }
