@@ -9,7 +9,6 @@ import { useMutation } from "@tanstack/react-query";
 
 const ServiceTicketTab = ({
   setIsEmployeeListOpen,
-  selectedEmployee,
   selectedCustomer,
   ticketInfo,
   setTicketInfo,
@@ -72,7 +71,6 @@ const ServiceTicketTab = ({
     <main className="mt-4">
       <div className="text-sm flex gap-10 flex-wrap">
         <h3 className="font-bold">Create Ticket Issue</h3>
-        <h3 className="opacity-50">Create Ticket Product Renewal</h3>
       </div>
       <div className="flex flex-col flex-wrap my-4">
         <InputField

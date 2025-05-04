@@ -21,11 +21,19 @@ import Button from "../components/Button";
 import InfoField from "../components/InfoField";
 import SalesDropup from "../components/SalesDropup.jsx";
 import { useMutation } from "@tanstack/react-query";
-import { POST } from "../api/api";
+import { GET, POST } from "../api/api";
 
 import generateRandomID from "../components/GenerateID";
 
-const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
+const Quotation = ({
+  loadSubModule,
+  setActiveSubModule,
+  employee_id,
+  position_id,
+}) => {
+  // TEMPORARY CONSTANT VALUE FOR EMPLOYEE LOGGED IN
+  const IS_SALES_REP = true;
+
   const { showAlert } = useAlert();
   const copyFromOptions = [];
   const copyToOptions = ["Order"];
@@ -50,6 +58,24 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   });
 
   const [copyToModal, setCopyToModal] = useState("");
+  const [isSalesRep, setIsSalesRep] = useState(false);
+
+  useEffect(() => {
+    const get = async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (res.position_id === "REG-2504-6039" || res.is_supervisor) {
+          setIsSalesRep(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee data.",
+        });
+      }
+    };
+    get();
+  }, []);
   // save current info to local storage
   // navigate to selected modal
   // use local storage to populate the fields
@@ -64,7 +90,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [copyInfo, setCopyInfo] = useState({}); // Info from copyFromModal
 
   const [address, setAddress] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
+  const [dateIssued, setDateIssued] = useState("");
 
   const [selectedProduct, setSelectedProduct] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("");
@@ -213,8 +239,9 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           if (product.special_requests !== null) {
             setDisableCopyTo(true);
           }
+          // console.log(product);
           return {
-            product: product.product_id,
+            inventory_item: product.inventory_items[0].inventory_item_id, // always select muna pinaka unang warehouse since quotation palang naman
             quantity: parseInt(product.quantity),
             special_requests: product.special_requests
               ? product.special_requests
@@ -233,6 +260,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
       // },
     };
     setPayload({ ...request, name: selectedCustomer.name });
+    console.log(request);
     quotationMutation.mutate(request);
   };
 
@@ -246,9 +274,9 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   useEffect(() => {
     setQuotationInfo({
       ...quotationInfo,
-      selected_delivery_date: deliveryDate,
+      selected_delivery_date: dateIssued,
     });
-  }, [deliveryDate]);
+  }, [dateIssued]);
 
   const handleClear = () => {
     setProducts([]);
@@ -256,7 +284,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     setSelectedProduct("");
     setSelectedEmployee("");
     setAddress("");
-    setDeliveryDate("");
+    setDateIssued("");
     setQuotationInfo({
       customer_id: "",
       quotation_id: "",
@@ -278,6 +306,19 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     if (selectedCustomer != "") setCanClear(true);
   }, [selectedCustomer]);
 
+  function handleCustomerSelection() {
+    if (isSalesRep) {
+      setIsCustomerListOpen(true);
+    } else {
+      setIsEmployeeListOpen(true);
+    }
+  }
+
+  useEffect(() => {
+    if (!selectedEmployee) return;
+    setIsCustomerListOpen(true);
+  }, [selectedEmployee]);
+
   return (
     <div className="quotation">
       <div className="body-content-container">
@@ -293,7 +334,15 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           onClose={() => setIsCustomerListOpen(false)}
           newCustomerModal={setIsNewCustomerModalOpen}
           setCustomer={setSelectedCustomer}
+          employee={selectedEmployee}
         ></CustomerListModal>
+
+        <EmployeeListModal
+          isOpen={isEmployeeListOpen}
+          onClose={() => setIsEmployeeListOpen(false)}
+          setEmployee={setSelectedEmployee}
+        ></EmployeeListModal>
+
         <ProductListModal
           isOpen={isProductListOpen}
           onClose={() => setIsProductListOpen(false)}
@@ -309,11 +358,6 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           onClose={() => setIsBlanketAgreementDetailsOpen(false)}
           quotationInfo={payload}
         ></BlanketAgreementDetailsModal>
-        {/* <EmployeeListModal
-          isOpen={isEmployeeListOpen}
-          onClose={() => setIsEmployeeListOpen(false)}
-          setEmployee={setSelectedEmployee}
-        ></EmployeeListModal> */}
         {/* DETAILS */}
         <div>
           <SalesInfo
@@ -322,8 +366,10 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             customerListModal={setIsCustomerListOpen}
             setCustomerInfo={setQuotationInfo}
             operationID={q_id}
-            setDeliveryDate={setDeliveryDate}
+            setDateIssued={setDateIssued}
+            date={new Date().toISOString().split("T")[0]}
             setAddress={setAddress}
+            handleCustomerSelection={handleCustomerSelection}
           />
         </div>
         {/* TABLE */}
@@ -349,6 +395,7 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
                   setCanClear(true);
                   setIsProductListOpen(true);
                 }}
+                disabled={!isSalesRep}
               >
                 Add Item
               </Button>
@@ -359,24 +406,33 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
             {/* Employee ID Input */}
             <div className="flex mb-2 w-full mt-4 gap-4 items-center">
-              <p className="">Employee ID</p>
-              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded">
-                <p className="text-sm">{employee_id || ""}</p>
+              <p className="">Sales Rep ID</p>
+              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                <p className="text-sm">{employee_id}</p>
               </div>
             </div>
-            {/* <div className="flex items-center gap-2">
-              <p className="text-gray-700 text-sm">Employee ID</p>
-              <input
-                type="text"
-                className="border border-gray-400 flex-1 p-1 h-[30px] max-w-[250px] rounded"
-                onChange={(e) => setSelectedEmployee(e.target.value)}
-                value={selectedEmployee || ""}
-              ></input>
-            </div> */}
+
+            {/*
+
+            {IS_SALES_REP ? (
+              ""
+            ) : (
+              <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+                <p className="">Processor ID</p>
+                <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                  <p className="text-sm">{employee_id || ""}</p>
+                </div>
+              </div>
+            )} */}
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto gap-2 flex">
-              <Button type="primary" className="" onClick={handleSubmit}>
+              <Button
+                type="primary"
+                className=""
+                onClick={handleSubmit}
+                disabled={!isSalesRep}
+              >
                 Submit Quotation
               </Button>
               <Button
@@ -452,13 +508,19 @@ const Quotation = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   );
 };
 
-const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
+const BodyContent = ({
+  loadSubModule,
+  setActiveSubModule,
+  employee_id,
+  position_id,
+}) => {
   return (
     <AlertProvider>
       <Quotation
         loadSubModule={loadSubModule}
         setActiveSubModule={setActiveSubModule}
         employee_id={employee_id}
+        position_id={position_id}
       />
     </AlertProvider>
   );

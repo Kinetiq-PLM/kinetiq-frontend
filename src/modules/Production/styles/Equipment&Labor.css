@@ -1,13 +1,14 @@
 .equimaprod {
   flex: auto;
   align-items: left;
+  width: 100%;
 }
 
 
 .equimaprod-header-section {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: left;
   width: 900px;
   margin-bottom: 3px;
 
@@ -248,7 +249,7 @@
     background-color: #ffffff;
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 0;
     padding-top: 10px;
     padding-bottom: 10px;
     color: #404040;
@@ -429,7 +430,7 @@
       background-color: #ffffff;
       position: sticky;
       top: 0;
-      z-index: 2;
+      z-index: 0;
       padding-top: 10px;
       padding-bottom: 10px;
       color: #404040;

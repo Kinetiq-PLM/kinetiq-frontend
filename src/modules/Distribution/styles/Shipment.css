@@ -969,8 +969,6 @@
   color: #dc3545;
 }
 
-/* Add these new styles at the end of your Shipment.css file */
-
 .shipment .icon-spacing {
   margin-right: 8px;
   vertical-align: middle;
@@ -3256,4 +3254,138 @@
 .shipment .failure-report-modal textarea:focus:not(:focus-visible),
 .shipment .failure-report-modal button:focus:not(:focus-visible) {
   outline: none;
+}
+
+@media (max-width: 1440px) {
+  /* Remove dots but keep color-coded statuses */
+  .shipment .status-cell {
+    padding-left: 0.75rem; /* Reset the padding since we're removing the dot */
+  }
+
+  .shipment .status-cell::before {
+    display: none; /* Hide the status dot */
+  }
+  
+  /* Add background color to status cells instead */
+  .shipment .status-pending {
+    background-color: rgba(108, 117, 125, 0.1);
+  }
+  
+  .shipment .status-shipped {
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+  
+  .shipment .status-delivered {
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+  
+  .shipment .status-failed {
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+  
+  /* Style for resolution statuses in failed shipments table */
+  .shipment .status-in-progress {
+    background-color: rgba(255, 193, 7, 0.1);
+  }
+  
+  .shipment .status-resolved {
+    background-color: rgba(23, 162, 184, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Make all shipment tables horizontally scrollable */
+  .shipment .shipment-table-container,
+  .shipment .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust row padding for better touch targets */
+  .shipment .shipment-table td,
+  .shipment .shipment-table th {
+    padding: 0.85rem 0.75rem;
+  }
+  
+  /* Handle pagination better on small screens */
+  .shipment .page-numbers {
+    display: none; /* Hide page numbers, keep only prev/next */
+  }
+  
+  .shipment .pagination-info {
+    display: inline-block;
+    margin: 0 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .shipment .pagination-button {
+    min-width: 80px; /* Make buttons bigger for touch */
+  }
+  
+  /* Add touch-friendly styles for rows */
+  .shipment .shipment-table tbody tr {
+    cursor: pointer;
+  }
+
+  .shipment .shipment-table tbody tr:active {
+    background-color: rgba(0, 168, 168, 0.1);
+  }
+  
+  /* Make filters better on small screens */
+  .shipment .filters-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .shipment .search-container {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+  
+  .shipment .filter-container {
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Hide less important columns on very small screens */
+  /* For ShipmentTable */
+  .shipment .shipment-table th:nth-child(3),
+  .shipment .shipment-table td:nth-child(3),
+  .shipment .shipment-table th:nth-child(4),
+  .shipment .shipment-table td:nth-child(4),
+  .shipment .shipment-table th:nth-child(5),
+  .shipment .shipment-table td:nth-child(5) {
+    display: none;
+  }
+  
+  /* For FailedShipmentsTable */
+  .shipment .failed-shipments-table th:nth-child(3),
+  .shipment .failed-shipments-table td:nth-child(3),
+  .shipment .failed-shipments-table th:nth-child(5),
+  .shipment .failed-shipments-table td:nth-child(5) {
+    display: none;
+  }
+  
+  /* For DeliveredShipmentsTable */
+  .shipment .delivered-shipments-table th:nth-child(3),
+  .shipment .delivered-shipments-table td:nth-child(3),
+  .shipment .delivered-shipments-table th:nth-child(4),
+  .shipment .delivered-shipments-table td:nth-child(4),
+  .shipment .delivered-shipments-table th:nth-child(5),
+  .shipment .delivered-shipments-table td:nth-child(5) {
+    display: none;
+  }
+  
+  /* Make sure no-data message spans fewer columns */
+  .shipment .no-data {
+    font-size: 0.8rem;
+    padding: 1.5rem 0.5rem;
+  }
+  
+  /* Optimize the sort icons for mobile */
+  .shipment .sort-icon {
+    display: block;
+    margin: 2px auto 0;
+  }
 }

@@ -1,0 +1,553 @@
+/* ========== Base Styles ========== */
+.notifications {
+    width: 100%;
+    padding: 10px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.notifications .notifications-container {
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    max-height: calc(100vh - 140px);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    isolation: isolate;
+    /* Creates a new stacking context */
+    position: relative;
+    overflow: hidden;
+    /* Prevent content from overflowing */
+}
+
+/* ========== Typography & Headers ========== */
+.notifications .page-title {
+    margin-bottom: 0 !important;
+    color: #00a8a8;
+}
+
+.notifications .title-divider {
+    margin: 12px 0 16px !important;
+}
+
+.notifications .record-count {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ========== Tab Styles ========== */
+.notifications .tabs-wrapper {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Important for proper flex child sizing */
+  }
+  
+  .notifications .notifications-tabs {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Important for proper flex child sizing */
+  }
+  
+  .notifications .tabs-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .notifications .notifications-tabs .ant-tabs-nav {
+    margin-bottom: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #fff;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    flex-wrap: wrap;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  .notifications .notifications-tabs .ant-tabs-nav::-webkit-scrollbar {
+    display: none; /* Optional: hide scrollbar on WebKit browsers */
+  }
+  
+  .notifications .notifications-tabs .ant-tabs-nav-list {
+    display: flex;
+    width: auto;
+    flex-wrap: nowrap; /* Prevent wrapping to a new line */
+  }
+  
+  /* Improve tab selection area for better click targets */
+  .notifications .notifications-tabs .ant-tabs-tab {
+    flex: 0 0 auto;
+    margin: 0 4px;
+    padding: 8px 16px;
+    /* Increase the height for better tap targets on mobile */
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: none;
+  }
+  
+  /* Enhanced active tab styles */
+  .notifications .notifications-tabs .ant-tabs-tab.ant-tabs-tab-active {
+    background-color: rgba(0, 168, 168, 0.1);
+    border-radius: 4px;
+    transition: none;
+  }
+  
+  .notifications .notifications-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #00a8a8;
+  }
+  
+  .notifications .notifications-tabs .ant-tabs-ink-bar {
+    background: #00a8a8;
+  }
+  
+  /* Make content area take remaining space */
+  .notifications .ant-tabs-content-holder {
+    flex: 1;
+    min-height: 0; /* Allow it to shrink */
+    overflow: hidden;
+  }
+  
+  .notifications .ant-tabs-content {
+    height: 100%;
+  }
+  
+  .ant-tabs-tabpane {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* For card style tabs on mobile */
+  .notifications .notifications-tabs.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab {
+    border: 1px solid #f0f0f0;
+    background: #fafafa;
+    border-radius: 4px;
+    margin: 0 2px;
+  }
+  
+  .notifications
+    .notifications-tabs.ant-tabs-card
+    > .ant-tabs-nav
+    .ant-tabs-tab.ant-tabs-tab-active {
+    background-color: #e6f7f7;
+    border-color: #00a8a8;
+  }
+
+/* ========== Control and Header Styles ========== */
+.notifications .header-right-content {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: nowrap;
+    /* Prevent wrapping by default */
+}
+
+.notifications .search-container {
+    flex: 1;
+    min-width: 0;
+    /* Allow container to shrink below content size */
+}
+
+.notifications .search-container .ant-input-search {
+    width: 100%;
+}
+
+/* Icon-only buttons for small screens */
+.notifications .icon-only-btn {
+    padding: 0 8px;
+    min-width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========== Table Styles ========== */
+.notifications .table-container {
+    flex: 1;
+    min-height: 0;
+    padding-bottom: 10px;
+    border: 0px solid #90d7d33d;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.notifications .ant-table {
+    border-radius: 8px;
+    overflow: auto;
+}
+
+.notifications .ant-table-thead>tr>th {
+    background-color: #267979c4;
+    font-weight: 600;
+    color: #ffffff;
+    border-right: 1px solid #267979c4 !important;
+    border-bottom: 0px !important;
+}
+
+.notifications .ant-table-thead>tr>th:hover {
+    background-color: #6b9b9bc4 !important;
+    color: #ffffff !important;
+}
+
+.notifications .ant-table-column-has-sorter>th {
+    cursor: pointer;
+}
+
+.notifications .ant-table-column-sort>th {
+    background-color: #6b9b9bc4 !important;
+}
+
+.notifications .ant-table-thead>tr>th.ant-table-column-sort {
+    background-color: #7fb2b2 !important;
+    color: #ffffff !important;
+}
+
+.notifications .ant-table-thead>tr>th .ant-table-column-sorter-up.active,
+.notifications .ant-table-thead>tr>th .ant-table-column-sorter-down.active {
+    color: #6f9090c4 !important;
+}
+
+.notifications .ant-table-thead>tr>th .ant-table-column-sorter-up,
+.notifications .ant-table-thead>tr>th .ant-table-column-sorter-down {
+    color: #4a6e6ec4;
+    /* dim inactive arrow */
+}
+
+.notifications .ant-table-tbody>tr>td {
+    border-right: 1px solid #cce3e3 !important;
+    border-bottom: 1px solid #cce3e3 !important;
+}
+
+.notifications .ant-table-thead>tr>th:last-child,
+.notifications.ant-table-tbody>tr>td:last-child {
+    border-right: none !important;
+}
+
+.notifications .ant-table-tbody>tr:nth-child(odd)>td {
+    background-color: #ffffffe8;
+}
+
+.notifications .ant-table-tbody>tr:nth-child(even)>td {
+    background-color: #f3f9f9;
+}
+
+.notifications .ant-table-tbody>tr:hover>td {
+    background-color: #d5e5e5 !important;
+}
+
+.notifications .ant-table-tbody>tr.ant-table-row-selected>td {
+    background-color: #d9f0f0 !important;
+}
+
+.notifications .table-meta-info {
+    padding: 4px 0;
+    color: #666;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ========== Search & Filter Controls ========== */
+.notifications .table-search-container {
+    min-width: 200px;
+    flex-grow: 1;
+}
+
+.notifications .table-search-container .ant-input-search {
+    max-width: 300px;
+}
+
+/* ========== Pagination Styles ========== */
+.ant-pagination-item-active {
+    border-color: #00a8a8 !important;
+}
+
+.ant-pagination-item-active a {
+    color: #00a8a8 !important;
+}
+
+.ant-pagination-item:hover:not(.ant-pagination-item-active) {
+    border-color: #00a8a8;
+}
+
+.ant-pagination-item:hover:not(.ant-pagination-item-active) a {
+    color: #00a8a8;
+}
+
+.ant-pagination-item-active:hover {
+    border-color: #00a8a8 !important;
+}
+
+.ant-pagination-item-active:hover a {
+    color: #00a8a8 !important;
+}
+
+.ant-pagination-prev:hover .ant-pagination-item-link,
+.ant-pagination-next:hover .ant-pagination-item-link {
+    border-color: #00a8a8;
+    color: #00a8a8;
+}
+
+.ant-pagination-jump-prev:hover .ant-pagination-item-link-icon,
+.ant-pagination-jump-next:hover .ant-pagination-item-link-icon,
+.ant-pagination-jump-prev:hover .ant-pagination-item-ellipsis,
+.ant-pagination-jump-next:hover .ant-pagination-item-ellipsis {
+    color: #00a8a8;
+}
+
+.ant-pagination-options-quick-jumper input:hover,
+.ant-pagination-options-quick-jumper input:focus {
+    border-color: #00a8a8;
+}
+
+/* ========== Button Styles ========== */
+.notifications .ant-btn-primary,
+.custom-modal .ant-btn-primary {
+    background-color: #00a8a8;
+    border-color: #00a8a8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus,
+.custom-modal .ant-btn-primary:hover,
+.custom-modal .ant-btn-primary:focus {
+    background-color: #55cfcf !important;
+    border-color: #55cfcf !important;
+    color: #fff !important;
+}
+
+/* ========== Scroll Bar Styles ========== */
+.log-container::-webkit-scrollbar,
+.scrollable-table .ant-table-body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.log-container::-webkit-scrollbar-track,
+.scrollable-table .ant-table-body::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+.log-container::-webkit-scrollbar-thumb,
+.scrollable-table .ant-table-body::-webkit-scrollbar-thumb {
+    background: #00a8a8;
+    border-radius: 4px;
+}
+
+.log-container::-webkit-scrollbar-thumb:hover,
+.scrollable-table .ant-table-body::-webkit-scrollbar-thumb:hover {
+    background: #008080;
+}
+
+/* Firefox scrollbar */
+.log-container,
+.scrollable-table .ant-table-body {
+    scrollbar-width: thin;
+    scrollbar-color: #00a8a8 #f0f0f0;
+}
+
+/* ========== Responsive Styles ========== */
+@media (max-width: 992px) {
+    .notifications .log-container {
+        padding: 12px;
+    }
+
+    .notifications .ant-tabs-tab {
+        padding: 8px 12px !important;
+    }
+
+    .notifications .header-right-content {
+        gap: 8px;
+    }
+
+    .notifications .search-container {
+        max-width: 220px;
+    }
+}
+
+@media (max-width: 820px) {
+    .notifications {
+        padding: 8px;
+    }
+
+    .notifications .log-container {
+        padding: 8px;
+        border-radius: 4px;
+        overflow-x: hidden;
+    }
+
+    /* Compact header to save space */
+    .notifications .page-title {
+        font-size: 18px !important;
+    }
+
+    .notifications .title-divider {
+        margin: 8px 0 12px !important;
+    }
+
+    /* Make the search and buttons more compact */
+    .notifications .header-right-content {
+        flex-wrap: nowrap;
+        width: auto;
+        align-items: center;
+    }
+
+    .notifications .search-container {
+        max-width: 150px;
+        min-width: 100px;
+    }
+
+    /* Make table meta info more compact */
+    .notifications .table-meta-info {
+        padding: 4px 0;
+        margin-bottom: 4px;
+    }
+
+    .notifications .record-count {
+        font-size: 12px;
+    }
+
+    /* Make tabs more touch-friendly but compact */
+    .notifications .ant-tabs-nav {
+        margin-bottom: 8px;
+    }
+
+    .notifications .ant-tabs-tab {
+        padding: 6px 4px !important;
+        min-height: 36px;
+    }
+
+    /* Make icons more prominent on mobile when text is hidden */
+    .notifications .ant-tabs-tab .anticon {
+        font-size: 16px;
+        margin-right: 0;
+    }
+
+    /* Special mobile layout for tab navigation area */
+    .notifications .ant-tabs-nav-wrap {
+        flex: 1;
+    }
+
+    .notifications .ant-tabs-extra-content {
+        flex: 2;
+    }
+}
+
+@media (max-width: 576px) {
+    .notifications .log-container {
+        max-height: calc(100vh - 120px);
+        padding: 8px 4px;
+    }
+
+    .notifications .ant-table-cell {
+        padding: 6px 4px !important;
+        white-space: nowrap;
+    }
+
+    /* Stack search and buttons for very small screens */
+    .notifications .header-right-content {
+        flex-direction: row;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .notifications .search-container {
+        max-width: 120px;
+        min-width: 80px;
+    }
+
+    .notifications .ant-input-search .ant-input {
+        padding-right: 4px !important;
+    }
+
+    .notifications .ant-input-search .ant-input-suffix {
+        right: 4px !important;
+    }
+
+    /* Shrink buttons to icon-only */
+    .notifications .ant-btn {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 8px;
+    }
+
+    .notifications .ant-btn .anticon {
+        font-size: 14px;
+    }
+
+    /* Compact pagination */
+    .notifications .table-pagination .ant-pagination {
+        display: flex;
+        justify-content: center;
+    }
+
+    .notifications .table-pagination .ant-pagination-item,
+    .notifications .table-pagination .ant-pagination-prev,
+    .notifications .table-pagination .ant-pagination-next {
+        margin: 0 2px;
+        min-width: 24px;
+        height: 24px;
+        line-height: 22px;
+    }
+
+    /* Reduce space between tab nav and content */
+    .notifications .ant-tabs-nav {
+        margin-bottom: 4px;
+    }
+
+    /* Reduce page title size further */
+    .notifications .page-title {
+        font-size: 16px !important;
+    }
+
+    .notifications .title-divider {
+        margin: 6px 0 8px !important;
+    }
+}
+
+@media (max-width: 820px) {
+    .notifications .ant-tabs-content {
+        max-height: 100vh;
+        overflow-y: auto;
+        transition: none !important;
+    }
+
+    .notifications .ant-tabs-tabpane {
+        height: auto !important;
+        overflow-y: auto;
+    }
+
+    .notifications .ant-tabs-tabpane-hidden {
+        display: none !important;
+    }
+}

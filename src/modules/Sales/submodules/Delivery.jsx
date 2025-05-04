@@ -25,6 +25,9 @@ import generateRandomID from "../components/GenerateID.jsx";
 import OrderedProductList from "../components/Modals/Lists/OrderedProductList.jsx";
 
 const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
+  // TEMPORARY CONSTANT VALUE FOR EMPLOYEE LOGGED IN
+  const IS_SALES_REP = false;
+
   const { showAlert } = useAlert();
 
   const copyFromOptions = ["Order"];
@@ -46,6 +49,10 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [address, setAddress] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
 
+  const [dateIssued, setDateIssued] = useState("");
+  const [dateDelivery, setDateDelivery] = useState("");
+  const [datePosted, setDatePosted] = useState("");
+
   const [selectedProduct, setSelectedProduct] = useState();
   const [selectedCustomer, setSelectedCustomer] = useState("");
 
@@ -66,17 +73,24 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
     { key: "product_name", label: "Product Name", editable: false },
+    {
+      key: "warehouse",
+      label: "Warehouse",
+      editable: false,
+      dropdown: true,
+    },
     { key: "special_requests", label: "Specification", editable: false },
     { key: "quantity", label: "Quantity" },
     { key: "selling_price", label: "Price", editable: false },
     { key: "tax", label: "Tax", editable: false },
-    { key: "discount", label: "Discount" },
+    { key: "discount", label: "Discount", editable: false },
     { key: "total_price", label: "Total Price", editable: false },
   ];
 
   // the products customer chose
   const [products, setProducts] = useState([]);
   const [initialProducts, setInitialProducts] = useState([]);
+  const [isSalesRep, setIsSalesRep] = useState(false);
 
   const [deliveryInfo, setDeliveryInfo] = useState({
     customer_id: "",
@@ -103,8 +117,11 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             Number(item.quantity) - Number(item.quantity_to_deliver) > 0
         )
         .map((item) => ({
-          product_id: item.product.product_id,
-          product_name: item.product.product_name,
+          product_id: item.inventory_item.item.item_id,
+          product_name: item.inventory_item.item.item_name,
+          warehouse: item.inventory_item.warehouse.warehouse_name,
+          inventory_item: item.inventory_item.inventory_item_id,
+          inventory_item_id: item.inventory_item.inventory_item_id,
           special_requests: item.special_requests,
           quantity: Number(item.quantity) - Number(item.quantity_to_deliver),
           selling_price: Number(item.unit_price),
@@ -141,6 +158,16 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     mutationFn: async (data) => await POST("sales/delivery/", data),
     onSuccess: (data, variables, context) => {
       setDeliveryID(data.delivery_note_id);
+      showAlert({
+        type: "success",
+        title: "Delivery Submitted",
+      });
+    },
+    onError: (error) => {
+      showAlert({
+        type: "error",
+        title: "An error occurred while creating delivery: " + error.message,
+      });
     },
   });
 
@@ -191,10 +218,11 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         order_id,
         shipping_method: "Standard", // drop down needed
         shipment_status: "Pending",
-        preferred_delivery_date: deliveryDate,
+        posting_date: datePosted,
+        preferred_delivery_date: dateDelivery,
         items: products.map((product, index) => {
           return {
-            product: product.product_id,
+            inventory_item: product.inventory_item_id,
             special_requests: product.special_requests,
             quantity: parseInt(product.quantity),
             quantity_to_deliver: parseInt(product.quantity),
@@ -207,20 +235,17 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
       },
       statement_data: {
         customer: selectedCustomer.customer_id,
-        salesrep: employee_id,
+        salesrep: selectedEmployee ? selectedEmployee.employee_id : employee_id,
         total_amount: Number(parseFloat(deliveryInfo.total_price).toFixed(2)),
         discount: Number(parseFloat(deliveryInfo.discount).toFixed(2)),
         total_tax: Number(parseFloat(deliveryInfo.total_tax).toFixed(2)),
         subtotal: Number(deliveryInfo.total_before_discount.toFixed(2)),
       },
     };
+    console.log(request);
     deliveryMutation.mutate(request);
     // INSERT LOGIC HERE TO ADD QUOTATION TO DATABASE
     setSubmitted(true);
-    showAlert({
-      type: "success",
-      title: "Delivery Submitted",
-    });
   };
 
   const transferData = () => {
@@ -398,6 +423,26 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
     if (selectedCustomer != "") setCanClear(true);
   }, [selectedCustomer]);
 
+  function handleCustomerSelection() {
+    setIsCustomerListOpen(true);
+  }
+
+  useEffect(() => {
+    const get = async () => {
+      try {
+        const res = await GET(`misc/employee/${employee_id}`);
+        if (["REG-2504-6039"].includes(res.position_id) || res.is_supervisor) {
+          setIsSalesRep(true);
+        }
+      } catch (err) {
+        showAlert({
+          type: "error",
+          title: "An error occurred while fetching employee: " + err.message,
+        });
+      }
+    };
+    get();
+  }, []);
   return (
     <div className="delivery">
       <div className="body-content-container">
@@ -409,11 +454,18 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
         <CustomerListModal
           isOpen={isCustomerListOpen}
+          isNewCustomerModalOpen={isNewCustomerModalOpen}
           onClose={() => setIsCustomerListOpen(false)}
           newCustomerModal={setIsNewCustomerModalOpen}
-          setSelectedCustomer={setSelectedCustomer}
           setCustomer={setSelectedCustomer}
+          employee={selectedEmployee}
         ></CustomerListModal>
+
+        <EmployeeListModal
+          isOpen={isEmployeeListOpen}
+          onClose={() => setIsEmployeeListOpen(false)}
+          setEmployee={setSelectedEmployee}
+        ></EmployeeListModal>
 
         <NewCustomerModal
           isOpen={isNewCustomerModalOpen}
@@ -435,12 +487,6 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
           setInitialProducts={setInitialProducts}
           order={selectedOrder}
         />
-        {/* 
-        <EmployeeListModal
-          isOpen={isEmployeeListOpen}
-          onClose={() => setIsEmployeeListOpen(false)}
-          setEmployee={setSelectedEmployee}
-        ></EmployeeListModal> */}
 
         {/* DETAILS */}
         <div>
@@ -450,8 +496,12 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             customerListModal={null}
             setCustomerInfo={setDeliveryInfo}
             operationID={deliveryID}
-            setDeliveryDate={setDeliveryDate}
+            setDateIssued={setDateIssued}
+            setDatePosted={setDatePosted}
+            setDateDelivery={setDateDelivery}
+            dataIssued={dateIssued}
             setAddress={setAddress}
+            handleCustomerSelection={handleCustomerSelection}
           />
         </div>
         {/* TABLE */}
@@ -487,11 +537,26 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
             {/* Employee ID Input */}
             <div className="flex mb-2 w-full mt-4 gap-4 items-center">
-              <p className="">Employee ID</p>
-              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded">
-                <p className="text-sm">{employee_id || ""}</p>
+              <p className="">Sales Rep ID</p>
+              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                <p className="text-sm">
+                  {selectedEmployee
+                    ? selectedEmployee.employee_id
+                    : employee_id}
+                </p>
               </div>
             </div>
+
+            {isSalesRep ? (
+              ""
+            ) : (
+              <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+                <p className="">Processor ID</p>
+                <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                  <p className="text-sm">{employee_id || ""}</p>
+                </div>
+              </div>
+            )}
 
             {/* Submit Button Aligned Right */}
             <div className="mt-auto gap-2 flex">

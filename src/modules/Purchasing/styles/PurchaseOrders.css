@@ -400,7 +400,7 @@
   background: white;
   border-radius: 8px;
   padding: 2rem;
-  width: 90%;
+  width: 40%;
   max-width: 800px;
   position: relative;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -432,8 +432,7 @@
 
 .purchord-modal-body {
   display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 2rem;
+  grid-template-columns:1fr;
 }
 
 .purchord-modal-image-container {
@@ -560,4 +559,10 @@
   resize: none;
   width: 100%;
   border: 1px solid #ddd;
+}
+
+.label-req label:after {
+  content: "*";
+  color: red;
+  margin-left: 2px;
 }

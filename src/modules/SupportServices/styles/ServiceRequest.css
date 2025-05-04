@@ -1,5 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
 
+.servrequ {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
 .servrequ .body-content-container {
   width: 100%;
   height: 100%;
@@ -9,46 +15,130 @@
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  position: relative;
+  min-width: 40rem;
+  min-height: 30rem;
 }
 
-/* Scrollable content area */
+/* Hide scrollbar arrows unless hovered */
 .servrequ .content-scroll-area {
   flex: 1;
   overflow-y: auto;
-  padding-right: 0.5rem;
-  margin-right: -0.5rem;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
   border-radius: 8px;
   box-shadow: 0rem 0.2rem 0.1rem rgba(162, 162, 162, 0.1);
   padding: 1rem;
   border: 1px solid #e0e0e0;
-  max-height: calc(100% - 7rem);
-  margin-top: 2rem;
+}
+
+/* Fixed tabs container */
+.servrequ .fixed-tabs-container {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 0;
+  padding-top: 1rem;
+}
+
+
+
+/* Tabs styling */
+.servrequ .tabs-container {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.servrequ .filter-tabs-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.servrequ .tab {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  transition: background-color ease 0.3s;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.servrequ .tab:hover {
+  background-color: #d6f5f5;
+}
+
+.servrequ .tab.active {
+  color: #00a8a8;
+  border-bottom: 2px solid #00a8a8;
+}
+
+.servrequ .tab-content {
+  margin-bottom: 1.5rem;
+}
+
+.servrequ .request-tab-content {
+  display: flex;
+  gap: 1rem;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.servrequ .input-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+
+
+/* TABLE STYLINGS */
+
+.servrequ .search-filter-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .servrequ .filter-options {
   position: absolute;
   top: 100%;
   right: 0;
-  width: 150px;
+  width: 130px;
   background-color: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e8e8e8;
   border-radius: 0.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 4;
   margin-top: 0.25rem;
 }
 
-.servrequ .requests-table {
+.servrequ .table-container {
   width: 100%;
+  margin-bottom: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  max-height: 270px;
+  overflow-y: auto;
+  display: block;
+  position: relative;
+}
+
+.servrequ .request-table {
+ width: 100%;
   border-collapse: collapse;
   font-family: "Inter", sans-serif;
 }
 
-.servrequ .requests-table thead {
+.servrequ .request-table thead {
   position: sticky;
   top: 0;
   background-color: #00a8a8; 
@@ -56,19 +146,109 @@
   z-index: 0;
 }
 
-.servrequ thead {
-  background-color: #00a8a8;
-  color: white;
-}
-
-.servrequ th {
+.servrequ .request-table th {
   padding: 0.75rem 1rem;
   text-align: center;
   font-weight: 500;
   font-size: 0.875rem;
 }
 
-.servrequ td {
+.servrequ .request-table td {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.servrequ .request-table tbody tr {
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+.servrequ .request-table tbody tr:hover {
+  background-color: #d6f5f5;
+}
+
+.servrequ .request-table .selected-row {
+  background-color: #d6f5f5;
+}
+
+.servrequ .request-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.servrequ .request-table .empty-row td {
+  height: 2.5rem;
+}
+
+
+/* ANALYSIS TAB STYLING */
+
+.servrequ  input:disabled,
+.servrequ  textarea:disabled {
+  background-color: #f0f0f0; 
+  opacity: 0.6; 
+}
+
+.servrequ .disabled-input {
+  background-color: #f5f5f5;
+  color: #999;
+}
+
+
+/* SERVICE ORDER TAB STYLING */
+
+.servrequ .items-button-right {
+  display: flex;
+  gap: 1rem;
+}
+
+.servrequ .service-order-items-section {
+  margin-top: 1.5rem;
+}
+
+.servrequ .service-order-items-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #00a8a8;
+}
+
+.servrequ .service-order-table-container {
+  width: 100%;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  max-height: 270px;
+  overflow-y: auto;
+  display: block;
+  position: relative;
+}
+
+.servrequ .service-order-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-family: "Inter", sans-serif;
+}
+
+.servrequ .service-order-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 0;
+}
+
+.servrequ .service-order-table th {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.servrequ .service-order-table td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #e0e0e0;
   font-size: 0.875rem;
@@ -76,134 +256,498 @@
   text-align: center;
 }
 
-.servrequ tbody tr {
+.servrequ .service-order-table .selected-row {
+  background-color: #d6f5f5;/* light teal */
+}
+
+.servrequ .service-order-table tbody tr {
   background-color: #ffffff;
   transition: background-color 0.3s ease;
 }
 
-.servrequ tbody tr:hover {
+.servrequ .service-order-table tbody tr:hover {
   background-color: #d6f5f5;
 }
 
-.servrequ .requests-table .selected-row {
-  background-color: #d6f5f5;
-}
-.servrequ tbody tr:last-child td {
+.servrequ .service-order-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.servrequ .empty-row td {
+.servrequ .service-order-table .empty-row td {
   height: 2.5rem;
+}
+
+.servrequ .item-buttons-left {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.servrequ .delete-item-button,
+.servrequ .edit-item-button,
+.servrequ .add-item-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+}
+
+.servrequ .delete-item-button {
+  background-color: #ff6b6b;
+}
+
+.servrequ .delete-item-button:hover {
+  background-color: #ff5252;
+}
+
+.servrequ .edit-item-button:hover,
+.servrequ .add-item-button:hover {
+  background-color: #098f8f;
+}
+
+.servrequ .add-item-button:disabled,
+.servrequ .edit-item-button:disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
+.servrequ .delete-item-button:disabled {
+  background-color: white;
+  color: #ff5252;
+  border: 1px solid #ff5252;
+  cursor: not-allowed;
+}
+
+
+.servrequ .inventory-filter-container {
+  margin-bottom: 1rem !important;
+  margin-top: 0rem !important;
+}
+/* Inventory modal styling */
+.servrequ .inventory-table-container {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  max-height: 250px;
+  overflow-y: auto;
+  display: block;
+  position: relative;
+}
+
+.servrequ .inventory-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: "Inter", sans-serif;
+}
+
+.servrequ .inventory-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 3;
+}
+
+.servrequ .inventory-table  th {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.servrequ .inventory-table  td {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.servrequ .inventory-table  tbody tr {
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+.servrequ .inventory-table tbody tr:hover {
+  background-color: #d6f5f5;
+}
+
+.servrequ .inventory-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.servrequ .inventory-table .empty-row td {
+  height: 2.5rem;
+}
+
+.servrequ .inventory-request-section {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 0.5rem;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+}
+
+.servrequ .inventory-buttons-left {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.servrequ .view-inventory-button,
+.servrequ .purchase-request-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  align-self: flex-start; /* prevent full width stretch */
+  width: auto; 
+}
+
+.servrequ .view-inventory-button:hover {
+  background-color: #098f8f;
+}
+
+.servrequ .purchase-request-button:hover {
+  background-color: #098f8f;
+}
+
+/* Edit Item Modal styling */
+.servrequ .edit-item-modal {
+  max-width: 700px;
+}
+
+
+/* Buttons container */
+.servrequ .buttons-container-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.servrequ .buttons-container-right-delorder {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.servrequ .buttons-container-left {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.servrequ .update-button,
+.servrequ .add-button,
+.servrequ .schedule-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  height: 2.5rem;
+  min-width: 7rem;
+}
+
+.servrequ .update-button:hover,
+.servrequ .add-button:hover,
+.servrequ .schedule-button:hover {
+  background-color: #098f8f;
+}
+
+.servrequ .update-button:active,
+.servrequ .add-button:active,
+.servrequ .schedule-button:active {
+  background-color: #087d7d;
+}
+
+.servrequ .add-button:disabled {
+  background-color: white;
+  color: #00a8a8;
+  border: 1px solid #00a8a8;
+  cursor: not-allowed;
+}
+
+.servrequ .table-buttons {
+  margin-top: 0.5rem;
 }
 
 .servrequ .modal-container {
   background-color: white;
   border-radius: 0.5rem;
   width: 100%;
-  max-width: 100vh;
-  max-height: 80vh;
+  max-width: 800px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
 }
 
 .servrequ .modal-content {
   padding: 1.5rem;
   flex: 1;
   overflow-y: auto;
-  max-height: calc(90vh - 120px);
   scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
+  scrollbar-color: #00a8a8 #f0f0f0;
 }
 
 .servrequ .modal-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(7, auto);
-  gap: 1rem 2rem;
-}
-
-.servrequ .modal-form .status-group {
-  grid-column: 2;
-  grid-row: 5;
-}
-
-.servrequ .modal-form .type-group {
-  grid-column: 2;
-  grid-row: 6;
-}
-
-.servrequ .modal-form .description-group {
-  grid-column: 1;
-  grid-row: 6 / span 2;
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
 }
 
-.servrequ .modal-form .remarks-group {
-  grid-column: 2;
-  grid-row: 7;
+.servrequ .form-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
 }
 
-.servrequ .modal-form .description-group textarea,
-.servrequ .modal-form .remarks-group textarea {
-  height: 8rem;
-  flex-grow: 1;
+.servrequ .form-row .form-group {
+  flex: 1;
 }
 
 .servrequ .form-group input:focus,
 .servrequ .form-group textarea:focus,
 .servrequ .form-group select:focus {
   outline: none;
-  border-color: #00a8a8;
+  border: 2px solid #00a8a8; /* Thicker border when focused */
 }
 
 .servrequ .form-group textarea {
+  height: 13rem !important;
   resize: none;
+}   
+
+.servrequ .description-group textarea {
+  height: 12rem !important;
+  resize: none;
+}  
+
+
+.servrequ textarea.description-textarea {
+  height: 12rem !important; /* Match the height of two input fields plus gap */
 }
 
-.servrequ .type-dropdown-list{
+.servrequ .item-list {
+  max-height: 100px;
+}
+
+.servrequ .modal-form-request {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(7, auto);
+  gap: 1rem 2rem;
+}
+
+.servrequ .modal-form-request .status-group {
+  grid-column: 2;
+  grid-row: 5;
+}
+
+.servrequ .modal-form-request .type-group {
+  grid-column: 2;
+  grid-row: 6;
+}
+
+.servrequ .modal-form-request .description-group {
+  grid-column: 1;
+  grid-row: 6 / span 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.servrequ .modal-form-request .remarks-group {
+  grid-column: 2;
+  grid-row: 7;
+}
+
+.servrequ .modal-form-request .description-group textarea,
+.servrequ .modal-form-request .remarks-group textarea {
+  height: 8rem;
+  flex-grow: 1;
+}
+
+.servrequ .status-dropdown-list {
   top: auto !important;
   bottom: 100% !important;
 }
 
 /* Responsive adjustments */
+@media (max-width: 992px) {
+  .servrequ .body-content-container {
+    min-width: auto;
+    max-height: none;
+    padding: 1.25rem;
+  }
+
+  .servrequ .modal-container {
+    max-width: 90%;
+  }
+  .servrequ .update-analysis-modal {
+    width: auto;
+    min-width: 70%;
+  }
+}
+
 @media (max-width: 768px) {
+  .servrequ .search-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .servrequ .search-input-wrapper {
+    margin-right: 0;
+  }
+
+  .servrequ .filter-dropdown {
+    width: 100%;
+  }
+
+  .servrequ .filter-button {
+    width: 100%;
+  }
+
+  .servrequ .table-container {
+    overflow-x: auto;
+  }
+
+  .servrequ .request-table {
+    min-width: 600px;
+  }
+
+  .servrequ .form-row {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: stretch;
+  }
+
+  .servrequ .buttons-container-right {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
   .servrequ .search-filter-container {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
   }
 
-  .servrequ .search-container {
-    max-width: none;
+  .servrequ .tabs-container {
+    justify-content: left;
+    overflow-x: auto;
   }
 
-  .servrequ .modal-form {
-    grid-template-columns: 1fr;
-  }
-
-  .servrequ .modal-form .description-group,
-  .servrequ .modal-form .status-group,
-  .servrequ .modal-form .type-group,
-  .servrequ .modal-form .remarks-group {
-    grid-column: 1;
-  }
-
-  .servrequ .modal-form .description-group {
-    grid-row: auto;
-  }
-
-  .servrequ .modal-form .status-group {
-    grid-row: auto;
-  }
-
-  .servrequ .modal-form .type-group {
-    grid-row: auto;
-  }
-
-  .servrequ .modal-form .remarks-group {
-    grid-row: auto;
-  }
+  .servrequ .item-buttons-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
 }
 
+}
+
+@media (max-width: 480px) {
+  .servrequ .body-content-container {
+    padding: 1rem;
+  }
+
+  .servrequ .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .servrequ .title-container {
+    width: 100%;
+  }
+
+  .servrequ .modal-header,
+  .servrequ .modal-content,
+  .servrequ .modal-footer {
+    padding: 1rem;
+  }
+
+  .servrequ .buttons-container-right-delorder {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+}
+}
+
+.servrequ .input-fields-container {
+  display: flex;
+  gap: 2rem;
+}
+
+.servrequ .form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.servrequ .update-analysis-modal {
+  max-width: 900px;
+}
+
+.servrequ .item-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.servrequ .item-buttons-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.servrequ .inner-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 0.75rem;
+}
+
+.servrequ .no-order-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif;
+  color: #f44336;
+}
+
+.servrequ .add-cancel-button{
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}

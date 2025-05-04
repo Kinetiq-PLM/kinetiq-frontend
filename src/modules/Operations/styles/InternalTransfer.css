@@ -17,60 +17,66 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    min-width: 400px;
+    min-width: auto; 
     min-height: unset;
     overflow: hidden;
-}
+  }
 
 .InternalTransfer .table-container,
 .InternalTransfer.rework .table-container {
-    width: 100%;
-    height: 492px;
-    position: relative;
-    background: white;
-    border-radius: 8px;
-    padding: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    max-width: 100%;
-    overflow: hidden;
+  width: 100%;
+  height: 492px;
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 0 1.1rem 0.5rem 1.1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-size: 0.875rem;
+  max-width: 100%;
+  overflow: auto; 
 }
+
 
 .InternalTransfer .table-container table {
     width: 100%;
     height: 100%;
     border-collapse: collapse;
+    display: table;
 }
-
-.InternalTransfer .table-container thead {
-    position: sticky;
-    top: 0;
-    background: #f8f9fa;
-    z-index: 2;
+.InternalTransfer .table-container {
+    overflow: auto; /* Scroll on the container */
 }
-
-.InternalTransfer .table-container tbody {
-    display: block;
-    overflow-y: auto;
-    height: calc(100% - 40px);
+.InternalTransfer .table-container table {
     width: 100%;
-}
+    table-layout: fixed;
+    min-width: 600px;
+  }
+.InternalTransfer .table-container thead {
+    width: 100%;
+    top: 0;
+    background: white;
+
+  }
+
+  .InternalTransfer .table-container tbody {
+    display: table-row-group;
+  }
 
 .InternalTransfer .table-container thead tr {
-    display: table;
     width: 100%;
+    display: table;
     table-layout: fixed;
 }
 
+
 .InternalTransfer .table-container tbody tr {
-    display: table;
     width: 100%;
+    display: table;
     table-layout: fixed;
 }
 
 .InternalTransfer table th {
-    background: #f8f9fa;
+    background: white;
     padding: 0.75rem;
     font-size: 0.875rem;
     color: #495057;
@@ -93,40 +99,92 @@
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+    overflow: auto; 
+  }
+  
 
+/* PERFECTLY CENTERED CHECKBOX STYLING */
 .InternalTransfer input[type="checkbox"] {
     appearance: none;
-    width: 16px;
-    height: 16px;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
     border: 2px solid #008080;
     background-color: white;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
-    margin: 0 auto;
-    display: block;
+    margin: 0;
+    position: relative;
+
+    transition: all 0.2s ease;
 }
 
 .InternalTransfer input[type="checkbox"]:checked {
     background-color: #008080;
-    border-color: #006666;
-    position: relative;
+    border-color: #008080;
 }
 
 .InternalTransfer input[type="checkbox"]:checked::after {
-    content: "✔";
-    font-size: 12px;
-    color: white;
-    font-weight: bold;
+    content: "";
     position: absolute;
-    left: 3px;
-    top: 0px;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: translate(-50%, -60%) rotate(45deg);
+}
+
+/* FIXED TABLE CELL STYLING */
+.InternalTransfer table th:first-child {
+    width: 50px;
+    padding: 0;
+    position: relative;
+    height: 100%;
+}
+.InternalTransfer table td:first-child {
+    width: 50px;
+    position: relative;
+    height: 100%;
+     
+}
+.InternalTransfer table th:nth-child(2) {
+    width: 15em;
+    padding: 0.75rem;
+    position: relative;
+    height: 100%;
+}
+
+.InternalTransfer table td:nth-child(2) {
+    width: 15em;
+    padding: 0.75rem;
+    position: relative;
+    height: 100%;
+}
+
+.InternalTransfer table td {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    color: #212529;
+    border-bottom: 1px solid #f1f1f1;
+    vertical-align: middle;
+    width: 10em;
+}
+
+.InternalTransfer table td:first-child {
+    width: 50px;
+    padding: 0.5rem;
+    text-align: center;
+    vertical-align: middle;
+
 }
 
 .InternalTransfer .input-group {
     display: flex;
     flex-direction: column;
-    width: 30%;
+    width: calc(50% - 0.5rem); 
+    min-width: 150px; 
 }
 
 .InternalTransfer .input-group label {
@@ -137,11 +195,12 @@
 
 .InternalTransfer .input-row {
     display: flex;
+    flex-wrap: wrap; 
     justify-content: space-between;
     margin-bottom: 1rem;
     align-items: center;
-    gap: 3.9rem;
-}
+    gap: 1rem; 
+  }
 
 .InternalTransfer .input-container-wrapper {
     display: flex;
@@ -150,34 +209,14 @@
     width: 100%;
 }
 
-@media only screen and (max-width: 600px) {
-    .InternalTransfer .input-container {
-        grid-template-columns: repeat(6, 1fr);
-    }
-    .InternalTransfer .send-to-button {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-@media only screen and (min-width: 600px) {
-    .InternalTransfer .input-container {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
-
-@media only screen and (min-width: 768px) {
-    .InternalTransfer .input-container {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
-
 .InternalTransfer .first-row {
     justify-content: flex-start;
 }
 
 .InternalTransfer .short-input {
-    width: 14rem !important;
+    width: 14rem ;
+    min-width: 10rem;
+    overflow-x: scroll;
 }
 
 .InternalTransfer .input-group input {
@@ -185,7 +224,7 @@
     border: 0.0625rem solid #ccc;
     border-radius: 0.25rem;
     font-size: 0.875rem;
-    width: 100%;
+
 }
 
 .InternalTransfer .input-group input[type="date"] {
@@ -195,12 +234,6 @@
     background-size: 16px;
     cursor: pointer;
     padding-right: 1.875rem;
-}
-
-.InternalTransfer .button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 1rem;
 }
 
 .InternalTransfer .button-container {
@@ -225,7 +258,8 @@
 }
 
 .InternalTransfer .module-dropdown {
-    width: 250px;
+    width: 14rem;
+    min-width: 10rem;
     height: 30px;
     padding: 5px;
     border: 1px solid #ccc;
@@ -241,7 +275,7 @@
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    pointer-events: down;
+    pointer-events: none;
 }
 
 .InternalTransfer .module-dropdown:hover {
@@ -252,9 +286,8 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    border-bottom: 1px solid #ddd;
     width: 100%;
-    margin-bottom: 0.5rem;
+    padding: 1.1em;
 }
 
 .InternalTransfer .tab {
@@ -282,26 +315,169 @@
     background-color: #00A8A8;
 }
 
-.InternalTransfer .table-container tbody::-webkit-scrollbar {
+.InternalTransfer .table-container::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
 
-.InternalTransfer .table-container tbody::-webkit-scrollbar-track {
+.InternalTransfer .table-container::-webkit-scrollbar-track {
     background: #f1f1f1;
 }
 
-.InternalTransfer .table-container tbody::-webkit-scrollbar-thumb {
+.InternalTransfer .table-container::-webkit-scrollbar-thumb {
     background: #00A8A8;
     border-radius: 3px;
 }
 
-.InternalTransfer .table-container tbody::-webkit-scrollbar-thumb:hover {
+.InternalTransfer .table-container::-webkit-scrollbar-thumb:hover {
     background: #008080;
 }
 
-.InternalTransfer table td:first-child,
-.InternalTransfer table th:first-child {
-    width: 50px;
-    padding: 0.5rem;
+.InternalTransfer .input-container::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.InternalTransfer .input-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.InternalTransfer .input-container::-webkit-scrollbar-thumb {
+    background: #00A8A8;
+    border-radius: 3px;
+}
+
+.InternalTransfer .input-container::-webkit-scrollbar-thumb:hover {
+    background: #008080;
+}
+
+.text-center {
     text-align: center;
+}
+
+.InternalTransfer .req-input{
+    background-color: #F8F8F8;
+}
+.InternalTransfer .item-number input[type="number"]::-webkit-inner-spin-button {
+    background-color: #0d9488; 
+    filter: invert(1); 
+    height: auto;
+  }
+
+/*
+@media only screen and (max-width: 600px) {
+    .InternalTransfer .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .InternalTransfer .send-to-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    .InternalTransfer .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media only screen and (min-width: 768px) {
+    .InternalTransfer .input-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}*/
+
+/* Media query for smaller tablets */
+@media (max-width: 768px) {
+    .InternalTransfer .body-content-container {
+      padding: 0.75rem; /* Reduced padding */
+      width: 100%;
+      min-width: auto;
+    }
+    .InternalTransfer .details-grid {
+      padding: 0.75rem; /* Reduced padding */
+      width: 100%;
+      min-width: auto;
+      overflow-x: auto;
+    }
+    .InternalTransfer .detail-row input{
+      min-width: 7rem;
+    }
+    .InternalTransfer .header-container h2 {
+      font-size: 1.25rem; /* Smaller heading */
+    }
+    .InternalTransfer .table-container{
+      overflow-x: auto;
+      overflow-y: auto;
+    }
+    .InternalTransfer.rework .table-container {
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+    .InternalTransfer .form-group span{
+      font-size: 0.9rem;
+      white-space: nowrap;      
+      overflow-x: auto;   
+      overflow-y: hidden;      
+      overflow-wrap: normal;     
+      display: inline-block;  
+    }
+    .InternalTransfer .input-container{
+        overflow-x: auto;
+    }
+    .InternalTransfer .input-group .short-input{
+        font-size: 0.9rem;
+        width: 10rem;
+        white-space: nowrap;      
+        overflow-x: auto;   
+        overflow-y: hidden;      
+        overflow-wrap: normal;     
+        display: inline-block;  
+    }
+    .InternalTransfer .input-group label{
+        font-size: 0.9rem;
+        width: 10rem;
+        white-space: nowrap;      
+        overflow-x: auto;   
+        overflow-y: hidden;      
+        overflow-wrap: normal;     
+        display: inline-block;  
+    }
+    .InternalTransfer .module-dropdown option{
+        font-size: 0.7rem;
+    }
+  }
+
+  .InternalTransfer table th:nth-child(1),
+.InternalTransfer table td:nth-child(1) {
+    width: 2rem;
+}
+
+.InternalTransfer table th:nth-child(2),
+.InternalTransfer table td:nth-child(2) {
+    width: 15rem;
+}
+
+.InternalTransfer table th:nth-child(3),
+.InternalTransfer table td:nth-child(3) {
+    width: 15rem;
+}
+
+.InternalTransfer table th:nth-child(4),
+.InternalTransfer table td:nth-child(4) {
+    width: 10rem;
+}
+
+.InternalTransfer table th:nth-child(5),
+.InternalTransfer table td:nth-child(5) {
+    width: 10rem;
+}
+
+.InternalTransfer table th:nth-child(6),
+.InternalTransfer table td:nth-child(6) {
+    width: 10rem;
+}
+.InternalTransfer table th:nth-child(7),
+.InternalTransfer table td:nth-child(7) {
+    width: 10rem;
 }

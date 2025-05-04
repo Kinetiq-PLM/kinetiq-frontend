@@ -186,7 +186,7 @@ const UpdateViewModal = ({ isOpen, onClose, request, onUpdate }) => {
         <div className="modal-header-divider"></div>
 
         <div className="modal-content">
-          <div className="modal-form">
+          <div className="modal-form-request">
             <div className="form-group">
               <label htmlFor="id">Request ID</label>
               <input type="text" id="id" value={formData.id} onChange={handleChange} placeholder="Enter request ID" />

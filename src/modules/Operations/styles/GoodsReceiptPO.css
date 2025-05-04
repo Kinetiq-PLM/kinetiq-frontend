@@ -868,9 +868,65 @@
   display: none;
 }
 
+.goods-r-po .item-date-input input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+.goods-r-po .item-number input[type="number"]::-webkit-inner-spin-button {
+  background-color: #0d9488; /* Adds background to the arrows */
+  filter: invert(1); /* Hack to invert the arrow color (works in some cases) */
+  width: 0.1;
+}
 
-
-
+/* Media query for smaller tablets */
+@media (max-width: 768px) {
+  .goods-r-po .body-content-container {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+  }
+  .goods-r-po .details-grid {
+    padding: 0.75rem; /* Reduced padding */
+    width: 100%;
+    min-width: auto;
+    overflow-x: auto;
+  }
+  .goods-r-po .detail-row input{
+    min-width: 7rem;
+  }
+  .goods-r-po .header-container h2 {
+    font-size: 1.25rem; /* Smaller heading */
+  }
+  
+  .goods-r-po .operations-gt-table table {
+    min-width: 100px; /* Smaller minimum width */
+  }
+  .goods-r-po .operations-gt-table th,
+  .goods-r-po .operations-gt-table td {
+    padding: 0.5rem; /* Even smaller padding */
+  }
+  
+  .goods-r-po .action-buttons {
+    justify-content: center; /* Center buttons on small screens */
+  }
+  .goods-r-po .table-wrapper {
+    overflow-x: auto;
+  }
+  .goods-r-po .dropdown-scrollbar tr td select{
+    font-size: 0.9rem !important;
+    position: relative;
+  }
+  .goods-r-po .dropdown-scrollbar tr td select option{
+    font-size: 0.7rem !important;
+    position: relative;
+    width: 10px;
+  }
+}
 
 
 

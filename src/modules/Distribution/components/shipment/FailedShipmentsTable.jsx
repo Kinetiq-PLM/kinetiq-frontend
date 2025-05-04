@@ -155,7 +155,7 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
       </div>
       
       <div className="table-wrapper">
-        <table className="shipment-table">
+        <table className="shipment-table failed-shipments-table">
           <thead>
             <tr>
               <th 
@@ -222,7 +222,7 @@ const FailedShipmentsTable = ({ failedShipments, onShipmentSelect, selectedShipm
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="no-data">
+                <td colSpan={window.innerWidth <= 576 ? 3 : 6} className="no-data">
                   No failed shipments found. Try adjusting your search.
                 </td>
               </tr>

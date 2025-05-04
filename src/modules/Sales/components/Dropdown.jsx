@@ -13,6 +13,7 @@ const Dropdown = ({
     return "";
   },
   isValidationVisible = false,
+  isDisabled = false,
 }) => {
   const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +55,7 @@ const Dropdown = ({
   };
 
   return (
-    <div className="flex-1 text-sm" style={{ width }}>
+    <div className={`flex-1 text-sm`} style={{ width }}>
       {label && (
         <div className="mb-2 text-gray-900">
           {label} <span className="text-red-900 ml-1">*</span>{" "}
@@ -65,7 +66,9 @@ const Dropdown = ({
           className="flex justify-between items-center py-2 px-3 bg-white border border-gray-200 rounded-md cursor-pointer select-none box-border"
           onClick={toggleDropdown}
         >
-          <div className="text-gray-600">{selectedOption || placeholder}</div>
+          <div className="text-gray-600 truncate">
+            {selectedOption || placeholder}
+          </div>
           <div
             className={`transition-transform duration-200 ${
               isOpen ? "transform rotate-180" : ""

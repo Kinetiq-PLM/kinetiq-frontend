@@ -15,7 +15,9 @@ const Table = ({ reports, onRowClick, selectedReport }) => {
         </thead>
         <tbody>
           {reports.length > 0 ? (
-            reports.map((report, index) => (
+             [...reports]
+             .sort((a, b) => new Date(b.submission_date) - new Date(a.submission_date))
+             .map((report, index) => (
               <tr
                 key={report.report_id || `report-${index}`}
                 className={`${

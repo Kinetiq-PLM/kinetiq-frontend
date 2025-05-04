@@ -3,23 +3,44 @@ import "./ModalInput.css";
 import Button from "./Button";
 import Dropdown from "./Dropdown";
 import Search from "./Search";
+import NotifModal from "./modalNotif/NotifModal";
+import axios from "axios";
 
 const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
   const [allAccounts, setAllAccounts] = useState([]);
-  const [mainAccounts, setMainAccounts] = useState([]);
-  const [availableSubAccounts, setAvailableSubAccounts] = useState([]);
-  const [selectedMainAccount, setSelectedMainAccount] = useState("");
-  const [selectedSubAccount, setSelectedSubAccount] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAccount, setSelectedAccount] = useState(null);
+  const [validation, setValidation] = useState({
+    isOpen: false,
+    type: "warning",
+    title: "",
+    message: "",
+  });
+
+  // API endpoint
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+  const GL_ACCOUNTS_ENDPOINT = `${API_URL}/api/general-ledger-accounts/`;
 
   // Fetch accounts
   useEffect(() => {
     if (!isModalOpen) return;
-    fetch("http://127.0.0.1:8000/api/general-ledger-accounts/")
-      .then((res) => res.json())
-      .then((data) => setAllAccounts(data))
-      .catch((err) => console.error("Error fetching accounts:", err));
+    const fetchAccounts = async () => {
+      try {
+        const response = await axios.get(GL_ACCOUNTS_ENDPOINT);
+        console.log("API Response (fetchAccounts):", response.data);
+        setAllAccounts(response.data);
+      } catch (error) {
+        console.error("Error fetching accounts:", error.response ? error.response.data : error);
+        setValidation({
+          isOpen: true,
+          type: "error",
+          title: "Fetch Error",
+          message: "Failed to load accounts. Please check your connection.",
+        });
+      }
+    };
+    fetchAccounts();
   }, [isModalOpen]);
 
   const filteredAccounts = allAccounts.filter((a) =>
@@ -28,45 +49,27 @@ const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
       .includes(searchTerm.toLowerCase())
   );
 
-
-  // Update sub-accounts when GL ID changes
-  useEffect(() => {
-    if (!selectedMainAccount) {
-      setAvailableSubAccounts([]);
-      setSelectedSubAccount("");
-      return;
-    }
-
-    const subAccountsList = allAccounts
-      .filter(a => a.gl_account_id === selectedMainAccount)
-      .map(a => a.account_name);
-    setAvailableSubAccounts(subAccountsList);
-    setSelectedSubAccount("");
-  }, [selectedMainAccount, allAccounts]);
-
   const onAddAccount = () => {
     if (!selectedAccount) {
-      alert("Please select an account.");
+      setValidation({
+        isOpen: true,
+        type: "warning",
+        title: "No Account Selected",
+        message: "Please select an account.",
+      });
       return;
     }
-
+  
     const accountData = {
       glAccountId: selectedAccount.gl_account_id,
       accountName: selectedAccount.account_name,
+      accountCode: selectedAccount.account_code,
     };
-
-    handleSubmit(accountData);
-    closeModal();
+  
+    handleSubmit(accountData);  
+    setTimeout(() => closeModal(), 100);
   };
-
-  // Dynamic filtering
-  const filteredMainAccounts = mainAccounts.filter(accountId =>
-    accountId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredSubAccounts = availableSubAccounts.filter(name =>
-    name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  
 
   if (!isModalOpen) return null;
 
@@ -87,11 +90,10 @@ const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
           <div className="modal-body mt-4">
             <Search
               type="text"
-              placeholder="Search by Name or GL Account ID..."
+              placeholder="Search name or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-
 
             <div className="mt-3">
               <Dropdown
@@ -112,7 +114,6 @@ const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
                   setSelectedAccount(matched || null);
                 }}
               />
-
             </div>
 
             {selectedAccount && (
@@ -128,6 +129,16 @@ const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
           </div>
         </div>
       </div>
+
+      {validation.isOpen && (
+        <NotifModal
+          isOpen={validation.isOpen}
+          onClose={() => setValidation({ ...validation, isOpen: false })}
+          type={validation.type}
+          title={validation.title}
+          message={validation.message}
+        />
+      )}
     </div>
   );
 };

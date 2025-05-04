@@ -24,7 +24,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
 
     const fetchWarehouses = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/warehouses/");
+            const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
 
             if (!response.ok) {
                 throw new Error(`Error fetching warehouses: ${response.status}`);
@@ -36,7 +36,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
             let warehouseList = Array.isArray(data) ? data : [];
 
             if (warehouseList.length > 0) {
-      
+
                 const formattedWarehouses = warehouseList.map(warehouse => {
                     if (typeof warehouse === 'object' && warehouse !== null) {
                         return {
@@ -101,7 +101,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
             const itemsList = Object.values(inventoryItems);
             setInventoryItemsList(itemsList);
         } else {
-            fetch("http://127.0.0.1:8000/api/inventory-items/")
+            fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
                 .then((res) => {
                     if (!res.ok) {
                         throw new Error(`Error fetching inventory items: ${res.status}`);
@@ -226,7 +226,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
         };
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/cyclic_counts/", {
+            const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newRecord),
@@ -282,115 +282,162 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                 )}
 
                 {/* Form Fields */}
-                <form onSubmit={handleSubmit}>
-                    <label>
-                        Inventory Item <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                        value={inventoryItemId}
-                        onChange={handleInventoryItemChange}
-                        required
-                        className="block w-full border border-gray-300 rounded-md p-2 mb-4"
-                    >
-                        <option value="">Select Inventory Item</option>
-                        {inventoryItemsList.map((item) => (
-                            <option key={item.inventory_item_id} value={item.inventory_item_id}>
-                                {item.inventory_item_id} - {item.item_type || "Unknown"}
-                            </option>
-                        ))}
-                    </select>
+                <form className="flex flex-wrap" onSubmit={handleSubmit}>
 
-                    {selectedInventoryItem && (
-                        <div className="mb-4 p-3 bg-gray-50 rounded-md">
-                            <h3 className="font-medium text-gray-700 mb-2">Selected Item Details</h3>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                                <p><span className="font-medium">Type:</span> {selectedInventoryItem.item_type}</p>
-                                <p><span className="font-medium">Current Qty:</span> {selectedInventoryItem.current_quantity}</p>
-                                {selectedInventoryItem.expiry && (
-                                    <p className={new Date(selectedInventoryItem.expiry) < new Date() ? 'text-red-500' : ''}>
-                                        <span className="font-medium">Expiry:</span> {formatDate(selectedInventoryItem.expiry)}
-                                    </p>
-                                )}
+                    {/* Forms - Box 1 */}
+                    <div className="max-h-[10rem]">
+
+                        {/* Inventory Item */}
+                        <label>
+                            Inventory Item <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                            value={inventoryItemId}
+                            onChange={handleInventoryItemChange}
+                            required
+                            className="block w-full borde text-gray-400 border-gray-300 rounded-md p-2 mb-4"
+                        >
+                            <option value="">Select Inventory Item</option>
+                            {inventoryItemsList.map((item) => (
+                                <option key={item.inventory_item_id} value={item.inventory_item_id}>
+                                    {item.inventory_item_id} - {item.item_type || "Unknown"}
+                                </option>
+                            ))}
+                        </select>
+
+                        {selectedInventoryItem && (
+                            <div className="mb-4 p-3 bg-gray-50 rounded-md">
+                                <h3 className="font-medium text-gray-700 mb-2">Selected Item Details</h3>
+                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                    <p><span className="font-medium">Type:</span> {selectedInventoryItem.item_type}</p>
+                                    <p><span className="font-medium">Current Qty:</span> {selectedInventoryItem.current_quantity}</p>
+                                    {selectedInventoryItem.expiry && (
+                                        <p className={new Date(selectedInventoryItem.expiry) < new Date() ? 'text-red-500' : ''}>
+                                            <span className="font-medium">Expiry:</span> {formatDate(selectedInventoryItem.expiry)}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    <label>
-                        Physical Count <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="number"
-                        placeholder="Enter Quantity"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        required
-                    />
 
-                    <label>
-                        Employee ID <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        placeholder="Enter Employee ID"
-                        value={employeeId}
-                        onChange={(e) => setEmployeeId(e.target.value)}
-                        required
-                    />
+                        {/* Employee ID  */}
+                        <label>
+                            Employee ID <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Enter Employee ID"
+                            value={employeeId}
+                            onChange={(e) => setEmployeeId(e.target.value)}
+                            required
+                        />
 
-                    <label>
-                        Status <span className="text-red-500">*</span>
-                    </label>
-                    <select value={status} onChange={(e) => setStatus(e.target.value)} required>
-                        <option value="">Select Status</option>
-                        <option value="Completed">Completed</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Open">Open</option>
-                        <option value="Closed">Closed</option>
-                    </select>
+                    </div>
 
-                    <label>
-                        Time Period <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                        value={timePeriod}
-                        onChange={(e) => setTimePeriod(e.target.value)}
-                        required
-                    >
-                        <option value="">Select Time Period</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="quarterly">Quarterly</option>
-                    </select>
+                    {/* Forms Box 2 - Grid */}
+                    <div className="grid grid-cols-2 gap-5">
+                        <span>
+                            {/*Physical Count  */}
+                            <label>
+                                Physical Count <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                placeholder="Enter Quantity"
+                                value={quantity}
+                                onChange={(e) => setQuantity(e.target.value)}
+                                required
+                            />
+                        </span>
 
-                    <label>
-                        Warehouse Location <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                        value={warehouseId}
-                        onChange={(e) => setWarehouseId(e.target.value)}
-                        required
-                    >
-                        <option value="">Select Warehouse</option>
-                        {localWarehouses.map((warehouse) => (
-                            <option
-                                key={warehouse.id}
-                                value={warehouse.id}
+
+                        {/* Time Period */}
+                        <span>
+                            <label>
+                                Time Period <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={timePeriod}
+                                onChange={(e) => setTimePeriod(e.target.value)}
+                                required
+                                className="text-gray-400"
                             >
-                                {warehouse.name}
-                            </option>
-                        ))}
-                    </select>
+                                <option value="">Select Time Period</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                        </span>
 
-                    <label>Remarks</label>
-                    <textarea
-                        placeholder="Enter Remarks"
-                        value={remarks}
-                        onChange={(e) => setRemarks(e.target.value)}
-                        rows="3"
-                    />
 
-                    {/* Buttons */}
-                    <div className="form-actions">
+
+
+                    </div>
+
+
+                    <div className="grid grid-cols-2 space-x-5">
+
+                        <span className="justify-start">
+
+                            <label>
+                                Status <span className="text-red-500">*</span>
+                            </label>
+                            <select value={status} onChange={(e) => setStatus(e.target.value)} required className="text-gray-400">
+                                <option value="">Select Status</option>
+                                <option value="Completed">Completed</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Open">Open</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+
+                        </span>
+
+
+
+                        <span className="justify-start">
+
+                            <label>
+                                Warehouse Location <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={warehouseId}
+                                onChange={(e) => setWarehouseId(e.target.value)}
+                                required
+                                className="text-gray-400"
+                            >
+                                <option value="">Select Warehouse</option>
+                                {localWarehouses.map((warehouse) => (
+                                    <option
+                                        key={warehouse.id}
+                                        value={warehouse.id}
+                                    >
+                                        {warehouse.name}
+                                    </option>
+                                ))}
+                            </select>
+
+                        </span>
+
+
+                    </div>
+
+                    <div>
+                        <label>Remarks</label>
+                        <textarea
+                            placeholder="Enter Remarks"
+                            value={remarks}
+                            onChange={(e) => setRemarks(e.target.value)}
+                            rows="1"
+                        />
+
+                    </div>
+
+
+
+                    {/* Buttons Container */}
+                    <div className="form-actions flex justify-end gap-5">
                         <button type="button" onClick={handleClear} className="clear-btn">
                             Clear
                         </button>
@@ -398,6 +445,8 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                             Submit
                         </button>
                     </div>
+
+
                 </form>
             </div>
         </div>
