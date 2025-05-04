@@ -1,9 +1,11 @@
+// Import necessary dependencies and components
 import React, { useState, useEffect } from "react";
 import "../ModalInput.css";
 import Dropdown from "../dropdown/Dropdown";
 import Button from "../button/Button";
 import Forms from "../forms/Forms";
 
+// PayrollModal component definition
 const PayrollModal = ({
   isModalOpen,
   closeModal,
@@ -14,8 +16,10 @@ const PayrollModal = ({
   payrollHrIds,
   isNewPayroll,
 }) => {
+  // Local state to manage form data
   const [formData, setFormData] = useState(selectedRow);
 
+  // Populate and initialize formData when modal is opened or selection changes
   useEffect(() => {
     if (selectedRow) {
       const updatedRow = [...selectedRow];
@@ -31,6 +35,7 @@ const PayrollModal = ({
     }
   }, [selectedRow, isCreating]);
 
+  // Helper function to generate random lowercase alphanumeric ID
   const generateLowercaseId = (length) => {
     const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
     let result = "";
@@ -40,6 +45,7 @@ const PayrollModal = ({
     return result;
   };
 
+  // Helper function to generate a payment reference number based on payment method
   const generateReferenceNumber = (paymentMethod) => {
     const randomNum = Math.floor(100000 + Math.random() * 900000);
     switch (paymentMethod) {
@@ -54,6 +60,7 @@ const PayrollModal = ({
     }
   };
 
+  // Utility function to validate YYYY-MM-DD format
   const isValidDate = (dateString) => {
     const regex = /^\d{4}-\d{2}-\d{2}$/;
     if (!regex.test(dateString)) return false;
@@ -61,17 +68,19 @@ const PayrollModal = ({
     return date instanceof Date && !isNaN(date.getTime());
   };
 
+  // Handles input changes based on the form index and conditions
   const handleInputChange = (index, value) => {
     // Prevent updates for disabled fields
     const isFieldEditable = isCreating
-      ? index !== 0 && index !== 5 // Allow all except Payroll Accounting ID and Reference Number in create mode
-      : index === 6; // Only allow Status (index 6) in edit mode
+      ? index !== 0 && index !== 5 // In create mode, disable Payroll ID and Reference #
+      : index === 6; // In edit mode, allow only Status field to be changed
 
     if (!isFieldEditable) return;
 
     const updatedFormData = [...formData];
     updatedFormData[index] = value;
 
+    // Auto-generate Reference Number if Payment Method changes
     if (index === 4 && isNewPayroll) {
       updatedFormData[5] = generateReferenceNumber(value);
     }
@@ -79,7 +88,9 @@ const PayrollModal = ({
     setFormData(updatedFormData);
   };
 
+  // Validates inputs and submits the form
   const handleFormSubmit = () => {
+    // Form validation for creation
     if (isCreating) {
       if (!formData[1]) {
         alert("Please select a Payroll HR ID.");
@@ -100,6 +111,8 @@ const PayrollModal = ({
     }
 
     const updatedFormData = [...formData];
+
+    // Generate Reference Number and format date if it's a new payroll
     if (isNewPayroll) {
       if (!updatedFormData[5] && updatedFormData[4]) {
         updatedFormData[5] = generateReferenceNumber(updatedFormData[4]);
@@ -109,17 +122,21 @@ const PayrollModal = ({
       }
     }
 
+    // Trigger parent submit handler
     handleSubmit(updatedFormData, isNewPayroll);
   };
 
+  // Do not render modal if it is not open
   if (!isModalOpen) {
     return null;
   }
 
+  // Main modal return block
   return (
     <div className="accounting-modal">
       <div className="modal-overlay">
         <div className="modal-container">
+          {/* Modal Header */}
           <div className="modal-header">
             <h2>{isCreating ? "Create Payroll Record" : "Edit Payroll Record"}</h2>
             <img
@@ -129,13 +146,31 @@ const PayrollModal = ({
               onClick={closeModal}
             />
           </div>
+
+          {/* Modal Body - Dynamic Form Fields */}
           <div className="modal-body">
             {columnHeaders.map((header, index) => {
-              // Determine if the field should be disabled
+              // Define disable logic per field
               const isDisabled = isCreating
-                ? header === "Payroll Accounting ID" || header === "Reference Number" // Disable auto-generated fields in create mode
-                : header !== "Status"; // Disable all except Status in edit mode
+                ? header === "Payroll Accounting ID" || header === "Reference Number"
+                : header !== "Status";
 
+              // Special rendering for Date Approved
+              if (header === "Date Approved" && isNewPayroll) {
+                return (
+                  <Forms
+                    key={index}
+                    type="date"
+                    formName={header}
+                    value={formData[index] || ""}
+                    onChange={(e) => handleInputChange(index, e.target.value)}
+                    disabled={isDisabled}
+                    required={true}
+                  />
+                );
+              }
+
+              // Disable editing for auto-generated fields
               if (header === "Payroll Accounting ID" || header === "Reference Number") {
                 return (
                   <Forms
@@ -144,14 +179,15 @@ const PayrollModal = ({
                     formName={header}
                     value={formData[index] || ""}
                     onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={true} // Always disabled
+                    disabled={true}
                   />
                 );
               }
+
+              // Dropdown for Payroll HR ID
               if (header === "Payroll HR ID") {
                 return (
-                  <div key={index} className="form-group">
-                    <label>{header}</label>
+                  <div key={index} className="flex flex-col gap-2">
                     {isNewPayroll ? (
                       <Dropdown
                         style="selection"
@@ -174,24 +210,14 @@ const PayrollModal = ({
                   </div>
                 );
               }
-              if (header === "Date Approved" && isNewPayroll) {
-                return (
-                  <Forms
-                    key={index}
-                    type="date"
-                    formName={header}
-                    value={formData[index] || ""}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={isDisabled}
-                    required={true}
-                  />
-                );
-              }
+
+              // Text input for Approved By (only when new)
               if (header === "Approved By" && isNewPayroll) {
                 return (
                   <Forms
                     key={index}
                     type="text"
+                    placeholder="Enter Approved By..."
                     formName={header}
                     value={formData[index]}
                     onChange={(e) => handleInputChange(index, e.target.value)}
@@ -200,9 +226,11 @@ const PayrollModal = ({
                   />
                 );
               }
+
+              // Payment Method dropdown
               if (header === "Payment Method" && isNewPayroll) {
                 return (
-                  <div key={index} className="form-group">
+                  <div key={index} className="flex flex-col gap-2">
                     <label>{header}</label>
                     <Dropdown
                       style="selection"
@@ -216,9 +244,11 @@ const PayrollModal = ({
                   </div>
                 );
               }
+
+              // Status dropdown (always editable)
               if (header === "Status") {
                 return (
-                  <div key={index} className="form-group">
+                  <div key={index} className="flex flex-col gap-2">
                     <label>{header}</label>
                     <Dropdown
                       style="selection"
@@ -226,12 +256,14 @@ const PayrollModal = ({
                       options={["Processing", "Completed"]}
                       value={formData[index]}
                       onChange={(val) => handleInputChange(index, val)}
-                      disabled={false} // Always editable
+                      disabled={false}
                       required={true}
                     />
                   </div>
                 );
               }
+
+              // Default form rendering for other fields
               return (
                 <Forms
                   key={index}
@@ -244,6 +276,8 @@ const PayrollModal = ({
               );
             })}
           </div>
+
+          {/* Modal Footer with Cancel and Submit Buttons */}
           <div className="modal-footer">
             <Button name="Cancel" variant="standard1" onclick={closeModal} />
             <Button
