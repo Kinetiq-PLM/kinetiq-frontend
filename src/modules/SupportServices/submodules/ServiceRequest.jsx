@@ -193,6 +193,8 @@ const ServiceRequest = ({employee_id}) => {
       console.log("Analysis created successfully:", data);
       setShowAddModal(false);
       fetchAnalysis(data.service_request.service_request_id)
+      setSuccessModalMessage(`Email sent to customer ${data.customer.name}!`); 
+      setShowSuccessModal(true);  
   } catch (error) {
     let firstError = "An unknown error occurred.";
     if (error && typeof error === "object") {
