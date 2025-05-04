@@ -12,26 +12,27 @@
   overflow: auto;
   flex-wrap: wrap;
   scrollbar-width: 1.5rem;
-  scrollbar-color: rgb(39, 164, 164) white; 
+  scrollbar-color: rgb(39, 164, 164) white;
 }
-  /* Webkit (Chrome, Edge, Safari) */
-  .usrprofile::-webkit-scrollbar {
-    width: 0.5rem;
-  }
 
-  .usrprofile::-webkit-scrollbar-track {
-    background: white;
-    border-radius: 1rem;
-  }
+/* Webkit (Chrome, Edge, Safari) */
+.usrprofile::-webkit-scrollbar {
+  width: 0.5rem;
+}
 
-  .usrprofile::-webkit-scrollbar-thumb {
-    background-color: rgb(39, 164, 164);
-    border-radius: 1rem;
-    border: 0.1rem solid white;
-  }
-    
+.usrprofile::-webkit-scrollbar-track {
+  background: white;
+  border-radius: 1rem;
+}
 
-.usrprofile .user-details-container{
+.usrprofile::-webkit-scrollbar-thumb {
+  background-color: rgb(39, 164, 164);
+  border-radius: 1rem;
+  border: 0.1rem solid white;
+}
+
+
+.usrprofile .user-details-container {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -52,19 +53,19 @@
   padding: 0rem 2rem;
 }
 
-.usrprofile .user-details-container{
+.usrprofile .user-details-container {
   border-bottom: 0.05rem solid rgb(207, 207, 207);
   padding: 1rem;
 }
 
-.usrprofile .user-details-container img{
+.usrprofile .user-details-container img {
   height: 10rem;
   width: auto;
   position: absolute;
   z-index: 0;
 }
 
-.usrprofile .user-image{
+.usrprofile .user-image {
   aspect-ratio: 1 / 1;
   width: 10rem;
   height: 10rem;
@@ -79,7 +80,7 @@
   user-select: none;
 }
 
-.usrprofile .user-details{
+.usrprofile .user-details {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -89,21 +90,22 @@
   color: #7d7d7d;
   gap: 1rem;
   margin-left: 1rem;
-  
+
 }
 
-.usrprofile .user-details strong, .usrprofile .role-details strong{
+.usrprofile .user-details strong,
+.usrprofile .role-details strong {
   font-weight: 700;
   color: #4eb5b5;
 }
 
-.usrprofile .user-name-pos{
+.usrprofile .user-name-pos {
   display: flex;
   flex-direction: row;
   margin-right: 2rem;
 }
 
-.usrprofile .user-name{
+.usrprofile .user-name {
   font-size: 2rem;
   color: #008b8b;
   margin-right: 0.75rem;
@@ -112,15 +114,15 @@
   width: fit-content;
 }
 
-.usrprofile .user-email{
+.usrprofile .user-email {
   color: rgb(155, 160, 162);
   font-size: 0.85rem;
   text-align: right;
   margin-right: 0.75rem;
 }
 
-.usrprofile .user-position{
-  border-left:  0.15rem solid #b4c0c0; 
+.usrprofile .user-position {
+  border-left: 0.15rem solid #b4c0c0;
   padding-left: 0.95rem;
   font-style: italic;
   font-size: 1.35rem;
@@ -128,7 +130,7 @@
   width: fit-content;
 }
 
-.usrprofile .role-details{
+.usrprofile .role-details {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -141,7 +143,7 @@
   font-size: 0.85rem;
 }
 
-.usrprofile .role-details h3{
+.usrprofile .role-details h3 {
   font-size: 0.85rem;
   width: 85%;
   color: #a2a2a2;
@@ -151,13 +153,14 @@
   padding-bottom: 0.5rem;
 }
 
-.usrprofile .password-section{
+.usrprofile .password-section {
   display: flex;
   flex-direction: column;
   width: 30rem;
   align-items: center;
 }
-.usrprofile .password-section h3{
+
+.usrprofile .password-section h3 {
   color: rgb(24, 172, 172);
   font-size: 1rem;
   font-weight: 700;
@@ -177,19 +180,19 @@
   font-size: 0.85rem;
 }
 
-.password-input-wrapper-item{
+.password-input-wrapper-item {
   width: 100%;
 }
 
-.usrprofile .password-input-wrapper{
-    position: relative;
-    width: 100%;
-    display: flex;
-    align-items: center;
+.usrprofile .password-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
-.usrprofile input[type="password"], 
-.usrprofile input[type="text"]{
+.usrprofile input[type="password"],
+.usrprofile input[type="text"] {
   color: #7d7d7d;
   font-size: 0.85rem;
   width: 100%;
@@ -201,14 +204,14 @@
 .usrprofile input[type="text"]:focus,
 .usrprofile input[type="password"]:focus {
   border: none;
-  box-shadow: 0 0 0.1rem 0.1rem rgba(0, 128, 128, 0.25); 
+  box-shadow: 0 0 0.1rem 0.1rem rgba(0, 128, 128, 0.25);
   outline: none;
 }
 
 .usrprofile input:-webkit-autofill {
-  background-color: white !important; 
-  color: #7d7d7d !important;          
-  -webkit-text-fill-color: #7d7d7d !important; 
+  background-color: white !important;
+  color: #7d7d7d !important;
+  -webkit-text-fill-color: #7d7d7d !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -230,15 +233,15 @@
   gap: 0.75rem;
 }
 
-.usrprofile .login-error{
-  color: rgb(255, 128, 0);  
+.usrprofile .login-error {
+  color: rgb(255, 128, 0);
   font-size: 0.7rem;
   font-style: italic;
   width: 100%;
   min-height: 0.7rem;
 }
 
-.usrprofile .user-info{
+.usrprofile .user-info {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -264,10 +267,12 @@
   color: #008b8b;
   font-weight: bold;
 }
-.usrprofile-modal .actions{
+
+.usrprofile-modal .actions {
   display: flex;
   gap: 1rem;
 }
+
 .usrprofile-modal .actions button {
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -279,15 +284,18 @@
   background-color: #008b8b;
   color: white;
 }
+
 .usrprofile-modal .confirm-btn:hover {
   background-color: #007b7b;
 }
 
-.usrprofile-modal .cancel-btn, .usrprofile-modal .ok-btn {
+.usrprofile-modal .cancel-btn,
+.usrprofile-modal .ok-btn {
   background-color: #dedede;
 }
 
-.usrprofile-modal .cancel-btn:hover, .usrprofile-modal .ok-btn:hover {
+.usrprofile-modal .cancel-btn:hover,
+.usrprofile-modal .ok-btn:hover {
   background-color: #c5c5c5;
 }
 
@@ -298,35 +306,37 @@
     align-items: center;
   }
 
-  .usrprofile .user-name-pos{
+  .usrprofile .user-name-pos {
     flex-direction: column !important;
-    
+
   }
 
-  .usrprofile .user-email, .usrprofile .user-name{
+  .usrprofile .user-email,
+  .usrprofile .user-name {
     text-align: left;
   }
 
-  .usrprofile .role-details{
+  .usrprofile .role-details {
     margin-left: 0rem;
   }
 
-  .usrprofile .user-position{
-    border-left:  none; 
+  .usrprofile .user-position {
+    border-left: none;
     padding-left: 0rem;
     padding-top: 0.4rem;
     font-size: 0.85rem;
   }
 
-  .usrprofile .user-name-pos{
+  .usrprofile .user-name-pos {
     margin-left: 2rem;
   }
-  .usrprofile .role-details{
+
+  .usrprofile .role-details {
     width: 100% !important;
   }
 
   .usrprofile .password-kinetiq-container {
-    align-items: center!important;
+    align-items: center !important;
     flex-direction: column !important;
     gap: 2rem;
   }
@@ -334,47 +344,53 @@
 }
 
 @media (max-width: 880px) {
-  .usrprofile .user-email, 
+
+  .usrprofile .user-email,
   .usrprofile .user-name,
-  .usrprofile .user-position{
+  .usrprofile .user-position {
     text-align: center;
   }
 
-  .usrprofile .user-email{
+  .usrprofile .user-email {
     margin-top: 0.2rem;
     font-size: 0.75rem;
   }
 
-  .usrprofile .user-name{
+  .usrprofile .user-name {
     margin-top: 1rem;
   }
-  .usrprofile .user-name-pos{
+
+  .usrprofile .user-name-pos {
     align-items: center;
     justify-content: center;
     margin: 0rem;
   }
-  .usrprofile .user-details-container{
+
+  .usrprofile .user-details-container {
     width: 100% !important;
     flex-wrap: nowrap !important;
     padding: 1rem !important;
     margin: 0rem !important;
   }
-  .usrprofile .role-details{
+
+  .usrprofile .role-details {
     margin: 0;
     padding-bottom: 1rem;
   }
-  .usrprofile .user-info{
+
+  .usrprofile .user-info {
     flex-direction: column !important;
     width: 100% !important;
     margin: 0;
   }
-  
-  .usrprofile .password-section{
+
+  .usrprofile .password-section {
     width: 100% !important;
     margin-top: 1.5rem !important;
   }
-  .usrprofile .user-details-container img{
-    display: none!important;
+
+  .usrprofile .user-details-container img {
+    display: none !important;
   }
 
   .usrprofile .password-kinetiq-container {
@@ -382,4 +398,3 @@
     margin: 0rem !important;
   }
 }
-
