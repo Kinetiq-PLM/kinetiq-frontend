@@ -89,29 +89,31 @@ const Table = ({
                                         </td>
                                     );
                                 })}
-                                {showPrintButton && (
-                                    <td style={{ display: "flex" }}>
-                                        <Printer
-                                            size={30}
-                                            color="#4A90E2"
-                                            style={{ cursor: "pointer" }}
-                                            onClick={() => handlePrintRow(row)}
-                                            title="Print Row"
-                                        />
+                                {(showPrintButton || showEditButton) && (
+                                    <td className="actions-cell">
+                                        <div className="icon-group">
+                                            {showPrintButton && (
+                                                <Printer
+                                                    size={20}
+                                                    color="#4A90E2"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => handlePrintRow(row)}
+                                                    title="Print Row"
+                                                />
+                                            )}
+                                            {showEditButton && (
+                                                <Pencil
+                                                    size={20}
+                                                    color="#4B5563"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => handleEditRow(row)}
+                                                    title="Edit Row"
+                                                />
+                                            )}
+                                        </div>
                                     </td>
                                 )}
 
-                                {showEditButton && (
-                                    <td style={{ display: "flex" }}>
-                                        <Pencil
-                                            size={30}
-                                            color="#4B5563"
-                                            style={{ cursor: "pointer" }}
-                                            onClick={() => handleEditRow(row)}
-                                            title="Edit Row"
-                                        />
-                                    </td>
-                                )}
                             </tr>
                         ))}
                     </tbody>

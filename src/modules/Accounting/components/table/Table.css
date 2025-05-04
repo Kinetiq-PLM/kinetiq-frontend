@@ -153,6 +153,21 @@
   background: #f8fafc;
 }
 
+
+.accounting-table .actions-cell {
+  min-width: 80px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.accounting-table .icon-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+
+
 @media (max-width: 768px) {
   .accounting-table table {
     width: max-content;
