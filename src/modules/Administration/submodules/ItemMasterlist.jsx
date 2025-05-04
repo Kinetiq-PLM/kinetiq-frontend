@@ -225,23 +225,54 @@ const ItemMasterManagement = () => {
   // Add Item handler
   const handleAddItem = () => {
     setModalMode("add");
+    // Set default values for required fields
     addItemForm.resetFields();
+    addItemForm.setFieldsValue({
+      item_type: "Product",
+      unit_of_measure: "kg",
+      item_status: "Active",
+      manage_item_by: "Serial Number"
+    });
     setAddItemModalVisible(true);
   };
 
+  // handleAddItemSubmit function - For the Add/Edit Item modal
   const handleAddItemSubmit = async (values) => {
     try {
+      // Filter out undefined/null values for optional fields
+      const filteredValues = Object.fromEntries(
+        Object.entries(values).filter(([_, value]) => value !== undefined && value !== null)
+      );
+      
       if (modalMode === "add") {
-        await itemMasterDataAPI.createItem(values);
+        // Only set required fields if they're missing
+        const itemData = {
+          ...filteredValues,
+          item_type: filteredValues.item_type || "Product",
+          unit_of_measure: filteredValues.unit_of_measure || "kg",
+          item_status: filteredValues.item_status || "Active",
+          manage_item_by: filteredValues.manage_item_by || "Serial Number"
+        };
+        
+        await itemMasterDataAPI.createItem(itemData);
         message.success("Item created successfully");
       } else {
-        await itemMasterDataAPI.updateItem(selectedRecord.item_id, values);
+        // For edit mode, maintain existing values for required fields
+        const itemData = {
+          ...filteredValues,
+          item_type: filteredValues.item_type || selectedRecord.item_type,
+          unit_of_measure: filteredValues.unit_of_measure || selectedRecord.unit_of_measure,
+          item_status: filteredValues.item_status || selectedRecord.item_status,
+          manage_item_by: filteredValues.manage_item_by || selectedRecord.manage_item_by
+        };
+        
+        await itemMasterDataAPI.updateItem(selectedRecord.item_id, itemData);
         message.success("Item updated successfully");
       }
       setAddItemModalVisible(false);
       fetchItems();
     } catch (error) {
-      message.error(`Failed to create item: ${error.response?.data?.message || error.message}`);
+      message.error(`Failed to ${modalMode === "add" ? "create" : "update"} item: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -264,7 +295,16 @@ const ItemMasterManagement = () => {
   const handleEditItem = (record) => {
     setModalMode("edit");
     setSelectedRecord(record);
-    itemForm.setFieldsValue({
+    setAddItemModalVisible(true);
+    
+    // Set all form fields with existing values from the record
+    addItemForm.setFieldsValue({
+      item_name: record.item_name,
+      item_description: record.item_description,
+      item_type: record.item_type,
+      unit_of_measure: record.unit_of_measure,
+      item_status: record.item_status,
+      manage_item_by: record.manage_item_by,
       preferred_vendor: record.preferred_vendor,
       purchasing_uom: record.purchasing_uom,
       items_per_purchase_unit: record.items_per_purchase_unit,
@@ -273,12 +313,24 @@ const ItemMasterManagement = () => {
       items_per_sale_unit: record.items_per_sale_unit,
       sales_quantity_per_package: record.sales_quantity_per_package
     });
-    setItemModalVisible(true);
   };
 
   const handleItemFormSubmit = async (values) => {
     try {
-      await itemMasterDataAPI.updateItem(selectedRecord.item_id, values);
+      // Ensure we don't overwrite required fields with null values
+      const updateData = {
+        ...values,
+        // Only include non-null values for nullable fields
+        preferred_vendor: values.preferred_vendor || null,
+        purchasing_uom: values.purchasing_uom || null,
+        items_per_purchase_unit: values.items_per_purchase_unit || null,
+        purchase_quantity_per_package: values.purchase_quantity_per_package || null,
+        sales_uom: values.sales_uom || null,
+        items_per_sale_unit: values.items_per_sale_unit || null,
+        sales_quantity_per_package: values.sales_quantity_per_package || null
+      };
+      
+      await itemMasterDataAPI.updateItem(selectedRecord.item_id, updateData);
       message.success("Item updated successfully");
       setItemModalVisible(false);
       fetchItems();
@@ -782,9 +834,9 @@ const ItemMasterManagement = () => {
           )}
         </Modal>
 
-        {/* Add Item Modal */}
+        {/* Add/Edit Item Modal */}
         <Modal
-          title="Add New Item"
+          title={modalMode === "add" ? "Add New Item" : "Edit Item"}
           visible={addItemModalVisible}
           onCancel={() => setAddItemModalVisible(false)}
           footer={null}
@@ -795,6 +847,12 @@ const ItemMasterManagement = () => {
             form={addItemForm}
             layout="vertical"
             onFinish={handleAddItemSubmit}
+            initialValues={{
+              item_type: "Product",
+              unit_of_measure: "kg",
+              item_status: "Active",
+              manage_item_by: "Serial Number"
+            }}
           >
             <Form.Item
               name="item_name"
@@ -843,7 +901,7 @@ const ItemMasterManagement = () => {
             <Form.Item
               name="manage_item_by"
               label="Manage By"
-              initialValue="None"
+              rules={[{ required: true, message: "Please select management method" }]}
             >
               <Select placeholder="Select management method">
                 {manageByOptions.map(option => (
@@ -857,7 +915,7 @@ const ItemMasterManagement = () => {
             <Form.Item
               name="item_status"
               label="Status"
-              initialValue="Active"
+              rules={[{ required: true, message: "Please select status" }]}
             >
               <Select>
                 <Option value="Active">Active</Option>
@@ -884,7 +942,7 @@ const ItemMasterManagement = () => {
               label="Purchasing UOM"
             >
               <Select allowClear placeholder="Select unit of measure">
-                {uomOptions.map(uom => (
+              {uomOptions.map(uom => (
                   <Option key={uom} value={uom}>
                     {uom}
                   </Option>
@@ -927,13 +985,13 @@ const ItemMasterManagement = () => {
               <InputNumber min={0} style={{ width: '100%' }} />
             </Form.Item>
 
-              <Form.Item
+            <Form.Item
               name="sales_quantity_per_package"
               label="Sales Quantity Per Package"
             >
               <InputNumber min={0} style={{ width: '100%' }} />
             </Form.Item>
-            
+
             <Form.Item className="form-actions">
               <Space>
                 <Button 
@@ -941,55 +999,53 @@ const ItemMasterManagement = () => {
                   htmlType="submit"
                   style={{ backgroundColor: '#00A8A8', borderColor: '#00A8A8' }}
                 >
-                  Create
+                  {modalMode === "add" ? "Create" : "Update"}
                 </Button>
                 <Button onClick={() => setAddItemModalVisible(false)}>
                   Cancel
                 </Button>
               </Space>
             </Form.Item>
-            </Form>
-            </Modal>
-            
-            {/* Archive Modal */}
-            <Modal
-              title="Archived Items"
-              visible={archiveModalVisible}
-              onCancel={() => setArchiveModalVisible(false)}
-              footer={[
-                <Button key="close" onClick={() => setArchiveModalVisible(false)}>
-                  Close
-                </Button>
-              ]}
-              width={800}
-              className="archive-modal"
-            >
-              <div className="archive-search-container">
-                <Input.Search
-                  placeholder="Search archived items..."
-                  allowClear
-                  onSearch={handleArchivedSearch}
-                  value={archivedSearchValue}
-                  onChange={(e) => setArchivedSearchValue(e.target.value)}
-                  style={{ marginBottom: 16 }}
-                />
-              </div>
-              
-              <Table 
-                dataSource={archivedItems} 
-                columns={archivedItemColumns} 
-                rowKey="item_id"
-                loading={loading}
-                pagination={{ pageSize: 5 }}
-                scroll={{ x: true }}
-                bordered
-                size="middle"
-                onChange={handleArchivedTableChange}
-              />
-            </Modal>
-            </div>
-            </div>
-            );
-            };
-            
-            export default ItemMasterManagement;
+          </Form>
+        </Modal>
+
+        {/* Archived Items Modal */}
+        <Modal
+          title="Archived Items"
+          visible={archiveModalVisible}
+          onCancel={() => setArchiveModalVisible(false)}
+          footer={[
+            <Button key="close" onClick={() => setArchiveModalVisible(false)}>
+              Close
+            </Button>
+          ]}
+          width={900}
+          className="archive-modal"
+        >
+          <div className="archived-search-container">
+            <Input.Search
+              placeholder="Search archived items..."
+              allowClear
+              onSearch={handleArchivedSearch}
+              value={archivedSearchValue}
+              onChange={(e) => setArchivedSearchValue(e.target.value)}
+              style={{ marginBottom: 16 }}
+            />
+          </div>
+          <Table 
+            dataSource={archivedItems} 
+            columns={archivedItemColumns} 
+            rowKey="item_id"
+            loading={loading}
+            pagination={{ pageSize: 5 }}
+            scroll={{ x: true }}
+            size="middle"
+            onChange={handleArchivedTableChange}
+          />
+        </Modal>
+      </div>
+    </div>
+  );
+};
+
+export default ItemMasterManagement;
