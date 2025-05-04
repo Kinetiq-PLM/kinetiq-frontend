@@ -42,7 +42,7 @@ const Information = ({ label, value = "" }) => {
 const PriorityDropbar = ({ label, setTicketInfo }) => {
   const priorityType = ["Low", "Medium", "High", "Urgent"];
 
-  const [priority, setPriority] = useState();
+  const [priority, setPriority] = useState("Low");
 
   const handlePriorityChange = (event) => {
     setPriority(event.target.value);
@@ -73,7 +73,7 @@ const PriorityDropbar = ({ label, setTicketInfo }) => {
 const StatusDropbar = ({ label, setTicketInfo }) => {
   const statusType = ["Open", "In Progress", "Closed"];
 
-  const [status, setStatus] = useState();
+  const [status, setStatus] = useState("Open");
 
   const handlePriorityChange = (event) => {
     setStatus(event.target.value);
