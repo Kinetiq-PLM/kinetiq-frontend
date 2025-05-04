@@ -20,7 +20,7 @@ const AccountsPayableReceiptModal = ({
       if (isCreating && !updatedRow[0]) {
         const currentYear = new Date().getFullYear();
         const uniqueId = generateLowercaseId(6);
-        updatedRow[0] = `AP-${currentYear}-${uniqueId}`;
+        updatedRow[0] = `AP-APR-${currentYear}-${uniqueId}`;
         updatedRow[6] = `REF-AP-${Math.floor(100000 + Math.random() * 900000)}`;
       }
       setFormData(updatedRow);
