@@ -170,12 +170,10 @@ const PurchaseOrderEdit = ({ purchaseOrder, onClose, onSuccess }) => {
               required
             >
               <option value="">Select Status</option>
-              <option value="Draft">Draft</option>
-              <option value="Pending">Pending</option>
-              <option value="Approved">Approved</option>
-              <option value="Rejected">Rejected</option>
+              <option value="Pending">Received</option>
+              <option value="Approved">Ordered</option>
+              <option value="Rejected">Returned</option>
               <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
             </select>
           </div>
           <div className="po-edit-form-group">
