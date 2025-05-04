@@ -29,7 +29,7 @@ const BodyContent = () => {
     
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/expiry-report/")
+        fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/expiry-report/")
             .then((res) => res.json())
             .then((data) => {
                 setExpiringItemsData(data);
