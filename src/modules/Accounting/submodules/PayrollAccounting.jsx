@@ -355,17 +355,17 @@ const PayrollAccounting = () => {
   const handleCreatePayroll = (isNewPayroll = false) => {
     const initialRow = isNewPayroll
       ? [
-        "", // payroll_accounting_id (generated in PayrollModal)
-        "", // payroll_hr_id
-        "", // date_approved
-        "", // approved_by
-        "", // payment_method
-        "", // reference_number (generated in modal)
-        "Processing", // status
-      ]
+          "", // payroll_accounting_id (generated in PayrollModal)
+          "", // payroll_hr_id
+          "", // date_approved
+          "", // approved_by
+          "", // payment_method
+          "", // reference_number (generated in modal)
+          "Processing", // status
+        ]
       : payrollAccounting_columns.map((col) =>
-        col === "Status" ? "Processing" : ""
-      );
+          col === "Status" ? "Processing" : ""
+        );
     console.log("Creating payroll, isNewPayroll:", isNewPayroll, "initialRow:", initialRow);
     setSelectedRow(initialRow);
     setIsCreating(true);
@@ -386,59 +386,72 @@ const PayrollAccounting = () => {
 
       console.log("Payload being sent to backend:", payload);
 
-      const response = await fetch(PAYROLL_ACCOUNTING_ENDPOINT, {
+      // Validate status locally
+      const validStatuses = ["Processing", "Completed"];
+      if (!validStatuses.includes(payload.status)) {
+        throw new Error(`Invalid status: ${payload.status}. Must be one of ${validStatuses.join(", ")}`);
+      }
+
+      const url = isNewPayroll
+        ? PAYROLL_ACCOUNTING_ENDPOINT
+        : `${PAYROLL_ACCOUNTING_ENDPOINT}${payload.payroll_accounting_id}/`;
+
+      const response = await fetch(url, {
         method: isNewPayroll ? "POST" : "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
+      const contentType = response.headers.get("content-type");
+      const responseText = await response.text();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Backend error response:", errorData);
-        throw new Error(
-          `HTTP error! status: ${response.status}, message: ${errorData.message || JSON.stringify(errorData)
-          }`
-        );
+        console.error("Response Text:", responseText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
       }
 
-      const newData = await response.json();
-      console.log("Backend response data:", newData);
+      if (contentType && contentType.includes("application/json")) {
+        const newData = JSON.parse(responseText);
+        console.log("Backend response data:", newData);
 
-      setPayrollAccountingData((prevData) =>
-        isNewPayroll
-          ? [
-            [
-              newData.payroll_accounting_id,
-              newData.payroll_hr_id,
-              newData.date_approved,
-              newData.approved_by,
-              newData.payment_method,
-              newData.reference_number,
-              newData.status,
-            ],
-            ...prevData,
-          ]
-          : prevData.map((row) =>
-            row[0] === updatedRow[0]
-              ? [
-                newData.payroll_accounting_id,
-                newData.payroll_hr_id,
-                newData.date_approved,
-                newData.approved_by,
-                newData.payment_method,
-                newData.reference_number,
-                newData.status,
+        setPayrollAccountingData((prevData) =>
+          isNewPayroll
+            ? [
+                [
+                  newData.payroll_accounting_id,
+                  newData.payroll_hr_id,
+                  newData.date_approved,
+                  newData.approved_by,
+                  newData.payment_method,
+                  newData.reference_number,
+                  newData.status,
+                ],
+                ...prevData,
               ]
-              : row
-          )
-      );
+            : prevData.map((row) =>
+                row[0] === updatedRow[0]
+                  ? [
+                      newData.payroll_accounting_id,
+                      newData.payroll_hr_id,
+                      newData.date_approved,
+                      newData.approved_by,
+                      newData.payment_method,
+                      newData.reference_number,
+                      newData.status,
+                    ]
+                  : row
+              )
+        );
 
-      setValidation({
-        isOpen: true,
-        type: "success",
-        title: "Success",
-        message: `Payroll record ${isNewPayroll ? "created" : "updated"} successfully.`,
-      });
+        setValidation({
+          isOpen: true,
+          type: "success",
+          title: "Success",
+          message: `Payroll record ${isNewPayroll ? "created" : "updated"} successfully.`,
+        });
+      } else {
+        throw new Error("Unexpected response format: Expected JSON but received HTML");
+      }
 
       setModalOpen(false);
       setIsCreating(false);
@@ -471,7 +484,6 @@ const PayrollAccounting = () => {
   return (
     <div className="accountsPayable">
       <div className="body-content-container">
-
         <div className="title-subtitle-container">
           <h1 className="subModule-title">Payroll Accounting</h1>
         </div>
@@ -536,37 +548,33 @@ const PayrollAccounting = () => {
         </div>
       </div>
 
-      {
-        modalOpen && (
-          <PayrollModal
-            isModalOpen={modalOpen}
-            closeModal={() => {
-              console.log("Closing modal");
-              setModalOpen(false);
-              setIsCreating(false);
-            }}
-            selectedRow={selectedRow}
-            handleSubmit={(data, isNewPayroll) => handleEditSubmit(data, isNewPayroll)}
-            columnHeaders={payrollAccounting_columns}
-            isCreating={isCreating}
-            payrollHrIds={payrollHrIds}
-            isNewPayroll={isCreating && selectedRow[1] === ""}
-          />
-        )
-      }
+      {modalOpen && (
+        <PayrollModal
+          isModalOpen={modalOpen}
+          closeModal={() => {
+            console.log("Closing modal");
+            setModalOpen(false);
+            setIsCreating(false);
+          }}
+          selectedRow={selectedRow}
+          handleSubmit={(data, isNewPayroll) => handleEditSubmit(data, isNewPayroll)}
+          columnHeaders={payrollAccounting_columns}
+          isCreating={isCreating}
+          payrollHrIds={payrollHrIds}
+          isNewPayroll={isCreating && selectedRow[1] === ""}
+        />
+      )}
 
-      {
-        validation.isOpen && (
-          <NotifModal
-            isOpen={validation.isOpen}
-            onClose={() => setValidation({ ...validation, isOpen: false })}
-            type={validation.type}
-            title={validation.title}
-            message={validation.message}
-          />
-        )
-      }
-    </div >
+      {validation.isOpen && (
+        <NotifModal
+          isOpen={validation.isOpen}
+          onClose={() => setValidation({ ...validation, isOpen: false })}
+          type={validation.type}
+          title={validation.title}
+          message={validation.message}
+        />
+      )}
+    </div>
   );
 };
 
