@@ -542,7 +542,7 @@ const BodyContent = () => {
           <div className="content-container">
             <InfoCard className="summary-infocard">
               <div className="summary-container">
-                <div className="summary-date-range">August 2025 - August 2026</div>
+                <div className="summary-date-range">January 2025 - January 2026</div>
                 <div className="summary-details">
                   <div className="summary-total-budget">
                     Total Budget
@@ -666,7 +666,7 @@ const BodyContent = () => {
           <div className="content-container">
             <InfoCard className="summary-infocard">
               <div className="summary-container">
-                <div className="summary-date-range">August 2025-August 2026</div>
+                <div className="summary-date-range">January 2025-January 2026</div>
                 <div className="summary-details">
                   <div className="summary-total-budget">
                     Total Approved Amount
@@ -791,7 +791,7 @@ const BodyContent = () => {
           <div className="content-container">
             <InfoCard className="summary-infocard">
               <div className="summary-container">
-                <div className="summary-date-range">August 2025 - August 2026</div>
+                <div className="summary-date-range">January 2025 - January 2026</div>
                 <div className="summary-details">
                   <div className="summary-total-budget">
                     Total Returned Amount
