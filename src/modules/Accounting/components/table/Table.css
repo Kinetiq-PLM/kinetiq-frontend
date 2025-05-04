@@ -1,17 +1,20 @@
 .accounting-table .table-container {
   width: 100%;
   max-height: 60vh;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .accounting-table table {
+  min-width: max-content; /* add this */
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto; /* change from fixed if you want natural column width growth */
   font-family: 'Inter', sans-serif;
 }
+
 
 .accounting-table thead {
   position: sticky;
