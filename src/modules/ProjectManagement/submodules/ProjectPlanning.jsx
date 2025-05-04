@@ -1,19 +1,48 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import ProjectGanttChart from "./ProjectGanttChart.jsx";
 import "../styles/ProjectPlanning.css";
+
+// Import icons individually
+import { 
+  FaClipboardList, 
+  FaTasks, 
+  FaUsersCog, 
+  FaTools, 
+  FaShieldAlt, 
+  FaChartLine, 
+  FaArrowLeft, 
+  FaPlus, 
+  FaRegCalendarAlt, 
+  FaFilter, 
+  FaExternalLinkAlt, 
+  FaBuilding, 
+  FaEdit, 
+  FaEye, 
+  FaCheckCircle, 
+  FaExclamationCircle, 
+  FaExclamationTriangle,
+  FaTrash,
+  FaPlusCircle
+} from "react-icons/fa";
 
 const ProjectPlanningDashboard = () => {
   // State for active view/form
   const [activeView, setActiveView] = useState("dashboard");
   const [selectedProjectType, setSelectedProjectType] = useState("external");
-  const [editMode, setEditMode] = useState(false);
-  const [editId, setEditId] = useState(null);
+  
+  const [showGanttChart, setShowGanttChart] = useState(false);
+
+  
   const [message, setMessage] = useState({ text: "", type: "" });
   
   // Pagination states
   const [currentExternalPage, setCurrentExternalPage] = useState(1);
   const [currentInternalPage, setCurrentInternalPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  
+  // Filter state
+  const [filterStatus, setFilterStatus] = useState("all");
   
   // Data lists for dropdowns
   const [approvalIds, setApprovalIds] = useState([]);
@@ -23,13 +52,16 @@ const ProjectPlanningDashboard = () => {
   const [projectIds, setProjectIds] = useState([]);
   const [employeeIds, setEmployeeIds] = useState([]);
   const [equipmentIds, setEquipmentIds] = useState([]);
+  const [equipmentNames, setEquipmentNames] = useState([]); // New state for equipment names
   const [internalProjectRequestIds, setInternalProjectRequestIds] = useState([]);
   const [internalProjectIds, setInternalProjectIds] = useState([]);
   const [departmentIds, setDepartmentIds] = useState([]);
   const [projectStatusOptions, setProjectStatusOptions] = useState([]);
   const [internalProjectStatusOptions, setInternalProjectStatusOptions] = useState([]);
-  const [bomIds, setBomIds] = useState([]);
-  const [budgetApprovalIds, setBudgetApprovalIds] = useState([]);
+  
+  // Removed unused state variables
+  // const [bomIds, setBomIds] = useState([]);
+  // const [budgetApprovalIds, setBudgetApprovalIds] = useState([]);
   
   // Project lists
   const [externalProjectsList, setExternalProjectsList] = useState([]);
@@ -57,10 +89,10 @@ const ProjectPlanningDashboard = () => {
     employeeId: ""
   });
   
-  // External Project Equipment Form
+  // External Project Equipment Form - Updated to support multiple equipment items
   const [externalProjectEquipmentForm, setExternalProjectEquipmentForm] = useState({
     projectId: "",
-    projectEquipmentId: ""
+    equipmentItems: [{ name: "" }]  // Array of equipment items
   });
   
   // External Project Warranty Form
@@ -71,6 +103,12 @@ const ProjectPlanningDashboard = () => {
     warrantyEndDate: ""
   });
   
+  // External Project Cost Form
+  const [externalProjectCostForm, setExternalProjectCostForm] = useState({
+    projectId: "",
+    bomId: "",
+    projectBudgetApproval: ""
+  });
   
   // Internal Project Request Form
   const [internalProjectRequestForm, setInternalProjectRequestForm] = useState({
@@ -125,8 +163,6 @@ const ProjectPlanningDashboard = () => {
           axios.get('/api/project-planning/get-department-ids/').catch(e => ({ data: [] })),
           axios.get('/api/project-planning/get-project-status-values/').catch(e => ({ data: ['not started', 'in progress', 'completed'] })),
           axios.get('/api/project-planning/get-internal-project-status-values/').catch(e => ({ data: ['not started', 'in progress', 'completed'] })),
-          axios.get('/api/project-planning/get-bom-ids-from-cost-management/').catch(e => ({ data: [] })),
-          axios.get('/api/project-planning/get-budget-approval-ids-from-cost-management/').catch(e => ({ data: [] })),
           axios.get('/api/project-planning/get-external-project-requests-list/').catch(e => ({ data: [] })),
           axios.get('/api/project-planning/get-internal-project-requests-list/').catch(e => ({ data: [] }))
         ];
@@ -144,8 +180,6 @@ const ProjectPlanningDashboard = () => {
           departmentRes,
           projectStatusRes,
           internalProjectStatusRes,
-          bomIdsRes,
-          budgetApprovalIdsRes,
           externalListRes,
           internalListRes
         ] = await Promise.all(apiCalls);
@@ -162,12 +196,26 @@ const ProjectPlanningDashboard = () => {
         setDepartmentIds(departmentRes.data);
         setProjectStatusOptions(projectStatusRes.data);
         setInternalProjectStatusOptions(internalProjectStatusRes.data);
-        setBomIds(bomIdsRes.data);
-        setBudgetApprovalIds(budgetApprovalIdsRes.data);
         setExternalProjectsList(externalListRes.data);
         setInternalProjectsList(internalListRes.data);
         setCurrentExternalPage(1);
         setCurrentInternalPage(1);
+        
+        // Fetch equipment names
+        try {
+          const equipmentNamesRes = await axios.get('/api/project-planning/get-equipment-names/');
+          setEquipmentNames(equipmentNamesRes.data);
+        } catch (error) {
+          console.error("Error fetching equipment names:", error);
+          // Create some mock equipment names if the API call fails
+          setEquipmentNames([
+            { id: "EQ-001", name: "Drill Machine" },
+            { id: "EQ-002", name: "Welding Equipment" },
+            { id: "EQ-003", name: "Forklift" },
+            { id: "EQ-004", name: "Concrete Mixer" },
+            { id: "EQ-005", name: "Excavator" }
+          ]);
+        }
       } catch (error) {
         console.error("Error fetching dropdown data:", error);
         setMessage({ 
@@ -202,10 +250,13 @@ const ProjectPlanningDashboard = () => {
         });
         break;
       case 'externalProjectEquipment':
-        setExternalProjectEquipmentForm({
-          ...externalProjectEquipmentForm,
-          [fieldName]: value
-        });
+        // For the projectId field
+        if (fieldName === 'projectId') {
+          setExternalProjectEquipmentForm({
+            ...externalProjectEquipmentForm,
+            projectId: value
+          });
+        }
         break;
       case 'externalProjectWarranty':
         setExternalProjectWarrantyForm({
@@ -242,17 +293,116 @@ const ProjectPlanningDashboard = () => {
     }
   };
 
-  // Form submission handlers
+  // Function to add another equipment field
+  const addEquipmentField = () => {
+    setExternalProjectEquipmentForm({
+      ...externalProjectEquipmentForm,
+      equipmentItems: [...externalProjectEquipmentForm.equipmentItems, { name: "" }]
+    });
+  };
+
+  // Function to remove an equipment field
+  const removeEquipmentField = (index) => {
+    const updatedItems = [...externalProjectEquipmentForm.equipmentItems];
+    updatedItems.splice(index, 1);
+    setExternalProjectEquipmentForm({
+      ...externalProjectEquipmentForm,
+      equipmentItems: updatedItems
+    });
+  };
+
+  // Function to update a specific equipment item
+  const updateEquipmentItem = (index, value) => {
+    const updatedItems = [...externalProjectEquipmentForm.equipmentItems];
+    updatedItems[index].name = value;
+    setExternalProjectEquipmentForm({
+      ...externalProjectEquipmentForm,
+      equipmentItems: updatedItems
+    });
+  };
+
+ // Add these functions to your component, right before or after your other handler functions
+
+// Function to handle viewing project details
+  const handleViewProject = (projectId, isInternal = false) => {
+  console.log(`Viewing ${isInternal ? 'internal' : 'external'} project with ID: ${projectId}`);
+  
+  // If the project is internal, set the form with the project data
+  if (isInternal) {
+    // Find the project in the internal projects list
+    const project = internalProjectsList.find(p => p.project_request_id === projectId);
+    if (project) {
+      setInternalProjectDetailsForm({
+        projectRequestId: project.project_request_id,
+        projectStatus: project.project_status?.toLowerCase() || "",
+        approvalId: project.approval_id || "",
+        projectDescription: project.project_description || ""
+      });
+      setActiveView("internalProjectDetails");
+    }
+  } else {
+    // Find the project in the external projects list
+    const project = externalProjectsList.find(p => p.project_request_id === projectId);
+    if (project) {
+      setExternalProjectDetailsForm({
+        projectRequestId: project.project_request_id,
+        projectStatus: project.project_status?.toLowerCase() || ""
+      });
+      setActiveView("externalProjectDetails");
+    }
+  }
+};
+
+// Function to handle editing project details
+// Function to handle editing project details
+const handleEditProject = (projectId, isInternal = false) => {
+  console.log(`Editing ${isInternal ? 'internal' : 'external'} project with ID: ${projectId}`);
+  
+  // If the project is internal, set the form with the project data
+  if (isInternal) {
+    // Find the project in the internal projects list
+    const project = internalProjectsList.find(p => p.project_request_id === projectId);
+    if (project) {
+      setInternalProjectDetailsForm({
+        projectRequestId: project.project_request_id,
+        projectStatus: project.project_status?.toLowerCase() || "",
+        approvalId: project.approval_id || "",
+        projectDescription: project.project_description || ""
+      });
+      setActiveView("internalProjectDetails");
+    }
+  } else {
+    // Find the project in the external projects list
+    const project = externalProjectsList.find(p => p.project_request_id === projectId);
+    if (project) {
+      setExternalProjectDetailsForm({
+        projectRequestId: project.project_request_id,
+        projectStatus: project.project_status?.toLowerCase() || ""
+      });
+      setActiveView("externalProjectDetails");
+    }
+  }
+};
+
+  // Form submission handlers with improved error handling
   const handleExternalProjectRequestSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting external project request form:", externalProjectRequestForm);
+    
     try {
-      const response = await axios.post('/api/project-planning/create-external-project-request/', {
+      const formData = {
         ProjectName: externalProjectRequestForm.projectName,
         ProjectDescription: externalProjectRequestForm.projectDescription,
         ApprovalID: externalProjectRequestForm.approvalId,
         OrderID: externalProjectRequestForm.orderId,
         ProjectStatus: "Pending"
-      });
+      };
+      
+      console.log("Sending data to API:", formData);
+      
+      const response = await axios.post('/api/project-planning/create-external-project-request/', formData);
+      
+      console.log("API response:", response.data);
       
       setMessage({ 
         text: "External project request created successfully!", 
@@ -279,8 +429,19 @@ const ProjectPlanningDashboard = () => {
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error creating project:", error);
+      let errorMessage = "Failed to create project. Please try again.";
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        
+        if (error.response.data && error.response.data.error) {
+          errorMessage = `Failed to create project: ${error.response.data.error}`;
+        }
+      }
+      
       setMessage({ 
-        text: "Failed to create project. Please try again.", 
+        text: errorMessage, 
         type: "error" 
       });
     }
@@ -288,13 +449,21 @@ const ProjectPlanningDashboard = () => {
 
   const handleExternalProjectDetailsSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting external project details form:", externalProjectDetailsForm);
+    
     try {
+      const formData = {
+        project_status: externalProjectDetailsForm.projectStatus
+      };
+      
+      console.log("Sending data to API:", formData);
+      
       const response = await axios.put(
         `/api/project-planning/external-details/${externalProjectDetailsForm.projectRequestId}/`, 
-        {
-          project_status: externalProjectDetailsForm.projectStatus
-        }
+        formData
       );
+      
+      console.log("API response:", response.data);
       
       setMessage({ 
         text: "Project details updated successfully!", 
@@ -319,8 +488,19 @@ const ProjectPlanningDashboard = () => {
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error updating project details:", error);
+      let errorMessage = "Failed to update project details. Please try again.";
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        
+        if (error.response.data && error.response.data.error) {
+          errorMessage = `Failed to update project details: ${error.response.data.error}`;
+        }
+      }
+      
       setMessage({ 
-        text: "Failed to update project details. Please try again.", 
+        text: errorMessage, 
         type: "error" 
       });
     }
@@ -328,12 +508,20 @@ const ProjectPlanningDashboard = () => {
 
   const handleExternalProjectLaborSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting external project labor form:", externalProjectLaborForm);
+    
     try {
-      const response = await axios.post('/api/project-planning/add-external-project-labor/', {
+      const formData = {
         ProjectID: externalProjectLaborForm.projectId,
         JobRoleNeeded: externalProjectLaborForm.jobRoleNeeded,
         EmployeeID: externalProjectLaborForm.employeeId
-      });
+      };
+      
+      console.log("Sending data to API:", formData);
+      
+      const response = await axios.post('/api/project-planning/add-external-project-labor/', formData);
+      
+      console.log("API response:", response.data);
       
       setMessage({ 
         text: "Project labor added successfully!", 
@@ -351,39 +539,81 @@ const ProjectPlanningDashboard = () => {
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error adding project labor:", error);
+      let errorMessage = "Failed to add project labor. Please try again.";
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        
+        if (error.response.data && error.response.data.error) {
+          errorMessage = `Failed to add project labor: ${error.response.data.error}`;
+        }
+      }
+      
       setMessage({ 
-        text: "Failed to add project labor. Please try again.", 
+        text: errorMessage, 
         type: "error" 
       });
     }
   };
 
-  // Added missing form submission handlers
   const handleExternalProjectEquipmentSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting external project equipment form:", externalProjectEquipmentForm);
+    
     try {
-      const response = await axios.post('/api/project-planning/add-external-project-equipment/', {
+      // Extract equipment names from the form
+      const equipmentNames = externalProjectEquipmentForm.equipmentItems
+        .map(item => item.name)
+        .filter(name => name.trim() !== "");
+      
+      if (equipmentNames.length === 0) {
+        setMessage({ 
+          text: "Please add at least one equipment item", 
+          type: "error" 
+        });
+        return;
+      }
+      
+      const formData = {
         ProjectID: externalProjectEquipmentForm.projectId,
-        ProjectEquipmentID: externalProjectEquipmentForm.projectEquipmentId    
-      });
+        EquipmentNames: equipmentNames
+      };
+      
+      console.log("Sending data to API:", formData);
+      
+      const response = await axios.post('/api/project-planning/add-external-project-equipment/', formData);
+      
+      console.log("API response:", response.data);
       
       setMessage({ 
-        text: "Project equipment added successfully!", 
+        text: `Successfully added ${equipmentNames.length} equipment items to the project!`, 
         type: "success" 
       });
       
       // Reset form
       setExternalProjectEquipmentForm({
         projectId: "",
-        projectEquipmentId: ""
+        equipmentItems: [{ name: "" }]
       });
       
       // Return to dashboard
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error adding project equipment:", error);
+      let errorMessage = "Failed to add project equipment. Please try again.";
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        
+        if (error.response.data && error.response.data.error) {
+          errorMessage = `Failed to add project equipment: ${error.response.data.error}`;
+        }
+      }
+      
       setMessage({ 
-        text: "Failed to add project equipment. Please try again.", 
+        text: errorMessage, 
         type: "error" 
       });
     }
@@ -391,6 +621,7 @@ const ProjectPlanningDashboard = () => {
 
   const handleExternalProjectWarrantySubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting external project warranty form:", externalProjectWarrantyForm);
     
     // Validate dates
     const startDate = new Date(externalProjectWarrantyForm.warrantyStartDate);
@@ -405,12 +636,18 @@ const ProjectPlanningDashboard = () => {
     }
     
     try {
-      const response = await axios.post('/api/project-planning/add-external-project-warranty/', {
+      const formData = {
         ProjectID: externalProjectWarrantyForm.projectId,
         Warrantycoverageyear: externalProjectWarrantyForm.warrantyCoverageYear,
         Warrantystartdate: externalProjectWarrantyForm.warrantyStartDate,
         Warrantyenddate: externalProjectWarrantyForm.warrantyEndDate
-      });
+      };
+      
+      console.log("Sending data to API:", formData);
+      
+      const response = await axios.post('/api/project-planning/add-external-project-warranty/', formData);
+      
+      console.log("API response:", response.data);
       
       setMessage({ 
         text: "Project warranty added successfully!", 
@@ -429,28 +666,40 @@ const ProjectPlanningDashboard = () => {
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error adding project warranty:", error);
-      if (error.response && error.response.data && error.response.data.error) {
-        setMessage({ 
-          text: `Failed to add project warranty: ${error.response.data.error}`, 
-          type: "error" 
-        });
-      } else {
-        setMessage({ 
-          text: "Failed to add project warranty. Please try again.", 
-          type: "error" 
-        });
+      let errorMessage = "Failed to add project warranty. Please try again.";
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        
+        if (error.response.data && error.response.data.error) {
+          errorMessage = `Failed to add project warranty: ${error.response.data.error}`;
+        }
       }
+      
+      setMessage({ 
+        text: errorMessage, 
+        type: "error" 
+      });
     }
   };
 
-  const handleExternalProjectCostSubmit = async (e) => {
+   const handleExternalProjectCostSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting external project cost form:", externalProjectCostForm);
+    
     try {
-      const response = await axios.post('/api/project-planning/add-external-project-cost-management/', {
+      const formData = {
         ProjectID: externalProjectCostForm.projectId,
         BomID: externalProjectCostForm.bomId,
         ProjectBudgetApproval: externalProjectCostForm.projectBudgetApproval
-      });
+      };
+      
+      console.log("Sending data to API:", formData);
+      
+      const response = await axios.post('/api/project-planning/add-external-project-cost-management/', formData);
+      
+      console.log("API response:", response.data);
       
       setMessage({ 
         text: "Project cost management added successfully!", 
@@ -468,32 +717,46 @@ const ProjectPlanningDashboard = () => {
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error adding project cost management:", error);
-      if (error.response && error.response.data && error.response.data.error) {
-        setMessage({ 
-          text: `Failed to add project cost management: ${error.response.data.error}`, 
-          type: "error" 
-        });
-      } else {
-        setMessage({ 
-          text: "Failed to add project cost management. Please try again.", 
-          type: "error" 
-        });
+      let errorMessage = "Failed to add project cost management. Please try again.";
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        
+        if (error.response.data && error.response.data.error) {
+          errorMessage = `Failed to add project cost management: ${error.response.data.error}`;
+        }
       }
+      
+      setMessage({ 
+        text: errorMessage, 
+        type: "error" 
+      });
     }
   };
 
   const handleInternalProjectRequestSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting internal project request form:", internalProjectRequestForm);
+    
     try {
-      const response = await axios.post('/api/project-planning/create-internal-project/', {
+      const formData = {
         ProjectNameint: internalProjectRequestForm.projectName,
         RequestDateint: internalProjectRequestForm.requestDate,
         Startingdateint: internalProjectRequestForm.startingDate,
         EmployeeIDint: internalProjectRequestForm.employeeId,
         DepartmentIDint: internalProjectRequestForm.departmentId,
-        Budgetrequestint: internalProjectRequestForm.budgetRequest,
-        Budgetdescriptionint: internalProjectRequestForm.budgetDescription
-      });
+        ReasonForRequest: internalProjectRequestForm.reasonForRequest,
+        MaterialsNeeded: internalProjectRequestForm.materialsNeeded,
+        EquipmentNeeded: internalProjectRequestForm.equipmentNeeded,
+        ProjectType: internalProjectRequestForm.projectType
+      };
+      
+      console.log("Sending data to API:", formData);
+      
+      const response = await axios.post('/api/project-planning/create-internal-project/', formData);
+      
+      console.log("API response:", response.data);
       
       setMessage({ 
         text: "Internal project request created successfully!", 
@@ -515,16 +778,29 @@ const ProjectPlanningDashboard = () => {
         startingDate: "",
         employeeId: "",
         departmentId: "",
-        budgetRequest: "",
-        budgetDescription: ""
+        reasonForRequest: "",
+        materialsNeeded: "",
+        equipmentNeeded: "",
+        projectType: ""
       });
       
       // Return to dashboard
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error creating internal project:", error);
+      let errorMessage = "Failed to create internal project. Please try again.";
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        
+        if (error.response.data && error.response.data.error) {
+          errorMessage = `Failed to create internal project: ${error.response.data.error}`;
+        }
+      }
+      
       setMessage({ 
-        text: "Failed to create internal project. Please try again.", 
+        text: errorMessage, 
         type: "error" 
       });
     }
@@ -532,12 +808,23 @@ const ProjectPlanningDashboard = () => {
 
   const handleInternalProjectDetailsSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting internal project details form:", internalProjectDetailsForm);
+    
     try {
-      const response = await axios.put(`/api/project-planning/internal-details/${internalProjectDetailsForm.projectRequestId}/`, {
+      const formData = {
         intrnl_project_status: internalProjectDetailsForm.projectStatus,
         approval_id: internalProjectDetailsForm.approvalId,
         project_description: internalProjectDetailsForm.projectDescription
-      });
+      };
+      
+      console.log("Sending data to API:", formData);
+      
+      const response = await axios.put(
+        `/api/project-planning/internal-details/${internalProjectDetailsForm.projectRequestId}/`, 
+        formData
+      );
+      
+      console.log("API response:", response.data);
       
       setMessage({ 
         text: "Internal project details updated successfully!", 
@@ -564,8 +851,19 @@ const ProjectPlanningDashboard = () => {
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error updating internal project details:", error);
+      let errorMessage = "Failed to update internal project details. Please try again.";
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        
+        if (error.response.data && error.response.data.error) {
+          errorMessage = `Failed to update internal project details: ${error.response.data.error}`;
+        }
+      }
+      
       setMessage({ 
-        text: "Failed to update internal project details. Please try again.", 
+        text: errorMessage, 
         type: "error" 
       });
     }
@@ -573,12 +871,20 @@ const ProjectPlanningDashboard = () => {
 
   const handleInternalProjectLaborSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting internal project labor form:", internalProjectLaborForm);
+    
     try {
-      const response = await axios.post('/api/project-planning/add-internal-project-labor/', {
+      const formData = {
         Projectidint: internalProjectLaborForm.projectId, 
         Jobroleint: internalProjectLaborForm.jobRole,
         EmployeeIDint: internalProjectLaborForm.employeeId
-      });
+      };
+      
+      console.log("Sending data to API:", formData);
+      
+      const response = await axios.post('/api/project-planning/add-internal-project-labor/', formData);
+      
+      console.log("API response:", response.data);
       
       setMessage({ 
         text: "Internal project labor added successfully!", 
@@ -596,26 +902,60 @@ const ProjectPlanningDashboard = () => {
       setActiveView("dashboard");
     } catch (error) {
       console.error("Error adding internal project labor:", error);
+      let errorMessage = "Failed to add internal project labor. Please try again.";
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        
+        if (error.response.data && error.response.data.error) {
+          errorMessage = `Failed to add internal project labor: ${error.response.data.error}`;
+        }
+      }
+      
       setMessage({ 
-        text: "Failed to add internal project labor. Please try again.", 
+        text: errorMessage, 
         type: "error" 
       });
     }
   };
 
+  // Function to handle filter change
+  const handleFilterChange = (status) => {
+    console.log(`Filtering projects by status: ${status}`);
+    setFilterStatus(status);
+  };
+
+  // Function to filter projects by status
+  const filterProjectsByStatus = (projects) => {
+    if (filterStatus === "all") return projects;
+    
+    return projects.filter(project => {
+      // Handle case insensitivity and normalize status values
+      const projectStatus = project.project_status?.toLowerCase() || "";
+      const filterValue = filterStatus.toLowerCase();
+      
+      return projectStatus.includes(filterValue);
+    });
+  };
+
   // Function to render the project lists for dashboard
   const renderProjectListsSection = () => {
+    // Filter projects by status
+    const filteredExternalProjects = filterProjectsByStatus(externalProjectsList);
+    const filteredInternalProjects = filterProjectsByStatus(internalProjectsList);
+    
     // Calculate pagination indexes for external projects
     const externalLastIndex = currentExternalPage * itemsPerPage;
     const externalFirstIndex = externalLastIndex - itemsPerPage;
-    const currentExternalProjects = externalProjectsList.slice(externalFirstIndex, externalLastIndex);
-    const totalExternalPages = Math.ceil(externalProjectsList.length / itemsPerPage);
+    const currentExternalProjects = filteredExternalProjects.slice(externalFirstIndex, externalLastIndex);
+    const totalExternalPages = Math.ceil(filteredExternalProjects.length / itemsPerPage);
     
     // Calculate pagination indexes for internal projects
     const internalLastIndex = currentInternalPage * itemsPerPage;
     const internalFirstIndex = internalLastIndex - itemsPerPage;
-    const currentInternalProjects = internalProjectsList.slice(internalFirstIndex, internalLastIndex);
-    const totalInternalPages = Math.ceil(internalProjectsList.length / itemsPerPage);
+    const currentInternalProjects = filteredInternalProjects.slice(internalFirstIndex, internalLastIndex);
+    const totalInternalPages = Math.ceil(filteredInternalProjects.length / itemsPerPage);
     
     // Functions to handle pagination
     const nextExternalPage = () => {
@@ -641,49 +981,149 @@ const ProjectPlanningDashboard = () => {
         setCurrentInternalPage(currentInternalPage - 1);
       }
     };
+    
+    // Add this near the end of your component, just before the final return statement
+    const renderGanttChart = () => {
+      if (!showGanttChart) return null;
+      
+      return (
+        <div className="gantt-chart-overlay">
+          <div className="gantt-chart-container">
+            <div className="gantt-header">
+              <h2>Project Gantt Chart</h2>
+              <button 
+                className="close-gantt-button"
+                onClick={() => setShowGanttChart(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <ProjectGanttChart />
+          </div>
+        </div>
+      );
+    };
+    // Function to render status badge
+    const renderStatusBadge = (status) => {
+      if (!status) return <span className="status-badge">Not set</span>;
+      
+      let badgeClass = "";
+      switch(status.toLowerCase()) {
+        case "completed":
+          badgeClass = "completed";
+          break;
+        case "in progress":
+          badgeClass = "active";
+          break;
+        case "not started":
+        case "pending":
+          badgeClass = "pending";
+          break;
+        default:
+          badgeClass = "";
+      }
+      
+      return <span className={`status-badge ${badgeClass}`}>{status}</span>;
+    };
   
     return (
       <div className="project-lists-section">
-        <h2 className="section-title"><b>Project Requests</b></h2>
+        <div className="section-header">
+          <h2 className="section-title">Project Requests</h2>
+            <div className="section-actions">
+              <div className="filter-controls">
+                <span className="filter-label">Filter by Status:</span>
+                <div className="filter-buttons">
+                  <button 
+                    className={`filter-button ${filterStatus === "all" ? "active" : ""}`}
+                    onClick={() => handleFilterChange("all")}
+                  >
+                    All
+                  </button>
+                  <button 
+                    className={`filter-button ${filterStatus === "not started" ? "active" : ""}`}
+                    onClick={() => handleFilterChange("not started")}
+                  >
+                    Not Started
+                  </button>
+                  <button 
+                    className={`filter-button ${filterStatus === "in progress" ? "active" : ""}`}
+                    onClick={() => handleFilterChange("in progress")}
+                  >
+                    In Progress
+                  </button>
+                  <button 
+                    className={`filter-button ${filterStatus === "completed" ? "active" : ""}`}
+                    onClick={() => handleFilterChange("completed")}
+                  >
+                    Completed
+                  </button>
+                </div>
+              </div>
+            </div>
+        </div>
         
         <div className="project-list">
-          <h3>External Project Requests</h3>
-          <table className="project-table">
-            <thead>
-              <tr>
-                <th>Project Request ID</th>
-                <th>Project Name</th>
-                <th>Approval ID</th>
-                <th>Item ID</th>
-                <th>Start Date</th>
-                <th>Project Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentExternalProjects.length > 0 ? (
-                currentExternalProjects.map(project => (
-                  <tr key={project.project_request_id}>
-                    <td>{project.project_request_id || 'N/A'}</td>
-                    <td>{project.project_name || 'N/A'}</td>
-                    <td>{project.approval_id || 'N/A'}</td>
-                    <td>{project.item_id || 'N/A'}</td>
-                    <td>{project.start_date || 'Not set'}</td>
-                    <td>{project.project_status || 'Not set'}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="no-data">No external project requests found</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <div className="list-header">
+            <h3>
+              <FaExternalLinkAlt className="list-icon" /> 
+              External Project Requests
+            </h3>
+            <button 
+              className="create-button" 
+              onClick={() => setActiveView("externalProjectRequest")}
+            >
+              <FaPlus /> New Request
+            </button>
+          </div>
           
-          {externalProjectsList.length > itemsPerPage && (
+          <div className="table-responsive">
+            <table className="project-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Project Name</th>
+                  <th>Approval ID</th>
+                  <th>Item ID</th>
+                  <th>Start Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentExternalProjects.length > 0 ? (
+                  currentExternalProjects.map(project => (
+                    <tr key={project.project_request_id}>
+                      <td>#{project.project_request_id || 'N/A'}</td>
+                      <td className="project-name">{project.project_name || 'N/A'}</td>
+                      <td>{project.approval_id || 'N/A'}</td>
+                      <td>{project.item_id || 'N/A'}</td>
+                      <td className="date-cell">{project.start_date || 'Not set'}</td>
+                      <td>{renderStatusBadge(project.project_status)}</td>
+                      <td className="actions-cell">
+                            <button 
+                              className="table-action-button edit"
+                              onClick={() => handleEditProject(project.project_request_id, false)}
+                            >
+                              <FaEdit title="Edit" />
+                            </button>
+                          </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="no-data">No external project requests found</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          
+          {filteredExternalProjects.length > itemsPerPage && (
             <div className="pagination-controls">
               <div className="pagination-info">
                 Page {currentExternalPage} of {totalExternalPages} 
-                ({externalFirstIndex + 1}-{Math.min(externalLastIndex, externalProjectsList.length)} of {externalProjectsList.length})
+                ({externalFirstIndex + 1}-{Math.min(externalLastIndex, filteredExternalProjects.length)} of {filteredExternalProjects.length})
               </div>
               <div className="pagination-buttons">
                 <button 
@@ -706,45 +1146,68 @@ const ProjectPlanningDashboard = () => {
         </div>
         
         <div className="project-list">
-          <h3>Internal Project Requests</h3>
-          <table className="project-table">
-            <thead>
-              <tr>
-                <th>Project Request ID</th>
-                <th>Project Name</th>
-                <th>Approval ID</th>
-                <th>Request Date</th>
-                <th>Employee</th>
-                <th>Department</th>
-                <th>Project Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentInternalProjects.length > 0 ? (
-                currentInternalProjects.map(project => (
-                  <tr key={project.project_request_id}>
-                    <td>{project.project_request_id || 'N/A'}</td>
-                    <td>{project.project_name || 'N/A'}</td>
-                    <td>{project.approval_id || 'N/A'}</td>
-                    <td>{project.request_date || 'Not set'}</td>
-                    <td>{project.employee || 'Not assigned'}</td>
-                    <td>{project.department || 'Not assigned'}</td>
-                    <td>{project.project_status || 'Not set'}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="no-data">No internal project requests found</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <div className="list-header">
+            <h3>
+              <FaBuilding className="list-icon" /> 
+              Internal Project Requests
+            </h3>
+            <button 
+              className="create-button" 
+              onClick={() => setActiveView("internalProjectRequest")}
+            >
+              <FaPlus /> New Request
+            </button>
+          </div>
           
-          {internalProjectsList.length > itemsPerPage && (
+          <div className="table-responsive">
+            <table className="project-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Project Name</th>
+                  <th>Approval ID</th>
+                  <th>Request Date</th>
+                  <th>Employee</th>
+                  <th>Department</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentInternalProjects.length > 0 ? (
+                  currentInternalProjects.map(project => (
+                    <tr key={project.project_request_id}>
+                      <td>#{project.project_request_id || 'N/A'}</td>
+                      <td className="project-name">{project.project_name || 'N/A'}</td>
+                      <td>{project.approval_id || 'N/A'}</td>
+                      <td className="date-cell">{project.request_date || 'Not set'}</td>
+                      <td>{project.employee || 'Not assigned'}</td>
+                      <td>{project.department || 'Not assigned'}</td>
+                      <td>{renderStatusBadge(project.project_status)}</td>
+                      <td className="actions-cell">
+                          <button 
+                            className="table-action-button edit"
+                            onClick={() => handleEditProject(project.project_request_id, true)}
+                          >
+                            <FaEdit title="Edit" />
+                          </button>
+                        </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="8" className="no-data">No internal project requests found</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          
+          {filteredInternalProjects.length > itemsPerPage && (
             <div className="pagination-controls">
               <div className="pagination-info">
                 Page {currentInternalPage} of {totalInternalPages} 
-                ({internalFirstIndex + 1}-{Math.min(internalLastIndex, internalProjectsList.length)} of {internalProjectsList.length})
+                ({internalFirstIndex + 1}-{Math.min(internalLastIndex, filteredInternalProjects.length)} of {filteredInternalProjects.length})
               </div>
               <div className="pagination-buttons">
                 <button 
@@ -771,22 +1234,84 @@ const ProjectPlanningDashboard = () => {
 
   // Function to render the dashboard
   const renderDashboard = () => {
+    // Calculate project statistics
+    const totalExternalProjects = externalProjectsList.length;
+    const totalInternalProjects = internalProjectsList.length;
+    
+    const externalInProgress = externalProjectsList.filter(
+      p => p.project_status && p.project_status.toLowerCase() === 'in progress'
+    ).length;
+    
+    const internalInProgress = internalProjectsList.filter(
+      p => p.project_status && p.project_status.toLowerCase() === 'in progress'
+    ).length;
+    
+    const externalCompleted = externalProjectsList.filter(
+      p => p.project_status && p.project_status.toLowerCase() === 'completed'
+    ).length;
+    
+    const internalCompleted = internalProjectsList.filter(
+      p => p.project_status && p.project_status.toLowerCase() === 'completed'
+    ).length;
+    
     return (
       <div className="project-planning-dashboard">
-        <h2 className="dashboard-title">Project Planning Dashboard</h2>
+        <div className="dashboard-overview">
+          <div className="stats-card total-projects">
+            <div className="stats-icon">
+              <FaClipboardList />
+            </div>
+            <div className="stats-content">
+              <h4>Total Projects</h4>
+              <div className="stats-value">{totalExternalProjects + totalInternalProjects}</div>
+              <div className="stats-details">
+                <span>{totalExternalProjects} External</span> | 
+                <span>{totalInternalProjects} Internal</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="stats-card in-progress">
+            <div className="stats-icon">
+              <FaTasks />
+            </div>
+            <div className="stats-content">
+              <h4>In Progress</h4>
+              <div className="stats-value">{externalInProgress + internalInProgress}</div>
+              <div className="stats-details">
+                <span>{externalInProgress} External</span> | 
+                <span>{internalInProgress} Internal</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="stats-card completed">
+            <div className="stats-icon">
+              <FaRegCalendarAlt />
+            </div>
+            <div className="stats-content">
+              <h4>Completed</h4>
+              <div className="stats-value">{externalCompleted + internalCompleted}</div>
+              <div className="stats-details">
+                <span>{externalCompleted} External</span> | 
+                <span>{internalCompleted} Internal</span>
+              </div>
+            </div>
+          </div>
+        </div>
         
         <div className="dashboard-tabs">
           <button 
             className={`dashboard-tab ${selectedProjectType === 'external' ? 'active' : ''}`}
             onClick={() => setSelectedProjectType('external')}
           >
-            External Projects
+            <FaExternalLinkAlt className="tab-icon" /> External Projects
           </button>
           <button 
             className={`dashboard-tab ${selectedProjectType === 'internal' ? 'active' : ''}`}
             onClick={() => setSelectedProjectType('internal')}
           >
-            Internal Projects
+            <FaBuilding className="tab-icon" /> Internal Projects
           </button>
         </div>
         
@@ -794,40 +1319,79 @@ const ProjectPlanningDashboard = () => {
           {selectedProjectType === 'external' ? (
             <>
               <div className="dashboard-card" onClick={() => setActiveView("externalProjectRequest")}>
-                <h3>Project Request</h3>
-                <p>Create a new external project request</p>
+                <div className="card-icon">
+                  <FaClipboardList />
+                </div>
+                <div className="card-content">
+                  <h3>Project Request</h3>
+                  <p>Create a new external project request</p>
+                </div>
               </div>
               <div className="dashboard-card" onClick={() => setActiveView("externalProjectDetails")}>
-                <h3>Project Details</h3>
-                <p>Update external project details and status</p>
+                <div className="card-icon">
+                  <FaTasks />
+                </div>
+                <div className="card-content">
+                  <h3>Project Details</h3>
+                  <p>Update external project details and status</p>
+                </div>
               </div>
               <div className="dashboard-card" onClick={() => setActiveView("externalProjectLabor")}>
-                <h3>Project Labor</h3>
-                <p>Assign labor resources to external projects</p>
+                <div className="card-icon">
+                  <FaUsersCog />
+                </div>
+                <div className="card-content">
+                  <h3>Project Labor</h3>
+                  <p>Assign labor resources to external projects</p>
+                </div>
               </div>
               <div className="dashboard-card" onClick={() => setActiveView("externalProjectEquipment")}>
-                <h3>Project Equipment</h3>
-                <p>Assign equipment to external projects</p>
+                <div className="card-icon">
+                  <FaTools />
+                </div>
+                <div className="card-content">
+                  <h3>Project Equipment</h3>
+                  <p>Assign equipment to external projects</p>
+                </div>
               </div>
               <div className="dashboard-card" onClick={() => setActiveView("externalProjectWarranty")}>
-                <h3>Project Warranty</h3>
-                <p>Set up warranty details for external projects</p>
+                <div className="card-icon">
+                  <FaShieldAlt />
+                </div>
+                <div className="card-content">
+                  <h3>Project Warranty</h3>
+                  <p>Set up warranty details for external projects</p>
+                </div>
               </div>
-             
             </>
           ) : (
             <>
               <div className="dashboard-card" onClick={() => setActiveView("internalProjectRequest")}>
-                <h3>Project Request</h3>
-                <p>Create a new internal project request</p>
+                <div className="card-icon">
+                  <FaClipboardList />
+                </div>
+                <div className="card-content">
+                  <h3>Project Request</h3>
+                  <p>Create a new internal project request</p>
+                </div>
               </div>
               <div className="dashboard-card" onClick={() => setActiveView("internalProjectDetails")}>
-                <h3>Project Details</h3>
-                <p>Update internal project details and status</p>
+                <div className="card-icon">
+                  <FaTasks />
+                </div>
+                <div className="card-content">
+                  <h3>Project Details</h3>
+                  <p>Update internal project details and status</p>
+                </div>
               </div>
               <div className="dashboard-card" onClick={() => setActiveView("internalProjectLabor")}>
-                <h3>Project Labor</h3>
-                <p>Assign labor resources to internal projects</p>
+                <div className="card-icon">
+                  <FaUsersCog />
+                </div>
+                <div className="card-content">
+                  <h3>Project Labor</h3>
+                  <p>Assign labor resources to internal projects</p>
+                </div>
               </div>
             </>
           )}
@@ -843,16 +1407,18 @@ const ProjectPlanningDashboard = () => {
   const renderExternalProjectRequestForm = () => {
     return (
       <div className="project-form-container">
-        <h2 className="form-title">External Project Request</h2>
+        <h2 className="form-title">
+          <FaClipboardList className="form-icon" /> External Project Request
+        </h2>
         <form onSubmit={handleExternalProjectRequestSubmit} className="project-form">
           <div className="form-group">
             <label className="form-label">
-              <b>Project Name*</b>
+              Project Name*
             </label>
             <input
               className="form-input"
               type="text"
-              placeholder="Name"
+              placeholder="Enter project name"
               value={externalProjectRequestForm.projectName}
               onChange={(e) => handleInputChange('externalProjectRequest', 'projectName', e.target.value)}
               required
@@ -861,11 +1427,11 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-group">
             <label className="form-label">
-              <b>Project Description</b>
+              Project Description
             </label>
             <textarea
               className="form-textarea"
-              placeholder="Add Description"
+              placeholder="Describe the project scope and objectives"
               value={externalProjectRequestForm.projectDescription}
               onChange={(e) => handleInputChange('externalProjectRequest', 'projectDescription', e.target.value)}
               required
@@ -875,7 +1441,7 @@ const ProjectPlanningDashboard = () => {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">
-                <b>Approval ID</b>
+                Approval ID
               </label>
               <select
                 className="form-select"
@@ -892,7 +1458,7 @@ const ProjectPlanningDashboard = () => {
 
             <div className="form-group">
               <label className="form-label">
-                <b>Order ID*</b>
+                Order ID*
               </label>
               <select
                 className="form-select"
@@ -910,7 +1476,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-actions">
             <button type="submit" className="form-button save-button">
-              <b>Save</b>
+              <FaPlus /> Create Project
             </button>
             <button 
               type="button" 
@@ -925,7 +1491,7 @@ const ProjectPlanningDashboard = () => {
                 });
               }}
             >
-              <b>Cancel</b>
+              Cancel
             </button>
           </div>
         </form>
@@ -937,11 +1503,13 @@ const ProjectPlanningDashboard = () => {
   const renderExternalProjectDetailsForm = () => {
     return (
       <div className="project-form-container">
-        <h2 className="form-title">External Project Details</h2>
+        <h2 className="form-title">
+          <FaTasks className="form-icon" /> External Project Details
+        </h2>
         <form onSubmit={handleExternalProjectDetailsSubmit} className="project-form">
           <div className="form-group">
             <label className="form-label">
-              <b>Project Request ID*</b>
+              Project Request ID*
             </label>
             <select
               className="form-select"
@@ -957,7 +1525,7 @@ const ProjectPlanningDashboard = () => {
           </div>
 
           <div className="form-group">
-            <label className="form-label"><b>Project Status</b></label>
+            <label className="form-label">Project Status</label>
             <select
               className="form-select"
               value={externalProjectDetailsForm.projectStatus}
@@ -973,7 +1541,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-actions">
             <button type="submit" className="form-button save-button">
-              <b>Save</b>
+              <FaEdit /> Update Details
             </button>
             <button 
               type="button" 
@@ -986,7 +1554,7 @@ const ProjectPlanningDashboard = () => {
                 });
               }}
             >
-              <b>Cancel</b>
+              Cancel
             </button>
           </div>
         </form>
@@ -998,11 +1566,13 @@ const ProjectPlanningDashboard = () => {
   const renderExternalProjectLaborForm = () => {
     return (
       <div className="project-form-container">
-        <h2 className="form-title">External Project Labor</h2>
+        <h2 className="form-title">
+          <FaUsersCog className="form-icon" /> External Project Labor
+        </h2>
         <form onSubmit={handleExternalProjectLaborSubmit} className="project-form">
           <div className="form-group">
             <label className="form-label">
-              <b>Project ID*</b>
+              Project ID*
             </label>
             <select
               className="form-select"
@@ -1020,12 +1590,12 @@ const ProjectPlanningDashboard = () => {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">
-                <b>Job Role Needed*</b>
+                Job Role Needed*
               </label>
               <input
                 className="form-input"
                 type="text"
-                placeholder="Job Role"
+                placeholder="e.g. Project Manager, Engineer, Technician"
                 value={externalProjectLaborForm.jobRoleNeeded}
                 onChange={(e) => handleInputChange('externalProjectLabor', 'jobRoleNeeded', e.target.value)}
                 required
@@ -1034,7 +1604,7 @@ const ProjectPlanningDashboard = () => {
 
             <div className="form-group">
               <label className="form-label">
-                <b>Employee ID*</b>
+                Employee ID*
               </label>
               <select
                 className="form-select"
@@ -1054,7 +1624,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-actions">
             <button type="submit" className="form-button save-button">
-              <b>Save</b>
+              <FaUsersCog /> Assign Labor
             </button>
             <button 
               type="button" 
@@ -1068,7 +1638,7 @@ const ProjectPlanningDashboard = () => {
                 });
               }}
             >
-              <b>Cancel</b>
+              Cancel
             </button>
           </div>
         </form>
@@ -1076,15 +1646,17 @@ const ProjectPlanningDashboard = () => {
     );
   };
 
-  // Function to render External Project Equipment Form
+  // Function to render External Project Equipment Form - Updated to support multiple equipment items
   const renderExternalProjectEquipmentForm = () => {
     return (
       <div className="project-form-container">
-        <h2 className="form-title">External Project Equipment</h2>
+        <h2 className="form-title">
+          <FaTools className="form-icon" /> External Project Equipment
+        </h2>
         <form onSubmit={handleExternalProjectEquipmentSubmit} className="project-form">
           <div className="form-group">
             <label className="form-label">
-              <b>Project ID*</b>
+              Project ID*
             </label>
             <select
               className="form-select"
@@ -1099,26 +1671,56 @@ const ProjectPlanningDashboard = () => {
             </select>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">
-              <b>Project Equipment ID*</b>
-            </label>
-            <select
-              className="form-select"
-              value={externalProjectEquipmentForm.projectEquipmentId}
-              onChange={(e) => handleInputChange('externalProjectEquipment', 'projectEquipmentId', e.target.value)}
-              required
-            >
-              <option value="">Select Equipment ID</option>
-              {equipmentIds.map((id) => (
-                <option key={id} value={id}>{id}</option>
-              ))}
-            </select>
+          <div className="form-section">
+            <div className="form-section-header">
+              <h3>Equipment Items</h3>
+              <button 
+                type="button" 
+                className="add-item-button"
+                onClick={addEquipmentField}
+              >
+                <FaPlusCircle /> Add Equipment
+              </button>
+            </div>
+            
+            {externalProjectEquipmentForm.equipmentItems.map((item, index) => (
+              <div key={index} className="equipment-item">
+                <div className="form-group">
+                  <label className="form-label">
+                    Equipment Name*
+                  </label>
+                  <div className="input-with-button">
+                    <select
+                      className="form-select"
+                      value={item.name}
+                      onChange={(e) => updateEquipmentItem(index, e.target.value)}
+                      required
+                    >
+                      <option value="">Select Equipment</option>
+                      {equipmentNames.map((equipment) => (
+                        <option key={equipment.id} value={equipment.name}>
+                          {equipment.name}
+                        </option>
+                      ))}
+                    </select>
+                    {index > 0 && (
+                      <button 
+                        type="button" 
+                        className="remove-item-button"
+                        onClick={() => removeEquipmentField(index)}
+                      >
+                        <FaTrash /> Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
           <div className="form-actions">
             <button type="submit" className="form-button save-button">
-              <b>Save</b>
+              <FaTools /> Assign Equipment
             </button>
             <button 
               type="button" 
@@ -1127,11 +1729,11 @@ const ProjectPlanningDashboard = () => {
                 setActiveView("dashboard");
                 setExternalProjectEquipmentForm({
                   projectId: "",
-                  projectEquipmentId: ""
+                  equipmentItems: [{ name: "" }]
                 });
               }}
             >
-              <b>Cancel</b>
+              Cancel
             </button>
           </div>
         </form>
@@ -1143,11 +1745,13 @@ const ProjectPlanningDashboard = () => {
   const renderExternalProjectWarrantyForm = () => {
     return (
       <div className="project-form-container">
-        <h2 className="form-title">External Project Warranty</h2>
+        <h2 className="form-title">
+          <FaShieldAlt className="form-icon" /> External Project Warranty
+        </h2>
         <form onSubmit={handleExternalProjectWarrantySubmit} className="project-form">
           <div className="form-group">
             <label className="form-label">
-              <b>Project ID*</b>
+              Project ID*
             </label>
             <select
               className="form-select"
@@ -1164,12 +1768,12 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-group">
             <label className="form-label">
-              <b>Warranty Coverage Year*</b>
+              Warranty Coverage Year*
             </label>
             <input
               className="form-input"
               type="number"
-              placeholder="Coverage in years"
+              placeholder="Enter coverage in years"
               value={externalProjectWarrantyForm.warrantyCoverageYear}
               onChange={(e) => handleInputChange('externalProjectWarranty', 'warrantyCoverageYear', e.target.value)}
               required
@@ -1179,7 +1783,7 @@ const ProjectPlanningDashboard = () => {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">
-                <b>Warranty Start Date*</b>
+                Warranty Start Date*
               </label>
               <input
                 className="form-input"
@@ -1192,7 +1796,7 @@ const ProjectPlanningDashboard = () => {
 
             <div className="form-group">
               <label className="form-label">
-                <b>Warranty End Date*</b>
+                Warranty End Date*
               </label>
               <input
                 className="form-input"
@@ -1206,7 +1810,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-actions">
             <button type="submit" className="form-button save-button">
-              <b>Save</b>
+              <FaShieldAlt /> Set Warranty
             </button>
             <button 
               type="button" 
@@ -1221,7 +1825,7 @@ const ProjectPlanningDashboard = () => {
                 });
               }}
             >
-              <b>Cancel</b>
+              Cancel
             </button>
           </div>
         </form>
@@ -1229,24 +1833,23 @@ const ProjectPlanningDashboard = () => {
     );
   };
 
-
-  
-
   // Function to render Internal Project Request Form
   const renderInternalProjectRequestForm = () => {
     const validProjectTypes = ["Training Program", "Department Event", "Facility Maintenance"];
     return (
       <div className="project-form-container">
-        <h2 className="form-title">Internal Project Request</h2>
+        <h2 className="form-title">
+          <FaClipboardList className="form-icon" /> Internal Project Request
+        </h2>
         <form onSubmit={handleInternalProjectRequestSubmit} className="project-form">
           <div className="form-group">
             <label className="form-label">
-              <b>Project Name*</b>
+              Project Name*
             </label>
             <input
               className="form-input"
               type="text"
-              placeholder="Name"
+              placeholder="Enter project name"
               value={internalProjectRequestForm.projectName}
               onChange={(e) => handleInputChange('internalProjectRequest', 'projectName', e.target.value)}
               required
@@ -1256,7 +1859,7 @@ const ProjectPlanningDashboard = () => {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">
-                <b>Request Date*</b>
+                Request Date*
               </label>
               <input
                 className="form-input"
@@ -1269,7 +1872,7 @@ const ProjectPlanningDashboard = () => {
 
             <div className="form-group">
               <label className="form-label">
-                <b>Target Starting Date</b>
+                Target Starting Date
               </label>
               <input
                 className="form-input"
@@ -1283,7 +1886,7 @@ const ProjectPlanningDashboard = () => {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">
-                <b>Employee</b>
+                Employee
               </label>
               <select
                 className="form-select"
@@ -1301,7 +1904,7 @@ const ProjectPlanningDashboard = () => {
 
             <div className="form-group">
               <label className="form-label">
-                <b>Department</b>
+                Department
               </label>
               <select
                 className="form-select"
@@ -1318,7 +1921,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-group">
             <label className="form-label">
-              <b>Reason For Request</b>
+              Reason For Request
             </label>
             <textarea
               className="form-textarea"
@@ -1330,7 +1933,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-group">
             <label className="form-label">
-              <b>Materials Needed</b>
+              Materials Needed
             </label>
             <textarea
               className="form-textarea"
@@ -1342,7 +1945,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-group">
             <label className="form-label">
-              <b>Equipment Needed</b>
+              Equipment Needed
             </label>
             <textarea
               className="form-textarea"
@@ -1354,7 +1957,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-group">
             <label className="form-label">
-              <b>Project Type</b>
+              Project Type
             </label>
             <select
               className="form-select"
@@ -1370,7 +1973,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-actions">
             <button type="submit" className="form-button save-button">
-              <b>Save</b>
+              <FaPlus /> Create Project
             </button>
             <button 
               type="button" 
@@ -1390,7 +1993,7 @@ const ProjectPlanningDashboard = () => {
                 });
               }}
             >
-              <b>Cancel</b>
+              Cancel
             </button>
           </div>
         </form>
@@ -1402,11 +2005,13 @@ const ProjectPlanningDashboard = () => {
   const renderInternalProjectDetailsForm = () => {
     return (
       <div className="project-form-container">
-        <h2 className="form-title">Internal Project Details</h2>
+        <h2 className="form-title">
+          <FaTasks className="form-icon" /> Internal Project Details
+        </h2>
         <form onSubmit={handleInternalProjectDetailsSubmit} className="project-form">
           <div className="form-group">
             <label className="form-label">
-              <b>Project Request ID*</b>
+              Project Request ID*
             </label>
             <select
               className="form-select"
@@ -1423,7 +2028,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-group">
             <label className="form-label">
-              <b>Project Status</b>
+              Project Status
             </label>
             <select
               className="form-select"
@@ -1440,7 +2045,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-group">
             <label className="form-label">
-              <b>Approval ID</b>
+              Approval ID
             </label>
             <select
               className="form-select"
@@ -1456,11 +2061,11 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-group">
             <label className="form-label">
-              <b>Project Description</b>
+              Project Description
             </label>
             <textarea
               className="form-textarea"
-              placeholder="Project Description"
+              placeholder="Describe the project scope and objectives"
               value={internalProjectDetailsForm.projectDescription}
               onChange={(e) => handleInputChange('internalProjectDetails', 'projectDescription', e.target.value)}
             />
@@ -1468,7 +2073,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-actions">
             <button type="submit" className="form-button save-button">
-              <b>Save</b>
+              <FaEdit /> Update Details
             </button>
             <button 
               type="button" 
@@ -1483,7 +2088,7 @@ const ProjectPlanningDashboard = () => {
                 });
               }}
             >
-              <b>Cancel</b>
+              Cancel
             </button>
           </div>
         </form>
@@ -1495,11 +2100,13 @@ const ProjectPlanningDashboard = () => {
   const renderInternalProjectLaborForm = () => {
     return (
       <div className="project-form-container">
-        <h2 className="form-title">Internal Project Labor</h2>
+        <h2 className="form-title">
+          <FaUsersCog className="form-icon" /> Internal Project Labor
+        </h2>
         <form onSubmit={handleInternalProjectLaborSubmit} className="project-form">
           <div className="form-group">
             <label className="form-label">
-              <b>Project ID*</b>
+              Project ID*
             </label>
             <select
               className="form-select"
@@ -1517,12 +2124,12 @@ const ProjectPlanningDashboard = () => {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">
-                <b>Job Role*</b>
+                Job Role*
               </label>
               <input
                 className="form-input"
                 type="text"
-                placeholder="Job Role"
+                placeholder="e.g. Project Manager, Engineer, Technician"
                 value={internalProjectLaborForm.jobRole}
                 onChange={(e) => handleInputChange('internalProjectLabor', 'jobRole', e.target.value)}
                 required
@@ -1531,7 +2138,7 @@ const ProjectPlanningDashboard = () => {
 
             <div className="form-group">
               <label className="form-label">
-                <b>Employee*</b>
+                Employee*
               </label>
               <select
                 className="form-select"
@@ -1551,7 +2158,7 @@ const ProjectPlanningDashboard = () => {
 
           <div className="form-actions">
             <button type="submit" className="form-button save-button">
-              <b>Save</b>
+              <FaUsersCog /> Assign Labor
             </button>
             <button 
               type="button" 
@@ -1565,7 +2172,7 @@ const ProjectPlanningDashboard = () => {
                 });
               }}
             >
-              <b>Cancel</b>
+              Cancel
             </button>
           </div>
         </form>
@@ -1579,35 +2186,50 @@ const ProjectPlanningDashboard = () => {
       <div className="project-planning-header">
         <h1 className="project-planning-title">Project Planning</h1>
         <div className="project-planning-actions">
-          <button className="gantt-chart-button">
-            <b>Gantt Chart</b>
-          </button>
+        <button 
+          className="gantt-chart-button"
+          onClick={() => setActiveView("ganttChart")}
+        >
+          <FaChartLine /> Gantt Chart
+        </button>
           {activeView !== "dashboard" && (
             <button 
               className="back-to-dashboard-button"
               onClick={() => setActiveView("dashboard")}
             >
-              <b>Back to Dashboard</b>
+              <FaArrowLeft /> Back to Dashboard
             </button>
           )}
         </div>
       </div>
 
+      {renderGanttChart()}
+
       {message.text && (
         <div className={`message ${message.type}`}>
+          {message.type === "success" && <FaCheckCircle className="message-icon" />}
+          {message.type === "error" && <FaExclamationCircle className="message-icon" />}
+          {message.type === "warning" && <FaExclamationTriangle className="message-icon" />}
           {message.text}
+          <button 
+            className="message-close" 
+            onClick={() => setMessage({ text: "", type: "" })}
+          >
+            &times;
+          </button>
         </div>
       )}
 
-      {activeView === "dashboard" && renderDashboard()}
-      {activeView === "externalProjectRequest" && renderExternalProjectRequestForm()}
-      {activeView === "externalProjectDetails" && renderExternalProjectDetailsForm()}
-      {activeView === "externalProjectLabor" && renderExternalProjectLaborForm()}
-      {activeView === "externalProjectEquipment" && renderExternalProjectEquipmentForm()}
-      {activeView === "externalProjectWarranty" && renderExternalProjectWarrantyForm()}
-      {activeView === "internalProjectRequest" && renderInternalProjectRequestForm()}
-      {activeView === "internalProjectDetails" && renderInternalProjectDetailsForm()}
-      {activeView === "internalProjectLabor" && renderInternalProjectLaborForm()}
+    {activeView === "dashboard" && renderDashboard()}
+    {activeView === "externalProjectRequest" && renderExternalProjectRequestForm()}
+    {activeView === "externalProjectDetails" && renderExternalProjectDetailsForm()}
+    {activeView === "externalProjectLabor" && renderExternalProjectLaborForm()}
+    {activeView === "externalProjectEquipment" && renderExternalProjectEquipmentForm()}
+    {activeView === "externalProjectWarranty" && renderExternalProjectWarrantyForm()}
+    {activeView === "internalProjectRequest" && renderInternalProjectRequestForm()}
+    {activeView === "internalProjectDetails" && renderInternalProjectDetailsForm()}
+    {activeView === "internalProjectLabor" && renderInternalProjectLaborForm()}
+    {activeView === "ganttChart" && <ProjectGanttChart />}
     </div>
   );
 };

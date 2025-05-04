@@ -1,5 +1,5 @@
 // Project List.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import "../styles/Project List.css";
 import axios from 'axios';
 
@@ -73,6 +73,17 @@ const ProjectList = () => {
     item_id: '',
     status: ''
   });
+  
+  // Refs for filter inputs
+  const projectNameInputRef = useRef(null);
+  const approvalIdInputRef = useRef(null);
+  const employeeIdInputRef = useRef(null);
+  const deptIdInputRef = useRef(null);
+  const statusSelectRef = useRef(null);
+  const externalProjectNameInputRef = useRef(null);
+  const externalApprovalIdInputRef = useRef(null);
+  const itemIdInputRef = useRef(null);
+  const externalStatusSelectRef = useRef(null);
   
   // Debounced filters for automatic searching
   const debouncedInternalFilters = useDebounce(internalFilters, 500);
@@ -158,6 +169,8 @@ const ProjectList = () => {
         const queryString = buildQueryString(internalFilters);
         const url = `${API_URL}/internal-requests/?page=${page}${queryString ? '&' + queryString : ''}`;
         
+        console.log("Fetching internal requests with URL:", url);
+        
         const response = await axios.get(url);
         setInternalRequests(response.data.results || []);
         setInternalRequestsPagination({
@@ -182,13 +195,15 @@ const ProjectList = () => {
       setLoadingStates(prev => ({ ...prev, internalRequests: false }));
     }
   }, [internalFilters]);
-
+  
   const fetchExternalRequests = useCallback(async (page = 1) => {
     setLoadingStates(prev => ({ ...prev, externalRequests: true }));
     try {
       return await fetchWithRetry(async () => {
         const queryString = buildQueryString(externalFilters);
         const url = `${API_URL}/external-requests/?page=${page}${queryString ? '&' + queryString : ''}`;
+        
+        console.log("Fetching external requests with URL:", url); // Debug log
         
         const response = await axios.get(url);
         setExternalRequests(response.data.results || []);
@@ -569,49 +584,197 @@ const ProjectList = () => {
     setShowFilter(!showFilter);
   };
   
-  const handleFilterChange = (type, field, value) => {
-    if (type === 'internal') {
-      setInternalFilters({
-        ...internalFilters,
-        [field]: value
-      });
-    } else {
-      setExternalFilters({
-        ...externalFilters,
-        [field]: value
-      });
-    }
-  };
-  
-  const applyFilters = () => {
-    if (selectedNav === "Internal Request") {
-      fetchInternalRequests(1); // Reset to page 1 when applying filters
-    } else {
-      fetchExternalRequests(1);
-    }
-    setShowFilter(false);
-  };
-  
-  const clearFilters = () => {
-    if (selectedNav === "Internal Request") {
-      setInternalFilters({
+  // Filter panel component with local state to prevent focus issues
+  const FilterPanel = () => {
+    if (!showFilter) return null;
+    
+    // Local state for filter inputs to prevent losing focus
+    const [localInternalFilters, setLocalInternalFilters] = useState({...internalFilters});
+    const [localExternalFilters, setLocalExternalFilters] = useState({...externalFilters});
+    
+    // Handle local filter changes without triggering parent component re-renders
+    const handleLocalFilterChange = (type, field, value) => {
+      if (type === 'internal') {
+        setLocalInternalFilters(prev => ({
+          ...prev,
+          [field]: value
+        }));
+      } else {
+        setLocalExternalFilters(prev => ({
+          ...prev,
+          [field]: value
+        }));
+      }
+    };
+    
+    // Apply filters from local state to parent state only when button is clicked
+    const handleApplyFilters = () => {
+      if (selectedNav === "Internal Request") {
+        // Apply the filters from local state to the main state
+        setInternalFilters(localInternalFilters);
+        // Reset to page 1 when applying new filters
+        setInternalRequestsPage(1);
+        fetchInternalRequests(1);
+      } else {
+        setExternalFilters(localExternalFilters);
+        setExternalRequestsPage(1);
+        fetchExternalRequests(1);
+      }
+      setShowFilter(false);
+    };
+    
+    // Clear local filters and parent filters
+    const handleClearFilters = () => {
+      const emptyFilters = {
         project_name: '',
         approval_id: '',
         employee_id: '',
         dept_id: '',
         status: ''
-      });
-      fetchInternalRequests(1);
-    } else {
-      setExternalFilters({
+      };
+      
+      const emptyExternalFilters = {
         project_name: '',
         approval_id: '',
         item_id: '',
         status: ''
-      });
-      fetchExternalRequests(1);
-    }
-    setShowFilter(false);
+      };
+      
+      if (selectedNav === "Internal Request") {
+        setLocalInternalFilters(emptyFilters);
+        setInternalFilters(emptyFilters);
+        setInternalRequestsPage(1);
+        fetchInternalRequests(1);
+      } else {
+        setLocalExternalFilters(emptyExternalFilters);
+        setExternalFilters(emptyExternalFilters);
+        setExternalRequestsPage(1);
+        fetchExternalRequests(1);
+      }
+      setShowFilter(false);
+    };
+    
+    return (
+      <div className="filter-panel">
+        <div className="filter-header">
+          <h3>Filter Projects</h3>
+          <button className="close-filter" onClick={toggleFilter}>×</button>
+        </div>
+        
+        {selectedNav === "Internal Request" ? (
+          <div className="filter-form">
+            <div className="filter-field">
+              <label>Project Name</label>
+              <input 
+                type="text" 
+                ref={projectNameInputRef}
+                value={localInternalFilters.project_name} 
+                onChange={(e) => handleLocalFilterChange('internal', 'project_name', e.target.value)}
+                placeholder="Filter by project name"
+              />
+            </div>
+            <div className="filter-field">
+              <label>Approval ID</label>
+              <input 
+                type="text" 
+                ref={approvalIdInputRef}
+                value={localInternalFilters.approval_id} 
+                onChange={(e) => handleLocalFilterChange('internal', 'approval_id', e.target.value)}
+                placeholder="Filter by approval ID"
+              />
+            </div>
+            <div className="filter-field">
+              <label>Employee ID</label>
+              <input 
+                type="text" 
+                ref={employeeIdInputRef}
+                value={localInternalFilters.employee_id} 
+                onChange={(e) => handleLocalFilterChange('internal', 'employee_id', e.target.value)}
+                placeholder="Filter by employee ID"
+              />
+            </div>
+            <div className="filter-field">
+              <label>Department ID</label>
+              <input 
+                type="text" 
+                ref={deptIdInputRef}
+                value={localInternalFilters.dept_id} 
+                onChange={(e) => handleLocalFilterChange('internal', 'dept_id', e.target.value)}
+                placeholder="Filter by department ID"
+              />
+            </div>
+            <div className="filter-field">
+              <label>Project Status</label>
+              <select 
+                ref={statusSelectRef}
+                value={localInternalFilters.status} 
+                onChange={(e) => handleLocalFilterChange('internal', 'status', e.target.value)}
+              >
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="ongoing">Ongoing</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+        ) : (
+          <div className="filter-form">
+            <div className="filter-field">
+              <label>Project Name</label>
+              <input 
+                type="text" 
+                ref={externalProjectNameInputRef}
+                value={localExternalFilters.project_name} 
+                onChange={(e) => handleLocalFilterChange('external', 'project_name', e.target.value)}
+                placeholder="Filter by project name"
+              />
+            </div>
+            <div className="filter-field">
+              <label>Approval ID</label>
+              <input 
+                type="text" 
+                ref={externalApprovalIdInputRef}
+                value={localExternalFilters.approval_id} 
+                onChange={(e) => handleLocalFilterChange('external', 'approval_id', e.target.value)}
+                placeholder="Filter by approval ID"
+              />
+            </div>
+            <div className="filter-field">
+              <label>Item ID</label>
+              <input 
+                type="text" 
+                ref={itemIdInputRef}
+                value={localExternalFilters.item_id} 
+                onChange={(e) => handleLocalFilterChange('external', 'item_id', e.target.value)}
+                placeholder="Filter by item ID"
+              />
+            </div>
+            <div className="filter-field">
+              <label>Project Status</label>
+              <select 
+                ref={externalStatusSelectRef}
+                value={localExternalFilters.status} 
+                onChange={(e) => handleLocalFilterChange('external', 'status', e.target.value)}
+              >
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="ongoing">Ongoing</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+        )}
+        
+        <div className="filter-actions">
+          <button className="btn btn-secondary" onClick={handleClearFilters}>Clear Filters</button>
+          <button className="btn btn-primary" onClick={handleApplyFilters}>Apply Filters</button>
+        </div>
+      </div>
+    );
   };
 
   // Toggle between active and archived projects
@@ -714,124 +877,6 @@ const ProjectList = () => {
     );
   };
 
-  // Filter component
-  const FilterPanel = () => {
-    if (!showFilter) return null;
-    
-    return (
-      <div className="filter-panel">
-        <div className="filter-header">
-          <h3>Filter Projects</h3>
-          <button className="close-filter" onClick={toggleFilter}>×</button>
-        </div>
-        
-        {selectedNav === "Internal Request" ? (
-          <div className="filter-form">
-            <div className="filter-field">
-              <label>Project Name</label>
-              <input 
-                type="text" 
-                value={internalFilters.project_name} 
-                onChange={(e) => handleFilterChange('internal', 'project_name', e.target.value)}
-                placeholder="Filter by project name"
-              />
-            </div>
-            <div className="filter-field">
-              <label>Approval ID</label>
-              <input 
-                type="text" 
-                value={internalFilters.approval_id} 
-                onChange={(e) => handleFilterChange('internal', 'approval_id', e.target.value)}
-                placeholder="Filter by approval ID"
-              />
-            </div>
-            <div className="filter-field">
-              <label>Employee ID</label>
-              <input 
-                type="text" 
-                value={internalFilters.employee_id} 
-                onChange={(e) => handleFilterChange('internal', 'employee_id', e.target.value)}
-                placeholder="Filter by employee ID"
-              />
-            </div>
-            <div className="filter-field">
-              <label>Department ID</label>
-              <input 
-                type="text" 
-                value={internalFilters.dept_id} 
-                onChange={(e) => handleFilterChange('internal', 'dept_id', e.target.value)}
-                placeholder="Filter by department ID"
-              />
-            </div>
-            <div className="filter-field">
-              <label>Project Status</label>
-              <select 
-                value={internalFilters.status} 
-                onChange={(e) => handleFilterChange('internal', 'status', e.target.value)}
-              >
-                <option value="">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="ongoing">Ongoing</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-          </div>
-        ) : (
-          <div className="filter-form">
-            <div className="filter-field">
-              <label>Project Name</label>
-              <input 
-                type="text" 
-                value={externalFilters.project_name} 
-                onChange={(e) => handleFilterChange('external', 'project_name', e.target.value)}
-                placeholder="Filter by project name"
-              />
-            </div>
-            <div className="filter-field">
-              <label>Approval ID</label>
-              <input 
-                type="text" 
-                value={externalFilters.approval_id} 
-                onChange={(e) => handleFilterChange('external', 'approval_id', e.target.value)}
-                placeholder="Filter by approval ID"
-              />
-            </div>
-            <div className="filter-field">
-              <label>Item ID</label>
-              <input 
-                type="text" 
-                value={externalFilters.item_id} 
-                onChange={(e) => handleFilterChange('external', 'item_id', e.target.value)}
-                placeholder="Filter by item ID"
-              />
-            </div>
-            <div className="filter-field">
-              <label>Project Status</label>
-              <select 
-                value={externalFilters.status} 
-                onChange={(e) => handleFilterChange('external', 'status', e.target.value)}
-              >
-                <option value="">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="ongoing">Ongoing</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-          </div>
-        )}
-        
-        <div className="filter-actions">
-          <button className="btn btn-secondary" onClick={clearFilters}>Clear Filters</button>
-          <button className="btn btn-primary" onClick={applyFilters}>Apply Filters</button>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="project-list-container">
       {/* Add the notification component */}
@@ -923,7 +968,7 @@ const ProjectList = () => {
                   >
                     External Requests
                   </button>
-                  <div className="status-indicators">
+                  <div className="status-indicators-projectlist">
                 <span className="status-indicator approved">
                   <div className="status-dot"></div>
                   <span>Approved</span>

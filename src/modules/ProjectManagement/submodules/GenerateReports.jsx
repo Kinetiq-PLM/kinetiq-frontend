@@ -16,8 +16,6 @@ axios.interceptors.response.use(
   }
 );
 
-axios.defaults.baseURL = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev';
-
 const GenerateReports = () => {
   const [reportData, setReportData] = useState([]);
   const [selectedReports, setSelectedReports] = useState([]);

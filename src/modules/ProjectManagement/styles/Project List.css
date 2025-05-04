@@ -87,7 +87,7 @@ body {
 }
 
 /* Status Indicators */
-.status-indicators {
+.status-indicators-projectlist{
   display: flex;
   gap: 1.5rem;
   margin-left: auto;
@@ -98,7 +98,7 @@ body {
   border-radius: var(--border-radius);
 }
 
-.status-indicator {
+.status-indicator{
   display: flex;
   align-items: center;
   font-size: 0.875rem;
@@ -106,7 +106,7 @@ body {
   font-weight: 500;
 }
 
-.status-dot {
+.status-dot{
   width: 0.75rem;
   height: 0.75rem;
   border-radius: 50%;
@@ -114,15 +114,15 @@ body {
 }
 
 .status-indicator.approved .status-dot {
-  background-color: var(--approved-color);
+  background-color: #28a745; /* Green color for approved */
 }
 
 .status-indicator.not-approved .status-dot {
-  background-color: var(--not-approved-color);
+  background-color: #dc3545; /* Red color for not approved */
 }
 
 .status-indicator.ongoing .status-dot {
-  background-color: var(--ongoing-color);
+  background-color: #fd7e14; /* Orange color for ongoing */
 }
 
 /* Status indicator dot styles for table rows */
@@ -140,21 +140,20 @@ body {
 }
 
 .status-indicator-dot.approved {
-  background-color: var(--approved-color);
+  background-color: #28a745; /* Green color for approved */
 }
 
 .status-indicator-dot.not-approved {
-  background-color: var(--not-approved-color);
+  background-color: #dc3545; /* Red color for not approved */
 }
 
 .status-indicator-dot.ongoing {
-  background-color: var(--ongoing-color);
+  background-color: #fd7e14; /* Orange color for ongoing */
 }
 
 .status-indicator-dot.pending {
   background-color: var(--pending-color);
 }
-
 /* Action Buttons */
 .action-buttons {
   display: flex;

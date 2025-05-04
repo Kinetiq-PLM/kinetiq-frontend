@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/TaskMonitoring.css";
 import axios from 'axios';
 
@@ -6,6 +6,10 @@ const API_URL = '/project-tasks/api';
 const ITEMS_PER_PAGE = 5; // Number of items to show per page
 
 const TaskMonitoring = () => {
+  // Create a ref for the container
+  const containerRef = useRef(null);
+  
+  // State management
   const [newProjectID, setNewProjectID] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newTaskdeadline, setNewTaskdeadline] = useState("");
@@ -13,7 +17,6 @@ const TaskMonitoring = () => {
   const [newLaborid, setNewLaborid] = useState("");
   
   const [selectedNavtask, setSelectedNavtask] = useState("External Task");
-  const [showTasklist, setShowTasklist] = useState(false);
   const [selectedReports, setSelectedReports] = useState([]);
   
   const [taskdata, setTaskdata] = useState([]);
@@ -29,6 +32,72 @@ const TaskMonitoring = () => {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPage2, setCurrentPage2] = useState(1);
+  
+  // Employee details modal state
+  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [employeeDetails, setEmployeeDetails] = useState(null);
+  const [employeeModalLoading, setEmployeeModalLoading] = useState(false);
+  const [employeeModalError, setEmployeeModalError] = useState(null);
+
+  // Success message state
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  // Effect to hide external UI elements
+  useEffect(() => {
+    // Function to hide the unwanted UI elements
+    const hideExternalUI = () => {
+      // Find and hide any external "Project Task List" headers or similar elements
+      const taskListHeaders = document.querySelectorAll('div[class*="task-list-header"], div[class*="project-task-header"]');
+      taskListHeaders.forEach(header => {
+        if (!containerRef.current?.contains(header)) {
+          header.style.display = 'none';
+        }
+      });
+      
+      // Also try to find by content
+      document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(heading => {
+        if (heading.textContent.includes('Project Task List') && !containerRef.current?.contains(heading)) {
+          // Find the closest container and hide it
+          const container = heading.closest('div');
+          if (container) {
+            container.style.display = 'none';
+          }
+        }
+      });
+      
+      // Hide any buttons that might be part of the external UI
+      document.querySelectorAll('button').forEach(button => {
+        if ((button.textContent.includes('Add New Task') || button.textContent.includes('Remove Selected')) 
+            && !containerRef.current?.contains(button)) {
+          button.style.display = 'none';
+        }
+      });
+    };
+    
+    // Call once on mount
+    hideExternalUI();
+    
+    // And set up an observer to handle dynamically added elements
+    const observer = new MutationObserver(hideExternalUI);
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    return () => {
+      // Clean up the observer on component unmount
+      observer.disconnect();
+    };
+  }, []);
+
+  // Effect to auto-hide success message after 5 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   // API functions with error handling
   const fetchData = async (url, errorMessage) => {
@@ -65,6 +134,69 @@ const TaskMonitoring = () => {
     }
   };
 
+  // Format date for display - now used in the employee modal
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
+  // Get employee details from employee ID - Updated with better debugging
+  const fetchEmployeeDetails = async (employeeId) => {
+    if (!employeeId) {
+      console.error("Cannot fetch employee details: Employee ID is missing");
+      setEmployeeModalError("Employee ID is missing");
+      return;
+    }
+    
+    setEmployeeModalLoading(true);
+    setEmployeeModalError(null);
+    
+    try {
+      // Log the URL being requested
+      console.log(`Fetching employee details from: ${API_URL}/employee-details/${employeeId}/`);
+      
+      // Make a real API call to fetch employee details
+      const response = await axios.get(`${API_URL}/employee-details/${employeeId}/`);
+      
+      // Log the response data
+      console.log("Employee details response:", response.data);
+      
+      if (response.data) {
+        setEmployeeDetails(response.data);
+      } else {
+        setEmployeeModalError("No employee details found");
+      }
+    } catch (err) {
+      console.error("Error fetching employee details:", err);
+      setEmployeeModalError(`Failed to load employee details: ${err.response?.data?.detail || err.message}`);
+    } finally {
+      setEmployeeModalLoading(false);
+    }
+  };
+
+  // Handle employee avatar click - Updated to prevent showing modal without employee ID
+  const handleEmployeeClick = (employee) => {
+    console.log("Employee clicked:", employee);
+    
+    if (!employee || !employee.employee_id) {
+      console.error("Missing employee ID:", employee);
+      // Don't show the modal if there's no employee ID
+      alert("Cannot view employee details: Employee ID is missing");
+      return;
+    }
+    
+    setSelectedEmployee(employee);
+    setShowEmployeeModal(true);
+    setEmployeeDetails(null); // Clear previous employee details
+    fetchEmployeeDetails(employee.employee_id);
+  };
+
+  // Load tasks based on selected tab
   useEffect(() => {
     const loadTasks = async () => {
       setLoading(true);
@@ -90,6 +222,7 @@ const TaskMonitoring = () => {
     loadTasks();
   }, [selectedNavtask]);
 
+  // Load dropdown options
   useEffect(() => {
     const loadDropdownOptions = async () => {
       try {
@@ -147,10 +280,10 @@ const TaskMonitoring = () => {
 
   const handleNavClick = (nav) => {
     setSelectedNavtask(nav);
-    setShowTasklist(false);
-    setSelectedReports([]); 
+    setSelectedReports([]);
   };
 
+  // Form submission for external tasks
   const handleFirstSubmitTask = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -171,7 +304,10 @@ const TaskMonitoring = () => {
       const updatedTasks = await fetchData(`${API_URL}/external-tasks/`, 'Error fetching external tasks');
       setTaskdata(Array.isArray(updatedTasks) ? updatedTasks : []);
       
-      setShowTasklist(true);
+      // Show success message
+      setSuccessMessage("External task created successfully!");
+      
+      // Reset form
       resetForm();
     } catch (err) {
       setError(`Failed to create task: ${err.response?.data?.detail || err.message}`);
@@ -181,6 +317,7 @@ const TaskMonitoring = () => {
     }
   };
 
+  // Form submission for internal tasks
   const handleSecondSubmitTask = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -201,7 +338,10 @@ const TaskMonitoring = () => {
       const updatedTasks = await fetchData(`${API_URL}/internal-tasks/`, 'Error fetching internal tasks');
       setTaskdata2(Array.isArray(updatedTasks) ? updatedTasks : []);
       
-      setShowTasklist(true);
+      // Show success message
+      setSuccessMessage("Internal task created successfully!");
+      
+      // Reset form
       resetForm();
     } catch (err) {
       setError(`Failed to create task: ${err.response?.data?.detail || err.message}`);
@@ -219,11 +359,6 @@ const TaskMonitoring = () => {
     setNewLaborid("");
   };
 
-  const handleBackClick = () => {
-    setShowTasklist(false);
-    setSelectedReports([]); 
-  };
-
   const handleCheckboxChange = (index) => {
     const isSelected = selectedReports.includes(index);
     if (isSelected) {
@@ -233,6 +368,7 @@ const TaskMonitoring = () => {
     }
   };
 
+  // Delete selected tasks
   const handleRemoveReports = async () => {
     if (selectedReports.length === 0) return;
     
@@ -254,6 +390,9 @@ const TaskMonitoring = () => {
         
         const updatedTasks = await fetchData(`${API_URL}/external-tasks/`, 'Error fetching external tasks');
         setTaskdata(Array.isArray(updatedTasks) ? updatedTasks : []);
+        
+        // Show success message
+        setSuccessMessage(`Successfully deleted ${selectedReports.length} external task(s)!`);
       } else {
         // Get the actual indices from the full data array
         const startIndex = (currentPage2 - 1) * ITEMS_PER_PAGE;
@@ -268,6 +407,9 @@ const TaskMonitoring = () => {
         
         const updatedTasks = await fetchData(`${API_URL}/internal-tasks/`, 'Error fetching internal tasks');
         setTaskdata2(Array.isArray(updatedTasks) ? updatedTasks : []);
+        
+        // Show success message
+        setSuccessMessage(`Successfully deleted ${selectedReports.length} internal task(s)!`);
       }
       
       setSelectedReports([]);
@@ -290,122 +432,285 @@ const TaskMonitoring = () => {
     ? totalPages(taskdata) 
     : totalPages(taskdata2);
   
+  // Helper function to format status for display
+  const formatStatus = (status) => {
+    if (!status) return '';
+    return status.replace('_', ' ');
+  };
+  
+  // Helper function to get status class
+  const getStatusClass = (status) => {
+    if (!status) return '';
+    return status.replace('_', '-');
+  };
+  
+  // Count tasks by status
+  const getTaskCounts = () => {
+    const data = selectedNavtask === "External Task" ? taskdata : taskdata2;
+    return {
+      completed: data.filter(t => t.task_status === 'completed').length,
+      inProgress: data.filter(t => t.task_status === 'in_progress').length,
+      pending: data.filter(t => t.task_status === 'pending').length
+    };
+  };
+  
+  const taskCounts = getTaskCounts();
+  
   // Render a simple loading state if we're still loading initial data
   if (loading && !taskdata.length && !taskdata2.length) {
     return (
-      <div className="task-monitoring-container">
+      <div className="task-monitoring-container" ref={containerRef}>
         <div className="loading-overlay">
-          <div className="loading-spinner">Loading...</div>
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Loading tasks...</p>
+          </div>
         </div>
       </div>
     );
   }
   
+  // Add CSS to hide unwanted elements
+  const hideExternalHeadersStyle = `
+    .project-task-list-header, 
+    .task-list-header:not(.task-monitoring-container *),
+    div:has(> h1:contains("Project Task List")),
+    div:has(> h2:contains("Project Task List")),
+    div:has(> h3:contains("Project Task List")),
+    div:has(> button:contains("Add New Task")):not(.task-monitoring-container *),
+    div:has(> button:contains("Remove Selected")):not(.task-monitoring-container *) {
+      display: none !important;
+    }
+  `;
+  
   return (
-    <div className="task-monitoring-container">
-      <div className="task-nav-container">
-        <button
-          className={`task-nav-button ${selectedNavtask === "Internal Task" ? "active" : ""}`}
-          onClick={() => handleNavClick("Internal Task")}
-        >
-          Internal Tasks
-        </button>
-        <button
-          className={`task-nav-button ${selectedNavtask === "External Task" ? "active" : ""}`}
-          onClick={() => handleNavClick("External Task")}
-        >
-          External Tasks
-        </button>
+    <div className="task-monitoring-container" ref={containerRef}>
+      {/* Inject style to hide external headers */}
+      <style>{hideExternalHeadersStyle}</style>
+      
+      <div className="header-section">
+        <h1 className="dashboard-title">
+          <i className="fas fa-tasks"></i>
+          Task Management Dashboard
+        </h1>
       </div>
-
-      {loading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner">Loading...</div>
+      
+      <div className="dashboard-content">
+        <div className="task-nav-container">
+          <button
+            className={`task-nav-button ${selectedNavtask === "Internal Task" ? "active" : ""}`}
+            onClick={() => handleNavClick("Internal Task")}
+          >
+            <i className="fas fa-project-diagram"></i> Internal Tasks
+          </button>
+          <button
+            className={`task-nav-button ${selectedNavtask === "External Task" ? "active" : ""}`}
+            onClick={() => handleNavClick("External Task")}
+          >
+            <i className="fas fa-external-link-alt"></i> External Tasks
+          </button>
         </div>
-      )}
 
-      {error && (
-        <div className="error-alert">
-          <span>{error}</span>
-          <button onClick={() => setError(null)}>&times;</button>
-        </div>
-      )}
-
-      {/* Tasks Table */}
-      <div className="tasks-table-container">
-        <h3>Current Tasks</h3>
-        <div className="table-responsive">
-          <table className="tasks-table">
-            <thead>
-              <tr>
-                <th>Task ID</th>
-                <th>Project Name</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Deadline</th>
-                <th>Assigned To</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentData.map((task, index) => (
-                <tr key={index}>
-                  <td>{task?.task_id || ''}</td>
-                  <td>{task?.ext_project_name || task?.project_name || ''}</td>
-                  <td>{task?.task_description || ''}</td>
-                  <td>
-                    {task?.task_status ? (
-                      <span className={`status-badge ${(task.task_status || '').replace('_', '-')}`}>
-                        {(task.task_status || '').replace('_', ' ')}
-                      </span>
-                    ) : ''}
-                  </td>
-                  <td>{task?.task_deadline || ''}</td>
-                  <td>{`${task?.first_name || ''} ${task?.last_name || ''}`}</td>
-                </tr>
-              ))}
-              {currentData.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="no-tasks">
-                    No tasks found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        
-        {/* Pagination Controls */}
-        {(selectedNavtask === "External Task" ? taskdata.length : taskdata2.length) > ITEMS_PER_PAGE && (
-          <div className="pagination-controls">
-            <button 
-              onClick={handlePrevPage} 
-              disabled={currentPageNum === 1}
-              className="pagination-button"
-            >
-              Previous
-            </button>
-            <span className="pagination-info">
-              Page {currentPageNum} of {totalPagesNum}
-            </span>
-            <button 
-              onClick={handleNextPage} 
-              disabled={currentPageNum === totalPagesNum}
-              className="pagination-button"
-            >
-              Next
-            </button>
+        {loading && (
+          <div className="loading-overlay">
+            <div className="loading-spinner">
+              <div className="spinner"></div>
+              <p>Processing your request...</p>
+            </div>
           </div>
         )}
-      </div>
 
-      {!showTasklist ? (
-        <div className="task-form-container">
-          <h2 className="form-title">New Project Task</h2>
+        {error && (
+          <div className="error-alert">
+            <div>
+              <i className="fas fa-exclamation-circle"></i>
+              <span>{error}</span>
+            </div>
+            <button onClick={() => setError(null)}>&times;</button>
+          </div>
+        )}
+        
+        {/* Success message toast */}
+        {successMessage && (
+          <div className="success-toast">
+            <div>
+              <i className="fas fa-check-circle"></i>
+              <span>{successMessage}</span>
+            </div>
+            <button onClick={() => setSuccessMessage(null)}>&times;</button>
+          </div>
+        )}
+
+        {/* Tasks List Card - Now this is the main task list instead of "Current Tasks" */}
+        <div className="task-list-card">
+          <div className="card-header">
+            <div className="header-content">
+              <h2><i className="fas fa-clipboard-list"></i> Current Tasks</h2>
+            </div>
+            <div className="task-summary">
+              <div className="summary-item">
+                <i className="fas fa-check-circle completed"></i>
+                <span>{taskCounts.completed} Completed</span>
+              </div>
+              <div className="summary-item">
+                <i className="fas fa-spinner in-progress"></i>
+                <span>{taskCounts.inProgress} In Progress</span>
+              </div>
+              <div className="summary-item">
+                <i className="fas fa-clock pending"></i>
+                <span>{taskCounts.pending} Pending</span>
+              </div>
+              <button 
+                onClick={handleRemoveReports} 
+                className="danger-button"
+                disabled={selectedReports.length === 0 || loading}
+              >
+                {loading ? <><i className="fas fa-spinner fa-spin"></i> Removing...</> : <><i className="fas fa-trash-alt"></i> Remove Selected</>}
+              </button>
+            </div>
+          </div>
+
+          <div className="task-table-container">
+            <div className="table-responsive">
+              <table className="task-table">
+                <thead>
+                  <tr>
+                    <th className="select-col"></th>
+                    <th>Task ID</th>
+                    <th>Project Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Deadline</th>
+                    <th>Assigned To</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentData.map((task, index) => {
+                    // Get initials for avatar
+                    const firstName = task?.first_name || '';
+                    const lastName = task?.last_name || '';
+                    const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+                    
+                    // Check if deadline is past
+                    const deadlineDate = task?.task_deadline ? new Date(task.task_deadline) : null;
+                    const isPastDeadline = deadlineDate && deadlineDate < new Date();
+                    
+                    // Check if we have a valid employee ID
+                    const hasEmployeeId = !!task?.employee_id;
+                    
+                    return (
+                      <tr key={index} className={selectedReports.includes(index) ? 'selected-row' : ''}>
+                        <td className="select-col">
+                          <input
+                            type="checkbox"
+                            checked={selectedReports.includes(index)}
+                            onChange={() => handleCheckboxChange(index)}
+                          />
+                        </td>
+                        <td>
+                          <span className="task-id">{task?.task_id || ''}</span>
+                        </td>
+                        <td>{task?.ext_project_name || task?.project_name || ''}</td>
+                        <td className="description-cell">
+                          <div className="description-content">
+                            {task?.task_description || ''}
+                          </div>
+                        </td>
+                        <td>
+                          {task?.task_status ? (
+                            <span className={`status-badge ${getStatusClass(task.task_status)}`}>
+                              <i className={
+                                task.task_status === 'completed' ? 'fas fa-check-circle' :
+                                task.task_status === 'in_progress' ? 'fas fa-spinner fa-spin' :
+                                task.task_status === 'pending' ? 'fas fa-clock' : 'fas fa-ban'
+                              }></i>
+                              {formatStatus(task.task_status)}
+                            </span>
+                          ) : ''}
+                        </td>
+                        <td>
+                          <div className={`deadline-cell ${isPastDeadline ? 'past-deadline' : ''}`}>
+                            {isPastDeadline && <i className="fas fa-exclamation-triangle warning-icon"></i>}
+                            {task?.task_deadline || ''}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="assigned-user">
+                            <div 
+                              className="user-avatar"
+                              style={{ cursor: hasEmployeeId ? 'pointer' : 'not-allowed' }} 
+                              onClick={() => {
+                                if (hasEmployeeId) {
+                                  handleEmployeeClick({
+                                    employee_id: task.employee_id,
+                                    first_name: task.first_name,
+                                    last_name: task.last_name
+                                  });
+                                } else {
+                                  alert("Cannot view employee details: Employee ID is missing");
+                                }
+                              }}
+                              title={hasEmployeeId ? "Click to view employee details" : "No employee ID available"}
+                            >
+                              {initials || 'N/A'}
+                            </div>
+                            <div className="user-info">
+                              <div className="user-name">{`${task?.first_name || ''} ${task?.last_name || ''}`}</div>
+                              <div className="user-id">{task?.employee_id ? `ID: ${task.employee_id}` : 'No ID'}</div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {currentData.length === 0 && (
+                    <tr>
+                      <td colSpan="7" className="no-tasks">
+                        <i className="fas fa-clipboard-list"></i>
+                        <h3>No tasks found</h3>
+                        <p>Create a new task below to get started</p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination Controls */}
+            {(selectedNavtask === "External Task" ? taskdata.length : taskdata2.length) > ITEMS_PER_PAGE && (
+              <div className="pagination-controls">
+                <button 
+                  onClick={handlePrevPage} 
+                  disabled={currentPageNum === 1}
+                  className="pagination-button"
+                >
+                  <i className="fas fa-chevron-left"></i> Previous
+                </button>
+                <span className="pagination-info">
+                  Page {currentPageNum} of {totalPagesNum}
+                </span>
+                <button 
+                  onClick={handleNextPage} 
+                  disabled={currentPageNum === totalPagesNum}
+                  className="pagination-button"
+                >
+                  Next <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Task Form Card - Now always visible below the task list */}
+        <div className="task-form-card">
+          <div className="card-header">
+            <h2 className="form-title"><i className="fas fa-plus-circle"></i> New Project Task</h2>
+          </div>
           
           <form onSubmit={selectedNavtask === "External Task" ? handleFirstSubmitTask : handleSecondSubmitTask}>
             <div className="form-grid">
               <div className="form-group">
-                <label htmlFor="projectID">Project*</label>
+                <label htmlFor="projectID"><i className="fas fa-project-diagram"></i> Project*</label>
                 <select
                   id="projectID"
                   value={newProjectID}
@@ -426,7 +731,7 @@ const TaskMonitoring = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="laborID">Assigned To*</label>
+                <label htmlFor="laborID"><i className="fas fa-user-tie"></i> Assigned To*</label>
                 <select
                   id="laborID"
                   value={newLaborid}
@@ -447,7 +752,7 @@ const TaskMonitoring = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="taskStatus">Task Status*</label>
+                <label htmlFor="taskStatus"><i className="fas fa-tasks"></i> Task Status*</label>
                 <select
                   id="taskStatus"
                   value={selectedTaskstatus}
@@ -464,7 +769,7 @@ const TaskMonitoring = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="taskDeadline">Task Deadline*</label>
+                <label htmlFor="taskDeadline"><i className="fas fa-calendar-alt"></i> Task Deadline*</label>
                 <input
                   id="taskDeadline"
                   type="date"
@@ -476,7 +781,7 @@ const TaskMonitoring = () => {
               </div>
 
               <div className="form-group full-width">
-                <label htmlFor="taskDescription">Task Description*</label>
+                <label htmlFor="taskDescription"><i className="fas fa-align-left"></i> Task Description*</label>
                 <textarea
                   id="taskDescription"
                   placeholder="Enter task description..."
@@ -495,106 +800,140 @@ const TaskMonitoring = () => {
                 className="primary-button"
                 disabled={loading}
               >
-                {loading ? "Saving..." : "Save Task"}
+                {loading ? <><i className="fas fa-spinner fa-spin"></i> Saving...</> : <><i className="fas fa-save"></i> Save Task</>}
               </button>
             </div>
           </form>
         </div>
-      ) : (
-        <div className="task-list-container">
-          <div className="task-list-header">
-            <h2>Project Task List</h2>
-            <div className="list-actions">
-              <button 
-                onClick={handleBackClick} 
-                className="secondary-button"
-              >
-                Add New Task
-              </button>
-              <button 
-                onClick={handleRemoveReports} 
-                className="danger-button"
-                disabled={selectedReports.length === 0 || loading}
-              >
-                {loading ? "Removing..." : "Remove Selected"}
-              </button>
-            </div>
-          </div>
-
-          <div className="task-table-container">
-            <div className="table-responsive">
-              <table className="task-table">
-                <thead>
-                  <tr>
-                    <th className="select-col"></th>
-                    <th>Task ID</th>
-                    <th>Project Name</th>
-                    <th>Assigned To</th>
-                    <th>Status</th>
-                    <th>Deadline</th>
-                    <th>Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentData.map((task, index) => (
-                    <tr key={index}>
-                      <td className="select-col">
-                        <input
-                          type="checkbox"
-                          checked={selectedReports.includes(index)}
-                          onChange={() => handleCheckboxChange(index)}
-                        />
-                      </td>
-                      <td><strong>{task?.task_id || ''}</strong></td>
-                      <td>{task?.ext_project_name || task?.project_name || ''}</td>
-                      <td>{`${task?.first_name || ''} ${task?.last_name || ''}`}</td>
-                      <td>
-                        {task?.task_status ? (
-                          <span className={`status-badge ${(task.task_status || '').replace('_', '-')}`}>
-                            {(task.task_status || '').replace('_', ' ')}
-                          </span>
-                        ) : ''}
-                      </td>
-                      <td>{task?.task_deadline || ''}</td>
-                      <td className="description-cell">{task?.task_description || ''}</td>
-                    </tr>
-                  ))}
-                  {currentData.length === 0 && (
-                    <tr>
-                      <td colSpan="7" className="no-tasks">
-                        No tasks found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Pagination Controls */}
-            {(selectedNavtask === "External Task" ? taskdata.length : taskdata2.length) > ITEMS_PER_PAGE && (
-              <div className="pagination-controls">
-                <button 
-                  onClick={handlePrevPage} 
-                  disabled={currentPageNum === 1}
-                  className="pagination-button"
-                >
-                  Previous
-                </button>
-                <span className="pagination-info">
-                  Page {currentPageNum} of {totalPagesNum}
-                </span>
-                <button 
-                  onClick={handleNextPage} 
-                  disabled={currentPageNum === totalPagesNum}
-                  className="pagination-button"
-                >
-                  Next
+        
+        {/* Employee Details Modal - Now using selectedEmployee and formatDate */}
+        {showEmployeeModal && (
+          <div className="modal-overlay" onClick={() => setShowEmployeeModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>
+                  <i className="fas fa-user-circle"></i>                   {selectedEmployee ? 
+                    `Employee: ${selectedEmployee.first_name} ${selectedEmployee.last_name}` : 
+                    'Employee Details'}
+                </h3>
+                <button className="modal-close" onClick={() => setShowEmployeeModal(false)}>
+                  <i className="fas fa-times"></i>
                 </button>
               </div>
-            )}
+              
+              {employeeModalLoading ? (
+                <div className="modal-loading">
+                  <div className="spinner"></div>
+                  <p>Loading employee details...</p>
+                </div>
+              ) : employeeModalError ? (
+                <div className="modal-body">
+                  <div className="error-message">
+                    <i className="fas fa-exclamation-circle"></i>
+                    <p>{employeeModalError}</p>
+                    {selectedEmployee && (
+                      <p>Could not load details for employee ID: {selectedEmployee.employee_id}</p>
+                    )}
+                  </div>
+                </div>
+              ) : employeeDetails ? (
+                <div className="modal-body">
+                  <div className="employee-profile">
+                    <div className="employee-avatar-large">
+                      {(employeeDetails.first_name?.charAt(0) || '') + (employeeDetails.last_name?.charAt(0) || '')}
+                    </div>
+                    <div className="employee-name-section">
+                      <h2>{`${employeeDetails.first_name || ''} ${employeeDetails.last_name || ''}`}</h2>
+                      <span className={`employee-status ${employeeDetails.status?.toLowerCase().replace(' ', '-') || ''}`}>
+                        <i className={
+                          employeeDetails.status === 'Active' ? 'fas fa-circle' : 
+                          employeeDetails.status === 'On leave' ? 'fas fa-umbrella-beach' : 
+                          'fas fa-plane-departure'
+                        }></i>
+                        {employeeDetails.status || 'Unknown'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="employee-details-grid">
+                    <div className="employee-detail-item">
+                      <div className="detail-label">
+                        <i className="fas fa-id-badge"></i> Employee ID
+                      </div>
+                      <div className="detail-value">{employeeDetails.employee_id || '-'}</div>
+                    </div>
+                    
+                    <div className="employee-detail-item">
+                      <div className="detail-label">
+                        <i className="fas fa-building"></i> Department
+                      </div>
+                      <div className="detail-value">
+                        {employeeDetails.dept_name || employeeDetails.dept_id || '-'}
+                      </div>
+                    </div>
+                    
+                    <div className="employee-detail-item">
+                      <div className="detail-label">
+                        <i className="fas fa-briefcase"></i> Position
+                      </div>
+                      <div className="detail-value">
+                        {employeeDetails.position_title || employeeDetails.position_id || '-'}
+                      </div>
+                    </div>
+                    
+                    <div className="employee-detail-item">
+                      <div className="detail-label">
+                        <i className="fas fa-phone"></i> Phone
+                      </div>
+                      <div className="detail-value">{employeeDetails.phone || '-'}</div>
+                    </div>
+                    
+                    <div className="employee-detail-item">
+                      <div className="detail-label">
+                        <i className="fas fa-user-tie"></i> Employment Type
+                      </div>
+                      <div className="detail-value">{employeeDetails.employment_type || '-'}</div>
+                    </div>
+                    
+                    {/* Use formatDate for date fields */}
+                    {employeeDetails.created_at && (
+                      <div className="employee-detail-item">
+                        <div className="detail-label">
+                          <i className="fas fa-calendar-plus"></i> Joined Date
+                        </div>
+                        <div className="detail-value">{formatDate(employeeDetails.created_at)}</div>
+                      </div>
+                    )}
+                    
+                    {employeeDetails.updated_at && (
+                      <div className="employee-detail-item">
+                        <div className="detail-label">
+                          <i className="fas fa-calendar-check"></i> Last Updated
+                        </div>
+                        <div className="detail-value">{formatDate(employeeDetails.updated_at)}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="modal-body">
+                  <p className="no-data">
+                    {selectedEmployee ? 
+                      `No details available for ${selectedEmployee.first_name} ${selectedEmployee.last_name}` : 
+                      'No employee details available'}
+                  </p>
+                </div>
+              )}
+              
+              <div className="modal-footer">
+                <button className="secondary-button" onClick={() => setShowEmployeeModal(false)}>
+                  <i className="fas fa-times"></i> Close
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
