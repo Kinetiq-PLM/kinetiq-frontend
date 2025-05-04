@@ -9,6 +9,7 @@ const AccountsPayableReceipt = () => {
   const [data, setData] = useState([]); // State to store table data
   const [searching, setSearching] = useState("");
   const [isLoading, setIsLoading] = useState(true); // State to manage loading state
+  const [openModal, setOpenModal] = useState(false); // State to manage modal visibility
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "",
@@ -25,6 +26,7 @@ const AccountsPayableReceipt = () => {
     "Payment Method",
     "Reference Number",
     "Status",
+    "Actions"
   ];
 
   // API Endpoint
@@ -78,6 +80,11 @@ const AccountsPayableReceipt = () => {
       .includes(searching.toLowerCase())
   );
 
+
+  const handleOpenModal = (row) => {
+    setOpenModal(true);
+  }
+
   // Loading spinner component
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
@@ -109,7 +116,7 @@ const AccountsPayableReceipt = () => {
           {isLoading ? (
             <LoadingSpinner />
           ) : (
-            <Table columns={columns} data={filteredData} />
+            <Table columns={columns} data={filteredData} showEditButton={true} handleEditRow={handleOpenModal} />
           )}
         </div>
       </div>
