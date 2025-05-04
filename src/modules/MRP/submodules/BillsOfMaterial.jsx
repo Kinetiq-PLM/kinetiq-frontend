@@ -23,8 +23,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [totalLaborCost, setTotalLaborCost] = useState(0);
     const [totalOrderCost, setTotalOrderCost] = useState(0);
 
-    //const baseurl = "http://127.0.0.1:8000";
-    const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
+    const baseurl = "http://127.0.0.1:8000";
+    //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
     const [bomData, setBomData] = useState([]);
     const [bomDetails, setBomDetails] = useState([]);
@@ -73,7 +73,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     const data = await response.json();
             
                     const formattedData = data.map((item) => ({
-                        serviceOrderItemId: item.service_order_item_id,
+                        serviceOrderItemId: item.service_order_id,
                         type: item.type,
                         description: item.description,
                         date: item.date.trim(),
@@ -311,7 +311,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         } else if (selectedRowData?.type === "Non Project") {
             total = parseFloat(npOverallProductCost || 0);
         } else {
-            total = parseFloat(prinOverallCost * 1.2);
+            total = parseFloat(prinOverallCost || 0);
         }
     
         total += totalCostOfProduction + totalLaborCost;

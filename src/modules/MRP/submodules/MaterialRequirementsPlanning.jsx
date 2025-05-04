@@ -42,8 +42,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
     const [totalLaborCost, setTotalLaborCost] = useState(0);
     const [totalOrderCost, setTotalOrderCost] = useState(0);
-    //const baseurl = "http://127.0.0.1:8000";
-    const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
+    const baseurl = "http://127.0.0.1:8000";
+    //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
 
 
@@ -82,7 +82,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 const data = await response.json();
         
                 const formattedData = data.map((item) => ({
-                    serviceOrderItemId: item.service_order_item_id,
+                    serviceOrderItemId: item.service_order_id,
                     type: item.type,
                     description: item.description,
                     date: item.date.trim(),
@@ -291,6 +291,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
             const formattedData = data.map((item, index) => ({
                 no: index + 1,
+                prin_service_order_item_id: item.service_order_item_id,
                 prin_material_id: item.item_id,
                 prin_uom: item.unit_of_measure,
                 prin_item_name: item.item_name,
@@ -429,11 +430,12 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const sendPrincipalData = async () => {
         try {
 
-            const payload = {
-                service_order_item_id: selectedRowData.number,
-                item_id: principalItems.prin_item_id,
-                mark_up_price: totalOrderCost
-            };
+            const payload = principalItems.map(item => ({
+                service_order_item_id: item.prin_service_order_item_id,
+                item_id: item.prin_material_id,
+                mark_up_price: item.prin_totalitemcost
+            }));
+
             console.log('Payload:', payload);
             const response = await fetch(`${baseurl}/insert_principal/`, {
                 method: 'POST',
@@ -446,18 +448,19 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             if (!response.ok) throw new Error('Failed to submit Principal Item Data');
             const data = await response.json();
             console.log('Success:', data);
-
-            const updateResponse = await fetch(`${baseurl}/update_tracking_status_principal/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ service_order_item_id: selectedRowData.number })
-            });
+            
+            // COMMENT LANG KASI DI PA AYOS YUNG SA TRACKING
+            // const updateResponse = await fetch(`${baseurl}/update_tracking_status_principal/`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({ service_order_item_id: selectedRowData.number })
+            // });
     
-            if (!updateResponse.ok) throw new Error('Failed to update tracking status');
-            const updateData = await updateResponse.json();
-            console.log('Tracking status updated:', updateData);
+            // if (!updateResponse.ok) throw new Error('Failed to update tracking status');
+            // const updateData = await updateResponse.json();
+            // console.log('Tracking status updated:', updateData);
 
         } catch (error) {
             console.error('Error sending Principal Item:', error);
@@ -472,7 +475,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         } else if (isProjectType === "Non Project") {
             total = parseFloat(npOverallProductCost || 0);
         } else if (isProjectType === "Principal Item") {
-            total = parseFloat(prinOverallCost * 1.2);
+            total = parseFloat(prinOverallCost || 0);
         }
 
         total += totalCostOfProduction + totalLaborCost;
@@ -660,7 +663,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </button>
 
                         <button
-                            onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false); fetchPrincipalDetails(item.serviceorderID); setSelectedRowData(item);}}
+                            onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false); setSelectedRowData(item);}}
                             style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                             <span>Next</span>
                             <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
