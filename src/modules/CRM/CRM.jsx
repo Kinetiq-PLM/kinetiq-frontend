@@ -27,7 +27,7 @@ const BodyContent = ({ loadSubModule, setActiveSubModule, employee_id }) => {
   const [avgDealAmount, setAvgDealAmount] = useState(0);
   const [totalRevenue, setTotalRevenue] = useState(0);
 
-  const [salesPeriod, setSalesPeriod] = useState("day");
+  const [salesPeriod, setSalesPeriod] = useState("month");
   const [conversionData, setConversionData] = useState([]);
 
   const ownerStatusData = [

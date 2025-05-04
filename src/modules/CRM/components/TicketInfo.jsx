@@ -61,9 +61,6 @@ const PriorityDropbar = ({ label, setTicketInfo }) => {
         onChange={handlePriorityChange}
         value={priority || ""}
       >
-        <option value="" disabled defaultValue={true}>
-          Select priority
-        </option>
         {priorityType.map((addr, index) => (
           <option key={index} value={addr}>
             {addr}
@@ -95,9 +92,6 @@ const StatusDropbar = ({ label, setTicketInfo }) => {
         onChange={handlePriorityChange}
         value={status || ""}
       >
-        <option value="" disabled defaultValue={true}>
-          Select status
-        </option>
         {statusType.map((addr, index) => (
           <option key={index} value={addr}>
             {addr}
