@@ -318,6 +318,12 @@ const PayrollAccounting = () => {
     </div>
   );
 
+
+  const handleEditRow = (row) => {
+    // logic to open edit modal, or update state
+    console.log("Edit this row:", row);
+  };
+
   return (
     <div className="accountsPayable">
       <div className="body-content-container">
@@ -350,7 +356,9 @@ const PayrollAccounting = () => {
               columns={payrollAccounting_columns}
               data={filteredData}
               handlePrintRow={handlePrintRow}
+              handleEditRow={handleEditRow}
               showPrintButton={true}
+              showEditButton={true}
             />
 
           )}

@@ -1,7 +1,17 @@
 import React, { useState } from "react";
+import { Printer, Pencil } from "lucide-react";
 import "./Table.css";
 
-const Table = ({ columns, data, enableCheckbox, handleStatusToggle, handlePrintRow, showPrintButton }) => {
+const Table = ({
+    columns,
+    data,
+    enableCheckbox,
+    handleStatusToggle,
+    handlePrintRow,
+    handleEditRow,
+    showPrintButton,
+    showEditButton
+}) => {
     const [selectedRows, setSelectedRows] = useState([]);
 
     const handleCheckboxChange = (index) => {
@@ -14,14 +24,16 @@ const Table = ({ columns, data, enableCheckbox, handleStatusToggle, handlePrintR
 
     const formatNumber = (value) => {
         if (!isNaN(value) && value !== "" && value !== null) {
-            return parseFloat(value).toLocaleString("en-US", { minimumFractionDigits: 2 });
+            return parseFloat(value).toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            });
         }
         return value;
     };
 
     return (
         <div className="accounting-table">
-            <div className={`table-container ${enableCheckbox ? 'checkbox-enabled' : ''}`}>
+            <div className={`table-container ${enableCheckbox ? "checkbox-enabled" : ""}`}>
                 <table>
                     <thead>
                         <tr>
@@ -77,23 +89,31 @@ const Table = ({ columns, data, enableCheckbox, handleStatusToggle, handlePrintR
                                         </td>
                                     );
                                 })}
-                                {showPrintButton && (
-                                    <td>
-                                        <button
-                                            onClick={() => handlePrintRow(row)}
-                                            style={{
-                                                backgroundColor: "#4A90E2",
-                                                color: "white",
-                                                padding: "4px 10px",
-                                                borderRadius: "4px",
-                                                border: "none",
-                                                cursor: "pointer",
-                                            }}
-                                        >
-                                            Print PDF
-                                        </button>
-                                    </td>
-                                )}
+                                <div className="flex">
+                                    {showPrintButton && (
+                                        <td style={{ display: "flex" }}>
+                                            <Pencil
+                                                size={30}
+                                                color="#4B5563"
+                                                style={{ cursor: "pointer" }}
+                                                onClick={() => handleEditRow(row)}
+                                                title="Edit Row"
+                                            />
+                                        </td>
+                                    )}
+
+                                    {showEditButton && (
+                                        <td style={{ display: "flex" }}>
+                                            <Printer
+                                                size={30}
+                                                color="#4A90E2"
+                                                style={{ cursor: "pointer" }}
+                                                onClick={() => handlePrintRow(row)}
+                                                title="Print Row"
+                                            />
+                                        </td>
+                                    )}
+                                </div>
                             </tr>
                         ))}
                     </tbody>
