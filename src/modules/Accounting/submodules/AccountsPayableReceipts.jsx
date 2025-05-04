@@ -19,6 +19,7 @@ const AccountsPayableReceipt = () => {
     title: "",
     message: "",
   });
+  const [invoiceIds, setInvoiceIds] = useState([]);
 
   const columns = [
     "AP ID",
@@ -56,13 +57,15 @@ const AccountsPayableReceipt = () => {
         item.status,
       ]);
       setData(transformedData);
+      const invIds = [...new Set(result.map((item) => item.invoice_id).filter(Boolean))];
+      setInvoiceIds(invIds);
     } catch (error) {
       console.error("Error fetching accounts payable receipt data:", error);
       setValidation({
         isOpen: true,
         type: "error",
         title: "Error",
-        message: "Failed to fetch Accounts Payable Receipt data.",
+        message: "Failed to fetch Accounts Payable Receipt data. Please try again later.",
       });
     } finally {
       setIsLoading(false);
@@ -74,13 +77,24 @@ const AccountsPayableReceipt = () => {
   }, []);
 
   const handleOpenModal = (row) => {
+    console.log("Opening modal with row:", row);
     setSelectedRow(row);
     setIsCreating(false);
     setModalOpen(true);
   };
 
   const handleCreateReceipt = () => {
-    const initialRow = columns.map((col) => (col === "Status" ? "Processing" : ""));
+    const initialRow = [
+      "", // ap_id (generated in modal)
+      "", // invoice_id
+      "", // amount
+      "", // payment_date
+      "", // payment_method
+      "", // paid_by
+      "", // reference_number (generated in modal)
+      "Processing", // status
+    ];
+    console.log("Creating receipt, initialRow:", initialRow);
     setSelectedRow(initialRow);
     setIsCreating(true);
     setModalOpen(true);
@@ -99,54 +113,76 @@ const AccountsPayableReceipt = () => {
         status: updatedRow[7],
       };
 
-      const response = await fetch(AP_RECEIPT_ENDPOINT, {
+      console.log("Payload being sent to backend:", payload);
+
+      // Validate status locally
+      const validStatuses = ["Processing", "Completed"];
+      if (!validStatuses.includes(payload.status)) {
+        throw new Error(`Invalid status: ${payload.status}. Must be one of ${validStatuses.join(", ")}`);
+      }
+
+      const url = isNewReceipt
+        ? AP_RECEIPT_ENDPOINT
+        : `${AP_RECEIPT_ENDPOINT}${payload.ap_id}/`;
+
+      const response = await fetch(url, {
         method: isNewReceipt ? "POST" : "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
+      const contentType = response.headers.get("content-type");
+      const responseText = await response.text();
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error("Response Text:", responseText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
       }
 
-      const newData = await response.json();
-      setData((prevData) =>
-        isNewReceipt
-          ? [
-              [
-                newData.ap_id,
-                newData.invoice_id,
-                newData.amount,
-                newData.payment_date,
-                newData.payment_method,
-                newData.paid_by,
-                newData.reference_number,
-                newData.status,
-              ],
-              ...prevData,
-            ]
-          : prevData.map((row) =>
-              row[0] === updatedRow[0]
-                ? [
-                    newData.ap_id,
-                    newData.invoice_id,
-                    newData.amount,
-                    newData.payment_date,
-                    newData.payment_method,
-                    newData.paid_by,
-                    newData.reference_number,
-                    newData.status,
-                  ]
-                : row
-            )
-      );
+      if (contentType && contentType.includes("application/json")) {
+        const newData = JSON.parse(responseText);
+        console.log("Backend response data:", newData);
 
-      setValidation({
-        isOpen: true,
-        type: "success",
-        title: "Success",
-        message: `Receipt record ${isNewReceipt ? "created" : "updated"} successfully.`,
-      });
+        setData((prevData) =>
+          isNewReceipt
+            ? [
+                [
+                  newData.ap_id,
+                  newData.invoice_id,
+                  newData.amount,
+                  newData.payment_date,
+                  newData.payment_method,
+                  newData.paid_by,
+                  newData.reference_number,
+                  newData.status,
+                ],
+                ...prevData,
+              ]
+            : prevData.map((row) =>
+                row[0] === updatedRow[0]
+                  ? [
+                      newData.ap_id,
+                      newData.invoice_id,
+                      newData.amount,
+                      newData.payment_date,
+                      newData.payment_method,
+                      newData.paid_by,
+                      newData.reference_number,
+                      newData.status,
+                    ]
+                  : row
+              )
+        );
+
+        setValidation({
+          isOpen: true,
+          type: "success",
+          title: "Success",
+          message: `Receipt record ${isNewReceipt ? "created" : "updated"} successfully.`,
+        });
+      } else {
+        throw new Error("Unexpected response format: Expected JSON but received HTML");
+      }
 
       setModalOpen(false);
       setIsCreating(false);
@@ -180,7 +216,7 @@ const AccountsPayableReceipt = () => {
     <div className="accountsPayable">
       <div className="body-content-container">
         <div className="title-subtitle-container">
-        <h1 className="subModule-title">Accounts Payable Receipt</h1>
+          <h1 className="subModule-title">Accounts Payable Receipt</h1>
         </div>
         <div className="parent-component-container">
           <div className="component-container">
@@ -219,6 +255,7 @@ const AccountsPayableReceipt = () => {
         <AccountsPayableReceiptModal
           isModalOpen={modalOpen}
           closeModal={() => {
+            console.log("Closing modal");
             setModalOpen(false);
             setIsCreating(false);
           }}
@@ -226,6 +263,8 @@ const AccountsPayableReceipt = () => {
           handleSubmit={handleEditSubmit}
           columnHeaders={columns.filter((col) => col !== "Action")}
           isCreating={isCreating}
+          invoiceIds={invoiceIds}
+          isNewReceipt={isCreating}
         />
       )}
 
