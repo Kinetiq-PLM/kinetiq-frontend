@@ -29,7 +29,7 @@ const Table = ({ contracts, onRowClick, onViewContract, selectedContract }) => {
               >
                 <td>{contract.contract_id}</td>
                 <td>{contract.customer ? contract.customer.name : "Unknown"}</td>
-                <td>{contract.product ? contract.product.product_name : "Unknown"}</td>
+                <td>{contract.product ? contract.product.item_name : "Unknown"}</td>
                 <td>{contract.date_issued}</td>
                 <td>{contract.end_date}</td>
                 <td>{contract.contract_status}</td>
