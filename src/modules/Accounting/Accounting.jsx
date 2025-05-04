@@ -192,7 +192,7 @@ const AccountingDashboard = () => {
         <div className="container mx-auto px-4 py-8">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            
+
             <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-500 text-sm font-medium">
@@ -292,7 +292,7 @@ const AccountingDashboard = () => {
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 max-sm:hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mb-8 max-sm:hidden">
             {/* Bar Chart */}
             <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
               <h2 className="text-xl font-semibold text-gray-800 mb-6">
@@ -336,7 +336,7 @@ const AccountingDashboard = () => {
               <h2 className="text-xl font-semibold text-gray-800 mb-6">
                 Chart of Accounts Distribution
               </h2>
-              <ResponsiveContainer width="100%" height={350}>
+              <ResponsiveContainer width="100%" height={420}>
                 <PieChart>
                   <Pie
                     data={pieData}
@@ -344,18 +344,13 @@ const AccountingDashboard = () => {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={120}
+                    outerRadius={130}
                     innerRadius={60}
-                    fill="#8884d8"
-                    paddingAngle={2}
+                    paddingAngle={3}
+                    labelLine={true}
                     label={({ name, percent }) =>
-                      `${name} (${(percent * 100).toFixed(0)}%)`
+                      `${name}: ${(percent * 100).toFixed(1)}%`
                     }
-                    labelLine={{
-                      stroke: "#666",
-                      strokeWidth: 1,
-                      strokeDasharray: "2 2",
-                    }}
                   >
                     {pieData.map((entry, index) => (
                       <Cell
@@ -370,11 +365,24 @@ const AccountingDashboard = () => {
                       backgroundColor: "#ffffff",
                       borderRadius: "8px",
                       border: "1px solid #e2e8f0",
+                      fontSize: "13px",
+                      padding: "10px 14px",
                     }}
+                    itemStyle={{ fontSize: "13px", color: "#333" }}
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={48}
+                    iconType="circle"
+                    wrapperStyle={{ display: "flex", justifyContent: "center", fontSize: "13px", color: "#4b5563" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
+              <p className="text-center text-sm text-gray-600 mt-4">
+                This chart shows the relative distribution of account types based on their frequency or balance.
+              </p>
             </div>
+
           </div>
         </div>
       </div>
