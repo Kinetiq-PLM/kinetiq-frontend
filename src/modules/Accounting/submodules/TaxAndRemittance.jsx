@@ -19,6 +19,7 @@ const TaxAndRemittance = () => {
     title: "",
     message: "",
   });
+  const [employeeIds, setEmployeeIds] = useState([]);
 
   const columns = [
     "Remittance ID",
@@ -56,13 +57,15 @@ const TaxAndRemittance = () => {
         item.status,
       ]);
       setData(transformedData);
+      const empIds = [...new Set(result.map((item) => item.employee_id).filter(Boolean))];
+      setEmployeeIds(empIds);
     } catch (error) {
       console.error("Error fetching tax remittance data:", error);
       setValidation({
         isOpen: true,
         type: "error",
         title: "Error",
-        message: "Failed to fetch Tax and Remittance data.",
+        message: "Failed to fetch Tax and Remittance data. Please try again later.",
       });
     } finally {
       setIsLoading(false);
@@ -74,15 +77,24 @@ const TaxAndRemittance = () => {
   }, []);
 
   const handleOpenModal = (row) => {
+    console.log("Opening modal with row:", row);
     setSelectedRow(row);
     setIsCreating(false);
     setModalOpen(true);
   };
 
   const handleCreateRemittance = () => {
-    const initialRow = columns.map((col) =>
-      col === "Status" ? "Processing" : col === "Deduction Type" ? "SSS" : ""
-    );
+    const initialRow = [
+      "", // remittance_id (generated in modal)
+      "", // employee_id
+      "SSS", // deduction_type
+      "", // amount
+      "", // payment_date
+      "", // payment_method
+      "", // reference_number (generated in modal)
+      "Processing", // status
+    ];
+    console.log("Creating remittance, initialRow:", initialRow);
     setSelectedRow(initialRow);
     setIsCreating(true);
     setModalOpen(true);
@@ -101,54 +113,76 @@ const TaxAndRemittance = () => {
         status: updatedRow[7],
       };
 
-      const response = await fetch(TAXREMITTANCE_ENDPOINT, {
+      console.log("Payload being sent to backend:", payload);
+
+      // Validate status locally
+      const validStatuses = ["Processing", "Completed"];
+      if (!validStatuses.includes(payload.status)) {
+        throw new Error(`Invalid status: ${payload.status}. Must be one of ${validStatuses.join(", ")}`);
+      }
+
+      const url = isNewRemittance
+        ? TAXREMITTANCE_ENDPOINT
+        : `${TAXREMITTANCE_ENDPOINT}${payload.remittance_id}/`;
+
+      const response = await fetch(url, {
         method: isNewRemittance ? "POST" : "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
+      const contentType = response.headers.get("content-type");
+      const responseText = await response.text();
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error("Response Text:", responseText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${responseText}`);
       }
 
-      const newData = await response.json();
-      setData((prevData) =>
-        isNewRemittance
-          ? [
-              [
-                newData.remittance_id,
-                newData.employee_id,
-                newData.deduction_type,
-                newData.amount,
-                newData.payment_date,
-                newData.payment_method,
-                newData.reference_number,
-                newData.status,
-              ],
-              ...prevData,
-            ]
-          : prevData.map((row) =>
-              row[0] === updatedRow[0]
-                ? [
-                    newData.remittance_id,
-                    newData.employee_id,
-                    newData.deduction_type,
-                    newData.amount,
-                    newData.payment_date,
-                    newData.payment_method,
-                    newData.reference_number,
-                    newData.status,
-                  ]
-                : row
-            )
-      );
+      if (contentType && contentType.includes("application/json")) {
+        const newData = JSON.parse(responseText);
+        console.log("Backend response data:", newData);
 
-      setValidation({
-        isOpen: true,
-        type: "success",
-        title: "Success",
-        message: `Remittance record ${isNewRemittance ? "created" : "updated"} successfully.`,
-      });
+        setData((prevData) =>
+          isNewRemittance
+            ? [
+                [
+                  newData.remittance_id,
+                  newData.employee_id,
+                  newData.deduction_type,
+                  newData.amount,
+                  newData.payment_date,
+                  newData.payment_method,
+                  newData.reference_number,
+                  newData.status,
+                ],
+                ...prevData,
+              ]
+            : prevData.map((row) =>
+                row[0] === updatedRow[0]
+                  ? [
+                      newData.remittance_id,
+                      newData.employee_id,
+                      newData.deduction_type,
+                      newData.amount,
+                      newData.payment_date,
+                      newData.payment_method,
+                      newData.reference_number,
+                      newData.status,
+                    ]
+                  : row
+              )
+        );
+
+        setValidation({
+          isOpen: true,
+          type: "success",
+          title: "Success",
+          message: `Remittance record ${isNewRemittance ? "created" : "updated"} successfully.`,
+        });
+      } else {
+        throw new Error("Unexpected response format: Expected JSON but received HTML");
+      }
 
       setModalOpen(false);
       setIsCreating(false);
@@ -183,8 +217,8 @@ const TaxAndRemittance = () => {
       <div className="body-content-container">
         <div className="title-subtitle-container">
           <h1 className="subModule-title">Tax and Remittance</h1>
-          </div>
-          <div className="parent-component-container">
+        </div>
+        <div className="parent-component-container">
           <div className="component-container">
             <Search
               type="text"
@@ -193,11 +227,13 @@ const TaxAndRemittance = () => {
               onChange={(e) => setSearching(e.target.value)}
             />
           </div>
-          <Button
-            name="Create New Remittance"
-            variant="standard2"
-            onclick={handleCreateRemittance}
-          />
+          <div className="component-container">
+            <Button
+              name="Create New Remittance"
+              variant="standard2"
+              onclick={handleCreateRemittance}
+            />
+          </div>
         </div>
 
         <div className="title-subtitle-container">
@@ -218,13 +254,16 @@ const TaxAndRemittance = () => {
         <TaxRemittanceModal
           isModalOpen={modalOpen}
           closeModal={() => {
+            console.log("Closing modal");
             setModalOpen(false);
             setIsCreating(false);
           }}
           selectedRow={selectedRow}
-          handleSubmit={handleEditSubmit}
+          handleSubmit={(data, isNewRemittance) => handleEditSubmit(data, isNewRemittance)}
           columnHeaders={columns}
           isCreating={isCreating}
+          employeeIds={employeeIds}
+          isNewRemittance={isCreating}
         />
       )}
 
