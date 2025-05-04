@@ -29,6 +29,7 @@ const AccountsPayableReceipt = () => {
     "Paid By",
     "Reference Number",
     "Status",
+    "Action",
   ];
 
   const API_URL =
@@ -223,7 +224,7 @@ const AccountsPayableReceipt = () => {
           }}
           selectedRow={selectedRow}
           handleSubmit={handleEditSubmit}
-          columnHeaders={columns}
+          columnHeaders={columns.filter((col) => col !== "Action")}
           isCreating={isCreating}
         />
       )}

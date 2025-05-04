@@ -109,7 +109,7 @@ const AccountsPayableReceiptModal = ({
               }
               if (header === "Payment Method") {
                 return (
-                  <div key={index} className="form-group">
+                  <div key={index} className="flex flex-col gap-2">
                     <label>{header}</label>
                     <Dropdown
                       style="selection"
@@ -125,7 +125,7 @@ const AccountsPayableReceiptModal = ({
               }
               if (header === "Status") {
                 return (
-                  <div key={index} className="form-group">
+                  <div key={index} className="flex flex-col gap-2">
                     <label>{header}</label>
                     <Dropdown
                       style="selection"
