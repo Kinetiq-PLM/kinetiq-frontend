@@ -7,7 +7,7 @@ import InvRestockForm from "./components/InvRestockForm";
 // import InvItemCards from "./components/InvItemCards";
 
 // Define the base URL for your local backend API
-const BASE_API_URL = "http://127.0.0.1:8000/api";
+const BASE_API_URL = "https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/api";
 
 // --- Helper Function for API Fetching ---
 const fetchData = async (url, setData, setLoading, setError, entityName) => {
@@ -66,8 +66,7 @@ const BodyContent = () => {
   const [warehouseList, setWarehouseList] = useState([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
 
-  // --- Effects ---
-  // Debounce search term
+
   useEffect(() => {
     const timerId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -106,31 +105,23 @@ const BodyContent = () => {
     fetchData(url, setRawMaterialBatchData, setLoadingRawMatBatches, setError, "Raw Material Batches");
   }, [selectedWarehouse, refreshCounter]);
 
-  // Fetch Aggregated Raw Material Data (needed for On Order, Total Stock per type)
-  // Use the dedicated view if available, otherwise adjust endpoint
   useEffect(() => {
-    // Assuming you have an endpoint that returns aggregated data like RawMaterialInventoryView
-    // If using the generic /warehouse-stock/, you might need frontend aggregation again,
-    // or modify the backend to provide this aggregated data alongside batches.
-    // Let's assume a dedicated endpoint exists for the aggregated view for simplicity:
-    const aggregateUrl = `${BASE_API_URL}/material-inventory/`; // Replace if needed
+
+    const aggregateUrl = `${BASE_API_URL}/material-inventory/`;
     console.log(`Fetching aggregated raw materials from: ${aggregateUrl}`);
     fetchData(aggregateUrl, setAggregatedRawMaterialData, setLoadingAggregatedRawMats, setError, "Aggregated Raw Materials");
-  }, [refreshCounter]); // Fetch only on manual refresh for now
+  }, [refreshCounter]);
 
-
-  // Derived State: Find selected warehouse location name
   const selectedWarehouseLocation = useMemo(() => {
     if (!selectedWarehouse) return "All Warehouses";
     const found = warehouseList.find(w => w.warehouse_id === selectedWarehouse);
-    return found ? found.warehouse_location : "Unknown Warehouse"; // Use location
+    return found ? found.warehouse_location : "Unknown Warehouse";
   }, [selectedWarehouse, warehouseList]);
 
-  // Derived State: Create a map for easy lookup of aggregated raw material data by item_id
   const aggregatedRawMaterialMap = useMemo(() => {
     const map = new Map();
     aggregatedRawMaterialData.forEach(item => {
-      map.set(item.item_id, { // Key by item_id from aggregated data
+      map.set(item.item_id, {
         total_stock: item.total_stock || 0,
         stock_on_order: item.stock_on_order || 0,
         minimum_threshold: item.minimum_threshold || 0,
@@ -140,7 +131,7 @@ const BodyContent = () => {
     return map;
   }, [aggregatedRawMaterialData]);
 
-  // --- Table Configuration and Data Mapping ---
+
   const tableConfigs = {
     Products: {
       columns: ["Name", "Item ID", "Total Stock", "Committed Stock", "Available Stock", "Status"],
@@ -214,16 +205,16 @@ const BodyContent = () => {
         return {
           ...batch, // Include original batch fields
           Name: batch.item_name || "Unknown Material",
-          "Item ID": batch.item_id_display || "???", // Use item_id_display from InventoryItem
+          "Item ID": batch.item_id_display || "???",
           "Batch No.": batch.item_no || "N/A",
           "Batch Qty": batchQty,
-          "Total Stock (Type)": totalStockType, // Show aggregated total
-          "On Order (Type)": onOrderType,       // Show aggregated on order
-          "Status": status,                      // Derived status (Expired > Low Type > In Stock > Out of Stock)
-          "Warehouse": batch.warehouse_id || "N/A", // Warehouse from InventoryItem
+          "Total Stock (Type)": totalStockType,
+          "On Order (Type)": onOrderType,
+          "Status": status,
+          "Warehouse": batch.warehouse_id || "N/A",
           "Expiry": batch.expiry ? new Date(batch.expiry).toLocaleDateString() : "N/A",
           "Last Updated": batch.last_update ? new Date(batch.last_update).toLocaleString() : "Unknown",
-          // Include thresholds for context if needed, clearly labeling them as 'Type'
+
           "Minimum Threshold (Type)": minThresholdType,
           "Maximum Threshold (Type)": aggregateInfo.maximum_threshold ?? 0,
         };
@@ -369,8 +360,7 @@ const BodyContent = () => {
         {/* Inventory Table */}
         <InvProductTable loading={currentConfig.loading} columns={currentConfig.columns} data={filteredData} onSelectProduct={setSelectedItem} activeTab={activeTab} selectedItem={selectedItem} />
 
-        {/* Optional Selected Item Details Section */}
-        {/* Consider adding a details panel here based on 'selectedItem' */}
+
 
       </div> {/* End body-content-container */}
 
