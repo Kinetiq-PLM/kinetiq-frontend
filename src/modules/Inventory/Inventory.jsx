@@ -459,15 +459,24 @@ const BodyContent = () => {
         <div className=" w-full min-h-[100px] flex justify-between gap-10">
           <div className=" flex items-center justify-start gap-5 rounded-xl p-3 w-full bg-gray-200">
             <span className="  h-[60px] w-[60px] bg-white"></span>
+            <span>
             <p className="text-lg font-semibold">Total Items in Inventory</p>
+            <p><span>Placeholder</span> Items</p>
+            </span>
           </div>
           <div className=" flex items-center gap-5 rounded-xl p-3 w-full bg-gray-200">
             <span className="  h-[60px] w-[60px] bg-white"></span>
-            <p className="text-lg font-semibold ">Active Warehouse</p>
+            <span>
+            <p className="text-lg font-semibold">Warehouse Active</p>
+            <p><span>{warehouseList.length}</span> Active Warehouse</p>
+            </span>
           </div>
           <div className=" flex items-center gap-5 rounded-xl p-3 w-full bg-gray-200">
             <span className="  h-[60px] w-[60px] bg-white"></span>
+            <span>
             <p className="text-lg font-semibold">Transfer Requests</p>
+            <p><span>Placeholder</span> Requests</p>
+            </span>
           </div>
         </div>
 
