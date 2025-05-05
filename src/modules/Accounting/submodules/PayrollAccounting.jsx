@@ -4,7 +4,6 @@ import NotifModal from "../components/modalNotif/NotifModal";
 import Table from "../components/table/Table";
 import Search from "../components/search/Search";
 import PayrollModal from "../components/payrollAccountingModal/PayrollModal";
-import Button from "../components/button/Button";
 
 const PayrollAccounting = () => {
   const [payrollAccountingData, setPayrollAccountingData] = useState([]);
@@ -18,12 +17,11 @@ const PayrollAccounting = () => {
     title: "",
     message: "",
   });
-  const [isCreating, setIsCreating] = useState(false);
-  const [hasProcessingStatus, setHasProcessingStatus] = useState(false);
   const [payrollHrIds, setPayrollHrIds] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
 
   const payroll_columns = [
+    "Status",
     "Payroll Accounting ID",
     "Payroll HR ID",
     "Employee ID",
@@ -47,19 +45,18 @@ const PayrollAccounting = () => {
     "Undertime Deduction",
     "Total Deductions",
     "Net Pay",
-    "Status",
     "Date Approved",
     "Reference Number",
   ];
 
   const payrollAccounting_columns = [
+    "Status",
     "Payroll Accounting ID",
     "Payroll HR ID",
     "Date Approved",
     "Approved By",
     "Payment Method",
     "Reference Number",
-    "Status",
   ];
 
   const API_URL =
@@ -77,7 +74,9 @@ const PayrollAccounting = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
+        result.sort((a, b) => new Date(b.date_approved) - new Date(a.date_approved));
         const transformedData = result.map((item) => [
+          item.status,
           item.payroll_accounting_id,
           item.payroll_hr_id,
           item.employee_id,
@@ -101,7 +100,6 @@ const PayrollAccounting = () => {
           item.undertime_deduction,
           item.total_deductions,
           item.net_pay,
-          item.status,
           item.date_approved,
           item.reference_number,
         ]);
@@ -130,13 +128,13 @@ const PayrollAccounting = () => {
         const result = await response.json();
         result.sort((a, b) => new Date(b.date_approved) - new Date(a.date_approved));
         const transformedData = result.map((item) => [
+          item.status,
           item.payroll_accounting_id,
           item.payroll_hr_id,
           item.date_approved,
           item.approved_by,
           item.payment_method,
           item.reference_number,
-          item.status,
         ]);
         setPayrollAccountingData(transformedData);
       } catch (error) {
@@ -159,8 +157,6 @@ const PayrollAccounting = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        const hasProcessing = result.some((item) => item.status === "Processing");
-        setHasProcessingStatus(hasProcessing);
       } catch (error) {
         console.error("Error fetching HR payroll data:", error);
         setValidation({
@@ -178,7 +174,7 @@ const PayrollAccounting = () => {
   }, []);
 
   const handlePrintRow = (rowData) => {
-    if (rowData[6] === "Processing") {
+    if (rowData[0] === "Processing") {
       setValidation({
         isOpen: true,
         type: "error",
@@ -188,189 +184,186 @@ const PayrollAccounting = () => {
       return;
     }
 
-    const printWindow = window.open('', '_blank');
-  
+    const payrollJournalRow = payrollData.find(
+      (row) => row[1] === rowData[1] // Match on payroll_accounting_id
+    );
+
+    const printWindow = window.open("", "_blank");
+
+    const renderRow = (label, value) => `
+      <tr>
+        <td><strong>${label}</strong></td>
+        <td>${value ?? "-"}</td>
+      </tr>
+    `;
+
     const html = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Kinetiq - PLM - Payroll</title>
-        <style>
-          @page {
-            size: letter;
-            margin: 0.5in;
-          }
-          body {
-            font-family: Arial, sans-serif;
-            padding: 0;
-            margin: 0;
-            background-color: #ffffff;
-            color: #333333;
-          }
-          .container {
-            max-width: 100%;
-            margin: 0 auto;
-          }
-          .header {
-            border-bottom: 2px solid #0055a5;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-          .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0055a5;
-          }
-          .logo-subtitle {
-            font-size: 14px;
-            color: #777;
-          }
-          .document-title {
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #0055a5;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-          }
-          th, td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-          }
-          tr:nth-child(even) {
-            background-color: #f9f9f9;
-          }
-          .footer {
-            margin-top: 40px;
-            padding-top: 15px;
-            border-top: 1px solid #ddd;
-            text-align: center;
-            font-size: 12px;
-            color: #777;
-          }
-          .confidential {
-            color: #cc0000;
-            font-style: italic;
-            margin-bottom: 10px;
-          }
-          .watermark {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 100px;
-            color: rgba(0, 0, 0, 0.03);
-            transform: rotate(-45deg);
-            z-index: -1;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="watermark">COPY</div>
-        <div class="container">
-          <div class="header">
-            <div>
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Kinetiq - PLM - Payroll</title>
+          <style>
+            @page {
+              size: letter;
+              margin: 0.5in;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #ffffff;
+              color: #333;
+            }
+            .container {
+              margin: 0 auto;
+              width: 100%;
+            }
+            .header {
+              border-bottom: 2px solid #0055a5;
+              padding-bottom: 15px;
+              margin-bottom: 25px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .logo {
+              font-size: 24px;
+              font-weight: bold;
+              color: #0055a5;
+            }
+            .document-title {
+              text-align: center;
+              font-size: 20px;
+              font-weight: bold;
+              margin: 20px 0;
+              color: #0055a5;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+            }
+            th, td {
+              padding: 8px 12px;
+              border-bottom: 1px solid #ccc;
+              text-align: left;
+            }
+            tr:nth-child(even) {
+              background-color: #f9f9f9;
+            }
+            .section-title {
+              font-size: 16px;
+              font-weight: bold;
+              margin-top: 30px;
+              border-bottom: 1px solid #0055a5;
+              color: #0055a5;
+            }
+            .footer {
+              margin-top: 40px;
+              font-size: 12px;
+              text-align: center;
+              color: #777;
+            }
+            .watermark {
+              position: absolute;
+              top: 50%;
+              left: 0;
+              width: 100%;
+              text-align: center;
+              font-size: 100px;
+              color: rgba(0, 0, 0, 0.03);
+              transform: rotate(-45deg);
+              z-index: -1;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="watermark">COPY</div>
+          <div class="container">
+            <div class="header">
               <div class="logo">Kinetiq - PLM</div>
-              <div class="logo-subtitle">Medical Equipment Manufacturing Company.</div>
+            </div>
+  
+            <div class="document-title">PAYROLL</div>
+  
+            ${payrollJournalRow
+        ? `
+                <div class="section-title">Payroll Breakdown</div>
+                <table>
+                  <tbody>
+                    ${payroll_columns.map((col, i) => renderRow(col, payrollJournalRow[i])).join("")}
+                  </tbody>
+                </table>
+                `
+        : "<p><em>No payroll journal entry found for this accounting record.</em></p>"
+      }
+  
+            <div class="footer">
+              <div>Kinetiq - PLM</div>
+              <div>Printed on ${new Date().toLocaleString()}</div>
             </div>
           </div>
   
-          <div class="document-title">PAYROLL</div>
-          
-          <table>
-            <tbody>
-              ${payrollAccounting_columns.map((col, i) => `
-                <tr>
-                  <td><strong>${col}</strong></td>
-                  <td>${rowData[i] ?? '-'}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-  
-          <div class="footer">
-            <div>Kinetiq - PLM</div>
-            <div>Printed on ${new Date().toLocaleString()}</div>
-          </div>
-        </div>
-        <script>
-          window.onload = () => {
-            window.print();
-          };
-          window.onafterprint = () => {
-            window.close();
-          };
-        </script>
-      </body>
-    </html>
+          <script>
+            window.onload = () => window.print();
+            window.onafterprint = () => window.close();
+          </script>
+        </body>
+      </html>
     `;
 
     printWindow.document.write(html);
     printWindow.document.close();
   };
 
+
   const openModal = (row) => {
     console.log("Opening modal with row:", row);
     setSelectedRow(row);
-    setIsCreating(false);
     setModalOpen(true);
   };
 
-  const handleCreatePayroll = (isNewPayroll = false) => {
-    const initialRow = isNewPayroll
-      ? [
-          "", // payroll_accounting_id (generated in PayrollModal)
-          "", // payroll_hr_id
-          "", // date_approved
-          "", // approved_by
-          "", // payment_method
-          "", // reference_number (generated in modal)
-          "Processing", // status
-        ]
-      : payrollAccounting_columns.map((col) =>
-          col === "Status" ? "Processing" : ""
-        );
-    console.log("Creating payroll, isNewPayroll:", isNewPayroll, "initialRow:", initialRow);
-    setSelectedRow(initialRow);
-    setIsCreating(true);
-    setModalOpen(true);
-  };
-
-  const handleEditSubmit = async (updatedRow, isNewPayroll = false) => {
+  const handleEditSubmit = async (updatedRow) => {
     try {
       const payload = {
-        payroll_accounting_id: updatedRow[0],
-        payroll_hr_id: updatedRow[1],
-        date_approved: updatedRow[2],
-        approved_by: updatedRow[3],
-        payment_method: updatedRow[4],
-        reference_number: updatedRow[5],
-        status: updatedRow[6],
+        status: updatedRow[0],
+        payroll_accounting_id: updatedRow[1],
+        payroll_hr_id: updatedRow[2],
+        employee_id: updatedRow[3],
+        pay_period_start: updatedRow[4],
+        pay_period_end: updatedRow[5],
+        employment_type: updatedRow[6],
+        base_salary: updatedRow[7],
+        overtime_hours: updatedRow[8],
+        overtime_pay: updatedRow[9],
+        holiday_pay: updatedRow[10],
+        bonus_pay: updatedRow[11],
+        thirteenth_month_pay: updatedRow[12],
+        total_bonuses: updatedRow[13],
+        gross_pay: updatedRow[14],
+        sss_contribution: updatedRow[15],
+        philhealth_contribution: updatedRow[16],
+        pagibig_contribution: updatedRow[17],
+        tax: updatedRow[18],
+        late_deduction: updatedRow[19],
+        absent_deduction: updatedRow[20],
+        undertime_deduction: updatedRow[21],
+        total_deductions: updatedRow[22],
+        net_pay: updatedRow[23],
+        date_approved: updatedRow[24],
+        reference_number: updatedRow[25],
       };
+
 
       console.log("Payload being sent to backend:", payload);
 
-      // Validate status locally
       const validStatuses = ["Processing", "Completed"];
       if (!validStatuses.includes(payload.status)) {
         throw new Error(`Invalid status: ${payload.status}. Must be one of ${validStatuses.join(", ")}`);
       }
 
-      const url = isNewPayroll
-        ? PAYROLL_ACCOUNTING_ENDPOINT
-        : `${PAYROLL_ACCOUNTING_ENDPOINT}${payload.payroll_accounting_id}/`;
+      const url = `${PAYROLL_JOURNAL_ENDPOINT}${payload.payroll_accounting_id}/`;
 
       const response = await fetch(url, {
-        method: isNewPayroll ? "POST" : "PUT",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -388,46 +381,51 @@ const PayrollAccounting = () => {
         console.log("Backend response data:", newData);
 
         setPayrollAccountingData((prevData) =>
-          isNewPayroll
-            ? [
-                [
-                  newData.payroll_accounting_id,
-                  newData.payroll_hr_id,
-                  newData.date_approved,
-                  newData.approved_by,
-                  newData.payment_method,
-                  newData.reference_number,
-                  newData.status,
-                ],
-                ...prevData,
+          prevData.map((row) =>
+            row[0] === updatedRow[0]
+              ? [
+                newData.status,
+                newData.payroll_accounting_id,
+                newData.payroll_hr_id,
+                newData.employee_id,
+                newData.pay_period_start,
+                newData.pay_period_end,
+                newData.employment_type,
+                newData.base_salary,
+                newData.overtime_hours,
+                newData.overtime_pay,
+                newData.holiday_pay,
+                newData.bonus_pay,
+                newData.thirteenth_month_pay,
+                newData.total_bonuses,
+                newData.gross_pay,
+                newData.sss_contribution,
+                newData.philhealth_contribution,
+                newData.pagibig_contribution,
+                newData.tax,
+                newData.late_deduction,
+                newData.absent_deduction,
+                newData.undertime_deduction,
+                newData.total_deductions,
+                newData.net_pay,
+                newData.date_approved,
+                newData.reference_number
               ]
-            : prevData.map((row) =>
-                row[0] === updatedRow[0]
-                  ? [
-                      newData.payroll_accounting_id,
-                      newData.payroll_hr_id,
-                      newData.date_approved,
-                      newData.approved_by,
-                      newData.payment_method,
-                      newData.reference_number,
-                      newData.status,
-                    ]
-                  : row
-              )
+              : row
+          )
         );
 
         setValidation({
           isOpen: true,
           type: "success",
           title: "Success",
-          message: `Payroll record ${isNewPayroll ? "created" : "updated"} successfully.`,
+          message: "Payroll record updated successfully.",
         });
       } else {
         throw new Error("Unexpected response format: Expected JSON but received HTML");
       }
 
       setModalOpen(false);
-      setIsCreating(false);
     } catch (error) {
       console.error("Error saving payroll record:", error);
       setValidation({
@@ -470,20 +468,6 @@ const PayrollAccounting = () => {
               onChange={(e) => setSearching(e.target.value)}
             />
           </div>
-          <div className="component-container">
-            <Button
-              name="Create New Payroll"
-              variant="standard2"
-              onclick={() => handleCreatePayroll(true)}
-            />
-            {hasProcessingStatus && (
-              <Button
-                name="Create Payroll"
-                variant="standard2"
-                onclick={() => handleCreatePayroll(false)}
-              />
-            )}
-          </div>
         </div>
 
         <div className="title-subtitle-container">
@@ -493,9 +477,7 @@ const PayrollAccounting = () => {
             <Table
               columns={payrollAccounting_columns}
               data={filteredData}
-              handlePrintRow={handlePrintRow}
               handleEditRow={openModal}
-              showPrintButton={true}
               showEditButton={true}
             />
           )}
@@ -511,7 +493,7 @@ const PayrollAccounting = () => {
           {isLoading ? (
             <LoadingSpinner />
           ) : (
-            <Table columns={payroll_columns} data={payrollData} />
+            <Table columns={payroll_columns} data={payrollData} showPrintButton={true} handlePrintRow={handlePrintRow} />
           )}
         </div>
       </div>
@@ -522,14 +504,11 @@ const PayrollAccounting = () => {
           closeModal={() => {
             console.log("Closing modal");
             setModalOpen(false);
-            setIsCreating(false);
           }}
           selectedRow={selectedRow}
-          handleSubmit={(data, isNewPayroll) => handleEditSubmit(data, isNewPayroll)}
+          handleSubmit={(data) => handleEditSubmit(data)}
           columnHeaders={payrollAccounting_columns}
-          isCreating={isCreating}
           payrollHrIds={payrollHrIds}
-          isNewPayroll={isCreating && selectedRow[1] === ""}
         />
       )}
 

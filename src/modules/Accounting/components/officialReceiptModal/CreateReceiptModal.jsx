@@ -136,7 +136,7 @@ const CreateReceiptModal = ({
       <div className="modal-overlay">
         <div className="modal-container">
           <div className="modal-header">
-            <h2 className="text-lg font-semibold">Create Receipt</h2>
+            <h2 className="text-lg font-semibold">Update Receipt</h2>
             <img
               className="cursor-pointer hover:scale-110"
               src="/accounting/Close.svg"
@@ -154,15 +154,28 @@ const CreateReceiptModal = ({
               />
             </div>
             <div className="flex flex-col gap-y-1">
-              <label>Sales Invoice ID*</label>
-              <Dropdown
-                style="selection"
-                defaultOption="Select invoice..."
-                options={invoiceOptions}
+              <Forms
+                type="text"
+                formName="Sales Invoice ID*"
+                placeholder="Enter sales invoice ID"
                 value={reportForm.salesInvoiceId}
-                onChange={(value) => handleInputChange("salesInvoiceId", value)}
+                onChange={(e) => handleInputChange("salesInvoiceId", e.target.value)}
               />
             </div>
+            <Forms
+              type="number"
+              formName="Total Amount*"
+              placeholder="Enter total amount"
+              value={reportForm.totalAmount}
+              onChange={(e) => handleInputChange("totalAmount", e.target.value)}
+            />
+            <Forms
+              type="number"
+              formName="Amount Due*"
+              placeholder="Enter amount due"
+              value={reportForm.amountDue}
+              onChange={(e) => handleInputChange("amountDue", e.target.value)}
+            />
             <Forms
               type="number"
               formName="Amount Paid*"
@@ -231,7 +244,7 @@ const CreateReceiptModal = ({
                         onChange={(value) => {
                           handleInputChange("bankAccount", value);
                         }}
-                      />
+                    />
                     </div>
                   ) : (
                     <div className="space-y-3">

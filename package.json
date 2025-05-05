@@ -25,6 +25,7 @@
     "axios": "^1.8.4",
     "chart.js": "^4.4.8",
     "date-fns": "^4.1.0",
+    "datepicker": "^0.0.0",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
     "html2canvas-pro": "^1.5.10",

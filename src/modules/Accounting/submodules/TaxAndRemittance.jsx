@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
 import Table from "../components/table/Table";
 import Search from "../components/search/Search";
-import Button from "../components/button/Button";
 import NotifModal from "../components/modalNotif/NotifModal";
 import TaxRemittanceModal from "../components/taxRemittance/TaxRemittanceModal"; // Imported component
 
@@ -30,7 +29,6 @@ const TaxAndRemittance = () => {
     "Payment Method",
     "Reference Number",
     "Status",
-    "Action",
   ];
 
   const API_URL =
@@ -80,23 +78,6 @@ const TaxAndRemittance = () => {
     console.log("Opening modal with row:", row);
     setSelectedRow(row);
     setIsCreating(false);
-    setModalOpen(true);
-  };
-
-  const handleCreateRemittance = () => {
-    const initialRow = [
-      "", // remittance_id (generated in modal)
-      "", // employee_id
-      "SSS", // deduction_type
-      "", // amount
-      "", // payment_date
-      "", // payment_method
-      "", // reference_number (generated in modal)
-      "Processing", // status
-    ];
-    console.log("Creating remittance, initialRow:", initialRow);
-    setSelectedRow(initialRow);
-    setIsCreating(true);
     setModalOpen(true);
   };
 
@@ -225,13 +206,6 @@ const TaxAndRemittance = () => {
               placeholder="Search Record..."
               value={searching}
               onChange={(e) => setSearching(e.target.value)}
-            />
-          </div>
-          <div className="component-container">
-            <Button
-              name="Create New Remittance"
-              variant="standard2"
-              onclick={handleCreateRemittance}
             />
           </div>
         </div>

@@ -1,89 +1,231 @@
 import React, { useState } from 'react';
 import "../styles/ManagementDashboard.css";
 
-function ManagementDashboard() {
-  // Dummy data for approvals (at least 10 entries)
-  const approvals = [
-    { approvalId: 'APP-001', requestId: 'REQ-101', externalId: 'EXT-501', issueDate: '2024-03-15', checkedBy: 'John Doe', checkedDate: '2024-03-16', status: 'Pending', dueDate: '2024-03-22', remarks: 'Awaiting final review' },
-    { approvalId: 'APP-002', requestId: 'REQ-102', externalId: 'EXT-502', issueDate: '2024-03-16', checkedBy: 'Jane Smith', checkedDate: '2024-03-17', status: 'Pending', dueDate: '2024-03-23', remarks: 'Needs further clarification' },
-    { approvalId: 'APP-003', requestId: 'REQ-103', externalId: 'EXT-503', issueDate: '2024-03-17', checkedBy: 'Alice Johnson', checkedDate: '2024-03-18', status: 'Pending', dueDate: '2024-03-24', remarks: 'Ready for final approval' },
-    { approvalId: 'APP-004', requestId: 'REQ-104', externalId: 'EXT-504', issueDate: '2024-03-18', checkedBy: 'Bob Williams', checkedDate: '2024-03-19', status: 'Pending', dueDate: '2024-03-25', remarks: 'Pending document verification' },
-    { approvalId: 'APP-005', requestId: 'REQ-105', externalId: 'EXT-505', issueDate: '2024-03-19', checkedBy: 'Charlie Brown', checkedDate: '2024-03-20', status: 'Pending', dueDate: '2024-03-26', remarks: 'Waiting for manager review' },
-    { approvalId: 'APP-006', requestId: 'REQ-106', externalId: 'EXT-506', issueDate: '2024-03-20', checkedBy: 'Diana Miller', checkedDate: '2024-03-21', status: 'Pending', dueDate: '2024-03-27', remarks: 'Clarification required' },
-    { approvalId: 'APP-007', requestId: 'REQ-107', externalId: 'EXT-507', issueDate: '2024-03-21', checkedBy: 'Eva Davis', checkedDate: '2024-03-22', status: 'Pending', dueDate: '2024-03-28', remarks: 'Ready for processing' },
-    { approvalId: 'APP-008', requestId: 'REQ-108', externalId: 'EXT-508', issueDate: '2024-03-22', checkedBy: 'Frank Wilson', checkedDate: '2024-03-23', status: 'Pending', dueDate: '2024-03-29', remarks: 'Documentation incomplete' },
-    { approvalId: 'APP-009', requestId: 'REQ-109', externalId: 'EXT-509', issueDate: '2024-03-23', checkedBy: 'Grace Moore', checkedDate: '2024-03-24', status: 'Pending', dueDate: '2024-03-30', remarks: 'Awaiting client feedback' },
-    { approvalId: 'APP-010', requestId: 'REQ-110', externalId: 'EXT-510', issueDate: '2024-03-24', checkedBy: 'Henry Taylor', checkedDate: '2024-03-25', status: 'Pending', dueDate: '2024-03-31', remarks: 'Urgent review needed' },
-    { approvalId: 'APP-011', requestId: 'REQ-111', externalId: 'EXT-511', issueDate: '2024-03-25', checkedBy: 'Isabella White', checkedDate: '2024-03-26', status: 'Pending', dueDate: '2024-04-01', remarks: 'Check for compliance' },
-    { approvalId: 'APP-012', requestId: 'REQ-112', externalId: 'EXT-512', issueDate: '2024-03-26', checkedBy: 'Jack Harris', checkedDate: '2024-03-27', status: 'Pending', dueDate: '2024-04-02', remarks: 'Review payment details' },
-  ];
 
-  const handleApprovalClick = (approvalId) => {
-    console.log(`Approval ID clicked: ${approvalId}`);
-    // Implement your navigation or detail page logic here
+function App() {
+  const [selectedRequestId, setSelectedRequestId] = useState(null);
+  const [currentView, setCurrentView] = useState('requestInfo'); // Default view to Request Info
+
+  // Dummy data for Request Info
+  const [requestsData] = useState([
+    { id: 'REQ-2024-001', type: 'Laptop Provision', description: 'Dell XPS 15', status: 'In Review', dateSubmitted: '2024-04-30', justification: 'Employee needs a new laptop for work.' },
+    { id: 'REQ-2024-002', type: 'Software Installation', description: 'Adobe Photoshop', status: 'Pending', dateSubmitted: '2024-05-01', justification: 'Design team requires Photoshop.' },
+    { id: 'REQ-2024-003', type: 'Hardware Repair', description: 'Printer Maintenance', status: 'Approved', dateSubmitted: '2024-04-28', justification: 'Printer is malfunctioning.' },
+    { id: 'REQ-2024-004', type: 'Network Setup', description: 'Office Wi-Fi Configuration', status: 'Rejected', dateSubmitted: '2024-04-25', justification: 'Initial request was incomplete.' },
+    { id: 'REQ-2024-005', type: 'Account Access', description: 'Reset Password for Employee', status: 'Completed', dateSubmitted: '2024-04-20', justification: 'Employee forgot their password.' },
+    { id: 'REQ-2024-006', type: 'Office Supplies', description: 'Purchase of stationery', status: 'Pending', dateSubmitted: '2024-05-02', justification: 'Restocking office supplies.' },
+  ]);
+
+  // Dummy data for Approval Progress
+  const [approvalProgressData] = useState([
+    { id: 'REQ-2024-001', approver: 'John Doe', status: 'In Review', step: 'Step 1: Manager Approval' },
+    { id: 'REQ-2024-002', approver: 'Jane Smith', status: 'Pending', step: 'Step 2: IT Approval' },
+    { id: 'REQ-2024-003', approver: 'Michael Brown', status: 'Approved', step: 'Step 3: Final Approval' },
+    { id: 'REQ-2024-004', approver: 'Emily Davis', status: 'Rejected', step: 'Step 1: Manager Approval' },
+    { id: 'REQ-2024-005', approver: 'Sarah Wilson', status: 'Completed', step: 'Step 3: Final Approval' },
+    { id: 'REQ-2024-006', approver: 'David Johnson', status: 'Pending', step: 'Step 1: Manager Approval' },
+  ]);
+
+  // Dummy data for Final Decision
+  const [finalDecisionData] = useState([
+    { id: 'REQ-2024-001', decision: 'Approved', comments: 'Approved by Manager.' },
+    { id: 'REQ-2024-002', decision: 'Pending', comments: 'Awaiting IT approval.' },
+    { id: 'REQ-2024-003', decision: 'Approved', comments: 'All steps completed successfully.' },
+    { id: 'REQ-2024-004', decision: 'Rejected', comments: 'Incomplete justification provided.' },
+    { id: 'REQ-2024-005', decision: 'Completed', comments: 'Request fulfilled and closed.' },
+    { id: 'REQ-2024-006', decision: 'Pending', comments: 'Awaiting Manager approval.' },
+  ]);
+
+  const handleViewDetailsClick = (requestId) => {
+    console.log(`View details clicked for: ${requestId}`);
+    setSelectedRequestId(requestId);
   };
 
+  const handleBackToList = () => {
+    console.log('Navigating back to Request Info list');
+    setSelectedRequestId(null);
+    setCurrentView('requestInfo');
+  };
+
+  const handleActionClick = (view) => {
+    console.log(`Navigating to: ${view}`);
+    setCurrentView(view);
+    setSelectedRequestId(null); // Reset detailed view
+  };
+
+  if (selectedRequestId) {
+    const selectedRequest = requestsData.find(req => req.id === selectedRequestId);
+    return (
+      <div className="app-container">
+        <div className="header">
+          <div className="header-left">Management &gt; Approve &gt; Details</div>
+          <div className="header-right">
+            <input type="text" placeholder="Search..." className="search-input" />
+          </div>
+        </div>
+        <div className="details-view">
+          {selectedRequest ? (
+            <>
+              <h2 className="details-title">Request Details</h2>
+              <div className="details-info">
+                <p><strong>Request ID:</strong> {selectedRequest.id}</p>
+                <p><strong>Type:</strong> {selectedRequest.type}</p>
+                <p><strong>Description:</strong> {selectedRequest.description}</p>
+                <p><strong>Status:</strong> <span className={`status ${selectedRequest.status.toLowerCase().replace(' ', '-')}`}>{selectedRequest.status}</span></p>
+                <p><strong>Date Submitted:</strong> {selectedRequest.dateSubmitted}</p>
+                <p><strong>Justification:</strong> {selectedRequest.justification}</p>
+              </div>
+              <button onClick={handleBackToList} className="back-to-list-button">Back to List</button>
+            </>
+          ) : (
+            <p>Loading details...</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="dashboard-container">
-      <div className="top-section">
-        <div className="status-box approved">
-          <p>Approved</p>
-          <span>16</span>
-        </div>
-        <div className="status-box pending">
-          <p>Pending</p>
-          <span>{approvals.length}</span> {/* Display the actual number of pending approvals */}
-        </div>
-        <div className="status-box rejected">
-          <p>Rejected</p>
-          <span>8</span>
+    <div className="app-container">
+      <div className="header">
+        <div className="header-left">Management &gt; Approve</div>
+        <div className="header-right">
+          <input type="text" placeholder="Search..." className="search-input" />
         </div>
       </div>
 
-      <div className="requests-section">
-        <h2>Latest Pending Approvals</h2>
-        <div className="requests-table-container">
-          <table className="requests-table">
-            <thead>
-              <tr>
-                <th>Approval ID</th>
-                <th>Request ID</th>
-                <th>External ID</th>
-                <th>Issue Date</th>
-                <th>Checked By</th>
-                <th>Checked Date</th>
-                <th>Status</th>
-                <th>Due Date</th>
-                <th>Remarks</th>
-              </tr>
-            </thead>
-            <tbody className="table-body-scroll">
-              {approvals.map((approval) => (
-                <tr key={approval.approvalId}>
-                  <td>
-                    <button 
-                      className="approval-button" 
-                      onClick={() => handleApprovalClick(approval.approvalId)}
-                    >
-                      {approval.approvalId}
-                    </button>
-                  </td>
-                  <td>{approval.requestId}</td>
-                  <td>{approval.externalId}</td>
-                  <td>{approval.issueDate}</td>
-                  <td>{approval.checkedBy}</td>
-                  <td>{approval.checkedDate}</td>
-                  <td>{approval.status}</td>
-                  <td>{approval.dueDate}</td>
-                  <td>{approval.remarks}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="approval-actions">
+        <div
+          className={`action-card ${currentView === 'requestInfo' ? 'active' : ''}`}
+          onClick={() => handleActionClick('requestInfo')}
+        >
+          <div className="action-icon">👤</div>
+          <h3 className="action-title">Request Info</h3>
+          <p className="action-description">View, requestor name, request type, justification</p>
+          <button className="view-button">View Info</button>
         </div>
+
+        <div
+          className={`action-card ${currentView === 'approvalProgress' ? 'active' : ''}`}
+          onClick={() => handleActionClick('approvalProgress')}
+        >
+          <div className="action-icon">📊</div>
+          <h3 className="action-title">Approval Progress</h3>
+          <p className="action-description">Track validation results, current approver/route</p>
+          <button className="view-button">Track Progress</button>
+        </div>
+
+        <div
+          className={`action-card ${currentView === 'finalDecision' ? 'active' : ''}`}
+          onClick={() => handleActionClick('finalDecision')}
+        >
+          <div className="action-icon">✅</div>
+          <h3 className="action-title">Final Decision</h3>
+          <p className="action-description">See approved/rejected status final comments</p>
+          <button className="view-button">See Decision</button>
+        </div>
+      </div>
+
+      <div className="main-content">
+        {currentView === 'requestInfo' && (
+          <div className="content-view request-info-view">
+            <h2 className="section-title">Request Info</h2>
+            <div className="table-container">
+              <table className="request-table">
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>Type</th>
+                    <th>Date Submitted</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {requestsData.map(request => (
+                    <tr key={request.id}>
+                      <td>{request.id}</td>
+                      <td>{request.type}</td>
+                      <td>{request.dateSubmitted}</td>
+                      <td className={`status ${request.status.toLowerCase().replace(' ', '-')}`}>
+                        {request.status}
+                      </td>
+                      <td>
+                        <button
+                          className="view-details-button"
+                          onClick={() => handleViewDetailsClick(request.id)}
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {currentView === 'approvalProgress' && (
+          <div className="content-view">
+            <h2 className="section-title">Approval Progress</h2>
+            <div className="table-container">
+              <table className="request-table">
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>Approver</th>
+                    <th>Status</th>
+                    <th>Step</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {approvalProgressData.map(progress => (
+                    <tr key={progress.id}>
+                      <td>{progress.id}</td>
+                      <td>{progress.approver}</td>
+                      <td className={`status ${progress.status.toLowerCase().replace(' ', '-')}`}>
+                        {progress.status}
+                      </td>
+                      <td>{progress.step}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {currentView === 'finalDecision' && (
+          <div className="content-view">
+            <h2 className="section-title">Final Decision</h2>
+            <div className="table-container">
+              <table className="request-table">
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>Decision</th>
+                    <th>Comments</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {finalDecisionData.map(decision => (
+                    <tr key={decision.id}>
+                      <td>{decision.id}</td>
+                      <td className={`status ${decision.decision.toLowerCase().replace(' ', '-')}`}>
+                        {decision.decision}
+                      </td>
+                      <td>{decision.comments}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-export default ManagementDashboard;
+export default App;
