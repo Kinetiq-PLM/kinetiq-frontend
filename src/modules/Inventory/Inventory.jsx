@@ -5,7 +5,8 @@ import InvProductTable from "./components/InvProductTable";
 import InvRestockForm from "./components/InvRestockForm";
 
 // Define the base URL for your local backend API
-const BASE_API_URL = "http://127.0.0.1:8000/api";
+// const BASE_API_URL = "http://127.0.0.1:8000/api";
+const BASE_API_URL = "https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api";
 
 // --- Helper Function for API Fetching ---
 const fetchData = async (url, setData, setLoading, setError, entityName) => {
@@ -72,7 +73,7 @@ const BodyContent = () => {
   // Fetch Warehouse List
   useEffect(() => {
     setError(null); // Clear previous errors on mount/refresh
-    fetchData("http://127.0.0.1:8000/api/warehouse-list/", setWarehouseList, setLoadingWarehouses, setError, "Warehouse List");
+    fetchData("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/", setWarehouseList, setLoadingWarehouses, setError, "Warehouse List");
   }, [refreshCounter]); // Refetch warehouses only on manual refresh
 
   // --- CORRECTED API CALLS ---
