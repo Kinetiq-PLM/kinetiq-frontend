@@ -89,7 +89,7 @@ const Operations = ({employee_id}) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTypeIndex(prev => (prev + 1) % docTypes.length);
-    }, 5000); // Change slide every 5 seconds
+    }, 10000); 
   
     return () => clearInterval(interval);
   }, []);
