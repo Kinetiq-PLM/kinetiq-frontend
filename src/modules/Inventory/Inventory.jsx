@@ -110,6 +110,15 @@ const BodyContent = () => {
     return found ? found.warehouse_location : "Unknown Warehouse";
   }, [selectedWarehouse, warehouseList]);
 
+  // Filter out archived warehouses for the dropdown
+  const activeWarehouseList = useMemo(() => {
+    return warehouseList.filter(w =>
+      w.warehouse_location &&
+      !w.warehouse_location.toLowerCase().includes("archived")
+
+    );
+  }, [warehouseList]);
+
   // Aggregated data map (remains the same, assumes it holds totals per item type)
   const aggregatedRawMaterialMap = useMemo(() => {
     const map = new Map();
@@ -334,7 +343,7 @@ const BodyContent = () => {
               <label htmlFor="warehouse-select" className="block text-sm font-medium text-gray-700 mb-1">Filter by Warehouse</label>
               <select id="warehouse-select" className="w-full border border-gray-300 rounded-lg p-2 text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500" value={selectedWarehouse} onChange={(e) => setSelectedWarehouse(e.target.value)} disabled={loadingWarehouses}>
                 <option value="">All Warehouses</option>
-                {warehouseList.map((w) => (<option key={w.warehouse_id} value={w.warehouse_id} className="text-gray-600 cursor-pointer">{w.warehouse_location || `Warehouse ${w.warehouse_id}`}</option>))}
+                {activeWarehouseList.map((w) => (<option key={w.warehouse_id} value={w.warehouse_id} className="text-gray-600 cursor-pointer">{w.warehouse_location || `Warehouse ${w.warehouse_id}`}</option>))}
               </select>
               {loadingWarehouses && <p className="text-xs text-gray-500 mt-1">Loading warehouses...</p>}
             </div>
