@@ -78,7 +78,7 @@ const BodyContent = () => {
   // --- CORRECTED API CALLS ---
   // Fetch full Product dataset ONCE (or on refresh), NOT on warehouse change
   useEffect(() => {
-    const url = `${BASE_API_URL}/products/`; // Endpoint for all products
+    const url = `${BASE_API_URL}/products/`; // Endpoint for all products (now per-warehouse view)
     fetchData(url, setProductData, setLoadingProducts, setError, "Products");
   }, [refreshCounter]); // Depends only on refreshCounter
 
@@ -131,16 +131,14 @@ const BodyContent = () => {
   // Table configurations (map data structure remains similar)
   const tableConfigs = {
     Products: {
-      columns: ["Name", "Item ID", "Total Stock", "Committed Stock", "Available Stock", "Status", "Warehouse"], // Added Warehouse
+      columns: ["Name", "Item ID", "Total Stock", "Committed Stock", "Available Stock", "Status", "Warehouse", "UOM"], // Added UOM
       data: productData, // Use the full dataset here
       loading: loadingProducts,
       baseDataProcessor: (product) => { // Moved processing logic here
         const totalStock = product.total_stock || 0;
-        // **IMPORTANT**: Assuming '/products/' endpoint returns 'available_stock'. Adjust if needed.
         const availableStock = product.available_stock || 0;
         const minThreshold = product.minimum_threshold || 0;
         let status = "In Stock";
-        // Use 'available_stock' for status check if available, otherwise fallback to total_stock
         const stockForStatus = product.hasOwnProperty('available_stock') ? availableStock : totalStock;
         if (stockForStatus <= 0) status = "Out of Stock";
         else if (stockForStatus < minThreshold && minThreshold > 0) status = "Low Stock";
@@ -149,11 +147,11 @@ const BodyContent = () => {
           Name: product.item_name || "Unknown Product",
           "Item ID": product.item_id || "???",
           "Total Stock": totalStock,
-          "Committed Stock": product.stock_committed || 0, // Assuming backend provides this
+          "Committed Stock": product.stock_committed || 0,
           "Available Stock": availableStock,
           Status: status,
-          // **IMPORTANT**: Assuming '/products/' endpoint returns 'warehouse_id'. Adjust if needed.
           Warehouse: product.warehouse_id || "N/A",
+          UOM: product.unit_of_measure || "N/A", // Added UOM mapping
           "Minimum Threshold": minThreshold,
           "Maximum Threshold": product.maximum_threshold || 0,
           "Last Updated": product.last_update ? new Date(product.last_update).toLocaleString() : "Unknown"
@@ -161,19 +159,20 @@ const BodyContent = () => {
       },
     },
     Assets: {
-      columns: ["Name", "Item ID", "Serial No", "Quantity", "Status", "Warehouse"],
+      columns: ["Name", "Item ID", "Serial No", "Quantity", "Status", "Warehouse", "UOM"], // Added UOM
       data: assetData, // Use the full dataset here
       loading: loadingAssets,
       baseDataProcessor: (asset) => {
         const status = (asset.current_quantity ?? 0) > 0 ? "In Stock" : "Out of Stock";
         return {
           ...asset,
-          Name: asset.item_name || "Unknown Asset", // Assuming '/assets/' returns item_name via join/select_related
-          "Item ID": asset.item?.item_id || asset.item_id_display || "???", // Adjust based on actual API response
+          Name: asset.item_name || "Unknown Asset",
+          "Item ID": asset.item?.item_id || asset.item_id_display || "???",
           "Serial No": asset.item_no || "N/A",
           Quantity: asset.current_quantity ?? 0,
           Status: status,
-          Warehouse: asset.warehouse_id || "N/A", // InventoryItem has warehouse_id
+          Warehouse: asset.warehouse_id || "N/A",
+          UOM: asset.unit_of_measure || "N/A", // Added UOM mapping
           "Last Updated": asset.last_update ? new Date(asset.last_update).toLocaleString() : "Unknown",
           "Minimum Threshold": "N/A",
           "Maximum Threshold": "N/A",
@@ -181,11 +180,10 @@ const BodyContent = () => {
       },
     },
     "Raw Materials": {
-      columns: ["Name", "Item ID", "Batch No.", "Batch Qty", "Total Stock (Type)", "On Order (Type)", "Status", "Warehouse", "Expiry"],
+      columns: ["Name", "Item ID", "Batch No.", "Batch Qty", "Total Stock (Type)", "On Order (Type)", "Status", "Warehouse", "Expiry", "UOM"], // Added UOM
       data: rawMaterialBatchData, // Use the full dataset here
       loading: loadingRawMatBatches || loadingAggregatedRawMats, // Depends on both fetches
       baseDataProcessor: (batch) => {
-        // **IMPORTANT**: Adjust 'item_id_display' based on what '/raw-materials/' actually returns for linking
         const itemMasterId = batch.item?.item_id || batch.item_id_display || null;
         const aggregateInfo = itemMasterId ? (aggregatedRawMaterialMap.get(itemMasterId) || {}) : {};
         const totalStockType = aggregateInfo.total_stock ?? 0;
@@ -198,22 +196,22 @@ const BodyContent = () => {
         if (batch.expiry && new Date(batch.expiry) < new Date()) {
           status = "Expired";
         }
-        // Only mark as Low Stock (Type) if not Expired and batch has stock
         else if (status === "In Stock" && totalStockType < minThresholdType && minThresholdType > 0) {
           status = "Low Stock (Type)"; // Indicate low stock based on overall type
         }
 
         return {
           ...batch, // Include original batch fields
-          Name: batch.item_name || "Unknown Material", // Assuming '/raw-materials/' returns item_name
+          Name: batch.item_name || "Unknown Material",
           "Item ID": itemMasterId || "???",
           "Batch No.": batch.item_no || "N/A",
           "Batch Qty": batchQty,
           "Total Stock (Type)": totalStockType, // From aggregated map
           "On Order (Type)": onOrderType,       // From aggregated map
           "Status": status,
-          Warehouse: batch.warehouse_id || "N/A", // InventoryItem has warehouse_id
+          Warehouse: batch.warehouse_id || "N/A",
           "Expiry": batch.expiry ? new Date(batch.expiry).toLocaleDateString() : "N/A",
+          UOM: batch.unit_of_measure || "N/A", // Added UOM mapping
           "Last Updated": batch.last_update ? new Date(batch.last_update).toLocaleString() : "Unknown",
           "Minimum Threshold (Type)": minThresholdType,
           "Maximum Threshold (Type)": aggregateInfo.maximum_threshold ?? 0,
