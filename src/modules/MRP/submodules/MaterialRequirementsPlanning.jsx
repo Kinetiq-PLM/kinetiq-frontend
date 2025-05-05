@@ -129,7 +129,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 const data = await response.json();
 
                 const formattedData = data.map((item) => ({
-                    sr_orderID: item.service_order_item_id,
+                    sr_orderID: item.service_order_id,
                     sr_status: item.status,
                 }));
 
@@ -449,18 +449,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             const data = await response.json();
             console.log('Success:', data);
             
-            // COMMENT LANG KASI DI PA AYOS YUNG SA TRACKING
-            // const updateResponse = await fetch(`${baseurl}/update_tracking_status_principal/`, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify({ service_order_item_id: selectedRowData.number })
-            // });
+            const updateResponse = await fetch(`${baseurl}/update_tracking_status_principal/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ service_order_id: selectedRowData.number })
+            });
     
-            // if (!updateResponse.ok) throw new Error('Failed to update tracking status');
-            // const updateData = await updateResponse.json();
-            // console.log('Tracking status updated:', updateData);
+            if (!updateResponse.ok) throw new Error('Failed to update tracking status');
+            const updateData = await updateResponse.json();
+            console.log('Tracking status updated:', updateData);
 
         } catch (error) {
             console.error('Error sending Principal Item:', error);

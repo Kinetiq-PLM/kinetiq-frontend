@@ -206,7 +206,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 if (!response.ok) throw new Error("Failed to fetch Principal statuses");
                 const data = await response.json();
                 const formattedData = data.map(item => ({
-                    sr_orderID: item.service_order_item_id,
+                    sr_orderID: item.service_order_id,
                     sr_status: item.status
                 }));
                 setPrincipalOrder(formattedData);
