@@ -300,6 +300,123 @@
   margin-left: 6px;
 }
 
+/* Add calendar date button */
+.hr-attendance-add-btn {
+  background-color: teal;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.75rem; /* Add margin to separate from filter */
+}
+
+.hr-attendance-add-btn .icon {
+  font-size: 1rem;
+}
+
+.hr-attendance-add-btn:hover {
+  background-color: #006666;
+}
+
+/* Modal styles */
+.hr-attendance-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.hr-attendance-modal {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 450px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hr-attendance-modal h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+}
+
+.hr-attendance-modal-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.hr-attendance-modal-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.hr-attendance-modal-form .checkbox-group label {
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.hr-attendance-modal-form .checkbox-group input {
+  margin-right: 0.5rem;
+}
+
+.hr-attendance-modal-form input[type="text"],
+.hr-attendance-modal-form input[type="date"] {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.hr-attendance-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.hr-attendance-modal-buttons button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.hr-attendance-modal-buttons .submit-btn {
+  background-color: #00b0b5;
+  color: white;
+}
+
+.hr-attendance-modal-buttons .submit-btn:hover {
+  background-color: #009097;
+}
+
+.hr-attendance-modal-buttons .cancel-btn {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.hr-attendance-modal-buttons .cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
 /* Add these styles at the end of the file */
 
 /* Status Tag Styling */

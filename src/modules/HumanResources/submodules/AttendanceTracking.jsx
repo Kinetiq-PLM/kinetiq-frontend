@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/AttendanceTracking.css";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiPlus } from "react-icons/fi";
 
 const AttendanceTracking = () => {
   /******************************************
@@ -23,6 +23,15 @@ const AttendanceTracking = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [toast, setToast] = useState(null);
+
+  const [showAddCalendarDateModal, setShowAddCalendarDateModal] = useState(false);
+  const [newCalendarDate, setNewCalendarDate] = useState({
+    date: "",
+    is_workday: true,
+    is_holiday: false,
+    is_special: false,
+    holiday_name: ""
+  });
 
   const showToast = (message, success = true) => {
     setToast({ message, success });
@@ -134,6 +143,66 @@ const AttendanceTracking = () => {
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
     return { paginated, totalPages, totalCount: filtered.length };
+  };
+
+  /******************************************
+   * 4) Add Calendar Date Logic
+   ******************************************/
+  const handleCalendarDateChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setNewCalendarDate(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleAddCalendarDate = async (e) => {
+    e.preventDefault();
+    
+    try {
+      setLoading(true);
+      
+      // Validate date is entered
+      if (!newCalendarDate.date) {
+        showToast("Date is required", false);
+        setLoading(false);
+        return;
+      }
+      
+      // If is_holiday is true but holiday_name is empty, add validation
+      if (newCalendarDate.is_holiday && !newCalendarDate.holiday_name) {
+        showToast("Holiday name is required when date is marked as a holiday", false);
+        setLoading(false);
+        return;
+      }
+      
+      // Submit the form data
+      const response = await axios.post(
+        "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/calendar_dates/calendar_dates/",
+        newCalendarDate
+      );
+      
+      showToast("Calendar date added successfully", true);
+      setShowAddCalendarDateModal(false);
+      
+      // Reset form data
+      setNewCalendarDate({
+        date: "",
+        is_workday: true,
+        is_holiday: false,
+        is_special: false,
+        holiday_name: ""
+      });
+      
+      // Refresh the calendar dates data
+      fetchCalendarDates();
+    } catch (err) {
+      console.error("Failed to add calendar date:", err);
+      const errorMsg = err.response?.data?.detail || "Failed to add calendar date";
+      showToast(errorMsg, false);
+    } finally {
+      setLoading(false);
+    }
   };
 
 /*******************************************************
@@ -503,6 +572,15 @@ const AttendanceTracking = () => {
                   </>
                 )}
               </select>
+              
+              {activeTab === "CalendarDates" && (
+                <button 
+                  className="hr-attendance-add-btn"
+                  onClick={() => setShowAddCalendarDateModal(true)}
+                >
+                  <FiPlus className="icon" /> Add Calendar Date
+                </button>
+              )}
             </div>
           </div>
           
@@ -556,6 +634,91 @@ const AttendanceTracking = () => {
           style={{ backgroundColor: toast.success ? "#4CAF50" : "#F44336" }}
         >
           {toast.message}
+        </div>
+      )}
+
+      {/* Calendar Date Add Modal */}
+      {showAddCalendarDateModal && (
+        <div className="hr-attendance-modal-overlay">
+          <div className="hr-attendance-modal">
+            <h3>Add Calendar Date</h3>
+            <form onSubmit={handleAddCalendarDate} className="hr-attendance-modal-form">
+              <div className="form-group">
+                <label>Date *</label>
+                <input 
+                  type="date" 
+                  name="date" 
+                  value={newCalendarDate.date}
+                  onChange={handleCalendarDateChange}
+                  required
+                />
+              </div>
+              
+              <div className="form-group checkbox-group">
+                <label>
+                  <input 
+                    type="checkbox" 
+                    name="is_workday" 
+                    checked={newCalendarDate.is_workday}
+                    onChange={handleCalendarDateChange}
+                  />
+                  Is Workday
+                </label>
+              </div>
+              
+              <div className="form-group checkbox-group">
+                <label>
+                  <input 
+                    type="checkbox" 
+                    name="is_holiday" 
+                    checked={newCalendarDate.is_holiday}
+                    onChange={handleCalendarDateChange}
+                  />
+                  Is Holiday
+                </label>
+              </div>
+              
+              <div className="form-group checkbox-group">
+                <label>
+                  <input 
+                    type="checkbox" 
+                    name="is_special" 
+                    checked={newCalendarDate.is_special}
+                    onChange={handleCalendarDateChange}
+                  />
+                  Is Special
+                </label>
+              </div>
+              
+              {newCalendarDate.is_holiday && (
+                <div className="form-group">
+                  <label>Holiday Name *</label>
+                  <input 
+                    type="text" 
+                    name="holiday_name" 
+                    value={newCalendarDate.holiday_name}
+                    onChange={handleCalendarDateChange}
+                    placeholder="Enter holiday name"
+                    required
+                  />
+                </div>
+              )}
+              
+              <div className="hr-attendance-modal-buttons">
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? "Adding..." : "Add"}
+                </button>
+                <button 
+                  type="button" 
+                  className="cancel-btn"
+                  onClick={() => setShowAddCalendarDateModal(false)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
