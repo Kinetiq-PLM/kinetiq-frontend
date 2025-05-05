@@ -262,20 +262,6 @@ const BodyContent = ({ onClose }) => {
       }, 5000);
     }
   };
-
-  const handleCancel = () => {
-    setFormData({
-      name: "",
-      department: "",
-      email: "",
-      requestType: "Assets",
-      dateRequested: format(new Date(), "yyyy-MM-dd"),
-      dateValid: format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
-      documentDate: format(new Date(), "yyyy-MM-dd"),
-      employeeId: "",
-      items: [],
-    });
-  };
   
 
   return (
@@ -366,7 +352,10 @@ const BodyContent = ({ onClose }) => {
             <button className="save-item" onClick={handleSave}>
               Next
             </button>
-            <div className="centered-error-message">{error === "Fill up the form first" && error}</div>
+            <div className="centered-error-message">
+              {error === "Fill up the form first" && error}
+            </div>
+            {successMessage && <div className="success-message">{successMessage}</div>}
           </div>
 
           <div className="table-container">
@@ -375,7 +364,6 @@ const BodyContent = ({ onClose }) => {
       <tr>
         <th>Item Name</th>
         <th>Quantity</th>
-        <th>Request ID</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -411,9 +399,8 @@ const BodyContent = ({ onClose }) => {
               onChange={(e) => handleInputChange(e, index)}
             />
           </td>
-          <td>{item.request_id || "N/A"}</td>
           <td>
-            <button onClick={() => handleRemoveRow(index)}>Remove</button>
+            <button className="remove-btn" onClick={() => handleRemoveRow(index)}>Remove</button>
           </td>
         </tr>
       ))}
@@ -424,15 +411,10 @@ const BodyContent = ({ onClose }) => {
   </button>
 </div>
           <div className="button-container">
-            <button className="cancel-btn" onClick={handleCancel}>
-              Clear
-            </button>
             <button className="submit-btn" onClick={handleSubmit}>
               Submit
             </button>
           </div>
-
-          {successMessage && <div className="success-message">{successMessage}</div>}
         </div>
       </div>
     </div>
