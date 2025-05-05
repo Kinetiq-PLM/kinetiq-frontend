@@ -1294,7 +1294,7 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Important for containing the scrollable area */
+  overflow-y: scroll; /* Important for containing the scrollable area */
 }
 
 /* Modal Header */

@@ -14,34 +14,58 @@ import {
   FaChevronUp,
   FaExclamationCircle,
   FaBoxOpen,
-  FaBoxes
+  FaBoxes,
+  FaClipboard
 } from "react-icons/fa";
 
 const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSave, onStatusUpdate }) => {
   // State for edited values
   const [editedValues, setEditedValues] = useState({});
-  // Remove packingCost state as we're removing cost functionality
   const [maxItemsCount, setMaxItemsCount] = useState(0);
-  
-  // Add a state for total quantity
   const [totalItemsQuantity, setTotalItemsQuantity] = useState(0);
   
-  // New state to track packed items by warehouse and inventory item
+  // New state for delivery notes info (for partial deliveries)
+  const [deliveryNotesInfo, setDeliveryNotesInfo] = useState(null);
+  
+  // New state to track packed items by warehouse, inventory item, and delivery note
   const [packedItems, setPackedItems] = useState({});
   
   // Accordion state for collapsible sections
   const [expandedSections, setExpandedSections] = useState({
     info: true,
+    partialDelivery: true,
     pickingInfo: true,
     employee: true,
     packingType: true,
     items: true
   });
   
-  // Check if packing list is already packed or shipped (both are final states for this module)
+  // Check if packing list is already packed or shipped (both are final states)
   const isPacked = packingList?.packing_status === 'Packed';
   const isShipped = packingList?.packing_status === 'Shipped';
   const isNotEditable = isPacked || isShipped;
+  
+  // Fetch delivery notes info for partial deliveries
+  useEffect(() => {
+    if (packingList && packingList.delivery_type === 'sales' && packingList.delivery_id) {
+      fetchDeliveryNotesInfo(packingList.delivery_id);
+    }
+  }, [packingList]);
+  
+  const fetchDeliveryNotesInfo = async (orderId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/delivery-notes/order/${orderId}/`);
+      if (response.ok) {
+        const data = await response.json();
+        setDeliveryNotesInfo(data);
+      }
+    } catch (error) {
+      console.error("Error fetching delivery notes info:", error);
+    }
+  };
+  
+  // Check if this is a partial delivery
+  const isPartialDelivery = !!(deliveryNotesInfo && deliveryNotesInfo.is_partial_delivery);
   
   useEffect(() => {
     // If we have picking_list_id, fetch the items_count to use as max value
@@ -78,9 +102,14 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
       packingList.items_details.forEach(item => {
         const warehouseId = item.warehouse_id || 'unknown';
         const itemId = item.inventory_item_id;
+        const deliveryNoteId = item.delivery_note_id || 'no_note';
         
         if (!initialPackedItems[warehouseId]) {
           initialPackedItems[warehouseId] = {};
+        }
+        
+        if (!initialPackedItems[warehouseId][deliveryNoteId]) {
+          initialPackedItems[warehouseId][deliveryNoteId] = {};
         }
         
         const isPacked = ['Packed', 'Shipped'].includes(packingList.packing_status);
@@ -91,9 +120,10 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
         
         if (packingList.packed_items_data && 
             packingList.packed_items_data[warehouseId] && 
-            packingList.packed_items_data[warehouseId][itemId]) {
+            packingList.packed_items_data[warehouseId][deliveryNoteId] &&
+            packingList.packed_items_data[warehouseId][deliveryNoteId][itemId]) {
           // Use the exact quantity from saved data
-          packedQty = parseInt(packingList.packed_items_data[warehouseId][itemId].packedQuantity) || 0;
+          packedQty = parseInt(packingList.packed_items_data[warehouseId][deliveryNoteId][itemId].packedQuantity) || 0;
         } else if (isPacked) {
           // If fully packed/shipped status, use max quantity
           packedQty = maxQuantity;
@@ -103,7 +133,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           packedQty = Math.min(Math.round(packingList.total_items_packed / packingList.items_details.length), maxQuantity);
         }
         
-        initialPackedItems[warehouseId][itemId] = {
+        initialPackedItems[warehouseId][deliveryNoteId][itemId] = {
           packedQuantity: packedQty,
           maxQuantity: maxQuantity,
           itemName: item.item_name,
@@ -168,15 +198,17 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     }));
   };
   
-  // Update the handleSave function
+  // Update the handleSave function to include delivery note info
   const handleSave = () => {
     if (isNotEditable) return;
     
     // Calculate the total packed items directly from the packedItems state
     let totalPacked = 0;
-    Object.values(packedItems).forEach(warehouseItems => {
-      Object.values(warehouseItems).forEach(item => {
-        totalPacked += item.packedQuantity;
+    Object.values(packedItems).forEach(warehouseDeliveryNotes => {
+      Object.values(warehouseDeliveryNotes).forEach(deliveryNoteItems => {
+        Object.values(deliveryNoteItems).forEach(item => {
+          totalPacked += item.packedQuantity;
+        });
       });
     });
     
@@ -210,7 +242,9 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
   const getNextStatusLabel = () => {
     switch (packingList.packing_status) {
       case 'Pending':
-        return 'Mark as Packed';
+        return isPartialDelivery ? 
+          `Mark as Packed (Delivery ${deliveryNotesInfo?.current_delivery} of ${deliveryNotesInfo?.total_deliveries})` : 
+          'Mark as Packed';
       default:
         return '';
     }
@@ -263,7 +297,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return "";
   };
   
-  // Handle status update button click
+  // Handle status update button click - include delivery notes info for partial deliveries
   const handleStatusUpdate = () => {
     if (isNotEditable) return;
     
@@ -271,9 +305,11 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     if (nextStatus) {
       // Calculate the total packed items directly from the packedItems state
       let totalPacked = 0;
-      Object.values(packedItems).forEach(warehouseItems => {
-        Object.values(warehouseItems).forEach(item => {
-          totalPacked += item.packedQuantity || 0;
+      Object.values(packedItems).forEach(warehouseDeliveryNotes => {
+        Object.values(warehouseDeliveryNotes).forEach(deliveryNoteItems => {
+          Object.values(deliveryNoteItems).forEach(item => {
+            totalPacked += item.packedQuantity || 0;
+          });
         });
       });
       
@@ -285,6 +321,28 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
         total_items_packed: totalPacked,
         packed_items_data: packedItems
       };
+      
+      // For partial deliveries, add delivery notes info
+      if (isPartialDelivery && deliveryNotesInfo) {
+        // Get the current delivery notes being processed
+        const currentDeliveryNotes = [];
+        
+        // Extract delivery note IDs from packed items
+        Object.values(packedItems).forEach(warehouseDeliveryNotes => {
+          Object.keys(warehouseDeliveryNotes).forEach(deliveryNoteId => {
+            if (deliveryNoteId !== 'no_note' && !currentDeliveryNotes.includes(deliveryNoteId)) {
+              currentDeliveryNotes.push(deliveryNoteId);
+            }
+          });
+        });
+        
+        updatedValues.delivery_notes_info = {
+          is_partial_delivery: true,
+          current_delivery_notes: currentDeliveryNotes,
+          current_delivery: deliveryNotesInfo.current_delivery,
+          total_deliveries: deliveryNotesInfo.total_deliveries
+        };
+      }
       
       // Call onStatusUpdate with all the edited values
       onStatusUpdate(packingList, nextStatus, updatedValues);
@@ -310,7 +368,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return `status-badge status-${status.toLowerCase()}`;
   };
   
-  // Get completion percentage based on filled fields - updated without cost factors
+  // Get completion percentage based on filled fields
   const getCompletionPercentage = () => {
     let totalScore = 0;
     let maxScore = 3; // Now only 3 factors (employee, packing type, items packed)
@@ -329,8 +387,8 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return (totalScore / maxScore) * 100;
   };
 
-  // Function to handle changes to packed quantities
-  const handlePackedQuantityChange = (warehouseId, itemId, value) => {
+  // Function to handle changes to packed quantities - updated for delivery notes
+  const handlePackedQuantityChange = (warehouseId, deliveryNoteId, itemId, value) => {
     // Don't update if packed or shipped
     if (isNotEditable) return;
     
@@ -338,43 +396,45 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     const newQuantity = parseInt(value) || 0;
     
     // Ensure the quantity doesn't exceed the maximum available quantity
-    const maxQty = packedItems[warehouseId]?.[itemId]?.maxQuantity || 0;
+    const maxQty = packedItems[warehouseId]?.[deliveryNoteId]?.[itemId]?.maxQuantity || 0;
     const validatedQuantity = Math.min(Math.max(0, newQuantity), maxQty);
     
-    // Update the packed items state
-    setPackedItems(prev => ({
-      ...prev,
-      [warehouseId]: {
-        ...prev[warehouseId],
-        [itemId]: {
-          ...prev[warehouseId][itemId],
-          packedQuantity: validatedQuantity
-        }
+    // Update the packed items state with the new structure
+    setPackedItems(prev => {
+      const updated = {...prev};
+      
+      if (!updated[warehouseId]) {
+        updated[warehouseId] = {};
       }
-    }));
+      
+      if (!updated[warehouseId][deliveryNoteId]) {
+        updated[warehouseId][deliveryNoteId] = {};
+      }
+      
+      updated[warehouseId][deliveryNoteId][itemId] = {
+        ...(updated[warehouseId][deliveryNoteId][itemId] || {}),
+        packedQuantity: validatedQuantity
+      };
+      
+      return updated;
+    });
     
-    // Update the total_items_packed
-    const updatedPackedItems = {
-      ...packedItems,
-      [warehouseId]: {
-        ...(packedItems[warehouseId] || {}),
-        [itemId]: {
-          ...(packedItems[warehouseId]?.[itemId] || {}),
-          packedQuantity: validatedQuantity
-        }
-      }
-    };
-    updateTotalItemsPacked(updatedPackedItems);
+    // Update the total_items_packed with a delay to ensure state is updated
+    setTimeout(() => {
+      updateTotalItemsPacked(packedItems);
+    }, 0);
   };
   
   // Function to update the total_items_packed based on all packed items
   const updateTotalItemsPacked = (packedItemsData) => {
     let total = 0;
     
-    // Sum up all packed quantities across all warehouses and items
+    // Sum up all packed quantities across all warehouses, delivery notes, and items
     Object.values(packedItemsData).forEach(warehouseItems => {
-      Object.values(warehouseItems).forEach(item => {
-        total += item.packedQuantity;
+      Object.values(warehouseItems).forEach(deliveryNoteItems => {
+        Object.values(deliveryNoteItems).forEach(item => {
+          total += (item.packedQuantity || 0);
+        });
       });
     });
     
@@ -382,7 +442,34 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     handleInputChange('total_items_packed', total);
   };
   
-  // Add helpers for bulk actions
+  // Add helpers for bulk actions - updated for delivery notes
+  const markAllItemsInDeliveryNote = (warehouseId, deliveryNoteId, isPack) => {
+    if (isNotEditable) return;
+    
+    const deliveryNoteItems = packedItems[warehouseId]?.[deliveryNoteId];
+    if (!deliveryNoteItems) return;
+    
+    const updatedDeliveryNoteItems = {};
+    Object.entries(deliveryNoteItems).forEach(([itemId, itemData]) => {
+      updatedDeliveryNoteItems[itemId] = {
+        ...itemData,
+        packedQuantity: isPack ? itemData.maxQuantity : 0
+      };
+    });
+    
+    const updatedPackedItems = {
+      ...packedItems,
+      [warehouseId]: {
+        ...packedItems[warehouseId],
+        [deliveryNoteId]: updatedDeliveryNoteItems
+      }
+    };
+    
+    setPackedItems(updatedPackedItems);
+    updateTotalItemsPacked(updatedPackedItems);
+  };
+  
+  // Mark all items in a warehouse as packed/unpacked
   const markAllItemsInWarehouse = (warehouseId, isPack) => {
     if (isNotEditable) return;
     
@@ -390,11 +477,15 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     if (!warehouseItems) return;
     
     const updatedWarehouseItems = {};
-    Object.entries(warehouseItems).forEach(([itemId, itemData]) => {
-      updatedWarehouseItems[itemId] = {
-        ...itemData,
-        packedQuantity: isPack ? itemData.maxQuantity : 0
-      };
+    Object.entries(warehouseItems).forEach(([deliveryNoteId, deliveryNoteItems]) => {
+      updatedWarehouseItems[deliveryNoteId] = {};
+      
+      Object.entries(deliveryNoteItems).forEach(([itemId, itemData]) => {
+        updatedWarehouseItems[deliveryNoteId][itemId] = {
+          ...itemData,
+          packedQuantity: isPack ? itemData.maxQuantity : 0
+        };
+      });
     });
     
     const updatedPackedItems = {
@@ -413,11 +504,16 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     const updatedPackedItems = {};
     Object.entries(packedItems).forEach(([warehouseId, warehouseItems]) => {
       updatedPackedItems[warehouseId] = {};
-      Object.entries(warehouseItems).forEach(([itemId, itemData]) => {
-        updatedPackedItems[warehouseId][itemId] = {
-          ...itemData,
-          packedQuantity: isPack ? itemData.maxQuantity : 0
-        };
+      
+      Object.entries(warehouseItems).forEach(([deliveryNoteId, deliveryNoteItems]) => {
+        updatedPackedItems[warehouseId][deliveryNoteId] = {};
+        
+        Object.entries(deliveryNoteItems).forEach(([itemId, itemData]) => {
+          updatedPackedItems[warehouseId][deliveryNoteId][itemId] = {
+            ...itemData,
+            packedQuantity: isPack ? itemData.maxQuantity : 0
+          };
+        });
       });
     });
     
@@ -425,9 +521,29 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     updateTotalItemsPacked(updatedPackedItems);
   };
 
-  // Render items section
+  // Helper to get delivery note display name
+  const getDeliveryNoteDisplayName = (deliveryNoteId) => {
+    if (deliveryNoteId === 'no_note') {
+      return 'General Items (No Delivery Note)';
+    }
+    
+    // If we have delivery notes info, look up the sequence number
+    if (deliveryNotesInfo && deliveryNotesInfo.delivery_notes) {
+      const noteInfo = deliveryNotesInfo.delivery_notes.find(
+        note => note.delivery_note_id === deliveryNoteId
+      );
+      
+      if (noteInfo) {
+        return `Delivery Note ${deliveryNoteId} (Batch ${noteInfo.sequence_number} of ${deliveryNotesInfo.total_deliveries})`;
+      }
+    }
+    
+    return `Delivery Note ${deliveryNoteId}`;
+  };
+
+  // Render items section, now with delivery note grouping
   const renderItemsSection = () => {
-    // Group items by warehouse
+    // First organize data by warehouse, then by delivery note
     const warehouseGroups = [];
     const warehouseMap = {};
     let totalQuantity = 0;
@@ -435,39 +551,62 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     
     // Check if we have item details
     if (packingList?.items_details?.length) {
-      // Group items by warehouse
+      // Group items first by warehouse, then by delivery note
       packingList.items_details.forEach(item => {
         const warehouseId = item.warehouse_id || 'unknown';
+        const deliveryNoteId = item.delivery_note_id || 'no_note';
         totalQuantity += parseInt(item.quantity) || 0;
         
         // Calculate current packed quantity from our tracking state
-        const packedQty = packedItems[warehouseId]?.[item.inventory_item_id]?.packedQuantity || 0;
+        const packedQty = packedItems[warehouseId]?.[deliveryNoteId]?.[item.inventory_item_id]?.packedQuantity || 0;
         totalPackedQuantity += packedQty;
         
+        // Initialize warehouse if needed
         if (!warehouseMap[warehouseId]) {
           const group = {
             warehouseId,
             warehouseName: item.warehouse_name || 'Unknown Warehouse',
-            items: [],
+            deliveryNotes: {},
             totalQuantity: 0,
             totalPackedQuantity: 0
           };
           warehouseMap[warehouseId] = group;
           warehouseGroups.push(group);
         }
-        warehouseMap[warehouseId].items.push(item);
+        
+        // Initialize delivery note if needed
+        if (!warehouseMap[warehouseId].deliveryNotes[deliveryNoteId]) {
+          warehouseMap[warehouseId].deliveryNotes[deliveryNoteId] = {
+            deliveryNoteId,
+            displayName: getDeliveryNoteDisplayName(deliveryNoteId),
+            items: [],
+            totalQuantity: 0,
+            totalPackedQuantity: 0
+          };
+        }
+        
+        // Add item to the delivery note
+        warehouseMap[warehouseId].deliveryNotes[deliveryNoteId].items.push(item);
         warehouseMap[warehouseId].totalQuantity += parseInt(item.quantity) || 0;
         warehouseMap[warehouseId].totalPackedQuantity += packedQty;
+        warehouseMap[warehouseId].deliveryNotes[deliveryNoteId].totalQuantity += parseInt(item.quantity) || 0;
+        warehouseMap[warehouseId].deliveryNotes[deliveryNoteId].totalPackedQuantity += packedQty;
       });
     }
   
     const hasMultipleWarehouses = warehouseGroups.length > 1;
+    const hasMultipleDeliveryNotes = isPartialDelivery;
   
     return (
       <div className="items-section">
         <h4 className="section-title">
           <FaBoxOpen className="section-icon" />
           Items to Pack ({packingList?.items_details?.length || 0} items, {totalPackedQuantity}/{totalQuantity} units packed)
+          {isPartialDelivery && (
+            <span className="batch-indicator">
+              (Batch {deliveryNotesInfo?.current_delivery} of {deliveryNotesInfo?.total_deliveries})
+            </span>
+          )}
         </h4>
   
         {!isNotEditable && (
@@ -490,27 +629,27 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
         )}
   
         {warehouseGroups.length > 0 ? (
-          warehouseGroups.map((group, groupIndex) => (
-            <div key={group.warehouseId} className="warehouse-group">
+          warehouseGroups.map((warehouse, warehouseIndex) => (
+            <div key={warehouse.warehouseId} className="warehouse-group">
               <h5 className="warehouse-name">
-                <FaWarehouse className="warehouse-icon" /> {group.warehouseName}
+                <FaWarehouse className="warehouse-icon" /> {warehouse.warehouseName}
                 <span className="warehouse-items-count">
-                  {group.items.length} item{group.items.length !== 1 ? 's' : ''}, 
-                  {group.totalPackedQuantity}/{group.totalQuantity} units packed
+                  {Object.keys(warehouse.deliveryNotes).length} delivery note(s),
+                  {warehouse.totalPackedQuantity}/{warehouse.totalQuantity} units packed
                 </span>
                 
                 {!isNotEditable && (
                   <div className="warehouse-actions">
                     <button 
                       className="pack-button" 
-                      onClick={() => markAllItemsInWarehouse(group.warehouseId, true)}
+                      onClick={() => markAllItemsInWarehouse(warehouse.warehouseId, true)}
                       disabled={isNotEditable}
                     >
                       Pack All
                     </button>
                     <button 
                       className="unpack-button" 
-                      onClick={() => markAllItemsInWarehouse(group.warehouseId, false)}
+                      onClick={() => markAllItemsInWarehouse(warehouse.warehouseId, false)}
                       disabled={isNotEditable}
                     >
                       Unpack All
@@ -519,72 +658,107 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                 )}
               </h5>
               
-              <div className="items-table-container">
-                <table className="items-table">
-                  <thead>
-                    <tr>
-                      <th>Item Name</th>
-                      <th>Item Number</th>
-                      <th>Available Qty</th>
-                      {!isNotEditable && <th>Packed Qty</th>}
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {group.items.map((item, itemIndex) => {
-                      const warehouseId = group.warehouseId;
-                      const itemId = item.inventory_item_id;
-                      const packedQuantity = packedItems[warehouseId]?.[itemId]?.packedQuantity || 0;
-                      const maxQuantity = parseInt(item.quantity) || 0;
-                      const isFullyPacked = packedQuantity === maxQuantity;
-                      const isPartiallyPacked = packedQuantity > 0 && packedQuantity < maxQuantity;
-                      
-                      return (
-                        <tr key={itemIndex} className={isFullyPacked ? 'fully-packed' : (isPartiallyPacked ? 'partially-packed' : '')}>
-                          <td>{item.item_name}</td>
-                          <td>{item.item_no || '-'}</td>
-                          <td>{maxQuantity}</td>
-                          {!isNotEditable ? (
-                            <td className="packed-quantity-cell">
-                              <div className="packed-quantity-input-group">
-                                <button 
-                                  className="quantity-btn" 
-                                  onClick={() => handlePackedQuantityChange(warehouseId, itemId, (packedQuantity - 1))} 
-                                  disabled={packedQuantity <= 0 || isNotEditable}
-                                >−</button>
-                                <input
-                                  type="number"
-                                  className="packed-quantity-input"
-                                  value={packedQuantity}
-                                  onChange={(e) => handlePackedQuantityChange(warehouseId, itemId, e.target.value)}
-                                  min="0"
-                                  max={maxQuantity}
-                                  disabled={isNotEditable}
-                                />
-                                <button 
-                                  className="quantity-btn" 
-                                  onClick={() => handlePackedQuantityChange(warehouseId, itemId, (packedQuantity + 1))} 
-                                  disabled={packedQuantity >= maxQuantity || isNotEditable}
-                                >+</button>
-                              </div>
-                            </td>
-                          ) : null}
-                          <td className="packing-status-cell">
-                            {isFullyPacked ? (
-                              <span className="status-indicator packed">Fully Packed</span>
-                            ) : isPartiallyPacked ? (
-                              <span className="status-indicator partial">Partially Packed</span>
-                            ) : (
-                              <span className="status-indicator unpacked">Not Packed</span>
-                            )}
-                          </td>
+              {/* Delivery Notes Groups */}
+              {Object.values(warehouse.deliveryNotes).map((deliveryNote, dnIndex) => (
+                <div key={deliveryNote.deliveryNoteId} className="delivery-note-group">
+                  <h6 className="delivery-note-header">
+                    <FaClipboard className="delivery-note-icon" /> {deliveryNote.displayName}
+                    <span className="delivery-note-items-count">
+                      {deliveryNote.items.length} item(s),
+                      {deliveryNote.totalPackedQuantity}/{deliveryNote.totalQuantity} units packed
+                    </span>
+                    
+                    {!isNotEditable && (
+                      <div className="delivery-note-actions">
+                        <button 
+                          className="pack-button" 
+                          onClick={() => markAllItemsInDeliveryNote(warehouse.warehouseId, deliveryNote.deliveryNoteId, true)}
+                          disabled={isNotEditable}
+                        >
+                          Pack All
+                        </button>
+                        <button 
+                          className="unpack-button" 
+                          onClick={() => markAllItemsInDeliveryNote(warehouse.warehouseId, deliveryNote.deliveryNoteId, false)}
+                          disabled={isNotEditable}
+                        >
+                          Unpack All
+                        </button>
+                      </div>
+                    )}
+                  </h6>
+                  
+                  <div className="items-table-container">
+                    <table className="items-table">
+                      <thead>
+                        <tr>
+                          <th>Item Name</th>
+                          <th>Item Number</th>
+                          <th>Available Qty</th>
+                          {!isNotEditable && <th>Packed Qty</th>}
+                          <th>Status</th>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              {groupIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
+                      </thead>
+                      <tbody>
+                        {deliveryNote.items.map((item, itemIndex) => {
+                          const warehouseId = warehouse.warehouseId;
+                          const deliveryNoteId = deliveryNote.deliveryNoteId;
+                          const itemId = item.inventory_item_id;
+                          const packedQuantity = packedItems[warehouseId]?.[deliveryNoteId]?.[itemId]?.packedQuantity || 0;
+                          const maxQuantity = parseInt(item.quantity) || 0;
+                          const isFullyPacked = packedQuantity === maxQuantity;
+                          const isPartiallyPacked = packedQuantity > 0 && packedQuantity < maxQuantity;
+                          
+                          return (
+                            <tr key={itemIndex} className={isFullyPacked ? 'fully-packed' : (isPartiallyPacked ? 'partially-packed' : '')}>
+                              <td>{item.item_name}</td>
+                              <td>{item.item_no || '-'}</td>
+                              <td>{maxQuantity}</td>
+                              {!isNotEditable ? (
+                                <td className="packed-quantity-cell">
+                                  <div className="packed-quantity-input-group">
+                                    <button 
+                                      className="quantity-btn" 
+                                      onClick={() => handlePackedQuantityChange(warehouseId, deliveryNoteId, itemId, (packedQuantity - 1))} 
+                                      disabled={packedQuantity <= 0 || isNotEditable}
+                                    >−</button>
+                                    <input
+                                      type="number"
+                                      className="packed-quantity-input"
+                                      value={packedQuantity}
+                                      onChange={(e) => handlePackedQuantityChange(warehouseId, deliveryNoteId, itemId, e.target.value)}
+                                      min="0"
+                                      max={maxQuantity}
+                                      disabled={isNotEditable}
+                                    />
+                                    <button 
+                                      className="quantity-btn" 
+                                      onClick={() => handlePackedQuantityChange(warehouseId, deliveryNoteId, itemId, (packedQuantity + 1))} 
+                                      disabled={packedQuantity >= maxQuantity || isNotEditable}
+                                    >+</button>
+                                  </div>
+                                </td>
+                              ) : null}
+                              <td className="packing-status-cell">
+                                {isFullyPacked ? (
+                                  <span className="status-indicator packed">Fully Packed</span>
+                                ) : isPartiallyPacked ? (
+                                  <span className="status-indicator partial">Partially Packed</span>
+                                ) : (
+                                  <span className="status-indicator unpacked">Not Packed</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  {dnIndex < Object.values(warehouse.deliveryNotes).length - 1 && <hr className="delivery-note-divider" />}
+                </div>
+              ))}
+              
+              {warehouseIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
             </div>
           ))
         ) : (
@@ -609,6 +783,101 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     );
   };
   
+  // Render partial delivery info section
+  const renderPartialDeliveryInfo = () => {
+    if (!isPartialDelivery || !deliveryNotesInfo) return null;
+    
+    const currentDelivery = deliveryNotesInfo.current_delivery;
+    const totalDeliveries = deliveryNotesInfo.total_deliveries;
+    const completedDeliveries = deliveryNotesInfo.completed_deliveries || 0;
+    const progressPercentage = (completedDeliveries / totalDeliveries) * 100;
+    
+    return (
+      <div className="accordion-section">
+        <div 
+          className="accordion-header special-header" 
+          onClick={() => toggleSection('partialDelivery')}
+          aria-expanded={expandedSections.partialDelivery}
+        >
+          <div className="accordion-title">
+            <FaBoxes className="section-icon" /> Partial Delivery Information
+          </div>
+          <div className="accordion-toggle">
+            {expandedSections.partialDelivery ? <FaChevronUp /> : <FaChevronDown />}
+          </div>
+        </div>
+        
+        {expandedSections.partialDelivery && (
+          <div className="accordion-content">
+            <div className="partial-delivery-info">
+              <div className="partial-delivery-header">
+                <div className="partial-delivery-title">
+                  <FaBoxes className="partial-delivery-icon" />
+                  <h4>Partial Delivery in Progress</h4>
+                </div>
+                <div className="partial-delivery-counter">
+                  <span className="delivery-counter-text">Delivery</span>
+                  <span className="delivery-counter-numbers">{currentDelivery} of {totalDeliveries}</span>
+                </div>
+              </div>
+              
+              <div className="partial-delivery-progress">
+                <div className="progress-bar-container">
+                  <div 
+                    className="progress-bar" 
+                    style={{ width: `${progressPercentage}%` }}
+                  ></div>
+                </div>
+                <div className="progress-text">
+                  {completedDeliveries} of {totalDeliveries} deliveries completed
+                </div>
+              </div>
+              
+              <div className="delivery-notes-list">
+                {deliveryNotesInfo.delivery_notes.map((note, index) => {
+                  const isCurrent = index + 1 === currentDelivery;
+                  const isCompleted = index + 1 < currentDelivery;
+                  const isPending = index + 1 > currentDelivery;
+                  
+                  // Determine status display
+                  let statusDisplay = note.shipment_status || 'Pending';
+                  if (statusDisplay) {
+                    statusDisplay = statusDisplay.charAt(0).toUpperCase() + statusDisplay.slice(1).toLowerCase();
+                  }
+                  
+                  return (
+                    <div 
+                      key={note.delivery_note_id} 
+                      className={`delivery-note-item ${isCurrent ? 'current-delivery' : (isCompleted ? 'completed-delivery' : 'pending-delivery')}`}
+                    >
+                      <div className="delivery-note-sequence">{index + 1}</div>
+                      <div className="delivery-note-content">
+                        <div className="delivery-note-id">{note.delivery_note_id}</div>
+                        <div className="delivery-note-details">
+                          <span className="item-count">{note.total_quantity || 0} items</span>
+                          <span className={`status-badge status-${String(note.shipment_status || '').toLowerCase()}`}>
+                            {statusDisplay}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <div className="delivery-notes-info">
+                <div className="info-message">
+                  <FaExclamationCircle className="info-icon" />
+                  <span>Partial deliveries must be processed sequentially. Complete this delivery before proceeding to the next.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="packing modal-overlay" onClick={onClose}>
       <div className="edit-packing-modal improved" onClick={e => e.stopPropagation()}>
@@ -619,6 +888,11 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
               <span className={getStatusBadgeClass(packingList.packing_status)}>
                 {packingList.packing_status || 'No Status'}
               </span>
+              {isPartialDelivery && (
+                <span className="partial-badge">
+                  Partial Delivery {deliveryNotesInfo?.current_delivery || '?'} of {deliveryNotesInfo?.total_deliveries || '?'}
+                </span>
+              )}
             </div>
           </div>
           <button className="close-button" onClick={onClose} aria-label="Close modal">×</button>
@@ -679,6 +953,9 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                 </div>
               )}
             </div>
+            
+            {/* Partial Delivery Info (if applicable) */}
+            {renderPartialDeliveryInfo()}
             
             {/* Packing Assignment Section */}
             <div className="accordion-section">
@@ -856,6 +1133,12 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                         <div className="step-indicator">3</div>
                         <span>The item will move to the shipping stage</span>
                       </div>
+                      {isPartialDelivery && (
+                        <div className="next-step-item">
+                          <div className="step-indicator">4</div>
+                          <span>After shipping, the next partial delivery will become available</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

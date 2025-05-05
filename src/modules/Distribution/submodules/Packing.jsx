@@ -21,6 +21,9 @@ const Packing = () => {
   const [typeFilter, setTypeFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   
+  // New state for delivery notes filtering
+  const [isPartialFilter, setIsPartialFilter] = useState("All");
+  
   // State for action management
   const [selectedList, setSelectedList] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -106,6 +109,11 @@ const Packing = () => {
     setTypeFilter(type);
   };
   
+  // Handle partial delivery filter change
+  const handlePartialFilterChange = (value) => {
+    setIsPartialFilter(value);
+  };
+  
   // Apply filters to packing lists
   const filteredLists = packingLists.filter(list => {
     // Apply status filter
@@ -116,6 +124,17 @@ const Packing = () => {
     // Apply type filter
     if (typeFilter !== "All" && list.packing_type !== typeFilter) {
       return false;
+    }
+    
+    // Apply partial delivery filter
+    if (isPartialFilter !== "All") {
+      const isPartial = list.delivery_notes_info && list.delivery_notes_info.is_partial_delivery;
+      if (isPartialFilter === "Partial" && !isPartial) {
+        return false;
+      }
+      if (isPartialFilter === "Complete" && isPartial) {
+        return false;
+      }
     }
     
     // Apply search filter (search by packing_list_id or delivery_id)
@@ -185,8 +204,10 @@ const Packing = () => {
           // Calculate from packed_items_data if available
           let calculatedTotal = 0;
           Object.values(updatedValues.packed_items_data).forEach(warehouseItems => {
-            Object.values(warehouseItems).forEach(item => {
-              calculatedTotal += item.packedQuantity || 0;
+            Object.values(warehouseItems).forEach(deliveryNoteItems => {
+              Object.values(deliveryNoteItems).forEach(item => {
+                calculatedTotal += item.packedQuantity || 0;
+              });
             });
           });
           updatedValues.total_items_packed = calculatedTotal;
@@ -225,7 +246,27 @@ const Packing = () => {
         return;
       }
       
-      // Remaining code stays the same...
+      // For other status changes, just update with what we have
+      const response = await fetch(`http://127.0.0.1:8000/api/packing-lists/${list.packing_list_id}/update/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          packing_status: newStatus,
+          ...updatedValues
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update packing list status');
+      }
+      
+      // Refresh the list after successful update
+      setRefreshTrigger(prev => prev + 1);
+      setShowEditModal(false);
+      toast.info(`Status updated to ${newStatus}`);
     } catch (err) {
       toast.error(`Error: ${err.message}`);
     }
@@ -255,8 +296,14 @@ const Packing = () => {
       setShowCompletionModal(false);
       setRefreshTrigger(prev => prev + 1);
       
+      // Check if this is a partial delivery
+      const isPartial = selectedList.delivery_notes_info && selectedList.delivery_notes_info.is_partial_delivery;
+      const successMessage = isPartial 
+        ? `Batch ${selectedList.delivery_notes_info.current_delivery} of ${selectedList.delivery_notes_info.total_deliveries} marked as Packed! A new Shipment has been created.`
+        : 'Packing list marked as Packed successfully! A new Shipment has been created.';
+      
       // Show success notification
-      toast.success('Packing list marked as Packed successfully! A new Shipment has been created.', {
+      toast.success(successMessage, {
         autoClose: 5000 // Keep this message visible a bit longer
       });
       
@@ -264,6 +311,15 @@ const Packing = () => {
       toast.error(`Error: ${err.message}`);
     }
   };
+  
+  // Get counts of partial vs complete deliveries
+  const getPartialCounts = () => {
+    const partial = packingLists.filter(list => list.delivery_notes_info && list.delivery_notes_info.is_partial_delivery).length;
+    const complete = packingLists.length - partial;
+    return { partial, complete };
+  };
+  
+  const { partial, complete } = getPartialCounts();
   
   return (
     <div className="packing">
@@ -297,6 +353,20 @@ const Packing = () => {
             selectedType={typeFilter}
             onTypeChange={handleTypeFilterChange}
           />
+          
+          {/* Add Partial Delivery Filter */}
+          <div className="filter-container">
+            <span className="filter-label">Delivery:</span>
+            <select
+              className="delivery-filter"
+              value={isPartialFilter}
+              onChange={(e) => handlePartialFilterChange(e.target.value)}
+            >
+              <option value="All">All Deliveries</option>
+              <option value="Partial">Partial Deliveries</option>
+              <option value="Complete">Complete Deliveries</option>
+            </select>
+          </div>
         </div>
         
         {/* Statistics Row */}
@@ -322,6 +392,14 @@ const Packing = () => {
             <span className="stat-value">
               {packingLists.filter(list => list.packing_status === 'Shipped').length}
             </span>
+          </div>
+          <div className="stat-box">
+            <span className="stat-label">Partial:</span>
+            <span className="stat-value">{partial}</span>
+          </div>
+          <div className="stat-box">
+            <span className="stat-label">Complete:</span>
+            <span className="stat-value">{complete}</span>
           </div>
         </div>
         
