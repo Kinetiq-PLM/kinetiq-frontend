@@ -315,11 +315,10 @@ const Picking = () => {
           autoClose: 5000 // Keep this message visible a bit longer
         });
       } else {
-        toast.success('Picking list completed successfully! A new Packing List has been created.', {
-          autoClose: 5000
+        toast.success('Picking list completed successfully! A new packing list has been created.', {
+          autoClose: 3000
         });
       }
-      
     } catch (err) {
       toast.error(`Error: ${err.message}`);
     }
