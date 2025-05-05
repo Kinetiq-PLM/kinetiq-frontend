@@ -22,7 +22,6 @@ const Employees = () => {
 
   // The new employee to add
   const [newEmployee, setNewEmployee] = useState({
-    user_id: "", // Auto-generated
     dept_id: "",
     dept_name: "",
     position_id: "",
@@ -94,7 +93,14 @@ const Employees = () => {
   const [toast, setToast] = useState(null);
   // for 3-dot menus in the table
   const [dotsMenuOpen, setDotsMenuOpen] = useState(null);
-
+  // Add these after other state variables
+  const [showUploadDocumentModal, setShowUploadDocumentModal] = useState(false);
+  const [showDocumentsModal, setShowDocumentsModal] = useState(false);
+  const [currentEmployee, setCurrentEmployee] = useState(null);
+  const [viewingDocuments, setViewingDocuments] = useState(null);
+  const [uploadingDocumentType, setUploadingDocumentType] = useState('');
+  const [uploadingFile, setUploadingFile] = useState(null);
+  const [uploadingStatus, setUploadingStatus] = useState('idle');
   // Helper to show toast messages
   const showToast = (message, success = true) => {
     setToast({ message, success });
@@ -789,7 +795,6 @@ const Employees = () => {
   // a) Add
   const handleAddEmployee = () => {
     setNewEmployee({
-      user_id: "", // Auto-generated
       dept_id: "",
       dept_name: "",
       position_id: "",
@@ -852,7 +857,6 @@ const Employees = () => {
     try {
       const employeeData = {
         // user_id: newEmployee.user_id || `TEMP-USER-${Date.now().toString(36)}`,
-        user_id: newEmployee.user_id || "",
         dept_id: newEmployee.dept_id,
         dept_name: newEmployee.dept_name || "",
         position_id: newEmployee.position_id,
@@ -888,7 +892,6 @@ const Employees = () => {
     // We fill editingEmployee with all the fields from the DB:
     setEditingEmployee({
       employee_id: emp.employee_id,
-      user_id: emp.user_id || "",
       dept_id: emp.dept_id || "",
       first_name: emp.first_name || "",
       last_name: emp.last_name || "",
@@ -1705,6 +1708,7 @@ const Employees = () => {
                 <th>Reports To</th> {/* Added column */}
                 <th>Status</th>
                 <th>Is Supervisor</th>
+                <th>Documents</th>
                 <th>Created At</th>
                 <th>Updated At</th>
                 <th></th>
@@ -1746,6 +1750,24 @@ const Employees = () => {
                     <span className={`hr-tag ${emp.is_supervisor ? "yes" : "no"}`}>
                       {emp.is_supervisor ? "Yes" : "No"}
                     </span>
+                  </td>
+                  <td>
+                    <div className="hr-document-actions">
+                      <button 
+                        className="hr-view-btn"
+                        onClick={() => handleViewDocuments(emp)}
+                      >
+                        View
+                      </button>
+                      {!isArchived && (
+                        <button 
+                          className="hr-upload-btn"
+                          onClick={() => handleUploadDocument(emp)}
+                        >
+                          Upload
+                        </button>
+                      )}
+                    </div>
                   </td>
                   <td>{emp.created_at}</td>
                   <td>{emp.updated_at}</td>
@@ -2148,6 +2170,148 @@ const Employees = () => {
   };
 
   /***************************************************************************
+   * Functions for Document Management
+   ***************************************************************************/
+  const handleViewDocuments = async (employee) => {
+    try {
+      setCurrentEmployee(employee);
+      
+      // Fetch the employee to get the latest document data
+      const response = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${employee.employee_id}/`);
+      const employeeData = response.data;
+      
+      console.log("Employee documents data:", employeeData.documents); // Add this
+      
+      let documents = { required: {}, optional: {} };
+      if (employeeData.documents) {
+        try {
+          documents = typeof employeeData.documents === 'string' 
+            ? JSON.parse(employeeData.documents) 
+            : employeeData.documents;
+            
+          console.log("Parsed documents:", documents); // Add this
+          
+          // Ensure the structure has required and optional properties
+          documents.required = documents.required || {};
+          documents.optional = documents.optional || {};
+        } catch (e) {
+          console.error("Error parsing documents:", e);
+        }
+      }
+      
+      setViewingDocuments(documents);
+      setShowDocumentsModal(true);
+      setDotsMenuOpen(null);
+    } catch (err) {
+      console.error("Error fetching employee documents:", err);
+      showToast("Failed to load employee documents", false);
+    }
+  };
+
+  const handleUploadDocument = (employee) => {
+    setCurrentEmployee(employee);
+    setUploadingDocumentType('');
+    setUploadingFile(null);
+    setShowUploadDocumentModal(true);
+    setDotsMenuOpen(null);
+  };
+
+  const handleUploadSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!currentEmployee || !uploadingFile || !uploadingDocumentType) {
+      showToast("Please select a file and document type", false);
+      return;
+    }
+    
+    try {
+      setUploadingStatus('uploading');
+      
+      // Define S3 directory based on employee ID and document type
+      const S3_BASE_DIRECTORY = `Human_Resource_Management/Employees/${currentEmployee.employee_id}/`;
+      const directory = `${S3_BASE_DIRECTORY}${uploadingDocumentType}`;
+      
+      console.log("Uploading to directory:", directory);
+      
+      // Step 1: Get the upload URL from the API
+      const getUrlResponse = await axios.post('https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload-to-s3/', {
+        filename: uploadingFile.name,
+        directory: directory,
+        contentType: uploadingFile.type
+      });
+      
+      console.log("S3 URL response:", getUrlResponse.data);
+      
+      // Step 2: Extract the upload URL and public file URL
+      const { uploadUrl, fileUrl } = getUrlResponse.data;
+      
+      // Step 3: Upload the file to the provided URL with proper content type
+      await axios.put(uploadUrl, uploadingFile, {
+        headers: {
+          'Content-Type': uploadingFile.type
+        }
+      });
+      
+      // Step 4: Fetch current documents for the employee
+      const employeeResponse = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${currentEmployee.employee_id}/`);
+      
+      // Step 5: Parse existing documents or create a new structure
+      let documents = { required: {}, optional: {} };
+      
+      if (employeeResponse.data.documents) {
+        try {
+          // Parse if it's a string, otherwise use as is
+          documents = typeof employeeResponse.data.documents === 'string' 
+            ? JSON.parse(employeeResponse.data.documents) 
+            : employeeResponse.data.documents;
+            
+          // Ensure the structure has required and optional properties
+          documents.required = documents.required || {};
+          documents.optional = documents.optional || {};
+        } catch (e) {
+          console.error("Error parsing documents:", e);
+        }
+      }
+      
+      // Step 6: Update the documents structure with the new file
+      documents.required[uploadingDocumentType] = {
+        verified: false,
+        path: fileUrl,
+        verified_by: null
+      };
+      
+      // Step 7: Update the employee's documents in your backend
+      await axios.patch(
+        `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${currentEmployee.employee_id}/`, 
+        { documents: JSON.stringify(documents) }
+      );
+      
+      showToast("Document uploaded successfully", true);
+      
+      // Reset form and close modal
+      setUploadingFile(null);
+      setUploadingDocumentType('');
+      setShowUploadDocumentModal(false);
+      
+      // Refresh employees data
+      fetchEmployees();
+    } catch (err) {
+      console.error("Error uploading document:", err);
+      // More detailed error logging
+      if (err.response) {
+        console.error("Response data:", err.response.data);
+        console.error("Response status:", err.response.status);
+      }
+      const errorMessage = err.response?.data?.detail || 
+                         Object.values(err.response?.data || {}).flat().join(", ") || 
+                         "Failed to upload document";
+      showToast(errorMessage, false);
+    } finally {
+      setUploadingStatus('idle');
+    }
+  };
+
+  /***************************************************************************
    * Main Render
    ***************************************************************************/
   return (
@@ -2308,16 +2472,7 @@ const Employees = () => {
             <h3 style={{ marginBottom: "1rem" }}>Add New Employee</h3>
             <form onSubmit={submitEmployeeModal} className="hr-employee-modal-form hr-two-col">
               {/* System Fields - Read Only */}
-              <div className="form-group">
-                <label>User ID</label>
-                <input 
-                  type="text"
-                  name="user_id"
-                  value={newEmployee.user_id}
-                  disabled
-                  placeholder="Auto-generated"
-                />
-              </div>
+              
               
               {/* System Timestamps */}
               <div className="form-group">
@@ -2554,17 +2709,7 @@ const Employees = () => {
                     </div>
                   </div>
                   
-                  <div className="form-group">
-                    <label>User ID</label>
-                    <div className="input-with-icon readonly">
-                      <i className="user-icon">👤</i>
-                      <input
-                        type="text"
-                        value={editingEmployee.user_id}
-                        disabled
-                      />
-                    </div>
-                  </div>
+                  
                   
                   <div className="form-group">
                     <label htmlFor="first_name">First Name <span className="required">*</span></label>
@@ -3241,6 +3386,135 @@ const Employees = () => {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* Document Upload Modal */}
+      {showUploadDocumentModal && (
+        <div className="hr-employee-modal-overlay">
+          <div className="hr-employee-modal">
+            <h3>Upload Document for {currentEmployee?.first_name} {currentEmployee?.last_name}</h3>
+            
+            <form onSubmit={handleUploadSubmit} className="hr-employee-modal-form">
+              <div className="form-group">
+                <label htmlFor="document-type">Document Type *</label>
+                <select 
+                  id="document-type"
+                  value={uploadingDocumentType}
+                  onChange={(e) => setUploadingDocumentType(e.target.value)}
+                  required
+                >
+                  <option value="">Select Document Type</option>
+                  <option value="psa_birth_cert">PSA Birth Certificate</option>
+                  <option value="nbi_clearance">NBI Clearance</option>
+                  <option value="sss_id">SSS ID</option>
+                  <option value="pagibig_id">Pag-IBIG ID</option>
+                  <option value="philhealth_id">PhilHealth ID</option>
+                  <option value="tin_id">TIN ID</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="document-file">File *</label>
+                <input 
+                  type="file"
+                  id="document-file"
+                  onChange={(e) => setUploadingFile(e.target.files[0])}
+                  required
+                />
+                <span className="input-help-text">
+                  Max file size: 5MB. Supported formats: PDF, DOC, DOCX, JPG, PNG.
+                </span>
+              </div>
+              
+              <div className="hr-employee-modal-buttons">
+                <button 
+                  type="button" 
+                  className="hr-employee-cancel-btn"
+                  onClick={() => {
+                    setShowUploadDocumentModal(false);
+                    setUploadingDocumentType("");
+                    setUploadingFile(null);
+                  }}
+                >
+                  Cancel
+                </button>
+                
+                <button 
+                  type="submit" 
+                  className="submit-btn"
+                  disabled={uploadingStatus === 'uploading' || !uploadingFile || !uploadingDocumentType}
+                >
+                  {uploadingStatus === 'uploading' ? 'Uploading...' : 'Upload Document'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Documents Viewing Modal */}
+      {showDocumentsModal && viewingDocuments && (
+        <div className="hr-employee-modal-overlay" onClick={() => setShowDocumentsModal(false)}>
+          <div className="hr-employee-modal" onClick={e => e.stopPropagation()}>
+            <h3>Employee Documents</h3>
+            
+            <div className="documents-section">
+              <h4>Required Documents</h4>
+              <table className="hr-documents-table">
+                <thead>
+                  <tr>
+                    <th>Document Type</th>
+                    <th>Status</th>
+                    <th>Verified By</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(viewingDocuments.required || {}).map(([docType, docInfo]) => (
+                    <tr key={docType}>
+                      <td>{docType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+                      <td>
+                        <span className={`hr-tag ${docInfo.verified ? 'approved' : 'pending'}`}>
+                          {docInfo.verified ? 'Verified' : 'Pending'}
+                        </span>
+                      </td>
+                      <td>{docInfo.verified_by || '-'}</td>
+                      <td>
+                        {docInfo.path && (
+                          <a 
+                            href={docInfo.path} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="hr-view-document-btn"
+                          >
+                            View / Download
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  {Object.keys(viewingDocuments.required || {}).length === 0 && (
+                    <tr>
+                      <td colSpan="4" className="hr-no-documents">No documents uploaded yet</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="hr-employee-modal-buttons">
+              <button className="hr-employee-cancel-btn" onClick={() => setShowDocumentsModal(false)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Uploading Overlay */}
+      {uploadingStatus === 'uploading' && (
+        <div className="hr-loading-overlay">
+          <div className="hr-spinner"></div>
+          <p>Uploading document...</p>
         </div>
       )}
 

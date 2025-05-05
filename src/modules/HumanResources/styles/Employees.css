@@ -1226,3 +1226,111 @@
 .hr-no-document {
   color: #888;
 }
+
+/* ---------------------------------------------------------
+   DOCUMENT MANAGEMENT STYLES
+   --------------------------------------------------------- */
+.hr-document-actions {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.hr-view-btn, .hr-upload-btn {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.hr-view-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.hr-upload-btn {
+  background-color: #28a745;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hr-view-btn:hover {
+  background-color: #0069d9;
+}
+
+.hr-upload-btn:hover {
+  background-color: #218838;
+}
+
+.hr-documents-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.hr-documents-table th,
+.hr-documents-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.hr-documents-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.hr-view-document-btn {
+  padding: 4px 8px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+}
+
+.hr-view-document-btn:hover {
+  background-color: #0069d9;
+  text-decoration: none;
+  color: white;
+}
+
+.hr-no-documents {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.hr-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  color: white;
+}
+
+.hr-spinner {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
