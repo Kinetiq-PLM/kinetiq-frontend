@@ -1,27 +1,31 @@
 .costprod {
   display: flex;
   font-family: Inter, sans-serif;
+  background-color: #ffffff;
 }
 
 .costprodcolumns {
   display: flex;
   padding: 3px;
-  gap: 30px;
+  padding-left: 15px;
+  gap: 15px;
 }
+
 
 .costprodheader-section {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
   width: 100%;
-}
 
-.costprodheader-section h1 {
-  font-family: Inter;
-  font-size: 36px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
+  h1 {
+    font-family: Inter;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
 }
 
 .column-expanded {
@@ -53,6 +57,8 @@
   gap: 10px;
 }
 
+
+
 .costprotable {
   background-color: white;
   width: 100%;
@@ -82,7 +88,7 @@
 .costprotable tbody tr {
   display: table;
   width: 100%;
-  table-layout: fixed;
+  table-layout: fixed; 
 }
 
 .costprotable thead {
@@ -90,7 +96,7 @@
   position: sticky;
   top: 0;
   background-color: white;
-  z-index: 0;
+  z-index: 2;
 }
 
 .costprotable td {
@@ -118,6 +124,7 @@
   line-height: normal;
   border-bottom: 1px solid #007878;
   width: 200px;
+
 }
 
 .costprotable tbody::-webkit-scrollbar {
@@ -138,9 +145,9 @@
   background: #007878;
 }
 
-.costrework-header {
+.raw-material-header {
   color: #000000;
-  padding-bottom: 20px;
+  padding-bottom: 20PX;
   font-family: Inter;
   font-size: 36px;
   font-style: normal;
@@ -149,109 +156,16 @@
 }
 
 .costrework-cost {
-  padding: 10px;
+  padding: 1rem;
   overflow-x: auto;
-  height: 88.3%;
+  height: 90%;
   background-color: rgb(255, 255, 255);
+  padding: 1rem;
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.costrework-cost-table {
   width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  background-color: rgb(255, 255, 255);
 }
 
-.costrework-cost-table h1 {
-  font-weight: 500px;
-}
-
-.costrework-cost-table td {
-  border-bottom: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  vertical-align: top;
-}
-
-.costrework-cost-table th {
-  border-bottom: 1px solid #007878;
-  padding: 8px;
-  text-align: left;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  vertical-align: top;
-  font-size: 10px;
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  background-color: rgb(255, 255, 255);
-}
-
-.costrework-cost-table tbody tr td:last-child {
-  padding-top: 14px; 
-}
-
-.costrework-cost-table input[type="text"],
-.costprotable input[type="text"],
-.costprotable select,
-.costprotable textarea {
-  width: 100%;
-  border: 1px solid #ddd;
-  padding: 6px 8px;
-  border-radius: 6px;
-  box-sizing: border-box;
-  font-family: inherit;
-  display: none; /* Hidden by default */
-}
-
-.costrework-cost-table input[type="text"]:focus,
-.costprotable input[type="text"]:focus,
-.costprotable select:focus,
-.costprotable textarea:focus {
-  border-color: #00A8A8;
-  outline: none;
-  background-color: #fff;
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
-  display: block; /* Show when focused */
-}
-
-.costrework-cost-table {
-  max-height: 400px;
-  overflow-y: auto;
-  display: block;
-  border-collapse: collapse;
-}
-
-.costrework-cost-table::-webkit-scrollbar {
-  width: 10px;
-}
-
-.costrework-cost-table::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 10px;
-}
-
-.costrework-cost-table::-webkit-scrollbar-thumb {
-  background-color: #00A8A8;
-  border-radius: 10px;
-  border: 2px solid #f0f0f0;
-  width: 8px;
-}
-
-.costrework-cost-table thead tr {
-  position: sticky;
-  top: 0;
-  background-color: white;
-  z-index: 1;
-}
 
 .cpsearch-wrapper {
   position: relative;
@@ -313,14 +227,10 @@
   }
 }
 
+
 @media (max-width: 768px) {
   .costprod {
     flex-direction: column;
-  }
-
-  .costprodcolumns {
-    flex-direction: column;
-    gap: 16px;
   }
 
   .column-expanded {
@@ -342,10 +252,10 @@
   }
 
   .costprotable,
-  .costrework-cost-container,
-  .costrework-cost-table {
+  .raw-cost-material{
     width: 100%;
     overflow-x: auto;
+    height: 100%;
   }
 
   .costprodbutton-group {
@@ -360,130 +270,301 @@
   }
 }
 
-/* Styles for editable cells with hover effect */
-/* Styles for editable cells with hover effect */
-.editable-cell {
-  position: relative;
-  cursor: pointer;
-}
 
-.editable-cell .cell-content {
-  padding: 6px 8px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.editable-cell:hover .cell-content {
-  background-color: #f5f5f5;
-}
-
-.editable-cell .cell-content input,
-.editable-cell .cell-content select,
-.editable-cell .cell-content textarea {
-  display: block; /* Ensure inputs are visible when rendered (during editing) */
-}
-
-.editable-rework-cell {
-  position: relative;
-  cursor: pointer;
-}
-
-.editable-rework-cell .cell-content {
-  padding: 6px 8px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.editable-rework-cell:hover .cell-content {
-  background-color: #f5f5f5;
-   /* Border already present, kept for consistency */
-}
-
-.editable-rework-cell .cell-content input {
-  display: block; /* Ensure inputs are visible when rendered (during editing) */
-}
-
-/* Specific styles for inputs */
-.actual-quantity-input {
-  width: 50px;
-  padding: 4px 6px;
-  font-size: 14px;
-  text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.cost-of-production-input {
-  width: 90px;
-  padding: 4px 6px;
-  font-size: 14px;
-  text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.miscellaneous-costs-input {
-  width: 80px;
-  padding: 4px 6px;
-  font-size: 14px;
-  text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.rework-required-select {
-  width: 60px;
-  padding: 4px 6px;
-  font-size: 14px;
-  text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.rework-notes-input {
+.raw-material-table {
+  background-color: rgb(255, 255, 255);
   width: 100%;
-  min-height: 80px;
-  overflow: auto;
-  padding: 4px 6px;
-  font-size: 13px;
-  font-family: Inter, sans-serif;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  line-height: 1.3;
-  resize: none;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  background-color: #f9f9f9;
-  box-sizing: border-box;
-  scrollbar-width: thin;
-  scrollbar-color: #00A8A8 #e0e0e0;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  max-height: 465px; /* Set a maximum height for the scrollable area */
+  position: relative;
 }
 
-.additional-cost-input,
-.additional-misc-input {
-  width: 100%;
-  padding: 4px 6px;
+
+.raw-material-table::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.raw-material-table::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Scrollbar track color */
+  border-radius: 10px;
+}
+
+.raw-material-table::-webkit-scrollbar-thumb {
+  background: #00A8A8; /* Scrollbar thumb color */
+  border-radius: 10px;
+}
+
+.raw-material-table::-webkit-scrollbar-thumb:hover {
+  background: #007878; /* Scrollbar thumb hover color */
+}
+
+.rawmaterial-content {
+  margin-bottom: 20px; 
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0px 4px 7.5px 1px rgba(0, 0, 0, 0.25);
+  padding: 10px;
+  max-height: 400px; /* Set a maximum height for the scrollable area */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+
+.rawmaterial-content::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.rawmaterial-content::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Scrollbar track color */
+  border-radius: 10px;
+}
+
+.rawmaterial-content::-webkit-scrollbar-thumb {
+  background: #00A8A8; /* Scrollbar thumb color */
+  border-radius: 10px;
+}
+
+.rawmaterial-content::-webkit-scrollbar-thumb:hover {
+  background: #007878; /* Scrollbar thumb hover color */
+}
+
+.raw-material-table h1 {
+  position: sticky; /* Make the element sticky */
+  top: 0; /* Stick to the top of the container */
+  z-index: 3; /* Ensure it stays above the table headers */
+  color: var(--Black, #000);
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  background-color: white; /* Ensure a consistent background */
+  border-bottom: 1px solid #ddd; /* Add a border for separation */
+}
+
+.raw-material-details{
+  background-color: rgb(255, 255, 255);
+  text-align: center;
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 400px; /* Set a maximum height for the scrollable area */
+  position: relative;
+}
+
+.raw-material-details th {
+  position: sticky; /* Make the element sticky */
+  top: 40px; /* Adjust to account for the height of the sticky h1 */
+  z-index: 2; /* Ensure it stays below the h1 but above the table rows */
+  color: #007878;
+  font-family: Inter;
   font-size: 14px;
-  text-align: left;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  background-color: rgb(255, 255, 255); /* Ensure a consistent background */
+  border-bottom: 1px solid #ddd; 
 }
 
-th.wrap-header {
+
+
+.raw-material-details td {
+  padding: 12px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
   white-space: normal;
-  word-wrap: break-word;
-  width: 200px;
+  border-bottom: 1px solid #ddd;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
-.prodcontainer {
-  align-items: left;
+.raw-material-details th,
+.raw-material-details td {
+  padding: 10px 20px; /* Add space inside the cells */
+  text-align: center; /* Center-align the text */
+}
+.prodtotal-cost {
+  display: flex; /* Use flexbox for alignment */
+  justify-content: space-between; /* Space out the elements */
+  align-items: center; /* Align items vertically */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
 }
 
-.prod-align-cell {
-  text-align: left;
+.prodtotal-cost h3 {
+  font-size: 16px; /* Adjust the font size */
+  font-weight: 600; /* Make the text bold */
+  color: #007878; /* Set a distinct color */
+  text-align: left; /* Align the text to the left */
+  margin: 0; /* Remove default margin */
+  padding: 5px 0;
+}
+
+.prodtotal-cost h4 {
+  margin: 0; /* Remove default margin */
+  text-align: right; /* Aligns the content to the right */
+  padding: 10px; /* Adds some padding for spacing */
+  font-family: Inter, sans-serif; /* Optional: Set a consistent font */
+  font-size: 14px; /* Optional: Adjust the font size */
+  color: #333; /* Optional: Set a text color */
+}
+
+.rawmaterial-input{
+  position: sticky; /* Make the element sticky */
+  top: 0;
+  z-index: 2;
+  width: 150px; /* Make the input field take the full width of the cell */
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center; /* Align the text to the left */
+}
+
+.rawmaterial-input:focus {
+  border-color: #00a8a8;
+  outline: none;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  text-align: center;
+  width: 100%;
+}
+
+.rawmaterial-input:hover {
+  border-color: #9cd4d4;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  cursor: pointer;
+}
+
+.rawmaterial-input[type="text"] {
+  text-align: center; /* Align numbers to the right */
+}
+
+.rawmaterial-input[type="quantity"] {
+  text-align: center; /* Align numbers to the right */
+}
+
+.rawmaterial-input[type="number"] {
+  text-align: center; /* Align numbers to the right */
+}
+
+.totalcostofrawmaterial-input{
+  width: 150px; /* Make the input field take the full width of the cell */
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  text-align: center; /* Align the text to the left */
+}
+
+.add-rowprod-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #007878;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 120px;
+}
+
+.add-rowprod-button:hover {
+  background-color: #005959;
+}
+
+.actual-quantity input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #d2d2d2;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #404040;
+  text-align: center;
+  width: 40%;
+  box-sizing: border-box;
+}
+
+.actual-quantity input[type="text"]:focus {
+  border-color: #00a8a8;
+  outline: none;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  text-align: center;
+  width: 40%;
+}
+
+.actual-quantity input[type="text"]:hover {
+  border-color: #9cd4d4;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  cursor: pointer;
+}
+
+.cost-of-production input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #d2d2d2;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #404040;
+  text-align: center;
+  width: 80%;
+  box-sizing: border-box;
+}
+
+.cost-of-production input[type="text"]:focus {
+  border-color: #00a8a8;
+  outline: none;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  text-align: center;
+  width: 80%;
+}
+
+.cost-of-production input[type="text"]:hover {
+  border-color: #9cd4d4;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  cursor: pointer;
+}
+
+.miscellaneous-costs input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #d2d2d2;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #404040;
+  text-align: center;
+  width: 65%;
+  box-sizing: border-box;
+}
+
+.miscellaneous-costs input[type="text"]:focus {
+  border-color: #00a8a8;
+  outline: none;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  text-align: center;
+  width: 65%;
+}
+
+.miscellaneous-costs input[type="text"]:hover {
+  border-color: #9cd4d4;
+  background-color: #ffffff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  cursor: pointer;
 }

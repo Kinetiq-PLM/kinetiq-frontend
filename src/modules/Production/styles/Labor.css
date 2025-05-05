@@ -1,0 +1,261 @@
+.laborprod {
+    flex: auto;
+    background-color: #ffffff;
+    padding: 20px;
+    width: 100%;
+  }
+  
+  .laborprod-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 900px;
+    margin-bottom: 3px;
+  
+    h1 {
+      font-family: Inter;
+      font-size: 36px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: normal;
+      flex-wrap: wrap;
+      padding-bottom: 10px;
+      padding-left: 10px;
+    }
+  }
+  
+  .laborprodcolumns {
+    display: flex;
+    gap: 20px;
+  
+    .prod-column-expanded {
+      flex: 1;
+      padding: 2px;
+      border-radius: 5px;
+      flex-wrap: wrap;
+      flex-grow: 2;
+    }
+  
+    .prodtop-section {
+      display: flex;
+      align-items: left;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+  }
+  
+  .laborprodsearch-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  
+  .laborprodsearch-bar {
+    padding: 8px 10px 8px 40px;
+    flex-shrink: 0;
+    font-size: 15px;
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    border: 1px solid #ffffff;
+    background-color: #fff;
+    border-radius: 8px;
+    width: 70%;
+    height: 40px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+  }
+  
+  .laborprodsearch-bar:focus {
+    border-color: #00A8A8;
+    outline: none;
+    background-color: #fff;
+    box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+  }
+  
+  .laborprodsearch-bar:hover {
+    border-radius: 10px;
+    border: 1.5px solid #A4A4A4;
+    background: #ffffff;
+  }
+  
+  .equila-labor-container {
+    overflow-x: auto;
+    max-height: 400px;
+    border: 1px solid #ddd;
+    border-color: #ffffff;
+  }
+  
+  .equila-labor-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .equila-labor-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  .equila-labor-container::-webkit-scrollbar-thumb {
+    background: #00A8A8;
+    border-radius: 10px;
+  }
+  
+  .equila-labor-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+  
+    th {
+      background-color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      color: #404040;
+      font-family: Inter;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 800;
+      line-height: normal;
+      border-bottom: 1px solid #D2D2D2;
+    }
+  
+    td {
+      color: #000;
+      font-family: Inter;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 300;
+      line-height: normal;
+      max-width: 100%;
+      word-wrap: break-word;
+      border-bottom: 1px solid #D2D2D2;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      text-align: center;
+    }
+  
+    h1 {
+      color: var(--Black, #000000);
+      font-family: Inter;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: normal;
+      text-align: center;
+    }
+  
+    h2 {
+      color: var(--Black, #000000);
+      font-family: Inter;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 300;
+      line-height: normal;
+    }
+  }
+
+
+  
+
+/* General styles for the table rows */
+.labor-row {
+    border-bottom: 1px solid #d2d2d2;
+    text-align: center;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+  }
+  
+  /* Styles for the table cells */
+  .labor-cell {
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Specific styles for the labor ID cell */
+  .labor-cell.labor-id h1 {
+    color: #000;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+  }
+  
+  /* Specific styles for the employee ID cell */
+  .labor-cell.employee-id {
+    color: #000;
+    font-size: 14px;
+    font-weight: 300;
+    text-align: center;
+  }
+  
+  /* Styles for the date input field */
+  .labor-cell-date-worked input[type="date"] {
+    padding: 6px 10px;
+    font-size: 14px;
+    border: 1px solid #d2d2d2;
+    border-radius: 5px;
+    background-color: #d2d2d2;
+    color: #404040;
+    text-align: center;
+    width: 55%;
+    box-sizing: border-box;
+  }
+  
+  .labor-cell-date-worked input[type="date"]:focus {
+    border-color: #00a8a8;
+    outline: none;
+    background-color: #ffffff;
+    box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+    text-align: center;
+    color: #404040;
+  }
+  
+  /* Styles for the days worked input field */
+  .labor-days-worked input[type="text"] {
+    padding: 6px 10px;
+    font-size: 14px;
+    border: 1px solid #d2d2d2;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    color: #404040;
+    text-align: center;
+    width: 20%;
+    box-sizing: border-box;
+  }
+  
+  .labor-days-worked input[type="text"]:focus {
+    border-color: #00a8a8;
+    outline: none;
+    background-color: #ffffff;
+    box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+    text-align: center;
+    width: 20%;
+  }
+
+  .labor-days-worked input[type="text"]:hover {
+    border-color: #9cd4d4;
+    background-color: #ffffff;
+    box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+    cursor: pointer;
+  }
+
+  

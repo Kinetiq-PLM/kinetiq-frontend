@@ -378,8 +378,10 @@ function App() {
       "Rework": "Rework",
     },
     "Production": {
-      "Equipment and Labor": "Equipment&Labor",
-      "Cost of Production": "CostOfProduction"
+      "Equipment": "Equipment",
+      "Labor": "Labor",
+      "Cost of Production": "CostOfProduction",
+      "Rework Cost": "ReworkCost",
     },
     "MRP": {
       "Material Requirements Planning": "MaterialRequirementsPlanning",

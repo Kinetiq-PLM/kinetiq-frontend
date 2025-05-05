@@ -1,0 +1,218 @@
+.rwprod {
+    display: flex;
+    background-color: white;
+    width: 100%;
+  }
+
+.rwprodcolumn {
+    display: flex;
+    padding: 3px;
+    padding-left: 15px;
+    gap: 15px;
+    width: 100%;
+  }
+
+.rwprodheader-section {
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  width: 100%;
+
+  h1 {
+    font-family: Inter;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    padding-top: 10px;
+  }
+
+  }  
+  
+.rework-cost-container {
+    padding: 20px;
+    background-color: #f9f9f9; /* Light background for contrast */
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin-bottom: 20px; /* Space below the section */
+  }
+  
+  /* Header for the Rework Cost section */
+  .rework-cost-header {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #007878; /* Distinct color for the header */
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  /* Table for displaying rework cost details */
+  .rework-cost-table {
+    width: 100%;
+    border-collapse: collapse; /* Remove gaps between table cells */
+    margin-top: 10px;
+  }
+  
+  .rework-cost-table th {
+    position: sticky; /* Make the header sticky */
+    top: 0;
+    background-color: #007878; /* Header background color */
+    color: #fff; /* Header text color */
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    padding: 10px;
+    border-bottom: 2px solid #ddd;
+    z-index: 2;
+  }
+  
+  .rework-cost-table td {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .rework-cost-table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Alternate row background */
+  }
+  
+  .rework-cost-table tr:hover {
+    background-color: #e6f7f7; /* Highlight row on hover */
+  }
+  
+  /* Button for adding new rework cost rows */
+  .add-rework-row-button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background-color: #007878;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-rework-row-button:hover {
+    background-color: #005959;
+  }
+  
+  /* Total cost section */
+  .rework-total-cost {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+  }
+  
+  .rework-total-cost h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #007878;
+    margin: 0;
+  }
+  
+  .rework-total-cost input {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: right;
+    width: 100px;
+  }
+
+  
+.rwprotable {
+    background-color: white;
+    width: 1300px;
+    height: 400px;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    
+  }
+  
+  .rwprotable h1 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #000000;
+    padding-left: 20px;
+  }
+  
+  .rwprotable  tbody {
+    display: block;
+    max-height: 350px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  .rwprotable  thead,
+  .costprotable tbody tr {
+    display: table;
+    width: 100%;
+  }
+  
+  .rwprotable  thead {
+    display: block;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 2;
+  }
+  
+  .rwprotable td {
+    padding: 12px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+    white-space: normal;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .rwprotable th {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #404040;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    border-bottom: 1px solid #007878;
+    width: 200px;
+  
+  }
+  
+  .rwprotable  tbody::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .rwprotable  tbody::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  .rwprotable  tbody::-webkit-scrollbar-thumb {
+    background: #00A8A8;
+    border-radius: 10px;
+  }
+  
+  .rwprotable  tbody::-webkit-scrollbar-thumb:hover {
+    background: #007878;
+  }
