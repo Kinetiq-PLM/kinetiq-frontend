@@ -111,17 +111,53 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
       y: horizontalPoint.y + verticalOffset // Apply vertical offset
     };
     
-    // Create path for the multi-segment connector
-    const path = `
-      M${outerPoint.x},${outerPoint.y}
-      L${straightPoint.x},${straightPoint.y}
-      L${horizontalPoint.x},${horizontalPoint.y}
-      L${labelPoint.x},${labelPoint.y}
-    `;
-    
+    // Create path with conditional logic based on department name
+    const path = (name === "Purchasing") 
+        ? `
+          M311.6999970927677,95.58319302160913
+          L309.8076889531935,75.67291502493362
+          L339.8076889531935,75.67291502493362
+        `
+        : ["Support & Services", "Distribution", "Report Generator", "MRP", "Management"].includes(name)
+        ? `
+          M${outerPoint.x},${outerPoint.y}
+          L${straightPoint.x},${straightPoint.y}
+          L${horizontalPoint.x},${horizontalPoint.y}
+        `
+        : `
+          M${outerPoint.x},${outerPoint.y}
+          L${straightPoint.x},${straightPoint.y}
+          L${horizontalPoint.x},${horizontalPoint.y}
+          L${labelPoint.x},${labelPoint.y}
+        `;
+        
     // Text anchor based on which side of the chart
-    const textAnchor = isRightSide ? 'start' : 'end';
-    
+    const textAnchor = (name === "Support & Services" || name === "Distribution" || name === "Report Generator" || name === "MRP" || name === "Management" || name === "Purchasing") ? 'end' : (isRightSide ? 'start' : 'end');
+
+    // Fixed position for specific labels, dynamic for others
+    let labelX = labelPoint.x;
+    let labelY = labelPoint.y;
+
+    if (name === "Support & Services") {
+      labelX = 145.2231257441751;
+      labelY = 244.11652914800334;
+    } else if (name === "Distribution") {
+      labelX = 145.92130545571004;
+      labelY = 200.06884411360636;
+    } else if (name === "Report Generator") {
+      labelX = 179.04279268613877;
+      labelY = 128.6421228617093;
+    } else if (name === "MRP") {
+      labelX = 253.81723175730775;
+      labelY = 78.39140226099033;
+    } else if (name === "Management") {
+      labelX = 204.45047303414822;
+      labelY = 103.30779248080648;
+    } else if (name === "Purchasing") {
+      labelX = 429.8076889531935;
+      labelY = 73.672915024933616;
+    }
+        
     return (
       <g>
         <path 
@@ -131,8 +167,8 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
           fill="none" 
         />
         <text 
-          x={labelPoint.x}
-          y={labelPoint.y}
+          x={labelX}
+          y={labelY}
           dy={5} // Vertical alignment
           fill="#333"
           textAnchor={textAnchor}
