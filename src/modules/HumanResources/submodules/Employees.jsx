@@ -1693,7 +1693,6 @@ const Employees = () => {
               <tr>
                 {isArchived && <th>Select</th>}
                 <th>Employee ID</th>
-                <th>User ID</th>
                 <th>Department ID</th>
                 <th>Department Name</th>
                 <th>Position ID</th>
@@ -1724,7 +1723,6 @@ const Employees = () => {
                     </td>
                   )}
                   <td>{emp.employee_id}</td>
-                  <td>{emp.user_id}</td>
                   <td>{emp.dept_id}</td>
                   <td>{emp.dept_name || "—"}</td>
                   <td>{emp.position_id || "—"}</td>
@@ -2442,7 +2440,11 @@ const Employees = () => {
                   required
                 >
                   <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
+                  <option value="On Leave">On Leave</option>
+                  <option value="Deployed">Deployed</option>
+                  <option value="Terminated">Terminated</option>
+                  <option value="Resigned">Resigned</option>
+                  
                 </select>
               </div>
 
@@ -2646,9 +2648,12 @@ const Employees = () => {
                       className={`status-select ${editingEmployee.status.toLowerCase()}`}
                     >
                       <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
+                      <option value="On Leave">On Leave</option>
+                      <option value="Deployed">Deployed</option>
+                      <option value="Terminated">Terminated</option>
+                      <option value="Resigned">Resigned</option>
                     </select>
-                    <small>Active employees have system access</small>
+                    <small>Reflects the employee's current working status</small>
                   </div>
                   
                   <div className="form-group">
