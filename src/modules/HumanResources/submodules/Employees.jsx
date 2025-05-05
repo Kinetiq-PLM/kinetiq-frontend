@@ -1598,6 +1598,7 @@ const Employees = () => {
                   <th>HR Approver</th>
                   <th>Approval Status</th>
                   <th>Clearance Status</th>
+                  <th>Document</th> {/* New column */}
                   <th>Created At</th>
                   <th>Updated At</th>
                   <th></th>
@@ -1620,6 +1621,20 @@ const Employees = () => {
                       <span className={`hr-tag ${resignation.clearance_status.toLowerCase().replace(/\s+/g, '-')}`}>
                         {resignation.clearance_status}
                       </span>
+                    </td>
+                    <td>
+                      {resignation.document_url ? (
+                        <a 
+                          href={resignation.document_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="hr-view-document-btn"
+                        >
+                          View Document
+                        </a>
+                      ) : (
+                        <span className="hr-no-document">—</span>
+                      )}
                     </td>
                     <td>{resignation.created_at}</td>
                     <td>{resignation.updated_at}</td>

@@ -20,6 +20,8 @@ const Recruitment = () => {
   const [showEditCandidateModal, setShowEditCandidateModal] = useState(false);
   const [showAddCandidateModal, setShowAddCandidateModal] = useState(false);
   const [showEditJobModal, setShowEditJobModal] = useState(false);
+  const [showAddInterviewModal, setShowAddInterviewModal] = useState(false);
+  const [showAddOnboardingModal, setShowAddOnboardingModal] = useState(false);
   
   // Reference data
   const [departments, setDepartments] = useState([]);
@@ -58,7 +60,7 @@ const Recruitment = () => {
   const [editingJobPosting, setEditingJobPosting] = useState(null);
 
   // UI States
-  const [activeTab, setActiveTab] = useState("Candidates");
+  const [activeTab, setActiveTab] = useState("Job Postings");
   const [showArchived, setShowArchived] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,6 +82,37 @@ const Recruitment = () => {
   // Add these state variables after the other state declarations
   const [selectedArchivedCandidates, setSelectedArchivedCandidates] = useState([]);
   const [selectedArchivedJobPostings, setSelectedArchivedJobPostings] = useState([]);
+
+  // Add these after other state variables
+  const [interviews, setInterviews] = useState([]);
+  const [archivedInterviews, setArchivedInterviews] = useState([]);
+  const [onboardingTasks, setOnboardingTasks] = useState([]);
+  const [archivedOnboardingTasks, setArchivedOnboardingTasks] = useState([]);
+
+  // For modals
+  const [showEditInterviewModal, setShowEditInterviewModal] = useState(false);
+  const [editingInterview, setEditingInterview] = useState(null);
+  const [newInterview, setNewInterview] = useState({
+    candidate_id: "",
+    interview_date: "",
+    interview_time: "",
+    interview_type: "Technical", // Default value
+    interviewer_id: "",
+    status: "Scheduled", // Default value
+    notes: ""
+  });
+
+  const [showEditOnboardingModal, setShowEditOnboardingModal] = useState(false);
+  const [editingOnboardingTask, setEditingOnboardingTask] = useState(null);
+  const [newOnboardingTask, setNewOnboardingTask] = useState({
+    employee_id: "",
+    task_name: "",
+    description: "",
+    due_date: "",
+    status: "Pending", // Default value
+    assigned_to: "",
+    priority: "Medium" // Default value
+  });
 
   // Fetch data on component mount
   useEffect(() => {
@@ -412,6 +445,22 @@ const Recruitment = () => {
       setSelectedArchivedJobPostings(prev => prev.filter(item => item !== id));
     } else {
       setSelectedArchivedJobPostings(prev => [...prev, id]);
+    }
+  };
+
+  const toggleSelectArchivedInterview = (id) => {
+    if (selectedArchivedInterviews.includes(id)) {
+      setSelectedArchivedInterviews(prev => prev.filter(item => item !== id));
+    } else {
+      setSelectedArchivedInterviews(prev => [...prev, id]);
+    }
+  };
+
+  const toggleSelectArchivedOnboardingTask = (id) => {
+    if (selectedArchivedOnboardingTasks.includes(id)) {
+      setSelectedArchivedOnboardingTasks(prev => prev.filter(item => item !== id));
+    } else {
+      setSelectedArchivedOnboardingTasks(prev => [...prev, id]);
     }
   };
 
@@ -868,6 +917,224 @@ const Recruitment = () => {
     );
   };
 
+  // Function to render interviews table
+  const renderInterviewsTable = (data, isArchived = false) => {
+    const { paginated, totalPages } = filterAndPaginate(data);
+    
+    if (loading) return <div className="recruitment-no-results">Loading interviews...</div>;
+    if (!paginated.length) return <div className="recruitment-no-results">No interviews found.</div>;
+    
+    return (
+      <>
+        <div className="recruitment-table-wrapper">
+          <div className="recruitment-table-scrollable">
+            <table className="recruitment-table">
+              <thead>
+                <tr>
+                  {isArchived && <th>Select</th>}
+                  <th>Interview ID</th>
+                  <th>Candidate</th>
+                  <th>Position</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Type</th>
+                  <th>Interviewer</th>
+                  <th>Status</th>
+                  <th>Notes</th>
+                  <th>Created At</th>
+                  <th>Updated At</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.map((interview, index) => (
+                  <tr key={interview.interview_id} className={isArchived ? "recruitment-archived-row" : ""}>
+                    {isArchived && (
+                      <td>
+                        <input 
+                          type="checkbox" 
+                          checked={selectedArchivedInterviews.includes(interview.interview_id)}
+                          onChange={() => toggleSelectArchivedInterview(interview.interview_id)}
+                        />
+                      </td>
+                    )}
+                    <td>{interview.interview_id}</td>
+                    <td>{interview.candidate_name || `${interview.first_name} ${interview.last_name}`}</td>
+                    <td>{interview.position_title}</td>
+                    <td>{formatDate(interview.interview_date)}</td>
+                    <td>{interview.interview_time}</td>
+                    <td>
+                      <span className={`recruitment-tag ${interview.interview_type.toLowerCase().replace(/\s+/g, '-')}`}>
+                        {interview.interview_type}
+                      </span>
+                    </td>
+                    <td>{interview.interviewer_name}</td>
+                    <td>
+                      <span className={`recruitment-tag ${interview.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                        {interview.status}
+                      </span>
+                    </td>
+                    <td>{interview.notes}</td>
+                    <td>{formatDate(interview.created_at)}</td>
+                    <td>{formatDate(interview.updated_at)}</td>
+                    <td className="recruitment-actions">
+                      <div className="recruitment-action-buttons">
+                        <div
+                          className="recruitment-dots"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDotsMenuOpen(dotsMenuOpen === index ? null : index);
+                          }}
+                        >
+                          ⋮
+                          {dotsMenuOpen === index && (
+                            <div className="recruitment-dropdown">
+                              <div 
+                                className="recruitment-dropdown-item"
+                                onClick={() => handleEditInterview(interview)}
+                              >
+                                Edit
+                              </div>
+                              {!isArchived && (
+                                <div 
+                                  className="recruitment-dropdown-item"
+                                  onClick={() => handleArchiveInterview(interview)}
+                                >
+                                  Archive
+                                </div>
+                              )}
+                              {isArchived && (
+                                <div 
+                                  className="recruitment-dropdown-item"
+                                  onClick={() => handleRestoreInterview(interview)}
+                                >
+                                  Restore
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {renderPagination(totalPages)}
+      </>
+    );
+  };
+
+  // Function to render onboarding tasks table
+  const renderOnboardingTable = (data, isArchived = false) => {
+    const { paginated, totalPages } = filterAndPaginate(data);
+    
+    if (loading) return <div className="recruitment-no-results">Loading onboarding tasks...</div>;
+    if (!paginated.length) return <div className="recruitment-no-results">No onboarding tasks found.</div>;
+    
+    return (
+      <>
+        <div className="recruitment-table-wrapper">
+          <div className="recruitment-table-scrollable">
+            <table className="recruitment-table">
+              <thead>
+                <tr>
+                  {isArchived && <th>Select</th>}
+                  <th>Task ID</th>
+                  <th>Employee</th>
+                  <th>Task Name</th>
+                  <th>Description</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Assigned To</th>
+                  <th>Priority</th>
+                  <th>Created At</th>
+                  <th>Updated At</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.map((task, index) => (
+                  <tr key={task.task_id} className={isArchived ? "recruitment-archived-row" : ""}>
+                    {isArchived && (
+                      <td>
+                        <input 
+                          type="checkbox" 
+                          checked={selectedArchivedOnboardingTasks.includes(task.task_id)}
+                          onChange={() => toggleSelectArchivedOnboardingTask(task.task_id)}
+                        />
+                      </td>
+                    )}
+                    <td>{task.task_id}</td>
+                    <td>{task.employee_name}</td>
+                    <td>{task.task_name}</td>
+                    <td>{task.description}</td>
+                    <td>{formatDate(task.due_date)}</td>
+                    <td>
+                      <span className={`recruitment-tag ${task.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                        {task.status}
+                      </span>
+                    </td>
+                    <td>{task.assigned_to_name}</td>
+                    <td>
+                      <span className={`recruitment-tag ${task.priority.toLowerCase().replace(/\s+/g, '-')}`}>
+                        {task.priority}
+                      </span>
+                    </td>
+                    <td>{formatDate(task.created_at)}</td>
+                    <td>{formatDate(task.updated_at)}</td>
+                    <td className="recruitment-actions">
+                      <div className="recruitment-action-buttons">
+                        <div
+                          className="recruitment-dots"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDotsMenuOpen(dotsMenuOpen === index ? null : index);
+                          }}
+                        >
+                          ⋮
+                          {dotsMenuOpen === index && (
+                            <div className="recruitment-dropdown">
+                              <div 
+                                className="recruitment-dropdown-item"
+                                onClick={() => handleEditOnboardingTask(task)}
+                              >
+                                Edit
+                              </div>
+                              {!isArchived && (
+                                <div 
+                                  className="recruitment-dropdown-item"
+                                  onClick={() => handleArchiveOnboardingTask(task)}
+                                >
+                                  Archive
+                                </div>
+                              )}
+                              {isArchived && (
+                                <div 
+                                  className="recruitment-dropdown-item"
+                                  onClick={() => handleRestoreOnboardingTask(task)}
+                                >
+                                  Restore
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {renderPagination(totalPages)}
+      </>
+    );
+  };
+
   const renderPagination = (totalPages) => {
     return (
       <div className="recruitment-pagination">
@@ -1013,20 +1280,42 @@ const Recruitment = () => {
 const handleAddClick = () => {
   if (activeTab === "Job Postings") {
     setNewJobPosting({
-      dept_id: null,
-      position_id: null,
+      dept_id: "",
+      position_id: "",
       position_title: "",
       description: "",
       requirements: "",
-      employment_type: null,
-      base_salary: null,
-      daily_rate: null,
-      duration_days: null,
-      posting_status: null
+      employment_type: "",
+      base_salary: "",
+      daily_rate: "",
+      duration_days: "",
+      posting_status: "Draft"
     });
     setShowAddJobModal(true);
   } else if (activeTab === "Candidates") {
     handleAddCandidate();
+  } else if (activeTab === "Interviews") {
+    setNewInterview({
+      candidate_id: "",
+      interview_date: "",
+      interview_time: "",
+      interview_type: "Technical",
+      interviewer_id: "",
+      status: "Scheduled",
+      notes: ""
+    });
+    setShowAddInterviewModal(true);
+  } else if (activeTab === "Onboarding") {
+    setNewOnboardingTask({
+      employee_id: "",
+      task_name: "",
+      description: "",
+      due_date: "",
+      status: "Pending",
+      assigned_to: "",
+      priority: "Medium"
+    });
+    setShowAddOnboardingModal(true);
   }
 };
 
@@ -1598,6 +1887,76 @@ const submitCandidateForm = async (e) => {
     }
   };
 
+// Interview handlers
+const handleInterviewChange = (e) => {
+  const { name, value } = e.target;
+  setNewInterview(prev => ({
+    ...prev,
+    [name]: value
+  }));
+};
+
+const handleInterviewSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    setLoading(true);
+    // API call would go here
+    // const response = await axios.post("your-api-endpoint", newInterview);
+    
+    // For now, simulate adding the interview
+    const mockResponse = {
+      ...newInterview,
+      interview_id: Date.now(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    setInterviews(prev => [...prev, mockResponse]);
+    setShowAddInterviewModal(false);
+    showToast("Interview scheduled successfully", true);
+  } catch (error) {
+    console.error("Error scheduling interview:", error);
+    showToast("Failed to schedule interview", false);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Onboarding task handlers
+const handleOnboardingTaskChange = (e) => {
+  const { name, value } = e.target;
+  setNewOnboardingTask(prev => ({
+    ...prev,
+    [name]: value
+  }));
+};
+
+const handleOnboardingTaskSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    setLoading(true);
+    // API call would go here
+    // const response = await axios.post("your-api-endpoint", newOnboardingTask);
+    
+    // For now, simulate adding the task
+    const mockResponse = {
+      ...newOnboardingTask,
+      task_id: Date.now(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    setOnboardingTasks(prev => [...prev, mockResponse]);
+    setShowAddOnboardingModal(false);
+    showToast("Onboarding task created successfully", true);
+  } catch (error) {
+    console.error("Error creating onboarding task:", error);
+    showToast("Failed to create onboarding task", false);
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
     <div className="recruitment">
       <div className="recruitment-body-content-container">
@@ -1667,6 +2026,16 @@ const submitCandidateForm = async (e) => {
           <div className="recruitment-header">
             <div className="recruitment-tabs">
               <button
+                className={activeTab === "Job Postings" ? "active" : ""}
+                onClick={() => {
+                  setActiveTab("Job Postings");
+                  setShowArchived(false);
+                  setCurrentPage(1);
+                }}
+              >
+                Job Postings <span className="recruitment-count">{jobPostings.length}</span>
+              </button>
+              <button
                 className={activeTab === "Candidates" ? "active" : ""}
                 onClick={() => {
                   setActiveTab("Candidates");
@@ -1677,14 +2046,24 @@ const submitCandidateForm = async (e) => {
                 Candidates <span className="recruitment-count">{candidates.length}</span>
               </button>
               <button
-                className={activeTab === "Job Postings" ? "active" : ""}
+                className={activeTab === "Interviews" ? "active" : ""}
                 onClick={() => {
-                  setActiveTab("Job Postings");
+                  setActiveTab("Interviews");
                   setShowArchived(false);
                   setCurrentPage(1);
                 }}
               >
-                Job Postings <span className="recruitment-count">{jobPostings.length}</span>
+                Interviews <span className="recruitment-count">{interviews.length}</span>
+              </button>
+              <button
+                className={activeTab === "Onboarding" ? "active" : ""}
+                onClick={() => {
+                  setActiveTab("Onboarding");
+                  setShowArchived(false);
+                  setCurrentPage(1);
+                }}
+              >
+                Onboarding <span className="recruitment-count">{onboardingTasks.length}</span>
               </button>
             </div>
           </div>
@@ -1692,6 +2071,8 @@ const submitCandidateForm = async (e) => {
           <div className="recruitment-table-container">
             {activeTab === "Candidates" && renderCandidatesTable(showArchived ? archivedCandidates : candidates, showArchived)}
             {activeTab === "Job Postings" && renderJobPostingsTable(showArchived ? archivedJobPostings : jobPostings, showArchived)}
+            {activeTab === "Interviews" && renderInterviewsTable(showArchived ? archivedInterviews : interviews, showArchived)}
+            {activeTab === "Onboarding" && renderOnboardingTable(showArchived ? archivedOnboardingTasks : onboardingTasks, showArchived)}
           </div>
         </div>
       </div>
@@ -2559,6 +2940,249 @@ const submitCandidateForm = async (e) => {
                   type="button" 
                   className="cancel-btn" 
                   onClick={() => setShowEditJobModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Interview Add Modal */}
+      {showAddInterviewModal && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3>Schedule New Interview</h3>
+            <form onSubmit={handleInterviewSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Candidate *</label>
+                    <select 
+                      name="candidate_id" 
+                      value={newInterview.candidate_id} 
+                      onChange={handleInterviewChange}
+                      required
+                    >
+                      <option value="">-- Select Candidate --</option>
+                      {candidates.map(candidate => (
+                        <option key={candidate.candidate_id} value={candidate.candidate_id}>
+                          {candidate.first_name} {candidate.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Interview Date *</label>
+                    <input 
+                      type="date" 
+                      name="interview_date" 
+                      value={newInterview.interview_date} 
+                      onChange={handleInterviewChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Interview Time *</label>
+                    <input 
+                      type="time" 
+                      name="interview_time" 
+                      value={newInterview.interview_time} 
+                      onChange={handleInterviewChange}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Interview Type *</label>
+                    <select
+                      name="interview_type"
+                      value={newInterview.interview_type}
+                      onChange={handleInterviewChange}
+                      required
+                    >
+                      <option value="Technical">Technical</option>
+                      <option value="HR">HR</option>
+                      <option value="Cultural Fit">Cultural Fit</option>
+                      <option value="Final">Final</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Interviewer *</label>
+                    <select
+                      name="interviewer_id"
+                      value={newInterview.interviewer_id}
+                      onChange={handleInterviewChange}
+                      required
+                    >
+                      <option value="">-- Select Interviewer --</option>
+                      {employees.map(emp => (
+                        <option key={emp.employee_id} value={emp.employee_id}>
+                          {emp.first_name} {emp.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      name="status"
+                      value={newInterview.status}
+                      onChange={handleInterviewChange}
+                    >
+                      <option value="Scheduled">Scheduled</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="Rescheduled">Rescheduled</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-group full-width">
+                  <label>Notes</label>
+                  <textarea
+                    name="notes"
+                    value={newInterview.notes}
+                    onChange={handleInterviewChange}
+                    placeholder="Additional notes about the interview..."
+                  />
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button type="submit" className="submit-btn">Schedule Interview</button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowAddInterviewModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Onboarding Add Modal */}
+      {showAddOnboardingModal && (
+        <div className="recruitment-modal-overlay">
+          <div className="recruitment-modal">
+            <h3>Create Onboarding Task</h3>
+            <form onSubmit={handleOnboardingTaskSubmit} className="recruitment-form">
+              <div className="recruitment-form-two-columns">
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Employee *</label>
+                    <select 
+                      name="employee_id" 
+                      value={newOnboardingTask.employee_id} 
+                      onChange={handleOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Employee --</option>
+                      {employees.map(emp => (
+                        <option key={emp.employee_id} value={emp.employee_id}>
+                          {emp.first_name} {emp.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Task Name *</label>
+                    <input 
+                      type="text" 
+                      name="task_name" 
+                      value={newOnboardingTask.task_name} 
+                      onChange={handleOnboardingTaskChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Due Date *</label>
+                    <input 
+                      type="date" 
+                      name="due_date" 
+                      value={newOnboardingTask.due_date} 
+                      onChange={handleOnboardingTaskChange}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-column">
+                  <div className="form-group">
+                    <label>Assigned To *</label>
+                    <select
+                      name="assigned_to"
+                      value={newOnboardingTask.assigned_to}
+                      onChange={handleOnboardingTaskChange}
+                      required
+                    >
+                      <option value="">-- Select Assignee --</option>
+                      {employees.map(emp => (
+                        <option key={emp.employee_id} value={emp.employee_id}>
+                          {emp.first_name} {emp.last_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      name="status"
+                      value={newOnboardingTask.status}
+                      onChange={handleOnboardingTaskChange}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Delayed">Delayed</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Priority</label>
+                    <select
+                      name="priority"
+                      value={newOnboardingTask.priority}
+                      onChange={handleOnboardingTaskChange}
+                    >
+                      <option value="High">High</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Low">Low</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-group full-width">
+                  <label>Description</label>
+                  <textarea
+                    name="description"
+                    value={newOnboardingTask.description}
+                    onChange={handleOnboardingTaskChange}
+                    placeholder="Detailed description of the task..."
+                  />
+                </div>
+              </div>
+              
+              <div className="recruitment-modal-buttons">
+                <button type="submit" className="submit-btn">Create Task</button>
+                <button 
+                  type="button" 
+                  className="cancel-btn" 
+                  onClick={() => setShowAddOnboardingModal(false)}
                 >
                   Cancel
                 </button>

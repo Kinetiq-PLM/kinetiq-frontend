@@ -10,7 +10,7 @@
 .recruitment-body-content-container {
   width: 100%;
   height: 100%;
-  max-width: 1600px;
+  /* max-width: 1600px; */
   margin: 0 auto;
   border-radius: 0.5rem;
   background-color: white;
@@ -576,6 +576,94 @@
   border: 1px solid #d3adf7;
 }
 
+/* Interview Type Tags */
+.recruitment-tag.technical {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.recruitment-tag.hr {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.recruitment-tag.cultural-fit {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.recruitment-tag.final {
+  background-color: #f9f0ff;
+  color: #722ed1;
+  border: 1px solid #d3adf7;
+}
+
+/* Interview Status Tags */
+.recruitment-tag.scheduled {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.recruitment-tag.in-progress {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.recruitment-tag.completed {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.recruitment-tag.cancelled {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
+}
+
+.recruitment-tag.rescheduled {
+  background-color: #f9f0ff;
+  color: #722ed1;
+  border: 1px solid #d3adf7;
+}
+
+/* Onboarding Task Status Tags */
+.recruitment-tag.pending {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.recruitment-tag.delayed {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
+}
+
+/* Priority Tags */
+.recruitment-tag.high {
+  background-color: #fff1f0;
+  color: #f5222d;
+  border: 1px solid #ffa39e;
+}
+
+.recruitment-tag.medium {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.recruitment-tag.low {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
 /* ---------------------------------------------------------
    ARCHIVED ROW
    --------------------------------------------------------- */
@@ -988,7 +1076,7 @@
 /* Base responsive adjustments - Apply to all screens */
 .recruitment-body-content-container {
   width: 100%;
-  max-width: 1600px;
+  /* max-width: 1600px; */
   padding: 1rem;
 }
 
