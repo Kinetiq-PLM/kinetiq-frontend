@@ -29,7 +29,6 @@ const TaxAndRemittance = () => {
     "Payment Method",
     "Reference Number",
     "Status",
-    "Action",
   ];
 
   const API_URL =

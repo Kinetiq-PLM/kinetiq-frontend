@@ -29,7 +29,6 @@ const AccountsPayableReceipt = () => {
     "Paid By",
     "Reference Number",
     "Status",
-    "Action",
   ];
 
   const API_URL =
