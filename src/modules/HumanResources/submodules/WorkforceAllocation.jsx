@@ -5,13 +5,13 @@ import "../styles/WorkforceAllocation.css";
 
 const WorkforceAllocation = () => {
   // States for data
-  const [employees, setEmployees] = useState([]);
+  const [activeEmployees, setActiveEmployees] = useState([]);
+  const [hrEmployees, setHrEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [allocations, setAllocations] = useState([]);
   const [archivedAllocations, setArchivedAllocations] = useState([]); 
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  // Add this new state for selected archived allocations
   const [selectedArchivedAllocations, setSelectedArchivedAllocations] = useState([]);
 
   // UI States
@@ -36,7 +36,7 @@ const WorkforceAllocation = () => {
     requesting_dept_id: "",
     current_dept_id: "",
     hr_approver: "",
-    employee_id: "", // Added employee_id field
+    employee_id: "",
     status: "Draft",
     start_date: "",
     end_date: "",
@@ -71,12 +71,43 @@ const WorkforceAllocation = () => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
+        // Fetch employees and departments
         const [employeesRes, deptsRes] = await Promise.all([
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/"),
           axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/")
         ]);
-        setEmployees(employeesRes.data);
-        setDepartments(deptsRes.data);
+        
+        const allEmployees = employeesRes.data;
+        const allDepartments = deptsRes.data;
+        
+        // Filter only active employees
+        const activeEmployeesList = allEmployees.filter(emp => emp.status === "Active");
+        setActiveEmployees(activeEmployeesList);
+        
+        // First, identify the HR department IDs
+        const hrDeptIds = allDepartments
+          .filter(dept => 
+            dept.dept_name && 
+            dept.dept_name.toLowerCase().includes('human resource')
+          )
+          .map(dept => dept.dept_id);
+        
+        // More strict filtering for HR employees - only those from HR department
+        const hrEmployeesList = allEmployees.filter(emp => 
+          emp.status === "Active" && (
+            // Employee must belong to an HR department
+            hrDeptIds.includes(emp.dept_id) || 
+            // OR their department name explicitly mentions HR (backup check)
+            (emp.dept_name && emp.dept_name.toLowerCase().includes('human resource'))
+          )
+        );
+        
+        console.log(`Found ${hrEmployeesList.length} HR employees for approver dropdown`);
+        console.log('HR Department IDs:', hrDeptIds);
+        setHrEmployees(hrEmployeesList);
+        
+        // Set departments
+        setDepartments(allDepartments);
       } catch (err) {
         console.error("Failed to fetch dropdown data:", err);
       }
@@ -163,7 +194,6 @@ const WorkforceAllocation = () => {
     }
   };
 
-  // Add these functions right after your existing handleUnarchive function
   const toggleSelectArchivedAllocation = (id) => {
     setSelectedArchivedAllocations(prev => 
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
@@ -203,87 +233,86 @@ const WorkforceAllocation = () => {
     }));
   };
 
-  
   const handleAddAllocation = async (e) => {
-      e.preventDefault();
-      
-      // Prevent duplicate submissions
-      if (submitting) {
-          console.log("Submission already in progress");
-          return;
-      }
-      
-      // Validate form
-      const errors = validateAddForm();
-      if (Object.keys(errors).length > 0) {
-        setFormErrors(errors);
+    e.preventDefault();
+    
+    // Prevent duplicate submissions
+    if (submitting) {
+        console.log("Submission already in progress");
         return;
-      }
+    }
+    
+    // Validate form
+    const errors = validateAddForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+    
+    try {
+      setSubmitting(true); // Start submission
       
-      try {
-        setSubmitting(true); // Start submission
-        
-        // Format payload with explicit field mapping
-        const payload = {
-          required_skills: newAllocation.required_skills,
-          task_description: newAllocation.task_description,
-          requesting_dept_id: newAllocation.requesting_dept_id,
-          current_dept_id: newAllocation.current_dept_id,
-          hr_approver: newAllocation.hr_approver || null,
-          employee: newAllocation.employee_id || null,
-          status: newAllocation.status,
-          start_date: newAllocation.start_date,
-          end_date: newAllocation.end_date,
-          approval_status: newAllocation.approval_status,
-          rejection_reason: newAllocation.rejection_reason || ""
-        };
-        
-        console.log("Sending payload:", payload);
-        
-        const response = await axios.post(
-          "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/", 
-          payload,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            }
+      // Format payload with explicit field mapping
+      const payload = {
+        required_skills: newAllocation.required_skills,
+        task_description: newAllocation.task_description,
+        requesting_dept_id: newAllocation.requesting_dept_id,
+        current_dept_id: newAllocation.current_dept_id,
+        hr_approver: newAllocation.hr_approver || null,
+        employee: newAllocation.employee_id || null,
+        status: newAllocation.status,
+        start_date: newAllocation.start_date,
+        end_date: newAllocation.end_date,
+        approval_status: newAllocation.approval_status,
+        rejection_reason: newAllocation.rejection_reason || ""
+      };
+      
+      console.log("Sending payload:", payload);
+      
+      const response = await axios.post(
+        "https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/workforce_allocation/workforce_allocations/", 
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
           }
-        );
-        
-        console.log("Response:", response);
-        showToast("Allocation added successfully");
-        setShowAddModal(false);
-        fetchAllocations();
-        
-        // Reset form
-        setNewAllocation({
-          required_skills: "",
-          task_description: "",
-          requesting_dept_id: "",
-          current_dept_id: "",
-          hr_approver: "",
-          employee_id: "",
-          status: "Draft",
-          start_date: "",
-          end_date: "",
-          approval_status: "Pending",
-          rejection_reason: ""
-        });
-        setFormErrors({});
-      } catch (err) {
-        console.error("Add allocation error:", err);
-        
-        if (err.response) {
-          console.error("Error details:", err.response.data);
-          setFormErrors(err.response.data || {});
-          showToast(`Failed to add allocation: ${JSON.stringify(err.response.data)}`, false);
-        } else {
-          showToast(`Failed to add allocation: ${err.message}`, false);
         }
-      } finally {
-        setSubmitting(false);
+      );
+      
+      console.log("Response:", response);
+      showToast("Allocation added successfully");
+      setShowAddModal(false);
+      fetchAllocations();
+      
+      // Reset form
+      setNewAllocation({
+        required_skills: "",
+        task_description: "",
+        requesting_dept_id: "",
+        current_dept_id: "",
+        hr_approver: "",
+        employee_id: "",
+        status: "Draft",
+        start_date: "",
+        end_date: "",
+        approval_status: "Pending",
+        rejection_reason: ""
+      });
+      setFormErrors({});
+    } catch (err) {
+      console.error("Add allocation error:", err);
+      
+      if (err.response) {
+        console.error("Error details:", err.response.data);
+        setFormErrors(err.response.data || {});
+        showToast(`Failed to add allocation: ${JSON.stringify(err.response.data)}`, false);
+      } else {
+        showToast(`Failed to add allocation: ${err.message}`, false);
       }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleEditAllocationChange = (e) => {
@@ -335,7 +364,6 @@ const WorkforceAllocation = () => {
     }
   };
 
-  // Modify the renderTable function to include checkboxes
   const renderTable = () => {
     const data = showArchived ? archivedAllocations : allocations;
     const { paginated, totalPages } = filterAndPaginate(data);
@@ -350,7 +378,6 @@ const WorkforceAllocation = () => {
             <table className="workforceallocation-table">
               <thead>
                 <tr>
-                  {/* Add checkbox column header when showing archived items */}
                   {showArchived && <th>Select</th>}
                   <th>Allocation ID</th>
                   <th>Request ID</th>
@@ -374,7 +401,6 @@ const WorkforceAllocation = () => {
               <tbody>
                 {paginated.map((allocation, index) => (
                   <tr key={allocation.allocation_id || index}>
-                    {/* Add checkbox in each row when showing archived items */}
                     {showArchived && (
                       <td>
                         <input
@@ -463,7 +489,7 @@ const WorkforceAllocation = () => {
             onClick={() => setCurrentPage(1)} 
             disabled={currentPage === 1}
           >
-            &#171; {/* Double left arrow */}
+            &#171;
           </button>
           
           <button 
@@ -471,7 +497,7 @@ const WorkforceAllocation = () => {
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
             disabled={currentPage === 1}
           >
-            &#8249; {/* Single left arrow */}
+            &#8249;
           </button>
           
           <div className="workforceallocation-pagination-numbers">
@@ -480,7 +506,6 @@ const WorkforceAllocation = () => {
               const maxVisiblePages = 5;
               
               if (totalPages <= maxVisiblePages + 2) {
-                // Show all pages if there are few
                 for (let i = 1; i <= totalPages; i++) {
                   pageNumbers.push(
                     <button
@@ -493,7 +518,6 @@ const WorkforceAllocation = () => {
                   );
                 }
               } else {
-                // Always show first page
                 pageNumbers.push(
                   <button
                     key={1}
@@ -504,21 +528,17 @@ const WorkforceAllocation = () => {
                   </button>
                 );
                 
-                // Calculate range around current page
                 let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
                 let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
                 
-                // Adjust if we're near the end
                 if (endPage - startPage < maxVisiblePages - 1) {
                   startPage = Math.max(2, endPage - maxVisiblePages + 1);
                 }
                 
-                // Add ellipsis after first page if needed
                 if (startPage > 2) {
                   pageNumbers.push(<span key="ellipsis1" className="workforceallocation-pagination-ellipsis">...</span>);
                 }
                 
-                // Add middle pages
                 for (let i = startPage; i <= endPage; i++) {
                   pageNumbers.push(
                     <button
@@ -531,12 +551,10 @@ const WorkforceAllocation = () => {
                   );
                 }
                 
-                // Add ellipsis before last page if needed
                 if (endPage < totalPages - 1) {
                   pageNumbers.push(<span key="ellipsis2" className="workforceallocation-pagination-ellipsis">...</span>);
                 }
                 
-                // Always show last page
                 pageNumbers.push(
                   <button
                     key={totalPages}
@@ -557,7 +575,7 @@ const WorkforceAllocation = () => {
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
             disabled={currentPage === totalPages}
           >
-            &#8250; {/* Single right arrow */}
+            &#8250;
           </button>
           
           <button 
@@ -565,7 +583,7 @@ const WorkforceAllocation = () => {
             onClick={() => setCurrentPage(totalPages)} 
             disabled={currentPage === totalPages}
           >
-            &#187; {/* Double right arrow */}
+            &#187;
           </button>
           
           <select
@@ -602,7 +620,6 @@ const WorkforceAllocation = () => {
                 />
               </div>
               
-              {/* Sort dropdown */}
               <select
                 className="workforceallocation-filter"
                 value={sortField}
@@ -627,13 +644,12 @@ const WorkforceAllocation = () => {
                 className="workforceallocation-add-btn"
                 onClick={() => {
                   setShowArchived(!showArchived);
-                  setSelectedArchivedAllocations([]);  // Clear selections when toggling view
+                  setSelectedArchivedAllocations([]);
                 }}
               >
                 {showArchived ? "View Active" : "View Archived"}
               </button>
               
-              {/* Add the Unarchive Selected button that appears conditionally */}
               {showArchived && selectedArchivedAllocations.length > 0 && (
                 <button 
                   className="workforceallocation-add-btn" 
@@ -645,11 +661,9 @@ const WorkforceAllocation = () => {
             </div>
           </div>
 
-          {/* Render Table */}
           {renderTable()}
         </div>
 
-        {/* Toast Notification */}
         {toast && (
           <div
             className="workforceallocation-toast"
@@ -659,7 +673,6 @@ const WorkforceAllocation = () => {
           </div>
         )}
 
-        {/* Add Allocation Modal */}
         {showAddModal && (
           <div className="workforceallocation-modal-overlay">
             <div className="workforceallocation-modal">
@@ -715,7 +728,7 @@ const WorkforceAllocation = () => {
                         onChange={handleAddAllocationChange}
                       >
                         <option value="">Select HR Approver</option>
-                        {employees.map(emp => (
+                        {hrEmployees.map(emp => (
                           <option key={emp.employee_id} value={emp.employee_id}>
                             {emp.first_name} {emp.last_name}
                           </option>
@@ -734,7 +747,7 @@ const WorkforceAllocation = () => {
                         onChange={handleAddAllocationChange}
                       >
                         <option value="">Select Employee</option>
-                        {employees.map(emp => (
+                        {activeEmployees.map(emp => (
                           <option key={emp.employee_id} value={emp.employee_id}>
                             {emp.first_name} {emp.last_name}
                           </option>
@@ -854,7 +867,6 @@ const WorkforceAllocation = () => {
                   )}
                 </div>
                 
-                {/* Show any non-field errors */}
                 {formErrors.non_field_errors && (
                   <div className="form-error">{formErrors.non_field_errors}</div>
                 )}
@@ -883,7 +895,6 @@ const WorkforceAllocation = () => {
           </div>
         )}
 
-        {/* Edit Allocation Modal */}
         {showEditModal && editingAllocation && (
           <div className="workforceallocation-modal-overlay">
             <div className="workforceallocation-modal">
@@ -908,7 +919,7 @@ const WorkforceAllocation = () => {
                         onChange={handleEditAllocationChange}
                       >
                         <option value="">Select Employee</option>
-                        {employees.map(emp => (
+                        {activeEmployees.map(emp => (
                           <option key={emp.employee_id} value={emp.employee_id}>
                             {emp.first_name} {emp.last_name}
                           </option>
@@ -927,7 +938,7 @@ const WorkforceAllocation = () => {
                         onChange={handleEditAllocationChange}
                       >
                         <option value="">Select HR Approver</option>
-                        {employees.map(emp => (
+                        {hrEmployees.map(emp => (
                           <option key={emp.employee_id} value={emp.employee_id}>
                             {emp.first_name} {emp.last_name}
                           </option>
@@ -992,7 +1003,6 @@ const WorkforceAllocation = () => {
                   )}
                 </div>
                 
-                {/* Show any non-field errors */}
                 {formErrors.non_field_errors && (
                   <div className="form-error">{formErrors.non_field_errors}</div>
                 )}
