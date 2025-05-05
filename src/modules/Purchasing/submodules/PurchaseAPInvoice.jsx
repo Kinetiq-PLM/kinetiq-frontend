@@ -12,7 +12,7 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showDateDropdown, setShowDateDropdown] = useState(false);
     const [showStatusFilter, setShowStatusFilter] = useState(false);
-    const [purchaseOrders, setPurchaseOrders] = useState({}); // Map of content_id to purchase_id
+    const [purchaseOrders, setPurchaseOrders] = useState({}); // Map of document_id to purchase_id
 
     const timeOptions = [
         "Last 30 days",
@@ -35,7 +35,7 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
         const fetchInvoices = async () => {
             try {
                 const response = await axios.get(
-                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/list/"
+                    "http://127.0.0.1:8000/api/invoices/list/"
                 );
                 console.log("Fetched invoices:", response.data);
                 setInvoices(response.data);
@@ -49,14 +49,15 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
     }, []);
 
     useEffect(() => {
-        // Fetch purchase orders using content_id from external-module
+        // Fetch purchase orders using document_id from external-module
         const fetchPurchaseOrders = async () => {
             try {
                 const externalModulesResponse = await axios.get(
-                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/external-modules/"
+                    "http://127.0.0.1:8000/api/invoices/document-header/"
                 );
+
                 const purchaseOrdersResponse = await axios.get(
-                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/"
+                    "http://127.0.0.1:8000/api/purchase-orders/list/"
                 );
 
                 const purchaseOrderMap = {};
@@ -65,7 +66,7 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
                         (order) => order.purchase_id === module.purchase_id
                     );
                     if (purchaseOrder) {
-                        purchaseOrderMap[module.content_id] = purchaseOrder.purchase_id;
+                        purchaseOrderMap[module.document_id] = purchaseOrder.purchase_id;
                     }
                 });
 
@@ -105,7 +106,7 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
             const term = searchTerm.toLowerCase();
             result = result.filter(invoice => 
                 (invoice.invoice_id && invoice.invoice_id.toString().toLowerCase().includes(term)) ||
-                (invoice.content_id && purchaseOrders[invoice.content_id]?.toString().toLowerCase().includes(term)) ||
+                (invoice.document_id && purchaseOrders[invoice.document_id]?.toString().toLowerCase().includes(term)) ||
                 (invoice.document_date && invoice.document_date.toString().toLowerCase().includes(term)) ||
                 (invoice.status && invoice.status.toLowerCase().includes(term))
             );
@@ -129,7 +130,8 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
     };
 
     const handleInvoiceClick = (invoice) => {
-        setSelectedInvoice(invoice); // Set the selected invoice
+        console.log("Selected Invoice:", invoice);
+        setSelectedInvoice(invoice);
     };
 
     // Back button handler to toggle dashboard
@@ -223,7 +225,7 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
                                             onClick={() => handleInvoiceClick(invoice)}
                                         >
                                             <div>{invoice.invoice_id}</div>
-                                            <div>{purchaseOrders[invoice.content_id] || "N/A"}</div>
+                                            <div>{purchaseOrders[invoice.document_id] || "N/A"}</div>
                                             <div>
                                                 <span className={`status-${invoice.status?.toLowerCase()}`}>{invoice.status}</span>
                                             </div>
