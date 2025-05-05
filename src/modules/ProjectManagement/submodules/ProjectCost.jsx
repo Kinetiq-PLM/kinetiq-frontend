@@ -3,6 +3,8 @@ import axios from "axios";
 import { Bar, Pie, Line } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement, Filler } from 'chart.js';
 import "../styles/Projectcost.css";
+axios.defaults.baseURL = 'https://htm0n3ydog.execute-api.ap-southeast-1.amazonaws.com/dev';
+
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement, Filler);
