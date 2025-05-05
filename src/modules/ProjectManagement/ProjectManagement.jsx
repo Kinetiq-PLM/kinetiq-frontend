@@ -101,6 +101,17 @@ const BodyContent = () => {
     }, []);
 
     const calculateDashboardStats = useCallback(() => {
+        if (!Array.isArray(projectSummary)) {
+            setDashboardStats({
+                existingProjects: 0,
+                ongoingProjects: 0,
+                delayedProjects: 0,
+                completedProjects: 0,
+                overallProgress: 0
+            });
+            return;
+        }
+        
         const stats = {
             existingProjects: projectSummary.length,
             ongoingProjects: 0,
@@ -159,7 +170,7 @@ const BodyContent = () => {
 
     // Calculate dashboard stats when project summary changes
     useEffect(() => {
-        if (projectSummary.length > 0) {
+        if (Array.isArray(projectSummary) && projectSummary.length > 0) {
             calculateDashboardStats();
             generateTaskCompletionData();
         }
@@ -169,11 +180,12 @@ const BodyContent = () => {
         setIsLoading(prev => ({ ...prev, overdueTasks: true }));
         try {
             const response = await axios.get('/api/dashboard/overdue-tasks/');
-            setOverdueTasks(response.data);
+            setOverdueTasks(Array.isArray(response.data) ? response.data : []);
             setErrors(prev => ({ ...prev, overdueTasks: null }));
         } catch (error) {
             console.error("Error fetching overdue tasks:", error);
             setErrors(prev => ({ ...prev, overdueTasks: "Failed to load overdue tasks" }));
+            setOverdueTasks([]);
         } finally {
             setIsLoading(prev => ({ ...prev, overdueTasks: false }));
         }
@@ -184,11 +196,12 @@ const BodyContent = () => {
         try {
             // Get only today's tasks from the today-tasks endpoint
             const response = await axios.get('/api/dashboard/today-tasks/');
-            setTodayTasks(response.data);
+            setTodayTasks(Array.isArray(response.data) ? response.data : []);
             setErrors(prev => ({ ...prev, todayTasks: null }));
         } catch (error) {
             console.error("Error fetching today's tasks:", error);
             setErrors(prev => ({ ...prev, todayTasks: "Failed to load today's tasks" }));
+            setTodayTasks([]);
         } finally {
             setIsLoading(prev => ({ ...prev, todayTasks: false }));
         }
@@ -198,11 +211,12 @@ const BodyContent = () => {
         setIsLoading(prev => ({ ...prev, projectSummary: true }));
         try {
             const response = await axios.get('/api/dashboard/project-summary/');
-            setProjectSummary(response.data);
+            setProjectSummary(Array.isArray(response.data) ? response.data : []);
             setErrors(prev => ({ ...prev, projectSummary: null }));
         } catch (error) {
             console.error("Error fetching project summary:", error);
             setErrors(prev => ({ ...prev, projectSummary: "Failed to load project summary" }));
+            setProjectSummary([]);
         } finally {
             setIsLoading(prev => ({ ...prev, projectSummary: false }));
         }
@@ -277,9 +291,10 @@ const BodyContent = () => {
     };
 
     // Filter projects based on selected type
-    const filteredProjects = projectSummary.filter(project => 
-        selectedProjectType === 'All' || project.type === selectedProjectType
-    );
+    const filteredProjects = Array.isArray(projectSummary) 
+        ? projectSummary.filter(project => 
+            selectedProjectType === 'All' || project.type === selectedProjectType)
+        : [];
     
     // Paginate data
     const paginatedOverdueTasks = overdueTasks.slice(
@@ -1007,152 +1022,152 @@ const BodyContent = () => {
                                                 </div>
                                             )}
                                             {projectDetail.project_issues && (
-                                                <div className="detail-item full-width">
-                                                    <span className="detail-label">Project Issue:</span>
-                                                    <span className="detail-value">{projectDetail.project_issues}</span>
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-
-                                    {/* Internal Project */}
-                                    {selectedProject.type === 'Internal' && (
-                                        <>
-                                            <div className="detail-item">
-                                                <span className="detail-label">Project Tracking ID:</span>
-                                                <span className="detail-value">{projectDetail.intrnl_project_tracking_id}</span>
-                                            </div>
-                                            <div className="detail-item">
-                                                <span className="detail-label">Project ID:</span>
-                                                <span className="detail-value">{projectDetail.intrnl_project_id}</span>
-                                            </div>
-                                            <div className="detail-item">
-                                                <span className="detail-label">Project Type:</span>
-                                                <span className="detail-value">Internal</span>
-                                            </div>
-                                            <div className="detail-item">
-                                                <span className="detail-label">Start Date:</span>
-                                                <span className="detail-value">{projectDetail.intrnl_start_date}</span>
-                                            </div>
-                                            <div className="detail-item">
-                                                <span className="detail-label">Estimated End Date:</span>
-                                                <span className="detail-value">{projectDetail.intrnl_estimated_end_date}</span>
-                                            </div>
-                                            {projectDetail.intrnl_project_issue && (
-                                                <div className="detail-item full-width">
-                                                    <span className="detail-label">Project Issue:</span>
-                                                    <span className="detail-value">{projectDetail.intrnl_project_issue}</span>
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-                                    
-                                    {/* Project Tasks Section */}
-                                    {projectDetail.tasks && projectDetail.tasks.length > 0 && (
-                                        <div className="detail-item full-width">
-                                            <span className="detail-label">Project Tasks:</span>
-                                            <div className="tasks-container">
-                                                <table className="details-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Task</th>
-                                                            <th>Status</th>
-                                                            <th>Deadline</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {projectDetail.tasks.map((task, idx) => (
-                                                            <tr key={idx}>
-                                                                <td>{task.description}</td>
-                                                                <td>
-                                                                    <span className={`status-badge ${task.status === 'completed' ? 'ok' : 'issue'}`}>
-                                                                        {task.status}
-                                                                    </span>
-                                                                </td>
-                                                                <td>{task.deadline}</td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="no-data-cell">No detailed information available for this project.</div>
-                            )}
-                        </div>
-                        <div className="modal-footer">
-                            <button className="cancel-btn" onClick={closeDetailsModal}>Close</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            
-            {/* Employee Details Modal */}
-            {showEmployeeModal && selectedEmployee && (
-                <div className="employee-details-modal">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>Employee: {selectedEmployee.EmployeeName}</h2>
-                            <button className="close-button" onClick={closeEmployeeModal}>×</button>
-                        </div>
-                        <div className="modal-body">
-                            {isLoadingEmployee ? (
-                                <div className="loading-cell">Loading employee details...</div>
-                            ) : employeeError ? (
-                                <div className="error-cell">Error: {employeeError}</div>
-                            ) : employeeDetails ? (
-                                <div className="employee-details-container">
-                                    <div className="employee-avatar-large">
-                                        <div className="avatar-circle">
-                                            {getInitials(selectedEmployee.EmployeeName)}
-                                        </div>
-                                        <h3>{employeeDetails.first_name} {employeeDetails.last_name}</h3>
-                                        <div className="employee-status-badge">
-                                            {employeeDetails.status}
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="employee-info-grid">
-                                        <div className="info-item">
-                                            <div className="info-label">Employee ID</div>
-                                            <div className="info-value">{employeeDetails.employee_id}</div>
-                                        </div>
-                                        
-                                        <div className="info-item">
-                                            <div className="info-label">Department</div>
-                                            <div className="info-value">{employeeDetails.dept_name || 'Not Assigned'}</div>
-                                        </div>
-                                        
-                                        <div className="info-item">
-                                            <div className="info-label">Position</div>
-                                            <div className="info-value">{employeeDetails.position_title || 'Not Assigned'}</div>
-                                        </div>
-                                        
-                                        <div className="info-item">
-                                            <div className="info-label">Phone</div>
-                                            <div className="info-value">{employeeDetails.phone || 'Not Available'}</div>
-                                        </div>
-                                        
-                                        <div className="info-item">
-                                            <div className="info-label">Employment Type</div>
-                                            <div className="info-value">{employeeDetails.employment_type || 'Not Specified'}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="no-data-cell">No detailed information available for this employee.</div>
-                            )}
-                        </div>
-                        <div className="modal-footer">
-                            <button className="primary-btn" onClick={closeEmployeeModal}>Close</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
-
-export default BodyContent;
+                                                                                                <div className="detail-item full-width">
+                                                                                                <span className="detail-label">Project Issue:</span>
+                                                                                                <span className="detail-value">{projectDetail.project_issues}</span>
+                                                                                            </div>
+                                                                                        )}
+                                                                                    </>
+                                                                                )}
+                                            
+                                                                                {/* Internal Project */}
+                                                                                {selectedProject.type === 'Internal' && (
+                                                                                    <>
+                                                                                        <div className="detail-item">
+                                                                                            <span className="detail-label">Project Tracking ID:</span>
+                                                                                            <span className="detail-value">{projectDetail.intrnl_project_tracking_id}</span>
+                                                                                        </div>
+                                                                                        <div className="detail-item">
+                                                                                            <span className="detail-label">Project ID:</span>
+                                                                                            <span className="detail-value">{projectDetail.intrnl_project_id}</span>
+                                                                                        </div>
+                                                                                        <div className="detail-item">
+                                                                                            <span className="detail-label">Project Type:</span>
+                                                                                            <span className="detail-value">Internal</span>
+                                                                                        </div>
+                                                                                        <div className="detail-item">
+                                                                                            <span className="detail-label">Start Date:</span>
+                                                                                            <span className="detail-value">{projectDetail.intrnl_start_date}</span>
+                                                                                        </div>
+                                                                                        <div className="detail-item">
+                                                                                            <span className="detail-label">Estimated End Date:</span>
+                                                                                            <span className="detail-value">{projectDetail.intrnl_estimated_end_date}</span>
+                                                                                        </div>
+                                                                                        {projectDetail.intrnl_project_issue && (
+                                                                                            <div className="detail-item full-width">
+                                                                                                <span className="detail-label">Project Issue:</span>
+                                                                                                <span className="detail-value">{projectDetail.intrnl_project_issue}</span>
+                                                                                            </div>
+                                                                                        )}
+                                                                                    </>
+                                                                                )}
+                                                                                
+                                                                                {/* Project Tasks Section */}
+                                                                                {projectDetail.tasks && projectDetail.tasks.length > 0 && (
+                                                                                    <div className="detail-item full-width">
+                                                                                        <span className="detail-label">Project Tasks:</span>
+                                                                                        <div className="tasks-container">
+                                                                                            <table className="details-table">
+                                                                                                <thead>
+                                                                                                    <tr>
+                                                                                                        <th>Task</th>
+                                                                                                        <th>Status</th>
+                                                                                                        <th>Deadline</th>
+                                                                                                    </tr>
+                                                                                                </thead>
+                                                                                                <tbody>
+                                                                                                    {projectDetail.tasks.map((task, idx) => (
+                                                                                                        <tr key={idx}>
+                                                                                                            <td>{task.description}</td>
+                                                                                                            <td>
+                                                                                                                <span className={`status-badge ${task.status === 'completed' ? 'ok' : 'issue'}`}>
+                                                                                                                    {task.status}
+                                                                                                                </span>
+                                                                                                            </td>
+                                                                                                            <td>{task.deadline}</td>
+                                                                                                        </tr>
+                                                                                                    ))}
+                                                                                                </tbody>
+                                                                                            </table>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="no-data-cell">No detailed information available for this project.</div>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="modal-footer">
+                                                                        <button className="cancel-btn" onClick={closeDetailsModal}>Close</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        
+                                                        {/* Employee Details Modal */}
+                                                        {showEmployeeModal && selectedEmployee && (
+                                                            <div className="employee-details-modal">
+                                                                <div className="modal-content">
+                                                                    <div className="modal-header">
+                                                                        <h2>Employee: {selectedEmployee.EmployeeName}</h2>
+                                                                        <button className="close-button" onClick={closeEmployeeModal}>×</button>
+                                                                    </div>
+                                                                    <div className="modal-body">
+                                                                        {isLoadingEmployee ? (
+                                                                            <div className="loading-cell">Loading employee details...</div>
+                                                                        ) : employeeError ? (
+                                                                            <div className="error-cell">Error: {employeeError}</div>
+                                                                        ) : employeeDetails ? (
+                                                                            <div className="employee-details-container">
+                                                                                <div className="employee-avatar-large">
+                                                                                    <div className="avatar-circle">
+                                                                                        {getInitials(selectedEmployee.EmployeeName)}
+                                                                                    </div>
+                                                                                    <h3>{employeeDetails.first_name} {employeeDetails.last_name}</h3>
+                                                                                    <div className="employee-status-badge">
+                                                                                        {employeeDetails.status}
+                                                                                    </div>
+                                                                                </div>
+                                                                                
+                                                                                <div className="employee-info-grid">
+                                                                                    <div className="info-item">
+                                                                                        <div className="info-label">Employee ID</div>
+                                                                                        <div className="info-value">{employeeDetails.employee_id}</div>
+                                                                                    </div>
+                                                                                    
+                                                                                    <div className="info-item">
+                                                                                        <div className="info-label">Department</div>
+                                                                                        <div className="info-value">{employeeDetails.dept_name || 'Not Assigned'}</div>
+                                                                                    </div>
+                                                                                    
+                                                                                    <div className="info-item">
+                                                                                        <div className="info-label">Position</div>
+                                                                                        <div className="info-value">{employeeDetails.position_title || 'Not Assigned'}</div>
+                                                                                    </div>
+                                                                                    
+                                                                                    <div className="info-item">
+                                                                                        <div className="info-label">Phone</div>
+                                                                                        <div className="info-value">{employeeDetails.phone || 'Not Available'}</div>
+                                                                                    </div>
+                                                                                    
+                                                                                    <div className="info-item">
+                                                                                        <div className="info-label">Employment Type</div>
+                                                                                        <div className="info-value">{employeeDetails.employment_type || 'Not Specified'}</div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="no-data-cell">No detailed information available for this employee.</div>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="modal-footer">
+                                                                        <button className="primary-btn" onClick={closeEmployeeModal}>Close</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            };
+                                            
+                                            export default BodyContent;

@@ -196,8 +196,8 @@ const ProjectPlanningDashboard = () => {
         setDepartmentIds(departmentRes.data);
         setProjectStatusOptions(projectStatusRes.data);
         setInternalProjectStatusOptions(internalProjectStatusRes.data);
-        setExternalProjectsList(externalListRes.data);
-        setInternalProjectsList(internalListRes.data);
+        setExternalProjectsList(externalListRes.data || []);
+        setInternalProjectsList(internalListRes.data || []);
         setCurrentExternalPage(1);
         setCurrentInternalPage(1);
         
@@ -354,14 +354,15 @@ const ProjectPlanningDashboard = () => {
 };
 
 // Function to handle editing project details
-// Function to handle editing project details
 const handleEditProject = (projectId, isInternal = false) => {
   console.log(`Editing ${isInternal ? 'internal' : 'external'} project with ID: ${projectId}`);
   
   // If the project is internal, set the form with the project data
   if (isInternal) {
     // Find the project in the internal projects list
-    const project = internalProjectsList.find(p => p.project_request_id === projectId);
+    const project = Array.isArray(internalProjectsList) ? 
+      internalProjectsList.find(p => p.project_request_id === projectId) : null;
+    
     if (project) {
       setInternalProjectDetailsForm({
         projectRequestId: project.project_request_id,
@@ -373,7 +374,9 @@ const handleEditProject = (projectId, isInternal = false) => {
     }
   } else {
     // Find the project in the external projects list
-    const project = externalProjectsList.find(p => p.project_request_id === projectId);
+    const project = Array.isArray(externalProjectsList) ? 
+      externalProjectsList.find(p => p.project_request_id === projectId) : null;
+    
     if (project) {
       setExternalProjectDetailsForm({
         projectRequestId: project.project_request_id,
@@ -415,7 +418,7 @@ const handleEditProject = (projectId, isInternal = false) => {
       
       // Refresh external projects list
       const externalListRes = await axios.get('/api/project-planning/get-external-project-requests-list/');
-      setExternalProjectsList(externalListRes.data);
+      setExternalProjectsList(externalListRes.data || []);
       
       // Reset form
       setExternalProjectRequestForm({
@@ -476,7 +479,7 @@ const handleEditProject = (projectId, isInternal = false) => {
       
       // Refresh external projects list
       const externalListRes = await axios.get('/api/project-planning/get-external-project-requests-list/');
-      setExternalProjectsList(externalListRes.data);
+      setExternalProjectsList(externalListRes.data || []);
       
       // Reset form
       setExternalProjectDetailsForm({
@@ -684,7 +687,7 @@ const handleEditProject = (projectId, isInternal = false) => {
     }
   };
 
-   const handleExternalProjectCostSubmit = async (e) => {
+  const handleExternalProjectCostSubmit = async (e) => {
     e.preventDefault();
     console.log("Submitting external project cost form:", externalProjectCostForm);
     
@@ -769,7 +772,7 @@ const handleEditProject = (projectId, isInternal = false) => {
       
       // Refresh internal projects list
       const internalListRes = await axios.get('/api/project-planning/get-internal-project-requests-list/');
-      setInternalProjectsList(internalListRes.data);
+      setInternalProjectsList(internalListRes.data || []);
       
       // Reset form
       setInternalProjectRequestForm({
@@ -837,7 +840,7 @@ const handleEditProject = (projectId, isInternal = false) => {
       
       // Refresh internal projects list
       const internalListRes = await axios.get('/api/project-planning/get-internal-project-requests-list/');
-      setInternalProjectsList(internalListRes.data);
+      setInternalProjectsList(internalListRes.data || []);
       
       // Reset form
       setInternalProjectDetailsForm({
@@ -928,7 +931,10 @@ const handleEditProject = (projectId, isInternal = false) => {
 
   // Function to filter projects by status
   const filterProjectsByStatus = (projects) => {
-    if (filterStatus === "all") return projects;
+    if (filterStatus === "all") return projects || [];
+    
+    // Make sure projects is an array before filtering
+    if (!Array.isArray(projects)) return [];
     
     return projects.filter(project => {
       // Handle case insensitivity and normalize status values
@@ -939,11 +945,33 @@ const handleEditProject = (projectId, isInternal = false) => {
     });
   };
 
+  // Function to render Gantt Chart
+  const renderGanttChart = () => {
+    if (!showGanttChart) return null;
+    
+    return (
+      <div className="gantt-chart-overlay">
+        <div className="gantt-chart-container">
+          <div className="gantt-header">
+            <h2>Project Gantt Chart</h2>
+            <button 
+              className="close-gantt-button"
+              onClick={() => setShowGanttChart(false)}
+            >
+              &times;
+            </button>
+          </div>
+          <ProjectGanttChart />
+        </div>
+      </div>
+    );
+  };
+
   // Function to render the project lists for dashboard
   const renderProjectListsSection = () => {
-    // Filter projects by status
-    const filteredExternalProjects = filterProjectsByStatus(externalProjectsList);
-    const filteredInternalProjects = filterProjectsByStatus(internalProjectsList);
+    // Filter projects by status - ensure arrays exist before filtering
+    const filteredExternalProjects = filterProjectsByStatus(Array.isArray(externalProjectsList) ? externalProjectsList : []);
+    const filteredInternalProjects = filterProjectsByStatus(Array.isArray(internalProjectsList) ? internalProjectsList : []);
     
     // Calculate pagination indexes for external projects
     const externalLastIndex = currentExternalPage * itemsPerPage;
@@ -982,27 +1010,6 @@ const handleEditProject = (projectId, isInternal = false) => {
       }
     };
     
-    // Add this near the end of your component, just before the final return statement
-    const renderGanttChart = () => {
-      if (!showGanttChart) return null;
-      
-      return (
-        <div className="gantt-chart-overlay">
-          <div className="gantt-chart-container">
-            <div className="gantt-header">
-              <h2>Project Gantt Chart</h2>
-              <button 
-                className="close-gantt-button"
-                onClick={() => setShowGanttChart(false)}
-              >
-                &times;
-              </button>
-            </div>
-            <ProjectGanttChart />
-          </div>
-        </div>
-      );
-    };
     // Function to render status badge
     const renderStatusBadge = (status) => {
       if (!status) return <span className="status-badge">Not set</span>;
@@ -1235,24 +1242,24 @@ const handleEditProject = (projectId, isInternal = false) => {
   // Function to render the dashboard
   const renderDashboard = () => {
     // Calculate project statistics
-    const totalExternalProjects = externalProjectsList.length;
-    const totalInternalProjects = internalProjectsList.length;
+    const totalExternalProjects = Array.isArray(externalProjectsList) ? externalProjectsList.length : 0;
+    const totalInternalProjects = Array.isArray(internalProjectsList) ? internalProjectsList.length : 0;
     
-    const externalInProgress = externalProjectsList.filter(
+    const externalInProgress = Array.isArray(externalProjectsList) ? externalProjectsList.filter(
       p => p.project_status && p.project_status.toLowerCase() === 'in progress'
-    ).length;
+    ).length : 0;
     
-    const internalInProgress = internalProjectsList.filter(
+    const internalInProgress = Array.isArray(internalProjectsList) ? internalProjectsList.filter(
       p => p.project_status && p.project_status.toLowerCase() === 'in progress'
-    ).length;
+    ).length : 0;
     
-    const externalCompleted = externalProjectsList.filter(
+    const externalCompleted = Array.isArray(externalProjectsList) ? externalProjectsList.filter(
       p => p.project_status && p.project_status.toLowerCase() === 'completed'
-    ).length;
+    ).length : 0;
     
-    const internalCompleted = internalProjectsList.filter(
+    const internalCompleted = Array.isArray(internalProjectsList) ? internalProjectsList.filter(
       p => p.project_status && p.project_status.toLowerCase() === 'completed'
-    ).length;
+    ).length : 0;
     
     return (
       <div className="project-planning-dashboard">
@@ -2156,6 +2163,41 @@ const handleEditProject = (projectId, isInternal = false) => {
             </div>
           </div>
 
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">
+                Job Role*
+              </label>
+              <input
+                className="form-input"
+                type="text"
+                placeholder="e.g. Project Manager, Engineer, Technician"
+                value={internalProjectLaborForm.jobRole}
+                onChange={(e) => handleInputChange('internalProjectLabor', 'jobRole', e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">
+                Employee*
+              </label>
+              <select
+                className="form-select"
+                value={internalProjectLaborForm.employeeId}
+                onChange={(e) => handleInputChange('internalProjectLabor', 'employeeId', e.target.value)}
+                required
+              >
+                <option value="">Select Employee</option>
+                {employeeIds.map((employee) => (
+                  <option key={employee.id} value={employee.id}>
+                    {employee.name} ({employee.id})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div className="form-actions">
             <button type="submit" className="form-button save-button">
               <FaUsersCog /> Assign Labor
@@ -2188,7 +2230,7 @@ const handleEditProject = (projectId, isInternal = false) => {
         <div className="project-planning-actions">
         <button 
           className="gantt-chart-button"
-          onClick={() => setActiveView("ganttChart")}
+          onClick={() => setShowGanttChart(true)}
         >
           <FaChartLine /> Gantt Chart
         </button>
