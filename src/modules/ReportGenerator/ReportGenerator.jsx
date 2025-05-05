@@ -85,9 +85,9 @@ const BodyContent = ({employee_id}) => {
 
     const textareaRef = useRef(null);
 
-    // const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
+    const API_BASE_URL = "https://c8epgmsavb.execute-api.ap-southeast-1.amazonaws.com/dev/";
 
-    const API_BASE_URL = "http://127.0.0.1:8000/";
+    // const API_BASE_URL = "http://127.0.0.1:8000/";
 
     const updateConversationTitle = async (conversationId, newTitle) => {
         try {
@@ -284,7 +284,7 @@ const BodyContent = ({employee_id}) => {
             const isDefaultTitle = currentConversation && currentConversation.title &&
                                    (currentConversation.title.startsWith("Convo ") || !currentConversation.title); // Check if it's the default or empty/null
 
-            if (isDefaultTitle && !isGeneratingTitle) {
+            if (isDefaultTitle && messageCount >= 2 && !isGeneratingTitle) {
                 console.log(`Conversation ${conversationId} has ${messageCount} messages and a default/missing title. Triggering generation.`);
                 handleGenerateTitle(conversationId);
             }
