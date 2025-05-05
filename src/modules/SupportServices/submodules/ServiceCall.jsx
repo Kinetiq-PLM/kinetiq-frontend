@@ -365,7 +365,7 @@ const ServiceCall = ({user_id, employee_id}) => {
               onClick={handleUpdateClick} 
               disabled={!selectedCall}
             >
-              Update
+              Edit
             </button>
           </div>
         </div>

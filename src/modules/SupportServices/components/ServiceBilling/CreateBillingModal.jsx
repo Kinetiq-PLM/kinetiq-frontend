@@ -198,50 +198,52 @@ const handleSelectRequest = (request) => {
 
 const fetchAnalysis = async (requestId) => {
   try {
-    const response = await GET(`analysis/request/${requestId}/`); 
-    console.log("analyses", response)
-    setFormData((prev) => ({
-      ...prev,
-      analysisId: response.analysis_id || "",
-      laborCost: response?.labor_cost || ""
-    }));
-    fetchOrder(response.analysis_id)
-  } catch (error) {
-    setFormData((prev) => ({
-      ...prev,
-      analysisId: "",
-      laborCost:  ""
-    }));
-    if (formData.orderId) {
+    const response = await GET(`analysis/request/${requestId}/`);
+    console.log("analyses", response);
+
+    if (response?.analysis_id) {
       setFormData((prev) => ({
         ...prev,
-        orderId: "",
-        orderTotalPrice:  ""
+        analysisId: response.analysis_id,
+        laborCost: response.labor_cost || ""
       }));
+      return fetchOrder(response.analysis_id);
     }
+
+  } catch (error) {
     console.error("Error fetching analyses:", error);
   }
-}
 
+  // If no valid analysis or error occurred, clear related fields
+  setFormData((prev) => ({
+    ...prev,
+    analysisId: "",
+    laborCost: "",
+    ...(prev.orderId && { orderId: "", orderTotalPrice: "" })
+  }));
+};
 const fetchOrder = async (analysisId) => {
   try {
-    const response = await GET(`order/orders/${analysisId}/`); 
-    console.log("orders", response)
-    const data = response[0]
+    const response = await GET(`order/orders/${analysisId}/`);
+    console.log("orders", response);
+
+    const data = response?.[0];
     setFormData((prev) => ({
       ...prev,
-      orderId: data.service_order_id || "",
-      orderTotalPrice:  data.order_total_price || "",
+      orderId: data?.service_order_id || "",
+      orderTotalPrice: data?.order_total_price || ""
     }));
+
   } catch (error) {
     console.error("Error fetching orders:", error);
     setFormData((prev) => ({
       ...prev,
       orderId: "",
-      orderTotalPrice:  ""
+      orderTotalPrice: ""
     }));
   }
-}
+};
+
 
 const [operationalCosts, setOperationalCosts] = useState([]);
 const [isOpCostDropdown, setOpenOpCost] = useState(false);

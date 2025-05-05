@@ -170,15 +170,6 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
     setOpenStatusDD(false); 
   };
 
-  const fetchTechnicians = async () => {
-    try {
-      const response = await GET("call/calls/technicians/");
-      setTechnicians(response);
-    } catch (error) {
-      console.error("Error fetching technicians:", error);
-    }
-  }
-
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -455,7 +446,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
               </div>
 
               <div className="form-column">
-                <div className="form-group description-group">
+                <div className="form-group description-group-submit">
                   <label htmlFor="description">Description</label>
                   <div className="textarea-container">
                     <textarea
@@ -489,7 +480,7 @@ const SubmitReportModal = ({ isOpen, onClose, onSubmit, technician}) => {
                     <span className="select-arrow" onClick={handleToggleDropdownStatus}>▼</span>
                     {isOpenStatusDD && (
                     <ul className="status-dropdown-list dropdown-list">
-                      {["Draft", "Submitted", "Reviewed"].map((status) => (
+                      {["Draft", "Submitted"].map((status) => (
                         <li key={status} onClick={() => handleSelectStatus(status)}>
                           {status}
                         </li>

@@ -30,7 +30,7 @@ const Table = ({ requests, onRowClick, selectedRequest }) => {
                   <td>{request.service_call? request.service_call.service_ticket.ticket_id : ""}</td>
                   <td>{request.service_request_id}</td>
                   <td>{request.service_call ? request.service_call.service_call_id : "Null"}</td>
-                  <td>{request.request_date ? request.request_date: "Null"}</td>
+                  <td>{new Date(request.request_date).toISOString().split("T")[0] || "Null"}</td>
                   <td>{request.request_type}</td>
                   <td>{request.request_status}</td>
                 </tr>

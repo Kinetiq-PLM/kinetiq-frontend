@@ -475,7 +475,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report, technician }) =>
               </div>
 
               <div className="form-column">
-                <div className="form-group description-group">
+                <div className="form-group description-group-submit">
                   <label htmlFor="description">Description</label>
                   <div className="textarea-container">
                     <textarea
@@ -509,7 +509,7 @@ const UpdateReportModal = ({ isOpen, onClose, onUpdate, report, technician }) =>
                     <span className="select-arrow" onClick={handleToggleDropdownStatus}>▼</span>
                     {isOpenStatusDD && (
                     <ul className="status-dropdown-list dropdown-list">
-                      {["Draft", "Submitted", "Reviewed"].map((status) => (
+                      {["Draft", "Submitted"].map((status) => (
                         <li key={status} onClick={() => handleSelectStatus(status)}>
                           {status}
                         </li>
