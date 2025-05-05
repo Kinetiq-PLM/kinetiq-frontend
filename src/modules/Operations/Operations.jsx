@@ -3,13 +3,14 @@ import './styles/Operations.css';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const COLORS = ['#2ab7b7', '#90f0f0', '#53c5d0', '#3187b3'];
+const docTypes = ['Total', 'Goods Receipt', 'Goods Receipt PO', 'Goods Issue', 'A/R Credit Memo'];
 
-const Operations = () => {
+const Operations = ({employee_id}) => {
   const [chartSize, setChartSize] = useState({
     width: window.innerWidth > 600 ? 600 : 400,
     height: window.innerWidth > 600 ? 450 : 320
   });
-
+  const PIE_ANIMATION_DURATION = 1000;
   const [activeIndex, setActiveIndex] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [statusCounts, setStatusCounts] = useState({
@@ -37,58 +38,81 @@ const Operations = () => {
     
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+  const [currentTypeIndex, setCurrentTypeIndex] = useState(0);
+  const [statusByType, setStatusByType] = useState({});
 
   const fetchData = async () => {
     try {
       const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      if (!response.ok) throw new Error('Network response was not ok');
+  
       const data = await response.json();
-      
       setDocuments(data);
-      
-      // Calculate status counts
-      const counts = {
-        Draft: 0,
-        Open: 0,
-        Closed: 0,
-        Cancelled: 0
+  
+      const grouped = {
+        Total: { Draft: 0, Open: 0, Closed: 0, Cancelled: 0 },
+        'Goods Receipt': { Draft: 0, Open: 0, Closed: 0, Cancelled: 0 },
+        'Goods Receipt PO': { Draft: 0, Open: 0, Closed: 0, Cancelled: 0 },
+        'Goods Issue': { Draft: 0, Open: 0, Closed: 0, Cancelled: 0 },
+        'A/R Credit Memo': { Draft: 0, Open: 0, Closed: 0, Cancelled: 0 },
       };
-      
+  
       let total = 0;
-      
+  
       data.forEach(doc => {
-        counts[doc.status] = (counts[doc.status] || 0) + 1;
+        const type = doc.document_type || 'Unknown';
+        const status = doc.status;
         const amount = parseFloat(doc.transaction_cost) || 0;
+  
         total += amount;
+  
+        // Total bucket
+        if (grouped['Total'][status] !== undefined) {
+          grouped['Total'][status]++;
+        }
+  
+        // Specific type bucket
+        if (grouped[type] && grouped[type][status] !== undefined) {
+          grouped[type][status]++;
+        }
       });
-      
-      setStatusCounts(counts);
+  
+      setStatusByType(grouped);
       setTotalValue(total);
-      
-      // Set current timestamp
-      const now = new Date();
-      setTimestamp(now.toLocaleString());
-      
+      setTimestamp(new Date().toLocaleString());
       setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
       setLoading(false);
     }
   };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTypeIndex(prev => (prev + 1) % docTypes.length);
+    }, 5000); // Change slide every 5 seconds
+  
+    return () => clearInterval(interval);
+  }, []);
+    
+  const [fadeStatus, setFadeStatus] = useState(false);
+
 
   const handlePieClick = (_, index) => {
     setActiveIndex(index);
   };
 
   // Prepare data for pie chart
+  const currentType = docTypes[currentTypeIndex];
+  const counts = statusByType[currentType] || { Draft: 0, Open: 0, Closed: 0, Cancelled: 0 };
+
   const pieData = [
-    { name: 'Draft', value: statusCounts.Draft },
-    { name: 'Open', value: statusCounts.Open },
-    { name: 'Closed', value: statusCounts.Closed },
-    { name: 'Cancelled', value: statusCounts.Cancelled },
+    { name: 'Draft', value: counts.Draft },
+    { name: 'Open', value: counts.Open },
+    { name: 'Closed', value: counts.Closed },
+    { name: 'Cancelled', value: counts.Cancelled },
   ];
+
+  
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-PH', {
@@ -98,6 +122,20 @@ const Operations = () => {
       maximumFractionDigits: 2
     }).format(amount);
   };
+  const [employeeName, setEmployeeName] = useState('');
+  useEffect(() => {
+    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/')
+      .then(response => response.json())
+      .then(data => {
+        const match = data.employees.find(emp => emp.employee_id === employee_id);
+        if (match) {
+          setEmployeeName(match.first_name); // Or match.employee_name if you want full name
+        }
+      })
+      .catch(error => {
+        console.error('Failed to fetch employee data:', error);
+      });
+  }, [employee_id]);
 
   if (loading) {
     return (
@@ -112,13 +150,14 @@ const Operations = () => {
       </div>
     );
   }
+  
 
   return (
     <div className="operations">
       <div className="body-content-container">
         <div className="operations-container">
           <div className="operations-header">
-            <h2 className="operations-welcome-text">Welcome back, Elena!</h2>
+            <h2 className="operations-welcome-text">Welcome back, {employeeName}!</h2>
             <div className="operations-total-box">
               <p className="operations-total-label">Total Value</p>
               <p className="operations-total-amount">{formatCurrency(totalValue)}</p>
@@ -128,22 +167,24 @@ const Operations = () => {
           <div className="operations-chart-section">
             <p className="operations-breadcrumb">Operations / Dashboard</p>
             <PieChart width={chartSize.width} height={chartSize.height}>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                innerRadius={100}
-                outerRadius={180}
-                label={({ name, percent }) =>
-                  `${name} ${(percent * 100).toFixed(1)}%`
-                }
-                activeIndex={activeIndex}
-                onClick={handlePieClick}
-                labelLine={{ strokeWidth: 2, stroke: '#066', strokeDasharray: '0' }}
-                isAnimationActive={true}
-              >
+            <Pie
+              key={currentTypeIndex}  // ADD THIS LINE
+              data={pieData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={100}
+              outerRadius={180}
+              label={({ name, percent }) =>
+                `${name} ${(percent * 100).toFixed(1)}%`
+              }
+              activeIndex={activeIndex}
+              onClick={handlePieClick}
+              labelLine={{ strokeWidth: 2, stroke: '#066', strokeDasharray: '0' }}
+              isAnimationActive={true}
+            >
+
                 {pieData.map((entry, index) => (
                   <Cell
                     key={index}
@@ -156,7 +197,7 @@ const Operations = () => {
               </Pie>
               <Tooltip />
             </PieChart>
-            <h3 className="operations-chart-title">Total Documents</h3>
+            <h3 className="operations-chart-title">{currentType} Documents</h3>
             <p className="operations-timestamp">As of: {timestamp}</p>
           </div>
 
@@ -168,6 +209,10 @@ const Operations = () => {
                   <div
                     key={item.name}
                     className={`operations-status-card operations-${item.name.toLowerCase()}-card`}
+                    style={{
+                      transition: `all ${PIE_ANIMATION_DURATION}ms ease-out`,
+                      opacity: currentTypeIndex % 2 ? 0.9 : 1 // Optional: slight opacity change
+                    }}
                   >
                     <p className="operations-status-count">{item.value}</p>
                     <p className="operations-status-label">{item.name}</p>

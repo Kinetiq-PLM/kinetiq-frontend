@@ -209,3 +209,12 @@
   font-size: 1.2rem;
   color: #333;
 }
+.operations .operations-status-card {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+.operations .operations-status-card.fade {
+  opacity: 0;
+  transform: scale(0.95);
+}
