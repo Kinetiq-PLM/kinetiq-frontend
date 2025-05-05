@@ -1,6 +1,7 @@
 // components/picking/PickingTable.jsx
 import React, { useState } from 'react';
 import '../../styles/Picking.css';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) => {
   const [sortField, setSortField] = useState('picking_list_id');
@@ -240,7 +241,15 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
                   <td>{list.delivery_id || '-'}</td>
                   <td>{getDeliveryTypeDisplay(list.delivery_type)}</td>
                   <td>{getWarehouseDisplay(list)}</td>
-                  <td className="centered-cell">{list.items_details?.length || 0}</td>
+                  <td className="centered-cell">
+                    {list.items_details?.length || 0}
+                    {list.items_details && 
+                     new Set(list.items_details.filter(i => i.delivery_note_id).map(i => i.delivery_note_id)).size > 1 && (
+                      <span className="multiple-notes-indicator" title="Multiple delivery notes">
+                        <FaExclamationTriangle />
+                      </span>
+                    )}
+                  </td>
                   <td>{getEmployeeName(list.picked_by)}</td>
                   <td className={`status-cell ${getStatusClass(list.picked_status)}`}>
                     {list.picked_status || 'Unknown'}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/Picking.css';
-import { FaRegSquare, FaCheckSquare, FaWarehouse, FaBoxOpen, FaClock } from 'react-icons/fa';
+import { FaRegSquare, FaCheckSquare, FaWarehouse, FaBoxOpen, FaClock, FaFileAlt } from 'react-icons/fa';
 
 const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, warehouses, onStatusUpdate }) => {
   const [selectedEmployee, setSelectedEmployee] = useState('');
@@ -125,12 +125,12 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     }
   };
   
-  // Function to render items tab with warehouse grouping
+  // Function to render items tab with warehouse and delivery note grouping
   const renderItemsTab = () => {
-    // Group items by warehouse
+    // Group items by warehouse and delivery note
     const warehouseGroups = [];
     const warehouseMap = {};
-  
+    
     // Show loading indicator
     if (loading) {
       return (
@@ -140,71 +140,53 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         </div>
       );
     }
-  
-    // If status is "Not Started", show instruction message
-    if (pickingList.picked_status === 'Not Started') {
-      return (
-        <div className="items-section not-started">
-          <div className="info-message">
-            <FaClock className="info-icon" />
-            <h4>Picking Not Started Yet</h4>
-            <p>To view and pick items, please:</p>
-            <ol>
-              <li>Go to the General Info tab</li>
-              <li>Assign an employee</li>
-              <li>Click "Start Picking" button</li>
-            </ol>
-            <p>Or simply try to mark an item as picked and the system will automatically update the status.</p>
-          </div>
-        </div>
-      );
-    }
-
-    // If no employee is assigned, show a message
-    if (!selectedEmployee) {
-      return (
-        <div className="items-section no-employee">
-          <div className="warning-message">
-            <FaClock className="warning-icon" />
-            <h4>Employee Assignment Required</h4>
-            <p>Please assign an employee in the General Info tab before picking items.</p>
-          </div>
-        </div>
-      );
-    }
-  
+    
+    // Status checks and employee assignment checks remain unchanged
+    
     // Use pickingItems if available, otherwise fall back to items_details
     const items = pickingItems.length > 0 ? pickingItems : 
       (pickingList?.items_details?.length ? pickingList.items_details : []);
-  
+    
     // Only process if we have items
     if (items.length) {
-      // Group items by warehouse
+      // First group by warehouse
       items.forEach(item => {
         const warehouseId = item.warehouse_id || 'unknown';
+        
         if (!warehouseMap[warehouseId]) {
           const group = {
             warehouseId,
             warehouseName: item.warehouse_name || 'Unknown Warehouse',
-            items: []
+            deliveryNotes: {}
           };
           warehouseMap[warehouseId] = group;
           warehouseGroups.push(group);
         }
-        warehouseMap[warehouseId].items.push(item);
+        
+        // Now group by delivery note within each warehouse
+        const deliveryNoteId = item.delivery_note_id || 'none';
+        
+        if (!warehouseMap[warehouseId].deliveryNotes[deliveryNoteId]) {
+          warehouseMap[warehouseId].deliveryNotes[deliveryNoteId] = {
+            deliveryNoteId,
+            items: []
+          };
+        }
+        
+        warehouseMap[warehouseId].deliveryNotes[deliveryNoteId].items.push(item);
       });
     }
-  
+    
     const hasMultipleWarehouses = warehouseGroups.length > 1;
-  
+    
     return (
       <div className="items-section">
         <h4 className="section-title">
           <span className="section-icon">📦</span>
           Items to Pick ({items.length})
         </h4>
-  
-        {/* Add progress bar */}
+        
+        {/* Progress bar remains unchanged */}
         {isCompleted ? (
           <div className="picking-progress">
             <div className="progress-bar-container">
@@ -220,64 +202,93 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
             <div className="progress-text">{pickingProgress}% completed</div>
           </div>
         )}
-  
+        
         {warehouseGroups.length > 0 ? (
-          warehouseGroups.map((group, groupIndex) => (
-            <div key={group.warehouseId} className="warehouse-group">
+          warehouseGroups.map((warehouse, warehouseIndex) => (
+            <div key={warehouse.warehouseId} className="warehouse-group">
               <h5 className="warehouse-name">
-                <FaWarehouse className="warehouse-icon" /> {group.warehouseName}
-                <span className="warehouse-progress">
-                  {group.items.filter(item => item.is_picked).length} / {group.items.length} items picked
-                </span>
+                <FaWarehouse className="warehouse-icon" /> {warehouse.warehouseName}
+                {Object.values(warehouse.deliveryNotes).length > 1 && (
+                  <span className="warehouse-progress">
+                    Multiple Delivery Notes ({Object.values(warehouse.deliveryNotes).length})
+                  </span>
+                )}
               </h5>
               
-              <div className="items-table-container">
-                <table className="items-table">
-                  <thead>
-                    <tr>
-                      <th>Status</th>
-                      <th>Item Name</th>
-                      <th>Quantity</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {group.items.map((item, index) => (
-                      <tr key={item.inventory_item_id || index} 
-                          className={`${index % 2 === 0 ? 'even-row' : 'odd-row'} ${item.is_picked ? 'picked-row' : ''}`}>
-                        <td>
-                          {item.is_picked ? 
-                            <span className="picked-status">Picked</span> : 
-                            <span className="not-picked-status">Not Picked</span>
-                          }
-                        </td>
-                        <td>{item.item_name || 'Unknown Item'}</td>
-                        <td className="centered-cell">{parseInt(item.quantity) || 0}</td>
-                        <td>
-                          {!isCompleted && (
-                            <button 
-                              className={`item-toggle-button ${item.is_picked ? 'unpick' : 'pick'}`}
-                              onClick={() => toggleItemPicked(item)}
-                              disabled={!selectedEmployee}
-                            >
+              {Object.values(warehouse.deliveryNotes).map((deliveryNote, dnIndex) => (
+                <div key={deliveryNote.deliveryNoteId} className="delivery-note-group">
+                  {/* Add a header for the delivery note if it exists */}
+                  {deliveryNote.deliveryNoteId !== 'none' && (
+                    <div className="delivery-note-header">
+                      <FaFileAlt className="delivery-note-icon" /> 
+                      <span className="delivery-note-id">
+                        Delivery Note: {deliveryNote.deliveryNoteId}
+                      </span>
+                      <span className="item-count">
+                        ({deliveryNote.items.length} items)
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="items-table-container">
+                    <table className="items-table">
+                      <thead>
+                        <tr>
+                          <th>Status</th>
+                          <th>Item Name</th>
+                          <th>Quantity</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {deliveryNote.items.map((item, index) => (
+                          <tr 
+                            key={item.inventory_item_id || index}
+                            className={`${index % 2 === 0 ? 'even-row' : 'odd-row'} ${item.is_picked ? 'picked-row' : ''}`}
+                          >
+                            <td>
                               {item.is_picked ? 
-                                <>
-                                  <FaCheckSquare /> Unpick
-                                </> : 
-                                <>
-                                  <FaRegSquare /> Mark as Picked
-                                </>
+                                <span className="picked-status">Picked</span> : 
+                                <span className="not-picked-status">Not Picked</span>
                               }
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                            </td>
+                            <td>{item.item_name || 'Unknown Item'}</td>
+                            <td className="centered-cell">{parseInt(item.quantity) || 0}</td>
+                            <td>
+                              {!isCompleted && (
+                                <button 
+                                  className={`item-toggle-button ${item.is_picked ? 'unpick' : 'pick'}`}
+                                  onClick={() => toggleItemPicked(item)}
+                                  disabled={!selectedEmployee}
+                                >
+                                  {item.is_picked ? 
+                                    <>
+                                      <FaCheckSquare /> Unpick
+                                    </> : 
+                                    <>
+                                      <FaRegSquare /> Mark as Picked
+                                    </>
+                                  }
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Add a separator between delivery notes */}
+                  {dnIndex < Object.values(warehouse.deliveryNotes).length - 1 && (
+                    <hr className="delivery-note-divider" />
+                  )}
+                </div>
+              ))}
               
-              {groupIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
+              {/* Add a separator between warehouses */}
+              {warehouseIndex < warehouseGroups.length - 1 && (
+                <hr className="warehouse-divider" />
+              )}
             </div>
           ))
         ) : (

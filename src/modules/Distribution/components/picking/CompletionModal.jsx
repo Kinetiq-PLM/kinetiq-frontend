@@ -9,7 +9,8 @@ import {
   FaListAlt,
   FaClipboardCheck,
   FaBox,
-  FaArrowRight
+  FaArrowRight,
+  FaFileAlt,
 } from 'react-icons/fa';
 import '../../styles/Picking.css';
 
@@ -124,7 +125,28 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
                 </div>
               </div>
             </div>
-            
+
+            {/* Delivery Notes Information */}
+            {pickingList.picking_items && pickingList.picking_items.some(item => item.delivery_note_id) && (
+              <div className="detail-row">
+                <div className="detail-item full-width">
+                  <span className="detail-label">Delivery Notes</span>
+                  <div className="detail-value-list">
+                    {Array.from(new Set(
+                      pickingList.picking_items
+                        .filter(item => item.delivery_note_id)
+                        .map(item => item.delivery_note_id)
+                    )).map(noteId => (
+                      <span key={noteId} className="delivery-note-badge">
+                        <FaFileAlt className="delivery-note-badge-icon" />
+                        {noteId}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* What happens next section */}
             <div className="info-section">
               <h4 className="section-header status-completed">
