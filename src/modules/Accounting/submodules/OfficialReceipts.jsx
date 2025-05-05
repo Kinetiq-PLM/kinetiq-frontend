@@ -139,11 +139,12 @@ const OfficialReceipts = () => {
     }));
   }, [user]);
 
-  const fetchData = async () => {
+  const fetchData = async (retries = 3, delay = 500) => {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       const response = await axios.get(OFFICIAL_RECEIPTS_ENDPOINT, config);
+      console.log("Fetched receipts:", response.data);
       setReceipts(response.data);
       setData(
         response.data.map((entry) => [
@@ -166,6 +167,11 @@ const OfficialReceipts = () => {
           .map((entry) => entry.invoice_id)
       );
     } catch (error) {
+      if (retries > 0) {
+        console.warn(`Retrying fetchData (${retries} attempts left)...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return fetchData(retries - 1, delay * 2);
+      }
       console.error("Error fetching receipts:", error);
       setValidation({
         isOpen: true,
@@ -180,19 +186,49 @@ const OfficialReceipts = () => {
     fetchData();
   }, []);
 
-  const calculateRemainingAmount = (newSettledAmount, amountDue) => {
+  const calculateRemainingAmount = (newSettledAmount, invoiceId, amountDue, totalAmount) => {
     const settledAmount = parseFloat(newSettledAmount) || 0;
-    if (isNaN(settledAmount)) {
-      throw new Error("Invalid settled amount. Please enter a valid number.");
+    if (isNaN(settledAmount) || settledAmount < 0) {
+      throw new Error("Invalid settled amount. Please enter a valid non-negative number.");
     }
 
-    const remainingBalance = parseFloat(amountDue);
-    if (isNaN(remainingBalance)) {
-      throw new Error("Invalid amount due. Please enter a valid number.");
+    if (!invoiceId) {
+      throw new Error("Invoice ID is required to calculate remaining amount.");
+    }
+
+    console.log("All receipts for invoiceId:", invoiceId, receipts.filter((r) => r.invoice_id === invoiceId));
+
+    const invoiceReceipts = receipts
+      .filter((r) => r.invoice_id === invoiceId && !isNaN(parseFloat(r.remaining_amount)))
+      .sort((a, b) => {
+        const amountA = parseFloat(a.remaining_amount);
+        const amountB = parseFloat(b.remaining_amount);
+        return amountA - amountB; // Lowest remaining_amount first
+      });
+
+    console.log("Sorted receipts by remaining_amount:", invoiceReceipts);
+
+    const lowestReceipt = invoiceReceipts[0];
+    let remainingBalance;
+
+    if (lowestReceipt && !isNaN(parseFloat(lowestReceipt.remaining_amount))) {
+      remainingBalance = parseFloat(lowestReceipt.remaining_amount);
+      console.log(`Using lowest remaining_amount from ${lowestReceipt.or_id} (${lowestReceipt.or_date}): ${remainingBalance}`);
+    } else {
+      remainingBalance = parseFloat(amountDue) || parseFloat(totalAmount) || 0;
+      console.log(`No valid receipts found. Falling back to amountDue: ${amountDue} or totalAmount: ${totalAmount}, remainingBalance: ${remainingBalance}`);
+    }
+
+    if (isNaN(remainingBalance) || remainingBalance < 0) {
+      throw new Error("Invalid remaining balance. Please check the invoice receipts or input amounts.");
+    }
+
+    if (settledAmount > remainingBalance) {
+      throw new Error(`Settled amount (${settledAmount}) exceeds remaining balance (${remainingBalance}).`);
     }
 
     const newRemaining = remainingBalance - settledAmount;
-    return newRemaining >= 0 ? newRemaining : 0;
+    return newRemaining;
   };
 
   const generateReferenceNumber = () => {
@@ -227,7 +263,7 @@ const OfficialReceipts = () => {
   const handleSubmit = async () => {
     if (
       !reportForm.startDate ||
-      !reportForm.totalAmount ||
+      !reportForm.salesInvoiceId ||
       !reportForm.amountDue ||
       !reportForm.amountPaid ||
       !reportForm.paymentMethod ||
@@ -243,30 +279,33 @@ const OfficialReceipts = () => {
     }
 
     try {
+      // Fallback for total_amount if blank
+      let totalAmount = parseFloat(reportForm.totalAmount);
+      if (isNaN(totalAmount) || !reportForm.totalAmount) {
+        const invoiceReceipts = receipts
+          .filter((r) => r.invoice_id === reportForm.salesInvoiceId && !isNaN(parseFloat(r.remaining_amount)))
+          .sort((a, b) => parseFloat(a.remaining_amount) - parseFloat(b.remaining_amount));
+        const lowestReceipt = invoiceReceipts[0];
+        totalAmount = lowestReceipt ? parseFloat(lowestReceipt.total_amount) : 0;
+        if (isNaN(totalAmount) || totalAmount <= 0) {
+          throw new Error("Invalid total amount. Please ensure a valid invoice is selected.");
+        }
+      }
+
       const newRemainingAmount = calculateRemainingAmount(
         reportForm.amountPaid,
-        reportForm.amountDue
+        reportForm.salesInvoiceId,
+        reportForm.amountDue,
+        totalAmount
       );
-
-      if (
-        parseFloat(reportForm.amountPaid) > parseFloat(reportForm.amountDue)
-      ) {
-        setValidation({
-          isOpen: true,
-          type: "warning",
-          title: "Invalid Payment",
-          message: `The settled amount (${reportForm.amountPaid}) exceeds the amount due (${reportForm.amountDue}).`,
-        });
-        return;
-      }
 
       const referenceNumber = generateReferenceNumber();
       const newReceipt = {
         or_id: generateCustomORID(),
-        invoice_id: reportForm.salesInvoiceId || null,
+        invoice_id: reportForm.salesInvoiceId,
         customer_id: reportForm.customerId,
         or_date: reportForm.startDate,
-        total_amount: parseFloat(reportForm.totalAmount).toFixed(2),
+        total_amount: totalAmount.toFixed(2),
         amount_due: parseFloat(reportForm.amountDue).toFixed(2),
         settled_amount: parseFloat(reportForm.amountPaid).toFixed(2),
         remaining_amount: newRemainingAmount.toFixed(2),
@@ -277,11 +316,13 @@ const OfficialReceipts = () => {
           reportForm.paymentMethod === "Bank Transfer" ? reportForm.bankAccount : null,
       };
 
+      console.log("Submitting receipt:", newReceipt);
+
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       const response = await axios.post(OFFICIAL_RECEIPTS_ENDPOINT, newReceipt, config);
       if (response.status === 201) {
-        fetchData();
+        await fetchData();
         closeModal();
         setValidation({
           isOpen: true,
@@ -303,15 +344,15 @@ const OfficialReceipts = () => {
         isOpen: true,
         type: "error",
         title: "Submission Failed",
-        message: error.response?.data?.detail || "Failed to connect to the API.",
+        message: error.message || "Failed to connect to the API.",
       });
     }
   };
 
   const sortedData = [...data].sort((a, b) => {
     if (sortOrder === "asc" || sortOrder === "desc") {
-      const valA = parseFloat(a[5]);
-      const valB = parseFloat(b[5]);
+      const valA = parseFloat(a[7]); // Sort by Remaining Amount
+      const valB = parseFloat(b[7]);
       if (isNaN(valA) || isNaN(valB)) return 0;
       return sortOrder === "asc" ? valA - valB : valB - valA;
     }
@@ -402,11 +443,6 @@ const OfficialReceipts = () => {
             font-size: 12px;
             color: #777;
           }
-          .confidential {
-            color: #cc0000;
-            font-style: italic;
-            margin-bottom: 10px;
-          }
           .watermark {
             position: absolute;
             top: 50%;
@@ -429,9 +465,7 @@ const OfficialReceipts = () => {
               <div class="logo-subtitle">Medical Equipment Manufacturing Company.</div>
             </div>
           </div>
-  
           <div class="document-title">OFFICIAL RECEIPT</div>
-          
           <table>
             <tbody>
               ${columns.map((col, i) => `
@@ -442,7 +476,6 @@ const OfficialReceipts = () => {
               `).join('')}
             </tbody>
           </table>
-  
           <div class="footer">
             <div>Kinetiq - PLM</div>
             <div>Printed on ${new Date().toLocaleString()}</div>
@@ -496,7 +529,7 @@ const OfficialReceipts = () => {
           </div>
           <div>
             <Button
-              name="Update Receipt"
+              name="Create Receipt"
               variant="standard2"
               onclick={openModal}
             />
