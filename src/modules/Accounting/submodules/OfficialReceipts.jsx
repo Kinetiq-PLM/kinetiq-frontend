@@ -443,6 +443,11 @@ const OfficialReceipts = () => {
             font-size: 12px;
             color: #777;
           }
+          .confidential {
+            color: #cc0000;
+            font-stile: italic;
+            margin-bottom: 10px;
+          }
           .watermark {
             position: absolute;
             top: 50%;
