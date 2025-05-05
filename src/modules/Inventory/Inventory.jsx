@@ -131,7 +131,7 @@ const BodyContent = () => {
   // Table configurations (map data structure remains similar)
   const tableConfigs = {
     Products: {
-      columns: ["Name", "Item ID", "Total Stock", "Committed Stock", "Available Stock", "Status", "Warehouse", "UOM"], // Added UOM
+      columns: ["Name", "Item ID", "Total Stock", "Committed Stock", "Available Stock", "Status", "UOM", "Warehouse"], // Added UOM
       data: productData, // Use the full dataset here
       loading: loadingProducts,
       baseDataProcessor: (product) => { // Moved processing logic here
@@ -159,7 +159,7 @@ const BodyContent = () => {
       },
     },
     Assets: {
-      columns: ["Name", "Item ID", "Serial No", "Quantity", "Status", "Warehouse", "UOM"], // Added UOM
+      columns: ["Name", "Item ID", "Serial No", "Quantity", "Status", "Warehouse"], // Added UOM
       data: assetData, // Use the full dataset here
       loading: loadingAssets,
       baseDataProcessor: (asset) => {
@@ -180,7 +180,7 @@ const BodyContent = () => {
       },
     },
     "Raw Materials": {
-      columns: ["Name", "Item ID", "Batch No.", "Batch Qty", "Total Stock (Type)", "On Order (Type)", "Status", "Warehouse", "Expiry", "UOM"], // Added UOM
+      columns: ["Name", "Item ID", "Batch No.", "Batch Qty", "Total Stock (Type)", "On Order (Type)", "Status", "UOM", "Expiry", "Warehouse"], // Added UOM
       data: rawMaterialBatchData, // Use the full dataset here
       loading: loadingRawMatBatches || loadingAggregatedRawMats, // Depends on both fetches
       baseDataProcessor: (batch) => {
