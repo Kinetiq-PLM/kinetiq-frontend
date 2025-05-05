@@ -64,7 +64,7 @@
 
 .InternalTransfer .table-container thead tr {
     width: 100%;
-    display: table;
+
     table-layout: fixed;
 }
 
@@ -448,7 +448,7 @@
     }
   }
 
-  .InternalTransfer table th:nth-child(1),
+.InternalTransfer table th:nth-child(1),
 .InternalTransfer table td:nth-child(1) {
     width: 2rem;
 }
