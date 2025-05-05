@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
 import Table from "../components/table/Table";
 import Search from "../components/search/Search";
-import Button from "../components/button/Button";
 import NotifModal from "../components/modalNotif/NotifModal";
 import AccountsPayableReceiptModal from "../components/accountPayableReceipts/apModal";
 
@@ -80,23 +79,6 @@ const AccountsPayableReceipt = () => {
     console.log("Opening modal with row:", row);
     setSelectedRow(row);
     setIsCreating(false);
-    setModalOpen(true);
-  };
-
-  const handleCreateReceipt = () => {
-    const initialRow = [
-      "", // ap_id (generated in modal)
-      "", // invoice_id
-      "", // amount
-      "", // payment_date
-      "", // payment_method
-      "", // paid_by
-      "", // reference_number (generated in modal)
-      "Processing", // status
-    ];
-    console.log("Creating receipt, initialRow:", initialRow);
-    setSelectedRow(initialRow);
-    setIsCreating(true);
     setModalOpen(true);
   };
 
@@ -225,14 +207,6 @@ const AccountsPayableReceipt = () => {
               placeholder="Search Record..."
               value={searching}
               onChange={(e) => setSearching(e.target.value)}
-            />
-          </div>
-          <div className="component-container">
-            <Button
-              type="button"
-              name="Create Receipt"
-              variant="standard2"
-              onclick={handleCreateReceipt}
             />
           </div>
         </div>
