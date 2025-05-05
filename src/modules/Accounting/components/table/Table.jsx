@@ -37,11 +37,11 @@ const Table = ({
                 <table>
                     <thead>
                         <tr>
+                            {(showPrintButton || showEditButton) && <th>Actions</th>}
                             {enableCheckbox && <th></th>}
                             {columns.map((column, index) => (
                                 <th key={index}>{column}</th>
                             ))}
-                            {showPrintButton && <th>Actions</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -50,6 +50,30 @@ const Table = ({
                                 key={rowIndex}
                                 className={selectedRows.includes(rowIndex) ? "selected-row" : ""}
                             >
+                                {(showPrintButton || showEditButton) && (
+                                    <td className="actions-cell">
+                                        <div className="icon-group">
+                                            {showPrintButton && (
+                                                <Printer
+                                                    size={20}
+                                                    color="#4A90E2"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => handlePrintRow(row)}
+                                                    title="Print Row"
+                                                />
+                                            )}
+                                            {showEditButton && (
+                                                <Pencil
+                                                    size={20}
+                                                    color="#4B5563"
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => handleEditRow(row)}
+                                                    title="Edit Row"
+                                                />
+                                            )}
+                                        </div>
+                                    </td>
+                                )}
                                 {enableCheckbox && (
                                     <td>
                                         <input
@@ -89,31 +113,6 @@ const Table = ({
                                         </td>
                                     );
                                 })}
-                                {(showPrintButton || showEditButton) && (
-                                    <td className="actions-cell">
-                                        <div className="icon-group">
-                                            {showPrintButton && (
-                                                <Printer
-                                                    size={20}
-                                                    color="#4A90E2"
-                                                    style={{ cursor: "pointer" }}
-                                                    onClick={() => handlePrintRow(row)}
-                                                    title="Print Row"
-                                                />
-                                            )}
-                                            {showEditButton && (
-                                                <Pencil
-                                                    size={20}
-                                                    color="#4B5563"
-                                                    style={{ cursor: "pointer" }}
-                                                    onClick={() => handleEditRow(row)}
-                                                    title="Edit Row"
-                                                />
-                                            )}
-                                        </div>
-                                    </td>
-                                )}
-
                             </tr>
                         ))}
                     </tbody>
