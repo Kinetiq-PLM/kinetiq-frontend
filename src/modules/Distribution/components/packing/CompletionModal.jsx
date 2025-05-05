@@ -253,4 +253,50 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
   );
 };
 
+// Add this component to show partial delivery progress
+const PartialDeliveryInfo = ({ deliveryNotesInfo }) => {
+  if (!deliveryNotesInfo || !deliveryNotesInfo.is_partial_delivery) return null;
+  
+  const { current_delivery, total_deliveries, completed_deliveries } = deliveryNotesInfo;
+  const progressPercentage = (completed_deliveries / total_deliveries) * 100;
+  
+  return (
+    <div className="partial-delivery-info">
+      <h4>Partial Delivery Progress</h4>
+      <div className="progress-bar-container">
+        <div 
+          className="progress-bar" 
+          style={{ width: `${progressPercentage}%` }}
+        ></div>
+      </div>
+      <div className="progress-text">
+        {completed_deliveries} of {total_deliveries} deliveries completed
+      </div>
+      
+      <div className="delivery-notes-list">
+        {deliveryNotesInfo.delivery_notes.map((note, index) => (
+          <div 
+            key={note.delivery_note_id} 
+            className={`delivery-note-item ${
+              index + 1 === current_delivery ? 'current-delivery' : 
+              index + 1 < current_delivery ? 'completed-delivery' : 'pending-delivery'
+            }`}
+          >
+            <div className="delivery-note-sequence">{index + 1}</div>
+            <div className="delivery-note-content">
+              <div className="delivery-note-id">{note.delivery_note_id}</div>
+              <div className="delivery-note-details">
+                <span className="item-count">{note.total_quantity || 0} items</span>
+                <span className={`status-badge status-${String(note.shipment_status || '').toLowerCase()}`}>
+                  {note.shipment_status || 'Pending'}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export default CompletionModal;

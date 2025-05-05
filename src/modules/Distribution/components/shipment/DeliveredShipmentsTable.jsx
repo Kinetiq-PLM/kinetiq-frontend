@@ -118,7 +118,7 @@ const DeliveredShipmentsTable = ({ shipments, onShipmentSelect, selectedShipment
     
     return (
       <span className="sort-icon">
-        {sortDirection === 'asc' ? '↑' : '↓'}
+        {sortDirection === 'asc' ? '▲' : '▼'}
       </span>
     );
   };

@@ -143,7 +143,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
               <th onClick={() => handleSort("order_status")} className="sortable">
                 Status
                 {sortField === "order_status" && (
-                  <span className="sort-icon">{sortDirection === "asc" ? "↑" : "↓"}</span>
+                  <span className="sort-icon">{sortDirection === "asc" ? "▲" : "▼"}</span>
                 )}
               </th>
               <th>Is Project-Based?</th>
@@ -151,7 +151,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, deliveryType }) =
               <th onClick={() => handleSort("del_order_id")} className="sortable">
                 Delivery Order ID
                 {sortField === "del_order_id" && (
-                  <span className="sort-icon">{sortDirection === "asc" ? "↑" : "↓"}</span>
+                  <span className="sort-icon">{sortDirection === "asc" ? "▲" : "▼"}</span>
                 )}
               </th>
               {/* TEMPORARY: Approval column - Comment this line to hide the column */}

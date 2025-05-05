@@ -129,7 +129,7 @@ const ShipmentTable = ({ shipments, onShipmentSelect, selectedShipment, carriers
     
     return (
       <span className="sort-icon">
-        {sortDirection === 'asc' ? '↑' : '↓'}
+        {sortDirection === 'asc' ? '▲' : '▼'}
       </span>
     );
   };

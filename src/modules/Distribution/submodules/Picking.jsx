@@ -304,10 +304,21 @@ const Picking = () => {
       setShowCompletionModal(false);
       setRefreshTrigger(prev => prev + 1);
       
-      // Show success notification
-      toast.success('Picking list completed successfully! A new Packing List has been created.', {
-        autoClose: 5000 // Keep this message visible a bit longer
-      });
+      // Different success message based on whether this is a partial delivery
+      const isPartialDelivery = selectedList.delivery_notes_info && selectedList.delivery_notes_info.is_partial_delivery;
+      const currentBatch = isPartialDelivery ? selectedList.delivery_notes_info.current_delivery : null;
+      const totalBatches = isPartialDelivery ? selectedList.delivery_notes_info.total_deliveries : null;
+      
+      // Show success notification with batch-specific message if applicable
+      if (isPartialDelivery) {
+        toast.success(`Batch ${currentBatch} of ${totalBatches} picked successfully! This batch will now proceed to packing.`, {
+          autoClose: 5000 // Keep this message visible a bit longer
+        });
+      } else {
+        toast.success('Picking list completed successfully! A new Packing List has been created.', {
+          autoClose: 5000
+        });
+      }
       
     } catch (err) {
       toast.error(`Error: ${err.message}`);

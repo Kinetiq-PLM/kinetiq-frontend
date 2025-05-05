@@ -101,24 +101,29 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
             </div>
             <div className="confirmation-text">
               <p className="confirmation-message">
-                Are you sure you want to mark this picking list as completed?
+                {isPartialDelivery 
+                  ? `Are you sure you want to complete Batch ${currentDelivery} of ${totalDeliveries}?`
+                  : 'Are you sure you want to mark this picking list as completed?'
+                }
               </p>
               <p className="confirmation-submessage">
-                This will automatically create a new packing list
-                {isPartialDelivery && ' for this partial delivery'}.
+                {isPartialDelivery
+                  ? `This will complete the picking for the current batch (${currentDelivery}/${totalDeliveries}) and create a packing list for these items.`
+                  : 'This will automatically create a new packing list.'
+                }
               </p>
             </div>
           </div>
           
-          {/* Partial delivery info */}
+          {/* Partial delivery info - enhanced for clarity */}
           {isPartialDelivery && (
             <div className="partial-delivery-alert">
               <FaExclamationCircle className="alert-icon" />
               <div className="alert-text">
                 <p className="alert-title">Partial Delivery in Progress</p>
                 <p className="alert-message">
-                  You are completing delivery {currentDelivery} of {totalDeliveries}.
-                  After this delivery is shipped, the next one will become available for picking.
+                  You are completing batch {currentDelivery} of {totalDeliveries}.
+                  After this batch is shipped, the next batch will automatically become available for picking.
                 </p>
               </div>
             </div>
