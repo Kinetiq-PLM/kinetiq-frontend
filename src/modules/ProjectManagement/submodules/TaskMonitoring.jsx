@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/TaskMonitoring.css";
 import axios from 'axios';
-axios.defaults.baseURL = 'https://htm0n3ydog.execute-api.ap-southeast-1.amazonaws.com/dev';
-
 
 const API_URL = '/project-tasks/api';
 const ITEMS_PER_PAGE = 5; // Number of items to show per page

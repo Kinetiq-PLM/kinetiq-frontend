@@ -1,7 +1,6 @@
 // Enhanced Warranties.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-axios.defaults.baseURL = 'https://htm0n3ydog.execute-api.ap-southeast-1.amazonaws.com/dev';
 import "../styles/Warranties.css";
 
 const BodyContent = () => {
