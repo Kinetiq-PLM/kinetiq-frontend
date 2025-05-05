@@ -224,7 +224,7 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
             <div className="purchreq-table-header">
               <div>PR No.</div>
               <div>Employee Name</div>
-              <div>Department</div>
+              <div>Status</div>
               <div>
                 <span
                   className="sortable-header"

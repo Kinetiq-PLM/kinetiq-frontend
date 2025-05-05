@@ -136,7 +136,7 @@
 
 .purchreq .purchreq-table-scrollable {
   width: 100%;
-  max-height: auto;
+  max-height: 600px;
   overflow-x: auto;
   overflow-y: auto;
   scrollbar-width: thin;
