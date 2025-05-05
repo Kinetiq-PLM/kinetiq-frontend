@@ -282,23 +282,25 @@ const ApprovalTable = ({employee_id}) => {
           <table>
             <thead>
               <tr>
-                <th></th> {/* Checkbox column - no checkbox in header */}
-                <th>Request ID</th> {/* ID column next */}
                 {activePrimaryTab === "Delivery Request" ? (
                   <>
-                    <th>Item Name</th>
-                    <th>Quantity</th>
-                    <th>Date</th>
-                    <th>Delivery Type</th>
-                    <th>Warehouse Location</th>
-                    <th>Receiving Unit</th>
+                    <th className="deliveryTH"></th>
+                    <th className="deliveryTH">Request ID</th> {/* ID column next */}
+                    <th className="deliveryTH">Item Name</th>
+                    <th className="deliveryTH">Quantity</th>
+                    <th className="deliveryTH">Date</th>
+                    <th className="deliveryTH">Delivery Type</th>
+                    <th className="deliveryTH">Warehouse Location</th>
+                    <th className="deliveryTH">Receiving Unit</th>
                   </>
                 ) : (
                   <>
-                    <th>Product Name</th>
-                    <th>Reason for Rework</th>
-                    <th>Actual Quantity</th>
-                    <th>Rework Quantity</th>
+                    <th className="reworkTH"></th>
+                    <th className="reworkTH">Request ID</th>
+                    <th className="reworkTH">Product Name</th>
+                    <th className="reworkTH">Reason for Rework</th>
+                    <th className="reworkTH">Actual Quantity</th>
+                    <th className="reworkTH">Rework Quantity</th>
                   </>
                 )}
               </tr>
@@ -310,31 +312,39 @@ const ApprovalTable = ({employee_id}) => {
                 </tr>
               ) : filteredData.map((row, index) => (
                 <tr key={row?.delivery_id || row.rework_id }>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedRow === index}
-                      onChange={() => handleCheckboxChange(index, row)}
-                    />
-                  </td>
+                  
                  
                   {activePrimaryTab === "Delivery Request" ? (
                     <>
-                      <td>{row.delivery_id}</td>
-                      <td>{row.item_name}</td>
-                      <td>{row.quantity || 0}</td> 
-                      <td>{row.request_date}</td>
-                      <td>{row.delivery_type}</td>
-                      <td>{row.warehouse_location}</td>
-                      <td>{row.module_name}</td>
+                      <td className="deliveryTD">
+                        <input
+                          type="checkbox"
+                          checked={selectedRow === index}
+                          onChange={() => handleCheckboxChange(index, row)}
+                        />
+                      </td>
+                      <td className="deliveryTD">{row.delivery_id}</td>
+                      <td className="deliveryTD">{row.item_name}</td>
+                      <td className="deliveryTD">{row.quantity || 0}</td> 
+                      <td className="deliveryTD">{row.request_date}</td>
+                      <td className="deliveryTD">{row.delivery_type}</td>
+                      <td className="deliveryTD">{row.warehouse_location}</td>
+                      <td className="deliveryTD">{row.module_name}</td>
                     </>
                   ) : (
                     <>
-                      <td>{row?.rework_id || ""}</td>
-                      <td>{row?.product_name || ""}</td>
-                      <td>{row?.reason_rework || ""}</td>
-                      <td>{row?.actual_quantity || ""}</td>
-                      <td>{row?.quantity ?? ""}</td>
+                      <td className="reworkTD">
+                        <input
+                          type="checkbox"
+                          checked={selectedRow === index}
+                          onChange={() => handleCheckboxChange(index, row)}
+                        />
+                      </td>
+                      <td className="reworkTD">{row?.rework_id || ""}</td>
+                      <td className="reworkTD">{row?.product_name || ""}</td>
+                      <td className="reworkTD">{row?.reason_rework || ""}</td>
+                      <td className="reworkTD">{row?.actual_quantity || ""}</td>
+                      <td className="reworkTD">{row?.quantity ?? ""}</td>
                     </>
                   )}
                 </tr>
@@ -372,10 +382,6 @@ const ApprovalTable = ({employee_id}) => {
                   }}
                 />
               </div>
-            </div>
-
-
-            <div className="input-row">
               <div className="input-group">
                 <label>Delivery Type</label>
                 <input 
@@ -389,6 +395,11 @@ const ApprovalTable = ({employee_id}) => {
                   }}
                 />
               </div>
+            </div>
+
+
+            <div className="input-row">
+              
               <div className="input-group">
                 <label>Receiving Unit</label>
                 <input 
@@ -422,7 +433,7 @@ const ApprovalTable = ({employee_id}) => {
         )}
         {/* Input Fields (Only for Rework Order) */}
         {activePrimaryTab === "Rework Order" && (
-          <div className="input-container">
+          <div className="input-container reworkOrder">
             <div className="input-row">
               <div className="input-group">
                 <label>Product ID</label>
@@ -442,6 +453,8 @@ const ApprovalTable = ({employee_id}) => {
                   onChange={(e) => handleChange(e, 'reason_rework')}
                 />
               </div>
+            </div>
+            <div className="input-row">
               <div className="input-group">
                 <label>Actual Quantity</label>
                 <input 
@@ -509,8 +522,3 @@ export default ApprovalTable;
 
 
    
-
-
-
-
-
