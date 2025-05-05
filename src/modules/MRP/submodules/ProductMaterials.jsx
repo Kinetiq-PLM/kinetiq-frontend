@@ -9,9 +9,25 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [flag, setFlag] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [addProduct, setAddProduct] = useState(false);
+    const [addRawMaterial, setAddRawMaterial] = useState(false);
+    const [editRawMaterial, setEditRawMaterial] = useState(false);
     const [showHelpOptions, setShowHelpOptions] = useState(false);
     const [isProjectType, setIsProjectType] = useState(null);
     const [fetchMrpData, setFetchMrpData] = useState([]);
+
+    const [productId, setProductId] = useState("");
+    const [productName, setProductName] = useState("");
+    const [productDescription, setProductDescription] = useState("");
+
+    const [newRawMaterial, setNewRawMaterial] = useState("");
+    const [newMaterialId, setNewMaterialId] = useState("");
+    const [newQuantity, setNewQuantity] = useState("");
+    const [newUnits, setNewUnits] = useState("");
+
+    const [editRawMaterial2, setEditRawMaterial2] = useState("");
+    const [editMaterialId, setEditMaterialId] = useState("");
+    const [editQuantity, setEditQuantity] = useState("");
+    const [editUnits, setEditUnits] = useState("");
 
     const [selectedRowData, setSelectedRowData] = useState(null); 
     const [selectedOrderNo, setSelectedOrderNo] = useState([]);
@@ -23,13 +39,13 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [rawMaterials, setRawMaterials] = useState([]);
     const [mrpData, setMrpData] = useState([]);
 
+    const materialIdOptions = rawMaterials.map(item => item.materialId);
+
     const [principalOrder, setPrincipalItemOrder] = useState([]);
     const [pnpOrder, setPnpOrder] = useState([]);
     const [prinOrder, setPrincipalOrder] = useState([]);
     const baseurl = "http://127.0.0.1:8000";
     //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
-
-
 
     useEffect(() => {
         const fetchMrpData = async () => {
@@ -141,8 +157,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
       date,
       status,
     };
-  })
-  .filter(item => item.status !== "complete");
+    })
+    .filter(item => item.status !== "complete");
 
 
     
@@ -156,15 +172,22 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         borderRadius: 10,
         outline: '1.5px solid #E5E5E5',
         padding: '10px',
-        width: 290,
+        width: 290, 
         fontSize: 17,
         fontFamily: 'Inter',
         fontWeight: 400,
         color: '#585757',
         overflow: 'hidden',
     };
-      
 
+    useEffect(() => {
+        if (!editRawMaterial) {
+            setEditMaterialId("");
+            setEditRawMaterial2("");
+            setEditQuantity("");
+            setEditUnits("");
+        }
+    }, [editRawMaterial]);
 
     return (      
         <div className="mats">
@@ -186,12 +209,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <button onClick={() => { setAddProduct(true) }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                                 <span style={{paddingLeft: 10,paddingRight: 10 }}>Add Product</span>
                         </button>
-                        
-
                     </div>
-
-                    
-
+    
                     <div className="search-container" style={{background: '#F7F9FB', borderRadius: 8, outline: '1px rgba(132,132,132,0.25) solid', padding: 5, display: 'flex', marginTop: 10, paddingRight: 100, alignItems: 'stretch',}}>
                         <input placeholder="Search Product ID..." type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{flex: 1, padding: '8px', border: 'none', outline: 'none', backgroundColor: 'transparent', color: '#969696', fontSize: 16, fontFamily: 'Inter'}}/>
                     </div>
@@ -212,14 +231,10 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </div>
                     ))}
                 </div>
-
-
             </div>
 
-            
-
             {rawmaterial && (
-            <div className="bom-print-modal2 fixed inset-0 flex items-center justify-center z-50 px-4">
+            <div className="bom-print-modal2 fixed inset-0 flex items-center justify-center z-50 px-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.25)' }}>
                 <div style={{width: 967, maxHeight: '90vh', background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', borderRadius: 10, display: 'flex', flexDirection: 'column', padding: '25px 20px', overflow: 'hidden', position: 'relative',}}>
                     <div style={{width: '100%', textAlign: 'center', color: '#130101', fontSize: 35, fontFamily: 'Inter',fontWeight: '400', textTransform: 'capitalize', letterSpacing: 1.4, marginBottom: 25}}>List of Raw Materials</div>
                     <div className="reqplan-table-scroll2" style={{flex: 1, overflowY: 'auto', overflowX: 'auto', marginBottom: 30, borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.15)', padding: 0}}>
@@ -243,11 +258,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12,width: '100%'}}>
                         <div style={{width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem',}}>
-                            <button onClick={() => { setIsOpen2(false), setAdditionalCost(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                            <button onClick={() => { setAddRawMaterial(true) }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                                     <span style={{paddingLeft: 10,paddingRight: 10 }}>Add Raw Material</span>
                             </button>
 
-                            <button onClick={() => { setIsOpen2(false), setAdditionalCost(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                            <button onClick={() => { setEditRawMaterial(true); }} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                                 <span style={{paddingLeft: 10,paddingRight: 10 }}>Edit Raw Material</span>
                             </button>
                         </div>
@@ -262,48 +277,170 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             )}
 
             {addProduct && (
-            <div className="bom-print-modal2 fixed inset-0 flex items-center justify-center z-50 px-4">
-                <div style={{ width: 583, height: 560, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', borderRadius: 10, padding: '40px 50px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between',}}>
-                <div style={{ textAlign: 'center', fontSize: 40, fontWeight: 700, fontFamily: 'Inter', letterSpacing: 2,color: '#130101', marginBottom: 20,}}>
+            <div className="bom-print-modal2 fixed inset-0 z-50 flex items-center justify-center px-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.25)' }}>
+                <div className="modal-inner mats"
+                style={{
+                    width: '100%',
+                    maxWidth: 480,
+                    background: 'white',
+                    boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)',
+                    borderRadius: 10,
+                    padding: '2rem 2rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'stretch',
+                    gap: 24
+                }}
+                >
+                <div style={{ textAlign: 'center', fontSize: 32, fontWeight: 700, fontFamily: 'Inter', letterSpacing: 1.5, color: '#130101' }}>
                     Add Product
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <label style={{ width: 150, fontWeight: 500, fontSize: 18, color: '#585757' }}>
-                        Product ID:
-                    </label>
-                    <div style={inputStyle}>SALES-ORD-2025-16f158</div>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <label style={{ width: 150, fontWeight: 500, fontSize: 18, color: '#585757' }}>
-                        Product
-                    </label>
-                    <div style={inputStyle}>Ice Cream</div>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                        <label style={{ width: 150,fontWeight: 500, fontSize: 18, color: '#585757',}}>
-                            Product Description
-                        </label>
-                        <div style={{...inputStyle, whiteSpace: 'normal', overflowWrap: 'break-word', height: 100, overflowY: 'auto',}}>
-                            Short Description
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', width: '100%' }}>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Product ID:</label>
+                        <input type="text" value={productId} onChange={(e) => setProductId(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
                         </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Product:</label>
+                        <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Product Description:</label>
+                        <textarea value={productDescription} onChange={(e) => setProductDescription(e.target.value)} style={{ ...inputStyle, width: '100%', height: 100, resize: 'none' }} />
+                        </div>
+
                     </div>
                 </div>
 
-                {/* Footer Buttons */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 30 }}>
+
+
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
                     <button onClick={() => setAddProduct(false)} style={buttonStyle2('#fff', '#A4A4A4')}>
                     <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
                     <span style={{ color: '#969696' }}>Close</span>
                     </button>
+                    <button style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <span>Add</span>
+                    <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
+                    </button>
+                </div>
+                </div>
+            </div>
+            )}
 
-                    <button
-                    style={buttonStyle('#00A8A8', '#00A8A8', 'white')}
-                    >
-                    <span>Next</span>
+            {addRawMaterial && (
+            <div className="bom-print-modal2 fixed inset-0 z-50 flex items-center justify-center px-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.25)' }}>
+                <div className="modal-inner mats" style={{ width: '100%', maxWidth: 480, height: 590,  background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', borderRadius: 10, padding: '2rem 2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', gap: 24 }}>
+                <div style={{ textAlign: 'center', fontSize: 32, fontWeight: 700, fontFamily: 'Inter', letterSpacing: 1.5, color: '#130101', marginBottom:10}}>
+                    Add Raw Material
+                </div>
+
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', width: '100%' }}>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Raw Material:</label>
+                        <input type="text" value={newRawMaterial} onChange={(e) => setNewRawMaterial(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Material ID:</label>
+                        <input type="text" value={newMaterialId} onChange={(e) => setNewMaterialId(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Quantity:</label>
+                        <input type="text" value={newQuantity} onChange={(e) => setNewQuantity(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Units:</label>
+                        <input type="text" value={newUnits} onChange={(e) => setNewUnits(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        </div>
+
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 20, }}>
+                    <button onClick={() => setAddRawMaterial(false)} style={buttonStyle2('#fff', '#A4A4A4')}>
+                    <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
+                    <span style={{ color: '#969696' }}>Close</span>
+                    </button>
+                    <button style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <span>Add</span>
+                    <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
+                    </button>
+                </div>
+                </div>
+            </div>
+            )}
+
+
+            {editRawMaterial && (
+            <div className="bom-print-modal2 fixed inset-0 z-50 flex items-center justify-center px-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.25)' }}>
+                <div className="modal-inner mats" style={{ width: '100%', maxWidth: 480, height: 590,  background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', borderRadius: 10, padding: '2rem 2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', gap: 24 }}>
+                <div style={{ textAlign: 'center', fontSize: 32, fontWeight: 700, fontFamily: 'Inter', letterSpacing: 1.5, color: '#130101', marginBottom:10}}>
+                    Edit Raw Material
+                </div>
+
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', width: '100%' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Material ID:</label>
+                        <select
+                        value={editMaterialId}
+                        onChange={(e) => {
+                            const selectedId = e.target.value;
+                            setEditMaterialId(selectedId);
+                            
+                            const selectedMaterial = rawMaterials.find(item => item.materialId === selectedId);
+                            if (selectedMaterial) {
+                                setEditRawMaterial2(selectedMaterial.rawMaterial);
+                                setEditQuantity(selectedMaterial.rmquantity);
+                                setEditUnits(selectedMaterial.rmunits);
+                            }
+                        }}
+                        style={{...inputStyle, width: '100%', appearance: 'none', backgroundColor: '#F5F5F5', borderRadius: 10, outline: '1.5px solid #E5E5E5', padding: '10px', fontSize: 17, fontFamily: 'Inter', fontWeight: 400, color: '#585757', cursor: 'pointer'}}>
+                        <option value="">Select Material ID</option>
+                        {materialIdOptions.map((id, index) => (
+                            <option key={index} value={id}>
+                            {id}
+                            </option>
+                        ))}
+                        </select>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Raw Material:</label>
+                        <input type="text" value={editRawMaterial2} onChange={(e) => setEditRawMaterial2(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Quantity:</label>
+                        <input type="text" value={editQuantity} onChange={(e) => setEditQuantity(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Units:</label>
+                        <input type="text" value={editUnits} onChange={(e) => setEditUnits(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 20, }}>
+                    <button onClick={() => setEditRawMaterial(false)} style={buttonStyle2('#fff', '#A4A4A4')}>
+                    <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
+                    <span style={{ color: '#969696' }}>Close</span>
+                    </button>
+                    <button style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <span>Edit</span>
                     <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                     </button>
                 </div>

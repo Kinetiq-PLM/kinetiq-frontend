@@ -580,16 +580,15 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                 <React.Fragment key={index}>
                                                     <div
                                                     className="print-row"
-                                                    style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', display: 'inline-flex'}}>
+                                                    style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'visible', display: 'inline-flex'}}>
                                                     <div style={cellStyle(82)}>{item.number}</div>
                                                     <div style={cellStyle(145)}>{item.p_product_name}</div>
                                                     <div style={cellStyle(96)}>{item.p_qtyProduct}</div>
                                                     <div style={cellStyle(140)}>{item.p_raw_material_name}</div>
                                                     <div style={cellStyle(130)}>{item.p_qty_of_raw_material}</div>
                                                     <div style={cellStyle(87)}>{item.p_units}</div>
-                                                    <div style={cellStyle(183)}>₱{item.p_cost_per_rm.toLocaleString()}</div>
-                                                    <div style={cellStyle(183)}>₱{item.p_total_cost_per_rm.toLocaleString()}</div>
-                                                    </div>
+                                                    <div style={cellStyle(183)}>₱{parseFloat(item.p_cost_per_rm).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                    <div style={cellStyle(183)}>₱{parseFloat(item.p_total_cost_per_rm).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
 
                                                     {(index + 1) % 3000 === 0 && (
                                                     <div className="print-page-break" style={{ height: 1 }} />
@@ -613,7 +612,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                         {item.label}
                                                     </div>
                                                     <div style={{ width: 168,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,textAlign: 'right',color: item.strong ? '#1C1C1C' : '#585757',fontFamily: 'Inter',display: 'flex',justifyContent: 'flex-end', alignItems: 'center'}}>
-                                                        ₱{item.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                        ₱{parseFloat(item.value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </div>
                                                 </div>
                                             ))}
@@ -683,18 +682,18 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                             <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>No.</div>
                                                         </div>
                                                     </div>
-                                                    <div data-type="Header" style={{width: 240, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                    <div data-type="Header" style={{width: 250, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                         <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                             <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Product</div>
                                                         </div>
                                                     </div>
-                                                    <div data-type="Header" style={{width: 96, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                    <div data-type="Header" style={{width: 100, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                         <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                             <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Qty. Of Product</div>
                                                         </div>
                                                     </div>
                                                 
-                                                    <div data-type="Header" style={{width: 87, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                    <div data-type="Header" style={{width: 100, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                         <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                             <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Units</div>
                                                         </div>
@@ -716,11 +715,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                     className="print-row"
                                                     style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', display: 'inline-flex'}}>
                                                     <div style={cellStyle(82)}>{item.number}</div>
-                                                    <div style={cellStyle(240)}>{item.np_product_name}</div>
-                                                    <div style={cellStyle(96)}>{item.np_qtyProduct}</div>
-                                                    <div style={cellStyle(87)}>{item.np_units}</div>
-                                                    <div style={cellStyle(271)}>₱{item.np_cost_per_product.toLocaleString()}</div>
-                                                    <div style={cellStyle(271)}>₱{item.np_totalCost.toLocaleString()}</div>
+                                                    <div style={cellStyle(250)}>{item.np_product_name}</div>
+                                                    <div style={cellStyle(100)}>{item.np_qtyProduct}</div>
+                                                    <div style={cellStyle(100)}>{item.np_units}</div>
+                                                    <div style={cellStyle(258)}>₱{parseFloat(item.np_cost_per_product).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                    <div style={cellStyle(257)}>₱{parseFloat(item.np_totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                                     </div>
 
                                                     {(index + 1) % 3000 === 0 && (
@@ -745,7 +744,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                         {item.label}
                                                     </div>
                                                     <div style={{ width: 168,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,textAlign: 'right',color: item.strong ? '#1C1C1C' : '#585757',fontFamily: 'Inter',display: 'flex',justifyContent: 'flex-end', alignItems: 'center'}}>
-                                                        ₱{item.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                        ₱{parseFloat(item.value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </div>
                                                 </div>
                                             ))}
@@ -796,7 +795,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div style={{width: 135, left: 139, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Order No.</div>
                                     <div style={{width: 135, left: 139, top: 516, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Date Created</div>
 
-                                    <div style={{width: 250, height: 16, left: 280, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.number}</div>
+                                    <div style={{width: 280, height: 16, left: 250, top: 472, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.number}</div>
                                     <div style={{width: 144, left: 385, top: 515, position: 'absolute', textAlign: 'right', color: '#111111', fontSize: 20, fontFamily: 'Inter', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>{selectedRowData.date}</div>
 
                                     <div style={{width: 135, left: 700, top: 473, position: 'absolute', color: '#1C1C1C', fontSize: 20, fontFamily: 'Inter', fontWeight: '700', textTransform: 'capitalize', lineHeight: 1, wordWrap: 'break-word'}}>Type</div>
@@ -815,18 +814,18 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                             <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>No.</div>
                                                         </div>
                                                     </div>
-                                                    <div data-type="Header" style={{width: 240, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                    <div data-type="Header" style={{width: 250, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                         <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                             <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Material</div>
                                                         </div>
                                                     </div>
-                                                    <div data-type="Header" style={{width: 96, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                    <div data-type="Header" style={{width: 100, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                         <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                             <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Qty. Of Material</div>
                                                         </div>
                                                     </div>
                                                 
-                                                    <div data-type="Header" style={{width: 87, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                                    <div data-type="Header" style={{width: 100, alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0.05)', borderLeft: '1px #E8E8E8 solid', borderTop: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                         <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                                             <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: '700', lineHeight: 1, wordWrap: 'break-word'}}>Units</div>
                                                         </div>
@@ -848,11 +847,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                     className="print-row"
                                                     style={{alignSelf: 'stretch', background: 'rgba(255, 255, 255, 0)', overflow: 'hidden', display: 'inline-flex'}}>
                                                     <div style={cellStyle(82)}>{item.no}</div>
-                                                    <div style={cellStyle(240)}>{item.prin_item_name}</div>
-                                                    <div style={cellStyle(96)}>{item.prin_quantity}</div>
-                                                    <div style={cellStyle(87)}>{item.prin_uom}</div>
-                                                    <div style={cellStyle(271)}>₱{item.prin_itemcost.toLocaleString()}</div>
-                                                    <div style={cellStyle(271)}>₱{item.prin_totalitemcost.toLocaleString()}</div>
+                                                    <div style={cellStyle(250)}>{item.prin_item_name}</div>
+                                                    <div style={cellStyle(100)}>{item.prin_quantity}</div>
+                                                    <div style={cellStyle(100)}>{item.prin_uom}</div>
+                                                    <div style={cellStyle(258)}>₱{parseFloat(item.prin_itemcost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                    <div style={cellStyle(257)}>₱{parseFloat(item.prin_totalitemcost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                                     </div>
 
                                                     {(index + 1) % 3000 === 0 && (
@@ -877,7 +876,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                                         {item.label}
                                                     </div>
                                                     <div style={{ width: 168,padding: '10px 12px',background: index % 2 === 1 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',fontSize: item.strong ? 16 : 14,fontWeight: item.strong ? 600 : 400,textAlign: 'right',color: item.strong ? '#1C1C1C' : '#585757',fontFamily: 'Inter',display: 'flex',justifyContent: 'flex-end', alignItems: 'center'}}>
-                                                        ₱{item.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                        ₱{parseFloat(item.value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </div>
                                                 </div>
                                             ))}

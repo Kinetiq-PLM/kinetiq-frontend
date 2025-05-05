@@ -80,7 +80,7 @@
     z-index: 9999;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* keep scrollable from top */
+    align-items: center; /* keep scrollable from top */
     padding: 2rem;
 }
   
@@ -95,7 +95,7 @@
     z-index: 9999;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* keep scrollable from top */
+    align-items: center; /* keep scrollable from top */
     padding: 2rem;
 }
   
@@ -367,7 +367,7 @@
     z-index: 9999;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     padding: 2rem;
 }
   
@@ -450,24 +450,27 @@
 }
 
   
-
-
-  
 @media (max-width: 640px) {
-    .mats .reqplan-help-wrapper {
-      bottom: 1.5rem;
-      right: 1.5rem;
-    }
-  
-    .mats .reqplan-help-button {
-      width: 48px;
-      height: 48px;
-      font-size: 24px;
-    }
-  
-    .mats .reqplan-help-option {
-      font-size: 13px;
-      padding: 0.4rem 0.8rem;
-    }
+  .mats .modal-inner {
+    padding: 2rem !important;
+    width: 95% !important;
+  }
+
+  .mats .modal-inner label {
+    width: 100% !important;
+    margin-bottom: 4px;
+  }
+
+  .mats .modal-inner input,
+  .mats .modal-inner textarea {
+    width: 100%;
+    padding: 2rem;
+  }
+
+  .mats .modal-inner button {
+    width: 100%;
+  }
+
 }
+
 

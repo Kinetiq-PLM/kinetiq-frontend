@@ -705,7 +705,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div className="table-cell" data-label="Product Description" style={rowCellStyle}><span>{item.product_description}</span></div>
                                     <div className="table-cell" data-label="Quantity" style={rowCellStyle}>{item.qtyProduct} pcs</div>
                                     <div className="table-cell" data-label="Raw Materials" onClick={() => {setSelectedProductId(item.product_id); fetchRawMaterials(item.product_id); setRawMaterial(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(200, 200, 200, 0.2)')} onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
-                                    <div className="table-cell" data-label="Cost" style={rowCellStyle}>₱{item.totalCost.toLocaleString()}</div>
+                                    <div className="table-cell" data-label="Cost" style={rowCellStyle}>₱{parseFloat(item.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+
                                     </div>
                                 ))}
                                 </div>
@@ -716,7 +717,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{overallTotalCost.toLocaleString(undefined, {minimumFractionDigits: 2,  maximumFractionDigits: 2, })}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{parseFloat(overallTotalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -774,7 +775,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div style={rowCellStyle}>{item.np_product_name}</div>
                                     <div style={rowCellStyle}>{item.np_product_description}</div>
                                     <div style={rowCellStyle}>{item.np_qtyProduct} pcs</div>
-                                    <div style={rowCellStyle}>₱{item.np_totalCost.toLocaleString()}</div>
+                                    <div style={rowCellStyle}>₱{item.np_totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                     </div>
                                 ))}
                                 </div>
@@ -785,7 +786,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{npOverallProductCost.toLocaleString(undefined, {minimumFractionDigits: 2,  maximumFractionDigits: 2, })}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{parseFloat(npOverallProductCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -844,7 +845,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                     <div style={rowCellStyle}>{item.prin_item_name}</div>
                                     <div style={rowCellStyle}>{item.prin_quantity}</div>
                                     <div style={rowCellStyle}>₱{item.prin_itemcost} </div>
-                                    <div style={rowCellStyle}>₱{item.prin_totalitemcost} </div>
+                                    <div style={rowCellStyle}>₱{item.prin_totalitemcost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} </div>
                                     </div>
                                 ))}
                                 </div>
@@ -855,7 +856,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Products:</b></span>
-                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{prinOverallCost.toLocaleString(undefined, {minimumFractionDigits: 2,  maximumFractionDigits: 2, })}</span>
+                                        <span style={{ padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>₱{parseFloat(prinOverallCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
 
                                     <div style={{padding: '8px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
@@ -957,7 +958,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{isProjectType === "Project" ? overallTotalCost : isProjectType === "Non Project" ? npOverallProductCost : prinOverallCost}</div>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(isProjectType === "Project" ? overallTotalCost : isProjectType === "Non Project" ? npOverallProductCost : prinOverallCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                 </div>
                                 </div>
                             </div>
@@ -970,7 +971,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{totalCostOfProduction}</div>
+                                    <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(totalCostOfProduction).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                 </div>
                                 </div>
                             </div>
@@ -983,7 +984,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 </div>
                                 <div data-type="Default" style={{flex: '1 1 0', alignSelf: 'stretch', borderLeft: '1px #E8E8E8 solid', borderBottom: '1px #E8E8E8 solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
                                     <div style={{alignSelf: 'stretch', padding: '10px 12px', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{totalLaborCost}</div>
+                                        <div style={{flex: '1 1 0', textAlign: 'center', color: '#585757', fontSize: 18, fontFamily: 'Inter', fontWeight: 500, lineHeight: 1, wordWrap: 'break-word'}}>₱{parseFloat(totalLaborCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                     </div>
                                 </div>
                             </div>
@@ -993,7 +994,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent:'center' }}>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Total Cost of Whole Order: </b></span>
-                                        <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500, }}>₱{totalOrderCost}</span>
+                                        <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500, }}>₱{parseFloat(totalOrderCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
                                     <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
                                         <span style={{ fontWeight: 500, color: '#585757' }}><b>Order No.: </b></span>
