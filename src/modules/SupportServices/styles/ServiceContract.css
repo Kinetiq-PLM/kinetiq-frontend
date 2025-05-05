@@ -174,8 +174,13 @@
   border: 2px solid #00a8a8; /* Thicker border when focused */
 }
 
-.servcont .form-group textarea {
-  height: 10rem;
+.servcont .add-cont-desc textarea {
+  height: 10rem !important;
+  resize: none;
+}
+
+.servcont .view-cont-desc textarea {
+  height: 21rem !important;
   resize: none;
 }
 
@@ -303,6 +308,70 @@
   top: auto !important;
   bottom: 100% !important;
 }
+
+.servcont .inventory-filter-container {
+  margin-bottom: 1rem !important;
+  margin-top: 0rem !important;
+}
+/* Inventory modal styling */
+.servcont .inventory-table-container {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  max-height: 250px;
+  overflow-y: auto;
+  display: block;
+  position: relative;
+}
+
+.servcont .inventory-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: "Inter", sans-serif;
+}
+
+.servcont .inventory-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #00a8a8; 
+  color: white;
+  z-index: 3;
+}
+
+.servcont .inventory-table  th {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.servcont .inventory-table  td {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #333;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.servcont .inventory-table  tbody tr {
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+.servcont .inventory-table tbody tr:hover {
+  background-color: #d6f5f5;
+}
+
+.servcont .inventory-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.servcont .inventory-table .empty-row td {
+  height: 2.5rem;
+}
+
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
