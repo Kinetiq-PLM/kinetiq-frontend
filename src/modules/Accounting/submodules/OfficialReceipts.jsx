@@ -110,6 +110,8 @@ const OfficialReceipts = () => {
     setReportForm({
       startDate: getCurrentDate(),
       salesInvoiceId: "",
+      totalAmount: "",
+      amountDue: "",
       amountPaid: "",
       paymentMethod: "",
       bankAccount: "",
@@ -120,6 +122,8 @@ const OfficialReceipts = () => {
   const [reportForm, setReportForm] = useState({
     startDate: getCurrentDate(),
     salesInvoiceId: "",
+    totalAmount: "",
+    amountDue: "",
     amountPaid: "",
     paymentMethod: "",
     bankAccount: "",
@@ -167,7 +171,10 @@ const OfficialReceipts = () => {
   const fetchInvoices = async () => {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      if (!token) {
+        throw new Error("No authentication token found.");
+      }
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       const response = await axios.get(INVOICES_ENDPOINT, config);
       setInvoices(response.data);
       if (response.data.length === 0) {
@@ -187,13 +194,13 @@ const OfficialReceipts = () => {
       });
       let message = "Could not load invoice list. Please ensure the API is accessible.";
       if (error.response?.status === 404) {
-        message = "Invoice endpoint not found. Verify the API configuration.";
-      } else if (error.response?.status === 403) {
-        message = "Access denied. Please check your authentication credentials.";
+        message = "Invoice endpoint not found. Verify the API URL and endpoint.";
+      } else if (error.response?.status === 403 || error.message === "No authentication token found.") {
+        message = "Access denied. Please check your authentication credentials or log in again.";
       } else if (error.code === "ERR_NETWORK") {
-        message = "Network error. Please ensure the API is running.";
+        message = "Network error. Please ensure the API server is running and accessible.";
       } else if (error.response?.status === 504) {
-        message = "Gateway timeout. Check the backend response time.";
+        message = "Gateway timeout. Check the backend response time or server status.";
       }
       setValidation({
         isOpen: true,
@@ -201,6 +208,7 @@ const OfficialReceipts = () => {
         title: "Invoice Fetch Failed",
         message: error.response?.data?.detail || message,
       });
+      setInvoices([]); // Ensure invoices is an empty array on error
     }
   };
 
@@ -254,6 +262,8 @@ const OfficialReceipts = () => {
     if (
       !reportForm.startDate ||
       !reportForm.salesInvoiceId ||
+      !reportForm.totalAmount ||
+      !reportForm.amountDue ||
       !reportForm.amountPaid ||
       !reportForm.paymentMethod ||
       !reportForm.createdBy
@@ -304,6 +314,8 @@ const OfficialReceipts = () => {
         invoice_id: reportForm.salesInvoiceId,
         customer_id: selectedInvoice.customer_id || "SALES-CUST-2025",
         or_date: reportForm.startDate,
+        total_amount: parseFloat(reportForm.totalAmount).toFixed(2),
+        amount_due: parseFloat(reportForm.amountDue).toFixed(2),
         settled_amount: parseFloat(reportForm.amountPaid).toFixed(2),
         remaining_amount: newRemainingAmount.toFixed(2),
         payment_method: reportForm.paymentMethod,
@@ -353,17 +365,15 @@ const OfficialReceipts = () => {
       return sortOrder === "asc" ? valA - valB : valB - valA;
     }
 
-    // Explicit default case
     if (sortOrder === "default" || !sortOrder) {
       const idA = a[1]?.toString().toLowerCase() || "";
       const idB = b[1]?.toString().toLowerCase() || "";
       return idA.localeCompare(idB);
     }
 
-    return 0; // fail-safe
+    return 0;
   });
 
-  // Filter data based on search input
   const filteredData = sortedData.filter((row) =>
     [row[0], row[1], row[2], row[6], row[7], row[8]]
       .filter(Boolean)
@@ -372,7 +382,6 @@ const OfficialReceipts = () => {
       .includes(searching.toLowerCase())
   );
 
-  // Handle row selection
   const handlePrintRow = (rowData) => {
     const printWindow = window.open('', '_blank');
   
@@ -503,7 +512,6 @@ const OfficialReceipts = () => {
     printWindow.document.write(html);
     printWindow.document.close();
   };
-
 
   return (
     <div className="officialReceipts">

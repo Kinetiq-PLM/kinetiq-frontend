@@ -165,6 +165,20 @@ const CreateReceiptModal = ({
             </div>
             <Forms
               type="number"
+              formName="Total Amount*"
+              placeholder="Enter total amount"
+              value={reportForm.totalAmount}
+              onChange={(e) => handleInputChange("totalAmount", e.target.value)}
+            />
+            <Forms
+              type="number"
+              formName="Amount Due*"
+              placeholder="Enter amount due"
+              value={reportForm.amountDue}
+              onChange={(e) => handleInputChange("amountDue", e.target.value)}
+            />
+            <Forms
+              type="number"
               formName="Amount Paid*"
               placeholder="Enter Amount paid"
               value={reportForm.amountPaid}
@@ -231,7 +245,7 @@ const CreateReceiptModal = ({
                         onChange={(value) => {
                           handleInputChange("bankAccount", value);
                         }}
-                      />
+                    />
                     </div>
                   ) : (
                     <div className="space-y-3">
