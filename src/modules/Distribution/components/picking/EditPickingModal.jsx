@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/Picking.css';
-import { FaRegSquare, FaCheckSquare, FaWarehouse, FaBoxOpen, FaClock, FaFileAlt } from 'react-icons/fa';
+import { FaRegSquare, FaCheckSquare, FaWarehouse, FaBoxOpen, FaClock, FaFileAlt, FaBoxes } from 'react-icons/fa';
+import PartialDeliveryInfo from './PartialDeliveryInfo';
 
 const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, warehouses, onStatusUpdate }) => {
   const [selectedEmployee, setSelectedEmployee] = useState('');
@@ -9,6 +10,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
   const [pickingItems, setPickingItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pickingProgress, setPickingProgress] = useState(0);
+  const [deliveryNotesInfo, setDeliveryNotesInfo] = useState(null);
   
   // Check if picking list is completed
   const isCompleted = pickingList?.picked_status === 'Completed';
@@ -18,8 +20,34 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     if (pickingList) {
       setSelectedEmployee(pickingList.picked_by || '');
       setModified(false); // Reset modified state when picking list changes
+      
+      // If this is a sales order, fetch delivery notes info
+      if (pickingList.delivery_type === 'sales') {
+        fetchDeliveryNotesInfo(pickingList.delivery_id);
+      } else {
+        // Reset delivery notes info for non-sales orders
+        setDeliveryNotesInfo(null);
+      }
     }
   }, [pickingList]);
+  
+  // Fetch delivery notes info for sales orders
+  const fetchDeliveryNotesInfo = async (orderID) => {
+    if (!orderID) return;
+    
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/delivery-notes/order/${orderID}/`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setDeliveryNotesInfo(data);
+      } else {
+        console.error('Failed to fetch delivery notes info');
+      }
+    } catch (error) {
+      console.error('Error fetching delivery notes info:', error);
+    }
+  };
   
   // Fetch picking items when picking list changes
   useEffect(() => {
@@ -514,6 +542,14 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
             <span className="status-icon">{getStatusIcon(pickingList.picked_status)}</span>
             <span className="status-text">{pickingList.picked_status}</span>
           </div>
+
+          {/* Show partial delivery info if this is a partial delivery */}
+          {deliveryNotesInfo && deliveryNotesInfo.is_partial_delivery && (
+            <PartialDeliveryInfo 
+              pickingList={pickingList} 
+              deliveryNotesInfo={deliveryNotesInfo} 
+            />
+          )}
 
           {/* Tab Navigation */}
           <div className="modal-tabs">

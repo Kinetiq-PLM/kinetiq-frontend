@@ -2025,3 +2025,313 @@
   margin-right: 5px;
   font-size: 0.75rem;
 }
+
+/* Partial Delivery Styles */
+
+/* Main container for partial delivery info */
+.partial-delivery-info {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Header with title and counter */
+.partial-delivery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.partial-delivery-title {
+  display: flex;
+  align-items: center;
+}
+
+.partial-delivery-title h4 {
+  margin: 0;
+  font-size: 1.1em;
+  color: #495057;
+  margin-left: 8px;
+}
+
+.partial-delivery-icon {
+  color: #6c757d;
+  font-size: 18px;
+}
+
+.partial-delivery-counter {
+  background-color: #e9ecef;
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.delivery-counter-text {
+  font-size: 0.8em;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.delivery-counter-numbers {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Progress bar */
+.partial-delivery-progress {
+  margin-bottom: 15px;
+}
+
+.progress-bar-container {
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #007bff;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.9em;
+  color: #6c757d;
+  text-align: right;
+}
+
+/* Delivery notes list */
+.delivery-notes-list {
+  margin-bottom: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+}
+
+.delivery-note-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.delivery-note-item:last-child {
+  border-bottom: none;
+}
+
+.delivery-note-item:hover {
+  background-color: #f8f9fa;
+}
+
+.delivery-note-item.current-delivery {
+  background-color: #e6f7ff;
+  border-left: 4px solid #007bff;
+}
+
+.delivery-note-item.completed-delivery {
+  background-color: #f0f8f0;
+  border-left: 4px solid #28a745;
+}
+
+.delivery-note-item.pending-delivery {
+  opacity: 0.7;
+}
+
+.delivery-note-sequence {
+  width: 24px;
+  height: 24px;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  font-weight: 600;
+  margin-right: 12px;
+}
+
+.current-delivery .delivery-note-sequence {
+  background-color: #007bff;
+}
+
+.completed-delivery .delivery-note-sequence {
+  background-color: #28a745;
+}
+
+.delivery-note-content {
+  flex: 1;
+}
+
+.delivery-note-id {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 4px;
+  font-size: 0.95em;
+}
+
+.delivery-note-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: #6c757d;
+}
+
+.item-count {
+  display: inline-block;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.status-badge-pending {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.status-badge-picking {
+  background-color: #e6f7ff;
+  color: #0d6efd;
+}
+
+.status-badge-packed {
+  background-color: #e5f9e0;
+  color: #198754;
+}
+
+.status-badge-shipped {
+  background-color: #d8f3e9;
+  color: #20c997;
+}
+
+.admin-override-warning {
+  margin-top: 4px;
+  font-size: 0.8em;
+  color: #fd7e14;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.warning-icon {
+  font-size: 12px;
+}
+
+/* Info message */
+.delivery-notes-info {
+  margin-top: 10px;
+}
+
+.info-message {
+  font-size: 0.9em;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #fff3cd;
+  border-radius: 4px;
+  border-left: 4px solid #ffc107;
+}
+
+.info-icon {
+  color: #ffc107;
+  font-size: 14px;
+}
+
+/* Partial delivery badge in completion modal */
+.partial-delivery-badge {
+  font-size: 0.8em;
+  background-color: #e9ecef;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 10px;
+  color: #495057;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+/* Partial delivery alert in completion modal */
+.partial-delivery-alert {
+  margin: 15px 0;
+  padding: 12px;
+  background-color: #fff3cd;
+  border-radius: 6px;
+  border-left: 4px solid #ffc107;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.alert-icon {
+  color: #ffc107;
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.alert-text {
+  flex: 1;
+}
+
+.alert-title {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+  color: #212529;
+}
+
+.alert-message {
+  margin: 0;
+  color: #495057;
+  font-size: 0.95em;
+}
+
+/* Partial delivery indicator in picking table */
+.partial-delivery-row {
+  position: relative;
+}
+
+.partial-delivery-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #ffc107;
+}
+
+.partial-delivery-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.partial-icon {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.partial-text {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #495057;
+}
