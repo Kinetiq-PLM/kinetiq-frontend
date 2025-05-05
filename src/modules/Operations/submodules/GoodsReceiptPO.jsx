@@ -13,10 +13,17 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const [activeTab, setActiveTab] = useState("document");
   const [showSerialModal, setShowSerialModal] = useState(false);
   const [selectedSerialNumbers, setSelectedSerialNumbers] = useState([]);
+  const [duplicateDetails, setDuplicateDetails] = useState({});
+  
   const calculateInitialAmount = () => {
     if (isCreateMode) return 0;
+    if (!selectedData?.document_items) return 0;
+    
     return selectedData.document_items.reduce((sum, item) => {
-      return sum + parseFloat(item.quantity * item.cost);
+      // First try item_price, then check duplicateDetails for a price
+      const price = item.item_price !== 0 ? item.item_price : 
+                    (duplicateDetails[item.item_id]?.[0]?.price || 0);
+      return sum + (parseFloat(item.quantity) * parseFloat(price));
     }, 0).toFixed(2);
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
@@ -93,23 +100,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   }, [vendorList, selectedData.vendor_code, employeeList, selectedData.employee_id]);
 
   
-  const [documentItems, setDocumentItems] = useState(
-    isCreateMode 
-      ? [{}] 
-      : [
-          ...selectedData.document_items.map(item => ({
-            content_id: item.content_id,
-            item_id: item.item_id,
-            item_name: item.item_name,
-            unit_of_measure: item.unit_of_measure,
-            quantity: item.quantity,
-            cost: item.item_price || 0, 
-            warehouse_id: item.warehouse_id,
-            item_no: item.item_no 
-          })), 
-          {}
-        ]
-  );
+  
 
  
   const today = new Date().toISOString().slice(0, 10);
@@ -272,7 +263,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   }, []);
  
   const [itemOptions, setItemOptions] = useState([]);
-  const [duplicateDetails, setDuplicateDetails] = useState({});
 
   // Inside your item fetch useEffect:
   useEffect(() => {
@@ -821,16 +811,36 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         toast.warning("Transaction cost must not exceed 10 digits (1 billion)")
       }
     }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
+
+  const [documentItems, setDocumentItems] = useState(
+    isCreateMode 
+      ? [{}] 
+      : [
+          ...selectedData.document_items.map(item => ({
+            content_id: item.content_id,
+            item_id: item.item_id,
+            item_name: item.item_name,
+            unit_of_measure: item.unit_of_measure,
+            quantity: item.quantity,
+            cost: item.item_price !== 0 ? item.item_price : (duplicateDetails[item.item_id]?.[0]?.price || 0), 
+            warehouse_id: item.warehouse_id,
+            item_no: item.item_no 
+          })), 
+          {}
+        ]
+  );
+
   useEffect(() => {
-      const newInitialAmount = documentItems
-        .slice(0, -1) // exclude the last empty row
-        .reduce((sum, item) => {
-          return sum + (parseFloat(item.quantity || 0) * parseFloat(item.cost || 0));
-        }, 0)
-        .toFixed(2);
-     
-      setInitialAmount(newInitialAmount);
-    }, [documentItems]);
+    const newInitialAmount = documentItems
+      .slice(0, -1) // exclude the last empty row
+      .reduce((sum, item) => {
+        // Use the price from the item object (which comes from duplicateDetails or itemOptions)
+        const price = parseFloat(item.cost || duplicateDetails[item.item_id]?.[0]?.price || 0);
+        return sum + (parseFloat(item.quantity || 0) * price);
+      }, 0)
+      .toFixed(2);
+    setInitialAmount(newInitialAmount);
+  }, [documentItems, duplicateDetails]);
    
 
   return (
@@ -1238,7 +1248,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                       </td>
                       <td readOnly style={{ cursor: 'not-allowed' }}>
                         {(() => {
-                          const total = (item.quantity * item.cost) || 0;
+                          const currentCost = item.cost || 
+                          (item.item_id && duplicateDetails[item.item_id]?.[0]?.price) || 0;
+
+                          const total = (parseFloat(item.quantity || 0) * parseFloat(currentCost));
                           if (total > 1000000000) {
                             toast.dismiss();
                             toast.error("Total cost must not exceed 1 billion");
@@ -1246,7 +1259,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                           return total.toFixed(2);
                         })()}
                       </td>
-                      
                       <td>
                         <select
                           value={item.warehouse_id || ''}

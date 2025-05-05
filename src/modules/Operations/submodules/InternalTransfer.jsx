@@ -91,11 +91,9 @@ const ApprovalTable = ({employee_id}) => {
             throw new Error("Invalid data format");
           }
           const sortedRequestData = data.sort((a, b) => {
-            // First: items with no warehouse_id come first
             if (!a.warehouse_location && b.warehouse_location) return -1;
             if (a.warehouse_location && !b.warehouse_location) return 1;
           
-            // Then: sort by request_date (convert to Date object if needed)
             const dateA = new Date(a.request_date);
             const dateB = new Date(b.request_date);
             return dateA - dateB;
