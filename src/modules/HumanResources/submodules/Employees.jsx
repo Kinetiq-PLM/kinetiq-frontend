@@ -1582,98 +1582,123 @@ const Employees = () => {
 
   // 3) Resignations Table
   const renderResignationsTable = (rawData) => {
-    const { paginated, totalPages } = filterAndPaginate(rawData);
-    
-    if (loading) return <div className="hr-employee-no-results">Loading resignations...</div>;
-    if (!paginated.length) return <div className="hr-employee-no-results">No resignations found.</div>;
-    
-    return (
-      <>
-        <div className="hr-employee-table-wrapper">
-          <div className="hr-employee-table-scrollable">
-            <table className="hr-employee-table">
-              <thead>
-                <tr>
-                  <th>Resignation ID</th>
-                  <th>Employee ID</th>
-                  <th>Submission Date</th>
-                  <th>Notice Period (Days)</th>
-                  <th>HR Approver</th>
-                  <th>Approval Status</th>
-                  <th>Clearance Status</th>
-                  <th>Document</th> {/* New column */}
-                  <th>Created At</th>
-                  <th>Updated At</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginated.map((resignation, index) => (
-                  <tr key={resignation.resignation_id}>
-                    <td>{resignation.resignation_id}</td>
-                    <td>{resignation.employee_id}</td>
-                    <td>{resignation.submission_date}</td>
-                    <td>{resignation.notice_period_days}</td>
-                    <td>{resignation.hr_approver_id || "—"}</td>
-                    <td>
-                      <span className={`hr-tag ${resignation.approval_status.toLowerCase()}`}>
-                        {resignation.approval_status}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`hr-tag ${resignation.clearance_status.toLowerCase().replace(/\s+/g, '-')}`}>
-                        {resignation.clearance_status}
-                      </span>
-                    </td>
-                    <td>
-                      {resignation.document_url ? (
-                        <a 
-                          href={resignation.document_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="hr-view-document-btn"
-                        >
-                          View Document
-                        </a>
-                      ) : (
-                        <span className="hr-no-document">—</span>
-                      )}
-                    </td>
-                    <td>{resignation.created_at}</td>
-                    <td>{resignation.updated_at}</td>
-                    <td className="hr-employee-actions">
-                      <div
-                        className="hr-employee-dots"
-                        onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
-                      >
-                        ⋮
-                        {dotsMenuOpen === index && (
-                          <div className="hr-employee-dropdown">
-                            <div
-                              className="hr-employee-dropdown-item"
-                              onClick={() => handleEditResignation(resignation)}
-                            >
-                              Edit
-                            </div>
-                            <div
-                              className="hr-employee-dropdown-item"
-                              onClick={() => handleViewResignationDetails(resignation)}
-                            >
-                              View Details
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </td>
+    try {
+      // Check if rawData is valid
+      if (!Array.isArray(rawData)) {
+        console.error("Invalid resignations data:", rawData);
+        return <div className="hr-employee-no-results">Error loading resignations data. Please refresh.</div>;
+      }
+      
+      const { paginated, totalPages } = filterAndPaginate(rawData);
+      
+      if (loading) return <div className="hr-employee-no-results">Loading resignations...</div>;
+      if (!paginated.length) return <div className="hr-employee-no-results">No resignations found.</div>;
+      
+      return (
+        <>
+          <div className="hr-employee-table-wrapper">
+            <div className="hr-employee-table-scrollable">
+              <table className="hr-employee-table">
+                <thead>
+                  <tr>
+                    <th>Resignation ID</th>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Submission Date</th>
+                    <th>Notice Period (Days)</th>
+                    <th>HR Approver ID</th>
+                    <th>HR Approver Name</th>
+                    <th>Approval Status</th>
+                    <th>Clearance Status</th>
+                    <th>Documents</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {paginated.map((resignation, index) => (
+                    <tr key={resignation.resignation_id || index}>
+                      <td>{resignation?.resignation_id || "-"}</td>
+                      <td>{resignation?.employee_id || "-"}</td>
+                      <td>{resignation?.employee_name || "-"}</td>
+                      <td>{resignation?.submission_date || "-"}</td>
+                      <td>{resignation?.notice_period_days || "-"}</td>
+                      <td>{resignation?.hr_approver_id || "—"}</td>
+                      <td>{resignation?.hr_approver_name || "—"}</td>
+                      <td>
+                        {resignation?.approval_status ? (
+                          <span className={`hr-tag ${resignation.approval_status.toLowerCase()}`}>
+                            {resignation.approval_status}
+                          </span>
+                        ) : "-"}
+                      </td>
+                      <td>
+                        {resignation?.clearance_status ? (
+                          <span className={`hr-tag ${resignation.clearance_status.toLowerCase().replace(/\s+/g, '-')}`}>
+                            {resignation.clearance_status}
+                          </span>
+                        ) : "-"}
+                      </td>
+                      <td>
+                        {resignation?.document_url ? (
+                          <a 
+                            href={resignation.document_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="hr-view-document-btn"
+                          >
+                            View Document
+                          </a>
+                        ) : (
+                          <span className="hr-no-document">—</span>
+                        )}
+                      </td>
+                      <td>{resignation?.created_at || "-"}</td>
+                      <td>{resignation?.updated_at || "-"}</td>
+                      <td className="hr-employee-actions">
+                        <div
+                          className="hr-employee-dots"
+                          onClick={() => setDotsMenuOpen(dotsMenuOpen === index ? null : index)}
+                        >
+                          ⋮
+                          {dotsMenuOpen === index && (
+                            <div className="hr-employee-dropdown">
+                              <div
+                                className="hr-employee-dropdown-item"
+                                onClick={() => handleEditResignation(resignation)}
+                              >
+                                Edit
+                              </div>
+                              <div
+                                className="hr-employee-dropdown-item"
+                                onClick={() => handleViewResignationDetails(resignation)}
+                              >
+                                View Details
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
+          {renderPagination(totalPages)}
+        </>
+      );
+    } catch (error) {
+      console.error("Error rendering resignations table:", error);
+      return (
+        <div className="hr-employee-error">
+          <h3>Error displaying resignations</h3>
+          <p>Something went wrong while displaying resignations data.</p>
+          <button onClick={() => window.location.reload()}>Refresh Page</button>
         </div>
-        {renderPagination(totalPages)}
-      </>
-    );
+      );
+    }
   };
 
   /***************************************************************************
@@ -2460,7 +2485,7 @@ const Employees = () => {
                   showArchived ? archivedPositions : positions,
                   showArchived
                 )
-              : activeTab === "Resignations" && renderResignationsTable(resignations)}
+              : renderResignationsTable(resignations)}
           </div>
         </div>
       </div>
