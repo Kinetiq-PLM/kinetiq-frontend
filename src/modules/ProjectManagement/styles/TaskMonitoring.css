@@ -1,18 +1,4 @@
 /* Base Styles with Enhanced Color Scheme */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background-color: #f8fafc;
-  font-size: 15px;
-}
-
 .fas, .far, .fab {
   margin-right: 10px;
   vertical-align: -1px;
@@ -25,6 +11,7 @@ body {
   background: white;
   border-radius: 10px;
   overflow: scroll;
+  font-family: 'Inter',sans-serif;
 }
 
 .header-section {
@@ -831,116 +818,6 @@ textarea.form-control {
     flex-wrap: wrap;
   }
 }
-
-/* Dark mode support with fixed gradients for truncated text */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #1a1a2e;
-    color: #e2e8f0;
-  }
-  
-  .task-monitoring-container {
-    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-  }
-  
-  .tasks-card, 
-  .task-form-card, 
-  .task-list-card {
-    background-color: #1e293b;
-    border-color: #334155;
-  }
-  
-  .form-control {
-    background-color: #0f172a;
-    border-color: #334155;
-    color: #e2e8f0;
-  }
-  
-  .form-control:focus {
-    background-color: #1e293b;
-  }
-  
-  .card-header {
-    border-bottom-color: #334155;
-  }
-  
-  .tasks-table th, .task-table th {
-    background-color: #0f172a;
-    color: #e2e8f0;
-    border-bottom-color: #334155;
-  }
-  
-  .tasks-table td, .task-table td {
-    border-bottom-color: #334155;
-    color: #e2e8f0;
-  }
-  
-  .tasks-table tr:hover, .task-table tr:hover {
-    background-color: #273549;
-  }
-  
-  .secondary-button, .danger-button {
-    background-color: #1e293b;
-  }
-  
-  .pagination-button {
-    background-color: #1e293b;
-    border-color: #334155;
-    color: #e2e8f0;
-  }
-  
-  .pagination-info {
-    background-color: #0f172a;
-    color: #94a3b8;
-  }
-  
-  .error-alert {
-    background-color: rgba(247, 37, 133, 0.15);
-  }
-  
-  .no-tasks {
-    background-color: #0f172a;
-    color: #94a3b8;
-  }
-  
-  .task-description {
-    color: #94a3b8;
-  }
-  
-  /* Fix gradient colors for dark mode */
-  .task-description::after {
-    background: linear-gradient(to right, rgba(30, 41, 59, 0), rgba(30, 41, 59, 1));
-  }
-  
-  .description-content::after {
-    background: linear-gradient(to right, transparent, #1e293b 50%);
-  }
-  
-  .status-badge.completed {
-    background-color: rgba(74, 214, 109, 0.15);
-  }
-  
-  .status-badge.in-progress {
-    background-color: rgba(248, 150, 30, 0.15);
-  }
-  
-  .status-badge.pending {
-    background-color: rgba(72, 149, 239, 0.15);
-  }
-  
-  .status-badge.canceled {
-    background-color: rgba(173, 181, 189, 0.15);
-  }
-  
-  .deadline-cell.past-deadline {
-    background-color: rgba(247, 37, 133, 0.15);
-  }
-  
-  .selected-count {
-    background-color: rgba(67, 97, 238, 0.15);
-  }
-}
-
 /* Employee Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -1180,60 +1057,6 @@ textarea.form-control {
   opacity: 1;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .modal-content {
-    background-color: #1e293b;
-  }
-  
-  .modal-header, .modal-footer {
-    border-color: #334155;
-  }
-  
-  .modal-close:hover {
-    background-color: #334155;
-  }
-  
-  .employee-profile {
-    border-color: #334155;
-  }
-  
-  .employee-avatar-large {
-    border-color: #1e293b;
-  }
-  
-  .employee-detail-item {
-    background-color: #0f172a;
-  }
-  
-  .employee-detail-item:hover {
-    background-color: #273549;
-  }
-  
-  .detail-value {
-    color: #e2e8f0;
-  }
-  
-  .no-data {
-    color: #94a3b8;
-  }
-  
-  .user-avatar::after {
-    background-color: #1e293b;
-  }
-  
-  .employee-status.active {
-    background-color: rgba(74, 214, 109, 0.15);
-  }
-  
-  .employee-status.on-leave {
-    background-color: rgba(248, 150, 30, 0.15);
-  }
-  
-  .employee-status.deployed {
-    background-color: rgba(72, 149, 239, 0.15);
-  }
-}
 
 /* Success Toast Styling */
 .success-toast {

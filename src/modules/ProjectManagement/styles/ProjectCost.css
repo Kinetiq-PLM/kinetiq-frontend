@@ -1,15 +1,8 @@
-/* General Styles */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
 
-/* Container Styles */
 .body-content-container {
   width: 100%;
   max-width: 1200px;
+  font-family: 'Inter'sans-serif;
   margin: 0 auto;
   padding: 2rem;
   background-color: white;
@@ -984,75 +977,6 @@
   }
 }
 
-/* Dark Mode Support (if your app supports it) */
-@media (prefers-color-scheme: dark) {
-  body {
-    --primary-color: #00C2C2;
-    --primary-hover: #00E0E0;
-    --primary-light: rgba(0, 194, 194, 0.15);
-    --text-color: #f0f0f0;
-    --light-text: #aaaaaa;
-    --light-gray: #2a2a2a;
-    --medium-gray: #666666;
-    --dark-gray: #999999;
-    --border-color: #444444;
-  }
-  
-  .body-content-container {
-    background-color: #1a1a1a;
-  }
-  
-  .form-card, .detail-card, .table-responsive {
-    background-color: #252525;
-    border-color: #333333;
-  }
-  
-  .card-header, .detail-card-header, .table-header {
-    background-color: #2a2a2a;
-    border-color: #333333;
-  }
-  
-  .form-input, .form-textarea, .search-input {
-    background-color: #333333;
-    color: #f0f0f0;
-    border-color: #444444;
-  }
-  
-  .form-input::placeholder, .search-input::placeholder {
-    color: #777777;
-  }
-  
-  .btn-secondary {
-    background-color: #333333;
-    color: #f0f0f0;
-    border-color: #444444;
-  }
-  
-  .btn-secondary:hover {
-    background-color: #444444;
-  }
-  
-  .data-table th {
-    background-color: #2a2a2a;
-    border-color: #333333;
-  }
-  
-  .data-table td {
-    border-color: #333333;
-  }
-  
-  .data-table tr:hover {
-    background-color: #2e2e2e;
-  }
-  
-  .data-table tr.selected {
-    background-color: rgba(0, 194, 194, 0.2);
-  }
-  
-  .cost-bar-container {
-    background-color: #333333;
-  }
-}
 
 /* Additional helper classes */
 .text-center {
