@@ -86,7 +86,8 @@ const OfficialReceipts = () => {
   ];
 
   const [data, setData] = useState([]);
-  const [invoices, setInvoices] = useState([]);
+  const [receipts, setReceipts] = useState([]);
+  const [invoiceIds, setInvoiceIds] = useState([]);
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -101,7 +102,6 @@ const OfficialReceipts = () => {
     import.meta.env.VITE_API_URL ||
     "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const OFFICIAL_RECEIPTS_ENDPOINT = `${API_URL}/api/official-receipts/`;
-  const INVOICES_ENDPOINT = `${API_URL}/api/invoices/`;
 
   const openModal = () => setModalOpen(true);
 
@@ -110,6 +110,7 @@ const OfficialReceipts = () => {
     setReportForm({
       startDate: getCurrentDate(),
       salesInvoiceId: "",
+      customerId: "SALES-CUST-2025",
       totalAmount: "",
       amountDue: "",
       amountPaid: "",
@@ -122,6 +123,7 @@ const OfficialReceipts = () => {
   const [reportForm, setReportForm] = useState({
     startDate: getCurrentDate(),
     salesInvoiceId: "",
+    customerId: "SALES-CUST-2025",
     totalAmount: "",
     amountDue: "",
     amountPaid: "",
@@ -142,6 +144,7 @@ const OfficialReceipts = () => {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       const response = await axios.get(OFFICIAL_RECEIPTS_ENDPOINT, config);
+      setReceipts(response.data);
       setData(
         response.data.map((entry) => [
           entry.or_id || "-",
@@ -157,6 +160,11 @@ const OfficialReceipts = () => {
           entry.created_by || "-",
         ])
       );
+      setInvoiceIds(
+        response.data
+          .filter((entry) => entry.invoice_id)
+          .map((entry) => entry.invoice_id)
+      );
     } catch (error) {
       console.error("Error fetching receipts:", error);
       setValidation({
@@ -168,67 +176,21 @@ const OfficialReceipts = () => {
     }
   };
 
-  const fetchInvoices = async () => {
-    try {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      if (!token) {
-        throw new Error("No authentication token found.");
-      }
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.get(INVOICES_ENDPOINT, config);
-      setInvoices(response.data);
-      if (response.data.length === 0) {
-        // REVISED: Improved validation message
-        setValidation({
-          isOpen: true,
-          type: "warning",
-          title: "No Invoices Available",
-          message: "No invoices with a remaining balance found. All invoices may be fully paid or returned.",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching invoices:", {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-      });
-      let message = "Could not load invoice list. Please ensure the API is accessible.";
-      if (error.response?.status === 404) {
-        message = "Invoice endpoint not found. Verify the API URL and endpoint.";
-      } else if (error.response?.status === 403 || error.message === "No authentication token found.") {
-        message = "Access denied. Please check your authentication credentials or log in again.";
-      } else if (error.code === "ERR_NETWORK") {
-        message = "Network error. Please ensure the API server is running and accessible.";
-      } else if (error.response?.status === 504) {
-        message = "Gateway timeout. Check the backend response time or server status.";
-      }
-      setValidation({
-        isOpen: true,
-        type: "error",
-        title: "Invoice Fetch Failed",
-        message: error.response?.data?.detail || message,
-      });
-      setInvoices([]); // Ensure invoices is an empty array on error
-    }
-  };
-
   useEffect(() => {
     fetchData();
-    fetchInvoices();
   }, []);
 
-  const calculateRemainingAmount = (invoiceId, newSettledAmount) => {
-    const selectedInvoice = invoices.find((inv) => inv.invoice_id === invoiceId);
-    if (!selectedInvoice) {
-      throw new Error("Invalid invoice ID.");
+  const calculateRemainingAmount = (newSettledAmount, amountDue) => {
+    const settledAmount = parseFloat(newSettledAmount) || 0;
+    if (isNaN(settledAmount)) {
+      throw new Error("Invalid settled amount. Please enter a valid number.");
     }
 
-    const settledAmount = parseFloat(newSettledAmount);
-    if (isNaN(settledAmount) || settledAmount <= 0) {
-      throw new Error("Invalid settled amount. Please enter a valid positive number.");
+    const remainingBalance = parseFloat(amountDue);
+    if (isNaN(remainingBalance)) {
+      throw new Error("Invalid amount due. Please enter a valid number.");
     }
 
-    const remainingBalance = parseFloat(selectedInvoice.remaining_balance);
     const newRemaining = remainingBalance - settledAmount;
     return newRemaining >= 0 ? newRemaining : 0;
   };
@@ -252,16 +214,19 @@ const OfficialReceipts = () => {
   };
 
   const handleInputChange = (field, value) => {
-    setReportForm((prevForm) => ({
-      ...prevForm,
-      [field]: value,
-    }));
+    setReportForm((prevForm) => {
+      const newForm = { ...prevForm, [field]: value };
+      if (field === "salesInvoiceId") {
+        const selectedReceipt = receipts.find((r) => r.invoice_id === value);
+        newForm.customerId = selectedReceipt?.customer_id || "SALES-CUST-2025";
+      }
+      return newForm;
+    });
   };
 
   const handleSubmit = async () => {
     if (
       !reportForm.startDate ||
-      !reportForm.salesInvoiceId ||
       !reportForm.totalAmount ||
       !reportForm.amountDue ||
       !reportForm.amountPaid ||
@@ -277,33 +242,20 @@ const OfficialReceipts = () => {
       return;
     }
 
-    const selectedInvoice = invoices.find(
-      (inv) => inv.invoice_id === reportForm.salesInvoiceId
-    );
-    if (!selectedInvoice) {
-      setValidation({
-        isOpen: true,
-        type: "warning",
-        title: "Invalid Invoice",
-        message: "Please select a valid invoice.",
-      });
-      return;
-    }
-
     try {
       const newRemainingAmount = calculateRemainingAmount(
-        reportForm.salesInvoiceId,
-        reportForm.amountPaid
+        reportForm.amountPaid,
+        reportForm.amountDue
       );
 
       if (
-        parseFloat(reportForm.amountPaid) > parseFloat(selectedInvoice.remaining_balance)
+        parseFloat(reportForm.amountPaid) > parseFloat(reportForm.amountDue)
       ) {
         setValidation({
           isOpen: true,
           type: "warning",
           title: "Invalid Payment",
-          message: `The settled amount (${reportForm.amountPaid}) exceeds the remaining invoice balance (${selectedInvoice.remaining_balance}).`,
+          message: `The settled amount (${reportForm.amountPaid}) exceeds the amount due (${reportForm.amountDue}).`,
         });
         return;
       }
@@ -311,8 +263,8 @@ const OfficialReceipts = () => {
       const referenceNumber = generateReferenceNumber();
       const newReceipt = {
         or_id: generateCustomORID(),
-        invoice_id: reportForm.salesInvoiceId,
-        customer_id: selectedInvoice.customer_id || "SALES-CUST-2025",
+        invoice_id: reportForm.salesInvoiceId || null,
+        customer_id: reportForm.customerId,
         or_date: reportForm.startDate,
         total_amount: parseFloat(reportForm.totalAmount).toFixed(2),
         amount_due: parseFloat(reportForm.amountDue).toFixed(2),
@@ -330,7 +282,6 @@ const OfficialReceipts = () => {
       const response = await axios.post(OFFICIAL_RECEIPTS_ENDPOINT, newReceipt, config);
       if (response.status === 201) {
         fetchData();
-        fetchInvoices();
         closeModal();
         setValidation({
           isOpen: true,
@@ -561,7 +512,7 @@ const OfficialReceipts = () => {
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
           setValidation={setValidation}
-          invoiceOptions={invoices.map((inv) => inv.invoice_id)}
+          invoiceOptions={invoiceIds}
         />
       )}
       {validation.isOpen && (
