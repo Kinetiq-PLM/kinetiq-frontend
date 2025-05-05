@@ -153,6 +153,29 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
     return matchesStatus && matchesSearch;
   });
 
+  const handleStatusChange = async (requestId, newStatus) => {
+    try {
+      // Update the status in the backend
+      await axios.patch(`http://127.0.0.1:8000/api/prf/update/${requestId}/`, {
+        status: newStatus,
+      });
+  
+      // Update the status locally (immediate reflection in UI)
+      setPurchaseRequests((prevRequests) =>
+        prevRequests.map((request) =>
+          request.request_id === requestId
+            ? { ...request, status: newStatus } // Update the status for the matching request
+            : request
+        )
+      );
+  
+      console.log(`Status for request ${requestId} updated to ${newStatus}`);
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setError("Failed to update status.");
+    }
+  };
+
   return (
     <div className="purchreq">
       <div className="purchreq-body-content-container">
@@ -224,7 +247,7 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
             <div className="purchreq-table-header">
               <div>PR No.</div>
               <div>Employee Name</div>
-              <div>Department</div>
+              <div>Status</div>
               <div>
                 <span
                   className="sortable-header"
@@ -238,15 +261,31 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
             </div>
             <div className="purchreq-table-scrollable">
               <div className="purchreq-table-rows">
-                {filteredRequests.length > 0 ? filteredRequests.map((request, index) => (
-                  <div key={index} className="purchreq-row" onClick={() => handleRequestClick(request)}>
-                    <div>{request.request_id}</div>
-                    <div>{employeeMap[request.employee_id]?.name || " "}</div>
-                    <div>{employeeMap[request.employee_id]?.dept_id || " "}</div>
-                    <div>{request.document_date}</div>
-                    <div>{request.valid_date}</div>
-                  </div>
-                )) : (
+                {filteredRequests.length > 0 ? (
+                  filteredRequests.map((request, index) => (
+                    <div key={index} className="purchreq-row">
+                      <div>{request.request_id}</div>
+                      <div>{employeeMap[request.employee_id]?.name || " "}</div>
+                      <div>
+                        <select
+                          value={request.status || "Pending"}
+                          onChange={(e) => handleStatusChange(request.request_id, e.target.value)}
+                        >
+                          <option value="Acknowledged">Acknowledged</option>
+                          <option value="Finished">Finished</option>
+                          <option value="Approved">Approved</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Returned">Returned</option>
+                          <option value="Rejected">Rejected</option>
+                          <option value="Cancelled">Cancelled</option>
+                          <option value="Expired">Expired</option>
+                        </select>
+                      </div>
+                      <div>{request.document_date}</div>
+                      <div>{request.valid_date}</div>
+                    </div>
+                  ))
+                ) : (
                   <div className="purchreq-no-results">No results found</div>
                 )}
               </div>
