@@ -9,7 +9,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
         // State to store warehouse movements data
         const [warehouseMovementsView, setWarehouseMovementsView] = useState([]);
 
-        // State to store warehouse data\
+        // State to store warehouse data
         const[warehouseItemsData, setWarehouseItemsData] = useState([]); 
 
         // State management to store warehouse loc data
@@ -89,7 +89,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
         useEffect(() => {
             const fetchWarehouseListData = async () => {
                 try {
-                    const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
+                    const response = await fetch("http://127.0.0.1:8000/api/warehouse-list/");
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseListData(data);
@@ -202,29 +202,17 @@ import { ContinuousColorLegend } from "@mui/x-charts";
             <div className={`stockflow ${showModal ? "blurred" : ""}`}>
                 
                 <div className="body-content-container">
-                
-                    {/* Navigation Tabs */}
-                    <nav className="top-0 left-0 flex flex-wrap justify-between  space-x-8 w-full p-2 mt-15">
-                        <div className="invNav flex border-b border-gray-200 space-x-8 md:w-auto mt-1 mb-1">
-                            {Object.keys(stockFlowTableConfigs).map((tab) => (
-                                <span
-                                    key={tab}
-                                    className={`cursor-pointer text-sm md:text-md font-semibold transition-colors ${
-                                        activeTab === tab ? "text-cyan-600 border-b-2 border-cyan-600" : "text-gray-500"
-                                    }`}
-                                    onClick={() => setActiveTab(tab)}
-                                >
-                                    {tab}
-                                </span>
-                            ))}
-                        </div>
-                    </nav>
 
-                    <section className="flex flex-wrap w-full h-auto space-y-3 md:space-x-4 ">
+                {/* Header Section */}
+                <div className=" w-full max-h-[80px]">
+                <div className=" w-full max-h-[80px] flex justify-between items-start gap-5">
+                    <div className="flex-col w-full">
+                    <h2 className="text-cyan-600 text-3xl font-semibold">INVENTORY: STOCKFLOW</h2>
+                    <p className={`text-base font-semibold mt-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>Selected Warehouse: <span className="font-normal">{}</span></p>
+                    </div>
 
-                                {/* Warehouse Filter */}
-                                
-                                <select name="" id="" className="w-full sm:w-[170px] border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
+                    <div className="w-[450px] h-full">
+                    <select name="" id="" className="w-full border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
                                         setWarehouse(e.target.value);
                                         setSelectedItem(null);
                                 }}>
@@ -234,10 +222,57 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                                             {warehouse.warehouse_location}
                                         </option>
                                     ))}
-                                </select>
+                                </select>   
+                    </div>
+                </div>
+                </div>
+                
+                    {/* Navigation Tabs */}
+                    <nav className="top-0 left-0 flex flex-wrap justify-between  space-x-8 w-full p-2">
+                        <div className="invNav flex border-b border-gray-200 space-x-8 md:w-auto mt-1 mb-1">
+                            {Object.keys(stockFlowTableConfigs).map((tab) => (
+                                <span
+                                    key={tab}
+                                    className={`cursor-pointer text-base md:text-md font-semibold transition-colors ${
+                                        activeTab === tab ? "text-cyan-600 border-b-2 border-cyan-600" : "text-gray-500"
+                                    }`}
+                                    onClick={() => setActiveTab(tab)}
+                                >
+                                    {tab}
+                                </span>
+                            ))}
+                        </div>
+                        <div className={`flex gap-2 border w-[290px] ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
+                        <button onClick={toggleModal} className=" w-full bg-cyan-600 text-white text-sm  px-2 py-1 rounded cursor-pointer">
+                                    Create Transfer
+                        </button>
+                        <button onClick={toggleModal} className="w-full bg-cyan-600 text-white text-sm  px-2 py-1 rounded cursor-pointer">
+                                    Transfer Form
+                        </button>
+
+                        </div>
+                    </nav>
+                    
+
+                    
+                    <section className="flex flex-wrap w-full h-auto space-y-3 md:space-x-4 ">
+
+                                {/* Warehouse Filter */}
+                                
+                                {/* <select name="" id="" className="w-full sm:w-[170px] border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
+                                        setWarehouse(e.target.value);
+                                        setSelectedItem(null);
+                                }}>
+                                    <option value="" className="text-gray-600">Select Warehouse</option>
+                                    {warehouseList.map((warehouse) => (
+                                        <option className="text-gray-600 cursor-pointer" key={warehouse.warehouse_id} value={warehouse.warehouse_location}>
+                                            {warehouse.warehouse_location}
+                                        </option>
+                                    ))}
+                                </select> */}
 
                                 {/* Expiry */}
-                                <select name="" id="" className="w-full sm:w-[160px] border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
+                                {/* <select name="" id="" className="w-full sm:w-[160px] border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
                                         setExpiry(e.target.value);
                                         setSelectedItem(null);
                                         }
@@ -247,7 +282,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                                             <option key={d} value={d}>{d}</option>
                                         ))}
                                     
-                                </select>
+                                </select> */}
 
                                 
                         
@@ -303,21 +338,21 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                         
                         
                         {/* side section for filters and item details */}
-                        <div className={`flex flex-col  rounded-lg min-h-full w-[230px] ml-4 p-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
+                        <div className={`flex flex-col  rounded-lg min-h-full w-[300px] ml-4 p-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
                             
                                 
 
 
                             <button
                                     onClick={toggleModal}
-                                    className="hidden md:block mt-4 bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
+                                    className="hidden md:block  bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
                                 >
-                                    Transfer Stock
+                                    Transfer Item
                             </button>
                             
 
                             {/* Selected Items and Item Deatils Label */}
-                            <div className="hidden md:block mt-4">
+                            <div className="hidden md:block mt-2">
                                 <h3 className="text-center text-gray-600 mt-2"></h3>
 
                                 {/* Selected Items Container */}
