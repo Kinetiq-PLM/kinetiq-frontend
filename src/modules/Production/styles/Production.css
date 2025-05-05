@@ -583,26 +583,7 @@
   border-radius: 8px;
   width: 100%;
   background-color: #d2d2d2;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
   color: #404040;
-}
-
-.production-table input[type="date"]:focus {
-  border-color: #00A8A8;
-  outline: none;
-  background-color: #ffffff;
-  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
-}
-
-.production-table input {
-  padding: 6px 4px;
-  font-size: 12px;
-  border: 1px solid #ffffff;
-  border-radius: 8px;
-  width: 100%;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
   text-align: center;
 }
 
@@ -632,10 +613,6 @@
   transition: all 0.3s ease;
   resize: none;
   box-sizing: border-box;
-  white-space: pre-wrap;  
-  word-wrap: break-word;  
-  scrollbar-width: thin;               
-  scrollbar-color: #00A8A8 #e0e0e0;
 }
 
 .production-table textarea:focus {
@@ -650,11 +627,4 @@
   background-color: #ffffff; 
   box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
   cursor: pointer; 
-}
-
-.custom-date-picker,
-.date-button,
-.calendar-icon,
-.hidden-date-input {
-  display: none; 
 }
