@@ -2381,14 +2381,8 @@ const handleOnboardingTaskSubmit = async (e) => {
                   {uploadingDocumentCategory === "required" && (
                     <>
                       <option value="resume">Resume</option>
-                      <option value="psa_birth_cert">PSA Birth Certificate</option>
-                      <option value="nbi_clearance">NBI Clearance</option>
                       <option value="diploma">College Diploma</option>
                       <option value="tor">Transcript of Records</option>
-                      <option value="sss_id">SSS ID</option>
-                      <option value="pagibig_id">Pag-IBIG ID</option>
-                      <option value="philhealth_id">PhilHealth ID</option>
-                      <option value="tin_id">TIN ID</option>
                     </>
                   )}
                   {uploadingDocumentCategory === "optional" && (
