@@ -16,64 +16,84 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
   const [approvalFilter, setApprovalFilter] = useState("all"); // Default to show all
   const [sortOrder, setSortOrder] = useState("newest"); // Default to newest
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [pendingStatusUpdates, setPendingStatusUpdates] = useState({});
 
   const statusOptions = ["All", "Acknowledged", "Finished", "Approved", "Pending", "Returned", "Rejected", "Cancelled", "Expired"];
 
-  useEffect(() => {
-    const fetchPurchaseRequests = async () => {
-      try {
-        // Fetch all purchase requests
-        const prfResponse = await axios.get("http://127.0.0.1:8000/api/prf/list/");
-        const purchaseRequests = prfResponse.data;
-  
-        // Fetch all quotation contents
-        const quotationResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/list/");
-        const quotationContents = quotationResponse.data;
-  
-        // Extract request_ids that have matching quotation_content_id
-        const requestIdsWithQuotation = new Set(quotationContents.map((qc) => qc.request_id));
-  
-        // Filter purchase requests to include only those with matching request_ids
-        const filteredRequests = purchaseRequests.filter((request) =>
-          requestIdsWithQuotation.has(request.request_id)
-        );
-  
-        // Sort filtered requests by document_date (newest first)
-        const sortedRequests = filteredRequests.sort((a, b) => {
-          const dateA = new Date(a.document_date);
-          const dateB = new Date(b.document_date);
-          return dateB - dateA;
-        });
-  
-        setPurchaseRequests(sortedRequests);
-      } catch (error) {
+  const fetchPurchaseRequests = async (signal) => {
+    try {
+      // Fetch all purchase requests
+      const prfResponse = await axios.get("http://127.0.0.1:8000/api/prf/list/", { signal });
+      const purchaseRequests = prfResponse.data;
+
+      // Fetch all quotation contents
+      const quotationResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/list/", { signal });
+      const quotationContents = quotationResponse.data;
+
+      // Extract request_ids that have matching quotation_content_id
+      const requestIdsWithQuotation = new Set(quotationContents.map((qc) => qc.request_id));
+
+      // Filter purchase requests to include only those with matching request_ids
+      const filteredRequests = purchaseRequests.filter((request) =>
+        requestIdsWithQuotation.has(request.request_id)
+      );
+
+      // Sort filtered requests by document_date (newest first)
+      const sortedRequests = filteredRequests.sort((a, b) => {
+        const dateA = new Date(a.document_date);
+        const dateB = new Date(b.document_date);
+        return dateB - dateA;
+      });
+
+      setPurchaseRequests(sortedRequests);
+    } catch (error) {
+      if (!axios.isCancel(error)) {
         console.error("Error fetching purchase requests or quotation contents:", error);
         setError("Failed to load purchase requests.");
+      }
+    }
+  };
+
+  const fetchEmployees = async (signal) => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/prf/employees/", { signal });
+      const employeeData = response.data.reduce((map, employee) => {
+        const fullName = `${employee.first_name} ${employee.last_name}`.trim();
+        map[employee.employee_id] = {
+          name: fullName,
+          dept_id: employee.dept_id,
+        };
+        return map;
+      }, {});
+      setEmployeeMap(employeeData);
+    } catch (error) {
+      if (!axios.isCancel(error)) {
+        console.error("Error fetching employees:", error);
+        setError("Failed to load employee data.");
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Create abort controllers for API calls
+    const abortController = new AbortController();
+    
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        await fetchPurchaseRequests(abortController.signal);
+        await fetchEmployees(abortController.signal);
       } finally {
         setLoading(false);
       }
     };
-  
-    const fetchEmployees = async () => {
-      try {
-        const response = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
-        const employeeData = response.data.reduce((map, employee) => {
-          const fullName = `${employee.first_name} ${employee.last_name}`.trim();
-          map[employee.employee_id] = {
-            name: fullName,
-            dept_id: employee.dept_id,
-          };
-          return map;
-        }, {});
-        setEmployeeMap(employeeData);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-        setError("Failed to load employee data.");
-      }
+    
+    fetchData();
+    
+    // Cleanup function to abort any pending requests when component unmounts
+    return () => {
+      abortController.abort();
     };
-  
-    fetchPurchaseRequests();
-    fetchEmployees();
   }, []);
 
   // Sort purchase requests dynamically based on sortOrder
@@ -127,6 +147,66 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
     setShowStatusDropdown(false);
   };
 
+  const handleStatusChange = async (requestId, newStatus) => {
+    try {
+      // Mark this request as having a pending update
+      setPendingStatusUpdates(prev => ({
+        ...prev,
+        [requestId]: true
+      }));
+      
+      // First, update the local state immediately for instant UI feedback
+      setPurchaseRequests(prevRequests => 
+        prevRequests.map(request => 
+          request.request_id === requestId 
+            ? { ...request, status: newStatus }
+            : request
+        )
+      );
+      
+      // Then update the backend
+      await axios.patch(`http://127.0.0.1:8000/api/prf/update/${requestId}/`, {
+        status: newStatus,
+      });
+
+      console.log(`Status for request ${requestId} updated to ${newStatus}`);
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setError("Failed to update status.");
+      
+      // If the API call fails, revert only this specific request
+      setPurchaseRequests(prevRequests => {
+        return prevRequests.map(request => {
+          if (request.request_id === requestId) {
+            // Fetch the current status from the server for just this one request
+            axios.get(`http://127.0.0.1:8000/api/prf/detail/${requestId}/`)
+              .then(response => {
+                const currentStatus = response.data.status;
+                setPurchaseRequests(latestRequests => 
+                  latestRequests.map(req => 
+                    req.request_id === requestId 
+                      ? { ...req, status: currentStatus }
+                      : req
+                  )
+                );
+              })
+              .catch(err => {
+                console.error("Failed to fetch current status:", err);
+              });
+          }
+          return request;
+        });
+      });
+    } finally {
+      // Clear the pending status regardless of success/failure
+      setPendingStatusUpdates(prev => {
+        const updated = { ...prev };
+        delete updated[requestId];
+        return updated;
+      });
+    }
+  };
+
   const filteredRequests = purchaseRequests.filter((request) => {
     const searchLower = searchTerm.toLowerCase();
     const employee = employeeMap[request.employee_id];
@@ -152,29 +232,6 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
 
     return matchesStatus && matchesSearch;
   });
-
-  const handleStatusChange = async (requestId, newStatus) => {
-    try {
-      // Update the status in the backend
-      await axios.patch(`http://127.0.0.1:8000/api/prf/update/${requestId}/`, {
-        status: newStatus,
-      });
-  
-      // Update the status locally (immediate reflection in UI)
-      setPurchaseRequests((prevRequests) =>
-        prevRequests.map((request) =>
-          request.request_id === requestId
-            ? { ...request, status: newStatus } // Update the status for the matching request
-            : request
-        )
-      );
-  
-      console.log(`Status for request ${requestId} updated to ${newStatus}`);
-    } catch (error) {
-      console.error("Error updating status:", error);
-      setError("Failed to update status.");
-    }
-  };
 
   return (
     <div className="purchreq">
@@ -268,8 +325,10 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
                       <div>{employeeMap[request.employee_id]?.name || " "}</div>
                       <div>
                         <select
+                          className={`status-select status-${request.status?.toLowerCase() || 'pending'} ${pendingStatusUpdates[request.request_id] ? 'status-updating' : ''}`}
                           value={request.status || "Pending"}
                           onChange={(e) => handleStatusChange(request.request_id, e.target.value)}
+                          disabled={pendingStatusUpdates[request.request_id]}
                         >
                           <option value="Acknowledged">Acknowledged</option>
                           <option value="Finished">Finished</option>

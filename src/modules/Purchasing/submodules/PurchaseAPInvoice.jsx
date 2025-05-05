@@ -24,7 +24,7 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
 
     const statusOptions = [
         "All",
-        "Over Due",
+        "Overdue",
         "Paid",
         "Received",
         "Forwarded"
@@ -98,7 +98,14 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
 
         // 2. Apply status filter
         if (selectedStatus !== "All") {
-            result = result.filter(invoice => invoice.status === selectedStatus);
+            if (selectedStatus === "Overdue") {
+                const today = new Date();
+                result = result.filter(invoice => 
+                    invoice.due_date && new Date(invoice.due_date) < today
+                );
+            } else {
+                result = result.filter(invoice => invoice.status === selectedStatus);
+            }
         }
 
         // 3. Apply search filter

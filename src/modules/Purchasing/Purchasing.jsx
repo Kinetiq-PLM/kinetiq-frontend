@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
-import { FaClipboardList, FaFileAlt, FaTruck, FaFileInvoice, FaReceipt, FaCreditCard, FaCarAlt, FaQuora, FaMarkdown, FaMarsDouble, FaAngleDoubleRight, FaBeer, FaAngellist, FaQuoteRight, FaCartPlus, FaShoppingCart } from 'react-icons/fa';
+import { FaClipboardList, FaFileAlt, FaTruck, FaFileInvoice, FaReceipt, FaCreditCard, FaCarAlt, FaQuora, FaMarkdown, FaMarsDouble, FaAngleDoubleRight, FaBeer, FaAngellist, FaQuoteRight, FaCartPlus, FaShoppingCart, FaCalendarAlt } from 'react-icons/fa';
 import './styles/Purchasing.css';
 
 import PurchaseReqList from './submodules/PurchaseReqList';
@@ -67,9 +67,14 @@ const PurchasingBody = () => {
                     <div className="purch-filters">
                         <div className="purch-filter-group">
                             <label>Date Range</label>
-                            <select className="purch-select">
-                                <option>Year</option>
-                            </select>
+                            <div className="purch-date-input-container">
+                                <input 
+                                    type="date" 
+                                    className="purch-date-input"
+                                    placeholder="Select Date"
+                                    onChange={(e) => console.log("Selected date:", e.target.value)}
+                                />
+                            </div>
                         </div>
                         <div className="purch-filter-group">
                             <label>Vendor</label>
@@ -218,6 +223,9 @@ const PurchasingBody = () => {
                                                     fill="#8884d8"
                                                     dataKey="value"
                                                     label={false}
+                                                    activeShape={false}
+                                                    isAnimationActive={false}
+                                                    onClick={null}
                                                 >
                                                     {pieData.map((entry, index) => (
                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

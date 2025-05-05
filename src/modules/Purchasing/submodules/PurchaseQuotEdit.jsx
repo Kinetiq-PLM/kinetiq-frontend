@@ -16,6 +16,7 @@ const PurchaseQuotEdit = ({ quotation, onClose, onSuccess }) => {
     remarks: quotation.remarks || "",
     vendor_code: quotation.vendor_code || "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,6 +25,7 @@ const PurchaseQuotEdit = ({ quotation, onClose, onSuccess }) => {
 
   const handleSubmit = async () => {
     try {
+      setIsSubmitting(true);
       const response = await axios.put(
         `http://127.0.0.1:8000/api/purchase_quotation/update/${quotation.quotation_id}/`,
         formData
@@ -33,26 +35,51 @@ const PurchaseQuotEdit = ({ quotation, onClose, onSuccess }) => {
     } catch (error) {
       console.error("Error updating quotation:", error.response?.data || error.message);
       alert("Failed to update quotation. Check the console for details.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle click outside to close
+  const handleModalClick = (e) => {
+    if (e.target.className === "purchasequot-edit-modal") {
+      onClose();
+    }
+  };
+
+  // Handle escape key to close
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      onClose();
     }
   };
 
   return (
-    <div className="purchasequot-edit-modal">
+    <div 
+      className="purchasequot-edit-modal" 
+      onClick={handleModalClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={-1}
+    >
       <div className="purchasequot-edit-content">
         <h3>Edit Quotation</h3>
+        
         <div className="form-group">
-          <label>Document No</label>
+          <label htmlFor="document_no">Document No</label>
           <input
             type="text"
+            id="document_no"
             name="document_no"
             value={formData.document_no}
             onChange={handleInputChange}
             disabled
           />
         </div>
+        
         <div className="form-group">
-          <label>Status</label>
+          <label htmlFor="status">Status</label>
           <select
+            id="status"
             name="status"
             value={formData.status}
             onChange={handleInputChange}
@@ -63,10 +90,33 @@ const PurchaseQuotEdit = ({ quotation, onClose, onSuccess }) => {
             <option value="Rejected">Rejected</option>
           </select>
         </div>
-        {/* Add other fields as needed */}
+        
+        <div className="form-group">
+          <label htmlFor="document_date">Document Date</label>
+          <input
+            type="date"
+            id="document_date"
+            name="document_date"
+            value={formData.document_date}
+            onChange={handleInputChange}
+          />
+        </div>
+        
         <div className="form-actions">
-          <button onClick={onClose}>Cancel</button>
-          <button onClick={handleSubmit}>Save</button>
+          <button 
+            onClick={onClose}
+            type="button"
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={handleSubmit}
+            type="button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Saving..." : "Save"}
+          </button>
         </div>
       </div>
     </div>

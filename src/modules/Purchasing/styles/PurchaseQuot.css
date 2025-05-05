@@ -14,10 +14,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     min-width: 40rem;
     min-height: 30rem;
-    margin-top: 0.5rem;
 }
 
 .purchquote .purchquote-header {
@@ -341,4 +340,121 @@
     font-size: 0.9rem;
     cursor: pointer;
     transition: background-color 0.2s;
+}
+
+/* Edit Modal Styles */
+.purchasequot-edit-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.purchasequot-edit-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 450px;
+  max-width: 90%;
+  padding: 24px;
+  position: relative;
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.purchasequot-edit-content h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+}
+
+.purchasequot-edit-content .form-group {
+  margin-bottom: 16px;
+}
+
+.purchasequot-edit-content label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.purchasequot-edit-content input,
+.purchasequot-edit-content select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.purchasequot-edit-content input:focus,
+.purchasequot-edit-content select:focus {
+  border-color: #00A8A8;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.purchasequot-edit-content input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.purchasequot-edit-content .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+}
+
+.purchasequot-edit-content .form-actions button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.purchasequot-edit-content .form-actions button:first-child {
+  background-color: white;
+  border: 1px solid #ddd;
+  color: #666;
+}
+
+.purchasequot-edit-content .form-actions button:first-child:hover {
+  background-color: #f5f5f5;
+}
+
+.purchasequot-edit-content .form-actions button:last-child {
+  background-color: #00bcd4;
+  border: 1px solid #00bcd4;
+  color: white;
+}
+
+.purchasequot-edit-content .form-actions button:last-child:hover {
+  background-color: #00A8A8;
+}

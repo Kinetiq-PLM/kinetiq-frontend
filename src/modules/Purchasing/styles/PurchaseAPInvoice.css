@@ -26,7 +26,7 @@
 /*For sizes ng mga content*/
 .apinvoice .apinvoice-table-scrollable {
     width: 100%;
-  max-height: auto;
+  max-height: 580px;
   overflow-x: auto;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -234,75 +234,42 @@
     cursor: pointer;
 }
 
-.apinvoice .status-closed,
-.apinvoice .status-open,
-.apinvoice .status-cancelled,
-.apinvoice .status-draft,
-.apinvoice .status-complete {
-    padding: 0.25rem 0.75rem;
-    border-radius: 1rem;
-    font-size: 0.9rem;
-    display: inline-block;
-}
 
-.apinvoice .status-closed {
-    background-color: #e3f2fd;
-    color: #1976d2;
-}
 
-.apinvoice .status-open {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-}
-
-.apinvoice .status-cancelled {
-    background-color: #ffebee;
-    color: #c62828;
-}
-
-.apinvoice .status-draft {
-    background-color: #fff3e0;
-    color: #f57c00;
-}
-
-.apinvoice .status-complete {
-    background-color: #c8e6c9;
-    color: #388e3c;
-}
-
-.apinvoice .status-approved,
-.apinvoice .status-pending,
-.apinvoice .status-rejected,
-.apinvoice .status-completed {
-  border-radius: 12px;
+.apinvoice .status-overdue,
+.apinvoice .status-received,
+.apinvoice .status-forwarded,
+.apinvoice .status-paid {
+    border-radius: 12px;
   padding: 2px 10px;
   font-size: 0.85em;
   font-weight: normal;
   display: inline-block;
 }
 
-.apinvoice .status-approved {
-  color: #155724;
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
+.apinvoice .status-overdue {
+    color: #dc2626;
+  background-color: #fee2e2;
+  border: 1px solid #fee2e2;
 }
 
-.apinvoice .status-pending {
-  color: #856404;
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
+.apinvoice .status-received {
+    color: #d97706;
+  background-color:#fef3c7;
+  border: 1px solid #fef3c7;
 }
 
-.apinvoice .status-rejected {
-  color: #721c24;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
+
+.apinvoice .status-forwarded {
+    color: #0284c7;
+  background-color: #e0f2fe;
+  border: 1px solid #e0f2fe;
 }
 
-.apinvoice .status-completed {
-  color: #0c5460;
-  background-color: #d1ecf1;
-  border: 1px solid #bee5eb;
+.apinvoice .status-paid {
+    color: #155724;
+  background-color: #d9ead3;
+  border: 1px solid #d9ead3;
 }
 
 .apinvoice .apinvoice-status-filter {
