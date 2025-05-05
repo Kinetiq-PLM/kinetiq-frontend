@@ -59,12 +59,56 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
     });
   }, [departmentStructureData]);
 
-  // Department colors - using a consistent palette with teal primary color like in Distribution module
+  // Enhanced gradient color palette - replace the existing COLORS array
   const COLORS = [
     '#00a8a8', '#66bc6d', '#8884d8', '#ff8042', 
     '#ffc658', '#82ca9d', '#8dd1e1', '#a4de6c',
     '#d0ed57', '#97e3d5', '#f5a623', '#f78da7'
   ];
+  
+  // Define gradient IDs for each color
+  const GRADIENTS = COLORS.map((color, index) => `departmentGradient-${index}`);
+  
+  // Helper function to create lighter/darker shade of a color
+  const createShade = (hexColor, percent) => {
+    const num = parseInt(hexColor.slice(1), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = (num >> 8 & 0x00FF) + amt;
+    const B = (num & 0x0000FF) + amt;
+    
+    return `#${(1 << 24 | (R < 255 ? (R < 0 ? 0 : R) : 255) << 16 | (G < 255 ? (G < 0 ? 0 : G) : 255) << 8 | (B < 255 ? (B < 0 ? 0 : B) : 255)).toString(16).slice(1)}`;
+  };
+  
+  // Then in your render, before your charts, add the SVG gradient definitions:
+  const renderGradientDefs = () => (
+    <defs>
+      {COLORS.map((color, index) => (
+        <linearGradient 
+          key={`gradient-${index}`} 
+          id={GRADIENTS[index]} 
+          x1="0" y1="0" 
+          x2="0" y2="1"
+        >
+          <stop offset="0%" stopColor={color} stopOpacity={0.9} />
+          <stop offset="100%" stopColor={createShade(color, 15)} stopOpacity={0.7} />
+        </linearGradient>
+      ))}
+      
+      {/* Add radial gradient for pie chart */}
+      {COLORS.map((color, index) => (
+        <radialGradient 
+          key={`radial-gradient-${index}`} 
+          id={`pieGradient-${index}`} 
+          cx="50%" cy="50%" r="50%" 
+          fx="50%" fy="50%"
+        >
+          <stop offset="0%" stopColor={createShade(color, 20)} stopOpacity={0.9} />
+          <stop offset="100%" stopColor={color} stopOpacity={1} />
+        </radialGradient>
+      ))}
+    </defs>
+  );
 
   // Calculate the total number of employees for percentage calculations
   const totalEmployees = departmentStructureData.reduce((sum, dept) => sum + dept.value, 0);
@@ -394,6 +438,7 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
                   <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0 }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart margin={{ top: 10, right: 30, bottom: 10, left: 30 }}> 
+                        {renderGradientDefs()}
                         <Pie
                           data={departmentStructureData}
                           cx="50%"
@@ -412,7 +457,7 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
                           {departmentStructureData.map((entry, index) => (
                             <Cell 
                               key={`cell-${index}`} 
-                              fill={COLORS[index % COLORS.length]}
+                              fill={`url(#pieGradient-${index % COLORS.length})`}
                               stroke="#fff"
                               strokeWidth={2}
                             />
@@ -431,24 +476,6 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
                             padding: '10px 15px'
                           }}
                         />
-                        <text 
-                          x="50%" 
-                          y="50%" 
-                          textAnchor="middle" 
-                          dominantBaseline="middle"
-                          style={{ fill: "#333", fontSize: "16px", fontWeight: "600" }}
-                        >
-                          {totalEmployees}
-                        </text>
-                        <text 
-                          x="50%" 
-                          y="50%" 
-                          dy="20" 
-                          textAnchor="middle" 
-                          style={{ fill: "#687C7B", fontSize: "12px" }}
-                        >
-                          employees
-                        </text>
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -578,40 +605,51 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
                     }}>
                       Department Coverage
                     </div>
-                    <div style={{
-                      fontSize: "13px",
-                      fontWeight: "500",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "5px",
-                      marginBottom: "8px"
-                    }}>
-                      <span>{superiors?.length || 0} of {totalDepartments}</span>
-                      <span style={{ color: "#687C7B" }}>departments with managers</span>
-                    </div>
-                    <div style={{
-                      width: "100%",
-                      height: "8px",
-                      backgroundColor: "#e9ecef",
-                      borderRadius: "4px",
-                      overflow: "hidden"
-                    }}>
-                      <div style={{
-                        width: `${totalDepartments > 0 ? (superiors?.length / totalDepartments) * 100 : 0}%`,
-                        height: "100%",
-                        background: "linear-gradient(90deg, #00a9ac 0%, #66bc6d 100%)"
-                      }}/>
-                    </div>
-                    <div style={{
-                      marginTop: "8px",
-                      fontSize: "11px",
-                      color: "#008a8c",
-                      fontWeight: "500",
-                      textAlign: "right"
-                    }}>
-                      {totalDepartments > 0 ? 
-                        Math.round((superiors?.length / totalDepartments) * 100) : 0}% coverage
-                    </div>
+                    {/* Calculate unique departments with superiors */}
+                    {(() => {
+                      // Get unique departments that have superiors
+                      const departmentsWithSuperiors = new Set(superiors.map(sup => sup.dept_id)).size;
+                      const coveragePercent = totalDepartments > 0 ? 
+                        Math.min(100, Math.round((departmentsWithSuperiors / totalDepartments) * 100)) : 0;
+                        
+                      return (
+                        <>
+                          <div style={{
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "5px",
+                            marginBottom: "8px"
+                          }}>
+                            <span>{departmentsWithSuperiors} of {totalDepartments}</span>
+                            <span style={{ color: "#687C7B" }}>departments with managers</span>
+                          </div>
+                          <div style={{
+                            width: "100%",
+                            height: "8px",
+                            backgroundColor: "#e9ecef",
+                            borderRadius: "4px",
+                            overflow: "hidden"
+                          }}>
+                            <div style={{
+                              width: `${coveragePercent}%`,
+                              height: "100%",
+                              background: "linear-gradient(90deg, #00a9ac 0%, #66bc6d 100%)"
+                            }}/>
+                          </div>
+                          <div style={{
+                            marginTop: "8px",
+                            fontSize: "11px",
+                            color: "#008a8c",
+                            fontWeight: "500",
+                            textAlign: "right"
+                          }}>
+                            {coveragePercent}% coverage
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
 
                   {/* Action button */}
@@ -649,8 +687,8 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
             )}
           </div>
         </div>
-        
-        {/* Department Growth Trends - Enhanced with better visuals */}
+
+        {/* Department Superiors Section with enhanced styling matching Department Structure */}
         <div className="hr-report-chart-full" style={{
           boxShadow: '0 6px 16px rgba(0,169,172,0.08)',
           borderRadius: '12px',
@@ -667,52 +705,383 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
             display: 'flex',
             alignItems: 'center'
           }}>
-            <i className="fas fa-chart-bar" style={{ marginRight: '10px', color: '#00a9ac' }}></i>
-            Department Growth Trends
+            <i className="fas fa-user-tie" style={{ marginRight: '10px', color: '#00a9ac' }}></i>
+            Department Leadership
           </h3>
           
           <div style={{
-            height: "400px",
+            height: "450px",
             display: "flex", 
-            justifyContent: "center", 
-            alignItems: "center"
+            flexDirection: "row",
+            position: "relative"
           }}>
-            {departmentStructureData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={departmentStructureData}
-                  layout="vertical"
-                  margin={{ top: 20, right: 80, left: 40, bottom: 40 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                  <XAxis type="number" />
-                  <YAxis 
-                    type="category" 
-                    dataKey="name" 
-                    width={120} 
-                    tick={{ fontSize: 12 }}
-                  />
-                  <Tooltip content={<CustomBarTooltip />} />
-                  <Legend wrapperStyle={{ paddingTop: 15 }} />
-                  <Bar dataKey="value" name="Employees" fill="#00a9ac" barSize={30} radius={[0, 4, 4, 0]}>
-                    {departmentStructureData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            {superiors && superiors.length > 0 ? (
+              <>
+                {/* Department superiors list - styled like department list */}
+                <div style={{ 
+                  width: "30%", 
+                  padding: "10px 20px 10px 10px",
+                  display: "flex",
+                  flexDirection: "column",
+                }}>
+                  <h4 style={{ 
+                    marginBottom: "15px", 
+                    fontSize: "14px", 
+                    fontWeight: "600",
+                    color: '#00a9ac',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <i className="fas fa-users-cog" style={{ marginRight: '8px' }}></i>
+                    Department Superiors
+                  </h4>
+                  
+                  <div style={{ 
+                    display: "flex", 
+                    flexDirection: "column", 
+                    gap: "10px",
+                    maxHeight: "400px",
+                    overflowY: "auto"
+                  }}>
+                    {superiors.map((superior, index) => (
+                      <div key={index} style={{ 
+                        display: "flex", 
+                        alignItems: "center",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        background: index % 2 === 0 ? "#f9fafb" : "white",
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                        transition: 'transform 0.2s ease',
+                        cursor: 'pointer',
+                        border: '1px solid #f0f0f0'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+                      }}>
+                        <div style={{ 
+                          width: "16px", 
+                          height: "16px", 
+                          backgroundColor: COLORS[index % COLORS.length],
+                          borderRadius: "4px",
+                          marginRight: "12px",
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        }} />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ 
+                            fontSize: "13px", 
+                            fontWeight: "600",
+                            marginBottom: "4px"
+                          }}>
+                            {superior.superior_name || 'Unassigned'}
+                          </div>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}>
+                            <span style={{ 
+                              fontSize: "12px", 
+                              color: "#687C7B"
+                            }}>
+                              {superior.dept_name}
+                            </span>
+                            <span style={{
+                              background: COLORS[index % COLORS.length] + '20',
+                              color: COLORS[index % COLORS.length],
+                              padding: '3px 8px',
+                              borderRadius: '12px',
+                              fontWeight: '600',
+                              fontSize: '11px'
+                            }}>
+                              Level {superior.hierarchy_level}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                    <LabelList dataKey="value" position="right" fill="#333" formatter={(value) => `${value}`} />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Middle section - Hierarchy visualization with improved styling */}
+                <div style={{ width: "40%", position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: 0, right: 0, left: 0, bottom: 0 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart margin={{ top: 10, right: 30, bottom: 10, left: 30 }}> 
+                        {renderGradientDefs()}
+                        <Pie
+                          data={superiors.reduce((acc, sup) => {
+                            const level = sup.hierarchy_level || 1;
+                            const existingLevel = acc.find(item => item.level === level);
+                            if (existingLevel) {
+                              existingLevel.value += 1;
+                            } else {
+                              acc.push({ 
+                                level, 
+                                name: `Level ${level}`, 
+                                value: 1,
+                                departmentCount: 1
+                              });
+                            }
+                            return acc;
+                          }, []).sort((a, b) => a.level - b.level)}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={true}
+                          outerRadius={130}
+                          innerRadius={40}
+                          paddingAngle={2}
+                          fill="#8884d8"
+                          dataKey="value"
+                          nameKey="name"
+                          startAngle={90}
+                          endAngle={-270}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {superiors.reduce((acc, sup) => {
+                            const level = sup.hierarchy_level || 1;
+                            if (!acc.some(item => item.level === level)) {
+                              acc.push({ level });
+                            }
+                            return acc;
+                          }, []).sort((a, b) => a.level - b.level).map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={`url(#pieGradient-${index % COLORS.length})`}
+                              stroke="#fff"
+                              strokeWidth={2}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          formatter={(value, name) => [
+                            `${value} superiors (${((value / superiors.length) * 100).toFixed(1)}%)`, 
+                            name
+                          ]}
+                          contentStyle={{
+                            backgroundColor: 'white',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                            border: 'none',
+                            padding: '10px 15px'
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Right section - Insights cards with matching styling */}
+                <div style={{ 
+                  width: "30%", 
+                  borderLeft: "1px dashed #e0e0e0",
+                  paddingLeft: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  gap: "15px"
+                }}>
+                  <h4 style={{ 
+                    fontSize: "14px", 
+                    color: "#00a9ac", 
+                    marginBottom: "10px",
+                    fontWeight: "600",
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <i className="fas fa-chart-line" style={{ marginRight: '8px' }}></i>
+                    Leadership Insights
+                  </h4>
+
+                  {/* Metric Card: Leadership Coverage */}
+                  <div style={{ 
+                    padding: "12px",
+                    borderRadius: "8px",
+                    backgroundColor: "#f9fafb",
+                    border: "1px solid #f0f0f0",
+                    marginBottom: "8px"
+                  }}>
+                    <div style={{ 
+                      fontSize: "12px", 
+                      color: "#687C7B",
+                      marginBottom: "5px" 
+                    }}>
+                      Leadership Coverage
+                    </div>
+                    <div style={{ 
+                      fontSize: "20px", 
+                      fontWeight: "700",
+                      color: "#00a9ac",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between"
+                    }}>
+                      {Math.round((superiors.length / totalDepartments) * 100)}%
+                      <span style={{ 
+                        fontSize: "11px",
+                        padding: "3px 8px",
+                        backgroundColor: "rgba(0, 169, 172, 0.1)",
+                        color: "#00a9ac",
+                        borderRadius: "12px" 
+                      }}>
+                        coverage rate
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Metric Card: Department Distribution */}
+                  <div style={{ 
+                    padding: "12px",
+                    borderRadius: "8px",
+                    backgroundColor: "#f9fafb", 
+                    border: "1px solid #f0f0f0",
+                    marginBottom: "8px"
+                  }}>
+                    <div style={{ 
+                      fontSize: "12px", 
+                      color: "#687C7B",
+                      marginBottom: "5px" 
+                    }}>
+                      Hierarchy Distribution
+                    </div>
+                    <div style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px"
+                    }}>
+                      <div style={{
+                        width: "100%",
+                        height: "8px",
+                        backgroundColor: "#e9ecef",
+                        borderRadius: "4px",
+                        overflow: "hidden",
+                        display: "flex"
+                      }}>
+                        {[1, 2, 3, 4, 5].map(level => {
+                          const count = superiors.filter(s => s.hierarchy_level === level).length;
+                          if (count === 0) return null;
+                          return (
+                            <div 
+                              key={level} 
+                              style={{
+                                width: `${(count / superiors.length) * 100}%`,
+                                height: "100%",
+                                backgroundColor: COLORS[(level - 1) % COLORS.length]
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div style={{
+                      marginTop: "8px",
+                      fontSize: "11px",
+                      color: "#687C7B",
+                      display: "flex",
+                      justifyContent: "space-between"
+                    }}>
+                      {[1, 2, 3, 4, 5].filter(level => superiors.some(s => s.hierarchy_level === level)).map(level => {
+                        const count = superiors.filter(s => s.hierarchy_level === level).length;
+                        return (
+                          <span key={level} style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "5px"
+                          }}>
+                            <span style={{
+                              width: "8px",
+                              height: "8px",
+                              borderRadius: "2px",
+                              backgroundColor: COLORS[(level - 1) % COLORS.length]
+                            }}></span>
+                            <span>L{level}</span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                    {/* Metric Card: Hierarchy Distribution */}
+                    <div style={{ 
+                      padding: "12px",
+                      borderRadius: "8px",
+                      backgroundColor: "#f9fafb",
+                      border: "1px solid #f0f0f0"
+                    }}>
+                      <div style={{ 
+                        fontSize: "12px", 
+                        color: "#687C7B",
+                        marginBottom: "5px" 
+                      }}>
+                        Superior Hierarchy Levels
+                      </div>
+                      <div style={{ 
+                        fontSize: "20px", 
+                        fontWeight: "700",
+                        color: "#00a9ac",
+                        marginBottom: "5px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between"
+                      }}>
+                        {superiors.filter(s => s.hierarchy_level === 1).length}
+                        <span style={{ 
+                          fontSize: "11px",
+                          padding: "3px 8px",
+                          backgroundColor: "rgba(0, 169, 172, 0.1)",
+                          color: "#00a9ac",
+                          borderRadius: "12px" 
+                        }}>
+                          top level managers
+                        </span>
+                      </div>
+                      <div style={{
+                        marginTop: "8px",
+                        fontSize: "12px",
+                        color: "#687C7B",
+                        display: "flex",
+                        justifyContent: "space-between"
+                      }}>
+                        <span>Total superiors: {superiors.length}</span>
+                        <span>Levels: {[...new Set(superiors.map(s => s.hierarchy_level))].length}</span>
+                      </div>
+                    </div>
+
+                  {/* Action button */}
+                  <button style={{
+                    marginTop: "10px",
+                    padding: "8px 12px",
+                    backgroundColor: "white",
+                    border: "1px solid #00a9ac",
+                    borderRadius: "6px",
+                    color: "#00a9ac",
+                    fontSize: "12px",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "6px"
+                  }}>
+                    <i className="fas fa-user-plus" style={{ fontSize: "11px" }}></i>
+                    Manage Department Leaders
+                  </button>
+                </div>
+              </>
             ) : (
               <div className="hr-empty-chart" style={{
                 width: '100%',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                height: '100%'
+                justifyContent: 'center'
               }}>
-                <div className="hr-empty-chart-icon" style={{ fontSize: "48px", marginBottom: "15px" }}>📈</div>
-                <p style={{ color: "#687C7B", fontSize: "16px" }}>No trend data available for {period} period</p>
+                <div className="hr-empty-chart-icon" style={{ fontSize: "48px", marginBottom: "15px" }}>👥</div>
+                <p style={{ color: "#687C7B", fontSize: "16px" }}>No department superiors data available</p>
               </div>
             )}
           </div>

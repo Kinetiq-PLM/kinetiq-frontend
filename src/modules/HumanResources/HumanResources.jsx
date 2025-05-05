@@ -307,8 +307,9 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         const departmentsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/departments/department/");
         const departments = departmentsRes.data;
 
-        // Add this code in the useEffect where departments data is fetched:
-        // This should be after the departmentsRes.data line
+        // Make sure to fetch department superiors
+        const departmentSuperiorsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/");
+        const departmentSuperiors = departmentSuperiorsRes.data;
 
         // Process department data for reports
         const depts = departmentsRes.data;
@@ -333,6 +334,8 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
           
           setDepartmentData(transformedDepts);
         }
+
+        setDepartmentSuperiors(departmentSuperiors);
         
         // 6. Fetch resignations data
         const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
@@ -373,11 +376,6 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
         // 15. Fetch onboarding tasks data
         const onboardingTasksRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/onboarding/tasks/");
         setOnboardingTasks(onboardingTasksRes.data);
-
-        // 16. Fetch department superiors
-        const departmentSuperiorsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/department_superiors/department-superiors/");
-        const departmentSuperiors = departmentSuperiorsRes.data;
-        setDepartmentSuperiors(departmentSuperiors);
 
         // Process leave requests for table and chart
         const sortedLeaveRequests = allLeaveRequests.sort((a, b) => 
