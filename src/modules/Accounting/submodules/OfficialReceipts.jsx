@@ -616,7 +616,7 @@ const OfficialReceipts = () => {
           </div>
           <div>
             <Button
-              name="Create Receipt"
+              name="Update Receipt"
               variant="standard2"
               onclick={openModal}
             />
