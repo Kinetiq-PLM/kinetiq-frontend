@@ -200,6 +200,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
             const formattedData = data.map((item, index) => ({
                 number: index + 1,
+                np_statement_item_id: item.statement_item_id,
                 np_product_id: item.product_id,
                 np_product_name: item.product_name,
                 np_product_description: item.description,
@@ -373,17 +374,18 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 const data = await response.json();
                 console.log('Successfully submitted BOM:', data);
 
-                const updateResponse = await fetch(`${baseurl}/update_tracking_status/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ order_id: selectedRowData.number })
-                });
+                // COMMENT MUNA KASI DI PA AYOS
+                // const updateResponse = await fetch(`${baseurl}/update_tracking_status/`, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     },
+                //     body: JSON.stringify({ order_id: selectedRowData.number })
+                // });
         
-                if (!updateResponse.ok) throw new Error('Failed to update tracking status');
-                const updateData = await updateResponse.json();
-                console.log('Tracking status updated:', updateData);
+                // if (!updateResponse.ok) throw new Error('Failed to update tracking status');
+                // const updateData = await updateResponse.json();
+                // console.log('Tracking status updated:', updateData);
 
             } catch (error) {
                 console.error('Error sending BOM:', error);
@@ -393,10 +395,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const sendNonProjectData = async () => {
         try {
 
-            const payload = {
-                order_id: selectedRowData.number,
-                final_price: totalOrderCost
-            };
+            const payload = npProducts.map(item => ({
+                final_price: item.np_totalCost,
+                statement_item_id: item.np_statement_item_id,
+            }));
+
             console.log('Payload:', payload);
             const response = await fetch(`${baseurl}/insert_nonproject/`, {
                 method: 'POST',
