@@ -453,7 +453,7 @@ const ApprovalTable = ({employee_id}) => {
                   onChange={(e) => handleChange(e, 'reason_rework')}
                 />
               </div>
-            </div>
+              </div>
             <div className="input-row">
               <div className="input-group">
                 <label>Actual Quantity</label>

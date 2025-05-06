@@ -927,6 +927,13 @@
     width: 10px;
   }
 }
+.goods-r-po .select-error {
+  border-color: red;
+}
+
+.goods-r-po .select-success {
+  border-color: green;
+}
 
 
 
