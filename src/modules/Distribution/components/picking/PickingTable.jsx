@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../../styles/Picking.css';
-import { FaExclamationTriangle } from 'react-icons/fa'; // Keep if needed for other indicators, remove if not
+import { FaSortUp, FaSortDown } from 'react-icons/fa';
 
 const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) => {
   const [sortField, setSortField] = useState('picking_list_id'); // Default sort can be changed
@@ -128,7 +128,9 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               >
                 Delivery ID
                 {sortField === 'delivery_id' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                  <span className="sort-icon">
+                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
+                  </span>
                 )}
               </th>
               <th
@@ -137,7 +139,9 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               >
                 Delivery Type
                 {sortField === 'delivery_type' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                  <span className="sort-icon">
+                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
+                  </span>
                 )}
               </th>
               <th
@@ -147,7 +151,9 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               >
                 Warehouse
                 {sortField === 'warehouse_name' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                  <span className="sort-icon">
+                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
+                  </span>
                 )}
               </th>
               <th
@@ -157,7 +163,9 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               >
                 Items
                 {sortField === 'items_count' && ( // Match the sort field name
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                  <span className="sort-icon">
+                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
+                  </span>
                 )}
               </th>
               <th
@@ -166,7 +174,9 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               >
                 Assigned To
                 {sortField === 'picked_by' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                  <span className="sort-icon">
+                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
+                  </span>
                 )}
               </th>
               <th
@@ -175,7 +185,9 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               >
                 Status
                 {sortField === 'picked_status' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                  <span className="sort-icon">
+                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
+                  </span>
                 )}
               </th>
               <th
@@ -184,7 +196,9 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
               >
                 Date Picked
                 {sortField === 'picked_date' && (
-                  <span className="sort-icon">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                  <span className="sort-icon">
+                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
+                  </span>
                 )}
               </th>
             </tr>

@@ -2336,3 +2336,41 @@
   color: #495057;
 }
 
+/* Add this to your Picking.css file */
+
+.picking .search-container {
+  position: relative;
+  width: 300px;
+}
+
+.picking .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.picking .search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.picking .search-input:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+.picking .sort-icon {
+  display: inline-flex;
+  margin-left: 0.25rem;
+  color: #00a8a8;
+  vertical-align: middle;
+}

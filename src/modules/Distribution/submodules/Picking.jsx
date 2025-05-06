@@ -8,6 +8,8 @@ import CompletionModal from "../components/picking/CompletionModal";
 import EditPickingModal from "../components/picking/EditPickingModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+// Import icons
+import { FaSearch } from 'react-icons/fa';
 
 const Picking = () => {
   // State for data management
@@ -340,7 +342,7 @@ const handleConfirmCompletion = async () => {
         {/* Filters Row */}
         <div className="filters-row">
           <div className="search-container">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><FaSearch /></span>
             <input
               type="text"
               className="search-input"
