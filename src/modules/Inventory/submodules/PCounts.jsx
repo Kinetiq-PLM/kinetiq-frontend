@@ -419,22 +419,23 @@ const BodyContent = () => {
               <table className="w-full table-layout:fixed text-center cursor-pointer">
                 <thead>
                   <tr className="border-b border-gray-300">
-                    {/* Changed 'Item ID' header to 'Item Name' */}
-                    {/* Changed 'Date Checked' header to 'Period' */}
-                    {['Item Type', 'Item Name', 'Item Onhand', 'Item Counted', 'Difference', 'Period', 'Employee', 'Warehouse', 'Status'].map((header) => (
+                    {/* Added 'UOM' header */}
+                    {['Item Type', 'Item Name', 'UOM', 'Item Onhand', 'Item Counted', 'Difference', 'Period', 'Employee', 'Warehouse', 'Status'].map((header) => (
                       <td key={header} className="w-[200px] py-2 px-4 font-bold text-gray-600 whitespace-nowrap">{header}</td>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr><td colSpan="9" className="p-2 text-gray-400">Loading...</td></tr>
+                    /* Adjusted colSpan */
+                    <tr><td colSpan="10" className="p-2 text-gray-400">Loading...</td></tr>
                   ) : filteredData.length === 0 ? (
-                    <tr><td colSpan="9" className="p-2 text-gray-400">No data available</td></tr>
+                    /* Adjusted colSpan */
+                    <tr><td colSpan="10" className="p-2 text-gray-400">No data available</td></tr>
                   ) : (
                     filteredData.map((item, index) => {
                       // Fetching inventoryItem locally might still be useful for details not in count record
-                      // const inventoryItem = item.inventory_item_id ? inventoryItems[item.inventory_item_id] : null; // Assuming backend sends inventory_item_id
+                      const inventoryItem = item.inventory_item_id ? inventoryItems[item.inventory_item_id] : null; // Assuming backend sends inventory_item_id
                       return (
                         <tr
                           key={item.inventory_count_id || index} // Use unique ID for key
@@ -444,6 +445,8 @@ const BodyContent = () => {
                           <td className="p-2">{item.item_type || "Unknown"}</td>
                           {/* MODIFIED: Use item_display_name */}
                           <td className="p-2">{item.item_display_name || "N/A"}</td>
+                          {/* Added UOM cell */}
+                          <td className="p-2">{inventoryItem?.uom || item.uom || "N/A"}</td>
                           <td className="p-2">{item.item_onhand ?? "-"}</td>
                           <td className="p-2">{item.item_actually_counted ?? "-"}</td>
                           <td className={`p-2 ${getDifferenceColorClass(item.difference_in_qty)}`}>
@@ -483,6 +486,8 @@ const BodyContent = () => {
                           <p className="text-gray-500 text-sm">{selectedRow?.item_display_name || "N/A"}</p>
                           {/* Display type directly from count record */}
                           <p className="text-gray-500 text-sm">Type: {selectedRow?.item_type || "Unknown"}</p>
+                          {/* Added UOM display */}
+                          <p className="text-gray-500 text-sm">UOM: {inventoryItem?.uom || selectedRow?.uom || "N/A"}</p>
                         </div>
 
                         <div className="mb-4">
