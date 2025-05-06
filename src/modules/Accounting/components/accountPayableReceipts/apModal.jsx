@@ -82,6 +82,100 @@ const AccountsPayableReceiptModal = ({
 
   if (!isModalOpen) return null;
 
+  // Group related fields for layout purposes
+  const renderFormField = (header, index) => {
+    const isDisabled = isCreating
+      ? header === "AP ID" || header === "Reference Number"
+      : header !== "Status";
+
+    if (header === "AP ID" || header === "Reference Number") {
+      return (
+        <Forms
+          key={index}
+          type="text"
+          formName={header}
+          value={formData[index] || ""}
+          onChange={(e) => handleInputChange(index, e.target.value)}
+          disabled={true}
+        />
+      );
+    }
+
+    if (header === "Payment Method") {
+      return (
+        <div key={index} className="flex flex-col gap-2">
+          <label>{header}</label>
+          <Dropdown
+            style="selection"
+            defaultOption="Select payment method..."
+            options={["Credit Card", "Bank Transfer", "Cash"]}
+            value={formData[index]}
+            onChange={(val) => handleInputChange(index, val)}
+            disabled={isDisabled}
+            required={true}
+          />
+        </div>
+      );
+    }
+
+    if (header === "Status") {
+      return (
+        <div key={index} className="flex flex-col gap-2">
+          <label>{header}</label>
+          <Dropdown
+            style="selection"
+            defaultOption="Select status..."
+            options={["Processing", "Completed"]}
+            value={formData[index]}
+            onChange={(val) => handleInputChange(index, val)}
+            disabled={false}
+            required={true}
+          />
+        </div>
+      );
+    }
+
+    if (header === "Payment Date") {
+      return (
+        <Forms
+          key={index}
+          type="date"
+          formName={header}
+          value={formData[index] || ""}
+          onChange={(e) => handleInputChange(index, e.target.value)}
+          disabled={isDisabled}
+          required={true}
+        />
+      );
+    }
+
+    if (header === "Amount") {
+      return (
+        <Forms
+          key={index}
+          type="number"
+          formName={header}
+          value={formData[index] || ""}
+          onChange={(e) => handleInputChange(index, e.target.value)}
+          disabled={isDisabled}
+          required={true}
+        />
+      );
+    }
+
+    return (
+      <Forms
+        key={index}
+        type="text"
+        formName={header}
+        value={formData[index] || ""}
+        onChange={(e) => handleInputChange(index, e.target.value)}
+        disabled={isDisabled}
+        required={header.includes("*")}
+      />
+    );
+  };
+
   return (
     <>
       <NotifModal
@@ -104,100 +198,33 @@ const AccountsPayableReceiptModal = ({
                 onClick={closeModal}
               />
             </div>
+            
             <div className="modal-body">
-              {columnHeaders.map((header, index) => {
-                const isDisabled = isCreating
-                  ? header === "AP ID" || header === "Reference Number"
-                  : header !== "Status";
+              {/* Payment details section - third row */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {columnHeaders[3] && renderFormField(columnHeaders[3], 3)} {/* Payment Date */}
+                {columnHeaders[4] && renderFormField(columnHeaders[4], 4)} {/* Payment Method */}
+              </div>
+              
+              {/* Section for identifiers - top row */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {columnHeaders[0] && renderFormField(columnHeaders[0], 0)} {/* AP ID */}
+                {columnHeaders[6] && renderFormField(columnHeaders[6], 6)} {/* Reference Number */}
+              </div>
 
-                if (header === "AP ID" || header === "Reference Number") {
-                  return (
-                    <Forms
-                      key={index}
-                      type="text"
-                      formName={header}
-                      value={formData[index] || ""}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      disabled={true}
-                    />
-                  );
-                }
+              {/* Invoice and amount section - second row */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {columnHeaders[1] && renderFormField(columnHeaders[1], 1)} {/* Invoice ID */}
+                {columnHeaders[2] && renderFormField(columnHeaders[2], 2)} {/* Amount */}
+              </div>
 
-                if (header === "Payment Method") {
-                  return (
-                    <div key={index} className="flex flex-col gap-2">
-                      <label>{header}</label>
-                      <Dropdown
-                        style="selection"
-                        defaultOption="Select payment method..."
-                        options={["Credit Card", "Bank Transfer", "Cash"]}
-                        value={formData[index]}
-                        onChange={(val) => handleInputChange(index, val)}
-                        disabled={isDisabled}
-                        required={true}
-                      />
-                    </div>
-                  );
-                }
-
-                if (header === "Status") {
-                  return (
-                    <div key={index} className="flex flex-col gap-2">
-                      <label>{header}</label>
-                      <Dropdown
-                        style="selection"
-                        defaultOption="Select status..."
-                        options={["Processing", "Completed"]}
-                        value={formData[index]}
-                        onChange={(val) => handleInputChange(index, val)}
-                        disabled={false}
-                        required={true}
-                      />
-                    </div>
-                  );
-                }
-
-                if (header === "Payment Date") {
-                  return (
-                    <Forms
-                      key={index}
-                      type="date"
-                      formName={header}
-                      value={formData[index] || ""}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      disabled={isDisabled}
-                      required={true}
-                    />
-                  );
-                }
-
-                if (header === "Amount") {
-                  return (
-                    <Forms
-                      key={index}
-                      type="number"
-                      formName={header}
-                      value={formData[index] || ""}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      disabled={isDisabled}
-                      required={true}
-                    />
-                  );
-                }
-
-                return (
-                  <Forms
-                    key={index}
-                    type="text"
-                    formName={header}
-                    value={formData[index] || ""}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={isDisabled}
-                    required={header.includes("*")}
-                  />
-                );
-              })}
+              {/* Additional information - fourth row */}
+              <div className="grid grid-cols-2 gap-4">
+                {columnHeaders[5] && renderFormField(columnHeaders[5], 5)} {/* Paid By */}
+                {columnHeaders[7] && renderFormField(columnHeaders[7], 7)} {/* Status */}
+              </div>
             </div>
+            
             <div className="modal-footer">
               <Button name="Cancel" variant="standard1" onclick={closeModal} />
               <Button
