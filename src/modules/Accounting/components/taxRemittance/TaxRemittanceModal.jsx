@@ -263,7 +263,7 @@ const TaxRemittanceModal = ({
         <div className="modal-overlay">
           <div className="modal-container">
             <div className="modal-header">
-              <h2>{isCreating ? "Create Remittance Record" : "Edit Remittance Record"}</h2>
+              <h2>{isCreating ? "Create Remittance Record" : "Update Remittance Record"}</h2>
               <img
                 className="cursor-pointer hover:scale-110"
                 src="/accounting/Close.svg"
