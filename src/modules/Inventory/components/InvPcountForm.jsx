@@ -210,7 +210,6 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
     const handleClear = () => {
         setInventoryItemId("");
         setQuantity("");
-        setEmployeeId("");
         setStatus("");
         setTimePeriod("");
         setWarehouseId("");
@@ -250,12 +249,14 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
             status: status,
             time_period: timePeriod,
             remarks: remarks,
-            warehouse_id_input: warehouseId, // Ensure your backend expects 'warehouse_id_input'
+            warehouse_id: warehouseId, // Ensure your backend expects 'warehouse_id_input'
         };
+
+        console.log("[InvPcountForm.jsx] Submitting new P-Count record:", newRecord); // Log data before sending
 
         try {
             // Using the original API endpoint for cyclic counts
-            const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/", {
+            const response = await fetch("http://127.0.0.1:8000/api/cyclic_counts/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newRecord),
@@ -267,7 +268,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
             }
 
             const data = await response.json();
-            console.log("Successfully inserted new record:", data);
+            console.log("[InvPcountForm.jsx] Successfully inserted new record - Backend Response:", data); // Log backend response
             setSuccessMessage("Successfully inserted new record!");
 
             setTimeout(() => {

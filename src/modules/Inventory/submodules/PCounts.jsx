@@ -487,6 +487,7 @@ const BodyContent = () => {
                     filteredData.map((item, index) => {
                       // Fetching inventoryItem locally might still be useful for details not in count record
                       const inventoryItem = item.inventory_item_id ? inventoryItems[item.inventory_item_id] : null; // Assuming backend sends inventory_item_id
+                      console.log("[PCounts.jsx] Rendering item in table:", item); // Log item being rendered
                       return (
                         <tr
                           key={item.inventory_count_id || index} // Use unique ID for key
