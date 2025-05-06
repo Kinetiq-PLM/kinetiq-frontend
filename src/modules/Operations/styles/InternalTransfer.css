@@ -19,13 +19,14 @@
     justify-content: flex-start;
     min-width: auto; 
     min-height: unset;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
 .InternalTransfer .table-container,
 .InternalTransfer.rework .table-container {
   width: 100%;
-  height: 492px;
+  height: 450px;
   position: relative;
   background: white;
   border-radius: 8px;
@@ -98,7 +99,10 @@
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: auto; 
+    overflow-y: visible;
+    overflow-x: auto;
+    height: auto;
+    min-height: fit-content;
   }
   
 
