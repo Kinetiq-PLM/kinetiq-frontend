@@ -415,29 +415,10 @@ const PayrollAccounting = () => {
         status: updatedRow[0],
         payroll_accounting_id: updatedRow[1],
         payroll_hr_id: updatedRow[2],
-        employee_id: updatedRow[3],
-        pay_period_start: updatedRow[4],
-        pay_period_end: updatedRow[5],
-        employment_type: updatedRow[6],
-        base_salary: updatedRow[7],
-        overtime_hours: updatedRow[8],
-        overtime_pay: updatedRow[9],
-        holiday_pay: updatedRow[10],
-        bonus_pay: updatedRow[11],
-        thirteenth_month_pay: updatedRow[12],
-        total_bonuses: updatedRow[13],
-        gross_pay: updatedRow[14],
-        sss_contribution: updatedRow[15],
-        philhealth_contribution: updatedRow[16],
-        pagibig_contribution: updatedRow[17],
-        tax: updatedRow[18],
-        late_deduction: updatedRow[19],
-        absent_deduction: updatedRow[20],
-        undertime_deduction: updatedRow[21],
-        total_deductions: updatedRow[22],
-        net_pay: updatedRow[23],
-        date_approved: updatedRow[24],
-        reference_number: updatedRow[25],
+        date_approved: updatedRow[3],
+        approved_by: updatedRow[4],
+        payment_method: updatedRow[5],
+        reference_number: updatedRow[6],
       };
 
       console.log("Payload being sent to backend:", payload);
@@ -451,7 +432,7 @@ const PayrollAccounting = () => {
         );
       }
 
-      const url = `${PAYROLL_JOURNAL_ENDPOINT}${payload.payroll_accounting_id}/`;
+      const url = `${PAYROLL_ACCOUNTING_ENDPOINT}${payload.payroll_accounting_id}/`;
 
       const response = await fetch(url, {
         method: "PUT",
@@ -475,33 +456,14 @@ const PayrollAccounting = () => {
 
         setPayrollAccountingData((prevData) =>
           prevData.map((row) =>
-            row[0] === updatedRow[0]
+            row[1] === updatedRow[1] // Match on payroll_accounting_id
               ? [
                   newData.status,
                   newData.payroll_accounting_id,
                   newData.payroll_hr_id,
-                  newData.employee_id,
-                  newData.pay_period_start,
-                  newData.pay_period_end,
-                  newData.employment_type,
-                  newData.base_salary,
-                  newData.overtime_hours,
-                  newData.overtime_pay,
-                  newData.holiday_pay,
-                  newData.bonus_pay,
-                  newData.thirteenth_month_pay,
-                  newData.total_bonuses,
-                  newData.gross_pay,
-                  newData.sss_contribution,
-                  newData.philhealth_contribution,
-                  newData.pagibig_contribution,
-                  newData.tax,
-                  newData.late_deduction,
-                  newData.absent_deduction,
-                  newData.undertime_deduction,
-                  newData.total_deductions,
-                  newData.net_pay,
                   newData.date_approved,
+                  newData.approved_by,
+                  newData.payment_method,
                   newData.reference_number,
                 ]
               : row
