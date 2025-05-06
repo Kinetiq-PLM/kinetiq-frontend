@@ -127,53 +127,9 @@ const Journal = () => {
     }
   };
 
-
-  // Fetching invoices from the API
-  const fetchInvoices = async () => {
-    try {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      // Use require_receipt=false to include invoices without receipts
-      const response = await axios.get(`${INVOICES_ENDPOINT}?for_journal=true&require_receipt=false`, config);
-      setInvoices(response.data);
-      if (response.data.length === 0) {
-        // REVISED: Improved validation message
-        setValidation({
-          isOpen: true,
-          type: "warning",
-          title: "No Invoices Available",
-          message: "No invoices with a remaining balance found. All invoices may be fully paid or returned.",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching invoices:", {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-      });
-      let message = "Could not load invoice list. Please ensure the API is accessible.";
-      if (error.response?.status === 404) {
-        message = "Invoice endpoint not found. Verify the API configuration.";
-      } else if (error.response?.status === 403) {
-        message = "Access denied. Please check your authentication credentials.";
-      } else if (error.code === "ERR_NETWORK") {
-        message = "Network error. Please ensure the API is running.";
-      } else if (error.response?.status === 504) {
-        message = "Gateway timeout. Check the backend response time.";
-      }
-      setValidation({
-        isOpen: true,
-        type: "error",
-        title: "Invoice Fetch Failed",
-        message: error.response?.data?.detail || message,
-      });
-    }
-  };
-
   useEffect(() => {
     fetchData();
     fetchCurrencies();
-    fetchInvoices();
   }, []);
 
 
