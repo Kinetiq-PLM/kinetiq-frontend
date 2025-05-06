@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
-import { FaClipboardList, FaFileAlt, FaTruck, FaFileInvoice, FaReceipt, FaCreditCard, FaCarAlt, FaQuora, FaMarkdown, FaMarsDouble, FaAngleDoubleRight, FaBeer, FaAngellist, FaQuoteRight, FaCartPlus, FaShoppingCart, FaCalendarAlt } from 'react-icons/fa';
+import { FaFileAlt, FaQuoteRight, FaShoppingCart, FaTruck, FaFileInvoice, FaCreditCard } from 'react-icons/fa';
 import './styles/Purchasing.css';
+import axios from "axios";
 
 import PurchaseReqList from './submodules/PurchaseReqList';
 import PurchaseQuot from './submodules/PurchaseQuot';
@@ -9,39 +10,89 @@ import PurchaseOrdStat from './submodules/PurchaseOrdStat';
 import PurchaseAPInvoice from './submodules/PurchaseAPInvoice';
 import PurchaseCredMemo from './submodules/PurchaseCredMemo';
 
-const barData = [
-    { name: 'IT', prs: 4 },
-    { name: 'Operations', prs: 6 },
-    { name: 'Admin', prs: 3 },
-];
-
-const lineData = [
-    { name: 'Jan', submitted: 10, approved: 8 },
-    { name: 'Feb', submitted: 12, approved: 9 },
-    { name: 'Mar', submitted: 14, approved: 11 },
-    { name: 'Apr', submitted: 13, approved: 10 },
-];
-
-const pieData = [
-    { name: 'Approved', value: 40 },
-    { name: 'Pending', value: 30 },
-    { name: 'Quotation Sent', value: 20 },
-    { name: 'Rejected', value: 10 },
-];
-
-const responseTimeData = [
-    { name: 'Jan', time: 3.0 },
-    { name: 'Feb', time: 2.5 },
-    { name: 'Mar', time: 3.5 },
-    { name: 'Apr', time: 3.0 },
-];
-
 const COLORS = ['#82ca9d', '#FFD580', '#FFFFC5', '#FF0000'];
 
 const PurchasingBody = () => {
     const [currentView, setCurrentView] = useState('dashboard');
     const [selectedModule, setSelectedModule] = useState(null);
-    
+
+    // State for dynamic chart data
+    const [barData, setBarData] = useState([]);
+    const [lineData, setLineData] = useState([]);
+    const [pieData, setPieData] = useState([]);
+    const [responseTimeData, setResponseTimeData] = useState([]);
+
+    useEffect(() => {
+        // Fetch data for charts
+        const fetchChartData = async () => {
+            try {
+                // Fetch bar chart data (e.g., PRs by department)
+                const prfResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
+                const barChartData = prfResponse.data.reduce((acc, prf) => {
+                    const department = prf.dept_id || "Unknown";
+                    const existing = acc.find((item) => item.name === department);
+                    if (existing) {
+                        existing.prs += 1;
+                    } else {
+                        acc.push({ name: department, prs: 1 });
+                    }
+                    return acc;
+                }, []);
+                setBarData(barChartData);
+
+                // Fetch line chart data (e.g., trends in purchase orders)
+                const purchaseOrdersResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/");
+                const lineChartData = purchaseOrdersResponse.data.reduce((acc, order) => {
+                    const month = new Date(order.order_date).toLocaleString("default", { month: "short" });
+                    const existing = acc.find((item) => item.name === month);
+                    if (existing) {
+                        existing.submitted += 1;
+                        if (order.status === "Approved") {
+                            existing.approved += 1;
+                        }
+                    } else {
+                        acc.push({ name: month, submitted: 1, approved: order.status === "Approved" ? 1 : 0 });
+                    }
+                    return acc;
+                }, []);
+                setLineData(lineChartData);
+
+                // Fetch pie chart data (e.g., quotation statuses)
+                const quotationsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
+                const pieChartData = quotationsResponse.data.reduce((acc, quotation) => {
+                    const status = quotation.status || "Unknown";
+                    const existing = acc.find((item) => item.name === status);
+                    if (existing) {
+                        existing.value += 1;
+                    } else {
+                        acc.push({ name: status, value: 1 });
+                    }
+                    return acc;
+                }, []);
+                setPieData(pieChartData);
+
+                // Fetch response time data (e.g., average response time for invoices)
+                const invoicesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/list/");
+                const responseTimeChartData = invoicesResponse.data.reduce((acc, invoice) => {
+                    const month = new Date(invoice.invoice_date).toLocaleString("default", { month: "short" });
+                    const responseTime = (new Date(invoice.payment_date) - new Date(invoice.invoice_date)) / (1000 * 60 * 60 * 24); // in days
+                    const existing = acc.find((item) => item.name === month);
+                    if (existing) {
+                        existing.time = (existing.time + responseTime) / 2; // Average response time
+                    } else {
+                        acc.push({ name: month, time: responseTime });
+                    }
+                    return acc;
+                }, []);
+                setResponseTimeData(responseTimeChartData);
+            } catch (error) {
+                console.error("Error fetching chart data:", error);
+            }
+        };
+
+        fetchChartData();
+    }, []);
+
     const handleModuleClick = (moduleName) => {
         if (moduleName === 'GoodsPendingReceipt') {
             alert("This is for Operation Module.");
@@ -51,305 +102,85 @@ const PurchasingBody = () => {
         setSelectedModule(moduleName);
         console.log(`Navigating to ${moduleName}`);
     };
-    
+
     const handleBackToDashboard = () => {
         setCurrentView('dashboard');
         setSelectedModule(null);
     };
-    
+
     return (
         <div className="purch">
             <div className="purch-body-content-container">
                 {currentView === 'dashboard' ? (
-                <div className="purch-content-wrapper">
-                    <h1 className="purch-title">Purchasing Department Dashboard</h1>
-                    
-                    <div className="purch-filters">
-                        <div className="purch-filter-group">
-                            <label>Date Range</label>
-                            <div className="purch-date-input-container">
-                                <input 
-                                    type="date" 
-                                    className="purch-date-input"
-                                    placeholder="Select Date"
-                                    onChange={(e) => console.log("Selected date:", e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className="purch-filter-group">
-                            <label>Vendor</label>
-                            <select className="purch-select">
-                                <option>Vendor B</option>
-                            </select>
-                        </div>
-                        <div className="purch-filter-group">
-                            <label>Department</label>
-                            <select className="purch-select">
-                                <option>All Departments</option>
-                            </select>
-                        </div>
+                    <div className="purch-content-wrapper">
+                        <h1 className="purch-title">Purchasing Department Dashboard</h1>
 
-                    </div>
-                    
-                    <div className="purch-stats">
-                        <div className="purch-stat-card" onClick={() => handleModuleClick('PurchaseReqList')} style={{cursor: 'pointer'}}>
-                            <div className="purch-stat-content">
-                                <div className="purch-stat-title">Open Purchase Requests</div>
-                                <div className="purch-stat-number">15</div>
-                                <div className="purch-stat-icon yellow"><FaFileAlt /></div>
-                            </div>
-                        </div>
-                        <div className="purch-stat-card" onClick={() => handleModuleClick('PurchaseQuot')} style={{cursor: 'pointer'}}>
-                            <div className="purch-stat-content">
-                                <div className="purch-stat-title">Pending Quotations</div>
-                                <div className="purch-stat-number">5</div>
-                                <div className="purch-stat-icon yellow"><FaQuoteRight /></div>
-                            </div>
-                        </div>
-                        <div className="purch-stat-card" onClick={() => handleModuleClick('PurchaseOrdStat')} style={{cursor: 'pointer'}}>
-                            <div className="purch-stat-content">
-                                <div className="purch-stat-title">Open Purchase Orders</div>
-                                <div className="purch-stat-number">8</div>
-                                <div className="purch-stat-icon yellow"><FaShoppingCart /></div>
-                            </div>
-                        </div>
-                        <div className="purch-stat-card" onClick={() => handleModuleClick('GoodsPendingReceipt')} style={{cursor: 'pointer'}}>
-                            <div className="purch-stat-content">
-                                <div className="purch-stat-title">Goods Pending Receipt</div>
-                                <div className="purch-stat-number">4</div>
-                                <div className="purch-stat-icon yellow"><FaTruck /></div>
-                            </div>
-                        </div>
-                        <div className="purch-stat-card" onClick={() => handleModuleClick('PurchaseAPInvoice')} style={{cursor: 'pointer'}}>
-                            <div className="purch-stat-content">
-                                <div className="purch-stat-title">Unmatched Invoices</div>
-                                <div className="purch-stat-number">3</div>
-                                <div className="purch-stat-icon red"><FaFileInvoice /></div>
-                            </div>
-                        </div>
-                        <div className="purch-stat-card" onClick={() => handleModuleClick('PurchaseCredMemo')} style={{cursor: 'pointer'}}>
-                            <div className="purch-stat-content">
-                                <div className="purch-stat-title">Credit Memos Issued</div>
-                                <div className="purch-stat-number">2</div>
-                                <div className="purch-stat-icon green"><FaCreditCard /></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="purch-charts">
-                        <div className="purch-chart-container">
-                            <div className="purch-chart-header">
-                                <h2>Purchase Request Status</h2>
-                            </div>
-                            <div className="purch-chart-content">
-                                <div className="purch-chart-left">
-                                    <ResponsiveContainer width="100%" height={200}>
-                                        <BarChart data={barData} layout="vertical" margin={{ left: 30, right: 5, top: 5, bottom: 5 }}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis type="number" />
-                                            <YAxis dataKey="name" type="category"/>
-                                            <Tooltip />
-                                            <Legend content={() => (
-                                                <div className="purch-chart-legend">
-                                                    <div className="purch-legend-item">
-                                                        <div className="purch-legend-color" style={{backgroundColor: "#8884d8"}}></div>
-                                                        <span>PRs by Department</span>
-                                                    </div>
-                                                </div>
-                                            )} />
-                                            <Bar dataKey="prs" fill="#8884d8" />
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                        <div className="purch-charts">
+                            <div className="purch-chart-container">
+                                <div className="purch-chart-header">
+                                    <h2>Purchase Request Status</h2>
                                 </div>
-                                <div className="purch-chart-right">
-                                    <ResponsiveContainer width="100%" height={200}>
-                                        <LineChart data={lineData}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis dataKey="name" />
-                                            <YAxis />
-                                            <Tooltip />
-                                            <Legend content={() => (
-                                                <div className="purch-chart-legend">
-                                                    <div className="purch-legend-item">
-                                                        <div className="purch-legend-color" style={{backgroundColor: "#8884d8"}}></div>
-                                                        <span>Submitted</span>
-                                                    </div>
-                                                    <div className="purch-legend-item">
-                                                        <div className="purch-legend-color" style={{backgroundColor: "#82ca9d"}}></div>
-                                                        <span>Approved</span>
-                                                    </div>
-                                                </div>
-                                            )} />
-                                            <Line type="monotone" dataKey="submitted" stroke="#8884d8" />
-                                            <Line type="monotone" dataKey="approved" stroke="#82ca9d" />
-                                        </LineChart>
-                                    </ResponsiveContainer>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <BarChart data={barData} layout="vertical" margin={{ left: 30, right: 5, top: 5, bottom: 5 }}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis type="number" />
+                                        <YAxis dataKey="name" type="category" />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Bar dataKey="prs" fill="#8884d8" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+
+                            <div className="purch-chart-container">
+                                <div className="purch-chart-header">
+                                    <h2>Quotation Monitoring</h2>
                                 </div>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <PieChart>
+                                        <Pie
+                                            data={pieData}
+                                            cx="50%"
+                                            cy="50%"
+                                            outerRadius={70}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                        >
+                                            {pieData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
                             </div>
-                            <div className="purch-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>PR ID</th>
-                                            <th>DEPARTMENT</th>
-                                            <th>DAYS OVER SLA</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td className="purch-red">PR001</td>
-                                            <td>IT</td>
-                                            <td>15</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <div className="purch-chart-container">
-                            <div className="purch-chart-header">
-                                <h2>Quotation Monitoring</h2>
-                            </div>
-                            <div className="purch-chart-content">
-                                <div className="purch-chart-left">
-                                    <div className="purch-pie-container">
-                                        <ResponsiveContainer width="100%" height={200}>
-                                            <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
-                                                <Pie
-                                                    data={pieData}
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    outerRadius={70}
-                                                    fill="#8884d8"
-                                                    dataKey="value"
-                                                    label={false}
-                                                    activeShape={false}
-                                                    isAnimationActive={false}
-                                                    onClick={null}
-                                                >
-                                                    {pieData.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                    ))}
-                                                </Pie>
-                                                <Tooltip />
-                                                <Legend 
-                                                    layout="horizontal"
-                                                    verticalAlign="bottom"
-                                                    align="center"
-                                                    wrapperStyle={{
-                                                        paddingTop: "10px",
-                                                        width: "100%",
-                                                        fontSize: "12px"
-                                                    }}
-                                                    iconType="square"
-                                                    iconSize={10}
-                                                    formatter={(value, entry) => <span style={{ color: '#000' }}>{value}</span>}
-                                                />
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                    </div>
+
+                            <div className="purch-chart-container">
+                                <div className="purch-chart-header">
+                                    <h2>Response Time</h2>
                                 </div>
-                                <div className="purch-chart-right">
-                                    <ResponsiveContainer width="100%" height={200}>
-                                        <LineChart data={responseTimeData}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis dataKey="name" />
-                                            <YAxis />
-                                            <Tooltip />
-                                            <Legend content={() => (
-                                                <div className="purch-chart-legend">
-                                                    <div className="purch-legend-item">
-                                                        <div className="purch-legend-color" style={{backgroundColor: "#8884d8"}}></div>
-                                                        <span>Avg Response Time (Days)</span>
-                                                    </div>
-                                                </div>
-                                            )} />
-                                            <Line type="monotone" dataKey="time" stroke="#8884d8" />
-                                        </LineChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-                            <div className="purch-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>VENDOR</th>
-                                            <th>QUOTATION AMOUNT</th>
-                                            <th>DELIVERY TIME</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Vendor A</td>
-                                            <td>$100,000</td>
-                                            <td>0 days</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <LineChart data={responseTimeData}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="name" />
+                                        <YAxis />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Line type="monotone" dataKey="time" stroke="#8884d8" />
+                                    </LineChart>
+                                </ResponsiveContainer>
                             </div>
                         </div>
                     </div>
-                    
-                    <div className="purch-leave-requests">
-                        <h2 className="purch-section-title">Leave Requests</h2>
-                        <div className="purch-table-container">
-                            <table className="purch-leave-table" style={{width: "100%"}}>
-                                <colgroup>
-                                    <col style={{width: "14%"}} />
-                                    <col style={{width: "14%"}} />
-                                    <col style={{width: "18%"}} />
-                                    <col style={{width: "18%"}} />
-                                    <col style={{width: "18%"}} />
-                                    <col style={{width: "18%"}} />
-                                </colgroup>
-                                <thead>
-                                    <tr>
-                                        <th>Emp ID</th>
-                                        <th>Leave ID</th>
-                                        <th>Leave Type</th>
-                                        <th>Start Date</th>
-                                        <th>End Date</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>E001</td>
-                                        <td>L001</td>
-                                        <td><span className="purch-badge vacation">Vacation</span></td>
-                                        <td>2025-03-12</td>
-                                        <td>2025-03-14</td>
-                                        <td><span className="purch-badge rejected">Rejected by Management</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>E002</td>
-                                        <td>L002</td>
-                                        <td><span className="purch-badge sick">Sick</span></td>
-                                        <td>2025-03-12</td>
-                                        <td>2025-03-13</td>
-                                        <td><span className="purch-badge approved">Approved by Management</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>E003</td>
-                                        <td>L003</td>
-                                        <td><span className="purch-badge sick">Sick</span></td>
-                                        <td>2025-03-12</td>
-                                        <td>2025-03-12</td>
-                                        <td><span className="purch-badge approved">Approved by Management</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
                 ) : (
-                <div className="purch-module-container">
-                    {selectedModule === 'PurchaseReqList' && <PurchaseReqList onBackToDashboard={handleBackToDashboard} />}
-                    {selectedModule === 'PurchaseQuot' && <PurchaseQuot onBackToDashboard={handleBackToDashboard} />}
-                    {selectedModule === 'PurchaseOrdStat' && <PurchaseOrdStat onBackToDashboard={handleBackToDashboard} />}
-                    {selectedModule === 'PurchaseAPInvoice' && <PurchaseAPInvoice onBackToDashboard={handleBackToDashboard} />}
-                    {selectedModule === 'PurchaseCredMemo' && <PurchaseCredMemo onBackToDashboard={handleBackToDashboard} />}
-                </div>
+                    <div className="purch-module-container">
+                        {selectedModule === 'PurchaseReqList' && <PurchaseReqList onBackToDashboard={handleBackToDashboard} />}
+                        {selectedModule === 'PurchaseQuot' && <PurchaseQuot onBackToDashboard={handleBackToDashboard} />}
+                        {selectedModule === 'PurchaseOrdStat' && <PurchaseOrdStat onBackToDashboard={handleBackToDashboard} />}
+                        {selectedModule === 'PurchaseAPInvoice' && <PurchaseAPInvoice onBackToDashboard={handleBackToDashboard} />}
+                        {selectedModule === 'PurchaseCredMemo' && <PurchaseCredMemo onBackToDashboard={handleBackToDashboard} />}
+                    </div>
                 )}
             </div>
         </div>
