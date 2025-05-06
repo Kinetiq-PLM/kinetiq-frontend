@@ -9,7 +9,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 900px;
+    width: 150%;
     margin-bottom: 3px;
   
     h1 {
@@ -19,7 +19,6 @@
       font-weight: 700;
       line-height: normal;
       flex-wrap: wrap;
-      padding-bottom: 10px;
       padding-left: 10px;
     }
   }

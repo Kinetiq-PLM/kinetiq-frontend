@@ -12,6 +12,9 @@ const BodyContent = () => {
     const [tasks, setTasks] = useState([]);
     const [tasksLoading, setTasksLoading] = useState(true);
     const [tasksError, setTasksError] = useState(null);
+    const [boms, setBoms] = useState([]);
+    const [bomsLoading, setBomsLoading] = useState(true);
+    const [bomsError, setBomsError] = useState(null);
 
     useEffect(() => {
         const fetchProductionData = async () => {
@@ -63,20 +66,35 @@ const BodyContent = () => {
         fetchTasks();
     }, []);
 
-    const handleStatusChange = async (index, newStatus) => {
-        const updatedProduction = [...productionData];
-        const updatedOrder = {
-            ...updatedProduction[index],
-            status: newStatus.trim(), // Trim the new status
+    useEffect(() => {
+        const fetchBOMs = async () => {
+            try {
+                const response = await axios.get("http://127.0.0.1:8000/api/bom/");
+                setBoms(response.data);
+                setBomsLoading(false);
+            } catch (error) {
+                setBomsError("Failed to fetch BOMs.");
+                setBomsLoading(false);
+            }
         };
+        fetchBOMs();
+    }, []);
+
+    const handleStatusChange = async (index, newStatus) => {
+        // Find the corresponding order in the original productionData array
+        const productionOrderId = filteredData[index].production_order_id;
+        const updatedProduction = productionData.map((order) =>
+            order.production_order_id === productionOrderId
+                ? { ...order, status: newStatus.trim() }
+                : order
+        );
 
         // Update the local state immediately for a responsive UI
-        updatedProduction[index] = updatedOrder;
         setProductionData(updatedProduction);
 
         try {
             // Make an API call to update the status in the database
-            await axios.patch(`http://127.0.0.1:8000/api/production/${updatedOrder.production_order_id}/`, {
+            await axios.patch(`http://127.0.0.1:8000/api/production/${productionOrderId}/`, {
                 status: newStatus.trim(),
             });
             console.log("Status updated successfully in the database.");
@@ -84,11 +102,7 @@ const BodyContent = () => {
             console.error("Failed to update status in the database:", error);
 
             // Revert the change in case of an error
-            updatedProduction[index] = {
-                ...updatedProduction[index],
-                status: productionData[index].status, // Revert to the original status
-            };
-            setProductionData(updatedProduction);
+            setProductionData(productionData);
         }
     };
 
@@ -154,26 +168,52 @@ const BodyContent = () => {
         }
     };
 
-    const filteredData = productionData.filter((order) => {
-        const search = searchQuery.toLowerCase();
-        const orderStatus = order.status ? order.status.trim().toLowerCase() : "";
-        const selected = selectedOption.trim().toLowerCase();
+    const filteredData = productionData
+        .slice() // Create a shallow copy to avoid mutating the original array
+        .sort((a, b) => a.production_order_id.localeCompare(b.production_order_id)) // Sort by production_order_id
+        .filter((order) => {
+            const search = searchQuery.toLowerCase();
+            const orderStatus = order.status ? order.status.trim().toLowerCase() : "";
+            const selected = selectedOption.trim().toLowerCase();
 
-        // Exact equality for status after normalization
-        const statusMatch = selected === "all projects" || orderStatus === selected;
+            // Exact equality for status after normalization
+            const statusMatch = selected === "all projects" || orderStatus === selected;
 
-        const searchMatch =
-            search === "" ||
-            (order.production_order_id && order.production_order_id.toLowerCase().includes(search)) ||
-            (order.task_id && order.task_id.toLowerCase().includes(search)) ||
-            (order.bom_id && order.bom_id.toLowerCase().includes(search)) ||
-            (order.start_date && order.start_date.toString().toLowerCase().includes(search)) ||
-            (order.end_date && order.end_date.toString().toLowerCase().includes(search)) ||
-            (order.target_quantity && order.target_quantity.toString().includes(search)) ||
-            (order.notes && order.notes.toLowerCase().includes(search));
+            const searchMatch =
+                search === "" ||
+                (order.production_order_id && order.production_order_id.toLowerCase().includes(search)) ||
+                (order.task_id && order.task_id.toLowerCase().includes(search)) ||
+                (order.bom_id && order.bom_id.toLowerCase().includes(search)) ||
+                (order.start_date && order.start_date.toString().toLowerCase().includes(search)) ||
+                (order.end_date && order.end_date.toString().toLowerCase().includes(search)) ||
+                (order.target_quantity && order.target_quantity.toString().includes(search)) ||
+                (order.notes && order.notes.toLowerCase().includes(search));
 
-        return statusMatch && searchMatch;
-    });
+            return statusMatch && searchMatch;
+        });
+
+    const filteredTasks = tasks
+        .filter(
+            task =>
+                task.task_id &&
+                task.task_id.toLowerCase() !== "" &&
+                // Exclude if project_id is null/undefined/"null"/empty string
+                task.project_id !== null &&
+                task.project_id !== undefined &&
+                task.project_id.toLowerCase() !== "null" &&
+                task.project_id !== "" &&
+                // Only include if task_id is NOT present in any order.task_id
+                !productionData.some(order => order.task_id === task.task_id)
+        )
+        .filter(task => {
+            const search = searchQuery.toLowerCase();
+            const bom = boms.find(bom => bom.project_id === task.project_id);
+            const bomId = bom ? bom.bom_id : "";
+            return (
+                task.task_id.toLowerCase().includes(search) ||
+                bomId.toLowerCase().includes(search)
+            );
+        });
 
     const handleSelectChange = (e) => setSelectedOption(e.target.value);
     const handleSearchChange = (e) => setSearchQuery(e.target.value);
@@ -231,7 +271,7 @@ const BodyContent = () => {
                                     <thead>
                                         <tr>
                                             <th style={{ textAlign: "center" }}>Production Order ID</th>
-                                            <th style={{ textAlign: "center" }}>Task ID</th>
+                                            <th style={{ textAlign: "center" }}>Project ID</th>
                                             <th style={{ textAlign: "center" }}>BOM ID</th>
                                             <th style={{ textAlign: "center" }}>Start Date</th>
                                             <th style={{ textAlign: "center" }}>End Date</th>
@@ -312,87 +352,85 @@ const BodyContent = () => {
                     </div>
                 </div>
                 <div className="prodlist-of-tasks">
-                    <h2>List of Tasks</h2>
+                    <h2>List of Projects</h2>
                     <div className="prodright-small-containers">
                         <div className="prodtasks-from-pm">
                             <div className="prod-listoftask-container">
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>Task ID</th>
-                                            <th>Start Date</th>
+                                            <th>Project ID</th>
                                             <th>BOM ID</th>
-                                            <th> </th>
+                                            <th></th>
                                         </tr>
                                     </thead>
-                                        <tbody>
-                                            {tasksLoading ? (
-                                                <tr>
-                                                    <td colSpan="3">Loading tasks...</td>
+                                    <tbody>
+                                        {tasksLoading || bomsLoading ? (
+                                            <tr>
+                                                <td colSpan="3">Loading tasks...</td>
+                                            </tr>
+                                        ) : tasksError || bomsError ? (
+                                            <tr>
+                                                <td colSpan="3">{tasksError || bomsError}</td>
+                                            </tr>
+                                        ) : (
+                                            filteredTasks.map((task, index) => (
+                                                <tr key={task.task_id || index}>
+                                                    <td>{task.task_id}</td>
+                                                    <td>
+                                                        {(boms.find(bom => bom.project_id === task.project_id) || {}).bom_id || ""}
+                                                    </td>
+                                                    <td className="rwaddbutton"><button>Add</button></td>
                                                 </tr>
-                                            ) : tasksError ? (
-                                                <tr>
-                                                    <td colSpan="3">{tasksError}</td>
-                                                </tr>
-                                            ) : (
-                                                tasks.map((task, index) => (
-                                                    <tr key={task.task_id || index}>
-                                                        <td>{task.task_id}</td>
-                                                        <td>{new Date(task.task_deadline).toLocaleDateString()}</td>
-                                                        <td>{task.bom_id}</td>
-                                                        <td><button className="prod-listoftask-add-btn">Add</button></td>
-                                                    </tr>
-                                                ))
-                                            )}
-                                        </tbody>
-                                    </table>
-                                
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
+                        </div>
+                        <div className="prodprogress-container">
+                            <div className="prodprogress-wheel">
+                                <svg className="prodcircular-progress" viewBox="0 0 36 36">
+                                    <path
+                                        className="prodcircle-background"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 1 1 0 31.831 a 15.9155 15.9155 0 1 1 0 -31.831"
+                                    />
+                                    <path
+                                        className="prodcircle-progress"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 1 1 0 31.831 a 15.9155 15.9155 0 1 1 0 -31.831"
+                                        strokeDasharray={`${completedPercentage}, 100`}
+                                    />
+                                </svg>
+                                <div className="prodprogress-text">{Math.round(completedPercentage)}%</div>
                             </div>
-                            <div className="prodprogress-container">
-                                <div className="prodprogress-wheel">
-                                    <svg className="prodcircular-progress" viewBox="0 0 36 36">
-                                        <path
-                                            className="prodcircle-background"
-                                            d="M18 2.0845 a 15.9155 15.9155 0 1 1 0 31.831 a 15.9155 15.9155 0 1 1 0 -31.831"
-                                        />
-                                        <path
-                                            className="prodcircle-progress"
-                                            d="M18 2.0845 a 15.9155 15.9155 0 1 1 0 31.831 a 15.9155 15.9155 0 1 1 0 -31.831"
-                                            strokeDasharray={`${completedPercentage}, 100`}
-                                        />
-                                    </svg>
-                                    <div className="prodprogress-text">{Math.round(completedPercentage)}%</div>
+                            <div className="prodprogress-details">
+                                <div className="prodprogress-item">
+                                    <span>In Progress</span>
+                                    <div className="prodbar-container">
+                                        <div className="prodbar" style={{ width: `${inProgressPercentage}%` }}></div>
+                                    </div>
+                                    <span>{Math.round(inProgressPercentage)}%</span>
                                 </div>
-                                <div className="prodprogress-details">
-                                    <div className="prodprogress-item">
-                                        <span>In Progress</span>
-                                        <div className="prodbar-container">
-                                            <div className="prodbar" style={{ width: `${inProgressPercentage}%` }}></div>
-                                        </div>
-                                        <span>{Math.round(inProgressPercentage)}%</span>
+                                <div className="prodprogress-item">
+                                    <span>Pending</span>
+                                    <div className="prodbar-container prodbar-container-pending">
+                                        <div className="prodbar" style={{ width: `${pendingPercentage}%` }}></div>
                                     </div>
-                                    <div className="prodprogress-item">
-                                        <span>Pending</span>
-                                        <div className="prodbar-container prodbar-container-pending">
-                                            <div className="prodbar" style={{ width: `${pendingPercentage}%` }}></div>
-                                        </div>
-                                        <span>{Math.round(pendingPercentage)}%</span>
+                                    <span>{Math.round(pendingPercentage)}%</span>
+                                </div>
+                                <div className="prodprogress-item">
+                                    <span>Completed</span>
+                                    <div className="prodbar-container">
+                                        <div className="prodbar" style={{ width: `${completedPercentage}%` }}></div>
                                     </div>
-                                    <div className="prodprogress-item">
-                                        <span>Completed</span>
-                                        <div className="prodbar-container">
-                                            <div className="prodbar" style={{ width: `${completedPercentage}%` }}></div>
-                                        </div>
-                                        <span>{Math.round(completedPercentage)}%</span>
-                                    </div>
+                                    <span>{Math.round(completedPercentage)}%</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        
+        </div>
     );
 };
 

@@ -73,20 +73,23 @@ const EquipmentTable = ({ searchTerm }) => {
     }
   };
 
-  const filteredData = equipmentData.filter((equipment) => {
-    const search = searchTerm.toLowerCase();
-    return (
-      (equipment.equipment_id && equipment.equipment_id.toLowerCase().includes(search)) ||
-      (equipment.equipment_name && equipment.equipment_name.toLowerCase().includes(search)) ||
-      (equipment.description && equipment.description.toLowerCase().includes(search)) ||
-      (equipment.last_maintenance_date &&
-        equipment.last_maintenance_date.toString().toLowerCase().includes(search)) ||
-      (equipment.equipment_cost &&
-        equipment.equipment_cost.toString().toLowerCase().includes(search)) ||
-      (equipment.availability_status &&
-        equipment.availability_status.toLowerCase().includes(search))
-    );
-  });
+  const filteredData = equipmentData
+    .slice() // Create a shallow copy to avoid mutating the original array
+    .sort((a, b) => a.equipment_id.localeCompare(b.equipment_id)) // Sort by equipment_id
+    .filter((equipment) => {
+      const search = searchTerm.toLowerCase();
+      return (
+        (equipment.equipment_id && equipment.equipment_id.toLowerCase().includes(search)) ||
+        (equipment.equipment_name && equipment.equipment_name.toLowerCase().includes(search)) ||
+        (equipment.description && equipment.description.toLowerCase().includes(search)) ||
+        (equipment.last_maintenance_date &&
+          equipment.last_maintenance_date.toString().toLowerCase().includes(search)) ||
+        (equipment.equipment_cost &&
+          equipment.equipment_cost.toString().toLowerCase().includes(search)) ||
+        (equipment.availability_status &&
+          equipment.availability_status.toLowerCase().includes(search))
+      );
+    });
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -242,17 +245,23 @@ const BodyContent = () => {
     setModalSearchQuery("");
   };
 
-  const filteredProjectEquipment = projectEquipmentData.filter((pe) => {
-    const search = modalSearchQuery.toLowerCase();
-    const normalizedItemId = pe.item_id.trim().toLowerCase(); // Normalize the item_id
-    const itemName = itemMap[normalizedItemId] || ""; // Get the item_name from itemMap
+  const filteredProjectEquipment = projectEquipmentData
+    .filter((pe) => {
+      const search = modalSearchQuery.toLowerCase();
+      const normalizedItemId = pe.item_id.trim().toLowerCase(); // Normalize the item_id
+      const itemName = itemMap[normalizedItemId] || ""; // Get the item_name from itemMap
 
-    return (
-      (pe.project_equipment_id && pe.project_equipment_id.toLowerCase().includes(search)) ||
-      (equipmentMap[pe.equipment_id] && equipmentMap[pe.equipment_id].toLowerCase().includes(search)) ||
-      (itemName.toLowerCase().includes(search)) // Include item_name in the search
-    );
-  });
+      return (
+        (pe.project_equipment_id && pe.project_equipment_id.toLowerCase().includes(search)) ||
+        (equipmentMap[pe.equipment_id] && equipmentMap[pe.equipment_id].toLowerCase().includes(search)) ||
+        itemName.toLowerCase().includes(search) // Include item_name in the search
+      );
+    })
+    .sort((a, b) => {
+      const nameA = equipmentMap[a.equipment_id] || ""; // Get equipment_name for a
+      const nameB = equipmentMap[b.equipment_id] || ""; // Get equipment_name for b
+      return nameA.localeCompare(nameB); // Sort alphabetically
+    });
 
   return (
     <div className="equimaprod">
@@ -309,15 +318,32 @@ const BodyContent = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredProjectEquipment.map((pe, index) => {
-                  const normalizedItemId = pe.item_id.trim().toLowerCase(); // Normalize the item_id
-                  return (
-                    <tr key={pe.project_equipment_id || index}>
-                      <td>{equipmentMap[pe.equipment_id] || pe.equipment_id}</td>
-                      <td>{itemMap[normalizedItemId] || pe.item_id}</td>
+                {(() => {
+                  const groupedEquipment = new Map();
+
+                  // Group data by equipment_name
+                  filteredProjectEquipment.forEach((pe) => {
+                    const equipmentName = equipmentMap[pe.equipment_id] || pe.equipment_id;
+                    const productName = itemMap[pe.item_id.trim().toLowerCase()] || pe.item_id;
+
+                    if (!groupedEquipment.has(equipmentName)) {
+                      groupedEquipment.set(equipmentName, []);
+                    }
+                    groupedEquipment.get(equipmentName).push(productName);
+                  });
+
+                  // Render grouped data
+                  return [...groupedEquipment.entries()].map(([equipmentName, productNames], index) => (
+                    <tr key={index}>
+                      <td>{equipmentName}</td>
+                      <td>
+                        {productNames.map((productName, idx) => (
+                          <div key={idx}>{productName}</div> // Each product name on a new line
+                        ))}
+                      </td>
                     </tr>
-                  );
-                })}
+                  ));
+                })()}
               </tbody>
             </table>
           )}

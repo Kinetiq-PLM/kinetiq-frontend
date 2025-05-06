@@ -5,7 +5,8 @@ import "../styles/ReworkCost.css";
 const BodyContent = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [productionData, setProductionData] = useState([]);
-  const [reworkCostData, setReworkCostData] = useState([]); // State for rework_cost data
+  const [reworkCostData, setReworkCostData] = useState([]);
+  const [mergedData, setMergedData] = useState([]); // State for merged data
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -13,41 +14,49 @@ const BodyContent = () => {
     setSearchQuery(event.target.value);
   };
 
-  // Fetch production data from the backend
+  // Fetch production and rework cost data from the backend
   useEffect(() => {
-    const fetchProductionData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://127.0.0.1:8000/api/cost-of-production/");
-        setProductionData(response.data);
+        const productionResponse = await axios.get("http://127.0.0.1:8000/api/cost-of-production/");
+        const reworkCostResponse = await axios.get("http://127.0.0.1:8000/api/rework-cost/");
+        setProductionData(productionResponse.data);
+        setReworkCostData(reworkCostResponse.data);
+
+        // Merge production and rework cost data based on production_order_id
+        const merged = productionResponse.data.map((prod) => {
+          const rework = reworkCostResponse.data.find(
+            (rew) => rew.production_order_id === prod.production_order_id
+          );
+          return {
+            ...prod,
+            additional_cost: rework ? rework.additional_cost : null,
+            additional_misc: rework ? rework.additional_misc : null,
+            total_rework_cost: rework ? rework.total_rework_cost : null,
+          };
+        });
+
+        setMergedData(merged);
         setLoading(false);
       } catch (err) {
-        setError("Failed to fetch production data.");
+        setError("Failed to fetch data.");
         setLoading(false);
       }
     };
 
-    const fetchReworkCostData = async () => {
-      try {
-        const response = await axios.get("http://127.0.0.1:8000/api/rework-cost/");
-        setReworkCostData(response.data);
-      } catch (err) {
-        console.error("Failed to fetch rework cost data.");
-      }
-    };
-
-    fetchProductionData();
-    fetchReworkCostData();
+    fetchData();
   }, []);
 
   // Filter data based on search query
-  const filteredData = productionData.filter((item) => {
+  const filteredData = mergedData.filter((item) => {
     const search = searchQuery.toLowerCase();
     return (
       (item.production_order_id && item.production_order_id.toLowerCase().includes(search)) ||
       (item.actual_quantity && item.actual_quantity.toString().includes(search)) ||
-      (item.cost_of_production && item.cost_of_production.toString().includes(search)) ||
-      (item.miscellaneous_costs && item.miscellaneous_costs.toString().includes(search)) ||
+      (item.additional_cost && item.additional_cost.toString().includes(search)) ||
+      (item.additional_misc && item.additional_misc.toString().includes(search)) ||
+      (item.total_rework_cost && item.total_rework_cost.toString().includes(search)) ||
       (typeof item.rework_required === "boolean" &&
         (item.rework_required ? "yes" : "no").includes(search)) ||
       (item.rework_notes && item.rework_notes.toLowerCase().includes(search))
@@ -60,12 +69,12 @@ const BodyContent = () => {
         <div className="rw-expanded">
           <div className="rwprodheader-section">
             <h1>Rework Cost</h1>
-            <div className="costprodbutton-group">
-              <div className="cpsearch-wrapper">
+            <div className="rworkbutton-group">
+              <div className="rwsearch-wrapper">
                 <img src="/icons/search-icon.png" alt="Search" className="search-icon" />
                 <input
                   type="text"
-                  className="cpsearch-bar"
+                  className="rwsearch-bar"
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={handleSearchChange}
@@ -75,11 +84,12 @@ const BodyContent = () => {
           </div>
 
           <div className="rwprotable">
+            <div className="rwprotable-scroll">
             <table>
-              <thead>
+             <thead>
                 <tr>
-                <th>Production Order ID</th>
-                  <th>Project Name</th>
+                  <th>Production Order ID</th>
+                  <th>Project Description</th>
                   <th>Actual Quantity</th>
                   <th>Additional Cost</th>
                   <th>Additional Miscellaneous Cost</th>
@@ -88,35 +98,73 @@ const BodyContent = () => {
                   <th>Rework Notes</th>
 
                 </tr>
-              </thead>
+                </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="6">Loading...</td>
+                    <td colSpan="7">Loading...</td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan="6">{error}</td>
+                    <td colSpan="7">{error}</td>
                   </tr>
                 ) : (
-                  filteredData.map((item, index) => {
-                    console.log(item); // Log the entire item object
-                    return (
-                      <tr key={index}>
-                        
-                        <td><h1>{item.production_order_id}</h1></td>
-                        <td></td>
-                        <td>{item.actual_quantity}</td>
-                        <td><input type="text" defaultValue={item.additional_cost} /></td>
-                        <td><input type="text" defaultValue={item.additional_misc} /></td>
-                        <td><input type="text" defaultValue={item.total_rework_cost} /></td>
-                        <td>{item.rework_required ? "Yes" : "No"}</td>
-                        <td>{item.rework_notes}</td>
-                      </tr>
-                    );
-                  }))};
+                  filteredData.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.production_order_id}</td>
+                      <td>{item.task_description}</td>
+                      <td className="rework-actual-quantity">
+                        <input
+                          type="text"
+                          value={item.actual_quantity || ""}
+                          onChange={(e) =>
+                            handleActualQuantityChange(item.production_order_id, e.target.value)
+                          }
+                        />
+                      </td>
+                      <td className="rework-additional-cost">
+                        <input
+                          type="text"
+                          value={item.additional_cost || ""}
+                          onChange={(e) =>
+                            handleCostChange(item.production_order_id, e.target.value)
+                          }
+                        />
+                      </td>
+                      <td className="rework-additional-misc">
+                        <input
+                          type="text"
+                          value={item.additional_misc || ""}
+                          onChange={(e) =>
+                            handleCostChange(item.production_order_id, e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>{item.total_rework_cost || "N/A"}</td>
+                      <td className="rw-rework-required">
+                        <select
+                          value={item.rework_required ? "Yes" : "No"}
+                          onChange={e =>
+                            handleReworkRequiredChange(item.production_order_id, e.target.value === "Yes")
+                          }
+                        >
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                        </select>
+                      </td>
+                      <td className="rework-notes">
+                          <textarea
+                              className="rework-notes-textarea"
+                              value={item.rework_notes || ""}
+                              onChange={(e) => handleFieldChange(order.production_order_id, "rework_notes", e.target.value)}
+                          />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </div>

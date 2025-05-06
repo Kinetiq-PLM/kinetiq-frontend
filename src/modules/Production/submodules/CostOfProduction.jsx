@@ -41,19 +41,21 @@ const BodyContent = () => {
     fetchReworkCostData();
   }, []);
 
-  // Filter data based on search query
-  const filteredData = productionData.filter((item) => {
-    const search = searchQuery.toLowerCase();
-    return (
-      (item.production_order_id && item.production_order_id.toLowerCase().includes(search)) ||
-      (item.actual_quantity && item.actual_quantity.toString().includes(search)) ||
-      (item.cost_of_production && item.cost_of_production.toString().includes(search)) ||
-      (item.miscellaneous_costs && item.miscellaneous_costs.toString().includes(search)) ||
-      (typeof item.rework_required === "boolean" &&
-        (item.rework_required ? "yes" : "no").includes(search)) ||
-      (item.rework_notes && item.rework_notes.toLowerCase().includes(search))
-    );
-  });
+  // Filter data based on search query and sort by production_order_id
+  const filteredData = productionData
+    .filter((item) => {
+      const search = searchQuery.toLowerCase();
+      return (
+        (item.production_order_id && item.production_order_id.toLowerCase().includes(search)) ||
+        (item.actual_quantity && item.actual_quantity.toString().includes(search)) ||
+        (item.cost_of_production && item.cost_of_production.toString().includes(search)) ||
+        (item.miscellaneous_costs && item.miscellaneous_costs.toString().includes(search)) ||
+        (typeof item.rework_required === "boolean" &&
+          (item.rework_required ? "yes" : "no").includes(search)) ||
+        (item.rework_notes && item.rework_notes.toLowerCase().includes(search))
+      );
+    })
+    .sort((a, b) => a.production_order_id.localeCompare(b.production_order_id)); // Sort by production_order_id
 
   // When an "Add Row" button is clicked for a given production_order_id,
   // append a blank row (with empty material, quantity, cost)

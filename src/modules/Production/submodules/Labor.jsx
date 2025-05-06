@@ -75,22 +75,24 @@ const LaborTable = ({ searchTerm }) => {
     }
   };
 
-  const filteredData = laborData.filter((labor) => {
-    const search = searchTerm.toLowerCase();
-    return (
-      (labor.labor_id && labor.labor_id.toLowerCase().includes(search)) ||
-      (labor.production_order_id && labor.production_order_id.toLowerCase().includes(search)) ||
-      (employeeMap[labor.employee_id] &&
-        employeeMap[labor.employee_id].toLowerCase().includes(search)) ||
-      (labor.date_worked &&
-        new Date(labor.date_worked)
-          .toISOString()
-          .split("T")[0]
-          .toLowerCase()
-          .includes(search)) ||
-      (labor.days_worked && labor.days_worked.toString().includes(search))
-    );
-  });
+  const filteredData = laborData
+    .filter((labor) => {
+      const search = searchTerm.toLowerCase();
+      return (
+        (labor.labor_id && labor.labor_id.toLowerCase().includes(search)) ||
+        (labor.production_order_id && labor.production_order_id.toLowerCase().includes(search)) ||
+        (employeeMap[labor.employee_id] &&
+          employeeMap[labor.employee_id].toLowerCase().includes(search)) ||
+        (labor.date_worked &&
+          new Date(labor.date_worked)
+            .toISOString()
+            .split("T")[0]
+            .toLowerCase()
+            .includes(search)) ||
+        (labor.days_worked && labor.days_worked.toString().includes(search))
+      );
+    })
+    .sort((a, b) => a.production_order_id.localeCompare(b.production_order_id)); // Sort by production_order_id
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
