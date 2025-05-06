@@ -12,10 +12,17 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const [activeTab, setActiveTab] = useState("document");
   const [showSerialModal, setShowSerialModal] = useState(false);
   const [selectedSerialNumbers, setSelectedSerialNumbers] = useState([]);
+  const [duplicateDetails, setDuplicateDetails] = useState({});
+
   const calculateInitialAmount = () => {
     if (isCreateMode) return 0;
+    if (!selectedData?.document_items) return 0;
+    
     return selectedData.document_items.reduce((sum, item) => {
-      return sum + parseFloat(item.quantity * item.cost);
+      // First try item_price, then check duplicateDetails for a price
+      const price = item.item_price !== 0 ? item.item_price : 
+                   (duplicateDetails[item.item_id]?.[0]?.price || 0);
+      return sum + (parseFloat(item.quantity) * parseFloat(price));
     }, 0).toFixed(2);
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
@@ -65,7 +72,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const fetchVendors = async () => {
     try {
       setLoading(true);
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
+      const response = await fetch("http://127.0.0.1:8000/operation/supplier/");
       if (!response.ok) throw new Error("Connection to database failed");
       const data = await response.json();
       if (!Array.isArray(data.vendors)) throw new Error("Invalid goods data format");
@@ -103,25 +110,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     }
   }, [vendorList, selectedData.vendor_code, employeeList, selectedData.employee_id]);
 
-  const [documentItems, setDocumentItems] = useState(
-    isCreateMode 
-      ? [{}] 
-      : [
-          ...selectedData.document_items.map(item => ({
-            content_id: item.content_id,
-            item_id: item.item_id,
-            item_name: item.item_name,
-            unit_of_measure: item.unit_of_measure,
-            quantity: item.quantity,
-            cost: item.item_price || 0, 
-            warehouse_id: item.warehouse_id,
-            item_no: item.item_no,
-            manuf_date: item.manuf_date,
-            expiry_date: item.expiry_date
-          })), 
-          {}
-        ]
-  );
+  
   const today = new Date().toISOString().slice(0, 10);
   // Initialize document details differently for create mode
   const [documentDetails, setDocumentDetails] = useState({
@@ -139,7 +128,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     initialAmount: initialAmount || 0,
     tax_rate: isCreateMode ? 0 : selectedData.tax_rate || 0,
     tax_amount: isCreateMode ? 0 : selectedData.tax_amount || 0,
-    delivery_note: isCreateMode ? "" : selectedData.delivery_note || "",
     discount_rate: isCreateMode ? 0 : selectedData.discount_rate || 0,
     discount_amount: isCreateMode ? 0 : selectedData.discount_amount || 0,
     freight: isCreateMode ? 0 : selectedData.freight || 0,
@@ -150,7 +138,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const fetchNextDocumentIds = async () => {
       if (isCreateMode) {
         try {
-          const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/get-next-doc-ids/');
+          const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/get-next-doc-ids/');
           if (!response.ok) throw new Error('Failed to fetch next document IDs');
          
           const data = await response.json();
@@ -182,7 +170,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
         // If this item exists in the database, delete it
         try {
-          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -208,7 +196,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   const reloadDocumentItems = async () => {
     try {
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
+      const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
       if (!response.ok) throw new Error('Failed to reload document');
       const updatedData = await response.json();
       return updatedData.document_items;
@@ -269,7 +257,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const [warehouseOptions, setWarehouseOptions] = useState([]);
 
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
+    fetch('http://127.0.0.1:8000/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
         // Sort A–Z by location
@@ -280,11 +268,10 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   }, []);
  
   const [itemOptions, setItemOptions] = useState([]);
-  const [duplicateDetails, setDuplicateDetails] = useState({});
  
   // Inside your item fetch useEffect:
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item/')
+    fetch('http://127.0.0.1:8000/operation/item/')
       .then(res => res.json())
       .then(data => {
         const typePriority = { product: 1, material: 2, asset: 3 };
@@ -402,7 +389,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   
 
 
-          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -552,7 +539,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       };
 
       // Call the create API
-      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
+      const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -637,7 +624,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           console.log(payload)
           let itemResponse
           if (item.content_id){
-            itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
+            itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/${item.content_id}/`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -645,7 +632,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
               body: JSON.stringify(payload),
             });
           }else{
-            itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/`, {
+            itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -682,7 +669,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0
         };
         console.log(updatedDocumentsData)
-        const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
+        const goodsTrackingResponse = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -714,7 +701,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
+      const response = await fetch("http://127.0.0.1:8000/operation/purchase_order/");
       if (!response.ok) throw new Error("Failed to fetch purchase orders");
      
       const data = await response.json();
@@ -731,7 +718,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
     try {
       // Fetch the selected purchase order details
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
+      const response = await fetch(`http://127.0.0.1:8000/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
       const selectedPO = await response.json();
@@ -805,16 +792,37 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       toast.warning("Transaction cost must not exceed 10 digits (1 billion)")
     }
   }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
+  const [documentItems, setDocumentItems] = useState(
+    isCreateMode 
+      ? [{}] 
+      : [
+          ...selectedData.document_items.map(item => ({
+            content_id: item.content_id,
+            item_id: item.item_id,
+            item_name: item.item_name,
+            unit_of_measure: item.unit_of_measure,
+            quantity: item.quantity,
+            cost: item.item_price !== 0 ? item.item_price : (duplicateDetails[item.item_id]?.[0]?.price || 0),
+            warehouse_id: item.warehouse_id,
+            item_no: item.item_no,
+            manuf_date: item.manuf_date,
+            expiry_date: item.expiry_date
+          })), 
+          {}
+        ]
+  );
+  
   useEffect(() => {
-      const newInitialAmount = documentItems
-        .slice(0, -1) // exclude the last empty row
-        .reduce((sum, item) => {
-          return sum + (parseFloat(item.quantity || 0) * parseFloat(item.cost || 0));
-        }, 0)
-        .toFixed(2);
-     
-      setInitialAmount(newInitialAmount);
-    }, [documentItems]);
+    const newInitialAmount = documentItems
+      .slice(0, -1) // exclude the last empty row
+      .reduce((sum, item) => {
+        // Use the price from the item object (which comes from duplicateDetails or itemOptions)
+        const price = parseFloat(item.cost || duplicateDetails[item.item_id]?.[0]?.price || 0);
+        return sum + (parseFloat(item.quantity || 0) * price);
+      }, 0)
+      .toFixed(2);
+    setInitialAmount(newInitialAmount);
+  }, [documentItems, duplicateDetails]);
 
 
 
@@ -1047,15 +1055,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
                       readOnly
                     />
                   </div>
-                  <div className="detail-row">
-  <label>Delivery Note</label>
-  <input
-    type="text"
-    value={documentDetails.delivery_note || ''}
-    onChange={(e) => handleDocumentDetailChange(e, "delivery_note")}
-    maxLength={255}
-  />
-</div>
                 </div>
               )}
             </div>

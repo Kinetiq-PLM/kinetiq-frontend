@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "../styles/GoodsReceiptPO.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
-
+import { Tooltip } from 'react-tooltip';
 
 const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
@@ -13,10 +13,18 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const [activeTab, setActiveTab] = useState("document");
   const [showSerialModal, setShowSerialModal] = useState(false);
   const [selectedSerialNumbers, setSelectedSerialNumbers] = useState([]);
+  const [duplicateDetails, setDuplicateDetails] = useState({});
+  const [purchaseItemsMatch, setPurchaseItemsMatch] = useState(false);
+
   const calculateInitialAmount = () => {
     if (isCreateMode) return 0;
+    if (!selectedData?.document_items) return 0;
+    
     return selectedData.document_items.reduce((sum, item) => {
-      return sum + parseFloat(item.quantity * item.cost);
+      // First try item_price, then check duplicateDetails for a price
+      const price = item.item_price !== 0 ? item.item_price : 
+                    (duplicateDetails[item.item_id]?.[0]?.price || 0);
+      return sum + (parseFloat(item.quantity) * parseFloat(price));
     }, 0).toFixed(2);
   };
   const [initialAmount, setInitialAmount] = useState(calculateInitialAmount());
@@ -53,7 +61,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       if (!response.ok) throw new Error("Connection to database failed");
       const data = await response.json();
       if (!Array.isArray(data.vendors)) throw new Error("Invalid goods data format");
-      setVendorList(data.vendors);
+      setVendorList(data.vendors.sort((a, b) => a.company_name.localeCompare(b.company_name)));
       if (!Array.isArray(data.employees)) throw new Error("Invalid goods data format");
       setEmployeeList(data.employees)
     } catch (error) {
@@ -93,23 +101,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   }, [vendorList, selectedData.vendor_code, employeeList, selectedData.employee_id]);
 
   
-  const [documentItems, setDocumentItems] = useState(
-    isCreateMode 
-      ? [{}] 
-      : [
-          ...selectedData.document_items.map(item => ({
-            content_id: item.content_id,
-            item_id: item.item_id,
-            item_name: item.item_name,
-            unit_of_measure: item.unit_of_measure,
-            quantity: item.quantity,
-            cost: item.item_price || 0, 
-            warehouse_id: item.warehouse_id,
-            item_no: item.item_no 
-          })), 
-          {}
-        ]
-  );
+  
 
  
   const today = new Date().toISOString().slice(0, 10);
@@ -272,7 +264,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   }, []);
  
   const [itemOptions, setItemOptions] = useState([]);
-  const [duplicateDetails, setDuplicateDetails] = useState({});
 
   // Inside your item fetch useEffect:
   useEffect(() => {
@@ -721,8 +712,13 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
   const handlePOSelect = async (poId) => {
-    if (!poId) return;
-    setSelectedPO(""); // Update the selected PO state
+    if (!poId) {
+      setSelectedPO("");
+      setPurchaseItemsMatch(false);
+      return;
+    }
+    
+    setSelectedPO(poId); // Update the selected PO state
  
     try {
       // Fetch the selected purchase order details
@@ -790,8 +786,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         tax_rate: Number(parseFloat(taxRate || 0).toFixed(2)),
       }));
       setDocumentItems([...poItems, {}]);
+      await checkCurrentDocumentItemsMatch(poId, selectedDelNote);
     } catch (error) {
       toast.error(`Failed to load PO data: ${error.message}`);
+      setPurchaseItemsMatch(false);
     }
   };
  
@@ -821,17 +819,210 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         toast.warning("Transaction cost must not exceed 10 digits (1 billion)")
       }
     }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount]);
+
+  const [documentItems, setDocumentItems] = useState(
+    isCreateMode 
+      ? [{}] 
+      : [
+          ...selectedData.document_items.map(item => ({
+            content_id: item.content_id,
+            item_id: item.item_id,
+            item_name: item.item_name,
+            unit_of_measure: item.unit_of_measure,
+            quantity: item.quantity,
+            cost: item.item_price !== 0 ? item.item_price : (duplicateDetails[item.item_id]?.[0]?.price || 0), 
+            warehouse_id: item.warehouse_id,
+            item_no: item.item_no 
+          })), 
+          {}
+        ]
+  );
+
   useEffect(() => {
-      const newInitialAmount = documentItems
-        .slice(0, -1) // exclude the last empty row
-        .reduce((sum, item) => {
-          return sum + (parseFloat(item.quantity || 0) * parseFloat(item.cost || 0));
-        }, 0)
-        .toFixed(2);
-     
-      setInitialAmount(newInitialAmount);
-    }, [documentItems]);
-   
+    const newInitialAmount = documentItems
+      .slice(0, -1) // exclude the last empty row
+      .reduce((sum, item) => {
+        // Use the price from the item object (which comes from duplicateDetails or itemOptions)
+        const price = parseFloat(item.cost || duplicateDetails[item.item_id]?.[0]?.price || 0);
+        return sum + (parseFloat(item.quantity || 0) * price);
+      }, 0)
+      .toFixed(2);
+    setInitialAmount(newInitialAmount);
+  }, [documentItems, duplicateDetails]);
+  const [poMismatchDetails, setPoMismatchDetails] = useState(null);
+
+  const checkCurrentDocumentItemsMatch = useCallback(async (purchaseId, deliveryNote) => {
+    if (!purchaseId) {
+      //console.log("No purchase ID provided - setting match to false");
+      setPurchaseItemsMatch(false);
+      setPoMismatchDetails(null);
+      return;
+    }
+  
+    try {
+      //console.log("Starting items match check for PO:", purchaseId);
+      
+      // Reset mismatch details
+      const mismatches = [];
+      
+      // Get current document items (excluding last empty row)
+      const currentItems = documentItems.slice(0, -1)
+        .filter(item => item.item_id) // Only include items with IDs
+        .map(item => ({
+          item_id: item.item_id,
+          quantity: parseInt(item.quantity || 0, 10)
+        }));
+  
+      //console.log("Current document items (filtered):", currentItems);
+  
+      // Find the selected purchase order
+      const selectedPO = purchaseOrders.find(po => po.purchase_id === purchaseId);
+      if (!selectedPO) {
+        //console.log("PO not found in local state - setting match to false");
+        setPurchaseItemsMatch(false);
+        setPoMismatchDetails(["Purchase order not found"]);
+        return;
+      }
+  
+      // Check if vendor_code matches
+      if (vendorID !== selectedPO.quotation_id.vendor_code.vendor_code) {
+        const mismatchMsg = `Vendor mismatch: ${selectedVendor} (Current) ≠ ${selectedPO.quotation_id.vendor_code.company_name} (PO)`;
+        //console.log(mismatchMsg);
+        mismatches.push(mismatchMsg);
+      }
+  
+      // Check if buyer matches
+      if (documentDetails.buyer !== selectedPO.quotation_id.buyer) {
+        const mismatchMsg = `Buyer mismatch: ${documentDetails.buyer} (Current) ≠ ${selectedPO.quotation_id.buyer} (PO)`;
+        //console.log(mismatchMsg);
+        mismatches.push(mismatchMsg);
+      }
+  
+      // Update mismatch details state
+      setPoMismatchDetails(mismatches.length > 0 ? mismatches : null);
+  
+      // If we have any mismatches, don't proceed with item checks
+      if (mismatches.length > 0) {
+        setPurchaseItemsMatch(false);
+        return;
+      }
+  
+      // Get items from purchase order
+      const poItems = (selectedPO.quotation_contents || []).map(content => ({
+        item_id: content.item_id,
+        quantity: parseInt(content.purchase_quantity || 0, 10)
+      }));
+  
+      //console.log("PO items from quotation contents:", poItems);
+  
+      // For partial delivery, check existing goods receipts
+      let existingPartialItems = {};
+      if (deliveryNote === "Partial Delivery") {
+        //console.log("Partial delivery - checking existing receipts");
+        const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/');
+        if (!response.ok) throw new Error("Failed to fetch goods receipts");
+        const goodsReceipts = await response.json();
+  
+        // Find all partial deliveries for this purchase ID (excluding current document if editing)
+        const partialReceipts = goodsReceipts.filter(gr => 
+          gr.purchase_id === purchaseId && 
+          gr.delivery_note === "Partial Delivery" &&
+          (!selectedData || gr.document_id !== selectedData.document_id)
+        );
+  
+        //console.log("Found partial receipts:", partialReceipts.length);
+  
+        // Sum quantities from all partial receipts
+        partialReceipts.forEach(gr => {
+          gr.document_items.forEach(item => {
+            existingPartialItems[item.item_id] = 
+              (existingPartialItems[item.item_id] || 0) + parseInt(item.quantity, 10);
+          });
+        });
+  
+        //console.log("Existing partial items quantities:", existingPartialItems);
+      }
+  
+      // Check matching based on delivery note type
+      let allItemsMatch = true;
+      let noExtraItems = true;
+      const itemMismatches = [];
+  
+      if (deliveryNote === "Full Delivery") {
+        //console.log("Checking full delivery match");
+        allItemsMatch = poItems.every(poItem => {
+          const currentItem = currentItems.find(ci => ci.item_id === poItem.item_id);
+          const match = currentItem && currentItem.quantity === poItem.quantity;
+          if (!match) {
+            const mismatchMsg = `Item ${poItem.item_id}: Qty ${currentItem?.quantity || 0} ≠ PO Qty ${poItem.quantity}`;
+            //console.log(mismatchMsg);
+            itemMismatches.push(mismatchMsg);
+          }
+          return match;
+        });
+  
+        noExtraItems = currentItems.every(ci => {
+          const exists = poItems.some(poItem => poItem.item_id === ci.item_id);
+          if (!exists) {
+            const mismatchMsg = `Extra item: ${ci.item_id}`;
+            //console.log(mismatchMsg);
+            itemMismatches.push(mismatchMsg);
+          }
+          return exists;
+        });
+      } else {
+        //console.log("Checking partial delivery match");
+        allItemsMatch = poItems.every(poItem => {
+          const currentQty = currentItems.find(ci => ci.item_id === poItem.item_id)?.quantity || 0;
+          const existingQty = existingPartialItems[poItem.item_id] || 0;
+          const totalQty = currentQty + existingQty;
+          const withinLimit = totalQty <= poItem.quantity;
+          
+          if (!withinLimit) {
+            const mismatchMsg = `Item ${poItem.item_id}: Total Qty ${totalQty} exceeds PO Qty ${poItem.quantity}`;
+            //console.log(mismatchMsg);
+            itemMismatches.push(mismatchMsg);
+          }
+          return withinLimit;
+        });
+  
+        noExtraItems = currentItems.every(ci => {
+          const exists = poItems.some(poItem => poItem.item_id === ci.item_id);
+          if (!exists) {
+            const mismatchMsg = `Extra item: ${ci.item_id}`;
+            //console.log(mismatchMsg);
+            itemMismatches.push(mismatchMsg);
+          }
+          return exists;
+        });
+      }
+  
+      // Combine all mismatches
+      const allMismatches = [...mismatches, ...itemMismatches];
+      setPoMismatchDetails(allMismatches.length > 0 ? allMismatches : null);
+  
+      /*console.log("Final match results:", {
+        allItemsMatch,
+        noExtraItems,
+        finalMatch: allItemsMatch && noExtraItems
+      });*/
+  
+      setPurchaseItemsMatch(allItemsMatch && noExtraItems);
+  
+    } catch (error) {
+      console.error("Error checking items match:", error);
+      setPurchaseItemsMatch(false);
+      setPoMismatchDetails(["Error checking match details"]);
+    }
+  }, [documentItems, purchaseOrders, selectedData, vendorID, documentDetails.buyer, selectedVendor]);
+  
+  useEffect(() => {
+    if (documentDetails.purchase_id) {
+      checkCurrentDocumentItemsMatch(documentDetails.purchase_id, selectedDelNote);
+    }
+  }, [documentDetails.purchase_id, selectedDelNote, checkCurrentDocumentItemsMatch]); 
+
+  
 
   return (
     <div className="goods-r-po">
@@ -839,24 +1030,46 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
         <div className="content-wrapper">
         <ToastContainer transition={Slide} />
+        <Tooltip
+  anchorId="purchaseIdSelect"
+  place="bottom"
+  content={poMismatchDetails ? poMismatchDetails.join('\n') : ''}
+  style={{
+    backgroundColor: '#E5E7EB',
+    color: '#000',
+    fontSize: '0.5em',
+    padding: '8px 12px',
+    borderRadius: '6px'
+  }}
+/>
+
           <div className="details-grid">
             <div className="details-section">
             {/* Vendor Code (ID) */}
-              <div className="detail-row dropdown-scrollbar">
+            <div className="detail-row dropdown-scrollbar">
                 <label>Purchase ID</label>
                 <select
+                  id="purchaseIdSelect"
                   value={documentDetails.purchase_id || ""}
                   onChange={(e) => {
                     setDocumentDetails(prev => ({
                       ...prev,
                       purchase_id: e.target.value
                     }));
+                    setSelectedPO(e.target.value);
+                    checkCurrentDocumentItemsMatch(e.target.value);
+                  }}
+                  data-tooltip-content={poMismatchDetails ? poMismatchDetails.join('\n') : ''} 
+                  style={{
+                    borderColor: poMismatchDetails !== null 
+                      ? 'red' 
+                      : (poMismatchDetails ? '#5CB338' : '#5CB338')
                   }}
                 >
                   <option value="">Select Purchase Order</option>
                   {purchaseOrders.map(po => (
                     <option key={po.purchase_id} value={po.purchase_id}>
-                      {po.purchase_id} - {po.status} {/* You can format this as needed */}
+                      {po.purchase_id} - {po.status}
                     </option>
                   ))}
                 </select>
@@ -1238,7 +1451,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                       </td>
                       <td readOnly style={{ cursor: 'not-allowed' }}>
                         {(() => {
-                          const total = (item.quantity * item.cost) || 0;
+                          const currentCost = item.cost || 
+                          (item.item_id && duplicateDetails[item.item_id]?.[0]?.price) || 0;
+
+                          const total = (parseFloat(item.quantity || 0) * parseFloat(currentCost));
                           if (total > 1000000000) {
                             toast.dismiss();
                             toast.error("Total cost must not exceed 1 billion");
@@ -1246,7 +1462,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                           return total.toFixed(2);
                         })()}
                       </td>
-                      
                       <td>
                         <select
                           value={item.warehouse_id || ''}
