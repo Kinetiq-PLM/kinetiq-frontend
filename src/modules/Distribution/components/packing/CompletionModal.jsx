@@ -34,8 +34,12 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
   const isPartialDelivery = !!(packingList.delivery_notes_info && packingList.delivery_notes_info.is_partial_delivery);
   
   // Get partial delivery info if available
-  const currentDelivery = isPartialDelivery ? packingList.delivery_notes_info.current_delivery : null;
+  let currentDelivery = isPartialDelivery ? packingList.delivery_notes_info.current_delivery : null;
   const totalDeliveries = isPartialDelivery ? packingList.delivery_notes_info.total_deliveries : null;
+  
+  if (currentDelivery > totalDeliveries) {
+    currentDelivery = totalDeliveries;
+  }
   const currentDeliveryNotes = isPartialDelivery ? packingList.delivery_notes_info.current_delivery_notes : [];
   
   // Get delivery notes display if available

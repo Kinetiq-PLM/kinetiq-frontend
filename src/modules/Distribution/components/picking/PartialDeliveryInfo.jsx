@@ -7,9 +7,13 @@ const PartialDeliveryInfo = ({ pickingList, deliveryNotesInfo }) => {
     return null;
   }
 
-  const currentDelivery = deliveryNotesInfo.current_delivery;
+  let currentDelivery = deliveryNotesInfo.current_delivery;
   const totalDeliveries = deliveryNotesInfo.total_deliveries;
   const completedDeliveries = deliveryNotesInfo.completed_deliveries;
+
+  if (currentDelivery > totalDeliveries) {
+    currentDelivery = totalDeliveries;
+  }
 
   const progressPercentage = (completedDeliveries / totalDeliveries) * 100;
 

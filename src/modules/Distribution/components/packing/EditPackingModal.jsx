@@ -786,10 +786,15 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
   // Render partial delivery info section
   const renderPartialDeliveryInfo = () => {
     if (!isPartialDelivery || !deliveryNotesInfo) return null;
-    
-    const currentDelivery = deliveryNotesInfo.current_delivery;
+
+    let currentDelivery = deliveryNotesInfo.current_delivery;
     const totalDeliveries = deliveryNotesInfo.total_deliveries;
     const completedDeliveries = deliveryNotesInfo.completed_deliveries || 0;
+    
+    if (currentDelivery > totalDeliveries) {
+      currentDelivery = totalDeliveries;
+    }
+    
     const progressPercentage = (completedDeliveries / totalDeliveries) * 100;
     
     return (
