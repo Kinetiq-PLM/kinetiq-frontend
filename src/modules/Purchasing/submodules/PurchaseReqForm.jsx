@@ -34,7 +34,7 @@ const PurchaseReqForm = ({ onClose }) => {
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/prf/employees/");
+                const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
                 const data = await response.json();
                 setEmployees(data);
             } catch {
@@ -48,7 +48,7 @@ const PurchaseReqForm = ({ onClose }) => {
         const fetchItems = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/quotation-content/item/list/");
+                const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/item/list/");
                 const data = await response.json();
                 setMaterials(data.filter((item) => item.item_type === "Raw Material"));
                 setAssets(data.filter((item) => item.item_type === "Asset"));
@@ -87,7 +87,7 @@ const PurchaseReqForm = ({ onClose }) => {
         };
     
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/purchase-order/list/", {
+            const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-order/list/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(purchaseData),
@@ -130,7 +130,7 @@ const PurchaseReqForm = ({ onClose }) => {
                 purchase_quantity: item.purchase_quantity,
             };
 
-            const response = await fetch("http://127.0.0.1:8000/api/quotation-content/create/", {
+            const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/create/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
@@ -152,13 +152,13 @@ const PurchaseReqForm = ({ onClose }) => {
       
         try {
           // Fetch all purchase requests
-          const res = await fetch("http://127.0.0.1:8000/api/prf/list/");
+          const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
           const data = await res.json();
       
           // Filter requests that do not have quotation content
           const requestsWithoutQuotation = [];
           for (const request of data) {
-            const checkRes = await fetch(`http://127.0.0.1:8000/api/quotation-content/check/?request_id=${request.request_id}`);
+            const checkRes = await fetch(`https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/check/?request_id=${request.request_id}`);
             const checkData = await checkRes.json();
       
             // Only include requests where quotation content does not exist
@@ -219,7 +219,7 @@ const PurchaseReqForm = ({ onClose }) => {
                 items: formData.items,
             };
 
-            const res = await fetch("http://127.0.0.1:8000/dev/api/prf/submit/", {
+            const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/dev/api/prf/submit/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
@@ -486,7 +486,7 @@ const PurchaseReqForm = ({ onClose }) => {
                                             status: "Pending",
                                         };
 
-                                        const quotationRes = await fetch("http://127.0.0.1:8000/api/purchase_quotation/create/", {
+                                        const quotationRes = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/create/", {
                                             method: "POST",
                                             headers: { "Content-Type": "application/json" },
                                             body: JSON.stringify(quotationPayload),
@@ -514,7 +514,7 @@ const PurchaseReqForm = ({ onClose }) => {
                                             status: purchaseForm.popupStatus || "Pending",
                                         };
 
-                                        const orderRes = await fetch("http://127.0.0.1:8000/api/purchase-orders/list/", {
+                                        const orderRes = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/", {
                                             method: "POST",
                                             headers: { "Content-Type": "application/json" },
                                             body: JSON.stringify(orderPayload),

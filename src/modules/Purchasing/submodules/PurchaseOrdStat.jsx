@@ -95,7 +95,7 @@ const PurchaseOrdStatBody = ({ onBackToDashboard }) => {
   useEffect(() => {
     const fetchPurchaseOrders = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/purchase-orders/list/");
+        const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/");
         if (!response.ok) {
           throw new Error("Failed to fetch purchase orders");
         }
@@ -127,7 +127,7 @@ const PurchaseOrdStatBody = ({ onBackToDashboard }) => {
     setSelectedOrder(order);
   
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/purchase-orders/list/");
+      const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/");
       if (!response.ok) {
         throw new Error("Failed to fetch purchase orders");
       }

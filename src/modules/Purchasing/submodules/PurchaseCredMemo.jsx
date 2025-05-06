@@ -40,7 +40,7 @@ const PurchaseCredMemoBody = ({ onBackToDashboard }) => {
     const fetchCreditMemos = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/api/credit-memo/list/"
+          "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/credit-memo/list/"
         );
         console.log("Credit Memos API Response:", response.data);
         setCreditMemos(response.data);

@@ -41,7 +41,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
         const employeeData = response.data.reduce((map, employee) => {
           const fullName = `${employee.first_name} ${employee.last_name}`.trim();
           map[employee.employee_id] = fullName;
@@ -62,7 +62,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
       if (!requestId) return;
 
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/prf/list/");
+        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
         const matchingRequest = response.data.find((req) => req.request_id === requestId);
 
         if (matchingRequest?.employee_id) {
@@ -86,7 +86,7 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
   useEffect(() => {
     const fetchVendors = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/vendor/list/");
+        const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/");
         setVendors(response.data);
       } catch (error) {
         console.error("Error fetching vendors:", error.response?.data || error.message);
@@ -100,18 +100,18 @@ const PurchForQuotForm = ({ onClose, request, quotation, onSuccess }) => {
     
         if (requestId) {
           // Fetch items filtered by request_id
-          const response = await axios.get("http://127.0.0.1:8000/api/quotation-content/list/");
+          const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/list/");
           itemsResponse = response.data.filter((item) => item.request_id === requestId);
           console.log("Filtered Items by Request ID:", itemsResponse);
         } else {
           // Fetch all items from item/list/ endpoint
-          const response = await axios.get("http://127.0.0.1:8000/api/quotation-content/item/list/");
+          const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/item/list/");
           itemsResponse = response.data;
           console.log("Fetched All Items:", itemsResponse);
         }
     
         // Fetch all items to map item_id to item_name
-        const allItemsResponseData = await axios.get("http://127.0.0.1:8000/api/quotation-content/item/list/");
+        const allItemsResponseData = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/item/list/");
         allItemsResponse = allItemsResponseData.data;
     
         // Map item_name to itemsResponse
@@ -309,7 +309,7 @@ const handleInputChange = (e) => {
 useEffect(() => {
   const fetchVendors = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/vendor/list/");
+      const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/");
       console.log("Vendors fetched:", response.data); // Debugging
       setVendors(response.data);
     } catch (error) {
@@ -327,7 +327,7 @@ useEffect(() => {
 
 const fetchQuotations = async () => {
   try {
-    const response = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
+    const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
     console.log("Fetched Quotations:", response.data);
   } catch (error) {
     console.error("Error fetching quotations:", error.response?.data || error.message);
@@ -361,7 +361,7 @@ const fetchQuotations = async () => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/purchase_quotation/create/",
+        "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/create/",
         payload
       );
       console.log("✅ Response from server:", response.data);
@@ -376,7 +376,7 @@ const fetchQuotations = async () => {
   const handleAddToList = async () => {
     try {
       // Check if a quotation already exists for the given request_id
-      const listResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
+      const listResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
       const existingQuotation = listResponse.data.find(
         (quotation) => quotation.request_id === requestId
       );
@@ -410,7 +410,7 @@ const fetchQuotations = async () => {
       console.log("Payload being sent:", payload);
   
       const createResponse = await axios.post(
-        "http://127.0.0.1:8000/api/purchase_quotation/create/",
+        "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/create/",
         payload
       );
   
@@ -450,7 +450,7 @@ const fetchQuotations = async () => {
   
       // Create purchase order
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/purchase-orders/list/",
+        "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/",
         poPayload,
         {
           headers: {
@@ -512,7 +512,7 @@ const handleAmountChange = async (e, index) => {
     };
 
     await axios.patch(
-      `http://127.0.0.1:8000/api/quotation-content/update/${updatedItems[index].quotation_content_id}/`,
+      `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/update/${updatedItems[index].quotation_content_id}/`,
       payload
     );
 

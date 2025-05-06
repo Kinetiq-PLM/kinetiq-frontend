@@ -27,7 +27,7 @@ const PurchaseQuotEdit = ({ quotation, onClose, onSuccess }) => {
     try {
       setIsSubmitting(true);
       const response = await axios.put(
-        `http://127.0.0.1:8000/api/purchase_quotation/update/${quotation.quotation_id}/`,
+        `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/update/${quotation.quotation_id}/`,
         formData
       );
       console.log("Updated Quotation:", response.data);

@@ -23,11 +23,11 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
   const fetchPurchaseRequests = async (signal) => {
     try {
       // Fetch all purchase requests
-      const prfResponse = await axios.get("http://127.0.0.1:8000/api/prf/list/", { signal });
+      const prfResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/", { signal });
       const purchaseRequests = prfResponse.data;
 
       // Fetch all quotation contents
-      const quotationResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/list/", { signal });
+      const quotationResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/list/", { signal });
       const quotationContents = quotationResponse.data;
 
       // Extract request_ids that have matching quotation_content_id
@@ -56,7 +56,7 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
 
   const fetchEmployees = async (signal) => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/prf/employees/", { signal });
+      const response = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/", { signal });
       const employeeData = response.data.reduce((map, employee) => {
         const fullName = `${employee.first_name} ${employee.last_name}`.trim();
         map[employee.employee_id] = {
@@ -165,7 +165,7 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
       );
       
       // Then update the backend
-      await axios.patch(`http://127.0.0.1:8000/api/prf/update/${requestId}/`, {
+      await axios.patch(`https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/update/${requestId}/`, {
         status: newStatus,
       });
 
@@ -179,7 +179,7 @@ const PurchaseReqListBody = ({ onBackToDashboard, toggleDashboardSidebar }) => {
         return prevRequests.map(request => {
           if (request.request_id === requestId) {
             // Fetch the current status from the server for just this one request
-            axios.get(`http://127.0.0.1:8000/api/prf/detail/${requestId}/`)
+            axios.get(`https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/detail/${requestId}/`)
               .then(response => {
                 const currentStatus = response.data.status;
                 setPurchaseRequests(latestRequests => 
