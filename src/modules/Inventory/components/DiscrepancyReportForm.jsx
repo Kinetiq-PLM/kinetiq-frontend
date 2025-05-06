@@ -50,7 +50,7 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
     };
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/users/")
+        fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/users/")
             .then((res) => {
                 if (!res.ok) {
                     throw new Error(`Error fetching users: ${res.status}`);
@@ -80,7 +80,7 @@ const DiscrepancyReportForm = ({ onClose, selectedItem, inventoryItems = {} }) =
             const itemsList = Object.values(inventoryItems);
             setInventoryItemsList(itemsList);
         } else {
-            fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
+            fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
                 .then((res) => {
                     if (!res.ok) {
                         throw new Error(`Error fetching inventory items: ${res.status}`);
