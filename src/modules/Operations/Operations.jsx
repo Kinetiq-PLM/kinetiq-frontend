@@ -7,8 +7,8 @@ const docTypes = ['Total', 'Goods Receipt', 'Goods Receipt PO', 'Goods Issue', '
 
 const Operations = ({employee_id}) => {
   const [chartSize, setChartSize] = useState({
-    width: window.innerWidth > 600 ? 600 : 400,
-    height: window.innerWidth > 600 ? 450 : 320
+    width: Math.min(window.innerWidth - 40, 600), 
+    height: window.innerWidth > 768 ? 450 : window.innerWidth > 480 ? 380 : 300
   });
   const PIE_ANIMATION_DURATION = 1000;
   const [activeIndex, setActiveIndex] = useState(null);
@@ -25,9 +25,10 @@ const Operations = ({employee_id}) => {
 
   useEffect(() => {
     const handleResize = () => {
+
       setChartSize({
-        width: window.innerWidth > 600 ? 600 : 400,
-        height: window.innerWidth > 600 ? 450 : 320
+        width: Math.min(window.innerWidth - 40, 600),
+        height: window.innerWidth > 768 ? 450 : window.innerWidth > 480 ? 380 : 300
       });
     };
 
@@ -43,7 +44,7 @@ const Operations = ({employee_id}) => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/');
+      const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/');
       if (!response.ok) throw new Error('Network response was not ok');
   
       const data = await response.json();
@@ -124,7 +125,7 @@ const Operations = ({employee_id}) => {
   };
   const [employeeName, setEmployeeName] = useState('');
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/')
+    fetch('http://127.0.0.1:8000/operation/supplier/')
       .then(response => response.json())
       .then(data => {
         const match = data.employees.find(emp => emp.employee_id === employee_id);
@@ -155,7 +156,7 @@ const Operations = ({employee_id}) => {
   return (
     <div className="operations">
       <div className="body-content-container">
-        <div className="operations-container">
+        <div className="operations-container dropdown-scrollbar">
           <div className="operations-header">
             <h2 className="operations-welcome-text">Welcome back, {employeeName}!</h2>
             <div className="operations-total-box">
@@ -174,8 +175,8 @@ const Operations = ({employee_id}) => {
               nameKey="name"
               cx="50%"
               cy="50%"
-              innerRadius={100}
-              outerRadius={180}
+              innerRadius={window.innerWidth > 768 ? 100 : window.innerWidth > 480 ? 80 : 60}
+              outerRadius={window.innerWidth > 768 ? 180 : window.innerWidth > 480 ? 150 : 120}
               label={({ name, percent }) =>
                 `${name} ${(percent * 100).toFixed(1)}%`
               }

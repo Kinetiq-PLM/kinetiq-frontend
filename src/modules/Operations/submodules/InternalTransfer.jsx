@@ -33,7 +33,7 @@ const ApprovalTable = ({employee_id}) => {
   const fetchWarehouse = async () => {
     try {
       setLoading(true);
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/");
+      const response = await fetch("http://127.0.0.1:8000/operation/get-warehouseID/");
       if (!response.ok) throw new Error("Connection to database failed");
 
 
@@ -79,9 +79,9 @@ const ApprovalTable = ({employee_id}) => {
       try {
           setLoading(true);
           setError(null); // Reset error state
-          const syncDataResponse = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/sync-production/");
-          const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/internal-transfer-delivery-request/");
-          const reworkResponse = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/rework-order/");
+          const syncDataResponse = await fetch("http://127.0.0.1:8000/operation/external-modules/sync-production/");
+          const response = await fetch("http://127.0.0.1:8000/operation/internal-transfer-delivery-request/");
+          const reworkResponse = await fetch("http://127.0.0.1:8000/operation/external-modules/rework-order/");
           if (!response.ok || !syncDataResponse || !reworkResponse) throw new Error("Connection to database failed");
  
           const data = await response.json();
@@ -152,7 +152,7 @@ const ApprovalTable = ({employee_id}) => {
     }
  
     try {
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/update-delivery-request/${selectedData.delivery_id}/`, {
+      const response = await fetch(`http://127.0.0.1:8000/operation/update-delivery-request/${selectedData.delivery_id}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -221,7 +221,7 @@ const ApprovalTable = ({employee_id}) => {
         return;
       }
       console.log(data.reason_rework)
-      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/external-modules/update-rework/', {
+      const response = await fetch('http://127.0.0.1:8000/operation/external-modules/update-rework/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
