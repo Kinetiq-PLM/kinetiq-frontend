@@ -118,7 +118,42 @@ const VendorAppForm = () => {
                 <div className="body-content-container">
                     <div className="vendorappform-header">
                         <button className="vendorappform-back">Back</button>
-                        <h2 className="vendorappform-title">Vendor Application Form</h2>
+                        <h2 className="vendorappform-title">Vendor Management</h2>
+                    </div>
+
+                    <div className="vaf-table-container">
+                    <div className="vaf-table-header">
+                    <div>Vendor Name</div>
+                    <div>Contact Person</div>
+                    <div>Status</div>
+                    <div>Date Requested</div>
+                    <div>Requestor</div>
+                    </div>
+                    <div className="vaf-table-scrollable">
+                    <div className="vaf-table-rows">
+                    {true ? ( // replace true with `length > 0` if needed
+                        <>
+                        <div className="vaf-row">
+                            <div>Khia Asylum</div>
+                            <div>Mommy Oni</div>
+                            <div>
+                            <select defaultValue="Pending">
+                                <option value="Approved">Approved</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                            </div>
+                            <div>04/05/2025</div>
+                            <div>CupcakKe</div>
+                        </div>
+                        </>
+                    ) : (
+                        <div className="vaf-no-results">No results found</div>
+                    )}
+                    </div>
+
+
+                    </div>
                     </div>
 
                     <div className="vendorappform-content">
@@ -341,7 +376,7 @@ const VendorAppForm = () => {
                                 Submit
                             </button>
                         </div>
-                    </div>
+                    </div>              
                 </div>
             </div>
         </div>
