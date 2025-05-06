@@ -13,4 +13,4 @@ const BodyContent = () => {
     );
 };
 
-export default BodyContent;
+ export default BodyContent;

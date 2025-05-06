@@ -1,0 +1,509 @@
+/* REMINDER! All of your elements must use your unique namespace '.manuproc' at the start to avoid leaking */
+
+.equimaprod {
+  flex: auto;
+}
+
+
+.equimaprod-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 900px;
+  margin-bottom: 3px;
+
+  h1 {
+    font-family: Inter;
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    flex-wrap: wrap;
+  }
+
+}
+
+.equimaprodcolumns {
+  display: flex;
+  gap: 20px;
+
+  .column {
+    flex: 1;
+    background-color: #EFF8F9;
+    padding: 2px;
+    border-radius: 5px;
+    flex-wrap: wrap;
+  }
+
+  .expanded {
+    flex-grow: 2;
+  }
+
+
+  .top-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+
+  }
+}
+
+.equimaprodbutton-group-materials {
+  display: flex;
+  gap: 10px;
+
+ 
+
+  .refresh-button,
+  .EMsave-button {
+    background: #00A8A8;
+    width: 146px;
+    height: 36px;
+    border: none;
+    color: white;
+    padding: 15px;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .refresh-button:hover,
+  .EMsave-button:hover {
+    background-color: #098F8F;
+  }
+
+}
+
+.equimaprod-button-group {
+  display: flex;
+  justify-content: center;
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-shadow: 0px -1px 0px 0px #E8E8E8 inset;
+  gap: 10px;
+  padding: 3px;
+
+}
+
+.equipment-button,
+.labor-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #555;
+  cursor: pointer;
+  padding: 5px 10px;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.equipment-button:hover,
+.labor-button:hover {
+  color: #00a6c7;
+}
+
+.equipment-button.active,
+.labor-button.active {
+  color: #00a6c7;
+
+}
+
+.equipment-button.active::after,
+.labor-button.active::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 3px;
+  background-color: #00a6c7;
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+}
+
+.equimaprodsearch-bar {
+  padding: 8px 5px 8px 20px;
+  flex-shrink: 0;
+  font-size: 15px;
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  border: 1px solid #ffffff;
+  background-color: #fff;
+  border-radius: 8px;
+  width: 725px;
+  height: 35px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  display: flex;
+  padding-left: 10px;
+  padding-right: 10px;
+  gap: 10px;
+
+  .search-icon {
+    width: 15px;
+    height: 15px;
+    pointer-events: none;
+  }
+
+}
+
+.equimaprod-notification-container {
+  width: 100%;
+  max-width: 500px;
+  height: 450px;
+  margin: 20px auto;
+  padding: 0; 
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  overflow-x: hidden;  
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+
+.header-notification {
+  font-size: 24px;
+  font-weight: bold;
+  padding: 10px;
+  padding-left: 10px;
+  color: #007878;
+  text-align: left;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10; 
+}
+
+
+
+.EM-table {
+  width: 1300px;
+  height: 410px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-radius: 20px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  padding: 10px;
+  box-shadow: 0px 4px 7.5px 1px rgba(0, 0, 0, 0.25);
+
+  .table-container {
+    overflow-x: auto;
+    max-height: 400px;
+    border: 1px solid #ddd;
+    border-color: #ffffff;
+    
+  }
+
+  
+  .table-container::-webkit-scrollbar {
+    width: 8px;
+  }
+
+
+  .table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+
+  .table-container::-webkit-scrollbar-thumb {
+    background: #00A8A8;
+    border-radius: 10px;
+  }
+
+
+  .equipment-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+  }
+
+  .equipment-table th,
+  .equipment-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #D2D2D2;
+    padding-bottom: 10px;
+  }
+
+  .equipment-table td{
+    color: #000;
+font-family: Inter;
+font-size: 14px;
+font-style: normal;
+font-weight: 300;
+line-height: normal;
+max-width: 200px;
+white-space: nowrap;  
+overflow: hidden;     
+text-overflow: ellipsis; 
+  }
+
+  .equipment-table th {
+    background-color: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #404040;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    border-bottom: 1px solid #D2D2D2;
+  }
+
+
+  h1 {
+    color: var(--Black, #000);
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  h2 {
+    color: var(--Black, #000);
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+  }
+
+  p {
+    padding-top: 10px;
+    color: var(--Black, #000);
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+    text-align: left;
+    max-width: 150px;
+    white-space: nowrap;  
+    overflow: hidden;     
+    text-overflow: ellipsis; 
+  }
+
+  .availability-dropdown {
+    display: flex;
+    width: 118px;
+    height: 33px;
+    padding: 10px 20px;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 5px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    font-family: Inter;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+
+  }
+
+  .labor-table{
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+
+    th{
+      background-color: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #404040;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    border-bottom: 1px solid #D2D2D2;
+    }
+
+    td{
+      padding: 20px;
+      color: #000;
+      font-family: Inter;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 300;
+      line-height: normal;
+      max-width: 200px;
+      white-space: nowrap;  
+      overflow: hidden;     
+      text-overflow: ellipsis; 
+      border-bottom: 1px solid #D2D2D2;
+    }
+
+    h1 {
+      color: var(--Black, #000000);
+      font-family: Inter;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: normal;
+    }
+  
+    h2 {
+      color: var(--Black, #000000);
+      font-family: Inter;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 300;
+      line-height: normal;
+    }
+
+}
+
+
+}
+
+.availability-dropdown.available {
+  background-color:#B0F6B0 ;
+  color: #2DA800;
+}
+
+.availability-dropdown.unavailable {
+  background: #FECDBF;
+  color: #A80000;
+}
+
+.availability-dropdown.undermaintenance {
+  color: #A4742D;
+  background: #FFE3AF;
+}
+
+.equipment-table input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.equipment-table input[type="date"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  width: 100%;
+  background-color: #d2d2d2;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  color: #404040;
+}
+
+.equipment-table input[type="text"]:focus {
+  border-color: #00A8A8;
+  outline: none;
+  background-color: #fff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+}
+
+
+.equipment-table td {
+  vertical-align: middle;
+  padding: 10px;
+}
+
+
+
+
+.labor-table input[type="date"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  width: 150px;
+  background-color: #d2d2d2;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  color: #404040;
+}
+
+.labor-table input[type="text"] {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+
+.labor-table input[type="text"]:focus {
+  border-color: #00A8A8;
+  outline: none;
+  background-color: #fff;
+  box-shadow: 0 0 4px rgba(0, 168, 168, 0.5);
+}
+
+
+.labor-table td {
+  vertical-align: middle;
+  padding: 10px;
+}
+
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 30px;
+  cursor: pointer;
+}

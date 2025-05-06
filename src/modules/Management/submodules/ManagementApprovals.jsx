@@ -1,214 +1,294 @@
 import React, { useState } from 'react';
 import "../styles/ManagementApprovals.css";
+import "../styles/ManagementDashboard.css";
 
-function Approvals() {
-  const [approvalStatus, setApprovalStatus] = useState('');
+function ManagementApprovals() {
   const [formData, setFormData] = useState({
-    approvalId: '',
-    requestId: '',
-    decisionDate: '',
-    externalModuleId: '',
-    issueDate: '',
-    checkedBy: '',
-    dueDate: '',
-    checkedDate: '',
+    formId: '',
+    requisitionForm: '',
+    name: '',
+    position: '',
+    department: '',
+    date: '',
+    requestTypes: [],
+    otherRequest: '',
+    policyAlignment: '',
+    supportingDocuments: [],
+    comments: '',
+    decisionOutcome: '',
     remarks: '',
   });
-  const [searchId, setSearchId] = useState('');
-  const [dateRange, setDateRange] = useState('Last 30 Days');
-  const [filterBy, setFilterBy] = useState('Filter By...');
-  const [approvalList, setApprovalList] = useState([
-    {
-      approvalId: '123',
-      requestId: 'REQ456',
-      decisionDate: '2023-11-15',
-      externalModuleId: 'MOD789',
-      issueDate: '2023-11-10',
-      checkedBy: 'John Doe',
-      dueDate: '2023-11-30',
-      checkedDate: '2023-11-12',
-      remarks: 'Approved',
-      status: 'approved',
-    },
-    {
-      approvalId: '456',
-      requestId: 'REQ789',
-      decisionDate: '2023-11-16',
-      externalModuleId: 'MOD101',
-      issueDate: '2023-11-11',
-      checkedBy: 'Jane Smith',
-      dueDate: '2023-12-01',
-      checkedDate: '2023-11-13',
-      remarks: 'Rejected',
-      status: 'rejected',
-    },
-    // Add more initial approval data as needed
-  ]);
 
-  const handleStatusChange = (event) => {
-    setApprovalStatus(event.target.value);
+  const [currentView, setCurrentView] = useState('form'); // Default view is the form
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+  const handleCheckboxChange = (type, field) => {
+    setFormData((prevState) => {
+      const isSelected = prevState[field].includes(type);
+      return {
+        ...prevState,
+        [field]: isSelected
+          ? prevState[field].filter((item) => item !== type)
+          : [...prevState[field], type],
+      };
+    });
   };
 
   const handleSave = () => {
     console.log('Form Data:', formData);
-    console.log('Approval Status:', approvalStatus);
-    // Add your save logic here (e.g., API call)
+    alert('Form saved successfully!');
+    setCurrentView('approvalProgress'); // Navigate to Approval Progress view
+  };
+
+  const handleNext = () => {
+    console.log('Navigating to Compliance Validation...');
+    setCurrentView('complianceValidation'); // Navigate to Compliance Validation view
+  };
+
+  const handleDecisionOutcome = () => {
+    console.log('Navigating to Decision Outcome...');
+    setCurrentView('decisionOutcome'); // Navigate to Decision Outcome view
   };
 
   const handleBack = () => {
-    // Add your back button logic here (e.g., navigation)
-    console.log("Back button clicked");
+    console.log('Navigating back...');
+    setCurrentView('form'); // Navigate back to the form
   };
 
-  const handleSearchIdChange = (event) => {
-    setSearchId(event.target.value);
-  };
+  if (currentView === 'approvalProgress') {
+    return (
+      <div className="management-approvals">
+        <h2 className="section-title">Approval Progress</h2>
+        <p>Approval progress details go here...</p>
+        <div className="form-buttons">
+          <button className="back-button" onClick={handleBack}>
+            Back
+          </button>
+          <button className="save-button" onClick={handleNext}>
+            Next
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  const handleDateRangeChange = (event) => {
-    setDateRange(event.target.value);
-  };
+  if (currentView === 'complianceValidation') {
+    return (
+      <div className="management-approvals">
+        <h2 className="section-title">Compliance Validation</h2>
+        <div className="form-row">
+          <div className="form-group">
+            <label>Policy Alignment:</label>
+            <div className="checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={formData.policyAlignment === 'Compliant'}
+                  onChange={() =>
+                    setFormData({ ...formData, policyAlignment: 'Compliant' })
+                  }
+                />
+                Compliant
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={formData.policyAlignment === 'Not Compliant'}
+                  onChange={() =>
+                    setFormData({ ...formData, policyAlignment: 'Not Compliant' })
+                  }
+                />
+                Not Compliant
+              </label>
+            </div>
+          </div>
+        </div>
 
-  const handleFilterByChange = (event) => {
-    setFilterBy(event.target.value);
+        <div className="form-row">
+          <div className="form-group">
+            <label>Supporting Documents:</label>
+            <div className="checkbox-group">
+              {['Quotation', 'Project Plan', 'Budget Plan', 'Policy Copy', 'Others'].map(
+                (doc) => (
+                  <label key={doc}>
+                    <input
+                      type="checkbox"
+                      checked={formData.supportingDocuments.includes(doc)}
+                      onChange={() => handleCheckboxChange(doc, 'supportingDocuments')}
+                    />
+                    {doc}
+                  </label>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="comments">Comments:</label>
+          <textarea
+            id="comments"
+            name="comments"
+            value={formData.comments}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="form-buttons">
+          <button className="back-button" onClick={handleBack}>
+            Cancel
+          </button>
+          <button className="save-button" onClick={handleDecisionOutcome}>
+            Save
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentView === 'decisionOutcome') {
+    return (
+      <div className="management-approvals">
+        <h2 className="section-title">Decision Outcome</h2>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="decisionOutcome">Decision Outcome:</label>
+            <select
+              id="decisionOutcome"
+              name="decisionOutcome"
+              value={formData.decisionOutcome}
+              onChange={handleInputChange}
+            >
+              <option value="">Choices...</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="remarks">Remarks:</label>
+          <textarea
+            id="remarks"
+            name="remarks"
+            value={formData.remarks}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="form-buttons">
+          <button className="back-button" onClick={handleBack}>
+            Cancel
+          </button>
+          <button className="save-button" onClick={() => alert('Decision saved!')}>
+            Save
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="approvals-container">
-      <div className="header">
-        <div className="search-bar"></div>
-        <div className="notification"></div>
-        <div className="user-profile"></div>
+    <div className="management-approvals">
+      {/* First Section */}
+      <div className="form-section">
+        <h2 className="section-title">Requisition Form</h2>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="formId">Form ID:</label>
+            <input
+              type="text"
+              id="formId"
+              name="formId"
+              value={formData.formId}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="requisitionForm">Requisition Form:</label>
+            <input
+              type="text"
+              id="requisitionForm"
+              name="requisitionForm"
+              value={formData.requisitionForm}
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
+
+        <h3 className="subsection-title">Requestor Information</h3>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="name">Name:</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="position">Position:</label>
+            <input
+              type="text"
+              id="position"
+              name="position"
+              value={formData.position}
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="department">Department/Section:</label>
+            <select
+              id="department"
+              name="department"
+              value={formData.department}
+              onChange={handleInputChange}
+            >
+              <option value="">Choices...</option>
+              <option value="Purchase">Purchase</option>
+              <option value="Project Proposal">Project Proposal</option>
+              <option value="Service">Service</option>
+              <option value="Salary Release">Salary Release</option>
+              <option value="Stock Transfer">Stock Transfer</option>
+              <option value="Asset Removal">Asset Removal</option>
+              <option value="Delivery Request">Delivery Request</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="date">Date / Request:</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
       </div>
 
-
-      <div className="content">
-        <h1>Approvals</h1>
-
-         <div className="search-id">
-          <input type="text" placeholder="Search ID..." value={searchId} onChange={handleSearchIdChange} />
-        </div>
-
-
-        <div className="filter-options">
-          <select value={dateRange} onChange={handleDateRangeChange}>
-            <option>Last 30 Days</option>
-            {/* Add other date range options */}
-          </select>
-          <select value={filterBy} onChange={handleFilterByChange}>
-            <option>Filter By...</option>
-            {/* Add other filter options */}
-          </select>
-        </div>
-
-
-        <div className="form-grid">
-          <div className="form-group">
-            <label>Approval ID</label>
-            <input type="text" name="approvalId" value={formData.approvalId} onChange={handleInputChange} />
-          </div>
-          <div className="form-group">
-            <label>Request ID</label>
-            <input type="text" name="requestId" value={formData.requestId} onChange={handleInputChange} />
-          </div>
-          <div className="form-group">
-            <label>Decision Date</label>
-            <input type="date" name="decisionDate" value={formData.decisionDate} onChange={handleInputChange} />
-          </div>
-          <div className="form-group">
-            <label>External Module ID</label>
-            <input type="text" name="externalModuleId" value={formData.externalModuleId} onChange={handleInputChange} />
-          </div>
-          <div className="form-group">
-            <label>Issue Date</label>
-            <input type="date" name="issueDate" value={formData.issueDate} onChange={handleInputChange} />
-          </div>
-          <div className="form-group">
-            <label>Checked By</label>
-            <input type="text" name="checkedBy" value={formData.checkedBy} onChange={handleInputChange} />
-          </div>
-          <div className="form-group">
-            <label>Due Date</label>
-            <input type="date" name="dueDate" value={formData.dueDate} onChange={handleInputChange} />
-          </div>
-          <div className="form-group">
-            <label>Checked Date</label>
-            <input type="date" name="checkedDate" value={formData.checkedDate} onChange={handleInputChange} />
-          </div>
-          <div className="form-group status-group">
-            <label>Status</label>
-            <div className="status-select-container">
-              <select value={approvalStatus} onChange={handleStatusChange}>
-                <option value="">Select Status</option>
-                <option value="approved">Approved</option>
-                <option value="pending">Pending</option>
-                 <option value="rejected">Rejected</option>
-              </select>
-            </div>
-          </div>
-          <div className="form-group remarks">
-            <label>Remarks</label>
-            <textarea name="remarks" value={formData.remarks} onChange={handleInputChange}></textarea>
-          </div>
-        </div> 
-
-
-        <div className="form-actions">
-          <button className="back-button" onClick={handleBack}>
-               Back
-          </button>
-          <button className="save-button" onClick={handleSave}>
-             Save
-          </button>
-       </div>
-
-
-        {/* Table List */}
-        <div className="Full-list">
-          <h2>Full List</h2>
-          <table className="requests-table-container">
-            <thead>
-              <tr>
-                <th>Approval ID</th>
-                <th>Request ID</th>
-                <th>Decision Date</th>
-                <th>External Module ID</th>
-                <th>Issue Date</th>
-                <th>Checked By</th>
-                <th>Due Date</th>
-                <th>Checked Date</th>
-                <th>Remarks</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody className="table-body-scroll">
-              {approvalList.map((approval) => (
-                <tr key={approval.approvalId}>
-                  <td>{approval.approvalId}</td>
-                  <td>{approval.requestId}</td>
-                  <td>{approval.decisionDate}</td>
-                  <td>{approval.externalModuleId}</td>
-                  <td>{approval.issueDate}</td>
-                  <td>{approval.checkedBy}</td>
-                  <td>{approval.dueDate}</td>
-                  <td>{approval.checkedDate}</td>
-                  <td>{approval.remarks}</td>
-                  <td>{approval.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Buttons */}
+      <div className="form-buttons">
+        <button className="back-button" onClick={handleBack}>
+          Back
+        </button>
+        <button className="save-button" onClick={handleSave}>
+          Save
+        </button>
       </div>
     </div>
   );
 }
 
-
-
-
-export default Approvals;
+export default ManagementApprovals;
