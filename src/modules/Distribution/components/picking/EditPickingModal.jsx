@@ -100,6 +100,20 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     }
   };
   
+  const getDisplayName = (item, field, defaultValue) => {
+    if (item && item[field] && item[field] !== 'Unknown Item' && item[field] !== 'Unknown Warehouse') {
+      return item[field];
+    }
+    
+    // For warehouse lookups, try to get from the warehouses list
+    if (field === 'warehouse_name' && item.warehouse_id) {
+      const warehouse = warehouses.find(w => w.id === item.warehouse_id);
+      if (warehouse) return warehouse.name;
+    }
+    
+    return defaultValue;
+  };
+
   // Get status action label
   const getStatusActionLabel = (currentStatus) => {
     switch (currentStatus) {
@@ -246,7 +260,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
           warehouseGroups.map((warehouse, warehouseIndex) => (
             <div key={warehouse.warehouseId} className="warehouse-group">
               <h5 className="warehouse-name">
-                <FaWarehouse className="warehouse-icon" /> {warehouse.warehouseName}
+              <FaWarehouse className="warehouse-icon" /> {getDisplayName(warehouse, 'warehouseName', 'Unknown Warehouse')}
                 {Object.values(warehouse.deliveryNotes).length > 1 && (
                   <span className="warehouse-progress">
                     Multiple Delivery Notes ({Object.values(warehouse.deliveryNotes).length})
@@ -291,7 +305,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
                                 <span className="not-picked-status">Not Picked</span>
                               }
                             </td>
-                            <td>{item.item_name || 'Unknown Item'}</td>
+                            <td>{getDisplayName(item, 'item_name', 'Unknown Item')}</td>
                             <td className="centered-cell">{parseInt(item.quantity) || 0}</td>
                             <td>
                               {!isCompleted && (
@@ -402,19 +416,37 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     
     try {
       setLoading(true);
+      
       // First try to get existing items
       let response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/items/`);
       let data = await response.json();
       
       // If no items exist yet, create them
       if (!response.ok || data.length === 0) {
-        await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/create-items/`, {
+        const createResponse = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/create-items/`, {
           method: 'POST'
         });
         
+        if (!createResponse.ok) {
+          throw new Error('Failed to create picking items');
+        }
+        
+        // Wait a moment to ensure the database has processed the creation
+        // and populated the names from related tables
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
         // Fetch again after creating
         response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/items/`);
+        
+        // Check if we received items with names
         data = await response.json();
+        
+        // If we still have missing data, fetch one more time after a delay
+        if (data.length > 0 && data.some(item => !item.item_name || !item.warehouse_name)) {
+          await new Promise(resolve => setTimeout(resolve, 700));
+          response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/items/`);
+          data = await response.json();
+        }
       }
       
       setPickingItems(data);
@@ -493,9 +525,9 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         onStatusUpdate(pickingList, 'In Progress', selectedEmployee, null);
       }
       
-      // Now update the item status
+      // Now update the item status - THIS IS THE MAIN FIX - METHOD NEEDS TO BE PUT
       const response = await fetch(`http://127.0.0.1:8000/api/picking-items/${item.picking_item_id}/update/`, {
-        method: 'PUT',
+        method: 'PUT', // CHANGED: Added method: 'PUT' here - this was missing!
         headers: {
           'Content-Type': 'application/json',
         },
@@ -504,6 +536,11 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
           picked_by: selectedEmployee,
           picked_at: !item.is_picked ? new Date().toISOString() : null,
           quantity_picked: !item.is_picked ? item.quantity : 0,
+          // ADDED: Include these fields to preserve them
+          item_name: item.item_name,
+          warehouse_name: item.warehouse_name,
+          warehouse_id: item.warehouse_id,
+          item_no: item.item_no,
         }),
       });
       

@@ -227,7 +227,11 @@ const handleStatusUpdate = async (list, newStatus, employeeId) => {
         return;
       }
     }
-  
+    if (newStatus === 'In Progress') {
+      setTimeout(() => {
+        fetchPickingItems();
+      }, 500); // Add slight delay to ensure backend processing completes
+    }
     // Build the update object
     const updateData = {
       picked_status: newStatus === 'Completed' ? 'In Progress' : newStatus // Don't set Completed yet
