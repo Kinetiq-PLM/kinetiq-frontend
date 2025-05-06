@@ -35,7 +35,7 @@ const BodyContent = ({ onClose }) => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/prf/employees/");
+        const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
         const data = await response.json();
         setEmployees(data);
       } catch {
@@ -49,7 +49,7 @@ const BodyContent = ({ onClose }) => {
     const fetchItems = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/quotation-content/item/list/");
+        const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/item/list/");
         const data = await response.json();
         setItems(data); // Populate the unified items list
       } catch {
@@ -106,7 +106,7 @@ const BodyContent = ({ onClose }) => {
     }
   
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/prf/list/");
+      const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
       const data = await response.json();
   
       // Filter the list to find matching requests with the same dates
@@ -176,7 +176,7 @@ const BodyContent = ({ onClose }) => {
   
       console.log("Payload being sent to backend:", data); // Debugging
   
-      const response = await fetch("http://127.0.0.1:8000/api/quotation-content/create/", {
+      const response = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/create/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -209,7 +209,7 @@ const BodyContent = ({ onClose }) => {
 
     console.log("Payload being sent to backend:", body); // Debugging
 
-    const res = await fetch("http://127.0.0.1:8000/api/prf/submit/", {
+    const res = await fetch("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/submit/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

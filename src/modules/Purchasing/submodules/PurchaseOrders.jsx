@@ -45,7 +45,7 @@ const PurchaseOrderUI = ({
 
         // First get the purchase order for this quotation
       const purchaseOrderResponse = await axios.get(
-        `http://127.0.0.1:8000/api/purchase-orders/list/?quotation_id=${quotation_id}`
+        `https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/?quotation_id=${quotation_id}`
       );
       
       if (purchaseOrderResponse.data.length === 0) {
@@ -56,7 +56,7 @@ const PurchaseOrderUI = ({
       const purchaseId = purchaseOrder.purchase_id;
 
       // Now get shipments for this purchase order
-      const shipmentsResponse = await axios.get("http://127.0.0.1:8000/api/received-shipment/list/");
+      const shipmentsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/received-shipment/list/");
       const filteredShipments = shipmentsResponse.data.filter(
         (shipment) => String(shipment.purchase_id) === String(purchaseId)
       );
@@ -68,7 +68,7 @@ const PurchaseOrderUI = ({
       }));
 
         // Fetch purchase quotation data
-        const quotationResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/list/");
+        const quotationResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/list/");
         const quotation = quotationResponse.data.find((q) => q.quotation_id === quotation_id);
 
         if (!quotation) {
@@ -78,11 +78,11 @@ const PurchaseOrderUI = ({
         const requestId = quotation.request_id;
 
         // Fetch quotation content (including unit_price and total)
-        const quotationContentResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/list/");
+        const quotationContentResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/list/");
         const quotationContent = quotationContentResponse.data.filter((qc) => qc.request_id === requestId);
 
         // Fetch item names
-        const itemsResponse = await axios.get("http://127.0.0.1:8000/api/quotation-content/item/list/");
+        const itemsResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/quotation-content/item/list/");
         const itemsData = itemsResponse.data;
 
         // Process items
@@ -107,7 +107,7 @@ const PurchaseOrderUI = ({
         const vendorCode = quotation.vendor_code || "N/A";
         let vendorName = "N/A";
         if (vendorCode !== "N/A") {
-          const vendorResponse = await axios.get("http://127.0.0.1:8000/api/purchase_quotation/vendor/list/");
+          const vendorResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase_quotation/vendor/list/");
           const vendor = vendorResponse.data.find((v) => v.vendor_code === vendorCode);
           vendorName = vendor ? vendor.company_name : "N/A";
         }
@@ -115,17 +115,17 @@ const PurchaseOrderUI = ({
         // Fetch employee data
         let employeeName = "N/A";
         if (requestId) {
-          const requestResponse = await axios.get("http://127.0.0.1:8000/api/prf/list/");
+          const requestResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/list/");
           const request = requestResponse.data.find((r) => r.request_id === requestId);
           if (request) {
-            const employeeResponse = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+            const employeeResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
             const employee = employeeResponse.data.find((e) => e.employee_id === request.employee_id);
             employeeName = employee ? `${employee.first_name} ${employee.last_name}` : "N/A";
           }
         }
 
         // Fetch employees for QC form
-        const employeesResponse = await axios.get("http://127.0.0.1:8000/api/prf/employees/");
+        const employeesResponse = await axios.get("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/prf/employees/");
         setEmployees(employeesResponse.data);
 
         // Update summary data
@@ -169,7 +169,7 @@ const PurchaseOrderUI = ({
         employee_id: qcForm.employee_id,
       };
 
-      await axios.post("http://127.0.0.1:8000/api/batch-inspection/create/", payload, {
+      await axios.post("https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/batch-inspection/create/", payload, {
         headers: { "Content-Type": "application/json" },
       });
 

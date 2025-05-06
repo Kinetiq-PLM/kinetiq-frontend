@@ -35,7 +35,7 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
         const fetchInvoices = async () => {
             try {
                 const response = await axios.get(
-                    "http://127.0.0.1:8000/api/invoices/list/"
+                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/list/"
                 );
                 console.log("Fetched invoices:", response.data);
                 setInvoices(response.data);
@@ -53,11 +53,11 @@ const PurchaseAPInvoiceBody = ({ onBackToDashboard }) => {
         const fetchPurchaseOrders = async () => {
             try {
                 const externalModulesResponse = await axios.get(
-                    "http://127.0.0.1:8000/api/invoices/document-header/"
+                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/invoices/document-header/"
                 );
 
                 const purchaseOrdersResponse = await axios.get(
-                    "http://127.0.0.1:8000/api/purchase-orders/list/"
+                    "https://yi92cir5p0.execute-api.ap-southeast-1.amazonaws.com/dev/api/purchase-orders/list/"
                 );
 
                 const purchaseOrderMap = {};
