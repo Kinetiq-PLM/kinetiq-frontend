@@ -52,18 +52,18 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const fetchVendors = async () => {
     try {
       setLoading(true);
-      const responseEmployee = await fetch("http://127.0.0.1:8000/operation/supplier/");
+      const responseEmployee = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
       if (!responseEmployee.ok) throw new Error("Connection to database failed");
       const dataE = await responseEmployee.json();
       if (!Array.isArray(dataE.employees)) throw new Error("Invalid employee format");
       setEmployeeList(dataE.employees)
-      const response = await fetch("http://127.0.0.1:8000/operation/customer/");
+      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/customer/");
       if (!response.ok) throw new Error("Connection to database failed");
       const data = await response.json();
       if (!Array.isArray(data)) throw new Error("Invalid customer format");
       setVendorList(data);
       setLoadingInvoices(true);
-      const responseSalesInvoice = await fetch("http://127.0.0.1:8000/operation/sales-invoice/");
+      const responseSalesInvoice = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/sales-invoice/");
       if (!responseSalesInvoice.ok) throw new Error("Failed to fetch invoices");
       const dataInvoice = await responseSalesInvoice.json();
       setInvoices(dataInvoice);
@@ -198,7 +198,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const fetchNextDocumentIds = async () => {
       if (isCreateMode) {
         try {
-          const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/get-next-doc-ids/');
+          const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/get-next-doc-ids/');
           if (!response.ok) throw new Error('Failed to fetch next document IDs');
          
           const data = await response.json();
@@ -234,7 +234,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
       // If this item exists in the database, delete it
       try {
-        await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
+        await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -260,7 +260,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   const reloadDocumentItems = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
+      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
       if (!response.ok) throw new Error('Failed to reload document');
       const updatedData = await response.json();
       return updatedData.document_items;
@@ -323,7 +323,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/operation/get-warehouseID/')
+    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
         // Sort A–Z by location
@@ -337,7 +337,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   // Inside your item fetch useEffect:
   useEffect(() => {
-      fetch('http://127.0.0.1:8000/operation/item/')
+      fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item/')
         .then(res => res.json())
         .then(data => {
           const typePriority = { product: 1, material: 2, asset: 3 };
@@ -453,7 +453,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   
 
 
-          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -597,7 +597,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         }))
       };
       // Call the create API
-      const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
+      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -693,7 +693,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             console.log(payload)
             let itemResponse
             if (item.content_id){
-              itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/${item.content_id}/`, {
+              itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
                 method: 'PUT',
                 headers: {
                   'Content-Type': 'application/json',
@@ -701,7 +701,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                 body: JSON.stringify(payload),
               });
             }else{
-              itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/`, {
+              itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -736,7 +736,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
             transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0
           };
-          const goodsTrackingResponse = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`, {
+          const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -768,7 +768,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/operation/purchase_order/");
+      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
       if (!response.ok) throw new Error("Failed to fetch purchase orders");
      
       const data = await response.json();
@@ -792,7 +792,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
     try {
       // Fetch the selected purchase order details
-      const response = await fetch(`http://127.0.0.1:8000/operation/purchase_order/${poId}/`);
+      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
       const selectedPO = await response.json();
