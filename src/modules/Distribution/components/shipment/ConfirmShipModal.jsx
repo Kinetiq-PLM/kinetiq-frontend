@@ -1,8 +1,13 @@
-import React from 'react';
-import { FaShippingFast, FaTruck, FaWeightHanging, FaRuler, FaMoneyBillWave, FaCheck, FaExclamationTriangle, FaInfoCircle, FaTimes } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaShippingFast, FaTruck, FaWeightHanging, FaRuler, FaMoneyBillWave, FaCheck, FaExclamationTriangle, FaInfoCircle, FaTimes, FaLayerGroup } from 'react-icons/fa';
 import PropTypes from 'prop-types';
+import axios from 'axios'; // Make sure axios is imported
 
 const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
+  // Add loading state for API calls
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [nextBatchStatus, setNextBatchStatus] = useState(null);
+
   // Helper function to format currency
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-PH', {
@@ -28,7 +33,62 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
     (shipment.shipping_cost_info?.distance_km <= 0);
   
   // Check if we can proceed (has warnings but not blockers)
-  const canProceed = true; // We're letting them proceed with warnings
+  const canProceed = !isProcessing; // Disable during processing
+  
+  // Check if this is likely a partial delivery (based on delivery type and items)
+  const isPartialDelivery = shipment.delivery_type === 'sales' && 
+    shipment.items_details?.some(item => item.delivery_note_id);
+  
+  // Function to create next batch picking list
+  const createNextBatchPickingList = async () => {
+    setNextBatchStatus({ status: 'loading', message: 'Creating next batch picking list...' });
+    
+    try {
+      // Call the API to create the next batch
+      const response = await axios.post(`http://127.0.0.1:8000/api/shipments/${shipment.shipment_id}/create-next-batch/`);
+      
+      if (response.data.success) {
+        setNextBatchStatus({ 
+          status: 'success', 
+          message: 'Next batch picking list created successfully' 
+        });
+      } else {
+        setNextBatchStatus({ 
+          status: 'info', 
+          message: response.data.message || 'No next batch required or all deliveries complete' 
+        });
+      }
+    } catch (error) {
+      console.error('Error creating next batch:', error);
+      setNextBatchStatus({ 
+        status: 'error', 
+        message: error.response?.data?.error || 'Failed to create next batch picking list' 
+      });
+    }
+  };
+  
+  // Handle confirmed shipment with processing for partial deliveries
+  const handleConfirmWithProcessing = async () => {
+    setIsProcessing(true);
+    
+    try {
+      // First confirm the shipment (call the original onConfirm)
+      await onConfirm();
+      
+      // If this is a partial delivery, trigger the next batch creation
+      if (isPartialDelivery) {
+        await createNextBatchPickingList();
+      }
+    } catch (error) {
+      console.error('Error during shipment processing:', error);
+      setNextBatchStatus({ 
+        status: 'error', 
+        message: 'Error processing shipment' 
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
   
   return (
     <div className="shipment modal-overlay">
@@ -42,6 +102,7 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
             className="close-button" 
             onClick={onCancel} 
             aria-label="Close modal"
+            disabled={isProcessing}
           >
             <FaTimes />
           </button>
@@ -58,6 +119,32 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
             </p>
           </div>
           
+          {/* Partial delivery notice - only shown for partial deliveries */}
+          {isPartialDelivery && (
+            <div className="info-container" style={{
+              margin: '1rem 0',
+              padding: '0.75rem',
+              backgroundColor: 'rgba(0, 123, 255, 0.1)',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              <FaLayerGroup style={{ 
+                color: '#007bff', 
+                marginRight: '0.75rem',
+                fontSize: '1.25rem'
+              }} />
+              <div>
+                <p style={{margin: 0, fontWeight: 500, color: '#007bff'}}>
+                  Partial Delivery Detected
+                </p>
+                <p style={{margin: '0.25rem 0 0 0', fontSize: '0.875rem'}}>
+                  After confirming this shipment, the next batch will be automatically prepared for processing.
+                </p>
+              </div>
+            </div>
+          )}
+          
           {/* Warnings section - only shown if there are warnings */}
           {(hasNoCarrier || hasInvalidDimensions) && (
             <div className="warning-container">
@@ -73,6 +160,43 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
                   <li>Weight or distance is not properly set. This may affect cost calculations.</li>
                 )}
               </ul>
+            </div>
+          )}
+          
+          {/* Next batch status - only shown if there's a status */}
+          {nextBatchStatus && (
+            <div className={`status-container status-${nextBatchStatus.status}`} style={{
+              margin: '1rem 0',
+              padding: '0.75rem',
+              borderRadius: '4px',
+              backgroundColor: nextBatchStatus.status === 'success' 
+                ? 'rgba(40, 167, 69, 0.1)' 
+                : nextBatchStatus.status === 'error'
+                  ? 'rgba(220, 53, 69, 0.1)'
+                  : nextBatchStatus.status === 'loading'
+                    ? 'rgba(0, 0, 0, 0.05)'
+                    : 'rgba(0, 123, 255, 0.1)',
+              color: nextBatchStatus.status === 'success' 
+                ? '#28a745' 
+                : nextBatchStatus.status === 'error'
+                  ? '#dc3545'
+                  : nextBatchStatus.status === 'loading'
+                    ? '#666'
+                    : '#007bff',
+            }}>
+              {nextBatchStatus.status === 'loading' && (
+                <div className="spinner" style={{ 
+                  display: 'inline-block',
+                  width: '1rem',
+                  height: '1rem',
+                  marginRight: '0.5rem',
+                  borderRadius: '50%',
+                  border: '2px solid currentColor',
+                  borderTopColor: 'transparent',
+                  animation: 'spin 1s linear infinite'
+                }}></div>
+              )}
+              {nextBatchStatus.message}
             </div>
           )}
           
@@ -171,6 +295,13 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
                 <div className="step-marker">5</div>
                 <div className="step-text">The associated packing list will be marked as "Shipped"</div>
               </div>
+              
+              {isPartialDelivery && (
+                <div className="step-item">
+                  <div className="step-marker">6</div>
+                  <div className="step-text">The next batch picking list will be created for partial delivery</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -180,6 +311,7 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
             type="button" 
             className="cancel-button"
             onClick={onCancel}
+            disabled={isProcessing}
           >
             <FaTimes className="button-icon" />
             Cancel
@@ -188,11 +320,29 @@ const ConfirmShipModal = ({ shipment, onConfirm, onCancel }) => {
           <button 
             type="button" 
             className="confirm-button"
-            onClick={onConfirm}
+            onClick={handleConfirmWithProcessing}
             disabled={!canProceed}
           >
-            <FaShippingFast className="button-icon" />
-            Confirm Shipment
+            {isProcessing ? (
+              <>
+                <span className="spinner" style={{
+                  display: 'inline-block',
+                  width: '1rem',
+                  height: '1rem',
+                  marginRight: '0.5rem',
+                  borderRadius: '50%',
+                  border: '2px solid currentColor',
+                  borderTopColor: 'transparent',
+                  animation: 'spin 1s linear infinite'
+                }}></span>
+                Processing...
+              </>
+            ) : (
+              <>
+                <FaShippingFast className="button-icon" />
+                Confirm Shipment
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -206,6 +356,8 @@ ConfirmShipModal.propTypes = {
     tracking_number: PropTypes.string,
     carrier_id: PropTypes.string,
     carrier_name: PropTypes.string,
+    delivery_type: PropTypes.string,
+    items_details: PropTypes.array,
     shipping_cost_info: PropTypes.shape({
       weight_kg: PropTypes.number,
       distance_km: PropTypes.number,

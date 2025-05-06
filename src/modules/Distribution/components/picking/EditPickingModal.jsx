@@ -49,6 +49,17 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     }
   };
   
+  // Add this function to get the batch display text based on delivery notes info
+  const getBatchDisplay = () => {
+    if (!deliveryNotesInfo || !deliveryNotesInfo.is_partial_delivery) return null;
+    
+    return (
+      <span className="batch-badge">
+        Batch {deliveryNotesInfo.current_delivery} of {deliveryNotesInfo.total_deliveries}
+      </span>
+    );
+  };
+
   // Fetch picking items when picking list changes
   useEffect(() => {
     if (pickingList && (pickingList.picked_status === 'In Progress' || pickingList.picked_status === 'Completed')) {

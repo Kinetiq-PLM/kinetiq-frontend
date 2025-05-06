@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaBox, FaBoxes, FaTruck, FaClipboardCheck, FaArrowRight, FaExclamationTriangle } from 'react-icons/fa';
+import { FaBox, FaBoxes, FaTruck, FaClipboardCheck, FaArrowRight, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 import '../../styles/Picking.css';
 
 const PartialDeliveryInfo = ({ pickingList, deliveryNotesInfo }) => {
@@ -45,7 +45,7 @@ const PartialDeliveryInfo = ({ pickingList, deliveryNotesInfo }) => {
           <h4>Partial Delivery in Progress</h4>
         </div>
         <div className="partial-delivery-counter">
-          <span className="delivery-counter-text">Delivery</span>
+          <span className="delivery-counter-text">Batch</span>
           <span className="delivery-counter-numbers">{currentDelivery} of {totalDeliveries}</span>
         </div>
       </div>
@@ -93,8 +93,8 @@ const PartialDeliveryInfo = ({ pickingList, deliveryNotesInfo }) => {
 
       <div className="delivery-notes-info">
         <div className="info-message">
-          <FaExclamationTriangle className="info-icon" />
-          <span>Partial deliveries must be processed sequentially. Complete this delivery before proceeding to the next.</span>
+          <FaInfoCircle className="info-icon" />
+          <span>Partial deliveries must be processed sequentially. After current batch is shipped, the next batch will automatically be available in a new picking list.</span>
         </div>
       </div>
     </div>

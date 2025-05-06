@@ -245,7 +245,9 @@ const CompletionModal = ({ packingList, employees, packingTypes, onConfirm, onCa
             onClick={onConfirm}
           >
             <FaCheck className="button-icon" />
-            Confirm
+            {isPartialDelivery 
+              ? `Complete Batch ${currentDelivery}/${totalDeliveries}`
+              : 'Complete Picking'}
           </button>
         </div>
       </div>

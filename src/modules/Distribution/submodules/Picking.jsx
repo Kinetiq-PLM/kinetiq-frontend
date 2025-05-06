@@ -280,49 +280,49 @@ const handleStatusUpdate = async (list, newStatus, employeeId) => {
   }
 };
   
-  // Handle completion confirmation
-  const handleConfirmCompletion = async () => {
-    if (!selectedList || !showCompletionModal) return;
+// In the handleConfirmCompletion function, update the success message to better explain next steps
+const handleConfirmCompletion = async () => {
+  if (!selectedList || !showCompletionModal) return;
+  
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${selectedList.picking_list_id}/update/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        picked_status: 'Completed'
+      }),
+    });
     
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${selectedList.picking_list_id}/update/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          picked_status: 'Completed'
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to complete picking list');
-      }
-      
-      // Close modal and refresh the list
-      setShowCompletionModal(false);
-      setRefreshTrigger(prev => prev + 1);
-      
-      // Different success message based on whether this is a partial delivery
-      const isPartialDelivery = selectedList.delivery_notes_info && selectedList.delivery_notes_info.is_partial_delivery;
-      const currentBatch = isPartialDelivery ? selectedList.delivery_notes_info.current_delivery : null;
-      const totalBatches = isPartialDelivery ? selectedList.delivery_notes_info.total_deliveries : null;
-      
-      // Show success notification with batch-specific message if applicable
-      if (isPartialDelivery) {
-        toast.success(`Batch ${currentBatch} of ${totalBatches} picked successfully! This batch will now proceed to packing.`, {
-          autoClose: 5000 // Keep this message visible a bit longer
-        });
-      } else {
-        toast.success('Picking list completed successfully! A new packing list has been created.', {
-          autoClose: 3000
-        });
-      }
-    } catch (err) {
-      toast.error(`Error: ${err.message}`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to complete picking list');
     }
-  };
+    
+    // Close modal and refresh the list
+    setShowCompletionModal(false);
+    setRefreshTrigger(prev => prev + 1);
+    
+    // Different success message based on whether this is a partial delivery
+    const isPartialDelivery = selectedList.delivery_notes_info && selectedList.delivery_notes_info.is_partial_delivery;
+    const currentBatch = isPartialDelivery ? selectedList.delivery_notes_info.current_delivery : null;
+    const totalBatches = isPartialDelivery ? selectedList.delivery_notes_info.total_deliveries : null;
+    
+    // Show success notification with batch-specific message if applicable
+    if (isPartialDelivery) {
+      toast.success(`Batch ${currentBatch} of ${totalBatches} picked successfully! After this batch is shipped, the next batch will automatically be available for picking.`, {
+        autoClose: 5000 // Keep this message visible a bit longer
+      });
+    } else {
+      toast.success('Picking list completed successfully! A new packing list has been created.', {
+        autoClose: 3000
+      });
+    }
+  } catch (err) {
+    toast.error(`Error: ${err.message}`);
+  }
+};
   
   return (
     <div className="picking">
