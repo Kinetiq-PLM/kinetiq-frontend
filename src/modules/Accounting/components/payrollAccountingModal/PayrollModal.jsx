@@ -120,6 +120,126 @@ const PayrollModal = ({
 
   if (!isModalOpen) return null;
 
+  // Function to organize form fields by creating components based on field type and index
+  const renderFormField = (header, index) => {
+    const isDisabled = isCreating
+      ? header === "Payroll Accounting ID" || header === "Reference Number"
+      : header !== "Status";
+
+    if (header === "Date Approved" && isNewPayroll) {
+      return (
+        <Forms
+          key={index}
+          type="date"
+          formName={header}
+          value={formData[index] || ""}
+          onChange={(e) => handleInputChange(index, e.target.value)}
+          disabled={isDisabled}
+          required={true}
+        />
+      );
+    }
+
+    if (header === "Payroll Accounting ID" || header === "Reference Number") {
+      return (
+        <Forms
+          key={index}
+          type="text"
+          formName={header}
+          value={formData[index] || ""}
+          onChange={(e) => handleInputChange(index, e.target.value)}
+          disabled={true}
+        />
+      );
+    }
+
+    if (header === "Payroll HR ID") {
+      return (
+        <div key={index} className="flex flex-col gap-2">
+          {isNewPayroll ? (
+            <Dropdown
+              style="selection"
+              defaultOption="Select Payroll HR ID..."
+              options={payrollHrIds}
+              value={formData[index]}
+              onChange={(val) => handleInputChange(index, val)}
+              disabled={isDisabled}
+              required={true}
+            />
+          ) : (
+            <Forms
+              type="text"
+              formName={header}
+              value={formData[index]}
+              onChange={(e) => handleInputChange(index, e.target.value)}
+              disabled={isDisabled}
+            />
+          )}
+        </div>
+      );
+    }
+
+    if (header === "Approved By" && isNewPayroll) {
+      return (
+        <Forms
+          key={index}
+          type="text"
+          placeholder="Enter Approved By..."
+          formName={header}
+          value={formData[index]}
+          onChange={(e) => handleInputChange(index, e.target.value)}
+          disabled={isDisabled}
+          required={true}
+        />
+      );
+    }
+
+    if (header === "Payment Method" && isNewPayroll) {
+      return (
+        <div key={index} className="flex flex-col gap-2">
+          <label>{header}</label>
+          <Dropdown
+            style="selection"
+            defaultOption="Select payment method..."
+            options={["Credit Card", "Bank Transfer", "Cash"]}
+            value={formData[index]}
+            onChange={(val) => handleInputChange(index, val)}
+            disabled={isDisabled}
+            required={true}
+          />
+        </div>
+      );
+    }
+
+    if (header === "Status") {
+      return (
+        <div key={index} className="flex flex-col gap-2">
+          <label>{header}</label>
+          <Dropdown
+            style="selection"
+            defaultOption="Select status..."
+            options={["Processing", "Completed"]}
+            value={formData[index]}
+            onChange={(val) => handleInputChange(index, val)}
+            disabled={isDisabled}
+            required={true}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <Forms
+        key={index}
+        type="text"
+        formName={header}
+        value={formData[index] || ""}
+        onChange={(e) => handleInputChange(index, e.target.value)}
+        disabled={isDisabled}
+      />
+    );
+  };
+
   return (
     <>
       <NotifModal
@@ -143,127 +263,50 @@ const PayrollModal = ({
             </div>
 
             <div className="modal-body">
-              {columnHeaders.map((header, index) => {
-                const isDisabled = isCreating
-                  ? header === "Payroll Accounting ID" || header === "Reference Number"
-                  : header !== "Status";
+              {/* ID fields in the first row */}
+              <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mb-4">
+                <div className="md:w-1/2">
+                  {columnHeaders[0] && renderFormField(columnHeaders[0], 0)} {/* Payroll Accounting ID */}
+                </div>
+                <div className="md:w-1/2">
+                  {columnHeaders[1] && renderFormField(columnHeaders[1], 1)} {/* Payroll HR ID */}
+                </div>
+              </div>
 
-                if (header === "Date Approved" && isNewPayroll) {
-                  return (
-                    <Forms
-                      key={index}
-                      type="date"
-                      formName={header}
-                      value={formData[index] || ""}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      disabled={isDisabled}
-                      required={true}
-                    />
-                  );
-                }
+              {/* Date and Approver in the second row */}
+              <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mb-4">
+                <div className="md:w-1/2">
+                  {columnHeaders[2] && renderFormField(columnHeaders[2], 2)} {/* Date Approved */}
+                </div>
+                <div className="md:w-1/2">
+                  {columnHeaders[3] && renderFormField(columnHeaders[3], 3)} {/* Approved By */}
+                </div>
+              </div>
 
-                if (header === "Payroll Accounting ID" || header === "Reference Number") {
-                  return (
-                    <Forms
-                      key={index}
-                      type="text"
-                      formName={header}
-                      value={formData[index] || ""}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      disabled={true}
-                    />
-                  );
-                }
+              {/* Payment Method and Reference Number in the third row */}
+              <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mb-4">
+                <div className="md:w-1/2">
+                  {columnHeaders[4] && renderFormField(columnHeaders[4], 4)} {/* Payment Method */}
+                </div>
+                <div className="md:w-1/2">
+                  {columnHeaders[5] && renderFormField(columnHeaders[5], 5)} {/* Reference Number */}
+                </div>
+              </div>
 
-                if (header === "Payroll HR ID") {
-                  return (
-                    <div key={index} className="flex flex-col gap-2">
-                      {isNewPayroll ? (
-                        <Dropdown
-                          style="selection"
-                          defaultOption="Select Payroll HR ID..."
-                          options={payrollHrIds}
-                          value={formData[index]}
-                          onChange={(val) => handleInputChange(index, val)}
-                          disabled={isDisabled}
-                          required={true}
-                        />
-                      ) : (
-                        <Forms
-                          type="text"
-                          formName={header}
-                          value={formData[index]}
-                          onChange={(e) => handleInputChange(index, e.target.value)}
-                          disabled={isDisabled}
-                        />
-                      )}
-                    </div>
-                  );
-                }
+              {/* Status in the fourth row */}
+              <div className="mb-4">
+                {columnHeaders[6] && renderFormField(columnHeaders[6], 6)} {/* Status */}
+              </div>
 
-                if (header === "Approved By" && isNewPayroll) {
-                  return (
-                    <Forms
-                      key={index}
-                      type="text"
-                      placeholder="Enter Approved By..."
-                      formName={header}
-                      value={formData[index]}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      disabled={isDisabled}
-                      required={true}
-                    />
-                  );
-                }
-
-                if (header === "Payment Method" && isNewPayroll) {
-                  return (
-                    <div key={index} className="flex flex-col gap-2">
-                      <label>{header}</label>
-                      <Dropdown
-                        style="selection"
-                        defaultOption="Select payment method..."
-                        options={["Credit Card", "Bank Transfer", "Cash"]}
-                        value={formData[index]}
-                        onChange={(val) => handleInputChange(index, val)}
-                        disabled={isDisabled}
-                        required={true}
-                      />
-                    </div>
-                  );
-                }
-
-                if (header === "Status") {
-                  return (
-                    <div key={index} className="flex flex-col gap-2">
-                      <label>{header}</label>
-                      <Dropdown
-                        style="selection"
-                        defaultOption="Select status..."
-                        options={["Processing", "Completed"]}
-                        value={formData[index]}
-                        onChange={(val) => handleInputChange(index, val)}
-                        disabled={isDisabled}
-                        required={true}
-                    />
-                    </div>
-                  );
-                }
-
-                return (
-                  <Forms
-                    key={index}
-                    type="text"
-                    formName={header}
-                    value={formData[index] || ""}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
-                    disabled={isDisabled}
-                  />
-                );
-              })}
+              {/* Any remaining fields */}
+              {columnHeaders.slice(7).map((header, idx) => (
+                <div key={idx + 7} className="mb-4">
+                  {renderFormField(header, idx + 7)}
+                </div>
+              ))}
             </div>
 
-            <div className="modal-footer">
+            <div className="modal-footer mt-5 flex justify-end space-x-3">
               <Button name="Cancel" variant="standard1" onclick={closeModal} />
               <Button name="Submit" variant="standard2" onclick={handleFormSubmit} />
             </div>
