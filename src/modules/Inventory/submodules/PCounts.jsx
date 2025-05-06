@@ -240,11 +240,11 @@ const BodyContent = () => {
       ? item.status?.toLowerCase() === selectedStatus.toLowerCase()
       : true;
     const dateMatch = selectedDate ? filterByDateRange([item], selectedDate).length > 0 : true;
-    // Check if warehouse_id is present in the item object for filtering
-    const warehouseIdForFilter = item.warehouse_id; // Adjust if backend sends ID under different name
+    // Compare by warehouse name (item.warehouse_location)
+    const warehouseNameForFilter = item.warehouse_location;
     const warehouseMatch = selectedWarehouse
-      ? warehouseIdForFilter === selectedWarehouse
-      : true;
+      ? warehouseNameForFilter === selectedWarehouse // Compare names directly
+      : true; // If no warehouse is selected, it's a match
     return statusMatch && dateMatch && warehouseMatch;
   });
 
@@ -336,7 +336,7 @@ const BodyContent = () => {
               {/* Warehouse filter dropdown */}
               <select
                 className="w-full border border-gray-300 rounded-lg p-2 text-gray-500 cursor-pointer"
-                value={selectedWarehouse} // Value should be warehouse_id for filtering
+                value={selectedWarehouse} // Value will now be the warehouse name
                 onChange={(e) => setSelectedWarehouse(e.target.value)}
                 disabled={loading || error}
               >
@@ -348,20 +348,22 @@ const BodyContent = () => {
                 ) : warehouses.length === 0 ? (
                   <option disabled>No warehouses available</option>
                 ) : (
-                  // Sort warehouses alphabetically by location name
-                  [...warehouses].sort((a, b) => (a.warehouse_location || "").localeCompare(b.warehouse_location || "")).map((w, index) => {
-                    console.log("Rendering warehouse option:", w); // Log each option
-                    return (
-                      <option
-                        key={w.warehouse_id || index} // Key should be unique ID
-                        value={w.warehouse_id} // Value sent on change is the ID
-                        className="text-gray-600 cursor-pointer"
-                      >
-                        {/* Display the location name */}
-                        {w.warehouse_location || `Warehouse ${w.warehouse_id}`}
-                      </option>
-                    );
-                  })
+                  // Filter out archived warehouses, then sort alphabetically by location name
+                  [...warehouses]
+                    .filter(w => !(w.warehouse_location && w.warehouse_location.startsWith("ARCHIVED_")))
+                    .sort((a, b) => (a.warehouse_location || "").localeCompare(b.warehouse_location || "")).map((w, index) => {
+                      console.log("Rendering warehouse option:", w); // Log each option
+                      return (
+                        <option
+                          key={w.warehouse_id || index} // Key remains unique ID
+                          value={w.warehouse_location || `Warehouse ${w.warehouse_id}`} // Value is now the name
+                          className="text-gray-600 cursor-pointer"
+                        >
+                          {/* Display the location name */}
+                          {w.warehouse_location || `Warehouse ${w.warehouse_id}`}
+                        </option>
+                      );
+                    })
                 )}
               </select>
 
