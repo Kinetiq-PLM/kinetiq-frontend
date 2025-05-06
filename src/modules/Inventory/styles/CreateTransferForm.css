@@ -4,57 +4,52 @@
   top: 0;
   left: 0;
   width: 100vw;
-  min-height: 200px;
   height: 100vh;
   background: rgba(0, 0, 0, 0.5); 
   display: flex;
-  align-items: stretch; /* Center vertically instead of stretching */
+  align-items: stretch;
   justify-content: center;
-  flex-wrap: wrap;
   z-index: 9999;
   overflow-y: auto;
 }
 
 /* Modal Content (Restock Form) */
-.stockflow .modal-content-items {
+.stockflow .modal-content {
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  height: auto !important; /* Force height to grow with content */
-  min-height: 200px; /* Minimum height to avoid collapse */
-  max-height: none !important; /* Remove any max-height constraints */
-  /* width: 680px; */
+  width: 380px;
   /* Removed fixed height so the form can grow if needed */
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   z-index: 1000;
 }
 
 @media screen and (min-width: 768px) {
-  .stockflow .modal-content-items {
-    width: 800px;
-    height: auto !important; /* Force height to grow with content */
-    min-height: 200px; /* Minimum height to avoid collapse */
-    max-height: none !important; /* Remove any max-height constraints */
+  .stockflow .modal-content {
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 500px;
+    height: auto;
   }
 }
 
 /* Form Elements */
-.stockflow .modal-content-items form {
+.stockflow .modal-content form {
   display: flex;
   flex-direction: column;
 }
 
 /* Labels for Input Fields */
-.stockflow .modal-content-items label {
+.stockflow .modal-content label {
   display: block;
   margin: 5px 0 5px;
   font-weight: 500;
 }
 
 /* Inputs, Textareas, and Select */
-.stockflow .modal-content-items input,
-.stockflow .modal-content-items textarea,
-.stockflow .modal-content-items select {
+.stockflow .modal-content input,
+.stockflow .modal-content textarea,
+.stockflow .modal-content select {
   width: 100%;
   padding: 8px;
   margin-bottom: 5px;
@@ -64,30 +59,27 @@
   color: #555;
 }
 
-.stockflow .modal-content-item .quantity {
-  width: 20px;
+.stockflow .modal-content textarea {
+  resize: vertical;
+  min-height: 5rem; 
 }
 
-.stockflow .modal-content-items textarea {
-  resize: vertical;
-  min-height: 2rem; 
-} */
-
 /* Form Section (Checkbox Groups) */
-/* .stockflow .modal-content .form-section {
+.stockflow .modal-content .form-section {
   display: flex;
   justify-content: space-between;
-} */
+}
 
 /* Form Actions (Buttons) */
-.stockflow .modal-content-items .form-actions {
+.stockflow .modal-content .form-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 2rem;
   margin-top: 1rem;
 }
 
 /* Close Button (X) */
-.stockflow .modal-content-items .close-btn {
+.stockflow .modal-content .close-btn {
   background: none;
   border: none;
   font-size: 1.5rem;
@@ -95,22 +87,22 @@
 }
 
 /* Clear and Submit Buttons */
-.stockflow .modal-content-items .clear-btn,
-.stockflow .modal-content-items .submit-btn {
+.stockflow .modal-content .clear-btn,
+.stockflow .modal-content .submit-btn {
   padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
 }
 
 /* Clear Button */
-.stockflow .modal-content-items .clear-btn {
+.stockflow .modal-content .clear-btn {
   border: 1px solid teal;
   color: teal;
   background: none;
 }
 
 /* Submit Button */
-.stockflow .modal-content-items .submit-btn {
+.stockflow .modal-content .submit-btn {
   background: teal;
   color: white;
   border: none;
@@ -120,14 +112,14 @@
   filter: blur(5px);
 }
 
-.stockflow .modal-content-items .form-section label {
+.stockflow .modal-content .form-section label {
   display: flex;
   align-items: center;
   gap: 8px; 
   margin-bottom: 8px;
 }
 
-.stockflow .modal-content-items .form-section input[type="checkbox"] {
+.stockflow .modal-content .form-section input[type="checkbox"] {
   margin: 0;
   flex-shrink: 0; 
-} 
+}

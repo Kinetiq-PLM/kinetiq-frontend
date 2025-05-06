@@ -1,7 +1,9 @@
     import React, { useState, useEffect, use } from "react";
     import InvTransferStockForm from "../components/InvTransferStockForm";
+    import CreateTransferStockForm from "../components/CreateTransferStockForm";
     import "../styles/StockFlow.css";
 import { ContinuousColorLegend } from "@mui/x-charts";
+import TransferStockForm from "../components/TransferStockForm";
 
 
     const BodyContent = () => {
@@ -24,21 +26,67 @@ import { ContinuousColorLegend } from "@mui/x-charts";
 
         // State to manage the selected item/row sa table
         const [selectedItem, setSelectedItem] = useState(null); 
+        const [transferItems, settransferItems] = useState([]);
 
         // Filter States
         const [selectedWarehouse, setWarehouse] = useState("");
         const [selectedExpiry, setExpiry] = useState("");
 
-        const[caputredItem, setCapturedItem] = useState(null);
+        const[activeTransferForm, setactiveTransferForm] = useState(false);
         
+        // Transfer Modal
         const [showModal, setShowModal] = useState(false);
-        const toggleModal = () => {
-            setShowModal(!showModal
-        )};
 
+        // Create Transfer Modal
+        const[showCreateTransferForm, setShowCreateTransferForm] = useState(false);
+
+        // active create transfer form to hide it
+        const[isActiveCTF, setCTFActive] = useState(false);
+
+        const[warehouseMovementID, setWarehouseMovementID] = useState("");
+
+        // Transfer Item Modal
+        const toggleModal = () => {
+            setShowModal(!showModal)
+        };
+
+        const toggleCreateTransferModal = () => {
+            setShowCreateTransferForm(!showCreateTransferForm)
+        };
+
+        const successCTD = (something) => {
+            setCTFActive(!isActiveCTF);
+            setWarehouseMovementID(something);
+            console.log("GOT IT UGH: ", something)
+            toggleCreateTransferModal(); 
+        };
+        
+
+       
         useEffect(() => {
             setSelectedItem(null);
         }, [activeTab]);
+
+
+
+        const handleAddTransferItem = () => {
+            if (selectedItem) {
+              settransferItems((prevItems) => {
+                // Check for duplicates based on inventory_item_id
+                const isDuplicate = prevItems.some(
+                  (item) => item.inventory_item_id === selectedItem.inventory_item_id
+                );
+                if (isDuplicate) {
+                  console.log("Item already added!");
+                  return prevItems;
+                }
+                return [...prevItems, selectedItem];
+              });
+              toggleModal(); // Open the transfer form
+            } else {
+              console.log("No item selected!");
+            }
+          };
 
 
 
@@ -47,7 +95,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
         useEffect(() => {
             const fetchData = async () => {
                 try {
-                    const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-data/");
+                    const response = await fetch("http://127.0.0.1:8000/api/warehousemovement-data/");
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
                     setWarehouseMovementsView(data);
@@ -66,7 +114,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
         useEffect(() => {
             const fetchWarehouseItemsData = async () => { 
                 try {
-                    const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-item-list/");
+                    const response = await fetch("http://127.0.0.1:8000/api/warehouse-item-list/");
                     
                     if (!response.ok) throw new Error("Failed to fetch data");
                     const data = await response.json();
@@ -197,7 +245,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
         // console.log(stockFlowTableConfigs)
         const activeConfig = stockFlowTableConfigs[activeTab];
        
-
+        
         return (
             <div className={`stockflow ${showModal ? "blurred" : ""}`}>
                 
@@ -242,11 +290,9 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                                 </span>
                             ))}
                         </div>
-                        <div className={`flex gap-2 border w-[290px] ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
-                        <button onClick={toggleModal} className=" w-full bg-cyan-600 text-white text-sm  px-2 py-1 rounded cursor-pointer">
-                                    Create Transfer
-                        </button>
-                        <button onClick={toggleModal} className="w-full bg-cyan-600 text-white text-sm  px-2 py-1 rounded cursor-pointer">
+                        <div className={`flex gap-2 w-[290px] ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
+                        
+                        <button onClick={handleAddTransferItem} className="w-full bg-cyan-600 text-white text-sm  px-2 py-1 rounded cursor-pointer">
                                     Transfer Form
                         </button>
 
@@ -254,39 +300,7 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                     </nav>
                     
 
-                    
-                    <section className="flex flex-wrap w-full h-auto space-y-3 md:space-x-4 ">
-
-                                {/* Warehouse Filter */}
-                                
-                                {/* <select name="" id="" className="w-full sm:w-[170px] border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
-                                        setWarehouse(e.target.value);
-                                        setSelectedItem(null);
-                                }}>
-                                    <option value="" className="text-gray-600">Select Warehouse</option>
-                                    {warehouseList.map((warehouse) => (
-                                        <option className="text-gray-600 cursor-pointer" key={warehouse.warehouse_id} value={warehouse.warehouse_location}>
-                                            {warehouse.warehouse_location}
-                                        </option>
-                                    ))}
-                                </select> */}
-
-                                {/* Expiry */}
-                                {/* <select name="" id="" className="w-full sm:w-[160px] border rounded-lg border-gray-300 h-[30px] text-gray-600 cursor-pointer p-1" onChange={(e) => {
-                                        setExpiry(e.target.value);
-                                        setSelectedItem(null);
-                                        }
-                                    }>
-                                    <option value="" >Select Expiry</option>
-                                    {["Next 30 Days", "Next 6 Months", "Within this Year"].map((d) => (
-                                            <option key={d} value={d}>{d}</option>
-                                        ))}
-                                    
-                                </select> */}
-
-                                
-                        
-                    </section>
+                
 
                     <button onClick={toggleModal} className="md:hidden w-full bg-cyan-600 text-white  my-2 px-3 py-1 rounded cursor-pointer">
                                     Transfer Stock
@@ -338,25 +352,20 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                         
                         
                         {/* side section for filters and item details */}
-                        <div className={`flex flex-col  rounded-lg min-h-full w-[300px] ml-4 p-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
+                        <div className={`flex flex-col gap-3 rounded-lg min-h-full w-[300px] ml-4 p-1 ${activeTab !== "Warehouse" ? "hidden" : ""}`}>
                             
                                 
 
 
-                            <button
-                                    onClick={toggleModal}
-                                    className="hidden md:block  bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
-                                >
-                                    Transfer Item
-                            </button>
                             
 
                             {/* Selected Items and Item Deatils Label */}
-                            <div className="hidden md:block mt-2">
-                                <h3 className="text-center text-gray-600 mt-2"></h3>
-
+                            <div className="hidden md:block">
+                                
+                                
                                 {/* Selected Items Container */}
-                                <div className="min-h-[300px] border rounded-lg border-gray-300 p-2">
+                                <div className="min-h-[300px] border rounded-lg border-gray-300 p-4">
+                                <h3 className="text-center text-gray-600 mt-2 mb-4">ITEM DETAILS</h3>
                                 {
                                     selectedItem !== null ? (
                                         <>
@@ -380,6 +389,12 @@ import { ContinuousColorLegend } from "@mui/x-charts";
                                 }
                                 </div>  
                             </div>
+                            <button
+                                    onClick={handleAddTransferItem}
+                                    className="hidden md:block  bg-cyan-600 text-white px-3 py-1 rounded cursor-pointer"
+                                >
+                                    Transfer Item
+                            </button>
                             
                         </div>
                     </main>
@@ -388,15 +403,32 @@ import { ContinuousColorLegend } from "@mui/x-charts";
 
                 </div>          
 
-                {showModal && (
-                <InvTransferStockForm
+                {showCreateTransferForm && (
+                <CreateTransferStockForm
+                    onClose={() => {
+                        // toggleModal();
+                        // setSelectedItem(null);
+                        // refreshInventory();
+                        toggleCreateTransferModal();
+                    }}
+                    // selectedItem={selectedItem}
+                    warehouseList={warehouseList}
+                    successCTD={successCTD}
+                    
+                 />
+            )}
+            
+            {showModal && (
+                <TransferStockForm
                     onClose={() => {
                         toggleModal();
                         setSelectedItem(null);
-                        // refreshInventory();
+                        refreshInventory();
+                        // toggleCreateTransferModal();
                     }}
-                    selectedItem={selectedItem}
+                    transferItems={transferItems} // Pass transferItems instead of selectedItem
                     warehouseList={warehouseList}
+                    settransferItems={settransferItems} // Pass settransferItems to allow removal
                     
                  />
             )}
