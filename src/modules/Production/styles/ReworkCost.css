@@ -4,14 +4,6 @@
     width: 100%;
   }
 
-.rwprodcolumn {
-    display: flex;
-    padding: 3px;
-    padding-left: 15px;
-    gap: 15px;
-    width: 100%;
-  }
-
 .rwprodheader-section {
   justify-content: space-between;
   align-items: center;
@@ -132,7 +124,6 @@
     width: 100px;
   }
 
-  
 .rwprotable {
     background-color: white;
     width: 1300px;
