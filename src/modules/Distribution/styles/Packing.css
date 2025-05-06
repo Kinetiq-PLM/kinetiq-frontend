@@ -2122,11 +2122,6 @@
   color: #0066cc;
 }
 
-/* Add this to your CSS file */
-.warehouse-group {
-  margin-bottom: 20px;
-}
-
 .warehouse-name {
   display: flex;
   align-items: center;
@@ -2284,3 +2279,4 @@ tr.partially-packed {
 .pack-action-button:hover:not(:disabled) {
   opacity: 0.9;
 }
+

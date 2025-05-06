@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/Picking.css';
-import { FaRegSquare, FaCheckSquare, FaWarehouse, FaBoxOpen, FaClock, FaFileAlt, FaBoxes } from 'react-icons/fa';
+import { 
+  FaRegSquare, 
+  FaCheckSquare, 
+  FaWarehouse, 
+  FaBoxOpen, 
+  FaClock, 
+  FaFileAlt, 
+  FaBoxes,
+  FaInfoCircle,
+  FaShoppingCart,
+  FaTools,
+  FaExchangeAlt,
+  FaQuestionCircle,
+  FaSpinner,
+  FaCheckCircle,
+  FaSave,
+  FaPlay,
+  FaCheck,
+  FaUser,
+  FaClipboardList,
+  FaExclamationTriangle
+} from 'react-icons/fa';
 import PartialDeliveryInfo from './PartialDeliveryInfo';
 
 const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, warehouses, onStatusUpdate }) => {
@@ -126,10 +147,10 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
   // Get status icon
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'Not Started': return '⏱️';
-      case 'In Progress': return '🔄';
-      case 'Completed': return '✅';
-      default: return '❓';
+      case 'Not Started': return <FaClock className="status-icon" />;
+      case 'In Progress': return <FaSpinner className="status-icon" />;
+      case 'Completed': return <FaCheckCircle className="status-icon" />;
+      default: return <FaQuestionCircle className="status-icon" />;
     }
   };
   
@@ -170,11 +191,11 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
   // Get delivery type icon
   const getDeliveryTypeIcon = (type) => {
     switch (type) {
-      case 'sales': return '🛒';
-      case 'service': return '🔧';
-      case 'content': return '📦';
-      case 'stock': return '🔄';
-      default: return '❓';
+      case 'sales': return <FaShoppingCart className="icon-spacing" />;
+      case 'service': return <FaTools className="icon-spacing" />;
+      case 'content': return <FaBoxOpen className="icon-spacing" />;
+      case 'stock': return <FaExchangeAlt className="icon-spacing" />;
+      default: return <FaQuestionCircle className="icon-spacing" />;
     }
   };
   
@@ -193,8 +214,6 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         </div>
       );
     }
-    
-    // Status checks and employee assignment checks remain unchanged
     
     // Use pickingItems if available, otherwise fall back to items_details
     const items = pickingItems.length > 0 ? pickingItems : 
@@ -234,10 +253,6 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     
     return (
       <div className="items-section">
-        <h4 className="section-title">
-          <span className="section-icon">📦</span>
-          Items to Pick ({items.length})
-        </h4>
         
         {/* Progress bar remains unchanged */}
         {isCompleted ? (
@@ -271,7 +286,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
               {Object.values(warehouse.deliveryNotes).map((deliveryNote, dnIndex) => (
                 <div key={deliveryNote.deliveryNoteId} className="delivery-note-group">
                   {/* Add a header for the delivery note if it exists */}
-                  {deliveryNote.deliveryNoteId !== 'none' && (
+                  {/* {deliveryNote.deliveryNoteId !== 'none' && (
                     <div className="delivery-note-header">
                       <FaFileAlt className="delivery-note-icon" /> 
                       <span className="delivery-note-id">
@@ -281,7 +296,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
                         ({deliveryNote.items.length} items)
                       </span>
                     </div>
-                  )}
+                  )} */}
                   
                   <div className="items-table-container">
                     <table className="items-table">
@@ -587,7 +602,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         <div className="modal-body">
           {/* Status indicator */}
           <div className={`status-indicator status-${pickingList.picked_status?.toLowerCase().replace(' ', '-')}`}>
-            <span className="status-icon">{getStatusIcon(pickingList.picked_status)}</span>
+            {getStatusIcon(pickingList.picked_status)}
             <span className="status-text">{pickingList.picked_status}</span>
           </div>
 
@@ -605,14 +620,14 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
               className={`tab-button ${activeTab === 'general' ? 'active' : ''}`}
               onClick={() => setActiveTab('general')}
             >
-              <span className="tab-icon">ℹ️</span>
+              <FaInfoCircle className="tab-icon" />
               General Info
             </button>
             <button 
               className={`tab-button ${activeTab === 'items' ? 'active' : ''}`}
               onClick={() => setActiveTab('items')}
             >
-              <span className="tab-icon">📦</span>
+              <FaBoxes className="tab-icon" />
               Items ({pickingList.items_details?.length || 0})
             </button>
           </div>
@@ -622,13 +637,12 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
             <>
               {/* Main information panel */}
               <div className="info-panel">
-                <h4 className="section-title">General Information</h4>
                 <div className="picking-details enhanced">
                   <div className="detail-row">
                     <div className="detail-item">
                       <span className="detail-label">Delivery Type</span>
                       <span className="detail-value">
-                        <span className="icon">{getDeliveryTypeIcon(pickingList.delivery_type)}</span>
+                        {getDeliveryTypeIcon(pickingList.delivery_type)}
                         {pickingList.is_external ? 'External' : 'Internal'} - 
                         {getDeliveryTypeDisplay(pickingList.delivery_type)}
                       </span>
@@ -657,7 +671,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
                 {/* Employee Assignment Section */}
                 <div className="edit-section">
                   <h4 className="section-title">
-                    <span className="section-icon">👤</span>
+                    <FaUser className="section-icon" />
                     Assign Employee
                     {!isCompleted && <span className="required-indicator">*</span>}
                   </h4>
@@ -694,7 +708,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
                 {/* Warehouse Section - Display Only */}
                 <div className="edit-section">
                   <h4 className="section-title">
-                    <span className="section-icon">🏢</span>
+                    <FaWarehouse className="section-icon" />
                     Warehouse
                   </h4>
                   
@@ -722,7 +736,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
               {!isCompleted && (
                 <div className="edit-section status-workflow-section">
                   <h4 className="section-title">
-                    <span className="section-icon">📋</span>
+                    <FaClipboardList className="section-icon" />
                     Workflow Actions
                   </h4>
                   
@@ -756,7 +770,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
                         disabled={isStatusUpdateDisabled()}
                       >
                         <span className="button-icon">
-                          {pickingList.picked_status === 'Not Started' ? '▶' : '✓'}
+                          {pickingList.picked_status === 'Not Started' ? <FaPlay /> : <FaCheck />}
                         </span>
                         {getStatusActionLabel(pickingList.picked_status)}
                       </button>
@@ -775,7 +789,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
               {isCompleted && (
                 <div className="completed-section">
                   <div className="completed-message">
-                    <span className="completed-icon">✅</span>
+                    <FaCheckCircle className="completed-icon" />
                     This picking list was completed on {formatDate(pickingList.picked_date)}
                   </div>
                 </div>
@@ -797,7 +811,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
               onClick={handleSave}
               disabled={!modified || isCompleted}
             >
-              <span className="button-icon">💾</span>
+              <FaSave className="button-icon" />
               Save Changes
             </button>
           )}

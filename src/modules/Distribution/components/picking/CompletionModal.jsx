@@ -6,12 +6,12 @@ import {
   FaBoxes, 
   FaTruck, 
   FaInfoCircle, 
-  FaListAlt,
+  FaClipboardList,
   FaClipboardCheck,
   FaBox,
   FaArrowRight,
   FaFileAlt,
-  FaExclamationCircle,
+  FaExclamationTriangle,
   FaShippingFast,
   FaBoxOpen
 } from 'react-icons/fa';
@@ -20,14 +20,12 @@ import '../../styles/Picking.css';
 const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCancel }) => {
   const [deliveryNotesInfo, setDeliveryNotesInfo] = useState(null);
   
-  // Fetch delivery notes info when the modal opens, if this is a sales order
   useEffect(() => {
     if (pickingList && pickingList.delivery_type === 'sales') {
       fetchDeliveryNotesInfo(pickingList.delivery_id);
     }
   }, [pickingList]);
   
-  // Function to fetch delivery notes info
   const fetchDeliveryNotesInfo = async (orderID) => {
     if (!orderID) return;
     
@@ -45,14 +43,12 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
     }
   };
   
-  // Function to get employee name from ID
   const getEmployeeName = (employeeId) => {
     if (!employeeId) return 'Not assigned';
     const employee = employees.find(emp => emp.employee_id === employeeId);
     return employee ? employee.full_name : employeeId;
   };
 
-  // Function to get warehouse name from ID
   const getWarehouseName = (warehouseId) => {
     if (pickingList.warehouse_name) return pickingList.warehouse_name;
     
@@ -61,28 +57,40 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
     return warehouse ? warehouse.name : warehouseId;
   };
 
-  // Function to get delivery type icon
   const getDeliveryTypeIcon = () => {
-    return pickingList.is_external ? <FaTruck className="icon-spacing" /> : <FaWarehouse className="icon-spacing" />;
+    return pickingList.is_external ? <FaTruck className="icon-spacing" aria-hidden="true" /> : <FaWarehouse className="icon-spacing" aria-hidden="true" />;
   };
   
-  // Check if this is a partial delivery
   const isPartialDelivery = deliveryNotesInfo && deliveryNotesInfo.is_partial_delivery;
-  
-  // Get current delivery info for partial deliveries
   const currentDelivery = isPartialDelivery ? deliveryNotesInfo.current_delivery : null;
   const totalDeliveries = isPartialDelivery ? deliveryNotesInfo.total_deliveries : null;
 
+  // Escape key handler
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onCancel]);
+
   return (
-    <div className="picking modal-overlay" onClick={onCancel}>
-      <div className="completion-modal improved" onClick={e => e.stopPropagation()} aria-labelledby="modal-title">
+    <div 
+      className="picking modal-overlay" 
+      onClick={onCancel} 
+      role="dialog" 
+      aria-modal="true" 
+      aria-labelledby="modal-title"
+    >
+      <div className="completion-modal improved" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h3 id="modal-title">
-            <FaClipboardCheck className="title-icon" />
+            <FaClipboardCheck className="title-icon" aria-hidden="true" />
             Complete Picking List
             {isPartialDelivery && (
               <span className="partial-delivery-badge">
-                Partial Delivery {currentDelivery} of {totalDeliveries}
+                Batch {currentDelivery} of {totalDeliveries}
               </span>
             )}
           </h3>
@@ -90,16 +98,16 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
             className="close-button" 
             onClick={onCancel} 
             aria-label="Close modal"
+            type="button"
           >
             &times;
           </button>
         </div>
         
         <div className="modal-body">
-          {/* Main confirmation message */}
           <div className="confirmation-banner">
             <div className="confirmation-icon">
-              <FaInfoCircle />
+              <FaInfoCircle aria-hidden="true" />
             </div>
             <div className="confirmation-text">
               <p className="confirmation-message">
@@ -117,48 +125,38 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
             </div>
           </div>
           
-          {/* Enhanced partial delivery info */}
-          {isPartialDelivery && (
-            <div className="partial-delivery-alert">
-              <FaExclamationCircle className="alert-icon" />
-              <div className="alert-text">
-                <p className="alert-title">Partial Delivery Workflow</p>
-                <p className="alert-message">
-                  <strong>Current Step:</strong> You are completing picking for batch {currentDelivery} of {totalDeliveries}.
-                </p>
-                <div className="partial-delivery-workflow">
-                  <div className="workflow-step">
-                    <div className="step-icon"><FaClipboardCheck /></div>
-                    <div className="step-label">1. Complete Picking</div>
-                  </div>
-                  <div className="workflow-arrow">→</div>
-                  <div className="workflow-step">
-                    <div className="step-icon"><FaBoxOpen /></div>
-                    <div className="step-label">2. Pack Items</div>
-                  </div>
-                  <div className="workflow-arrow">→</div>
-                  <div className="workflow-step">
-                    <div className="step-icon"><FaShippingFast /></div>
-                    <div className="step-label">3. Ship Batch</div>
-                  </div>
-                  <div className="workflow-arrow">→</div>
-                  <div className="workflow-step">
-                    <div className="step-icon"><FaArrowRight /></div>
-                    <div className="step-label">4. Next Batch Ready</div>
+          <div className="modal-content-scroll">
+            {/* Batch Information - for partial delivery only */}
+            {isPartialDelivery && (
+              <div className="info-section">
+                <h4 className="section-header">
+                  <FaFileAlt className="icon-spacing" aria-hidden="true" /> 
+                  Batch Information
+                </h4>
+                <div className="batch-info">
+                  <div className="detail-row">
+                    <div className="detail-item">
+                      <span className="detail-label">Current Batch</span>
+                      <div className="detail-value-with-icon">
+                        <span className="count-badge">{currentDelivery} of {totalDeliveries}</span>
+                      </div>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-label">Status</span>
+                      <div className="detail-value-with-icon">
+                        <span className="status-badge status-badge-picking">Picking</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <p className="alert-note">
-                  After this batch is shipped, the next batch will automatically become available for picking.
-                </p>
               </div>
-            </div>
-          )}
-          
-          <div className="modal-content-scroll">
-            {/* Picking list details section */}
+            )}
+
+            {/* Picking List Details - for all orders */}
             <div className="info-section">
               <h4 className="section-header">
-                <FaListAlt className="icon-spacing" /> Picking List Details
+                <FaClipboardList className="icon-spacing" aria-hidden="true" /> 
+                Picking List Details
               </h4>
               
               <div className="picking-details enhanced">
@@ -177,14 +175,14 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
                   <div className="detail-item">
                     <span className="detail-label">Warehouse</span>
                     <div className="detail-value-with-icon">
-                      <FaWarehouse className="detail-icon" />
+                      <FaWarehouse className="detail-icon" aria-hidden="true" />
                       {getWarehouseName(pickingList.warehouse_id)}
                     </div>
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Assigned To</span>
                     <div className="detail-value-with-icon">
-                      <FaUser className="detail-icon" />
+                      <FaUser className="detail-icon" aria-hidden="true" />
                       {getEmployeeName(pickingList.picked_by)}
                     </div>
                   </div>
@@ -194,7 +192,7 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
                   <div className="detail-item">
                     <span className="detail-label">Items Count</span>
                     <div className="detail-value-with-icon">
-                      <FaBoxes className="detail-icon" />
+                      <FaBoxes className="detail-icon" aria-hidden="true" />
                       <span className="count-badge">{pickingList.items_details?.length || 0}</span>
                     </div>
                   </div>
@@ -213,13 +211,14 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
               </div>
             </div>
 
-            {/* Delivery Notes Information - Enhanced */}
+            {/* Delivery Notes - if applicable */}
             {pickingList.picking_items && pickingList.picking_items.some(item => item.delivery_note_id) && (
               <div className="info-section">
                 <h4 className="section-header">
-                  <FaFileAlt className="icon-spacing" /> Delivery Notes
+                  <FaFileAlt className="icon-spacing" aria-hidden="true" /> 
+                  Delivery Notes
                 </h4>
-                <div className="delivery-notes-container">
+                <div className="delivery-notes-grid">
                   {Array.from(new Set(
                     pickingList.picking_items
                       .filter(item => item.delivery_note_id)
@@ -227,25 +226,30 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
                   )).map(noteId => (
                     <div key={noteId} className="delivery-note-card">
                       <div className="delivery-note-header">
-                        <FaFileAlt className="delivery-note-icon" />
-                        <span className="delivery-note-id">{noteId}</span>
-                      </div>
-                      <div className="delivery-note-body">
-                        <div className="delivery-note-stat">
-                          <span className="stat-label">Items:</span>
-                          <span className="stat-value">
-                            {pickingList.picking_items.filter(item => item.delivery_note_id === noteId).length}
-                          </span>
+                        <div className="delivery-note-title">
+                          <FaFileAlt className="delivery-note-icon" aria-hidden="true" />
+                          <span className="delivery-note-id">{noteId}</span>
                         </div>
-                        {isPartialDelivery && deliveryNotesInfo && (
-                          <div className="delivery-note-batch">
-                            <span className="batch-label">Batch:</span>
-                            <span className="batch-value">
-                              {deliveryNotesInfo.delivery_notes.findIndex(note => note.delivery_note_id === noteId) + 1} 
-                              of {deliveryNotesInfo.total_deliveries}
+                        {/* <span className="status-badge status-badge-picking">Ready for Shipping</span> */}
+                      </div>
+                      <div className="delivery-note-content">
+                        <div className="delivery-note-info-row">
+                          <div className="info-item">
+                            <span className="info-label">Items</span>
+                            <span className="info-value">
+                              <strong>{pickingList.picking_items.filter(item => item.delivery_note_id === noteId).length}</strong>
                             </span>
                           </div>
-                        )}
+                          
+                          {isPartialDelivery && deliveryNotesInfo && (
+                            <div className="info-item">
+                              <span className="info-label">Batch</span>
+                              <span className="info-value">
+                                <strong>{deliveryNotesInfo.delivery_notes.findIndex(note => note.delivery_note_id === noteId) + 1}</strong> of {deliveryNotesInfo.total_deliveries}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -253,57 +257,103 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
               </div>
             )}
 
-            {/* What happens next section */}
-            <div className="info-section">
-              <h4 className="section-header status-completed">
-                <FaCheck className="icon-spacing" />
-                What happens next?
-              </h4>
-              
-              <div className="next-steps-container">
-                <div className="next-step-item">
-                  <div className="step-number">1</div>
-                  <div className="step-content">
-                    <FaClipboardCheck className="step-icon" />
-                    <div className="step-text">The picking list status will be updated to "Completed"</div>
+            {/* What happens next - for both normal and partial deliveries */}
+            {!isPartialDelivery ? (
+              <div className="info-section">
+                <h4 className="section-header status-completed">
+                  <FaCheck className="icon-spacing" aria-hidden="true" />
+                  What happens next?
+                </h4>
+                
+                <div className="next-steps-container">
+                  <div className="next-step-item">
+                    <div className="step-number">1</div>
+                    <div className="step-content">
+                      <FaClipboardCheck className="step-icon" aria-hidden="true" />
+                      <div className="step-text">The picking list status will be updated to "Completed"</div>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="step-connector"></div>
-                
-                <div className="next-step-item">
-                  <div className="step-number">2</div>
-                  <div className="step-content">
-                    <FaBox className="step-icon" />
-                    <div className="step-text">A new packing list will be automatically created</div>
+                  
+                  <div className="step-connector" aria-hidden="true"></div>
+                  
+                  <div className="next-step-item">
+                    <div className="step-number">2</div>
+                    <div className="step-content">
+                      <FaBox className="step-icon" aria-hidden="true" />
+                      <div className="step-text">A new packing list will be automatically created</div>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="step-connector"></div>
-                
-                <div className="next-step-item">
-                  <div className="step-number">3</div>
-                  <div className="step-content">
-                    <FaBoxes className="step-icon" />
-                    <div className="step-text">All picked items will be added to the packing list</div>
+                  
+                  <div className="step-connector" aria-hidden="true"></div>
+                  
+                  <div className="next-step-item">
+                    <div className="step-number">3</div>
+                    <div className="step-content">
+                      <FaBoxes className="step-icon" aria-hidden="true" />
+                      <div className="step-text">All picked items will be added to the packing list</div>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="step-connector"></div>
-                
-                <div className="next-step-item">
-                  <div className="step-number">4</div>
-                  <div className="step-content">
-                    <FaArrowRight className="step-icon" />
-                    <div className="step-text">
-                      {isPartialDelivery 
-                        ? <strong>After shipping, the next batch will automatically be ready for picking</strong>
-                        : 'You\'ll be able to track the order in the Packing module'}
+                  
+                  <div className="step-connector" aria-hidden="true"></div>
+                  
+                  <div className="next-step-item">
+                    <div className="step-number">4</div>
+                    <div className="step-content">
+                      <FaArrowRight className="step-icon" aria-hidden="true" />
+                      <div className="step-text">You'll be able to track the order in the Packing module</div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="info-section">
+                <h4 className="section-header status-in-progress">
+                  <FaClipboardList className="icon-spacing" aria-hidden="true" />
+                  What happens next?
+                </h4>
+                
+                <div className="next-steps-container">
+                  <div className="next-step-item">
+                    <div className="step-number">1</div>
+                    <div className="step-content">
+                      <FaClipboardCheck className="step-icon" aria-hidden="true" />
+                      <div className="step-text">Complete picking for batch {currentDelivery} of {totalDeliveries}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="step-connector" aria-hidden="true"></div>
+                  
+                  <div className="next-step-item">
+                    <div className="step-number">2</div>
+                    <div className="step-content">
+                      <FaBoxOpen className="step-icon" aria-hidden="true" />
+                      <div className="step-text">Pack the items for this batch</div>
+                    </div>
+                  </div>
+                  
+                  <div className="step-connector" aria-hidden="true"></div>
+                  
+                  <div className="next-step-item">
+                    <div className="step-number">3</div>
+                    <div className="step-content">
+                      <FaShippingFast className="step-icon" aria-hidden="true" />
+                      <div className="step-text">Ship this batch to the customer</div>
+                    </div>
+                  </div>
+                  
+                  <div className="step-connector" aria-hidden="true"></div>
+                  
+                  <div className="next-step-item">
+                    <div className="step-number">4</div>
+                    <div className="step-content">
+                      <FaArrowRight className="step-icon" aria-hidden="true" />
+                      <div className="step-text">The next batch will become available for picking</div>
+                    </div>
+                  </div>
+                </div>
+                <p className="info-note">After this batch is shipped, the next batch will automatically become available for picking.</p>
+              </div>
+            )}
           </div>
         </div>
         
@@ -311,14 +361,16 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
           <button 
             className="cancel-button"
             onClick={onCancel}
+            type="button"
           >
             Cancel
           </button>
           <button 
             className="confirm-button"
             onClick={onConfirm}
+            type="button"
           >
-            <FaCheck className="button-icon" />
+            <FaCheck className="button-icon" aria-hidden="true" />
             {isPartialDelivery 
               ? `Complete Batch ${currentDelivery}/${totalDeliveries}`
               : 'Complete Picking'}

@@ -42,10 +42,10 @@ const PartialDeliveryInfo = ({ pickingList, deliveryNotesInfo }) => {
   };
 
   return (
-    <div className="partial-delivery-info">
+    <div className="partial-delivery-info" role="region" aria-label="Partial delivery information">
       <div className="partial-delivery-header">
         <div className="partial-delivery-title">
-          <FaBoxes className="partial-delivery-icon" />
+          <FaBoxes className="partial-delivery-icon" aria-hidden="true" />
           <h4>Partial Delivery in Progress</h4>
         </div>
         <div className="partial-delivery-counter">
@@ -59,6 +59,10 @@ const PartialDeliveryInfo = ({ pickingList, deliveryNotesInfo }) => {
           <div 
             className="progress-bar" 
             style={{ width: `${progressPercentage}%` }}
+            role="progressbar"
+            aria-valuenow={progressPercentage}
+            aria-valuemin="0"
+            aria-valuemax="100"
           ></div>
         </div>
         <div className="progress-text">
@@ -66,7 +70,7 @@ const PartialDeliveryInfo = ({ pickingList, deliveryNotesInfo }) => {
         </div>
       </div>
 
-      <div className="delivery-notes-list">
+      <div className="delivery-notes-list" tabIndex="0">
         {deliveryNotesInfo.delivery_notes.map((note, index) => (
           <div 
             key={note.delivery_note_id} 
@@ -75,7 +79,7 @@ const PartialDeliveryInfo = ({ pickingList, deliveryNotesInfo }) => {
               index + 1 < currentDelivery ? 'completed-delivery' : 'pending-delivery'
             }`}
           >
-            <div className="delivery-note-sequence">{index + 1}</div>
+            <div className="delivery-note-sequence" aria-hidden="true">{index + 1}</div>
             <div className="delivery-note-content">
               <div className="delivery-note-id">{note.delivery_note_id}</div>
               <div className="delivery-note-details">
@@ -86,7 +90,7 @@ const PartialDeliveryInfo = ({ pickingList, deliveryNotesInfo }) => {
               </div>
               {note.admin_override && (
                 <div className="admin-override-warning">
-                  <FaExclamationTriangle className="warning-icon" />
+                  <FaExclamationTriangle className="warning-icon" aria-hidden="true" />
                   <span>Admin override by {note.admin_override}</span>
                 </div>
               )}
@@ -97,7 +101,7 @@ const PartialDeliveryInfo = ({ pickingList, deliveryNotesInfo }) => {
 
       <div className="delivery-notes-info">
         <div className="info-message">
-          <FaInfoCircle className="info-icon" />
+          <FaInfoCircle className="info-icon" aria-hidden="true" />
           <span>Partial deliveries must be processed sequentially. After current batch is shipped, the next batch will automatically be available in a new picking list.</span>
         </div>
       </div>

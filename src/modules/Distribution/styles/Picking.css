@@ -1439,6 +1439,8 @@
 .picking .detail-value {
   font-size: 0.95rem;
   color: #212529;
+  display: flex;
+  align-items: center;
 }
 
 .picking .detail-value.highlight {
@@ -1844,11 +1846,7 @@
   }
 }
 
-.warehouse-group {
-  margin-bottom: 1.5rem;
-}
-
-.warehouse-name {
+.picking .warehouse-name {
   display: flex;
   align-items: center;
   font-size: 1rem;
@@ -1860,12 +1858,11 @@
   border-left: 3px solid #00a8a8;
 }
 
-.warehouse-icon {
+.picking .warehouse-icon {
   margin-right: 0.5rem;
 }
 
-.warehouse-divider {
-  margin: 1.5rem 0;
+.picking .warehouse-divider {
   border: none;
   border-top: 1px dashed #e0e0e0;
 }
@@ -1875,32 +1872,32 @@
   margin: 15px 0;
 }
 
-.progress-bar-container {
+.picking .progress-bar-container {
   height: 15px;
   background-color: #e0e0e0;
   border-radius: 10px;
   overflow: hidden;
 }
 
-.progress-bar {
+.picking .progress-bar {
   height: 100%;
   background-color: #4caf50;
   transition: width 0.3s ease;
 }
 
-.progress-text {
+.picking .progress-text {
   text-align: center;
   margin-top: 5px;
   font-weight: bold;
 }
 
-.warehouse-progress {
+.picking .warehouse-progress {
   font-size: 0.8em;
   margin-left: 10px;
   color: #666;
 }
 
-.item-toggle-button {
+.picking .item-toggle-button {
   padding: 5px 8px;
   border: none;
   border-radius: 4px;
@@ -1911,22 +1908,22 @@
   font-size: 0.9em;
 }
 
-.item-toggle-button.pick {
+.picking .item-toggle-button.pick {
   background-color: #e0f2f1;
   color: #00796b;
 }
 
-.item-toggle-button.unpick {
+.picking .item-toggle-button.unpick {
   background-color: #f1f8e9;
   color: #558b2f;
 }
 
-.item-toggle-button:disabled {
+.picking .item-toggle-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.picked-status {
+.picking .picked-status {
   color: #4caf50;
   font-weight: bold;
   display: flex;
@@ -1934,24 +1931,19 @@
   gap: 5px;
 }
 
-.not-picked-status {
+.picking .not-picked-status {
   color: #ff9800;
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.picked-row {
+.picking .picked-row {
   background-color: #f1f8e9 !important;
 }
 
 
-/* Delivery Note Grouping Styles */
-.delivery-note-group {
-  margin-bottom: 16px;
-}
-
-.delivery-note-header {
+.picking .delivery-note-header {
   background-color: #e8f4ff;
   padding: 8px 12px;
   border-radius: 4px 4px 0 0;
@@ -1963,23 +1955,23 @@
   color: #0077cc;
 }
 
-.delivery-note-icon {
+.picking .delivery-note-icon {
   margin-right: 8px;
   font-size: 1rem;
 }
 
-.delivery-note-id {
+.picking .delivery-note-id {
   font-size: 0.9rem;
 }
 
-.item-count {
+.picking .item-count {
   margin-left: 8px;
   font-size: 0.8rem;
   color: #555;
   font-weight: normal;
 }
 
-.delivery-note-divider {
+.picking .delivery-note-divider {
   margin: 16px 0;
   border: none;
   height: 1px;
@@ -1988,7 +1980,7 @@
 }
 
 /* Multiple delivery note indicator */
-.warehouse-group .warehouse-progress {
+.picking .warehouse-group .warehouse-progress {
   background-color: #ffeb3b;
   color: #333;
   font-size: 0.75rem;
@@ -1999,18 +1991,18 @@
 }
 
 /* Delivery note badges */
-.detail-item.full-width {
+.picking .detail-item.full-width {
   flex-basis: 100%;
 }
 
-.detail-value-list {
+.picking .detail-value-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 5px;
 }
 
-.delivery-note-badge {
+.picking .delivery-note-badge {
   display: inline-flex;
   align-items: center;
   background-color: #e3f2fd;
@@ -2021,7 +2013,7 @@
   border: 1px solid #bbdefb;
 }
 
-.delivery-note-badge-icon {
+.picking .delivery-note-badge-icon {
   margin-right: 5px;
   font-size: 0.75rem;
 }
@@ -2029,7 +2021,7 @@
 /* Partial Delivery Styles */
 
 /* Main container for partial delivery info */
-.partial-delivery-info {
+.picking .partial-delivery-info {
   background-color: #f8f9fa;
   border: 1px solid #e9ecef;
   border-radius: 6px;
@@ -2039,31 +2031,31 @@
 }
 
 /* Header with title and counter */
-.partial-delivery-header {
+.picking .partial-delivery-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
 }
 
-.partial-delivery-title {
+.picking .partial-delivery-title {
   display: flex;
   align-items: center;
 }
 
-.partial-delivery-title h4 {
+.picking .partial-delivery-title h4 {
   margin: 0;
   font-size: 1.1em;
   color: #495057;
   margin-left: 8px;
 }
 
-.partial-delivery-icon {
+.picking .partial-delivery-icon {
   color: #6c757d;
   font-size: 18px;
 }
 
-.partial-delivery-counter {
+.picking .partial-delivery-counter {
   background-color: #e9ecef;
   border-radius: 20px;
   padding: 4px 12px;
@@ -2074,25 +2066,25 @@
   min-width: 80px;
 }
 
-.delivery-counter-text {
+.picking .delivery-counter-text {
   font-size: 0.8em;
   color: #6c757d;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.delivery-counter-numbers {
+.picking .delivery-counter-numbers {
   font-size: 1.1em;
   font-weight: 600;
   color: #495057;
 }
 
 /* Progress bar */
-.partial-delivery-progress {
+.picking .partial-delivery-progress {
   margin-bottom: 15px;
 }
 
-.progress-bar-container {
+.picking .progress-bar-container {
   height: 8px;
   background-color: #e9ecef;
   border-radius: 4px;
@@ -2100,21 +2092,21 @@
   margin-bottom: 8px;
 }
 
-.progress-bar {
+.picking .progress-bar {
   height: 100%;
   background-color: #007bff;
   border-radius: 4px;
   transition: width 0.3s ease;
 }
 
-.progress-text {
+.picking .progress-text {
   font-size: 0.9em;
   color: #6c757d;
   text-align: right;
 }
 
 /* Delivery notes list */
-.delivery-notes-list {
+.picking .delivery-notes-list {
   margin-bottom: 15px;
   max-height: 200px;
   overflow-y: auto;
@@ -2122,7 +2114,7 @@
   border-radius: 4px;
 }
 
-.delivery-note-item {
+.picking .delivery-note-item {
   display: flex;
   align-items: center;
   padding: 10px;
@@ -2130,29 +2122,29 @@
   transition: background-color 0.2s ease;
 }
 
-.delivery-note-item:last-child {
+.picking .delivery-note-item:last-child {
   border-bottom: none;
 }
 
-.delivery-note-item:hover {
+.picking .delivery-note-item:hover {
   background-color: #f8f9fa;
 }
 
-.delivery-note-item.current-delivery {
+.picking .delivery-note-item.current-delivery {
   background-color: #e6f7ff;
   border-left: 4px solid #007bff;
 }
 
-.delivery-note-item.completed-delivery {
+.picking .delivery-note-item.completed-delivery {
   background-color: #f0f8f0;
   border-left: 4px solid #28a745;
 }
 
-.delivery-note-item.pending-delivery {
+.picking .delivery-note-item.pending-delivery {
   opacity: 0.7;
 }
 
-.delivery-note-sequence {
+.picking .delivery-note-sequence {
   width: 24px;
   height: 24px;
   background-color: #6c757d;
@@ -2166,64 +2158,64 @@
   margin-right: 12px;
 }
 
-.current-delivery .delivery-note-sequence {
+.picking .current-delivery .delivery-note-sequence {
   background-color: #007bff;
 }
 
-.completed-delivery .delivery-note-sequence {
+.picking .completed-delivery .delivery-note-sequence {
   background-color: #28a745;
 }
 
-.delivery-note-content {
+.picking .delivery-note-content {
   flex: 1;
 }
 
-.delivery-note-id {
+.picking .delivery-note-id {
   font-weight: 600;
   color: #495057;
   margin-bottom: 4px;
   font-size: 0.95em;
 }
 
-.delivery-note-details {
+.picking .delivery-note-details {
   display: flex;
   justify-content: space-between;
   font-size: 0.85em;
   color: #6c757d;
 }
 
-.item-count {
+.picking .item-count {
   display: inline-block;
 }
 
-.status-badge {
+.picking .status-badge {
   padding: 2px 8px;
   border-radius: 12px;
   font-size: 0.85em;
   font-weight: 600;
 }
 
-.status-badge-pending {
+.picking .status-badge-pending {
   background-color: #f8f9fa;
   color: #6c757d;
 }
 
-.status-badge-picking {
+.picking .status-badge-picking {
   background-color: #e6f7ff;
   color: #0d6efd;
 }
 
-.status-badge-packed {
+.picking .status-badge-packed {
   background-color: #e5f9e0;
   color: #198754;
 }
 
-.status-badge-shipped {
+.picking .status-badge-shipped {
   background-color: #d8f3e9;
   color: #20c997;
 }
 
-.admin-override-warning {
+.picking .admin-override-warning {
   margin-top: 4px;
   font-size: 0.8em;
   color: #fd7e14;
@@ -2232,16 +2224,16 @@
   gap: 4px;
 }
 
-.warning-icon {
+.picking .warning-icon {
   font-size: 12px;
 }
 
 /* Info message */
-.delivery-notes-info {
+.picking .delivery-notes-info {
   margin-top: 10px;
 }
 
-.info-message {
+.picking .info-message {
   font-size: 0.9em;
   color: #6c757d;
   display: flex;
@@ -2253,13 +2245,13 @@
   border-left: 4px solid #ffc107;
 }
 
-.info-icon {
+.picking .info-icon {
   color: #ffc107;
   font-size: 14px;
 }
 
 /* Partial delivery badge in completion modal */
-.partial-delivery-badge {
+.picking .partial-delivery-badge {
   font-size: 0.8em;
   background-color: #e9ecef;
   padding: 2px 8px;
@@ -2271,7 +2263,7 @@
 }
 
 /* Partial delivery alert in completion modal */
-.partial-delivery-alert {
+.picking .partial-delivery-alert {
   margin: 15px 0;
   padding: 12px;
   background-color: #fff3cd;
@@ -2282,34 +2274,34 @@
   gap: 12px;
 }
 
-.alert-icon {
+.picking .alert-icon {
   color: #ffc107;
   font-size: 20px;
   margin-top: 2px;
 }
 
-.alert-text {
+.picking .alert-text {
   flex: 1;
 }
 
-.alert-title {
+.picking .alert-title {
   margin: 0 0 4px 0;
   font-weight: 600;
   color: #212529;
 }
 
-.alert-message {
+.picking .alert-message {
   margin: 0;
   color: #495057;
   font-size: 0.95em;
 }
 
 /* Partial delivery indicator in picking table */
-.partial-delivery-row {
+.picking .partial-delivery-row {
   position: relative;
 }
 
-.partial-delivery-row::before {
+.picking .partial-delivery-row::before {
   content: '';
   position: absolute;
   left: 0;
@@ -2319,18 +2311,18 @@
   background-color: #ffc107;
 }
 
-.partial-delivery-cell {
+.picking .partial-delivery-cell {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.partial-icon {
+.picking .partial-icon {
   color: #6c757d;
   font-size: 14px;
 }
 
-.partial-text {
+.picking .partial-text {
   font-size: 0.9em;
   font-weight: 600;
   color: #495057;
@@ -2373,4 +2365,127 @@
   margin-left: 0.25rem;
   color: #00a8a8;
   vertical-align: middle;
+}
+
+/* Add at the end of your current Picking.css */
+
+.picking .info-note {
+  margin-top: 10px;
+  font-size: 0.85em;
+  color: #6c757d;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #00a8a8;
+}
+
+.picking .batch-info {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fcfcfc;
+  overflow: hidden;
+}
+
+.picking .status-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.picking .status-badge-picking {
+  background-color: #e6f7ff;
+  color: #0d6efd;
+}
+
+.picking .section-header.status-in-progress {
+  color: #00a8a8;
+}
+
+/* Enhanced Delivery Notes Section */
+.picking .delivery-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.picking .delivery-note-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.picking .delivery-note-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.picking .delivery-note-header {
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picking .delivery-note-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.picking .delivery-note-icon {
+  color: #0077cc;
+  font-size: 18px;
+}
+
+.picking .delivery-note-id {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.picking .delivery-note-content {
+  padding: 12px 16px;
+}
+
+.picking .delivery-note-info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.picking .info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.picking .info-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.picking .info-value {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .picking .delivery-notes-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .picking .delivery-note-info-row {
+    flex-direction: column;
+    gap: 8px;
+  }
 }
