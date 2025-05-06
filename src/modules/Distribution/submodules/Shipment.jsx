@@ -113,17 +113,18 @@ const Shipment = () => {
     // Function to fetch employees
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/employees/');
+        // Use the carrier-specific endpoint instead of the general employees endpoint
+        const response = await fetch('http://127.0.0.1:8000/api/carrier-employees/');
         
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.detail || 'Failed to fetch employees');
+          throw new Error(errorData.detail || 'Failed to fetch carrier employees');
         }
         
         const data = await response.json();
         setEmployees(data);
       } catch (err) {
-        console.error('Error fetching employees:', err);
+        console.error('Error fetching carrier employees:', err);
       }
     };
   
