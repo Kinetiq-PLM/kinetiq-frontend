@@ -22,6 +22,48 @@ const BodyContent = () => {
   const [pendingStatusChange, setPendingStatusChange] = useState(null);
   const [remarksInput, setRemarksInput] = useState("");
 
+  // State for user role
+  const [userRole, setUserRole] = useState('Guest'); // Default role
+
+  console.log("PCounts Component Rendered. Current userRole state:", userRole);
+
+  // Get user role from localStorage on component mount
+  useEffect(() => {
+    console.log("PCounts RBAC Effect: Attempting to read user from localStorage...");
+    let roleFromStorage = 'Guest'; // Default role if not found or error
+    try {
+      const rawStoredUser = localStorage.getItem("user");
+      console.log("PCounts RBAC Effect: Raw localStorage 'user' item:", rawStoredUser);
+
+      if (rawStoredUser) {
+        const storedUser = JSON.parse(rawStoredUser);
+        console.log("PCounts RBAC Effect: Parsed storedUser:", storedUser);
+
+        if (storedUser && storedUser.role && storedUser.role.role_name) {
+          roleFromStorage = storedUser.role.role_name;
+          console.log("PCounts RBAC Effect: Extracted roleFromStorage:", roleFromStorage);
+        } else {
+          console.warn("PCounts RBAC Effect: User role not found in localStorage or data structure is unexpected. Falling back to:", roleFromStorage);
+        }
+      } else {
+        console.warn("PCounts RBAC Effect: No 'user' item found in localStorage. Falling back to:", roleFromStorage);
+      }
+    } catch (error) {
+      console.error("PCounts RBAC Effect: Error reading or parsing user data from localStorage:", error);
+    }
+    setUserRole(roleFromStorage); // Update the state
+  }, []); // Empty dependency array ensures this runs only once on mount
+
+  // Derived boolean flags for role checks - these will re-evaluate when userRole state changes
+  const isWarehouseStaff = userRole === 'Warehouse Staff';
+  const isManager = userRole === 'Warehouse Manager';
+  const isSystemAdmin = userRole === 'System Administrator';
+
+  useEffect(() => {
+    // This effect runs whenever userRole (the state) changes, logging the derived flags.
+    console.log(`PCounts RBAC: Role checks (derived from state) - isWarehouseStaff: ${isWarehouseStaff}, isManager: ${isManager}, isSystemAdmin: ${isSystemAdmin}`);
+  }, [userRole]); // Log when userRole state changes
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
@@ -318,6 +360,8 @@ const BodyContent = () => {
 
   return (
     <div className="pcounts">
+      {/* Exaggerated H1 test removed */}
+
       <div className="body-content-container ">
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -398,18 +442,25 @@ const BodyContent = () => {
             </span>
 
             <span className="md:hidden space-y-2">
-              <button
-                className="w-full bg-cyan-600 text-white rounded-lg p-2 hover:bg-cyan-700"
-                onClick={() => setShowInvPcountForm(true)}
-              >
-                Add P-counts
-              </button>
-              <button
-                className="w-full bg-cyan-600 text-white rounded-lg p-2 hover:bg-cyan-700"
-                onClick={() => setShowDiscrepancyForm(true)}
-              >
-                Report a Discrepancy
-              </button>
+              {/* RBAC: Show 'Add P-counts' only to Warehouse Staff (or Admin) */}
+              {(isWarehouseStaff || isSystemAdmin) && (
+                <button
+                  className="w-full bg-cyan-600 text-white rounded-lg p-2 hover:bg-cyan-700"
+                  onClick={() => setShowInvPcountForm(true)}
+                >
+                  Add P-counts
+                </button>
+              )}
+
+              {/* RBAC: Show 'Report Discrepancy' only to Manager (or Admin) */}
+              {(isManager || isSystemAdmin) && (
+                <button
+                  className="w-full bg-cyan-600 text-white rounded-lg p-2 hover:bg-cyan-700"
+                  onClick={() => setShowDiscrepancyForm(true)}
+                >
+                  Report a Discrepancy
+                </button>
+              )}
             </span>
           </div>
 
@@ -534,7 +585,9 @@ const BodyContent = () => {
                           <p className="text-gray-500 text-sm">Time Period: {selectedRow?.time_period || "-"}</p>
                         </div>
 
-                        {selectedRow && (
+                        {/* RBAC: Show Status Management section to Staff, Manager, Admin */}
+                        {/* Buttons inside will be disabled for Staff */}
+                        {(isWarehouseStaff || isManager || isSystemAdmin) && selectedRow && (
                           <div className="mb-4">
                             <h4 className="text-cyan-600 text-sm font-semibold">Status Management</h4>
                             <p className={`text-sm ${getStatusColorClass(selectedRow.status)}`}>
@@ -548,10 +601,22 @@ const BodyContent = () => {
                                     <button
                                       key={status}
                                       onClick={() => updateCountStatus(status)}
-                                      className={`text-xs px-2 py-1 rounded ${status === 'Cancelled' ? 'bg-red-100 text-red-700 hover:bg-red-200' :
-                                        status === 'Completed' ? 'bg-green-100 text-green-700 hover:bg-green-200' :
-                                          status === 'Closed' ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' :
-                                            'bg-blue-100 text-blue-700 hover:bg-blue-200' // Default/In Progress
+                                      // Disable button for Warehouse Staff
+                                      disabled={isWarehouseStaff}
+                                      className={`text-xs px-2 py-1 rounded ${
+                                        // Base styles
+                                        status === 'Cancelled' ? 'bg-red-100 text-red-700' :
+                                          status === 'Completed' ? 'bg-green-100 text-green-700' :
+                                            status === 'Closed' ? 'bg-gray-100 text-gray-700' :
+                                              'bg-blue-100 text-blue-700' // Default/In Progress
+                                        } ${
+                                        // Add hover styles only if NOT disabled
+                                        !isWarehouseStaff ? (
+                                          status === 'Cancelled' ? 'hover:bg-red-200' :
+                                            status === 'Completed' ? 'hover:bg-green-200' :
+                                              status === 'Closed' ? 'hover:bg-gray-200' :
+                                                'hover:bg-blue-200'
+                                        ) : 'opacity-50 cursor-not-allowed' // Styles for disabled button
                                         }`}
                                     >
                                       {status}
@@ -589,18 +654,25 @@ const BodyContent = () => {
                 </div>
               )}
 
-              <button
-                className="w-full bg-cyan-600 text-white rounded-lg p-2 hover:bg-cyan-700"
-                onClick={() => setShowInvPcountForm(true)}
-              >
-                Add P-counts
-              </button>
-              <button
-                className="w-full bg-cyan-600 text-white rounded-lg p-2 hover:bg-cyan-700"
-                onClick={() => setShowDiscrepancyForm(true)}
-              >
-                Report a Discrepancy
-              </button>
+              {/* RBAC: Show 'Add P-counts' only to Warehouse Staff (or Admin) */}
+              {(isWarehouseStaff || isSystemAdmin) && (
+                <button
+                  className="w-full bg-cyan-600 text-white rounded-lg p-2 hover:bg-cyan-700"
+                  onClick={() => setShowInvPcountForm(true)}
+                >
+                  Add P-counts
+                </button>
+              )}
+
+              {/* RBAC: Show 'Report Discrepancy' only to Manager (or Admin) */}
+              {(isManager || isSystemAdmin) && (
+                <button
+                  className="w-full bg-cyan-600 text-white rounded-lg p-2 hover:bg-cyan-700"
+                  onClick={() => setShowDiscrepancyForm(true)}
+                >
+                  Report a Discrepancy
+                </button>
+              )}
             </div>
           </main>
         </div>
