@@ -77,7 +77,7 @@ const TransferStockForm = ({ onClose, transferItems, warehouseList, settransferI
       };
 
       const warehouseMovementResponse = await fetch(
-        "http://127.0.0.1:8000/api/warehousemovement-transfer/",
+        "https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-transfer/",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -102,7 +102,7 @@ const TransferStockForm = ({ onClose, transferItems, warehouseList, settransferI
 
       // Send all movement items in a single POST request
       const warehouseMovementItemResponse = await fetch(
-        "http://127.0.0.1:8000/api/warehousemovement-items/",
+        "https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-items/",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
