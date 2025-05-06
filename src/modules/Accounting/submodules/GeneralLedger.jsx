@@ -1,26 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "../styles/accounting-styling.css";
-import Button from "../components/Button";
-import Dropdown from "../components/Dropdown";
-import Table from "../components/Table";
-import Search from "../components/Search";
+import Dropdown from "../components/dropdown/Dropdown";
+import Table from "../components/table/Table";
+import Search from "../components/search/Search";
 import NotifModal from "../components/modalNotif/NotifModal";
 import ReportModalInput from "../components/ReportModalInput";
 import axios from "axios";
 
 const BodyContent = () => {
-  // Use state
-  const columns = [
-    "Entry Line ID",
-    "GL Account ID",
-    "Account name",
-    "Journal ID",
-    "Debit",
-    "Credit",
-    "Description",
-  ];
+  const [activeTab, setActiveTab] = useState("General Ledger");
   const [data, setData] = useState([]);
-  const [journalDateMap, setJournalDateMap] = useState({});
+  const [defaultSortedData, setDefaultSortedData] = useState([]);
+  const [sortOption, setSortOption] = useState("");
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [isLoading, setIsLoading] = useState(true);
@@ -41,225 +32,143 @@ const BodyContent = () => {
     message: "",
   });
 
-  // API endpoint
-  const API_URL =
-    import.meta.env.VITE_API_URL ||
-    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
-  const JOURNAL_ENTRIES_ENDPOINT = `${API_URL}/api/journal-entries/`;
-  const GENERAL_LEDGER_ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
-  const FINANCIAL_REPORTS_ENDPOINT = `${API_URL}/api/financial-reports/`;
+  const columns = [
+    "Entry Line ID",
+    "GL Account ID",
+    "Account name",
+    "Journal ID",
+    "Date",
+    "Debit",
+    "Credit",
+    "Description",
+  ];
 
-  // Open Modal
+  const API_URL = import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+  const ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
+
   const openModal = () => setIsModalOpen(true);
-
-  // Close Modal
   const closeModal = () => {
     setIsModalOpen(false);
     setScopedData(null);
   };
 
-  // Fetch Journal Dates for Generate Report
-  const fetchJournalDates = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get(JOURNAL_ENTRIES_ENDPOINT);
-      const dateMap = {};
-      response.data.forEach((entry) => {
-        dateMap[entry.journal_id || entry.id] =
-          entry.journal_date || entry.date;
-      });
-      setJournalDateMap(dateMap);
+      const response = await axios.get(ENDPOINT);
+
+      const formatted = response.data.map((entry) => ({
+        entryLineId: entry.entry_line_id,
+        glAccountId: entry.gl_account_id || "N/A",
+        accountName: entry.account_name || "No Account",
+        journalId: entry.journal_id || "-",
+        date: entry.journal_date || entry.date || "-",
+        debit: parseFloat(entry.debit_amount || "0.00").toFixed(2),
+        credit: parseFloat(entry.credit_amount || "0.00").toFixed(2),
+        description: entry.description || "-",
+      }));
+
+      return formatted;
     } catch (error) {
-      console.error(
-        "Error fetching journal dates:",
-        error.response ? error.response.data : error
-      );
+      console.error("Error fetching data:", error.response ? error.response.data : error);
       setValidation({
         isOpen: true,
         type: "error",
         title: "Fetch Error",
-        message:
-          "Failed to load general ledger data. Please check your connection.",
+        message: "Failed to load General Ledger data.",
       });
+      return [];
     }
   };
 
-  // Fetch General Ledger Data
-  const fetchData = async () => {
-    setIsLoading(true); // Set loading to true when fetching starts
-    try {
-      const response = await axios.get(GENERAL_LEDGER_ENDPOINT);
-      const enrichedData = response.data.map((entry) => {
-        const journalId = entry.journal_id;
-        const journalDate = journalDateMap[journalId] || null;
-
-        return {
-          row: [
-            entry.entry_line_id,
-            entry.gl_account_id || "N/A",
-            entry.account_name || "No Account",
-            journalId || "-",
-            parseFloat(entry.debit_amount || "0.00").toFixed(2),
-            parseFloat(entry.credit_amount || "0.00").toFixed(2),
-            entry.description || "-",
-          ],
-          journalDate,
-        };
-      });
-
-      setData(enrichedData);
-      setIsLoading(false); // Set loading to false when data is loaded
-    } catch (error) {
-      console.error(
-        "Error fetching GL data:",
-        error.response ? error.response.data : error
-      );
-      setValidation({
-        isOpen: true,
-        type: "error",
-        title: "Fetch Error",
-        message:
-          "Failed to load general ledger data. Please check your connection.",
-      });
-      setIsLoading(false); // Set loading to false even on error
-    }
+  const fetchAllData = async () => {
+    setIsLoading(true);
+    const generalLedger = await fetchData();
+    const sortedData = [...generalLedger].sort((a, b) => new Date(b.date) - new Date(a.date));
+    setData(sortedData);
+    setDefaultSortedData(sortedData);
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    const fetchAll = async () => {
-      await fetchJournalDates();
-    };
-    fetchAll();
+    fetchAllData();
   }, []);
 
-  useEffect(() => {
-    if (Object.keys(journalDateMap).length > 0) {
-      fetchData();
+  const filterByActiveTab = () => {
+    if (activeTab === "Accounts Payable") {
+      const relevantJournalIds = new Set(
+        data
+          .filter(
+            (entry) =>
+              entry.accountName === "Accounts Payable" || entry.accountName === "Raw Material Used"
+          )
+          .map((entry) => entry.journalId)
+      );
+      return data.filter((entry) => relevantJournalIds.has(entry.journalId));
     }
-  }, [journalDateMap]);
 
-  // Handle Input Change
-  const handleInputChange = (field, value) => {
-    setReportForm((prevState) => ({ ...prevState, [field]: value }));
+    if (activeTab === "Accounts Receivable") {
+      const relevantJournalIds = new Set(
+        data
+          .filter(
+            (entry) =>
+              entry.accountName === "Accounts Receivable" || entry.accountName === "Sales Revenue"
+          )
+          .map((entry) => entry.journalId)
+      );
+      return data.filter((entry) => relevantJournalIds.has(entry.journalId));
+    }
+
+    return data;
   };
 
-  // Handle Submit
-  const handleSubmit = async () => {
-    const { startDate, endDate } = reportForm;
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+  const getCurrentTabData = () => scopedData || filterByActiveTab();
 
-    const filteredData = data.filter((item) => {
-      const journalDate = new Date(item.journalDate);
-      return journalDate >= start && journalDate <= end;
-    });
+  const handleSort = (selected) => {
+    setSortOption(selected);
+    const currentData = getCurrentTabData();
 
-    setScopedData(filteredData);
+    if (selected === "Ascending" || selected === "Descending") {
+      const order = selected === "Ascending" ? "asc" : "desc";
+      setSortOrder(order);
 
-    const totalCost = filteredData.reduce(
-      (sum, item) => sum + (parseFloat(item.row[4]) || 0),
-      0
-    );
-
-    const reportPayload = {
-      report_id: `FR-${Date.now()}`,
-      report_type: reportForm.typeOfReport,
-      total_cost: totalCost.toFixed(2),
-      start_date: startDate,
-      end_date: endDate,
-      generated_by: reportForm.generatedBy,
-    };
-
-    try {
-      const response = await axios.post(
-        FINANCIAL_REPORTS_ENDPOINT,
-        reportPayload
-      );
-
-      if (response.status === 201) {
-        setValidation({
-          isOpen: true,
-          type: "success",
-          title: "Report Generated Successfully",
-          message: "Kindly check it under the Financial Reports tab.",
-        });
-        closeModal();
-      } else {
-        setValidation({
-          isOpen: true,
-          type: "error",
-          title: "Server Error",
-          message: "Failed to submit report.",
-        });
-      }
-    } catch (error) {
-      console.error(
-        "Error submitting report:",
-        error.response ? error.response.data : error
-      );
-      setValidation({
-        isOpen: true,
-        type: "error",
-        title: "Check Connection!",
-        message:
-          error.response?.data?.detail || "Failed to connect to the server.",
+      const sorted = [...currentData].sort((a, b) => {
+        const totalA = (parseFloat(a.debit) || 0) + (parseFloat(a.credit) || 0);
+        const totalB = (parseFloat(b.debit) || 0) + (parseFloat(b.credit) || 0);
+        return order === "asc" ? totalA - totalB : totalB - totalA;
       });
+
+      setData(sorted);
+    } else {
+      setData(defaultSortedData);
     }
   };
 
-  const filteredData = data.filter((item) => {
+  const filteredData = getCurrentTabData().filter((item) => {
     const searchContent = [
-      item.row[0], // Entry Line ID
-      item.row[1], // GL Account ID
-      item.row[2], // Account Name
-      item.row[3], // Journal ID
-      item.row[6], // Description
+      item.entryLineId,
+      item.glAccountId,
+      item.accountName,
+      item.journalId,
+      item.debit,
+      item.credit,
+      item.date,
+      item.description,
     ]
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
-
-    return searchContent.includes(searching.toLowerCase());
+    return searchContent.includes(searching.trim().toLowerCase()); // with .trim() it fixes the space error
   });
 
-  const dataToCalculate = scopedData || filteredData;
-  const totalDebit = dataToCalculate.reduce(
-    (sum, item) => sum + (parseFloat(item.row[4]) || 0),
-    0
-  );
-  const totalCredit = dataToCalculate.reduce(
-    (sum, item) => sum + (parseFloat(item.row[5]) || 0),
-    0
-  );
+  const totalDebit = filteredData.reduce((sum, item) => sum + (parseFloat(item.debit) || 0), 0);
+  const totalCredit = filteredData.reduce((sum, item) => sum + (parseFloat(item.credit) || 0), 0);
 
-  const handleSort = () => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
+  const formatNumber = (num) => num.toLocaleString("en-US", { minimumFractionDigits: 2 });
 
-    const sortedData = [...data].sort((a, b) => {
-      const debitA = parseFloat(a.row[4]) || 0;
-      const creditA = parseFloat(a.row[5]) || 0;
-      const debitB = parseFloat(b.row[4]) || 0;
-      const creditB = parseFloat(b.row[5]) || 0;
-
-      const totalA = debitA + creditA;
-      const totalB = debitB + creditB;
-
-      return newSortOrder === "asc" ? totalA - totalB : totalB - totalA;
-    });
-
-    setData(sortedData);
-  };
-
-  const formatNumber = (num) =>
-    num.toLocaleString("en-US", { minimumFractionDigits: 2 });
-  const formattedTotalDebit = formatNumber(totalDebit);
-  const formattedTotalCredit = formatNumber(totalCredit);
-
-  // Loading spinner component
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      <p className="ml-4 text-gray-600">Loading general ledger data...</p>
+      <p className="ml-4 text-gray-600">Loading data...</p>
     </div>
   );
 
@@ -267,14 +176,16 @@ const BodyContent = () => {
     <div className="generalLedger">
       <div className="body-content-container">
         <div className="title-subtitle-container">
-          <h1 className="subModule-title">General Ledger</h1>
+          <h1 className="subModule-title">{activeTab}</h1>
         </div>
+
         <div className="parent-component-container">
           <div className="component-container">
             <Dropdown
               options={["Ascending", "Descending"]}
               style="selection"
               defaultOption="Sort Debit Credit.."
+              value={sortOption}
               onChange={handleSort}
             />
             <Search
@@ -284,13 +195,25 @@ const BodyContent = () => {
               onChange={(e) => setSearching(e.target.value)}
             />
           </div>
-          <div>
-            <Button
-              name="Generate report"
-              variant="standard2"
-              onclick={openModal}
-            />
+
+          <div className="flex border-b-2 border-gray-400">
+            {["General Ledger", "Accounts Payable", "Accounts Receivable"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`relative px-4 py-2 text-sm font-medium transition-colors cursor-pointer duration-300 hover:text-teal-500 ${activeTab === tab
+                    ? "text-teal-500"
+                    : "text-gray-800 hover:text-teal-500"
+                  }`}
+              >
+                {tab}
+                {activeTab === tab && (
+                  <span className="absolute left-0 right-0 -bottom-1 h-1 bg-teal-500"></span>
+                )}
+              </button>
+            ))}
           </div>
+
         </div>
 
         {isLoading ? (
@@ -298,19 +221,24 @@ const BodyContent = () => {
         ) : (
           <>
             <Table
-              data={filteredData.map((item) => item.row)}
+              data={filteredData.map((item) => [
+                item.entryLineId,
+                item.glAccountId,
+                item.accountName,
+                item.journalId,
+                item.date,
+                item.debit,
+                item.credit,
+                item.description,
+              ])}
               columns={columns}
             />
 
-            <div
-              className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 
-                 font-light max-sm:text-[10px] max-sm:font-light max-md:text-[10px] max-md:font-light 
-                max-lg:text-[10px] max-lg:font-light max-xl:text-[10px] max-xl:font-light 2xl:text-[10px] 2xl:font-light"
-            >
+            <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 font-light text-sm">
               <div className="col-span-3"></div>
               <div className="font-bold">Total</div>
-              <div>{formattedTotalDebit}</div>
-              <div>{formattedTotalCredit}</div>
+              <div>{formatNumber(totalDebit)}</div>
+              <div>{formatNumber(totalCredit)}</div>
             </div>
           </>
         )}
@@ -320,14 +248,14 @@ const BodyContent = () => {
         isModalOpen={isModalOpen}
         closeModal={closeModal}
         reportForm={reportForm}
-        handleInputChange={handleInputChange}
-        handleSubmit={handleSubmit}
+        handleInputChange={(field, value) => setReportForm((prev) => ({ ...prev, [field]: value }))}
+        handleSubmit={() => { }}
       />
 
       {validation.isOpen && (
         <NotifModal
           isOpen={validation.isOpen}
-          onClose={() => setValidation({ ...validation, isOpen: false })}
+          onClose={() => setValidation((prev) => ({ ...prev, isOpen: false }))}
           type={validation.type}
           title={validation.title}
           message={validation.message}

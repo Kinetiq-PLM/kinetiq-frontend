@@ -291,10 +291,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
             const formattedData = data.map((item, index) => ({
                 no: index + 1,
-                prin_material_id: item.material_id,
+                prin_material_id: item.item_id,
                 prin_uom: item.unit_of_measure,
                 prin_item_name: item.item_name,
-                prin_item_id: item.item_id,
                 prin_quantity: item.item_quantity,
                 prin_itemcost: parseFloat(item.item_price),
                 prin_totalitemcost: parseFloat(item.total_item_price)
@@ -488,54 +487,67 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     ]
 
     const getFilteredData = () => {
-        return mrpData.filter((item) => {
+        const term = (searchTerm || "").toLowerCase();
+      
+        const filterItem = (item) => {
+          const number = (item.number || item.serviceOrderItemId || "").toLowerCase();
+          const date = (item.date || "").toLowerCase();
+          const details = (item.details || item.description || "").toLowerCase();
+      
+          return (
+            number.includes(term) ||
+            date.includes(term) ||
+            details.includes(term)
+          );
+        };
+      
+        const mrpFiltered = (mrpData || []).filter(item => {
           const matchesFlag =
             flag === 0 ||
             (flag === 1 && item.type === "Project") ||
-            (flag === 2 && item.type === "Non Project") ||
-            (flag === 3 && item.type === "Item Principal");
-      
-          const term = (searchTerm || "").toLowerCase(); 
-          const number = (item.number || "").toLowerCase();
-          const date = (item.date || "").toLowerCase();
-          const details = (item.details || "").toLowerCase();
-      
-          const searchMatch =
-            number.includes(term) ||
-            date.includes(term) ||
-            details.includes(term);
-      
-          return matchesFlag && searchMatch;
+            (flag === 2 && item.type === "Non Project");
+          return matchesFlag && filterItem(item);
         });
-    };
+      
+        const principalFiltered = (principalOrder || []).filter(item => {
+          const matchesFlag = flag === 0 || flag === 3;
+          return matchesFlag && filterItem(item);
+        }).map(item => ({
+          number: item.serviceOrderItemId,
+          type: item.type || "Principal Item",
+          details: item.description || "—",
+          date: item.date || ""
+        }));
+      
+        return [...mrpFiltered, ...principalFiltered];
+        };
+      
 
     const filteredData = getFilteredData();
 
-    const mergedRows2 = (
-        flag === 0
-          ? [...(filteredData || []), ...(principalOrder || [])]
-          : flag === 3
-          ? principalOrder
-          : filteredData 
-      ).map((item) => {
-        const number = item.number || item.serviceOrderItemId;
-        const type = item.type;
-        const details = item.details || item.description;
-        const date = item.date;
-      
-        const pnpMatch = pnpOrder.find(p => p.pnp_orderID === number);
-        const prinMatch = prinOrder.find(p => p.sr_orderID === number);
-      
-        const status = pnpMatch?.pnp_status || prinMatch?.sr_status || "";
-      
-        return {
-          number,
-          type,
-          details,
-          date,
-          status
-        };
-      }).filter(item => (item.status || "").toLowerCase() !== "complete");
+    const mergedRows2 = getFilteredData()
+    .map(item => {
+    const number = item.number || "";
+    const type = item.type || "Unknown";
+    const details = item.details || "—";
+    const date = item.date || "";
+
+    const pnpMatch = (pnpOrder || []).find(p => p.pnp_orderID === number);
+    const prinMatch = (prinOrder || []).find(p => p.sr_orderID === number);
+
+    const status = (pnpMatch?.pnp_status || prinMatch?.sr_status || "").toLowerCase().trim();
+
+    return {
+      number,
+      type,
+      details,
+      date,
+      status,
+    };
+  })
+  .filter(item => item.status !== "complete");
+
+
     
     const buttonStyle = (bg, border, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer', });
     const buttonStyle2 = (bg, textColor = '#585757') => ({display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 20px', borderRadius: 8, background: bg, border: '0.5px solid #585757', color: textColor, fontSize: 16, fontWeight: '500', fontFamily: 'Inter', gap: 6, cursor: 'pointer',});
@@ -641,19 +653,18 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     ))}
                     </div>
 
-                    <div
-                    style={{display: 'flex', justifyContent: 'space-between', marginTop: 'auto', flexWrap: 'wrap', gap: 10,}}>
-                    <button onClick={() => setIsOpen(false)} style={buttonStyle2('#fff', '#A4A4A4')}>
-                        <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
-                        <span style={{ color: '#969696' }}>Back</span>
-                    </button>
+                    <div style={{display: 'flex', justifyContent: 'space-between', marginTop: 'auto', flexWrap: 'wrap', gap: 10,}}>
+                        <button onClick={() => setIsOpen(false)} style={buttonStyle2('#fff', '#A4A4A4')}>
+                            <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
+                            <span style={{ color: '#969696' }}>Back</span>
+                        </button>
 
-                    <button
-                        onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false); fetchPrincipalDetails(item.serviceorderID); setSelectedRowData(item);}}
-                        style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
-                        <span>Next</span>
-                        <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
-                    </button>
+                        <button
+                            onClick={() => {if (isProjectType === "Project") {setIsOpen2(true);} else if (isProjectType === "Non Project") {setIsOpen3(true);} else {setIsOpen4(true);} setIsOpen(false); fetchPrincipalDetails(item.serviceorderID); setSelectedRowData(item);}}
+                            style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                            <span>Next</span>
+                            <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
+                        </button>
                     </div>
                 </div>
                 </div>
@@ -1037,7 +1048,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             <div className="bom-print-modal">
                 <div className="fixed inset-0 flex items-center justify-center px-4">
                 <div style={{width: '100%', maxWidth: 525, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', borderRadius: 10, padding: 24, display: 'flex', flexDirection: 'column', gap: 24, position: 'relative'}}>
-                    <img style={{width: 171, height: 171, margin: '0 auto'}} src="public/icons/module-icons/MRP-icons/MRPCheck.png" />
+                    <img style={{width: 171, height: 171, margin: '0 auto'}} src="/icons/module-icons/MRP-icons/MRPCheck.png" />
                     <div style={{textAlign: 'center', fontSize: 28, fontFamily: 'Inter', fontWeight: 400, color: '#130101', letterSpacing: 1.2, textTransform: 'capitalize'}}>Bills of Material Created</div>
                     <div style={{textAlign: 'center', fontSize: 14, fontFamily: 'Inter', fontWeight: 400, color: '#130101', textTransform: 'capitalize', letterSpacing: 0.56}}>The BOM is sent to the sales for approval, <br />go to pending for more information</div>
                     <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
@@ -1047,7 +1058,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </div>
                     </div>
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
-                    <button onClick={() => setCreated(false)} style={buttonStyle2('#fff')}>
+                    <button onClick={() => {setCreated(false), setIsOpen4(false), setIsOpen3(false), setIsOpen2(false), setIsOpen(false), setChecker(false), setCreated(false), setAdditionalCost(false), setAdditionalCost2(false), setRawMaterial(false)}} style={buttonStyle2('#fff')}>
                         <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
                         <span style={{color: '#969696'}}>Close</span>
                     </button>

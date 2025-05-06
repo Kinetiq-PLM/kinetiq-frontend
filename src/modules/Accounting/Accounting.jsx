@@ -17,7 +17,7 @@ import {
   Line,
   CartesianGrid,
 } from "recharts";
-import Button from "./components/Button";
+import Button from "./components/button/Button";
 
 // Professional color palette
 const COLORS = [
@@ -85,18 +85,16 @@ const AccountingDashboard = () => {
 
         // Accounts Payable Summary
         if (
-          accountName === "Accounts Payable" ||
-          accountName === "Cash in Bank"
+          accountName === "Accounts Payable" || accountName === "Raw Material Used"
         ) {
-          accountsPayableTotal += credit - debit; // Net Payable
+          accountsPayableTotal += debit; // Net Payable
         }
 
         // Accounts Receivable Summary
         if (
-          accountName === "Accounts Receivable" ||
-          accountName === "Sales Revenue"
+          accountName === "Accounts Receivable" || accountName === "Sales Revenue"
         ) {
-          accountsReceivableTotal += debit - credit; // Net Receivable
+          accountsReceivableTotal += credit; // Net Receivable
         }
       });
 
@@ -135,24 +133,20 @@ const AccountingDashboard = () => {
         typeCounts[acc.account_type] = (typeCounts[acc.account_type] || 0) + 1;
       });
 
-      const formattedPie = Object.entries(typeCounts).map(([label, value]) => ({
-        name: label,
-        value,
-      }));
+      const formattedPie = [
+        {
+          name: "Accounts Payable",
+          value: parseFloat(accountsPayableTotal.toFixed(2)),
+        },
+        {
+          name: "Accounts Receivable",
+          value: parseFloat(accountsReceivableTotal.toFixed(2)),
+        },
+      ];
 
       setPieData(formattedPie);
 
-      // Mock trend data (replace with API call if endpoint exists)
-      const mockTrendData = [
-        { month: "Jan", revenue: 19000, expenses: 15000 },
-        { month: "Feb", revenue: 21000, expenses: 16500 },
-        { month: "Mar", revenue: 20000, expenses: 17000 },
-        { month: "Apr", revenue: 22000, expenses: 16000 },
-        { month: "May", revenue: 24000, expenses: 17500 },
-        { month: "Jun", revenue: 26000, expenses: 18000 },
-      ];
 
-      setTrendData(mockTrendData);
     } catch (error) {
       console.error(
         "Error fetching data:",
@@ -204,8 +198,8 @@ const AccountingDashboard = () => {
         {/* Main Content */}
         <div className="container mx-auto px-4 py-8">
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-            
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
             <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-500 text-sm font-medium">
@@ -302,35 +296,10 @@ const AccountingDashboard = () => {
                 {formatCurrency(summary.receivable)}
               </p>
             </div>
-
-            <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-500 text-sm font-medium">
-                  Net Balance
-                </h3>
-                <span className="p-2 bg-purple-100 text-purple-800 rounded-full">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </span>
-              </div>
-              <p className="text-xl font-bold text-gray-900">
-                {formatCurrency(summary.balance)}
-              </p>
-            </div>
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 max-sm:hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mb-8 max-sm:hidden">
             {/* Bar Chart */}
             <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
               <h2 className="text-xl font-semibold text-gray-800 mb-6">
@@ -372,9 +341,10 @@ const AccountingDashboard = () => {
             {/* Pie Chart */}
             <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
               <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                Chart of Accounts Distribution
+                Accounts Payable and Receivable
               </h2>
-              <ResponsiveContainer width="100%" height={350}>
+
+              <ResponsiveContainer width="100%" height={420}>
                 <PieChart>
                   <Pie
                     data={pieData}
@@ -382,18 +352,13 @@ const AccountingDashboard = () => {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={120}
+                    outerRadius={130}
                     innerRadius={60}
-                    fill="#8884d8"
-                    paddingAngle={2}
+                    paddingAngle={3}
+                    labelLine={true}
                     label={({ name, percent }) =>
-                      `${name} (${(percent * 100).toFixed(0)}%)`
+                      `${name}: ${(percent * 100).toFixed(1)}%`
                     }
-                    labelLine={{
-                      stroke: "#666",
-                      strokeWidth: 1,
-                      strokeDasharray: "2 2",
-                    }}
                   >
                     {pieData.map((entry, index) => (
                       <Cell
@@ -403,65 +368,41 @@ const AccountingDashboard = () => {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value, name) => [`${value} accounts`, name]}
+                    formatter={(value, name) => [
+                      `₱${parseFloat(value).toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                      })}`,
+                      name,
+                    ]}
                     contentStyle={{
                       backgroundColor: "#ffffff",
                       borderRadius: "8px",
                       border: "1px solid #e2e8f0",
+                      fontSize: "13px",
+                      padding: "10px 14px",
+                    }}
+                    itemStyle={{ fontSize: "13px", color: "#333" }}
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={48}
+                    iconType="circle"
+                    wrapperStyle={{
+                      display: "flex",
+                      justifyContent: "center",
+                      fontSize: "13px",
+                      color: "#4b5563",
                     }}
                   />
                 </PieChart>
               </ResponsiveContainer>
+
+              <p className="text-center text-sm text-gray-600 mt-4">
+                This chart shows the relative balances of Accounts Payable and Receivable based on the General Ledger.
+              </p>
+
             </div>
-          </div>
 
-          {/* Trend Chart */}
-          <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300 mb-8 max-sm:hidden">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Revenue vs Expenses Trend
-            </h2>
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart
-                data={trendData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip
-                  formatter={(value) => formatCurrency(value)}
-                  contentStyle={{
-                    backgroundColor: "#ffffff",
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                  }}
-                />
-                <Legend wrapperStyle={{ paddingTop: 20 }} iconType="circle" />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke={COLORS[2]}
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                  activeDot={{ r: 8 }}
-                  name="Revenue"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="expenses"
-                  stroke={COLORS[3]}
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                  activeDot={{ r: 8 }}
-                  name="Expenses"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Footnote */}
-          <div className="text-center text-gray-500 text-sm mt-8">
-            <p>Last updated: April 20, 2025 • To be revised soon.</p>
           </div>
         </div>
       </div>

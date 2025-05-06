@@ -82,8 +82,8 @@ const handleSelectSTM = (statementItem) => {
   setFormData((prev) => ({
     ...prev,
     statementId: statementItem.statement_item_id || "",
-    productId: statementItem.product?.product_id || "",
-    productName: statementItem.product?.product_name || "",
+    productId: statementItem.inventory_item?.item?.item_id || "",
+    productName: statementItem.inventory_item?.item?.item_name || "",
     productQuantity: statementItem.quantity || "",
     customerId: statementItem.statement?.customer?.customer_id || "",
     phoneNumber: statementItem?.statement?.customer?.phone_number || "",

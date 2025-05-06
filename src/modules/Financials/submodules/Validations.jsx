@@ -361,7 +361,7 @@ const BodyContent = () => {
 
   const fetchReturns = async () => {
     try {
-      const data = await GET("/validation/budget-returns/");
+      const data = await GET("validation/budget-returns/");
       const mappedData = data.map(sub => ({
         validationId: sub.validation_id,
         returnsId: sub?.budget_return?.budget_return_id || "",
@@ -384,7 +384,7 @@ const BodyContent = () => {
 
   const fetchRequests = async () => {
     try {
-      const data = await GET("/validation/budget-requests/");
+      const data = await GET("validation/budget-requests/");
       const mappedData = data.map(sub => ({
         validationId: sub.validation_id,
         reqID: sub?.budget_request?.budget_request_id || "",
@@ -405,7 +405,7 @@ const BodyContent = () => {
 
   const fetch = async () => {
     try {
-      const data = await GET("/validation/budget-submissions/");
+      const data = await GET("validation/budget-submissions/");
       const mappedData = data.map(sub => ({
         validationId: sub.validation_id,
         requestId: sub?.budget_submission?.budget_submission_id || "",
@@ -542,7 +542,7 @@ const BodyContent = () => {
           <div className="content-container">
             <InfoCard className="summary-infocard">
               <div className="summary-container">
-                <div className="summary-date-range">August 2025 - August 2026</div>
+                <div className="summary-date-range">January 2025 - January 2026</div>
                 <div className="summary-details">
                   <div className="summary-total-budget">
                     Total Budget
@@ -584,14 +584,14 @@ const BodyContent = () => {
             </InfoCard>
             <InfoCard className="filter-infocard">
               <div className="filter-controls">
-                <input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                <input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}style={{ border: '1px solid gray' }} />
                 <div className="filter-group">
-                  <select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+                  <select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}style={{ border: '1px solid gray' }}>
                     <option value="Last 30 days">Last 30 days</option>
                     <option value="Last 7 days">Last 7 days</option>
                     <option value="All Time">All Time</option>
                   </select>
-                  <select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
+                  <select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}style={{ border: '1px solid gray' }}>
                     <option value="All">Filter By</option>
                     <option value="lowest amount">Lowest Amount</option>
                     <option value="highest amount">Highest Amount</option>
@@ -666,7 +666,7 @@ const BodyContent = () => {
           <div className="content-container">
             <InfoCard className="summary-infocard">
               <div className="summary-container">
-                <div className="summary-date-range">August 2025-August 2026</div>
+                <div className="summary-date-range">January 2025-January 2026</div>
                 <div className="summary-details">
                   <div className="summary-total-budget">
                     Total Approved Amount
@@ -709,14 +709,14 @@ const BodyContent = () => {
             </InfoCard>
             <InfoCard className="filter-infocard">
               <div className="filter-controls">
-                <input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                <input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ border: '1px solid gray' }}/>
                 <div className="filter-group">
-                  <select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+                  <select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}style={{ border: '1px solid gray' }}>
                     <option value="Last 30 days">Last 30 days</option>
                     <option value="Last 7 days">Last 7 days</option>
                     <option value="All Time">All Time</option>
                   </select>
-                  <select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
+                  <select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}style={{ border: '1px solid gray' }}>
                     <option value="All">Filter By</option>
                     <option value="lowest amount">Lowest Amount</option>
                     <option value="highest amount">Highest Amount</option>
@@ -791,7 +791,7 @@ const BodyContent = () => {
           <div className="content-container">
             <InfoCard className="summary-infocard">
               <div className="summary-container">
-                <div className="summary-date-range">August 2025 - August 2026</div>
+                <div className="summary-date-range">January 2025 - January 2026</div>
                 <div className="summary-details">
                   <div className="summary-total-budget">
                     Total Returned Amount
@@ -816,14 +816,14 @@ const BodyContent = () => {
             </InfoCard>
             <InfoCard className="filter-infocard">
               <div className="filter-controls">
-                <input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                <input className="search" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}style={{ border: '1px solid gray' }} />
                 <div className="filter-group">
-                  <select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+                  <select className="select-day" value={dateRange} onChange={(e) => setDateRange(e.target.value)}style={{ border: '1px solid gray' }}>
                     <option value="Last 30 days">Last 30 days</option>
                     <option value="Last 7 days">Last 7 days</option>
                     <option value="All Time">All Time</option>
                   </select>
-                  <select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
+                  <select className="select-type" value={filterBy} onChange={(e) => setFilterBy(e.target.value)}style={{ border: '1px solid gray' }}>
                     <option value="All">Filter By</option>
                     <option value="lowest amount">Lowest Amount</option>
                     <option value="highest amount">Highest Amount</option>
@@ -1064,4 +1064,3 @@ const BodyContent = () => {
 };
 
 export default BodyContent;
-

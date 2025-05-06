@@ -24,7 +24,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
 
     const fetchWarehouses = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/warehouses/");
+            const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
 
             if (!response.ok) {
                 throw new Error(`Error fetching warehouses: ${response.status}`);
@@ -36,7 +36,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
             let warehouseList = Array.isArray(data) ? data : [];
 
             if (warehouseList.length > 0) {
-      
+
                 const formattedWarehouses = warehouseList.map(warehouse => {
                     if (typeof warehouse === 'object' && warehouse !== null) {
                         return {
@@ -101,7 +101,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
             const itemsList = Object.values(inventoryItems);
             setInventoryItemsList(itemsList);
         } else {
-            fetch("http://127.0.0.1:8000/api/inventory-items/")
+            fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
                 .then((res) => {
                     if (!res.ok) {
                         throw new Error(`Error fetching inventory items: ${res.status}`);
@@ -226,7 +226,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
         };
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/cyclic_counts/", {
+            const response = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newRecord),
@@ -320,7 +320,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                             </div>
                         )}
 
-                        
+
                         {/* Employee ID  */}
                         <label>
                             Employee ID <span className="text-red-500">*</span>
@@ -334,7 +334,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                         />
 
                     </div>
-                        
+
                     {/* Forms Box 2 - Grid */}
                     <div className="grid grid-cols-2 gap-5">
                         <span>
@@ -348,9 +348,9 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                                 value={quantity}
                                 onChange={(e) => setQuantity(e.target.value)}
                                 required
-                            />   
+                            />
                         </span>
-                        
+
 
                         {/* Time Period */}
                         <span>
@@ -367,7 +367,8 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                                 <option value="weekly">Weekly</option>
                                 <option value="monthly">Monthly</option>
                                 <option value="quarterly">Quarterly</option>
-                            </select>                            
+                                <option value="yearly">Yearly</option>
+                            </select>
                         </span>
 
 
@@ -378,50 +379,50 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
 
                     <div className="grid grid-cols-2 space-x-5">
 
-                    <span className="justify-start">
+                        <span className="justify-start">
 
-                        <label>
-                            Status <span className="text-red-500">*</span>
-                        </label>
-                        <select value={status} onChange={(e) => setStatus(e.target.value)} required  className="text-gray-400">
-                            <option value="">Select Status</option>
-                            <option value="Completed">Completed</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Open">Open</option>
-                            <option value="Closed">Closed</option>
-                        </select>
+                            <label>
+                                Status <span className="text-red-500">*</span>
+                            </label>
+                            <select value={status} onChange={(e) => setStatus(e.target.value)} required className="text-gray-400">
+                                <option value="">Select Status</option>
+                                <option value="Completed">Completed</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Open">Open</option>
+                                <option value="Closed">Closed</option>
+                            </select>
 
-                    </span>
+                        </span>
 
 
 
-                    <span className="justify-start">
+                        <span className="justify-start">
 
-                        <label>
-                            Warehouse Location <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            value={warehouseId}
-                            onChange={(e) => setWarehouseId(e.target.value)}
-                            required
-                             className="text-gray-400"
-                        >
-                            <option value="">Select Warehouse</option>
-                            {localWarehouses.map((warehouse) => (
-                                <option
-                                    key={warehouse.id}
-                                    value={warehouse.id}
-                                >
-                                    {warehouse.name}
-                                </option>
-                            ))}
-                        </select>      
+                            <label>
+                                Warehouse Location <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={warehouseId}
+                                onChange={(e) => setWarehouseId(e.target.value)}
+                                required
+                                className="text-gray-400"
+                            >
+                                <option value="">Select Warehouse</option>
+                                {localWarehouses.map((warehouse) => (
+                                    <option
+                                        key={warehouse.id}
+                                        value={warehouse.id}
+                                    >
+                                        {warehouse.name}
+                                    </option>
+                                ))}
+                            </select>
 
-                    </span>
-         
+                        </span>
+
 
                     </div>
-                    
+
                     <div>
                         <label>Remarks</label>
                         <textarea
@@ -430,7 +431,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
                             onChange={(e) => setRemarks(e.target.value)}
                             rows="1"
                         />
-                      
+
                     </div>
 
 

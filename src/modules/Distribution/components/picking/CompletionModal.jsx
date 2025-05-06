@@ -111,7 +111,7 @@ const CompletionModal = ({ pickingList, employees, warehouses, onConfirm, onCanc
                     <span className="detail-label">Items Count</span>
                     <div className="detail-value-with-icon">
                       <FaBoxes className="detail-icon" />
-                      <span className="count-badge">{pickingList.items_count || 0}</span>
+                      <span className="count-badge">{pickingList.items_details?.length || 0}</span>
                     </div>
                   </div>
                   <div className="detail-item">

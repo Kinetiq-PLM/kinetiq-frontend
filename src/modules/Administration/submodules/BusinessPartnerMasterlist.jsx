@@ -196,15 +196,15 @@ const BusinessPartnerMasterlist = () => {
   };
 
   // Vendor edit handlers
-  const handleEditVendor = (record) => {
-    setSelectedRecord(record);
-    vendorForm.setFieldsValue({
-      vendor_name: record.vendor_name,
-      contact_person: record.contact_person,
-      status: record.status
-    });
-    setVendorEditModalVisible(true);
-  };
+    const handleEditVendor = (record) => {
+      setSelectedRecord(record);
+      vendorForm.setFieldsValue({
+        vendor_name: record.vendor_name,
+        contact_person: record.contact_person,
+        status: record.status
+      });
+      setVendorEditModalVisible(true);
+    };
 
   const handleVendorFormSubmit = async (values) => {
     try {
@@ -260,111 +260,12 @@ const BusinessPartnerMasterlist = () => {
       ),
     },
     {
-      title: "Employee ID",
-      dataIndex: "employee_id",
-      key: "employee_id",
-      sorter: true,
-      width: 110,
-      render: (text) => text || "-",
-    },
-    {
-      title: "Vendor Code",
-      dataIndex: "vendor_code",
-      key: "vendor_code",
-      sorter: true,
-      width: 150,
-      render: (text) => text || "-",
-    },
-    {
-      title: "Customer ID",
-      dataIndex: "customer_id",
-      key: "customer_id",
-      sorter: true,
-      width: 150,
-      render: (text) => text || "-",
-    },
-    {
       title: "Contact Info",
       dataIndex: "contact_info",
       key: "contact_info",
       sorter: true,
       width: 120,
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      width: 60,
-      align: "center",
-      render: (_, record) => (
-        <Space size="small">
-          <Button 
-            type="primary" 
-            icon={<EditOutlined />} 
-            size="small"
-            onClick={() => handleEditPartner(record)}
-          />
-        </Space>
-      ),
-    },
-  ];
-
-  const vendorColumns = [
-    {
-      title: "Vendor Code",
-      dataIndex: "vendor_code",
-      key: "vendor_code",
-      sorter: true,
-      width: 180,
-    },
-    {
-      title: "Vendor Name",
-      dataIndex: "vendor_name",
-      key: "vendor_name",
-      sorter: true,
-      width: 180,
-    },
-    {
-      title: "Contact Person",
-      dataIndex: "contact_person",
-      key: "contact_person",
-      sorter: true,
-      width: 150,
-    },
-    {
-      title: "Application Reference",
-      dataIndex: "application_reference",
-      key: "application_reference",
-      sorter: true,
-      width: 200,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      sorter: true,
-      width: 100,
-      render: (status) => (
-        <Tag color={status === "Active" ? "green" : "red"}>
-          {status}
-        </Tag>
-      ),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      width: 60,
-      align: "center",
-      render: (_, record) => (
-        <Space size="small">
-          <Button 
-            type="primary" 
-            icon={<EditOutlined />} 
-            size="small"
-            onClick={() => handleEditVendor(record)}
-          />
-        </Space>
-      ),
-    },
+    }
   ];
 
   // Calculate table data for pagination
@@ -373,13 +274,6 @@ const BusinessPartnerMasterlist = () => {
     const start = (current - 1) * pageSize;
     const end = start + pageSize;
     return partners.slice(start, end);
-  };
-
-  const getVendorTableData = () => {
-    const { current, pageSize } = vendorPagination;
-    const start = (current - 1) * pageSize;
-    const end = start + pageSize;
-    return vendors.slice(start, end);
   };
 
   // Render main component
@@ -442,42 +336,6 @@ const BusinessPartnerMasterlist = () => {
                   dataSource={getPartnerTableData()} 
                   columns={partnerColumns} 
                   rowKey="partner_id"
-                  loading={loading}
-                  scroll={{ x: true, y: 400 }}
-                  pagination={false}
-                  bordered
-                  size="middle"
-                  showSorterTooltip={false}
-                  sortDirections={['ascend', 'descend']}
-                  onChange={handleTableChange}
-                  className="scrollable-table"
-                />
-              </div>
-            </TabPane>
-
-            <TabPane 
-              tab={<span><ShopOutlined /> {windowWidth > 576 ? "Vendors" : ""}</span>} 
-              key="vendors"
-            >
-              {/* Vendors tab content */}
-              <div className="table-meta-info">
-                <span className="record-count">Total Vendors: {vendors.length}</span>
-                <div className="table-pagination">
-                  <Pagination 
-                    current={vendorPagination.current}
-                    pageSize={vendorPagination.pageSize}
-                    total={vendors.length}
-                    onChange={handleVendorPaginationChange}
-                    showSizeChanger={false}
-                    size="small"
-                  />
-                </div>
-              </div>
-              <div className="table-container">
-                <Table 
-                  dataSource={getVendorTableData()} 
-                  columns={vendorColumns} 
-                  rowKey="vendor_code"
                   loading={loading}
                   scroll={{ x: true, y: 400 }}
                   pagination={false}

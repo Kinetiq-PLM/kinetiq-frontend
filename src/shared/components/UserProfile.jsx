@@ -25,6 +25,16 @@ const BodyContent = ({ employee_id }) => {
   const [isPassChanged, setIsPassChanged] = useState(false);
 
   const arePassFieldsValid = async () => {
+    setNewPassErr("");
+    setConPassErr("");
+    setCurrPassErr("");
+    const pass_valid = await checkPassword();
+    console.log(pass_valid);
+    if (!pass_valid) {
+      setCurrPassErr("* Incorrect password. *");
+      return false;
+    }
+
     if (!newPassword || !conPassword || !currPassword) {
       if (!currPassword) {
         setCurrPassErr("* This field cannot be empty. *");
@@ -49,12 +59,6 @@ const BodyContent = ({ employee_id }) => {
     }
     if (newPassword !== conPassword) {
       setConPassErr("* Passwords do not match. *");
-      return false;
-    }
-    const pass_valid = await checkPassword();
-    console.log(pass_valid);
-    if (!pass_valid) {
-      setCurrPassErr("* Incorrect password. *");
       return false;
     }
 
@@ -341,9 +345,15 @@ const BodyContent = ({ employee_id }) => {
               <strong>&gt;&nbsp;Module Permissions:</strong>
             </p>
             <p>
-              {Array.isArray(permissions)
+              {
+              /*Array.isArray(permissions)
                 ? permissions.join(", ")
-                : permissions}
+                : permissions*/
+                permissions.split(',').map((perm, i, arr) => {
+                  const [main, sub] = perm.split('/')
+                  return sub?sub:main + (i<arr.length-1?',':'')
+                })
+              }
             </p>
           </div>
         </div>
@@ -361,7 +371,7 @@ const BodyContent = ({ employee_id }) => {
             <div className="content">{popupContent}</div>
             <div className="actions">
               {popupContent ===
-              "Are you sure you want to change your password?" ? (
+                "Are you sure you want to change your password?" ? (
                 <>
                   <button
                     className="confirm-btn"

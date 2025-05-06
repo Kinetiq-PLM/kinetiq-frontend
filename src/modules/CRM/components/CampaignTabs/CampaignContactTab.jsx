@@ -38,7 +38,7 @@ export default function CampaignContactTab() {
 
   const contactsMutation = useMutation({
     mutationFn: async (data) => await GET(`crm/campaigns/${data.campaign}`),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       const contacts = data.contacts.map((contact) => ({
         customer_id: contact.customer.customer_id,
         name: contact.customer.name,
@@ -47,7 +47,7 @@ export default function CampaignContactTab() {
         contact_person: contact.customer.contact_person,
       }));
       setContactList(contacts);
-      queryClient.refetchQueries(["campaigns"]);
+      await queryClient.refetchQueries(["campaigns"]);
     },
   });
 
@@ -139,6 +139,7 @@ export default function CampaignContactTab() {
           isOpen={isMessageOpen}
           onClose={() => setIsMessageOpen(false)}
           campaign={selectedCampaign}
+          contacts={contactList}
         ></MessageModal>
 
         <CustomerListModal

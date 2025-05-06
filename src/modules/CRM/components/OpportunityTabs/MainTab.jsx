@@ -14,6 +14,7 @@ import OpportunityModal from "../OpportunityModal.jsx";
 import ConfirmDelete from "./../ConfirmDelete";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { InputCustomer } from "./../OpportunityInfo";
+
 export default function MainTab({ employee_id }) {
   const { showAlert } = useAlert();
 
@@ -222,7 +223,7 @@ export default function MainTab({ employee_id }) {
                     onClick={() => setIsNewOpportunityModalOpen(true)}
                     disabled={!selectedCustomer}
                   >
-                    New Opportunity
+                    New
                   </Button>
 
                   <Button
@@ -230,7 +231,7 @@ export default function MainTab({ employee_id }) {
                     onClick={() => setIsOpportunityModalOpen(true)}
                     disabled={!selectedOpportunity}
                   >
-                    Modify Opportunity
+                    Modify
                   </Button>
 
                   <Button
@@ -238,7 +239,7 @@ export default function MainTab({ employee_id }) {
                     onClick={() => setIsDeleteModalOpen(true)}
                     disabled={!selectedOpportunity}
                   >
-                    Delete Opportunity
+                    Delete
                   </Button>
                 </div>
               </div>

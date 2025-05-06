@@ -7,7 +7,6 @@
 
 .approvals .body-content-container {
   width: 100%;
-  height: 100vh;
   border-radius: 0.5rem;
   background-color: white;
   padding: 1rem;
@@ -30,6 +29,7 @@
   z-index: 50;
   align-self: start;
   margin-left: 15px;
+  margin-top: 50px;
 }
 
 .approvals .tabs button {
@@ -92,7 +92,7 @@
 .approvals .summary-infocard {
   margin-bottom: 20px;
   border-radius: 20px;
-  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid #b9b9b9;
 }
 
 .approvals .summary-container {
@@ -238,7 +238,7 @@
   display: flex;
   flex-direction: column;
   border-radius: 20px;
-  box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid #b9b9b9;
   width: 100%;
   max-width: 85vw;
   margin: 20px auto 40px auto;
@@ -260,7 +260,7 @@
 }
 
 .approvals .validation-table th {
-  background-color: #9ab2b1;
+  background-color: #00A8A8;
   padding: 17px;
   color: white;
 }
@@ -268,14 +268,12 @@
 .approvals .validation-table tbody tr:nth-child(even) {
   background-color: #fbfcfc;
 }
-
-.approvals .validation-table tbody tr:nth-child(odd) {
-  background-color: #d7e0e0;
+.valid .validation-table tbody tr:nth-child(odd) {
+  background-color: #C9E7E5;
 }
 
-
 .approvals .validation-table tbody tr:nth-child(odd) {
-  background-color: #d7e0e0;
+  background-color: #C9E7E5;
 }
 
 .approvals .validation-table th:nth-child(1),
@@ -665,11 +663,13 @@ font-size: 12.5px;
   box-shadow: 1px 4px 8px rgba(0, 0, 0, 0.2);
   margin: 20px auto;
   width: 100%;
-  padding: 0px 20px;
+  padding-top: 10px;
   padding-bottom: 50px;
   position: relative;
   font-size: clamp(11px, 2vw, 12.5px);
 }
+
+
 .approvals .validation-table-2-reject th {
   background-color: transparent;
 }
@@ -733,10 +733,18 @@ font-size: 12.5px;
 
 
 .approvals .validation-table-2 thead th {
-  color: black;
-  background-color: white;
+  color: white;
+  background-color: #00A8A8;
 }
 
+.approvals .validation-table-2 thead th:first-child {
+  border-top-left-radius: 10px;
+  text-indent: 20px;
+}
+
+.approvals .validation-table-2 thead th:last-child {
+  border-top-right-radius: 10px;
+}
 .approvals .validation-table-2 tbody tr {
   border-bottom: 1px solid #ddd; /* Only bottom border */
 }
@@ -992,3 +1000,101 @@ font-size: 12.5px;
   border: none !important;
 }
 
+@media (max-width: 480px) {
+  .approvals .body-content-container {
+    padding: 6px;
+    border-radius: 10px;
+    min-width: 0;
+    height: auto;
+  }
+
+  .approvals .tabs {
+    flex-direction: column;
+    margin-left: 0;
+    margin-top: 20px;
+    padding: 4px;
+    border-radius: 4px;
+  }
+
+  .approvals .tab-navigation {
+    gap: 4px;
+  }
+
+  .approvals .content-container {
+    padding: 8px;
+  }
+
+  .approvals .summary-infocard,
+  .approvals .infocard-validation-table,
+  .approvals .filter-infocard,
+  .approvals .table-infocard,
+  .approvals .reject-table {
+    max-width: 98vw;
+    margin: 8px auto;
+    padding: 8px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .approvals .summary-details {
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 0;
+  }
+
+  .approvals .summary-total-spent,
+  .approvals .summary-total-budget,
+  .approvals .summary-total-remaining {
+    margin-top: 10px;
+    padding: 1px 10px;
+    font-size: 11px;
+  }
+
+  .approvals .summary-approved,
+  .approvals .summary-pending,
+  .approvals .summary-rejected {
+    padding: 1px 10px;
+    margin-top: 10px;
+    font-size: 11px;
+  }
+
+  .approvals .edit-modal {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .approvals .edit-modal-details {
+    margin-left: 0;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .approvals .edit-modal input,
+  .approvals .edit-modal-details input {
+    padding: 6px;
+    border-radius: 4px;
+  }
+
+  .approvals .edit-modal-buttons {
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .approvals .popup-content {
+    width: 95vw;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+
+  .approvals .popup-title {
+    font-size: 18px;
+  }
+
+  .approvals .popup-message {
+    font-size: 12px;
+  }
+}

@@ -1,20 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
+import DeliveryReceiptPDF from './DeliveryReceiptPDF';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
-const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
+const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [deliveryReceipt, setDeliveryReceipt] = useState(null);
   const [error, setError] = useState(null);
   const [customerName, setCustomerName] = useState('');
+  const [customerData, setCustomerData] = useState(null);
   
   // Form state
   const [signature, setSignature] = useState('');
   const [rejectReason, setRejectReason] = useState('');
   const [isRejecting, setIsRejecting] = useState(false);
   
+  // PDF generation state
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+  
   // Signature state
   const [signatureMode, setSignatureMode] = useState('type'); // 'type' or 'draw'
   const sigCanvas = useRef({}); // Reference for the signature canvas
+  
+  // PDF reference
+  const pdfRef = useRef(null);
 
   // Fetch delivery receipt on component mount
   useEffect(() => {
@@ -57,7 +67,7 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
     fetchDeliveryReceipt();
   }, [shipment.delivery_receipt_id]);
 
-  // New function to fetch customer name
+  // Function to fetch customer name
   const fetchCustomerName = async (customerId) => {
     try {
       const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/customers/${customerId}/`);
@@ -73,6 +83,7 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
       }
       
       const customerData = await response.json();
+      setCustomerData(customerData);
       if (customerData && customerData.name) {
         setCustomerName(customerData.name);
       }
@@ -194,6 +205,59 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
     });
   };
   
+  // Handle PDF generation and download
+  const handleGeneratePDF = async () => {
+    if (!pdfRef.current) return;
+    
+    setIsPdfGenerating(true);
+    
+    try {
+      const pdfElement = pdfRef.current;
+      
+      // Generate PDF using html2canvas and jsPDF
+      const canvas = await html2canvas(pdfElement, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      // Calculate the dimensions to fit the PDF page
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      
+      // Calculate the total height needed
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // If the image is taller than the page, split it across multiple pages
+      let heightLeft = imgHeight;
+      let position = 0;
+      let pageOffset = 0;
+      
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      
+      // Add more pages if needed
+      while (heightLeft > 0) {
+        position = -pageHeight * ++pageOffset;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      pdf.save(`Delivery_Receipt_${deliveryReceipt?.delivery_receipt_id || 'Unknown'}.pdf`);
+      
+      setIsPdfGenerating(false);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      setIsPdfGenerating(false);
+    }
+  };
+  
   // Determine if receipt can be updated
   const canBeUpdated = deliveryReceipt && 
                        deliveryReceipt.receipt_status !== 'Received' && 
@@ -267,6 +331,22 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
                     </div>
                   )}
                 </div>
+                
+                {/* Add PDF download button */}
+                <div className="pdf-buttons" style={{ marginTop: '15px', textAlign: 'right' }}>
+                  <button 
+                    type="button"
+                    className="save-button"
+                    onClick={handleGeneratePDF}
+                    disabled={isPdfGenerating}
+                    style={{ 
+                      backgroundColor: '#00a8a8',
+                      cursor: isPdfGenerating ? 'wait' : 'pointer'
+                    }}
+                  >
+                    {isPdfGenerating ? 'Generating PDF...' : 'Download Receipt PDF'}
+                  </button>
+                </div>
               </div>
               
               {canBeUpdated ? (
@@ -309,78 +389,78 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
                 ) : (
                   // Delivery Signature Form
                   <form onSubmit={handleSubmit}>
-                  <div className="delivery-receipt-section">
-                    <h4>Delivery Confirmation</h4>
-                    
-                    <div className="signature-mode-toggle">
-                      <button 
-                        type="button"
-                        className={`mode-button ${signatureMode === 'type' ? 'active' : ''}`}
-                        onClick={() => setSignatureMode('type')}
-                      >
-                        Type Signature
-                      </button>
-                      <button
-                        type="button"
-                        className={`mode-button ${signatureMode === 'draw' ? 'active' : ''}`}
-                        onClick={() => setSignatureMode('draw')}
-                      >
-                        Draw Signature
-                      </button>
+                    <div className="delivery-receipt-section">
+                      <h4>Delivery Confirmation</h4>
+                      
+                      <div className="signature-mode-toggle">
+                        <button 
+                          type="button"
+                          className={`mode-button ${signatureMode === 'type' ? 'active' : ''}`}
+                          onClick={() => setSignatureMode('type')}
+                        >
+                          Type Signature
+                        </button>
+                        <button
+                          type="button"
+                          className={`mode-button ${signatureMode === 'draw' ? 'active' : ''}`}
+                          onClick={() => setSignatureMode('draw')}
+                        >
+                          Draw Signature
+                        </button>
+                      </div>
+                      
+                      <div className="form-row">
+                        <label className="form-label">Receiver Signature:</label>
+                        {signatureMode === 'type' ? (
+                          <div className="signature-box">
+                            <input
+                              className="signature-input"
+                              value={signature}
+                              onChange={(e) => setSignature(e.target.value)}
+                              placeholder="Type signature or confirmation code here"
+                              // required
+                            />
+                          </div>
+                        ) : (
+                          <div className="signature-canvas-container">
+                            <SignatureCanvas
+                              ref={sigCanvas}
+                              penColor="black"
+                              canvasProps={{
+                                width: 500,
+                                height: 200,
+                                className: 'signature-canvas'
+                              }}
+                            />
+                            <button 
+                              type="button" 
+                              className="clear-signature-button"
+                              onClick={clearSignature}
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="receipt-status-buttons">
+                        <button
+                          type="submit"
+                          className="receipt-status-button receive"
+                          disabled={!isSignatureValid()}
+                        >
+                          Confirm Receipt
+                        </button>
+                        <button
+                          type="button"
+                          className="receipt-status-button reject"
+                          onClick={() => setIsRejecting(true)}
+                        >
+                          Reject Delivery
+                        </button>
+                      </div>
                     </div>
-                    
-                    <div className="form-row">
-                      <label className="form-label">Receiver Signature:</label>
-                      {signatureMode === 'type' ? (
-                        <div className="signature-box">
-                          <input
-                            className="signature-input"
-                            value={signature}
-                            onChange={(e) => setSignature(e.target.value)}
-                            placeholder="Type signature or confirmation code here"
-                            // required
-                          />
-                        </div>
-                      ) : (
-                        <div className="signature-canvas-container">
-                          <SignatureCanvas
-                            ref={sigCanvas}
-                            penColor="black"
-                            canvasProps={{
-                              width: 500,
-                              height: 200,
-                              className: 'signature-canvas'
-                            }}
-                          />
-                          <button 
-                            type="button" 
-                            className="clear-signature-button"
-                            onClick={clearSignature}
-                          >
-                            Clear
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="receipt-status-buttons">
-                      <button
-                        type="submit"
-                        className="receipt-status-button receive"
-                        disabled={!isSignatureValid()}
-                      >
-                        Confirm Receipt
-                      </button>
-                      <button
-                        type="button"
-                        className="receipt-status-button reject"
-                        onClick={() => setIsRejecting(true)}
-                      >
-                        Reject Delivery
-                      </button>
-                    </div>
-                  </div>
-                </form>
+                  </form>
                 )
               ) : (
                 <div className={deliveryReceipt.receipt_status === 'Received' ? 'delivered-message' : 'failed-message'}>
@@ -404,6 +484,17 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel }) => {
             Close
           </button>
         </div>
+      </div>
+      
+      {/* Hidden PDF component for generation */}
+      <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+        <DeliveryReceiptPDF 
+          ref={pdfRef}
+          receipt={deliveryReceipt}
+          shipment={shipment}
+          customer={customerData}
+          employees={employees} // Add this prop
+        />
       </div>
     </div>
   );

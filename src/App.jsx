@@ -35,6 +35,33 @@ function App() {
   // landing page
   const [showLanding, setShowLanding] = useState(true);
 
+  // log out at time out
+  useEffect(() => {
+    let logoutTimeout;
+  
+    const resetTimeout = () => {
+      if (logoutTimeout) clearTimeout(logoutTimeout);
+      logoutTimeout = setTimeout(() => {
+        console.log("No activity detected for 10 minutes. Logging out.");
+        handleLogout();
+      }, 30 * 60 * 1000); // 30 minutes
+    };
+  
+    const activityEvents = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+    activityEvents.forEach(event =>
+      window.addEventListener(event, resetTimeout)
+    );
+  
+    resetTimeout();
+  
+    return () => {
+      clearTimeout(logoutTimeout);
+      activityEvents.forEach(event =>
+        window.removeEventListener(event, resetTimeout)
+      );
+    };
+  }, []);
+
   useEffect(() => {
     if (activeModule || activeSubModule || showUserProfile) {
       setShowLanding(false);
@@ -266,7 +293,7 @@ function App() {
 
   const mainModules = import.meta.glob('./modules/*/*.jsx');
   const subModules = import.meta.glob('./modules/*/submodules/*.jsx');
-  
+
   const loadMainModule = (moduleId) => {
     const moduleFile = `./modules/${moduleFileNames[moduleId]}/${moduleFileNames[moduleId]}.jsx`;
 
@@ -292,10 +319,10 @@ function App() {
 
   const loadSubModule = (submoduleId, mainModule = activeModule) => {
     const submoduleFile = `./modules/${moduleFileNames[mainModule]}/submodules/${moduleSubmoduleFileNames[mainModule][submoduleId]}.jsx`;
-  
+
     if (subModules[submoduleFile]) {
       const LazyComponent = lazy(subModules[submoduleFile]);
-  
+
       const WrappedComponent = () => (
         <LazyComponent
           loadSubModule={loadSubModule}
@@ -304,7 +331,7 @@ function App() {
           employee_id={user?.employee_id}
         />
       );
-  
+
       setModuleComponent(() => WrappedComponent);
       setShowUserProfile(false);
     } else {
@@ -333,16 +360,14 @@ function App() {
     "Purchase Request": "PurchaseRequest",
     "Project Request": "ProjectRequest",
     "Workforce Request": "WorkforceRequest",
-    "Job Posting": "JobPosting"
+    "Job Posting": "JobPosting",
+    "Employee Request": "EmployeeRequest"
   };
 
   const moduleSubmoduleFileNames = {
     Management: {
       "Dashboard": "ManagementDashboard",
-      "Project Approval": "ManagementApprovals",
-      "User Roles": "UserRoles",
-      "Access Control": "AccessControl",
-      Settings: "Settings",
+      "Project Approval": "ManagementApprovals"
     },
     Administration: {
       "User": "User",
@@ -360,15 +385,18 @@ function App() {
       "Journal Entry": "JournalEntry",
       "General Ledger": "GeneralLedger",
       "General Ledger Accounts": "GeneralLedgerAccounts",
-      "Accounts Receivable": "AccountsReceivable",
-      "Accounts Payable": "AccountsPayable",
+      // "Accounts Payable": "AccountsPayable",
+      // "Accounts Receivable": "AccountsReceivable",
       "Official Receipts": "OfficialReceipts",
+      "Payroll Accounting": "PayrollAccounting",
+      "Tax and Remittance": "TaxAndRemittance",
+      "Accounts Payable Receipts": "AccountsPayableReceipts",
     },
     "Financials": {
       "Reports": "Reports",
-      "Validations" : "Validations",
-      "Approvals" : "Approvals",
-      "Forms" : "Forms"
+      "Validations": "Validations",
+      "Approvals": "Approvals",
+      "Forms": "Forms"
     },
     "Purchasing": {
       "Purchase Request List": "PurchaseReqList",
@@ -389,25 +417,20 @@ function App() {
       Quotation: "Quotation",
       Order: "Order",
       Delivery: "Delivery",
-      // Invoice: "Invoice",
-      // "Blanket Agreement": "BlanketAgreement",
-      "Master List": "MasterList",
-      Reporting: "Reporting",
-      // Return: "Return",
+      Transactions: "Transactions",
     },
     CRM: {
-      Ticket: "Ticket",
-      Campaign: "Campaign",
-      "Partner Master Data": "PartnerMasterData",
+      Leads: "Leads",
       Opportunity: "Opportunity",
-      Support: "Support",
+      Campaign: "Campaign",
+      Contacts: "Contacts",
+      Cases: "Cases",
     },
     "Support & Services": {
       "Service Ticket": "ServiceTicket",
       "Service Call": "ServiceCall",
-      "Service Request": "ServiceRequest",
       "Warranty Renewal": "WarrantyRenewal",
-      "Service Analysis": "ServiceAnalysis",
+      "Service Request": "ServiceRequest",
       "Service Billing": "ServiceBilling",
       "Service Report": "ServiceReport",
       "Service Contract": "ServiceContract",
@@ -433,6 +456,7 @@ function App() {
     "MRP": {
       "Material Requirements Planning": "MaterialRequirementsPlanning",
       "Bills Of Material": "BillsOfMaterial",
+      "Product Materials": "ProductMaterials",
     },
     "Project Management": {
       "Project List": "Project List",
@@ -440,7 +464,8 @@ function App() {
       "Project Request": "Projectrequest",
       "Tasks": "TaskMonitoring",
       "Report Monitoring": "Reports",
-      "Warranty Monitoring":"Warranties",
+      "Warranty Monitoring": "Warranties",
+      "Project Cost":"ProjectCost",
     },
     "Human Resources": {
       "Employees": "Employees",
@@ -455,13 +480,43 @@ function App() {
     },
     "Report Generator": {
     },
+    "Employee Request": {
+      "Resignation Request": "ResignationRequest",
+      "Overtime Request": "OvertimeRequest",
+      "Leave Request": "LeaveRequest"
+    },
   };
 
 
 
   const rawPermissions = user?.role?.permissions || "";
   const allowedModules = rawPermissions.split(",").map((m) => m.trim()); // ["Admin", "Operations", ...]
+  console.log('raw permissions...')
+  console.log(rawPermissions)
+  console.log("allowed modules...")
+  console.log(allowedModules)
 
+  const filteredModuleFileNames = {};
+
+  allowedModules.forEach((permission) => {
+    const [main, sub] = permission.split('/')
+
+    if (!filteredModuleFileNames[main]) {
+      filteredModuleFileNames[main] = {};
+    }
+
+    if (!sub) {
+      filteredModuleFileNames[main] = {
+      ...moduleSubmoduleFileNames[main]
+      }
+    } else {
+      filteredModuleFileNames[main][sub] = moduleSubmoduleFileNames[main][sub]
+    }
+  });
+
+  console.log('filtered modules...')
+  console.log(filteredModuleFileNames)
+/*
   const filteredModuleFileNames = allowedModules.includes("All")
     ? moduleFileNames
     : Object.fromEntries(
@@ -469,11 +524,15 @@ function App() {
         allowedModules.includes(key)
       )
     );
+*/
 
   const modulesIcons = Object.keys(filteredModuleFileNames).map((module) => ({
     id: module,
-    icon: `/icons/module-icons/${filteredModuleFileNames[module]}.png`,
+    icon: `/icons/module-icons/${moduleFileNames[module]}.png`,
   }));
+
+  console.log('module icons...')
+  console.log(modulesIcons)
 
   return (
     <div className="shell">

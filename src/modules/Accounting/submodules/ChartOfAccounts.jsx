@@ -1,11 +1,11 @@
 import "../styles/accounting-styling.css";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Search from "../components/Search";
-import Button from "../components/Button";
-import Dropdown from "../components/Dropdown";
-import Table from "../components/Table";
-import CoaModalInput from "../components/CoaModalInput";
+import Search from "../components/search/Search";
+import Button from "../components/button/Button";
+import Dropdown from "../components/dropdown/Dropdown";
+import Table from "../components/table/Table";
+import CoaModalInput from "../components/chartOfAccountsModal/CoaModalInput";
 import NotifModal from "../components/modalNotif/NotifModal";
 
 const BodyContent = () => {
@@ -132,7 +132,7 @@ const BodyContent = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searching.toLowerCase());
+      .includes(searching.trim().toLowerCase());
     const matchesType = selectedAccountType ? type === selectedAccountType : true;
     return matchesSearch && matchesType;
   });

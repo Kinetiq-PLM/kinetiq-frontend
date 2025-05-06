@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { BarChart, Bar,XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Pie, PieChart, Cell, LabelList} from "recharts";
 import "../styles/Reports.css";
+import { GET } from "../api/api.jsx";
 
 const data = [
     { name: "Asset", current: 500000, previous: 450000 },
@@ -31,6 +32,7 @@ const CashFlowCard = ({ data }) => {
     net: item.inflow - item.outflow,
   }));
 
+
   const renderLegend = (props) => {
     const { payload } = props;
     return (
@@ -45,7 +47,7 @@ const CashFlowCard = ({ data }) => {
     );
   };
 
-  const [chartHeight, setChartHeight] = useState(400);
+  const [chartHeight, setChartHeight] = useState(600);
   const [chartMargin, setChartMargin] = useState({ top: 50, right: 50, left: 50, bottom: 45 });
 
   useEffect(() => {
@@ -54,7 +56,7 @@ const CashFlowCard = ({ data }) => {
         setChartHeight(300);
         setChartMargin({ top: 30, right: 20, left: 20, bottom: 10}); 
       } else {
-        setChartHeight(400);
+        setChartHeight(600);
         setChartMargin({ top: 50, right: 50, left: 50, bottom: 45 }); 
       }
     };
@@ -86,7 +88,7 @@ const CashFlowCard = ({ data }) => {
                 return [value, name];
               }}
               wrapperStyle={{
-                backgroundColor: '#88B4B4', 
+                backgroundColor: '#00A8A8', 
                 borderRadius: '10px', 
                 padding: '5px', 
               }}
@@ -95,24 +97,24 @@ const CashFlowCard = ({ data }) => {
                 color: '#6C7676',
             }}
             />
-            <Legend verticalAlign="top" align="center" wrapperStyle={{ top: 15, left: 0, padding: '20px' }} content={renderLegend} />
-            <Bar dataKey="outflow" stackId="a" fill="#787878" name="Outflow" radius={[2, 2, 0, 0]} />
-            <Bar dataKey="inflow" stackId="a" fill="#00BBBB" name="Inflow" radius={[2, 2, 0, 0]} />
-            <Bar dataKey="net" stackId="a" fill="#DAE4E4" name="Net" radius={[4, 4, 0, 0]} />
+            <Legend verticalAlign="top" align="center" wrapperStyle={{ top: 15, left: 65, padding: '20px' }} content={renderLegend} />
+            <Bar dataKey="outflow" stackId="a" fill="#ACC3C3" name="Outflow" radius={[2, 2, 0, 0]} />
+            <Bar dataKey="inflow" stackId="a" fill="#00A8A8" name="Inflow" radius={[2, 2, 0, 0]} />
+            <Bar dataKey="net" stackId="a" fill="#C9E7E5" name="Net" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
       <div className="summary-numbers" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ position: 'absolute', top: '-15px', left: '10px', width: 'calc(100% - 20px)', height: '2px', backgroundColor: '#00BBBB' }}></div>
+        <div style={{ position: 'absolute', top: '-15px', left: '10px', width: 'calc(100% - 20px)', height: '2px', backgroundColor: '#00A8A8' }}></div>
         <div className="summary-item" style={{ position: 'relative' }}>
           <div className="summary-label">INFLOW</div>
           <div className="summary-value">₱{inflowTotal.toLocaleString()}</div>
-          <div style={{ position: 'absolute', right: '-10px', top: '50%', transform: 'translateY(-50%)', width: '1px', height: '50px', backgroundColor: '#00BBBB' }}></div>
+          <div style={{ position: 'absolute', right: '-10px', top: '50%', transform: 'translateY(-50%)', width: '1px', height: '50px', backgroundColor: '#00A8A8' }}></div>
         </div>
         <div className="summary-item" style={{ position: 'relative' }}>
           <div className="summary-label">OUTFLOW</div>
           <div className="summary-value">-₱{outflowTotal.toLocaleString()}</div>
-          <div style={{ position: 'absolute', right: '-10px', top: '50%', transform: 'translateY(-50%)', width: '1px', height: '50px', backgroundColor: '#00BBBB' }}></div>
+          <div style={{ position: 'absolute', right: '-10px', top: '50%', transform: 'translateY(-50%)', width: '1px', height: '50px', backgroundColor: '#00A8A8' }}></div>
         </div>
         <div className="summary-item">
           <div className="summary-label">NET</div>
@@ -125,60 +127,86 @@ const CashFlowCard = ({ data }) => {
   
   
 const InvoiceCollections = () => {
-    const collectedAmount = 180000.50; 
-    const openInvoicesAmount = 120300.45; 
-    const overdueAmount = 70550.00; 
-    const avatarLetter = 'A';
+    const [collectedAmount, setCollectedAmount] = useState(0);
+    const [openInvoicesAmount, setOpenInvoicesAmount] = useState(0);
+    const [overdueAmount, setOverdueAmount] = useState(0);
 
-    const totalAmount = collectedAmount + openInvoicesAmount + overdueAmount;
+    useEffect(() => {
+        const fetchInvoiceCollections = async () => {
+            try {
+                const data = await GET("/reports/receivable-aging/");
+                const today = new Date();
 
-    const collectedWidth = (collectedAmount / totalAmount) * 100 + '%';
-    const openInvoicesWidth = (openInvoicesAmount / totalAmount) * 100 + '%';
-    const overdueWidth = (overdueAmount / totalAmount) * 100 + '%';
+                let collected = 0;
+                let open = 0;
+                let overdue = 0;
 
+                data.forEach(entry => {
+                    // Collected: sum of settled_amount
+                    collected += parseFloat(entry.settled_amount) || 0;
+
+                    // Open: sum of remaining_amount where remaining_amount > 0
+                    if ((parseFloat(entry.remaining_amount) || 0) > 0) {
+                        open += parseFloat(entry.remaining_amount) || 0;
+
+                        // Overdue: if or_date is before today and remaining_amount > 0
+                        const dueDate = new Date(entry.or_date);
+                        if (dueDate < today) {
+                            overdue += parseFloat(entry.remaining_amount) || 0;
+                        }
+                    }
+                });
+
+                setCollectedAmount(collected);
+                setOpenInvoicesAmount(open);
+                setOverdueAmount(overdue);
+            } catch (error) {
+                console.error("Error fetching invoice collections:", error);
+            }
+        };
+        fetchInvoiceCollections();
+    }, []);
+
+    const totalAmount = Math.abs(collectedAmount) + Math.abs(openInvoicesAmount) + Math.abs(overdueAmount);
+
+    const collectedWidth = totalAmount ? (Math.abs(collectedAmount) / totalAmount) * 100 + '%' : '0%';
+    const openInvoicesWidth = totalAmount ? (Math.abs(openInvoicesAmount) / totalAmount) * 100 + '%' : '0%';
+    const overdueWidth = totalAmount ? (Math.abs(overdueAmount) / totalAmount) * 100 + '%' : '0%';
+    
     const renderInvoiceCollections = () => {
         return (
             <InfoCard className="invoice-collections-card">
-                <h2 className="invoice-collections-title">Invoice & Collections</h2>
-                <div className="invoice-collections-bar">
-                    <div
-                        className="bar-section collected"
-                        style={{ width: collectedWidth }}
-                    >
-                        <span className="amount">₱{collectedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                    </div>
-                    <div
-                        className="bar-section open-invoices"
-                        style={{ width: openInvoicesWidth }}
-                    >
-                        <span className="amount">₱{openInvoicesAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                    </div>
-                    <div
-                        className="bar-section overdue"
-                        style={{ width: overdueWidth }}
-                    >
-                        <span className="amount">₱{overdueAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                    </div>
+            <h2 className="invoice-collections-title">Invoice & Collections</h2>
+            <div className="invoice-collections-bar">
+                <div className="bar-section collected" style={{ width: collectedWidth }}>
+                    <span className="amount">₱{collectedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
-                <div className="label-group">
-                    <span className="label" style={{ width: collectedWidth }}>COLLECTED</span>
-                    <span className="label" style={{ width: openInvoicesWidth }}>OPEN INVOICES</span>
-                    <span className="label" style={{ width: overdueWidth }}>OVERDUE</span>
+                <div className="bar-section open-invoices" style={{ width: openInvoicesWidth }}>
+                    <span className="amount">₱{openInvoicesAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
-            </InfoCard>
-        );
-    };
+                <div className="bar-section overdue" style={{ width: overdueWidth }}>
+                    <span className="amount">₱{overdueAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+            </div>
+            <div className="label-group">
+                <span className="label" style={{ width: collectedWidth }}>COLLECTED</span>
+                <span className="label" style={{ width: openInvoicesWidth }}>OPEN INVOICES</span>
+                <span className="label" style={{ width: overdueWidth }}>OVERDUE</span>
+            </div>
+        </InfoCard>
+    );
+};
 
     return renderInvoiceCollections();
 };
 
     const categories = [
-        { name: 'Payroll', amount: 120080, color: '#00BBBB' },
-        { name: 'Marketing', amount: 60040, color: '#68A0F2' },
-        { name: 'Rent or Lease', amount: 40530, color: '#E6D064' },
-        { name: 'Miscellaneous', amount: 20416, color: '#E96062' },
-        { name: 'Other Expenses', amount: 90060, color: '#D3D3D3' },
+        { name: 'Cost of Goods Sold (COGS)', amount: 11111, color: '#00A8A8' },
+        { name: 'Operating Expenses', amount: 60040, color: '#469FC2' },
+        { name: 'Other Expenses', amount: 40530, color: '#dad891' },
+        { name: 'Contra-Revenue', amount: 20416, color: '#da9191' },
     ];
+    
 
     const calculatePercentages = (categories) => {
         if (!categories || categories.length === 0) {
@@ -194,6 +222,70 @@ const InvoiceCollections = () => {
 
     const pieData = calculatePercentages(categories);
 
+    
+
+    const incomeStatementCategories = {
+        "Revenue": [
+          "Sales Revenue", "Service Revenue"
+        ],
+        "Cost of Goods Sold": [
+          "Raw Materials Used", "Direct Labor", "Factory Overhead",
+          "Work-in-Process Adjustments", "Cost of Finished Goods Sold"
+        ],
+        "Operating Expenses": [
+          "Salaries & Wages", "Office Supplies & Equipment", "Rent & Utilities",
+          "Depreciation", "Software & IT Expenses", "Legal & Professional Fees",
+          "Bonus Expense", "Marketing & Advertising", "Sales Commissions",
+          "Shipping & Freight Costs", "Packaging Costs"
+        ],
+        "Other Income": [
+          "Interest Income", "Gain on Sale of Assets", "Investment Income"
+        ],
+        "Other Expense": [
+          "Interest Expense", "Exchange Rate Losses", "Penalties & Fines"
+        ],
+        "Contra-Revenue": [
+          "Discounts Allowed", "Rework Cost", "Sales Return"
+        ]
+      };
+      
+      function groupIncomeStatement(entries, categoriesMap) {
+        const result = {};
+        Object.keys(categoriesMap).forEach(cat => {
+          result[cat] = {};
+          categoriesMap[cat].forEach(sub => {
+            result[cat][sub] = 0;
+          });
+        });
+      
+        entries.forEach(entry => {
+          Object.entries(categoriesMap).forEach(([cat, subs]) => {
+            subs.forEach(sub => {
+              if (
+                entry.account_name &&
+                entry.account_name.toLowerCase().includes(sub.toLowerCase())
+              ) {
+                let value = 0;
+                if (["Revenue", "Other Income"].includes(cat)) {
+                  value = parseFloat(entry.credit_amount) - parseFloat(entry.debit_amount);
+                } else {
+                  value = parseFloat(entry.debit_amount) - parseFloat(entry.credit_amount);
+                }
+                result[cat][sub] += value;
+              }
+            });
+          });
+        });
+      
+        return Object.entries(result).map(([category, itemsObj]) => ({
+          category,
+          items: Object.entries(itemsObj).map(([name, value]) => ({
+            name,
+            value
+          }))
+        }));
+      }
+      
 
 const incomeStatementData = [
         {
@@ -286,11 +378,31 @@ const incomeStatementData = [
         },
       ];
 
+      const getAgingBucket = (days) => {
+        if (days <= 30) return '0 - 30';
+        if (days <= 60) return '31 - 60';
+        if (days <= 90) return '61 - 90';
+        return '91+';
+      };
+    
+        
+
 
       
 const BodyContent = () => {
     const [activeTab, setActiveTab] = useState(tabs[0]);
     const [isCompact, setIsCompact] = useState(window.innerWidth < 768);
+
+    const [incomeStatementDataSummary, setIncomeStatementDataSummary] = useState([]);    
+    const [cashFlowData, setCashFlowData] = useState([]);
+    const [periodBalance, setPeriodBalance] = useState([]);
+    const [expenseOverviewData, setExpenseOverviewData] = useState([]);
+    const [pieChartData, setPieChartData] = useState([
+        { name: "Previous", value: 0, color: "#F4E1AE" },
+        { name: "Current", value: 0, color: "#00A8A8" },
+      ]);
+      const [pieChartPercentages, setPieChartPercentages] = useState({ previous: 0, current: 0 });
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -308,21 +420,240 @@ const BodyContent = () => {
             setActiveTab(tabs[currentIndex - 1]);
         }
     };
+
+    useEffect(() => {
+        const fetchCashFlow = async () => {
+          try {
+            const data = await GET("/reports/monthly-cashflow/");
+            const months = [
+              "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            ];
+            // Normalize API data months for matching (UPPERCASE is safest)
+            const normalizedData = data.map(item => ({
+              ...item,
+              month: item.month.trim().toUpperCase()
+            }));
+            const mapped = months.map(month => {
+              const found = normalizedData.find(item => item.month === month.toUpperCase());
+              return found
+                ? {
+                    month, // always use "Jan", "Feb", etc. for chart
+                    inflow: found.inflow,
+                    outflow: found.outflow,
+                    net: found.net,
+                  }
+                : { month, inflow: 0, outflow: 0, net: 0 };
+            });
+            setCashFlowData(mapped);
+            console.log("API data:", data);
+            console.log("Mapped cash flow data:", mapped);
+          } catch (error) {
+            console.error("Error fetching cash flow data:", error);
+          }
+        };
+        fetchCashFlow();
+      }, []);
+
+      useEffect(() => {
+        const fetchExpenseOverview = async () => {
+            try {
+                const data = await GET("/reports/general-ledger/");
+                const typeSummary = Array.isArray(data.type_summary) ? data.type_summary : [];
     
-    const cashFlowData = [
-        { month: 'Jan', inflow: 519976.21, outflow: 10000 },
-        { month: 'Feb', inflow: 450000, outflow: 50000 },
-        { month: 'Mar', inflow: 600000, outflow: 200000 },
-        { month: 'Apr', inflow: 550000, outflow: 350000 },
-        { month: 'May', inflow: 480000, outflow: 410000 },
-        { month: 'Jun', inflow: 520000, outflow: 230000 },
-        { month: 'Jul', inflow: 490000, outflow: 120000 },
-        { month: 'Aug', inflow: 530000, outflow: 40000 },
-        { month: 'Sep', inflow: 500000, outflow: 25000 },
-        { month: 'Oct', inflow: 540000, outflow: 10000 },
-        { month: 'Nov', inflow: 510000, outflow: 50000 },
-        { month: 'Dec', inflow: 550000, outflow: 10000 },
-      ];
+                // Define which account types to include and their display names/colors
+                const expenseTypes = [
+                    { key: "Cost of Goods Sold", name: "Cost of Goods Sold (COGS)", color: "#00A8A8" },
+                    { key: "Operating Expense", name: "Operating Expenses", color: "#469FC2" },
+                    { key: "Other Expense", name: "Other Expenses", color: "#dad891" },
+                    { key: "Contra-Revenue", name: "Contra-Revenue", color: "#da9191" }
+                ];
+    
+                // Map and sum the amounts
+                const categories = expenseTypes.map(type => {
+                    const found = typeSummary.find(item => item.account_type === type.key);
+                    // For expenses, use total_debit; for Contra-Revenue, also use total_debit
+                    const amount = found ? (parseFloat(found.total_debit) || 0) : 0;
+                    return {
+                        name: type.name,
+                        amount,
+                        color: type.color
+                    };
+                });
+    
+                // Calculate percentages and formatted amounts
+                const totalAmount = categories.reduce((sum, cat) => sum + cat.amount, 0);
+                const expenseOverviewData = categories.map(cat => ({
+                    ...cat,
+                    percentage: totalAmount ? (cat.amount / totalAmount) * 100 : 0,
+                    formattedAmount: `₱${cat.amount.toLocaleString()}`
+                }));
+    
+                setExpenseOverviewData(expenseOverviewData);
+                console.log("Expense Overview Data:", expenseOverviewData);
+                console.log("Type Summary:", typeSummary);
+            } catch (error) {
+                console.error("Error fetching expense overview:", error);
+            }
+        };
+        fetchExpenseOverview();
+    }, []);
+
+    useEffect(() => {
+        const fetchReceivableAging = async () => {
+            try {
+                const data = await GET("/reports/receivable-aging/");
+                const today = new Date();
+                const buckets = {
+                    '0 - 30': 0,
+                    '31 - 60': 0,
+                    '61 - 90': 0,
+                    '91+': 0,
+                };
+    
+                data.forEach(entry => {
+                    // Use amount_due and skip if invalid or in the future
+                    if (!entry.amount_due || entry.amount_due <= 0) return;
+                
+                    const dueDate = new Date(entry.or_date);
+                    if (dueDate > today) return; // <-- this line prevents future dates
+                
+                    const diffTime = today - dueDate;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                    let bucket = '';
+                    if (diffDays <= 30) bucket = '0 - 30';
+                    else if (diffDays <= 60) bucket = '31 - 60';
+                    else if (diffDays <= 90) bucket = '61 - 90';
+                    else bucket = '91+';
+                
+                    buckets[bucket] += entry.amount_due;
+                });
+                setReceivableAgingData([
+                    { name: '0 - 30', amount: buckets['0 - 30'] },
+                    { name: '31 - 60', amount: buckets['31 - 60'] },
+                    { name: '61 - 90', amount: buckets['61 - 90'] },
+                    { name: '91+', amount: buckets['91+'] },
+                ]);
+
+                console.log("Receivable Aging Data:", data);
+                //view the data per each bucket
+                console.log("Receivable Aging Buckets:", buckets);
+            } catch (error) {
+                console.error("Error fetching receivable aging:", error);
+            }
+        };
+        fetchReceivableAging();
+    }, []);
+
+     useEffect(() => {
+        const fetchPeriodBalance = async () => {
+            try {
+                const data = await GET("/reports/general-ledger/");
+                const period = data.period_balance?.[0] || {};
+                const mapped = [
+                    { name: "Asset", current: period.asset?.current_year || 0, previous: period.asset?.previous_year || 0 },
+                    { name: "Liability", current: period.liability?.current_year || 0, previous: period.liability?.previous_year || 0 },
+                    { name: "Equity", current: period.equity?.current_year || 0, previous: period.equity?.previous_year || 0 },
+                    { name: "Revenue", current: period.revenue?.current_year || 0, previous: period.revenue?.previous_year || 0 },
+                    { name: "Expense", current: period.expense?.current_year || 0, previous: period.expense?.previous_year || 0 }
+                ];
+                
+                setPeriodBalance(mapped);
+                console.log("Period Balance Data:", mapped);
+            } catch (error) {
+                console.error("Error fetching period balance:", error);
+            }
+        };
+        fetchPeriodBalance();
+    }, []);
+
+    useEffect(() => {
+        const fetchPieChartData = async () => {
+          try {
+            const data = await GET("/reports/period-balance/");
+            const period = data.general_ledger?.[0] || {};
+            const totalCurrent =
+              (period.asset?.current_year || 0) +
+              (period.liability?.current_year || 0) +
+              (period.equity?.current_year || 0) +
+              (period.revenue?.current_year || 0) +
+              (period.expense?.current_year || 0);
+            const totalPrevious =
+              (period.asset?.previous_year || 0) +
+              (period.liability?.previous_year || 0) +
+              (period.equity?.previous_year || 0) +
+              (period.revenue?.previous_year || 0) +
+              (period.expense?.previous_year || 0);
+      
+            setPieChartData([
+              { name: "Previous", value: totalPrevious, color: "#F4E1AE" },
+              { name: "Current", value: totalCurrent, color: "#00A8A8" },
+            ]);
+            const total = Math.abs(totalCurrent) + Math.abs(totalPrevious);
+            setPieChartPercentages({
+              previous: total ? (Math.abs(totalPrevious) / total) * 100 : 0,
+              current: total ? (Math.abs(totalCurrent) / total) * 100 : 0,
+            });
+            console.log("Pie chart data:", { totalCurrent, totalPrevious });
+          } catch (error) {
+            console.error("Error fetching pie chart period balance:", error);
+          }
+        };
+        fetchPieChartData();
+      }, []);
+
+      const [periodSummary, setPeriodSummary] = useState({
+        totalCurrent: 0,
+        totalPrevious: 0,
+        rows: []
+      });
+    
+    useEffect(() => {
+      const fetchPeriodSummary = async () => {
+        try {
+          const data = await GET("/reports/period-balance/");
+          const period = data.general_ledger?.[0] || {};
+          const rows = [
+            {
+              label: "Asset",
+              current: period.asset?.current_year || 0,
+              previous: period.asset?.previous_year || 0,
+            },
+            {
+              label: "Liability",
+              current: period.liability?.current_year || 0,
+              previous: period.liability?.previous_year || 0,
+            },
+            {
+              label: "Equity",
+              current: period.equity?.current_year || 0,
+              previous: period.equity?.previous_year || 0,
+            },
+            {
+              label: "Revenue",
+              current: period.revenue?.current_year || 0,
+              previous: period.revenue?.previous_year || 0,
+            },
+            {
+              label: "Expense",
+              current: period.expense?.current_year || 0,
+              previous: period.expense?.previous_year || 0,
+            },
+          ];
+          const totalCurrent = rows.reduce((sum, r) => sum + (r.current || 0), 0);
+          const totalPrevious = rows.reduce((sum, r) => sum + (r.previous || 0), 0);
+          setPeriodSummary({ totalCurrent, totalPrevious, rows });
+          console.log("Period Summary Data:", { totalCurrent, totalPrevious, rows });
+          console.log("Total Current:", totalCurrent, "Total Previous:", totalPrevious);
+        } catch (error) {
+          console.error("Error fetching period summary:", error);
+        }
+      };
+      fetchPeriodSummary();
+    }, []);
+
+    /*
     const trialBalanceData = [
         { AccountNo: 1, AccountName: "Marketing", Type: "Expense", CurrentPeriodBalance: 500000.00, PreviousPeriodBalance: 400000.00 },
         { AccountNo: 2, AccountName: "Operations", Type: "Expense", CurrentPeriodBalance: 400000.00, PreviousPeriodBalance: 200000.00 },
@@ -336,20 +667,91 @@ const BodyContent = () => {
         { AccountNo: 10, AccountName: "Project Management", Type: "Expense", CurrentPeriodBalance: 400000.00, PreviousPeriodBalance: 250000.00 },
         { AccountNo: 11, AccountName: "Human Resources", Type: "Expense", CurrentPeriodBalance: 400000.00, PreviousPeriodBalance: 250000.00 },
     ];
-    
-    const receivableAgingData = [
-        { name: 'Current', amount: 30345.50 },
-        { name: '0 - 30', amount: 20231.00 },
-        { name: '31 - 60', amount: 10857.30 },
-        { name: '61 - 90', amount: 8050.00 },
-    ];
+    */
+    const [trialBalanceData, setTrialBalanceData] = useState([]);
 
-    const payableAgingData = [
-  { name: 'Current', amount: 6050.00 },
-  { name: '0 - 30', amount: 20231.00 },
-  { name: '31 - 60', amount: 8050.43 },
-  { name: '61 - 90', amount: 5000.00 },
-];
+    useEffect(() => {
+        const fetchTrialBalanceData = async () => {
+          try {
+            const data = await GET("/reports/general-ledger/");
+            const ledger = Array.isArray(data.general_ledger) ? data.general_ledger : [];
+      
+            const accountMap = new Map();
+      
+            ledger.forEach((entry) => {
+              const key = `${entry.account_name}|${entry.account_type}`;
+              if (!accountMap.has(key)) {
+                accountMap.set(key, {
+                  AccountNo: accountMap.size + 1,
+                  AccountName: entry.account_name,
+                  Type: entry.account_type,
+                  CurrentPeriodBalance: 0,
+                  PreviousPeriodBalance: 0,
+                });
+              }
+              // balance = debit - credit
+              const row = accountMap.get(key);
+              row.CurrentPeriodBalance += (parseFloat(entry.debit_amount) || 0) - (parseFloat(entry.credit_amount) || 0);
+              row.PreviousPeriodBalance += (parseFloat(entry.previous_debit_amount) || 0) - (parseFloat(entry.previous_credit_amount) || 0); // Added logic for PreviousPeriodBalance
+            });
+      
+            setTrialBalanceData(Array.from(accountMap.values()));
+            console.log("Trial Balance Data:", Array.from(accountMap.values()));
+          } catch (error) {
+            console.error("Error fetching trial balance data:", error);
+          }
+        };
+        fetchTrialBalanceData();
+      }, []);
+
+    
+    const [receivableAgingData, setReceivableAgingData] = useState([
+        { name: '0 - 30', amount: 0 },
+        { name: '31 - 60', amount: 0 },
+        { name: '61 - 90', amount: 0 },
+        { name: '91+', amount: 0 },
+      ]);
+    
+    
+      
+
+
+// --- Fetch Income Statement Data ---
+useEffect(() => {
+    const fetchIncomeStatement = async () => {
+      try {
+        const [current, last, last2] = await Promise.all([
+          GET("/reports/general-ledger/?period=current_year"),
+          GET("/reports/general-ledger/?period=last_year"),
+          GET("/reports/general-ledger/?period=last_2_years"),
+        ]);
+        const currentSummary = groupIncomeStatement(current.general_ledger || [], incomeStatementCategories);
+        const lastSummary = groupIncomeStatement(last.general_ledger || [], incomeStatementCategories);
+        const last2Summary = groupIncomeStatement(last2.general_ledger || [], incomeStatementCategories);
+
+        const allCats = Object.keys(incomeStatementCategories);
+        const merged = allCats.map(cat => {
+          const subs = incomeStatementCategories[cat];
+          return {
+            category: cat,
+            items: subs.map(sub => ({
+              name: sub,
+              year1: (currentSummary.find(c => c.category === cat)?.items.find(i => i.name === sub)?.value) || 0,
+              year2: (lastSummary.find(c => c.category === cat)?.items.find(i => i.name === sub)?.value) || 0,
+              year3: (last2Summary.find(c => c.category === cat)?.items.find(i => i.name === sub)?.value) || 0,
+            }))
+          };
+        });
+
+        setIncomeStatementDataSummary(merged);
+      } catch (error) {
+        console.error("Error fetching income statement:", error);
+      }
+    };
+    fetchIncomeStatement();
+  }, []);
+
+
 
 
     
@@ -383,20 +785,19 @@ const BodyContent = () => {
                 
                 {activeTab === 'Cash Flow' && (
                     <div className="content-grid">
-                        <InfoCard className="infocard-cash-flow-base">
-                            <InfoCard className="infocard-cash-flow">
                                 <CashFlowCard data={cashFlowData} />
-                            </InfoCard>
-                            <div className="cash-flow-invoice-collections">
+                         
+                            
+                        
+                        
                                 <InvoiceCollections />
-                            </div>
-                        </InfoCard>
+                            
                             <InfoCard className="receivable-aging-card">
                                 <div className="receivable-aging-chart">
                                     <div className="title-container"> 
                                         <h2 className="receivable-aging-title">Receivable Aging</h2>
                                     </div>
-                                    <ResponsiveContainer width="100%" height={200}>
+                                    <ResponsiveContainer width="100%" height={300}>
                                         <BarChart data={receivableAgingData} layout="vertical" margin={{ top: 15, right: 30, left: 50, bottom: 5 }}>
                                             <XAxis type="number" tick={false} axisLine={false} />
                                             <YAxis
@@ -421,7 +822,7 @@ const BodyContent = () => {
                                             />
                                             <Bar
                                                 dataKey="amount"
-                                                fill="#00BBBB"
+                                                fill="#00A8A8"
                                                 label={({ value, x, y, width, height }) => (
                                                     <text
                                                         x={x + width - 5}
@@ -444,77 +845,25 @@ const BodyContent = () => {
                                 </div>
                             </InfoCard>
 
-                            <InfoCard className="payable-aging-card"> 
-                                <div className="payable-aging-chart">
-                                    <div className="title-container"> 
-                                        <h2 className="payable-aging-title">Payable Aging</h2>
-                                    </div>
-                                    <ResponsiveContainer width="100%" height={200}>
-                                        <BarChart data={payableAgingData} layout="vertical" margin={{ top: 15, right: 30, left: 50, bottom: 5 }}>
-                                            <XAxis type="number" tick={false} axisLine={false} />
-                                            <YAxis
-                                                type="category"
-                                                dataKey="name" 
-                                                tick={(props) => {
-                                                    const { x, y, payload } = props;
-                                                    return (
-                                                        <g transform={`translate(${x},${y})`}>
-                                                            <text
-                                                                x={-15} 
-                                                                y={0}
-                                                                dy={5}
-                                                                textAnchor="end"
-                                                                className="custom-y-axis-label"
-                                                            >
-                                                                {payload.value}
-                                                            </text>
-                                                        </g>
-                                                    );
-                                                }}
-                                            />
-                                            <Bar
-                                                dataKey="amount"
-                                                fill="#E96062"
-                                                label={({ value, x, y, width, height }) => (
-                                                    <text
-                                                        x={x + width - 5}
-                                                        y={y + height / 2}
-                                                        fill="white"
-                                                        textAnchor="end"
-                                                        dominantBaseline="middle"
-                                                        fontWeight="600"
-                                                        fontStyle="italic"
-                                                    >
-                                                        ₱{value.toFixed(2).toLocaleString()}
-                                                    </text>
-                                                )}
-                                            />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                    <div className="total-payable">
-                                        TOTAL PAYABLE: <span className="payable-amount">₱{payableAgingData.reduce((sum, item) => sum + item.amount, 0).toFixed(2).toLocaleString()}</span>
-                                    </div>
-                                </div>
-                            </InfoCard>
                             <InfoCard className="expense-overview-card">
                                 <h2 className="expense-overview-title">Expense Overview</h2>
                                 <div className="expense-overview-content">
                                     <div className="expense-overview-chart">
                                         <ResponsiveContainer width="100%" height={400}>
                                             <PieChart>
-                                                {pieData.length > 0 && (
-                                                    <Pie
-                                                        data={pieData}
-                                                        dataKey="percentage"
-                                                        nameKey="name"
+                                            {pieData.length > 0 && (
+                                                <Pie
+                                                    data={expenseOverviewData}
+                                                    dataKey="percentage"
+                                                    nameKey="name"
                                                         cx="50%"
                                                         cy="50%"
                                                         outerRadius={160}
                                                         innerRadius={70}
                                                         fill="#8884d8"
                                                     >
-                                                        <LabelList dataKey="percentage" position="inside" formatter={(value) => `${Math.round(value)}%`} />
-                                                        {pieData.map((entry, index) => (
+                                                        <LabelList dataKey="percentage" position="inside" formatter={value => `${Math.round(value)}%`} />
+                                                        {expenseOverviewData.map((entry, index) => (
                                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                                         ))}
                                                     </Pie>
@@ -526,7 +875,7 @@ const BodyContent = () => {
                                         <h3 className="categories-title">TOP CATEGORIES</h3>
                                         <hr className="categories-divider" />
                                         <div className="category-list">
-                                            {pieData.map((category, index) => (
+                                            {expenseOverviewData.map((category, index) => (
                                                 <div key={index} className="category-item">
                                                     <div className="category-icon" style={{ backgroundColor: category.color }}></div>
                                                     <div className="category-details">
@@ -543,108 +892,111 @@ const BodyContent = () => {
                     </div>
                 )}
 
-                {activeTab === "Trial Balance" && (
-                    <div className="content-grid">
-                        <div className="chart-container">
-                            <h2 className="chart-title">Current Period Balance And Previous Period Balance</h2>
-                            <ResponsiveContainer width="100%" height="75%">
-                                <BarChart data={data} margin={{ top: 10, right: 20, left: 15, bottom: 0 }}>
-                                    <defs>
-                                        <linearGradient id="currentBarGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#469FC2" stopOpacity={100} />
-                                            <stop offset="100%" stopColor="#F7FFFE" stopOpacity={100} />
-                                        </linearGradient>
-                                        <linearGradient id="previousBarGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#C9E7E5" stopOpacity={100} />
-                                            <stop offset="100%" stopColor="#F7FFFE" stopOpacity={100} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="0" vertical={false} stroke="#00A8A8" strokeWidth={1}/> 
-                                    <XAxis dataKey="name" tick={{ fill: "#4A4A4A" }} />
-                                    <YAxis
-                                        tickCount={8} 
-                                        tick={{ fill: "#4A4A4A" }}
-                                        tickFormatter={(value) => `₱${value.toLocaleString()}`}
-                                        width={90}
-                                    />
-                                    <Legend
-                                        verticalAlign="top"
-                                        align="center"
-                                        wrapperStyle={{ paddingBottom: 40 }}
-                                    />
-                                    <Tooltip 
-                                        wrapperStyle={{
-                                            backgroundColor: '#88B4B4', 
-                                            borderRadius: '10px', 
-                                            padding: '5px',
-                                        }}
-                                        contentStyle={{
-                                            fontSize: '14px',
-                                            color: '#6C7676',
-                                        }}
-                                    />
-                                    <Bar dataKey="current" fill="url(#currentBarGradient)" name="Current Period Balance" radius={[3, 3, 0, 0]} />
-                                    <Bar dataKey="previous" fill="url(#previousBarGradient)" name="Previous Period Balance" radius={[3, 3, 0, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                        <InfoCard className="info-card-2">
-  <div className="pie-chart-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-    <ResponsiveContainer className="pie" width="100%" height={150}>
-      <PieChart>
-        <Pie
-          data={[
-            { name: "Previous", value: 50.5, color: "#F4E1AE" },
-            { name: "Current", value: 49.5, color: "#A0D3E8" },
-          ]}
-          dataKey="value"
-          nameKey="name"
-          cx="50%"
-          cy="60%"
-          outerRadius={55}
-          innerRadius={0}
-          startAngle={90}
-          endAngle={-270}
-          labelLine={false}
-        >
-          <Cell key="previous" fill="#F4E1AE" />
-          <Cell key="current" fill="#A0D3E8" />
-        </Pie>
-      </PieChart>
-    </ResponsiveContainer>
-    <div className="pie-chart-labels" style={{ fontWeight: 'bold', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', marginTop: '-100px' }}>
-      <div style={{ textAlign: 'left', paddingLeft: '20px', position: 'relative' }}>
-        <div style={{ fontWeight: 'bold', position: 'absolute', top: '60%', transform: 'translateY(-60%)', right: '45px', width: '110px', height: '1px', backgroundColor: 'black' }}></div>
-        Previous Period Balance
-        <div style={{ color:'#C5C8C8', textAlign: 'left', marginTop: '10px' }}>50.5%</div>
-      </div>
-      <div style={{  textAlign: 'right', paddingRight: '20px', position: 'relative' }}>
-        Current Period Balance
-        <div style={{ fontWeight: 'bold', position: 'absolute', top: '60%', transform: 'translateY(-50%)', left: '45px', width: '110px', height: '1px', backgroundColor: 'black' }}></div>
-        <div  style={{ color:'#C5C8C8', textAlign: 'right', marginTop: '10px' }}>49.5%</div>
-      </div>
+{activeTab === "Trial Balance" && (
+  <div className="content-grid">
+    <div className="chart-container">
+      <h2 className="chart-title">Current Period Balance And Previous Period Balance</h2>
+      <ResponsiveContainer width="100%" height="75%">
+        <BarChart data={periodBalance} margin={{ top: 10, right: 20, left: 15, bottom: 0 }}>
+          <defs>
+            <linearGradient id="currentBarGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#00A8A8" stopOpacity={100} />
+              <stop offset="100%" stopColor="#C9E7E5" stopOpacity={100} />
+            </linearGradient>
+            <linearGradient id="previousBarGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#C9E7E5" stopOpacity={100} />
+              <stop offset="100%" stopColor="#F7FFFE" stopOpacity={100} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="0" vertical={false} stroke="#00A8A8" strokeWidth={1}/> 
+          <XAxis dataKey="name" tick={{ fill: "#4A4A4A" }} />
+          <YAxis
+            tickCount={8} 
+            tick={{ fill: "#4A4A4A" }}
+            tickFormatter={(value) => `₱${value.toLocaleString()}`}
+            width={90}
+          />
+          <Legend
+            verticalAlign="top"
+            align="center"
+            wrapperStyle={{ paddingBottom: 40 }}
+          />
+          <Tooltip 
+            wrapperStyle={{
+              backgroundColor: '#88B4B4', 
+              borderRadius: '10px', 
+              padding: '5px',
+            }}
+            contentStyle={{
+              fontSize: '14px',
+              color: '#6C7676',
+            }}
+          />
+          <Bar dataKey="current" fill="url(#currentBarGradient)" name="Current Period Balance" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="previous" fill="url(#previousBarGradient)" name="Previous Period Balance" radius={[3, 3, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
-  </div>
-</InfoCard>
+                                                <InfoCard className="info-card-2">
+                          <div className="pie-chart-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <ResponsiveContainer className="pie" width="100%" height={150}>
+                              <PieChart>
+                                <Pie
+                                  ie
+                                  data={pieChartData.map(d => ({ ...d, value: Math.abs(d.value) }))}
+                                  dataKey="value"
+                                  nameKey="name"
+                                  cx="50%"
+                                  cy="60%"
+                                  outerRadius={55}
+                                  innerRadius={0}
+                                  startAngle={90}
+                                  endAngle={-270}
+                                  labelLine={false}
+                                >
+                                  <Cell key="previous" fill="#F4E1AE" />
+                                  <Cell key="current" fill="#A0D3E8"/>
+                                </Pie>
+                              </PieChart>
+                            </ResponsiveContainer>
+                            <div className="pie-chart-labels" style={{ fontWeight: 'bold', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', marginTop: '-100px' }}>
+                              <div style={{ textAlign: 'left', paddingLeft: '20px', position: 'relative' }}>
+                                <div style={{ fontWeight: 'bold', position: 'absolute', top: '60%', transform: 'translateY(-60%)', right: '45px', width: '110px', height: '1px', backgroundColor: 'black' }}></div>
+                                Previous Period Balance
+                                <div style={{ color:'#C5C8C8', textAlign: 'left', marginTop: '10px' }}>
+                                  {pieChartPercentages.previous.toFixed(1)}%
+                                </div>
+                              </div>
+                              <div style={{ textAlign: 'right', paddingRight: '20px', position: 'relative' }}>
+                                Current Period Balance
+                                <div style={{ fontWeight: 'bold', position: 'absolute', top: '60%', transform: 'translateY(-50%)', left: '45px', width: '110px', height: '1px', backgroundColor: 'black' }}></div>
+                                <div style={{ color:'#C5C8C8', textAlign: 'right', marginTop: '10px' }}>
+                                  {pieChartPercentages.current.toFixed(1)}%
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </InfoCard>
                         <InfoCard className="info-card-3-base">
                             <div className="period-container">
                                 <div className="period-covered">Period Covered</div>
-                                <div className="february-2023">February 2023</div>
                             </div>
                             <div>
                                 <InfoCard className="info-card-3">
                                     <table className="financial-table">
+                                    <colgroup>
                                         <col style={{ width: '15%' }} />   
-                                        <col style={{ width: '15%' }} />  
+                                          
                                         <col style={{ width: '15%' }} />   
                                         <col style={{ width: '15%' }} /> 
                                         <col style={{ width: '15%' }} />
+                                        </colgroup>
                                         <thead>
                                             <tr>
                                             </tr>
                                             <tr>
                                                 <th>Account Name</th>
-                                                <th>Account No.</th>
+                                                
                                                 <th>Type</th>
                                                 <th>Current Period Balance</th>
                                                 <th>Previous Period Balance</th>
@@ -657,7 +1009,7 @@ const BodyContent = () => {
                                                     className={index % 2 ===0 ? "even-row" : "odd-row"}
                                                     >
                                                     <td>{item.AccountName}</td>
-                                                    <td>{item.AccountNo}</td>
+                                                    
                                                     <td>{item.Type}</td>
                                                     <td>₱{item.CurrentPeriodBalance.toLocaleString()}</td>
                                                     <td>₱{item.PreviousPeriodBalance.toLocaleString()}</td>
@@ -668,160 +1020,84 @@ const BodyContent = () => {
                                 </InfoCard></div>
                         </InfoCard>
                                 <InfoCard className="info-card-4">
-                                    <div className="financial-summary">
-                                        <div className="infocard-4-header-row">
-                                            <div className="infocard-4-header-label"></div>
-                                            <div className="infocard-4-header-label">Total</div>
-                                            <div className="infocard-4-header-label1"></div>
-                                            <div className="infocard-4-header-label"></div>
-                                            <div className="infocard-4-header-cell1">₱ 515,500.00</div>
-                                            <div className="infocard-4-header-cell2">₱ 515,500.00</div>
-                                        </div>
-                                        <div className="infocard-4-header-row-bottom">
-                                            <div className="infocard-4-header-cell"></div>
-                                            <div className="infocard-4-header-cell">Previous Period Balance</div>
-                                            <div className="infocard-4-header-cell">Current Period Balance</div>
-                                        </div>
-
-                                        <div className="infocard-4-row">
-                                            <div className="infocard-4-row-label">Asset</div>
-                                            <div className="infocard-4-row-value">₱ 418,000.00</div>
-                                            <div className="infocard-4-row-value">₱ 418,000.00</div>
-                                        </div>
-                                        <div className="infocard-4-row">
-                                            <div className="infocard-4-row-label">Liability</div>
-                                            <div className="infocard-4-row-value">(₱ 38,000.00)</div>
-                                            <div className="infocard-4-row-value">(₱ 35,000.00)</div>
-                                        </div>
-                                        <div className="infocard-4-row">
-                                            <div className="infocard-4-row-label">Equity</div>
-                                            <div className="infocard-4-row-value">₱ 102,000.00</div>
-                                            <div className="infocard-4-row-value">(₱ 35,000.00)</div>
-                                        </div>
-                                        <div className="infocard-4-row">
-                                            <div className="infocard-4-row-label">Revenue</div>
-                                            <div className="infocard-4-row-value">₱ 110,000.00</div>
-                                            <div className="infocard-4-row-value">₱ 120,000.00</div>
-                                        </div>
-                                        <div className="infocard-4-row">
-                                            <div className="infocard-4-row-label">Expense</div>
-                                            <div className="infocard-4-row-value">(₱ 76,500.00)</div>
-                                            <div className="infocard-4-row-value">(₱ 85,000.00)</div>
-                                        </div>
+                                  <div className="financial-summary">
+                                    <div className="infocard-4-header-row">
+                                      <div className="infocard-4-header-label"></div>
+                                      <div className="infocard-4-header-label">Total</div>
+                                      <div className="infocard-4-header-label1"></div>
+                                      <div className="infocard-4-header-label"></div>
+                                      <div className="infocard-4-header-cell1">₱ {periodSummary.totalPrevious.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+                                      <div className="infocard-4-header-cell2">₱ {periodSummary.totalCurrent.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
                                     </div>
+                                    <div className="infocard-4-header-row-bottom">
+                                      <div className="infocard-4-header-cell"></div>
+                                      <div className="infocard-4-header-cell">Previous Period Balance</div>
+                                      <div className="infocard-4-header-cell">Current Period Balance</div>
+                                    </div>
+                                    {periodSummary.rows.map((row, idx) => (
+                                      <div className="infocard-4-row" key={row.label}>
+                                        <div className="infocard-4-row-label">{row.label}</div>
+                                        <div className="infocard-4-row-value">₱ {row.previous.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+                                        <div className="infocard-4-row-value">₱ {row.current.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </InfoCard>
                     </div>
                  )}
                             
 
-                {activeTab === "Income Statement" && (
-                    <div className="content-grid">
-                        <InfoCard className="info-card-income-statement">
-                            <table className="income-statement-table">
-                                <thead>
-                                    <tr>
-                                        <th>Income Statement</th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th>Revenue</th>
-                                        <th>Year 1</th>
-                                        <th>Year 2</th>
-                                        <th>Year 3</th>
-                                    </tr>
-                                    {incomeStatementData
-                                        .find((category) => category.category === "Revenue")
-                                        ?.items.map((item, itemIndex) => (
-                                        <tr key={itemIndex}>
-                                            <td>{item.name}</td>
-                                            <td>{item.year1 ? item.year1.toLocaleString() : ""}</td>
-                                            <td>{item.year2 ? item.year2.toLocaleString() : ""}</td>
-                                            <td>{item.year3 ? item.year3.toLocaleString() : ""}</td>
-                                        </tr>
-                                        ))}
-                                        <tr>
-                                            <th>Cost of Goods Sold</th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                    {incomeStatementData
-                                        .find((category) => category.category === "Cost of Goods Sold")
-                                        ?.items.map((item, itemIndex) => (
-                                        <tr key={itemIndex}>
-                                            <td>{item.name}</td>
-                                            <td>{item.year1 ? item.year1.toLocaleString() : ""}</td>
-                                            <td>{item.year2 ? item.year2.toLocaleString() : ""}</td>
-                                            <td>{item.year3 ? item.year3.toLocaleString() : ""}</td>
-                                        </tr>
-                                        ))}
-                                        <tr>
-                                            <th>Operating Expenses</th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                    {incomeStatementData
-                                        .find((category) => category.category === "Operating Expenses")
-                                        ?.items.map((item, itemIndex) => (
-                                        <tr key={itemIndex}>
-                                            <td>{item.name}</td>
-                                            <td>{item.year1 ? item.year1.toLocaleString() : ""}</td>
-                                            <td>{item.year2 ? item.year2.toLocaleString() : ""}</td>
-                                            <td>{item.year3 ? item.year3.toLocaleString() : ""}</td>
-                                        </tr>
-                                        ))}
-                                        <tr>
-                                            <th>Operating Profit (Loss)</th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                    {incomeStatementData
-                                        .find((category) => category.category === "Operating Profit (Loss)")
-                                        ?.items.map((item, itemIndex) => (
-                                        <tr key={itemIndex}>
-                                            <td>{item.name}</td>
-                                            <td>{item.year1 ? item.year1.toLocaleString() : ""}</td>
-                                            <td>{item.year2 ? item.year2.toLocaleString() : ""}</td>
-                                            <td>{item.year3 ? item.year3.toLocaleString() : ""}</td>
-                                        </tr>
-                                        ))}
-                                        <tr>
-                                            <th>Profit (Loss) Before Taxes</th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                    {incomeStatementData
-                                        .find((category) => category.category === "Profit (Loss) Before Taxes")
-                                        ?.items.map((item, itemIndex) => (
-                                        <tr key={itemIndex}>
-                                            <td>{item.name}</td>
-                                            <td>{item.year1 ? item.year1.toLocaleString() : ""}</td>
-                                            <td>{item.year2 ? item.year2.toLocaleString() : ""}</td>
-                                            <td>{item.year3 ? item.year3.toLocaleString() : ""}</td>
-                                        </tr>
-                                        ))}
-                                </tbody>
-                            </table>
-                        </InfoCard>
-                    </div>
-                )}
+                            {activeTab === "Income Statement" && (
+          <div className="content-grid">
+            <InfoCard className="info-card-income-statement">
+              <table className="income-statement-table">
+                <thead>
+                  <tr>
+                    <th>Income Statement</th>
+                    <th>Current Year</th>
+                    <th>Last Year</th>
+                    <th>Last 2 Years</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.keys(incomeStatementCategories).map((cat, catIdx) => (
+                    <React.Fragment key={catIdx}>
+                      <tr>
+                        <th colSpan={4}>{cat}</th>
+                      </tr>
+                      {incomeStatementDataSummary
+                        .find((category) => category.category === cat)
+                        ?.items.map((item, itemIndex) => (
+                          <tr key={itemIndex}>
+                            <td>{item.name}</td>
+                            <td>
+                              {item.year1 !== undefined
+                                ? item.year1.toLocaleString(undefined, { minimumFractionDigits: 2 })
+                                : "0.00"}
+                            </td>
+                            <td>
+                              {item.year2 !== undefined
+                                ? item.year2.toLocaleString(undefined, { minimumFractionDigits: 2 })
+                                : "0.00"}
+                            </td>
+                            <td>
+                              {item.year3 !== undefined
+                                ? item.year3.toLocaleString(undefined, { minimumFractionDigits: 2 })
+                                : "0.00"}
+                            </td>
+                          </tr>
+                        ))}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </InfoCard>
+          </div>
+        )}
             </div>
         </div>
                             
     );
 };
                         
-
-                            
-
-                    
-
-
 export default BodyContent;

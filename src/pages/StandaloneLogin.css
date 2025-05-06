@@ -135,6 +135,7 @@
     color: grey;
   }
 
+
   .login-container input[type="email"]{
     font-size: 0.85rem;
     width: 18rem;
@@ -153,10 +154,10 @@
   .login-container .password-wrapper {
     position: relative;
     width: 100%;
+    height: fit-content;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: fit-content;
   }
 
   .login-container .password-wrapper input{
@@ -171,6 +172,7 @@
     right: 0.5rem;
     cursor: pointer;
     color: #888;
+    margin: 0rem;
   }
   
   /* Options */

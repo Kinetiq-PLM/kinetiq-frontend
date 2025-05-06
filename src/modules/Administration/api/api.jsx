@@ -1,6 +1,6 @@
 // src/modules/Administration/api/api.jsx
 import axios from 'axios';
-// const API_BASE_URL = 'http://localhost:8000/api';
+//const API_BASE_URL = 'http://localhost:8000/api';
 const API_BASE_URL = 'https://7lthyploub.execute-api.ap-southeast-1.amazonaws.com/dev/api';
 
 // Create axios instance with default config
@@ -151,6 +151,17 @@ export const policiesAPI = {
     }
   },
 
+  // Get a specific policy by ID
+  getPolicy: async (id) => {
+    try {
+      const response = await api.get(`/policies/${id}/`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching policy ${id}:`, error);
+      throw error;
+    }
+  },
+
   // Create a new policy
   createPolicy: async (policyData) => {
     try {
@@ -163,42 +174,67 @@ export const policiesAPI = {
   },
 
   // Update a policy
-  updatePolicy: async (policyId, policyData) => {
+  updatePolicy: async (id, policyData) => {
     try {
-      const response = await api.put(`/policies/${policyId}/`, policyData);
+      const response = await api.put(`/policies/${id}/`, policyData);
       return response.data;
     } catch (error) {
-      console.error('Error updating policy:', error);
+      console.error(`Error updating policy ${id}:`, error);
       throw error;
     }
   },
 
-  // Get a single policy
-  getPolicy: async (policyId) => {
+  // Partial update a policy
+  patchPolicy: async (id, policyData) => {
     try {
-      const response = await api.get(`/policies/${policyId}/`);
+      const response = await api.patch(`/policies/${id}/`, policyData);
       return response.data;
     } catch (error) {
-      console.error('Error fetching policy:', error);
+      console.error(`Error patching policy ${id}:`, error);
       throw error;
     }
   },
 
-  // Archive (soft delete) a policy
-  archivePolicy: async (policyId) => {
+  // Delete (archive) a policy
+  deletePolicy: async (id) => {
     try {
-      const response = await api.delete(`/policies/${policyId}/`);
+      const response = await api.delete(`/policies/${id}/`);
       return response.data;
     } catch (error) {
-      console.error('Error archiving policy:', error);
+      console.error(`Error deleting policy ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // Fixed uploadPolicyDocument API function
+  uploadPolicyDocument: async (id, file) => {
+    try {
+      // Create a FormData object
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // Log the file being uploaded for debugging
+      console.log(`Uploading file: ${file.name}, size: ${file.size}, type: ${file.type}`);
+      
+      const response = await api.post(`/policies/${id}/upload_document/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          // Don't set the boundary - let the browser set it automatically
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error(`Error uploading document to policy ${id}:`, error);
+      console.error("Response data:", error.response?.data);
       throw error;
     }
   },
 
   // Get archived policies
-  getArchivedPolicies: async () => {
+  getArchivedPolicies: async (params = {}) => {
     try {
-      const response = await api.get('/policies/archived/');
+      const response = await api.get('/policies/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived policies:', error);
@@ -207,313 +243,12 @@ export const policiesAPI = {
   },
 
   // Restore an archived policy
-  restorePolicy: async (policyId) => {
+  restorePolicy: async (id) => {
     try {
-      const response = await api.patch(`/policies/${policyId}/restore/`);
+      const response = await api.patch(`/policies/${id}/restore/`);
       return response.data;
     } catch (error) {
-      console.error('Error restoring policy:', error);
-      throw error;
-    }
-  },
-
-  // Upload a document to a policy
-  uploadPolicyDocument: async (policyId, documentFile) => {
-    try {
-      const formData = new FormData();
-      formData.append('document', documentFile);
-      
-      const response = await api.post(`/policies/${policyId}/upload_document/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error uploading policy document:', error);
-      throw error;
-    }
-  },
-
-  // Download a policy document
-  downloadPolicyDocument: async (policyId) => {
-    try {
-      const response = await api.get(`/policies/${policyId}/download_document/`, {
-        responseType: 'blob'
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error downloading policy document:', error);
-      throw error;
-    }
-  }
-};
-
-// Assets API endpoints
-export const assetsAPI = {
-  // Get all assets with optional search and ordering
-  getAssets: async (params = {}) => {
-    try {
-      const response = await api.get('/item-master/assets/', { params });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching assets:', error);
-      throw error;
-    }
-  },
-
-  // Create a new asset
-  createAsset: async (assetData) => {
-    try {
-      const response = await api.post('/item-master/assets/', assetData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating asset:', error);
-      throw error;
-    }
-  },
-
-  // Update an asset
-  updateAsset: async (assetId, assetData) => {
-    try {
-      const response = await api.put(`/item-master/assets/${assetId}/`, assetData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating asset:', error);
-      throw error;
-    }
-  },
-
-  // Get a single asset
-  getAsset: async (assetId) => {
-    try {
-      const response = await api.get(`/item-master/assets/${assetId}/`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching asset:', error);
-      throw error;
-    }
-  },
-
-  getContentIds: async () => {
-    try {
-      const response = await api.get('/item-master/assets/content_ids/');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching content IDs:', error);
-      throw error;
-    }
-  },
-
-  // Archive (soft delete) an asset
-  archiveAsset: async (assetId) => {
-    try {
-      const response = await api.delete(`/item-master/assets/${assetId}/`);
-      return response.data;
-    } catch (error) {
-      console.error('Error archiving asset:', error);
-      throw error;
-    }
-  },
-
-  // Get archived assets
-  getArchivedAssets: async (params = {}) => {
-    try {
-      const response = await api.get('/item-master/assets/archived/', { params });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching archived assets:', error);
-      throw error;
-    }
-  },
-
-  // Restore an archived asset
-  restoreAsset: async (assetId) => {
-    try {
-      const response = await api.patch(`/item-master/assets/${assetId}/restore/`);
-      return response.data;
-    } catch (error) {
-      console.error('Error restoring asset:', error);
-      throw error;
-    }
-  }
-};
-
-// Products API endpoints
-export const productsAPI = {
-  // Get all products with optional search and ordering
-  getProducts: async (params = {}) => {
-    try {
-      const response = await api.get('/item-master/products/', { params });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      throw error;
-    }
-  },
-
-  getPolicies: async () => {
-    try {
-      const response = await api.get('/item-master/products/policy_id/');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching policy IDs:', error);
-      throw error;
-    }
-  },
-
-  // Create a new product
-  createProduct: async (productData) => {
-    try {
-      const response = await api.post('/item-master/products/', productData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating product:', error);
-      throw error;
-    }
-  },
-
-  // Update a product
-  updateProduct: async (productId, productData) => {
-    try {
-      const response = await api.put(`/item-master/products/${productId}/`, productData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating product:', error);
-      throw error;
-    }
-  },
-
-  // Get a single product
-  getProduct: async (productId) => {
-    try {
-      const response = await api.get(`/item-master/products/${productId}/`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching product:', error);
-      throw error;
-    }
-  },
-
-  // Archive (soft delete) a product
-  archiveProduct: async (productId) => {
-    try {
-      const response = await api.delete(`/item-master/products/${productId}/`);
-      return response.data;
-    } catch (error) {
-      console.error('Error archiving product:', error);
-      throw error;
-    }
-  },
-
-  // Get archived products
-  getArchivedProducts: async (params = {}) => {
-    try {
-      const response = await api.get('/item-master/products/archived/', { params });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching archived products:', error);
-      throw error;
-    }
-  },
-
-  // Restore an archived product
-  restoreProduct: async (productId) => {
-    try {
-      const response = await api.patch(`/item-master/products/${productId}/restore/`);
-      return response.data;
-    } catch (error) {
-      console.error('Error restoring product:', error);
-      throw error;
-    }
-  }
-};
-
-// Raw Materials API endpoints
-export const rawMaterialsAPI = {
-  // Get all raw materials with optional search and ordering
-  getRawMaterials: async (params = {}) => {
-    try {
-      const response = await api.get('/item-master/raw-materials/', { params });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching raw materials:', error);
-      throw error;
-    }
-  },
-
-  getVendors: async () => {
-    try {
-      const response = await api.get('/item-master/raw-materials/vendor_code/');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching content IDs:', error);
-      throw error;
-    }
-  },
-
-  // Create a new raw material
-  createRawMaterial: async (materialData) => {
-    try {
-      const response = await api.post('/item-master/raw-materials/', materialData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating raw material:', error);
-      throw error;
-    }
-  },
-
-  // Update a raw material
-  updateRawMaterial: async (materialId, materialData) => {
-    try {
-      const response = await api.put(`/item-master/raw-materials/${materialId}/`, materialData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating raw material:', error);
-      throw error;
-    }
-  },
-
-  // Get a single raw material
-  getRawMaterial: async (materialId) => {
-    try {
-      const response = await api.get(`/item-master/raw-materials/${materialId}/`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching raw material:', error);
-      throw error;
-    }
-  },
-
-  // Archive (soft delete) a raw material
-  archiveRawMaterial: async (materialId) => {
-    try {
-      const response = await api.delete(`/item-master/raw-materials/${materialId}/`);
-      return response.data;
-    } catch (error) {
-      console.error('Error archiving raw material:', error);
-      throw error;
-    }
-  },
-
-  // Get archived raw materials
-  getArchivedRawMaterials: async (params = {}) => {
-    try {
-      const response = await api.get('/item-master/raw-materials/archived/', { params });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching archived raw materials:', error);
-      throw error;
-    }
-  },
-
-  // Restore an archived raw material
-  restoreRawMaterial: async (materialId) => {
-    try {
-      const response = await api.patch(`/item-master/raw-materials/${materialId}/restore/`);
-      return response.data;
-    } catch (error) {
-      console.error('Error restoring raw material:', error);
+      console.error(`Error restoring policy ${id}:`, error);
       throw error;
     }
   }
@@ -531,6 +266,19 @@ export const itemMasterDataAPI = {
       throw error;
     }
   },
+
+  // Create a new item
+  createItem: async (itemData) => {
+    try {
+      const response = await api.post('/item-master/item-master/', itemData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating item:', error);
+      throw error;
+    }
+
+  },
+
 
   // Update an item
   updateItem: async (itemId, itemData) => {
@@ -629,7 +377,7 @@ export const vendorAPI = {
   // Get all vendors with optional search and ordering
   getVendors: async (params = {}) => {
     try {
-      const response = await api.get('/partner-master/vendors/', { params });
+      const response = await api.get('/item-master/vendor/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching vendors:', error);
@@ -662,7 +410,7 @@ export const vendorAPI = {
 
 // Audit Log API endpoints
 export const auditLogAPI = {
-  // Get audit logs with optional search and ordering
+  // Get all audit logs with optional search and ordering
   getAuditLogs: async (params = {}) => {
     try {
       const response = await api.get('/logs/', { params });
@@ -672,14 +420,65 @@ export const auditLogAPI = {
       throw error;
     }
   },
-
-  // Get a single audit log entry
-  getAuditLog: async (logId) => {
+  
+  // Get recent audit logs (last 24 hours)
+  getRecentAuditLogs: async (params = {}) => {
     try {
-      const response = await api.get(`/logs/${logId}/`);
+      const response = await api.get('/logs/recent/', { params });
       return response.data;
     } catch (error) {
-      console.error('Error fetching audit log:', error);
+      console.error('Error fetching recent audit logs:', error);
+      throw error;
+    }
+  },
+  
+  // Get audit logs by date range
+  getAuditLogsByDateRange: async (startDate, endDate, params = {}) => {
+    try {
+      const queryParams = { 
+        ...params, 
+        start_date: startDate, 
+        end_date: endDate 
+      };
+      const response = await api.get('/logs/', { params: queryParams });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching audit logs by date range:', error);
+      throw error;
+    }
+  },
+  
+  // Get audit logs summary (count by action type)
+  getAuditLogsSummary: async () => {
+    try {
+      const response = await api.get('/logs/summary/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching audit logs summary:', error);
+      throw error;
+    }
+  },
+  
+  // Filter audit logs by user
+  getAuditLogsByUser: async (userId, params = {}) => {
+    try {
+      const queryParams = { ...params, user_id: userId };
+      const response = await api.get('/logs/', { params: queryParams });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching audit logs by user:', error);
+      throw error;
+    }
+  },
+  
+  // Filter audit logs by action type
+  getAuditLogsByAction: async (actionType, params = {}) => {
+    try {
+      const queryParams = { ...params, action_type: actionType };
+      const response = await api.get('/logs/', { params: queryParams });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching audit logs by action:', error);
       throw error;
     }
   }
@@ -784,7 +583,7 @@ export const warehouseAPI = {
   // Archive (soft delete) a warehouse
   archiveWarehouse: async (warehouseId) => {
     try {
-      const response = await api.delete(`/warehouses/${warehouseId}/`);
+      const response = await api.delete(`/warehouse/${warehouseId}/`);
       return response.data;
     } catch (error) {
       console.error('Error archiving warehouse:', error);
@@ -793,9 +592,9 @@ export const warehouseAPI = {
   },
 
   // Get archived warehouses
-  getArchivedWarehouses: async () => {
+  getArchivedWarehouses: async (params = {}) => {
     try {
-      const response = await api.get('/warehouses/archived/', { params });
+      const response = await api.get('/warehouse/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived warehouses:', error);
@@ -806,7 +605,7 @@ export const warehouseAPI = {
   // Restore an archived warehouse
   restoreWarehouse: async (warehouseId) => {
     try {
-      const response = await api.patch(`/warehouses/${warehouseId}/restore/`);
+      const response = await api.patch(`/warehouse/${warehouseId}/restore/`);
       return response.data;
     } catch (error) {
       console.error('Error restoring warehouse:', error);
