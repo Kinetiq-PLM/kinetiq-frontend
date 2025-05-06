@@ -65,8 +65,8 @@ const PayrollModal = ({
 
   const handleInputChange = (index, value) => {
     const isFieldEditable = isCreating
-      ? index !== 0 && index !== 5
-      : index === 6;
+      ? index !== 0 && index !== 6
+      : index === 0;
 
     if (!isFieldEditable) return;
 
