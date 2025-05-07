@@ -85,7 +85,7 @@
 .operations-status-cards {
   display: flex;
   flex-direction: row;
-  gap: 0.8rem;
+  gap: 0.5rem;
   margin-top: 1rem;
   flex-wrap: wrap;
 }
@@ -271,4 +271,22 @@
 
 .operations .dropdown-scrollbar::-webkit-scrollbar-track {
   background: #f1f5f9;
+}
+.operations .operations.loading-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 1.2rem;
+  color: #333;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.operations .operations-container.loading {
+  overflow: hidden;
+  position: relative;
 }

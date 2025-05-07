@@ -34,33 +34,37 @@
 
 .gr .operations-gt-filters {
   display: flex;
-  gap: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 0.5rem;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding: 1.1em;
 }
 
 .gr .operations-gt-tab {
+  font-size: 0.875rem;
+  font-weight: normal;
   padding: 0.5rem 1rem;
-  border: none;
-  background: none;
-  color: #64748b;
   cursor: pointer;
-  font-weight: 500;
+  color: #666;
   position: relative;
+  transition: color 0.3s ease;
+  background: none;
+  border: none;
 }
 
 .gr .operations-gt-tab.active {
-  color: #0d9488;
+  color: #00A8A8;
+  font-weight: 500;
 }
 
 .gr .operations-gt-tab.active::after {
-  content: '';
+  content: "";
   position: absolute;
-  bottom: -0.5rem;
   left: 0;
+  bottom: -1px;
   width: 100%;
-  height: 2px;
-  background-color: #0d9488;
+  height: 1px;
+  background-color: #00A8A8;
 }
 
 .gr .operation_table_container {

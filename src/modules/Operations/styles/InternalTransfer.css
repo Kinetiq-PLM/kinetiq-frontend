@@ -38,14 +38,24 @@
 }
 
 
+
 .InternalTransfer .table-container table {
     width: 100%;
-    height: 100%;
     border-collapse: collapse;
-    display: table;
+    table-layout: fixed;
+    min-width: 600px;
 }
 .InternalTransfer .table-container {
-    overflow: auto; /* Scroll on the container */
+    width: 100%;
+    height: 450px;
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    padding: 0 1.1rem 0.5rem 1.1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    font-size: 0.875rem;
+    max-width: 100%;
+    overflow: auto;
 }
 .InternalTransfer .table-container table {
     width: 100%;
@@ -53,11 +63,18 @@
     min-width: 600px;
   }
 .InternalTransfer .table-container thead {
-    width: 100%;
+    position: sticky;
     top: 0;
-    background: white;
+    z-index: 10;
+    background-color: white;
+}
+.InternalTransfer .table-container thead tr {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
 
-  }
 
   .InternalTransfer .table-container tbody {
     display: table-row-group;
@@ -83,6 +100,8 @@
     font-weight: 600;
     text-align: left;
     border-bottom: 1px solid #dee2e6;
+    position: sticky;
+    top: 0;
 }
 
 .InternalTransfer table td {
@@ -90,6 +109,7 @@
     font-size: 0.875rem;
     color: #212529;
     border-bottom: 1px solid #f1f1f1;
+    vertical-align: middle;
 }
 
 .InternalTransfer .input-container {
