@@ -530,7 +530,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       }
       // Prepare the payload for the create API
       const payload = {
-        vendor_code: vendorID,
+        vendor_code: null,
         document_type: "Goods Issue",
         transaction_id: documentDetails.transaction_id,
         document_no: documentDetails.document_no,
@@ -557,7 +557,6 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
           item_no: null
         }))
       };
-
       // Call the create API
       const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
         method: 'POST',
@@ -661,7 +660,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
           }
         }
         const updatedDocumentsData = {
-          vendor_code: vendorID,
+          vendor_code: null,
           document_type: "Goods Issue",
           transaction_id: documentDetails.transaction_id,
           document_no: documentDetails.document_no,

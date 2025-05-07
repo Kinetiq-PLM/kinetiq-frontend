@@ -895,7 +895,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       .slice(0, -1) // exclude the last empty row
       .reduce((sum, item) => {
         const price = parseFloat(item.cost || duplicateDetails[item.item_id]?.[0]?.price || 0);
-        const total = parseFloat((parseFloat(item.quantity || 0) * parseFloat(price))-parseFloat(item?.ar_discount || 0));
+        const discount_percent = item?.ar_discount || 0;
+        const discount = (parseFloat(item.quantity || 0) * parseFloat(price)*(discount_percent/100))
+        const total = parseFloat((parseFloat(item.quantity || 0) * parseFloat(price))-discount);
         return total;
       }, 0)
       .toFixed(2);
@@ -1272,8 +1274,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                         {(() => {
                           const currentCost = item.cost || 
                           (item.item_id && duplicateDetails[item.item_id]?.[0]?.price) || 0;
-
-                          const total = parseFloat((parseFloat(item.quantity || 0) * parseFloat(currentCost))-parseFloat(item?.ar_discount || 0));
+                          const discount_percent = item?.ar_discount || 0;
+                          const discount = (parseFloat(item.quantity || 0) * parseFloat(currentCost)*(discount_percent/100))
+                          const total = parseFloat((parseFloat(item.quantity || 0) * parseFloat(currentCost))-discount);
                           if (total > 1000000000) {
                             toast.dismiss();
                             toast.error("Total cost must not exceed 1 billion");
