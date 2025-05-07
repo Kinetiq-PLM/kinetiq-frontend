@@ -78,9 +78,7 @@
 
 
 .deliveryApproval .table-container thead {
-  position: sticky;
-  top: -15px;
-  z-index: 10;
+
   background-color: white;
 }
 

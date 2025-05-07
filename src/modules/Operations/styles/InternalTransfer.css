@@ -63,14 +63,9 @@
     min-width: 600px;
   }
 .InternalTransfer .table-container thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
     background-color: white;
 }
 .InternalTransfer .table-container thead tr {
-    position: sticky;
-    top: 0;
     background-color: white;
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
 }
@@ -81,9 +76,7 @@
   }
 
 .InternalTransfer .table-container thead tr {
-    width: 100%;
-    
-    table-layout: fixed;
+    background-color: white;
 }
 
 
@@ -93,15 +86,15 @@
 }
 
 .InternalTransfer table th {
-  background: white;
+    background: white;
     padding: 0.75rem;
     font-size: 0.875rem;
     color: #495057;
     font-weight: 600;
     text-align: left;
     border-bottom: 1px solid #dee2e6;
-    position: sticky;
-    top: 0;
+    position: static;
+    top: auto;
 }
 
 
