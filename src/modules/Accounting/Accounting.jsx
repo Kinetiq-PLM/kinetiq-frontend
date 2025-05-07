@@ -55,70 +55,93 @@ const AccountingDashboard = () => {
   const GENERAL_LEDGER_ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
   const CHART_OF_ACCOUNTS_ENDPOINT = `${API_URL}/api/chart-of-accounts/`;
 
+  const computeNetBalances = (entries) => {
+    const accountSums = {};
+  
+    entries.forEach(({ accountName, debit, credit }) => {
+      if (!accountSums[accountName]) {
+        accountSums[accountName] = { debit: 0, credit: 0 };
+      }
+  
+      accountSums[accountName].debit += parseFloat(debit) || 0;
+      accountSums[accountName].credit += parseFloat(credit) || 0;
+    });
+  
+    return Object.entries(accountSums).map(
+      ([name, { debit, credit }]) => ({
+        accountName: name,
+        debit: debit.toFixed(2),
+        credit: credit.toFixed(2),
+        net: (debit - credit).toFixed(2),
+      })
+    );
+  };
+  
   const fetchData = async () => {
     try {
-      // Fetch General Ledger data
       const glResponse = await axios.get(GENERAL_LEDGER_ENDPOINT);
       const glData = glResponse.data;
-
+  
       const grouped = {};
       let totalDebit = 0;
       let totalCredit = 0;
-      let accountsPayableTotal = 0;
-      let accountsReceivableTotal = 0;
-
+  
+      const netBalanceEntries = [];
+  
       glData.forEach((entry) => {
         const accountName = entry.account_name || "Unknown";
         const debit = parseFloat(entry.debit_amount || 0);
         const credit = parseFloat(entry.credit_amount || 0);
-
-        // Grouping for bar chart
+  
         if (!grouped[accountName]) {
           grouped[accountName] = { debit: 0, credit: 0 };
         }
         grouped[accountName].debit += debit;
         grouped[accountName].credit += credit;
-
-        // Totals
+  
+        netBalanceEntries.push({ accountName, debit, credit });
+  
         totalDebit += debit;
         totalCredit += credit;
-
-        // Accounts Payable Summary
-        if (
-          accountName === "Accounts Payable" || accountName === "Raw Material Used"
-        ) {
-          accountsPayableTotal += debit; // Net Payable
-        }
-
-        // Accounts Receivable Summary
-        if (
-          accountName === "Accounts Receivable" || accountName === "Sales Revenue"
-        ) {
-          accountsReceivableTotal += credit; // Net Receivable
-        }
       });
-
-      // Set chart series
+  
+      const netBalances = computeNetBalances(netBalanceEntries);
+  
+      const accountsPayableNet = netBalances
+        .filter(
+          (item) =>
+            item.accountName === "Accounts Payable" ||
+            item.accountName === "Raw Material Used"
+        )
+        .reduce((sum, item) => sum + parseFloat(item.net), 0);
+  
+      const accountsReceivableNet = netBalances
+        .filter(
+          (item) =>
+            item.accountName === "Accounts Receivable" ||
+            item.accountName === "Sales Revenue"
+        )
+        .reduce((sum, item) => sum + parseFloat(item.net), 0);
+  
       const labels = Object.keys(grouped);
       const chartData = labels.map((label) => ({
         name: label,
         Debit: parseFloat(grouped[label].debit.toFixed(2)),
         Credit: parseFloat(grouped[label].credit.toFixed(2)),
       }));
-
+  
       setChartSeries(chartData);
       setSummary({
         debit: totalDebit.toFixed(2),
         credit: totalCredit.toFixed(2),
-        payable: accountsPayableTotal.toFixed(2),
-        receivable: accountsReceivableTotal.toFixed(2),
+        payable: accountsPayableNet.toFixed(2),
+        receivable: accountsReceivableNet.toFixed(2),
         balance: (totalDebit - totalCredit).toFixed(2),
       });
-
-      // Fetch Chart of Accounts data
+  
       const coaResponse = await axios.get(CHART_OF_ACCOUNTS_ENDPOINT);
       const coaData = coaResponse.data;
-
+  
       setData(
         coaData.map((acc, index) => ({
           id: index + 1,
@@ -127,39 +150,34 @@ const AccountingDashboard = () => {
           account_type: acc.account_type,
         }))
       );
-
-      const typeCounts = {};
-      coaData.forEach((acc) => {
-        typeCounts[acc.account_type] = (typeCounts[acc.account_type] || 0) + 1;
-      });
-
+  
       const formattedPie = [
         {
           name: "Accounts Payable",
-          value: parseFloat(accountsPayableTotal.toFixed(2)),
+          value: parseFloat(accountsPayableNet.toFixed(2)),
         },
         {
           name: "Accounts Receivable",
-          value: parseFloat(accountsReceivableTotal.toFixed(2)),
+          value: parseFloat(accountsReceivableNet.toFixed(2)),
         },
       ];
-
+  
       setPieData(formattedPie);
-
-
+  
     } catch (error) {
       console.error(
         "Error fetching data:",
         error.response ? error.response.data : error
       );
       setValidation({
-        isOpen: true, // Ensure this is set to true
+        isOpen: true,
         type: "error",
         title: "Fetch Error",
         message: "Failed to load dashboard data. Please check your connection.",
       });
     }
   };
+  
 
   useEffect(() => {
     fetchData();
@@ -172,6 +190,7 @@ const AccountingDashboard = () => {
       minimumFractionDigits: 2,
     }).format(value);
   };
+
 
   return (
     <div className="accounting">
