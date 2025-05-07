@@ -76,7 +76,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
   const fetchVendors = async () => {
     try {
       setLoading(true);
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
+      const response = await fetch("http://127.0.0.1:8000/operation/supplier/");
       if (!response.ok) throw new Error("Connection to database failed");
       const data = await response.json();
       if (!Array.isArray(data.vendors)) throw new Error("Invalid goods data format");
@@ -149,7 +149,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
     const fetchNextDocumentIds = async () => {
       if (isCreateMode) {
         try {
-          const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/get-next-doc-ids/');
+          const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/get-next-doc-ids/');
           if (!response.ok) throw new Error('Failed to fetch next document IDs');
          
           const data = await response.json();
@@ -184,7 +184,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
         // If this item exists in the database, delete it
         try {
-          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -210,7 +210,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
  
   const reloadDocumentItems = async () => {
     try {
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
+      const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
       if (!response.ok) throw new Error('Failed to reload document');
       const updatedData = await response.json();
       return updatedData.document_items;
@@ -276,7 +276,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
 
 
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
+    fetch('http://127.0.0.1:8000/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
         // Sort A–Z by location
@@ -290,7 +290,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
 
   // Inside your item fetch useEffect:
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item/')
+    fetch('http://127.0.0.1:8000/operation/item/')
       .then(res => res.json())
       .then(data => {
         const typePriority = { product: 1, material: 2, asset: 3 };
@@ -405,7 +405,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
   
 
 
-          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -559,7 +559,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       };
 
       // Call the create API
-      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
+      const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -573,10 +573,9 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       }
 
       const result = await response.json();
-      toast.success('Create successful:', result);
-      
-      // Call onSuccess with the created data if needed
-      onSuccess(result);
+      if(onSuccess){
+        await onSuccess(result);
+      }      
       
     } catch (error) {
       toast.error(`Failed to create document. Please try again later`);
@@ -638,7 +637,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
           }
           let itemResponse
           if (item.content_id){
-            itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
+            itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/${item.content_id}/`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -646,7 +645,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
               body: JSON.stringify(payload),
             });
           }else{
-            itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/`, {
+            itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -681,7 +680,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
           tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
           transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0
         };
-        const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
+        const goodsTrackingResponse = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -695,11 +694,11 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       }
       if (onSuccess) {
         await onSuccess();
-        toast.success("Successfully updated documents.");
-        
-      }
-      if (onBack) {
-        onBack();  // Navigate back to GoodsTracking
+        toast.dismiss()
+        toast.success("Successfully updated documents.", {
+          autoClose: 1000,
+          onClose: () => onBack(), 
+        });
       }
     } catch (error) {
       toast.error(`Failed to update data. Please try again later`);
@@ -720,7 +719,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
   // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
+      const response = await fetch("http://127.0.0.1:8000/operation/purchase_order/");
       if (!response.ok) throw new Error("Failed to fetch purchase orders");
      
       const data = await response.json();
@@ -740,7 +739,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
  
     try {
       // Fetch the selected purchase order details
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
+      const response = await fetch(`http://127.0.0.1:8000/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
       const selectedPO = await response.json();
@@ -1077,8 +1076,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
                     <th>Manufacturing Date</th>
                     <th>Expiry Date</th>
                     <th>Warehouse Location</th>
-                    <th>Serial No.</th>
                     <th>Batch No.</th>
+                    <th>Serial No.</th>
                   </tr>
                 </thead>
                 <tbody className="dropdown-scrollbar">

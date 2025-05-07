@@ -52,18 +52,18 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const fetchVendors = async () => {
     try {
       setLoading(true);
-      const responseEmployee = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
+      const responseEmployee = await fetch("http://127.0.0.1:8000/operation/supplier/");
       if (!responseEmployee.ok) throw new Error("Connection to database failed");
       const dataE = await responseEmployee.json();
       if (!Array.isArray(dataE.employees)) throw new Error("Invalid employee format");
       setEmployeeList(dataE.employees)
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/customer/");
+      const response = await fetch("http://127.0.0.1:8000/operation/customer/");
       if (!response.ok) throw new Error("Connection to database failed");
       const data = await response.json();
       if (!Array.isArray(data)) throw new Error("Invalid customer format");
       setVendorList(data);
       setLoadingInvoices(true);
-      const responseSalesInvoice = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/sales-invoice/");
+      const responseSalesInvoice = await fetch("http://127.0.0.1:8000/operation/sales-invoice/");
       if (!responseSalesInvoice.ok) throw new Error("Failed to fetch invoices");
       const dataInvoice = await responseSalesInvoice.json();
       setInvoices(dataInvoice);
@@ -198,7 +198,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const fetchNextDocumentIds = async () => {
       if (isCreateMode) {
         try {
-          const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/get-next-doc-ids/');
+          const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/get-next-doc-ids/');
           if (!response.ok) throw new Error('Failed to fetch next document IDs');
          
           const data = await response.json();
@@ -234,7 +234,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
       // If this item exists in the database, delete it
       try {
-        await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
+        await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -260,7 +260,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   const reloadDocumentItems = async () => {
     try {
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
+      const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
       if (!response.ok) throw new Error('Failed to reload document');
       const updatedData = await response.json();
       return updatedData.document_items;
@@ -323,7 +323,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
   useEffect(() => {
-    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
+    fetch('http://127.0.0.1:8000/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
         // Sort A–Z by location
@@ -337,7 +337,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   // Inside your item fetch useEffect:
   useEffect(() => {
-      fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item/')
+      fetch('http://127.0.0.1:8000/operation/item/')
         .then(res => res.json())
         .then(data => {
           const typePriority = { product: 1, material: 2, asset: 3 };
@@ -453,7 +453,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   
 
 
-          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -595,8 +595,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           item_no: null
         }))
       };
+      console.log(payload)
       // Call the create API
-      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
+      const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -624,10 +625,14 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
       const result = await response.json();
-      toast.success('Create successful:', result);
-     
-      // Call onSuccess with the created data if needed
-      onSuccess(result);
+      if (onSuccess) {
+        await onSuccess();
+        toast.dismiss()
+        toast.success("Successfully updated documents.", {
+          autoClose: 1000,
+          onClose: () => onBack(), 
+        });
+      }   
      
     } catch (error) {
       toast.error(`Failed to create document. Please try again later`);
@@ -648,10 +653,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         toast.dismiss()
         toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
         return;
-      }else if (!documentDetails.buyer){
-        toast.dismiss()
-        toast.error("Buyer is required.")
-        return
       }
       for (let item of updatedDocumentItems){
         rowNum += 1
@@ -693,7 +694,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             console.log(payload)
             let itemResponse
             if (item.content_id){
-              itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
+              itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/${item.content_id}/`, {
                 method: 'PUT',
                 headers: {
                   'Content-Type': 'application/json',
@@ -701,7 +702,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                 body: JSON.stringify(payload),
               });
             }else{
-              itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/`, {
+              itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -736,7 +737,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
             transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0
           };
-          const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
+          const goodsTrackingResponse = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -768,7 +769,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
-      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
+      const response = await fetch("http://127.0.0.1:8000/operation/purchase_order/");
       if (!response.ok) throw new Error("Failed to fetch purchase orders");
      
       const data = await response.json();
@@ -792,7 +793,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
     try {
       // Fetch the selected purchase order details
-      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
+      const response = await fetch(`http://127.0.0.1:8000/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
       const selectedPO = await response.json();
@@ -894,18 +895,19 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       .slice(0, -1) // exclude the last empty row
       .reduce((sum, item) => {
         const price = parseFloat(item.cost || duplicateDetails[item.item_id]?.[0]?.price || 0);
-        const totalprice = price - (price * parseFloat(item.ar_discount/100))
-        return parseFloat(sum + (parseFloat(item.quantity || 0) * totalprice));
+        const total = parseFloat((parseFloat(item.quantity || 0) * parseFloat(price))-parseFloat(item?.ar_discount || 0));
+        return total;
       }, 0)
       .toFixed(2);
     setInitialAmount(newInitialAmount);
+    
   }, [documentItems, duplicateDetails]);
 
 
   return (
     <div className="ar-cred">
       <div className="body-content-container">
-        <div className="back-button" onClick={handleBackWithUpdate}>← Back</div>
+        <div className="back-button" onClick={handleBackWithUpdate}>← Save</div>
         <div className="content-wrapper">
         <ToastContainer transition={Slide} />
           <div className="details-grid">
@@ -1271,7 +1273,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                           const currentCost = item.cost || 
                           (item.item_id && duplicateDetails[item.item_id]?.[0]?.price) || 0;
 
-                          const total = parseFloat((parseFloat(item.quantity || 0) * parseFloat(currentCost))-parseFloat(item.ar_discount));
+                          const total = parseFloat((parseFloat(item.quantity || 0) * parseFloat(currentCost))-parseFloat(item?.ar_discount || 0));
                           if (total > 1000000000) {
                             toast.dismiss();
                             toast.error("Total cost must not exceed 1 billion");
