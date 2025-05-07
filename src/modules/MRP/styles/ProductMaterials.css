@@ -473,4 +473,41 @@
 
 }
 
+.mats select::-webkit-scrollbar {
+  width: 8px;
+}
 
+.mats select::-webkit-scrollbar-thumb {
+  background-color: #00A8A8;
+  border-radius: 8px;
+}
+
+.mats select::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+
+.mats select {
+  width: 100%;
+}
+
+.mats select:focus {
+  width: 100%;
+}
+
+.mats select option {
+  white-space: nowrap; /* Prevents text wrapping */
+}
+
+/* Truncate long text in select options */
+.select-truncate option {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Optional: match select dropdown with input width */
+.select-truncate {
+  width: 100%;
+  max-width: 320px; /* match your input box */
+}

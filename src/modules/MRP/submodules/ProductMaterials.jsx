@@ -11,9 +11,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [addProduct, setAddProduct] = useState(false);
     const [addRawMaterial, setAddRawMaterial] = useState(false);
     const [editRawMaterial, setEditRawMaterial] = useState(false);
-    const [showHelpOptions, setShowHelpOptions] = useState(false);
+    const [checker, setChecker] = useState(false);
+    const [checker2, setChecker2] = useState(false);
+    const [checker3, setChecker3] = useState(false);
+    const [created, setCreated] = useState(false);
+    const [created2, setCreated2] = useState(false);
+    const [created3, setCreated3] = useState(false);
     const [isProjectType, setIsProjectType] = useState(null);
     const [fetchMrpData, setFetchMrpData] = useState([]);
+
+    const [isCustomMaterial, setIsCustomMaterial] = useState(false);
+    const [allMaterialOptions, setAllMaterialOptions] = useState([]);
 
     const [productId, setProductId] = useState("");
     const [productName, setProductName] = useState("");
@@ -99,6 +107,26 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         { "product_id": "ADMIN-PROD-2025-a6d292", "raw_material": "Stainless Steel", "material_id": "ADMIN-MATERIAL-2025-37d86c", "rm_quantity": "109.90","units": "kg", "unit_cost": "100.00", "total_cost": "10990.00"}
     ]
 
+    const fetchAllMaterialOptions = async () => {
+        try {
+            const response = await fetch(`${baseurl}/product_material/productrawmaterial/`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch all material options");
+            }
+            const data = await response.json();
+            const formatted = data.map(item => ({
+                materialId: item.material_id,
+                rawMaterial: item.item_name,
+                quantity: item.quantity_required,
+                units: item.unit_of_measure,
+            }));
+            setAllMaterialOptions(formatted);
+        } catch (error) {
+            console.error("Error fetching all material options:", error);
+        }
+    };
+    
+
     const getFilteredData = () => {
         const term = (searchTerm || "").toLowerCase();
       
@@ -181,13 +209,41 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     };
 
     useEffect(() => {
+        if (!addProduct) {
+            setProductId("");
+            setProductName("");
+            setProductDescription("");
+        }
+    
+        if (!addRawMaterial) {
+            setNewMaterialId("");
+            setNewRawMaterial("");
+            setNewQuantity("");
+            setNewUnits("");
+            setIsCustomMaterial(false);
+        } else {
+            fetchAllMaterialOptions();
+    
+            if (newMaterialId && !isCustomMaterial) {
+                const matched = allMaterialOptions.find(item => item.materialId === newMaterialId);
+                if (matched) {
+                    setNewRawMaterial(matched.rawMaterial || "");
+                    setNewQuantity(matched.quantity || "");
+                    setNewUnits(matched.units || "");
+                }
+            }
+        }
+    
         if (!editRawMaterial) {
             setEditMaterialId("");
             setEditRawMaterial2("");
             setEditQuantity("");
             setEditUnits("");
         }
-    }, [editRawMaterial]);
+    }, [addProduct, addRawMaterial, editRawMaterial, newMaterialId, isCustomMaterial]);
+    
+    
+    
 
     return (      
         <div className="mats">
@@ -326,7 +382,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
                     <span style={{ color: '#969696' }}>Close</span>
                     </button>
-                    <button style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <button onClick={() => setChecker(true)} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                     <span>Add</span>
                     <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                     </button>
@@ -344,38 +400,110 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
                 <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center', width: '100%' }}>
-                        
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
-                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Raw Material:</label>
-                        <input type="text" value={newRawMaterial} onChange={(e) => setNewRawMaterial(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
-                        </div>
 
+                        {/* MATERIAL ID SELECT or CUSTOM INPUT */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
                         <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Material ID:</label>
-                        <input type="text" value={newMaterialId} onChange={(e) => setNewMaterialId(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        {!isCustomMaterial ? (
+                            <select
+                            className="select-truncate"
+                            value={newMaterialId}
+                            onChange={(e) => {
+                              if (e.target.value === "custom") {
+                                setIsCustomMaterial(true);
+                                setNewMaterialId("ADMIN-ITEM-2025-");
+                              } else {
+                                setNewMaterialId(e.target.value);
+                              }
+                            }}
+                            style={{...inputStyle, width: '100%', appearance: 'none', cursor: 'pointer',}}>
+                            <option value="">Select Material ID</option>
+                            <option value="custom">Custom (Type your own)</option>
+                            {allMaterialOptions
+                              .sort((a, b) => a.rawMaterial.localeCompare(b.rawMaterial))
+                              .map((item, index) => (
+                                <option key={index} value={item.materialId}>
+                                  {item.materialId} ({item.rawMaterial})
+                                </option>
+                            ))}
+                            </select>
+                        ) : (
+                            <input
+                            type="text"
+                            value={newMaterialId}
+                            onChange={(e) => setNewMaterialId(e.target.value)}
+                            style={{ ...inputStyle, width: '100%' }}
+                            placeholder="ADMIN-ITEM-2025-XXXXXX"
+                            />
+                        )}
                         </div>
 
+
+
+                        {/* RAW MATERIAL */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
+                        <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Raw Material:</label>
+                        <input
+                            type="text"
+                            value={newRawMaterial}
+                            onChange={(e) => setNewRawMaterial(e.target.value)}
+                            disabled={!isCustomMaterial}
+                            style={{
+                            ...inputStyle,
+                            width: '100%',
+                            backgroundColor: isCustomMaterial ? '#F5F5F5' : '#E5E5E5',
+                            cursor: isCustomMaterial ? 'text' : 'not-allowed'
+                            }}
+                        />
+                        </div>
+
+                        {/* QUANTITY */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
                         <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Quantity:</label>
-                        <input type="text" value={newQuantity} onChange={(e) => setNewQuantity(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        <input
+                            type="text"
+                            value={newQuantity}
+                            onChange={(e) => setNewQuantity(e.target.value)}
+                            disabled={!isCustomMaterial}
+                            style={{
+                            ...inputStyle,
+                            width: '100%',
+                            backgroundColor: isCustomMaterial ? '#F5F5F5' : '#E5E5E5',
+                            cursor: isCustomMaterial ? 'text' : 'not-allowed'
+                            }}
+                        />
                         </div>
 
+                        {/* UNITS */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
                         <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Units:</label>
-                        <input type="text" value={newUnits} onChange={(e) => setNewUnits(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
+                        <input
+                            type="text"
+                            value={newUnits}
+                            onChange={(e) => setNewUnits(e.target.value)}
+                            disabled={!isCustomMaterial}
+                            style={{
+                            ...inputStyle,
+                            width: '100%',
+                            backgroundColor: isCustomMaterial ? '#F5F5F5' : '#E5E5E5',
+                            cursor: isCustomMaterial ? 'text' : 'not-allowed'
+                            }}
+                        />
                         </div>
 
+                        
                     </div>
                 </div>
 
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 20, }}>
                     <button onClick={() => setAddRawMaterial(false)} style={buttonStyle2('#fff', '#A4A4A4')}>
-                    <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
-                    <span style={{ color: '#969696' }}>Close</span>
+                        <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
+                        <span style={{ color: '#969696' }}>Close</span>
                     </button>
-                    <button style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
-                    <span>Add</span>
-                    <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
+                    <button onClick={() => setChecker2(true)} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                        <span>Add</span>
+                        <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                     </button>
                 </div>
                 </div>
@@ -439,7 +567,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
                     <span style={{ color: '#969696' }}>Close</span>
                     </button>
-                    <button style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <button onClick={() => setChecker3(true)} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                     <span>Edit</span>
                     <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                     </button>
@@ -448,6 +576,157 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             </div>
             )}
 
+            {checker && (
+            <div className="bom-print-modal2">
+                <div className="fixed inset-0 flex items-center justify-center px-4">
+                <div style={{width: '100%', maxWidth: 660, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', borderRadius: 10, padding: 24, display: 'flex', flexDirection: 'column', gap: 24}}>
+                    <div style={{textAlign: 'center', fontSize: 55, fontFamily: 'Inter', fontWeight: 400, color: '#130101', lineHeight: 1.2, letterSpacing: 1.2}}>Are you sure you want <br></br> to add a product?</div>
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
+                        <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                            <span style={{ fontWeight: 500, color: '#585757' }}><b>Product ID.: </b></span>
+                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>{productId}</span>
+                        </div>
+                    </div>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
+                    <button onClick={() => setChecker(false)} style={buttonStyle2('#fff')}>
+                        <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
+                        <span style={{color: '#969696'}}>Back</span>
+                    </button>
+                    <button onClick={() => {setCreated(true)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                        <span>Add Product</span>
+                        <div className="MRPIcon5" style={{width: 13, height: 21, marginLeft: 8}} />
+                    </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            )}
+
+            {checker2 && (
+            <div className="bom-print-modal2">
+                <div className="fixed inset-0 flex items-center justify-center px-4">
+                <div style={{width: '100%', maxWidth: 660, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', borderRadius: 10, padding: 24, display: 'flex', flexDirection: 'column', gap: 24}}>
+                    <div style={{textAlign: 'center', fontSize: 55, fontFamily: 'Inter', fontWeight: 400, color: '#130101', lineHeight: 1.2, letterSpacing: 1.2}}>Are you sure you want <br></br> to add raw material?</div>
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
+                        <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                            <span style={{ fontWeight: 500, color: '#585757' }}><b>Material ID.: </b></span>
+                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>{newMaterialId}</span>
+                        </div>
+                    </div>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
+                    <button onClick={() => setChecker2(false)} style={buttonStyle2('#fff')}>
+                        <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
+                        <span style={{color: '#969696'}}>Back</span>
+                    </button>
+                    <button onClick={() => {setCreated2(true)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                        <span>Add Product</span>
+                        <div className="MRPIcon5" style={{width: 13, height: 21, marginLeft: 8}} />
+                    </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            )}
+
+            {checker3 && (
+            <div className="bom-print-modal2">
+                <div className="fixed inset-0 flex items-center justify-center px-4">
+                <div style={{width: '100%', maxWidth: 660, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', borderRadius: 10, padding: 24, display: 'flex', flexDirection: 'column', gap: 24}}>
+                    <div style={{textAlign: 'center', fontSize: 55, fontFamily: 'Inter', fontWeight: 400, color: '#130101', lineHeight: 1.2, letterSpacing: 1.2}}>Are you sure you want <br></br> to edit raw material?</div>
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
+                        <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                            <span style={{ fontWeight: 500, color: '#585757' }}><b>Material ID.: </b></span>
+                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>{editMaterialId}</span>
+                        </div>
+                    </div>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
+                    <button onClick={() => setChecker3(false)} style={buttonStyle2('#fff')}>
+                        <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
+                        <span style={{color: '#969696'}}>Back</span>
+                    </button>
+                    <button onClick={() => {setCreated3(true),setChecker3(false),setEditRawMaterial2(false)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                        <span>Add Product</span>
+                        <div className="MRPIcon5" style={{width: 13, height: 21, marginLeft: 8}} />
+                    </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            )}
+
+            {created && (
+            <div className="bom-print-modal">
+                <div className="fixed inset-0 flex items-center justify-center px-4">
+                <div style={{width: '100%', maxWidth: 525, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', borderRadius: 10, padding: 24, display: 'flex', flexDirection: 'column', gap: 24, position: 'relative'}}>
+                    <img style={{width: 171, height: 171, margin: '0 auto'}} src="/icons/module-icons/MRP-icons/MRPCheck.png" />
+                    <div style={{textAlign: 'center', fontSize: 28, fontFamily: 'Inter', fontWeight: 400, color: '#130101', letterSpacing: 1.2, textTransform: 'capitalize'}}>Added Product</div>
+                    
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
+                        <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                            <span style={{ fontWeight: 500, color: '#585757' }}><b>Material ID: </b></span>
+                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>{productId}</span>
+                        </div>
+                    </div>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
+                    <button onClick={() => {setCreated(false),setChecker(false),setAddProduct(false)}} style={buttonStyle2('#fff')}>
+                        <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
+                        <span style={{color: '#969696'}}>Close</span>
+                    </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            )}
+
+            {created2 && (
+            <div className="bom-print-modal">
+                <div className="fixed inset-0 flex items-center justify-center px-4">
+                <div style={{width: '100%', maxWidth: 525, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', borderRadius: 10, padding: 24, display: 'flex', flexDirection: 'column', gap: 24, position: 'relative'}}>
+                    <img style={{width: 171, height: 171, margin: '0 auto'}} src="/icons/module-icons/MRP-icons/MRPCheck.png" />
+                    <div style={{textAlign: 'center', fontSize: 28, fontFamily: 'Inter', fontWeight: 400, color: '#130101', letterSpacing: 1.2, textTransform: 'capitalize'}}>Added Raw Materials</div>
+                    
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
+                        <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                            <span style={{ fontWeight: 500, color: '#585757' }}><b>Material ID: </b></span>
+                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>{newMaterialId}</span>
+                        </div>
+                    </div>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
+                    <button onClick={() => {setCreated2(false),setChecker2(false),setAddRawMaterial(false)}} style={buttonStyle2('#fff')}>
+                        <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
+                        <span style={{color: '#969696'}}>Close</span>
+                    </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            )}
+
+            {created3 && (
+            <div className="bom-print-modal">
+                <div className="fixed inset-0 flex items-center justify-center px-4">
+                <div style={{width: '100%', maxWidth: 525, background: 'white', boxShadow: '0px 4px 7.5px 1px rgba(0,0,0,0.25)', borderRadius: 10, padding: 24, display: 'flex', flexDirection: 'column', gap: 24, position: 'relative'}}>
+                    <img style={{width: 171, height: 171, margin: '0 auto'}} src="/icons/module-icons/MRP-icons/MRPCheck.png" />
+                    <div style={{textAlign: 'center', fontSize: 28, fontFamily: 'Inter', fontWeight: 400, color: '#130101', letterSpacing: 1.2, textTransform: 'capitalize'}}>Edited Raw Materials</div>
+                    
+                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}>
+                        <div style={{padding: '6px 24px', background: 'white', borderRadius: 20, boxShadow: '0px 4px 7.5px 1px rgba(0, 0, 0, 0.25)', display: 'flex', alignItems: 'center', gap: 10,}}>
+                            <span style={{ fontWeight: 500, color: '#585757' }}><b>Material ID: </b></span>
+                            <span style={{padding: '6px 24px', color: '#585757', fontFamily: 'Inter', fontWeight: 500 }}>{editMaterialId}</span>
+                        </div>
+                    </div>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
+                    <button onClick={() => {setCreated3(false),setChecker3(false),setEditRawMaterial(false)}} style={buttonStyle2('#fff')}>
+                        <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
+                        <span style={{color: '#969696'}}>Close</span>
+                    </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            )}
+
+            
 
 
         </div>
