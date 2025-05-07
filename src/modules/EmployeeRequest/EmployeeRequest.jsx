@@ -58,9 +58,10 @@ const EmployeeRequest = ({ loadSubModule, setActiveSubModule, employee_id }) => 
       // Navigate to the submodule - Order matters here!
       // We need to first set the active submodule, then load it
       setActiveSubModule(submodule);
-      loadSubModule(submodule);
-      
-      console.log('Navigation successful to:', submodule);
+      setTimeout(() => {
+        loadSubModule(submodule);
+        console.log('Navigation successful to:', submodule);
+      }, 0);
     } catch (error) {
       console.error('Error navigating to submodule:', error);
       alert(`Failed to navigate to ${submodule}. Please try again or contact support.`);
@@ -94,6 +95,7 @@ const EmployeeRequest = ({ loadSubModule, setActiveSubModule, employee_id }) => 
                 <div className="emp-req-card-action">
                   <button 
                     onClick={(e) => navigateToSubmodule(request.submodule, e)}
+                    className="emp-req-action-button"
                   >
                     Submit Request
                   </button>
