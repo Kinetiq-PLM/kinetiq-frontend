@@ -35,9 +35,13 @@ const Operations = ({employee_id}) => {
     window.addEventListener('resize', handleResize);
     
     // Fetch data from API
-    fetchData();
+    if (documents.length === 0) {
+      fetchData();
+    }
     
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
   const [currentTypeIndex, setCurrentTypeIndex] = useState(0);
   const [statusByType, setStatusByType] = useState({});
@@ -137,6 +141,7 @@ const Operations = ({employee_id}) => {
         console.error('Failed to fetch employee data:', error);
       });
   }, [employee_id]);
+ 
   if (loading) {
     return (
       <div className="operations">
@@ -150,23 +155,6 @@ const Operations = ({employee_id}) => {
       </div>
     );
   }
-
-  if (loading) {
-    return (
-      
-      <div className="operations">
-        <div className="body-content-container">
-          <div className="operations-container">
-          <div className="operations loading-center">
-            <p>Loading data...</p>
-          </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-
   return (
     <div className="operations">
       <div className="body-content-container">
