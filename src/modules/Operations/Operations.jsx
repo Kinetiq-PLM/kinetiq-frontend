@@ -137,9 +137,23 @@ const Operations = ({employee_id}) => {
         console.error('Failed to fetch employee data:', error);
       });
   }, [employee_id]);
+  if (loading) {
+    return (
+      <div className="operations">
+        <div className="body-content-container">
+          <div className="operations-container loading">
+            <div className="operations loading-center">
+              <p>Loading data...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
+      
       <div className="operations">
         <div className="body-content-container">
           <div className="operations-container">

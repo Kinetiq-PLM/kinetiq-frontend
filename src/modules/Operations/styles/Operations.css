@@ -244,9 +244,19 @@
 .operations .loading-center {
   display: flex;
   justify-content: center;
-  height: 100vh; /* Full screen height */
-  font-size: 1.2rem;
+  align-items: center;
+  height: 100; 
+  width: 100%;
+  font-size: 1.5rem;
   color: #333;
+  position: absolute;
+  top: 20%;
+  left: 0;
+  right: 0;
+  margin-top: -1.5rem;
+  text-align: center;
+  z-index:10;
+  transform: translateY(-50%);
 }
 .operations .operations-status-card {
   transition: transform 0.3s ease, opacity 0.3s ease;
@@ -272,21 +282,22 @@
 .operations .dropdown-scrollbar::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
-.operations .operations.loading-center {
+.operations .loading-center {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  font-size: 1.2rem;
+  width: 100%;
+  font-size: 1.5rem;
   color: #333;
   position: absolute;
-  top: 0;
+  top: 50%; 
   left: 0;
   right: 0;
-  bottom: 0;
+  text-align: center;
+  z-index: 10;
 }
 
-.operations .operations-container.loading {
-  overflow: hidden;
+.operations-container.loading {
   position: relative;
+  min-height: 300px; 
 }
