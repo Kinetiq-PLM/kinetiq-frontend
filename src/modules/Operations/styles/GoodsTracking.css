@@ -38,7 +38,7 @@
   align-items: center;
   width: 100%;
   padding: 1.1em;
-  gap: 0.5rem; /* Add spacing between tabs */
+  gap: 0.5rem; 
 }
 .gr .operations-gt-tab {
   font-size: 1rem;
