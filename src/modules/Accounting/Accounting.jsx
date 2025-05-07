@@ -188,9 +188,6 @@ const AccountingDashboard = () => {
                   Financial overview and analysis
                 </p>
               </div>
-              <div>
-                <Button name="Refresh data" variant="standard2" onclick={fetchData} />
-              </div>
             </div>
           </div>
         </div>
@@ -337,72 +334,6 @@ const AccountingDashboard = () => {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-
-            {/* Pie Chart */}
-            <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-300">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                Accounts Payable and Receivable
-              </h2>
-
-              <ResponsiveContainer width="100%" height={420}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={130}
-                    innerRadius={60}
-                    paddingAngle={3}
-                    labelLine={true}
-                    label={({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(1)}%`
-                    }
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value, name) => [
-                      `₱${parseFloat(value).toLocaleString("en-PH", {
-                        minimumFractionDigits: 2,
-                      })}`,
-                      name,
-                    ]}
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      borderRadius: "8px",
-                      border: "1px solid #e2e8f0",
-                      fontSize: "13px",
-                      padding: "10px 14px",
-                    }}
-                    itemStyle={{ fontSize: "13px", color: "#333" }}
-                  />
-                  <Legend
-                    verticalAlign="bottom"
-                    height={48}
-                    iconType="circle"
-                    wrapperStyle={{
-                      display: "flex",
-                      justifyContent: "center",
-                      fontSize: "13px",
-                      color: "#4b5563",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-
-              <p className="text-center text-sm text-gray-600 mt-4">
-                This chart shows the relative balances of Accounts Payable and Receivable based on the General Ledger.
-              </p>
-
-            </div>
-
           </div>
         </div>
       </div>
