@@ -54,7 +54,7 @@ const TaxRemittanceModal = ({
       case "Cash":
         return `REF-Cash-${randomNum}`;
       case "Bank Transfer":
-        return `REF-Bank-${randomNum}`;
+        return `REF-Bank Transfer-${randomNum}`;
       case "Credit Card":
         return `REF-Credit Card-${randomNum}`;
       default:
