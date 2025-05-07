@@ -38,7 +38,7 @@
   border-radius: 4px;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: auto;
 }
 
 .JournalEntry .table-row,
@@ -47,7 +47,7 @@
   display: grid;
   grid-template-columns: .5fr 0.5fr 0.5fr 0.2fr;
   gap: 8px;
-  padding: 1rem;
+  padding: .3rem 1rem;
   border-bottom: 1px solid #ccc;
   align-items: center;
 }
