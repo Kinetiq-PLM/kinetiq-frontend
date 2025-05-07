@@ -93,7 +93,7 @@
 }
 
 .InternalTransfer table th {
-    background: white;
+  background: white;
     padding: 0.75rem;
     font-size: 0.875rem;
     color: #495057;
@@ -104,12 +104,12 @@
     top: 0;
 }
 
+
 .InternalTransfer table td {
     padding: 0.75rem;
     font-size: 0.875rem;
     color: #212529;
     border-bottom: 1px solid #f1f1f1;
-    vertical-align: middle;
 }
 
 .InternalTransfer .input-container {
@@ -130,16 +130,16 @@
 .InternalTransfer input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border: 2px solid #008080;
     background-color: white;
     border-radius: 4px;
     cursor: pointer;
     margin: 0;
     position: relative;
-
     transition: all 0.2s ease;
+    top: 3.4px;
 }
 
 .InternalTransfer input[type="checkbox"]:checked {
@@ -173,7 +173,7 @@
 
 .InternalTransfer table td:first-child {
     width: 50px;
-    padding: 0.5rem;
+    padding: 0.5rem 0.75rem;
     text-align: center;
     vertical-align: middle;
 
