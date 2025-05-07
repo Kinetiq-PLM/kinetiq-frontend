@@ -231,7 +231,7 @@ const GeneralLedgerAccounts = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searching.toLowerCase());
+      .includes(searching.toLowerCase().trim());
 
     const matchesStatus =
       statusFilter === "All" ||

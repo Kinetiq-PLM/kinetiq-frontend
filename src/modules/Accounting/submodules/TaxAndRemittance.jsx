@@ -167,7 +167,7 @@ const TaxAndRemittance = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searching.toLowerCase())
+      .includes(searching.toLowerCase().trim())
   );
 
   const LoadingSpinner = () => (
