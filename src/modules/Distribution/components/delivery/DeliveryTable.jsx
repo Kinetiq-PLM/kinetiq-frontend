@@ -83,6 +83,14 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, projectFilter, pa
   const currentItems = filteredDeliveries.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredDeliveries.length / itemsPerPage);
   
+  // Get appropriate sort icon
+  const getSortIcon = (field) => {
+    if (sortField !== field) return <FaSort className="sort-icon neutral" />;
+    return sortDirection === "asc" ? 
+      <FaSortUp className="sort-icon ascending" /> : 
+      <FaSortDown className="sort-icon descending" />;
+  };
+
   // Handle column sort
   const handleSort = (field) => {
     const newDirection = field === sortField && sortDirection === "asc" ? "desc" : "asc";
@@ -152,29 +160,32 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, projectFilter, pa
         <table className="delivery-table">
           <thead>
             <tr>
-              <th>
+              <th className="sortable" onClick={() => handleSort(deliveryType === 'sales' ? 'sales_order_id' : 
+                deliveryType === 'service' ? 'service_order_id' : 
+                deliveryType === 'content' ? 'content_id' : 'stock_transfer_id')}>
                 {deliveryType === 'sales' ? 'Sales Order ID' : 
                 deliveryType === 'service' ? 'Service Order ID' : 
                 deliveryType === 'content' ? 'Content ID' : 
                 'Stock Transfer ID'}
+                {getSortIcon(deliveryType === 'sales' ? 'sales_order_id' : 
+                  deliveryType === 'service' ? 'service_order_id' : 
+                  deliveryType === 'content' ? 'content_id' : 'stock_transfer_id')}
               </th>
-              <th onClick={() => handleSort("order_status")} className="sortable">
+              <th className="sortable" onClick={() => handleSort("order_status")}>
                 Status
-                {sortField === "order_status" && (
-                  <span className="sort-icon">
-                    {sortDirection === "asc" ? <FaSortUp /> : <FaSortDown />}
-                  </span>
-                )}
+                {getSortIcon("order_status")}
               </th>
-              <th>Is Project-Based?</th>
-              <th>Is Partial Delivery?</th>
-              <th onClick={() => handleSort("del_order_id")} className="sortable">
+              <th className="sortable" onClick={() => handleSort("is_project_based")}>
+                Is Project-Based?
+                {getSortIcon("is_project_based")}
+              </th>
+              <th className="sortable" onClick={() => handleSort("is_partial_delivery")}>
+                Is Partial Delivery?
+                {getSortIcon("is_partial_delivery")}
+              </th>
+              <th className="sortable" onClick={() => handleSort("del_order_id")}>
                 Delivery Order ID
-                {sortField === "del_order_id" && (
-                  <span className="sort-icon">
-                    {sortDirection === "asc" ? <FaSortUp /> : <FaSortDown />}
-                  </span>
-                )}
+                {getSortIcon("del_order_id")}
               </th>
               {/* TEMPORARY: Approval column - Comment this line to hide the column */}
               {/* <th>Actions</th> */}

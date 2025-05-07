@@ -3514,3 +3514,305 @@
   margin-bottom: 1rem;
   color: #dee2e6;
 }
+
+/* Add these styles to improve the look with icons */
+
+/* Page header with icon */
+.shipment .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.shipment .page-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.shipment .title-icon {
+  margin-right: 12px;
+  color: #00a8a8;
+  font-size: 1.5rem;
+}
+
+.shipment .refresh-button {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shipment .refresh-button:hover {
+  background-color: #e9ecef;
+}
+
+.shipment .refresh-icon {
+  margin-right: 6px;
+}
+
+/* Search container with icon */
+.shipment .search-container {
+  position: relative;
+  flex: 1 1 250px;
+}
+
+.shipment .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.shipment .search-input {
+  padding: 8px 12px 8px 36px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  width: 100%;
+  transition: border-color 0.15s ease-in-out;
+}
+
+/* Filter improvements */
+.shipment .filter-container {
+  margin-left: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.shipment .filter-label {
+  color: #495057;
+  font-weight: 500;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.shipment .filter-icon {
+  margin-right: 6px;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* Status buttons with icons */
+.shipment .status-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.shipment .status-button {
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.shipment .button-icon {
+  margin-right: 6px;
+  font-size: 0.9rem;
+}
+
+.shipment .status-button:hover {
+  background-color: #e9ecef;
+}
+
+.shipment .status-button.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}
+
+/* Stats row with icons */
+.shipment .stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.shipment .stat-box {
+  flex: 1 1 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.shipment .stat-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.shipment .stat-icon {
+  margin-right: 6px;
+  color: #00a8a8;
+}
+
+.shipment .stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+/* Error state with icon */
+.shipment .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 6px;
+}
+
+.shipment .error-icon {
+  font-size: 2rem;
+  color: #dc3545;
+  margin-bottom: 16px;
+}
+
+.shipment .error-message {
+  color: #856404;
+  font-weight: 500;
+}
+
+/* Table improvements */
+.shipment .shipment-table th.sortable {
+  cursor: pointer;
+  position: relative;
+  padding-right: 24px;
+}
+
+.shipment .sort-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+}
+
+.shipment .sort-icon.neutral {
+  color: #adb5bd;
+}
+
+.shipment .sort-icon.ascending,
+.shipment .sort-icon.descending {
+  color: #00a8a8;
+}
+
+/* Empty table state */
+.shipment .no-data {
+  padding: 40px !important;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.shipment .no-data-icon {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: #dc3545;
+}
+
+/* Delivery type cell with icon */
+.shipment .delivery-type-cell {
+  display: flex;
+  align-items: center;
+}
+
+.shipment .delivery-type-icon {
+  margin-right: 8px;
+  color: #00a8a8;
+}
+
+/* Pagination controls */
+.shipment .pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.shipment .pagination-button {
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.shipment .pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shipment .pagination-icon {
+  font-size: 0.8rem;
+  margin: 0 4px;
+}
+
+.shipment .page-numbers {
+  display: flex;
+  gap: 6px;
+}
+
+.shipment .page-number {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shipment .page-number.active {
+  background-color: #00a8a8;
+  color: white;
+  border-color: #00a8a8;
+}

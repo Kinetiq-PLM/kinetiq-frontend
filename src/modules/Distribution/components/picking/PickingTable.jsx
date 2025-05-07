@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../../styles/Picking.css';
-import { FaSortUp, FaSortDown } from 'react-icons/fa';
+import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
 const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) => {
   const [sortField, setSortField] = useState('picking_list_id'); // Default sort can be changed
@@ -22,6 +22,14 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
     }
     // Reset to first page when sorting changes
     setCurrentPage(1);
+  };
+
+  // Get appropriate sort icon
+  const getSortIcon = (field) => {
+    if (sortField !== field) return <FaSort className="sort-icon neutral" />;
+    return sortDirection === 'asc' ? 
+      <FaSortUp className="sort-icon ascending" /> : 
+      <FaSortDown className="sort-icon descending" />;
   };
 
   // Sort the picking lists
@@ -127,22 +135,14 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
                 onClick={() => handleSort('delivery_id')}
               >
                 Delivery ID
-                {sortField === 'delivery_id' && (
-                  <span className="sort-icon">
-                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
-                  </span>
-                )}
+                {getSortIcon('delivery_id')}
               </th>
               <th
                 className="sortable"
                 onClick={() => handleSort('delivery_type')}
               >
                 Delivery Type
-                {sortField === 'delivery_type' && (
-                  <span className="sort-icon">
-                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
-                  </span>
-                )}
+                {getSortIcon('delivery_type')}
               </th>
               <th
                 className="sortable"
@@ -150,11 +150,7 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
                 onClick={() => handleSort('warehouse_name')}
               >
                 Warehouse
-                {sortField === 'warehouse_name' && (
-                  <span className="sort-icon">
-                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
-                  </span>
-                )}
+                {getSortIcon('warehouse_name')}
               </th>
               <th
                 className="sortable"
@@ -162,44 +158,28 @@ const PickingTable = ({ pickingLists, onListSelect, selectedList, employees }) =
                 onClick={() => handleSort('items_count')} // Use a consistent field name if possible, like 'items_count' from serializer
               >
                 Items
-                {sortField === 'items_count' && ( // Match the sort field name
-                  <span className="sort-icon">
-                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
-                  </span>
-                )}
+                {getSortIcon('items_count')}
               </th>
               <th
                 className="sortable"
                 onClick={() => handleSort('picked_by')}
               >
                 Assigned To
-                {sortField === 'picked_by' && (
-                  <span className="sort-icon">
-                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
-                  </span>
-                )}
+                {getSortIcon('picked_by')}
               </th>
               <th
                 className="sortable"
                 onClick={() => handleSort('picked_status')}
               >
                 Status
-                {sortField === 'picked_status' && (
-                  <span className="sort-icon">
-                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
-                  </span>
-                )}
+                {getSortIcon('picked_status')}
               </th>
               <th
                 className="sortable"
                 onClick={() => handleSort('picked_date')}
               >
                 Date Picked
-                {sortField === 'picked_date' && (
-                  <span className="sort-icon">
-                    {sortDirection === 'asc' ? <FaSortUp /> : <FaSortDown />}
-                  </span>
-                )}
+                {getSortIcon('picked_date')}
               </th>
             </tr>
           </thead>

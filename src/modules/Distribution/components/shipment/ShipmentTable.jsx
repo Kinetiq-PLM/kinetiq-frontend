@@ -1,5 +1,6 @@
 // components/shipment/ShipmentTable.jsx
 import React, { useState } from 'react';
+import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
 const ShipmentTable = ({ shipments, onShipmentSelect, selectedShipment, carriers, employees, getEmployeeFullName, getReadableShipmentType }) => {
   const [sortField, setSortField] = useState('shipment_id');
@@ -125,13 +126,10 @@ const ShipmentTable = ({ shipments, onShipmentSelect, selectedShipment, carriers
   
   // Get sort icon
   const getSortIcon = (field) => {
-    if (sortField !== field) return null;
-    
-    return (
-      <span className="sort-icon">
-        {sortDirection === 'asc' ? '▲' : '▼'}
-      </span>
-    );
+    if (sortField !== field) return <FaSort className="sort-icon neutral" />;
+    return sortDirection === 'asc' ? 
+      <FaSortUp className="sort-icon ascending" /> : 
+      <FaSortDown className="sort-icon descending" />;
   };
 
   return (
