@@ -741,7 +741,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         company_name: getVendor.company_name || null,
         contact_person: quotation.contact_person || null,
         buyer: quotation?.buyer || "",
-        owner: quotation.request_id?.employee_name || null,
         delivery_date: selectedPO.delivery_date || null,
         status: "Draft",
         posting_date: date_today,
@@ -874,10 +873,11 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         .filter(item => item.item_id) // Only include items with IDs
         .map(item => ({
           item_id: item.item_id,
+          item_name: item.item_name,
           quantity: parseInt(item.quantity || 0, 10)
         }));
   
-      //console.log("Current document items (filtered):", currentItems);
+      console.log("Current document items (filtered):", currentItems);
   
       // Find the selected purchase order
       const selectedPO = purchaseOrders.find(po => po.purchase_id === purchaseId);
@@ -957,19 +957,21 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         allItemsMatch = poItems.every(poItem => {
           const currentItem = currentItems.find(ci => ci.item_id === poItem.item_id);
           const match = currentItem && currentItem.quantity === poItem.quantity;
+          const matchedItem = itemOptions.find(opt => opt.id === poItem.item_id);
           if (!match) {
-            const mismatchMsg = `Item ${poItem.item_id}: Qty ${currentItem?.quantity || 0} ≠ PO Qty ${poItem.quantity}`;
-            //console.log(mismatchMsg);
+            const mismatchMsg = `Item ${matchedItem?.name || poItem.item_id}: Qty ${currentItem?.quantity || 0} ≠ PO Qty ${poItem.quantity}`;
             itemMismatches.push(mismatchMsg);
           }
           return match;
         });
-  
+
         noExtraItems = currentItems.every(ci => {
           const exists = poItems.some(poItem => poItem.item_id === ci.item_id);
           if (!exists) {
-            const mismatchMsg = `Extra item: ${ci.item_id}`;
-            //console.log(mismatchMsg);
+            const itemName = ci.item_name || 
+                            itemOptions.find(opt => opt.id === ci.item_id)?.name || 
+                            `Item ${ci.item_id}`;
+            const mismatchMsg = `Extra item: ${itemName}`;
             itemMismatches.push(mismatchMsg);
           }
           return exists;
@@ -981,9 +983,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           const existingQty = existingPartialItems[poItem.item_id] || 0;
           const totalQty = currentQty + existingQty;
           const withinLimit = totalQty <= poItem.quantity;
-          
+          const matchedItem = itemOptions.find(opt => opt.id === poItem.item_id);
           if (!withinLimit) {
-            const mismatchMsg = `Item ${poItem.item_id}: Total Qty ${totalQty} exceeds PO Qty ${poItem.quantity}`;
+            const mismatchMsg = `Item ${matchedItem?.name || poItem.item_id}: Total Qty ${totalQty} exceeds PO Qty ${poItem.quantity}`;
             //console.log(mismatchMsg);
             itemMismatches.push(mismatchMsg);
           }
@@ -993,8 +995,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         noExtraItems = currentItems.every(ci => {
           const exists = poItems.some(poItem => poItem.item_id === ci.item_id);
           if (!exists) {
-            const mismatchMsg = `Extra item: ${ci.item_id}`;
-            //console.log(mismatchMsg);
+            const itemName = ci.item_name || 
+                            itemOptions.find(opt => opt.id === ci.item_id)?.name || 
+                            `Item ${ci.item_id}`;
+            const mismatchMsg = `Extra item: ${itemName}`;
             itemMismatches.push(mismatchMsg);
           }
           return exists;
