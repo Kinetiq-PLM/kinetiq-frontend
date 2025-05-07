@@ -188,7 +188,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, projectFilter, pa
                 {getSortIcon("del_order_id")}
               </th>
               {/* TEMPORARY: Approval column - Comment this line to hide the column */}
-              {/* <th>Actions</th> */}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -215,7 +215,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, projectFilter, pa
                   <td className="centered-cell">{order.is_partial_delivery ? "Yes" : "No"}</td>
                   <td>{formatID(order.del_order_id, "delivery")}</td>
                   {/* TEMPORARY: Approval button - Comment these lines to remove the button */}
-                  {/* <td>
+                  <td>
                     {order.order_status !== "Approved" ? (
                       <button
                         className="approve-button"
@@ -235,7 +235,7 @@ const DeliveryTable = ({ deliveries, searchTerm, statusFilter, projectFilter, pa
                         <FaCheck className="check-icon" /> Approved
                       </span>
                     )}
-                  </td> */}
+                  </td>
                 </tr>
               ))
             ) : (
