@@ -43,7 +43,9 @@ const BodyContent = () => {
     "Description",
   ];
 
-  const API_URL = import.meta.env.VITE_API_URL || "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+  const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
   const ENDPOINT = `${API_URL}/api/general-ledger-jel-view/`;
 
   const openModal = () => setIsModalOpen(true);
@@ -69,7 +71,10 @@ const BodyContent = () => {
 
       return formatted;
     } catch (error) {
-      console.error("Error fetching data:", error.response ? error.response.data : error);
+      console.error(
+        "Error fetching data:",
+        error.response ? error.response.data : error
+      );
       setValidation({
         isOpen: true,
         type: "error",
@@ -83,7 +88,9 @@ const BodyContent = () => {
   const fetchAllData = async () => {
     setIsLoading(true);
     const generalLedger = await fetchData();
-    const sortedData = [...generalLedger].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sortedData = [...generalLedger].sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
     setData(sortedData);
     setDefaultSortedData(sortedData);
     setIsLoading(false);
@@ -93,13 +100,34 @@ const BodyContent = () => {
     fetchAllData();
   }, []);
 
+  const computeNetBalances = (entries) => {
+    const accountSums = {};
+
+    entries.forEach(({ accountName, debit, credit }) => {
+      if (!accountSums[accountName]) {
+        accountSums[accountName] = { debit: 0, credit: 0 };
+      }
+
+      accountSums[accountName].debit += parseFloat(debit) || 0;
+      accountSums[accountName].credit += parseFloat(credit) || 0;
+    });
+
+    return Object.entries(accountSums).map(([name, { debit, credit }]) => ({
+      accountName: name,
+      debit: debit.toFixed(2),
+      credit: credit.toFixed(2),
+      net: (debit - credit).toFixed(2),
+    }));
+  };
+
   const filterByActiveTab = () => {
     if (activeTab === "Accounts Payable") {
       const relevantJournalIds = new Set(
         data
           .filter(
             (entry) =>
-              entry.accountName === "Accounts Payable" || entry.accountName === "Raw Material Used"
+              entry.accountName === "Accounts Payable" ||
+              entry.accountName === "Raw Material Used"
           )
           .map((entry) => entry.journalId)
       );
@@ -111,7 +139,8 @@ const BodyContent = () => {
         data
           .filter(
             (entry) =>
-              entry.accountName === "Accounts Receivable" || entry.accountName === "Sales Revenue"
+              entry.accountName === "Accounts Receivable" ||
+              entry.accountName === "Sales Revenue"
           )
           .map((entry) => entry.journalId)
       );
@@ -157,13 +186,38 @@ const BodyContent = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
-    return searchContent.includes(searching.trim().toLowerCase()); // with .trim() it fixes the space error
+    return searchContent.includes(searching.trim().toLowerCase());
   });
 
-  const totalDebit = filteredData.reduce((sum, item) => sum + (parseFloat(item.debit) || 0), 0);
-  const totalCredit = filteredData.reduce((sum, item) => sum + (parseFloat(item.credit) || 0), 0);
+  const netBalances = computeNetBalances(filteredData);
 
-  const formatNumber = (num) => num.toLocaleString("en-US", { minimumFractionDigits: 2 });
+  const accountsPayableNet = netBalances
+    .filter(
+      (item) =>
+        item.accountName === "Accounts Payable" ||
+        item.accountName === "Raw Material Used"
+    )
+    .reduce((sum, item) => sum + parseFloat(item.net), 0);
+
+  const accountsReceivableNet = netBalances
+    .filter(
+      (item) =>
+        item.accountName === "Accounts Receivable" ||
+        item.accountName === "Sales Revenue"
+    )
+    .reduce((sum, item) => sum + parseFloat(item.net), 0);
+
+  const totalDebit = filteredData.reduce(
+    (sum, item) => sum + (parseFloat(item.debit) || 0),
+    0
+  );
+  const totalCredit = filteredData.reduce(
+    (sum, item) => sum + (parseFloat(item.credit) || 0),
+    0
+  );
+
+  const formatNumber = (num) =>
+    num.toLocaleString("en-US", { minimumFractionDigits: 2 });
 
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-8 mt-30">
@@ -197,23 +251,25 @@ const BodyContent = () => {
           </div>
 
           <div className="flex border-b-2 border-gray-400">
-            {["General Ledger", "Accounts Payable", "Accounts Receivable"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`relative px-4 py-2 text-sm font-medium transition-colors cursor-pointer duration-300 hover:text-teal-500 ${activeTab === tab
-                    ? "text-teal-500"
-                    : "text-gray-800 hover:text-teal-500"
+            {["General Ledger", "Accounts Payable", "Accounts Receivable"].map(
+              (tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`relative px-4 py-2 text-sm font-medium transition-colors cursor-pointer duration-300 hover:text-teal-500 ${
+                    activeTab === tab
+                      ? "text-teal-500"
+                      : "text-gray-800 hover:text-teal-500"
                   }`}
-              >
-                {tab}
-                {activeTab === tab && (
-                  <span className="absolute left-0 right-0 -bottom-1 h-1 bg-teal-500"></span>
-                )}
-              </button>
-            ))}
+                >
+                  {tab}
+                  {activeTab === tab && (
+                    <span className="absolute left-0 right-0 -bottom-1 h-1 bg-teal-500"></span>
+                  )}
+                </button>
+              )
+            )}
           </div>
-
         </div>
 
         {isLoading ? (
@@ -235,10 +291,48 @@ const BodyContent = () => {
             />
 
             <div className="grid grid-cols-7 gap-4 mt-4 items-center border-t pt-2 font-light text-sm">
-              <div className="col-span-3"></div>
-              <div className="font-bold">Total</div>
-              <div>{formatNumber(totalDebit)}</div>
-              <div>{formatNumber(totalCredit)}</div>
+              <div className="col-span-3" />
+
+              {activeTab === "General Ledger" && (
+                <>
+                  <div className="font-bold">Total</div>
+                  <div>{formatNumber(totalDebit)}</div>
+                  <div>{formatNumber(totalCredit)}</div>
+                  <div className="col-span-1" />
+                </>
+              )}
+
+              {activeTab === "Accounts Payable" && (
+                <>
+                  <div className="font-bold col-span-2">
+                    Accounts Payable Total
+                  </div>
+                  <div className="font-light col-span-2">
+                    {formatNumber(accountsPayableNet)}
+                  </div>
+                  <div className="col-span-1" />
+                </>
+              )}
+
+              {activeTab === "Accounts Receivable" && (
+                <>
+                  <div className="font-bold col-span-2">
+                    Accounts Receivable Total
+                  </div>
+                  <div className="font-light col-span-2">
+                    {formatNumber(accountsReceivableNet)}
+                  </div>
+                  <div className="col-span-1" />
+                </>
+              )}
+
+              {activeTab !== "General Ledger" &&
+                activeTab !== "Accounts Payable" &&
+                activeTab !== "Accounts Receivable" && (
+                  <div className="col-span-7 text-gray-500 italic text-center">
+                    Select a tab to view totals
+                  </div>
+                )}
             </div>
           </>
         )}
@@ -248,8 +342,10 @@ const BodyContent = () => {
         isModalOpen={isModalOpen}
         closeModal={closeModal}
         reportForm={reportForm}
-        handleInputChange={(field, value) => setReportForm((prev) => ({ ...prev, [field]: value }))}
-        handleSubmit={() => { }}
+        handleInputChange={(field, value) =>
+          setReportForm((prev) => ({ ...prev, [field]: value }))
+        }
+        handleSubmit={() => {}}
       />
 
       {validation.isOpen && (
