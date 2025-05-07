@@ -253,17 +253,17 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
  
  
   const isRowFilled = (row) => {
+    
     const baseFieldsFilled = (
       row.item_id &&
       row.item_name &&
       row.quantity &&
-      row.cost &&
       row.warehouse_id
     );
     const isProduct = row.item_type === 'product'; // Adjust this based on how you identify products
-    
+
     if (isProduct) {
-      return baseFieldsFilled && row.manufacturing_date && row.expiry_date;
+      return baseFieldsFilled && row.manuf_date && row.expiry_date;
     }
     
     return baseFieldsFilled;
@@ -528,10 +528,6 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
         toast.error("Please add at least one valid item before saving");
         return;
       }
-      if (!documentDetails.buyer) {
-        toast.error("Buyer information is required");
-        return;
-      }
       // Prepare the payload for the create API
       const payload = {
         vendor_code: vendorID,
@@ -601,9 +597,6 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
       toast.dismiss()
       toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
       return;
-    }else if (!documentDetails.buyer){
-      toast.dismiss()
-      toast.error("Buyer is required.")
     }
     for (let item of updatedDocumentItems){
       rowNum += 1

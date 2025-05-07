@@ -72,7 +72,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const fetchVendors = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://127.0.0.1:8000/operation/supplier/");
+      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/supplier/");
       if (!response.ok) throw new Error("Connection to database failed");
       const data = await response.json();
       if (!Array.isArray(data.vendors)) throw new Error("Invalid goods data format");
@@ -138,7 +138,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const fetchNextDocumentIds = async () => {
       if (isCreateMode) {
         try {
-          const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/get-next-doc-ids/');
+          const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/get-next-doc-ids/');
           if (!response.ok) throw new Error('Failed to fetch next document IDs');
          
           const data = await response.json();
@@ -170,7 +170,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
         // If this item exists in the database, delete it
         try {
-          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -196,7 +196,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   const reloadDocumentItems = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`);
+      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`);
       if (!response.ok) throw new Error('Failed to reload document');
       const updatedData = await response.json();
       return updatedData.document_items;
@@ -248,7 +248,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const isProduct = row.item_type === 'product'; // Adjust this based on how you identify products
     
     if (isProduct) {
-      return baseFieldsFilled && row.manufacturing_date && row.expiry_date;
+      return baseFieldsFilled && row.manuf_date && row.expiry_date;
     }
     
     return baseFieldsFilled;
@@ -257,7 +257,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   const [warehouseOptions, setWarehouseOptions] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/operation/get-warehouseID/')
+    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
         // Sort A–Z by location
@@ -271,7 +271,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
   // Inside your item fetch useEffect:
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/operation/item/')
+    fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item/')
       .then(res => res.json())
       .then(data => {
         const typePriority = { product: 1, material: 2, asset: 3 };
@@ -389,7 +389,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   
 
 
-          await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
+          await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${currentItem.content_id}/`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -504,10 +504,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
         toast.error("Please add at least one valid item before saving");
         return;
       }
-      if (!documentDetails.buyer) {
-        toast.error("Buyer information is required");
-        return;
-      }
       // Prepare the payload for the create API
       const payload = {
         vendor_code: null,
@@ -539,7 +535,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       };
 
       // Call the create API
-      const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
+      const response = await fetch('https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -577,9 +573,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
       toast.dismiss()
       toast.error("Transaction cost must not exceed 10 digits (Approx 1 billion)");
       return;
-    }else if (!documentDetails.buyer){
-      toast.dismiss()
-      toast.error("Buyer is required.")
     }
     for (let item of updatedDocumentItems){
       rowNum += 1
@@ -624,7 +617,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           console.log(payload)
           let itemResponse
           if (item.content_id){
-            itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/${item.content_id}/`, {
+            itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/${item.content_id}/`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -632,7 +625,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
               body: JSON.stringify(payload),
             });
           }else{
-            itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/`, {
+            itemResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/document-item/`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -669,7 +662,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0
         };
         console.log(updatedDocumentsData)
-        const goodsTrackingResponse = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`, {
+        const goodsTrackingResponse = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/goods-tracking/${selectedData.document_id}/`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -701,7 +694,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/operation/purchase_order/");
+      const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/");
       if (!response.ok) throw new Error("Failed to fetch purchase orders");
      
       const data = await response.json();
@@ -718,7 +711,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
  
     try {
       // Fetch the selected purchase order details
-      const response = await fetch(`http://127.0.0.1:8000/operation/purchase_order/${poId}/`);
+      const response = await fetch(`https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
       const selectedPO = await response.json();

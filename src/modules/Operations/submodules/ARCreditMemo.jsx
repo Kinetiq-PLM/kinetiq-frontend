@@ -543,13 +543,12 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
     const tax_amount = (taxRate / 100) * invoiceAmount;
     const total = parseFloat(invoiceAmount + invoiceAmount +tax_amount).toFixed(2);
-
     setDocumentDetails(prev => ({
       ...prev,
       tax_amount: tax_amount,
       total: total,
     }));
-  }, [documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount, documentDetails.invoice_amount]);
+  }, [documentDetails.ar_discount, documentDetails.tax_rate, documentDetails.discount_rate, documentDetails.freight, initialAmount, documentDetails.invoice_amount]);
  
  
   const handleDocumentDetailChange = (e, field) => {
@@ -652,6 +651,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
       }else if (!documentDetails.buyer){
         toast.dismiss()
         toast.error("Buyer is required.")
+        return
       }
       for (let item of updatedDocumentItems){
         rowNum += 1
@@ -893,9 +893,9 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     const newInitialAmount = documentItems
       .slice(0, -1) // exclude the last empty row
       .reduce((sum, item) => {
-        // Use the price from the item object (which comes from duplicateDetails or itemOptions)
         const price = parseFloat(item.cost || duplicateDetails[item.item_id]?.[0]?.price || 0);
-        return sum + (parseFloat(item.quantity || 0) * price);
+        const totalprice = price - (price * parseFloat(item.ar_discount/100))
+        return parseFloat(sum + (parseFloat(item.quantity || 0) * totalprice));
       }, 0)
       .toFixed(2);
     setInitialAmount(newInitialAmount);
@@ -1271,7 +1271,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
                           const currentCost = item.cost || 
                           (item.item_id && duplicateDetails[item.item_id]?.[0]?.price) || 0;
 
-                          const total = (parseFloat(item.quantity || 0) * parseFloat(currentCost));
+                          const total = parseFloat((parseFloat(item.quantity || 0) * parseFloat(currentCost))-parseFloat(item.ar_discount));
                           if (total > 1000000000) {
                             toast.dismiss();
                             toast.error("Total cost must not exceed 1 billion");

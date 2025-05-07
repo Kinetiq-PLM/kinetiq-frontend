@@ -580,6 +580,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     }else if (!documentDetails.buyer){
       toast.dismiss()
       toast.error("Buyer is required.")
+      return
     }
     for (let item of updatedDocumentItems){
       rowNum += 1
@@ -747,11 +748,13 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         tax_amount: Number(parseFloat(quotation.tax || 0).toFixed(2)),
         discount_rate: Number(parseFloat(quotation.discount_percent || 0).toFixed(2)),
         freight: Number(parseFloat(quotation.freight || 0).toFixed(2)),
+        purchase_id: poId
       }));
  
       // Get item details from pre-fetched itemOptions
+      
       const poItems = (selectedPO.quotation_contents || []).map(content => {
-        const itemId = content.material_id || content.asset_id || content.product_id;
+        const itemId = content.item_id;
         const matchedItem = itemOptions.find(opt => opt.id === itemId);
         if (!matchedItem) return null;
  
@@ -764,7 +767,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           type: matchedItem.type,
         };
       }).filter(item => item !== null);
- 
+      console.log(poItems)
       // Calculate initial amount
       const poInitialAmount = poItems.reduce((sum, item) => sum + (item.cost * item.quantity), 0);
       const taxAmount = parseFloat(quotation.tax || 0);

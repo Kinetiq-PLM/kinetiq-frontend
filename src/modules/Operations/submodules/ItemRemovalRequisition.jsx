@@ -70,17 +70,33 @@ const ItemRemoval = () => {
       try {
           setLoading(true);
           setError(null); // Reset error state
- 
+  
           const response = await fetch("https://js6s4geoo2.execute-api.ap-southeast-1.amazonaws.com/dev/operation/item-removal/");
           if (!response.ok) throw new Error("Connection to database failed");
- 
+  
           const data = await response.json();
           if (!Array.isArray(data)) throw new Error("Invalid goods data format");
- 
-          setTableData(data);
-          if (data.length > 0){
+  
+          // Sort the data:
+          const sortedData = data.sort((a, b) => {
+              // Check if one is pending and the other is not
+              if (a.deprecation_status === 'Pending' && b.deprecation_status !== 'Pending') {
+                  return -1; // 'a' comes first
+              }
+              if (a.deprecation_status !== 'Pending' && b.deprecation_status === 'Pending') {
+                  return 1; // 'b' comes first
+              }
+  
+              // If both are either pending or not pending, sort by reported_date
+              const dateA = new Date(a.reported_date);
+              const dateB = new Date(b.reported_date);
+              return dateB - dateA; // Most recent first
+          });
+  
+          setTableData(sortedData);
+          if (sortedData.length > 0) {
               setSelectedRow(0);
-              setSelectedData(data[0]);
+              setSelectedData(sortedData[0]);
           }
       } catch (error) {
           if (error.name !== "AbortError") setError(error.message);
@@ -88,6 +104,7 @@ const ItemRemoval = () => {
           setLoading(false);
       }
   };
+  
  
   useEffect(() => {
       fetchData();
