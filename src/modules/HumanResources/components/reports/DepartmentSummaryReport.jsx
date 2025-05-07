@@ -920,7 +920,13 @@ const DepartmentSummaryReport = ({ departments = [], superiors = [], period }) =
                       alignItems: "center",
                       justifyContent: "space-between"
                     }}>
-                      {Math.round((superiors.length / totalDepartments) * 100)}%
+                       {(() => {
+                      // Get unique departments that have superiors
+                      const departmentsWithSuperiors = new Set(superiors.map(sup => sup.dept_id)).size;
+                      const coveragePercent = totalDepartments > 0 ? 
+                        Math.min(100, Math.round((departmentsWithSuperiors / totalDepartments) * 100)) : 0;
+                      return coveragePercent;
+                    })()}%
                       <span style={{ 
                         fontSize: "11px",
                         padding: "3px 8px",
