@@ -1033,13 +1033,17 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         <Tooltip
   anchorId="purchaseIdSelect"
   place="bottom"
+  positionStrategy="fixed"
   content={poMismatchDetails ? poMismatchDetails.join('\n') : ''}
   style={{
     backgroundColor: '#E5E7EB',
+    width: '30em',
     color: '#000',
     fontSize: '0.5em',
     padding: '8px 12px',
-    borderRadius: '6px'
+    borderRadius: '6px',
+    overflowWrap: 'break-word',
+    whiteSpace: 'pre-wrap',
   }}
 />
 
