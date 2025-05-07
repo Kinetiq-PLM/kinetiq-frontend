@@ -11,7 +11,6 @@ const AccountsPayableReceipt = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-  const [isCreating, setIsCreating] = useState(false);
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "",
@@ -77,11 +76,10 @@ const AccountsPayableReceipt = () => {
   const handleOpenModal = (row) => {
     console.log("Opening modal with row:", row);
     setSelectedRow(row);
-    setIsCreating(false);
     setModalOpen(true);
   };
 
-  const handleEditSubmit = async (updatedRow, isNewReceipt = false) => {
+  const handleEditSubmit = async (updatedRow) => {
     try {
       const payload = {
         ap_id: updatedRow[0],
@@ -102,12 +100,10 @@ const AccountsPayableReceipt = () => {
         throw new Error(`Invalid status: ${payload.status}. Must be one of ${validStatuses.join(", ")}`);
       }
 
-      const url = isNewReceipt
-        ? AP_RECEIPT_ENDPOINT
-        : `${AP_RECEIPT_ENDPOINT}${payload.ap_id}/`;
+      const url = `${AP_RECEIPT_ENDPOINT}${payload.ap_id}/`;
 
       const response = await fetch(url, {
-        method: isNewReceipt ? "POST" : "PUT",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -125,9 +121,9 @@ const AccountsPayableReceipt = () => {
         console.log("Backend response data:", newData);
 
         setData((prevData) =>
-          isNewReceipt
-            ? [
-                [
+          prevData.map((row) =>
+            row[0] === updatedRow[0]
+              ? [
                   newData.ap_id,
                   newData.invoice_id,
                   newData.amount,
@@ -136,37 +132,22 @@ const AccountsPayableReceipt = () => {
                   newData.paid_by,
                   newData.reference_number,
                   newData.status,
-                ],
-                ...prevData,
-              ]
-            : prevData.map((row) =>
-                row[0] === updatedRow[0]
-                  ? [
-                      newData.ap_id,
-                      newData.invoice_id,
-                      newData.amount,
-                      newData.payment_date,
-                      newData.payment_method,
-                      newData.paid_by,
-                      newData.reference_number,
-                      newData.status,
-                    ]
-                  : row
-              )
+                ]
+              : row
+          )
         );
 
         setValidation({
           isOpen: true,
           type: "success",
           title: "Success",
-          message: `Receipt record ${isNewReceipt ? "created" : "updated"} successfully.`,
+          message: "Receipt record updated successfully.",
         });
       } else {
         throw new Error("Unexpected response format: Expected JSON but received HTML");
       }
 
       setModalOpen(false);
-      setIsCreating(false);
     } catch (error) {
       console.error("Error saving receipt record:", error);
       setValidation({
@@ -230,14 +211,12 @@ const AccountsPayableReceipt = () => {
           closeModal={() => {
             console.log("Closing modal");
             setModalOpen(false);
-            setIsCreating(false);
           }}
           selectedRow={selectedRow}
           handleSubmit={handleEditSubmit}
-          columnHeaders={columns.filter((col) => col !== "Action")}
-          isCreating={isCreating}
+          columnHeaders={columns}
           invoiceIds={invoiceIds}
-          isNewReceipt={isCreating}
+          isNewReceipt={true}
         />
       )}
 
