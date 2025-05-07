@@ -403,7 +403,7 @@ const PayrollAccounting = () => {
     printWindow.document.close();
   };
 
-  const openModal = (row) => {
+  const handleOpenModal = (row) => {
     console.log("Opening modal with row:", row);
     setSelectedRow(row);
     setModalOpen(true);
@@ -534,7 +534,7 @@ const PayrollAccounting = () => {
             <Table
               columns={payrollAccounting_columns}
               data={filteredData}
-              handleEditRow={openModal}
+              handleEditRow={handleOpenModal}
               showEditButton={true}
             />
           )}
@@ -568,9 +568,10 @@ const PayrollAccounting = () => {
             setModalOpen(false);
           }}
           selectedRow={selectedRow}
-          handleSubmit={(data) => handleEditSubmit(data)}
+          handleSubmit={handleEditSubmit}
           columnHeaders={payrollAccounting_columns}
           payrollHrIds={payrollHrIds}
+          isNewPayroll={true}
         />
       )}
 

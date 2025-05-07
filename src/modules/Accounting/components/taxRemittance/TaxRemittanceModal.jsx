@@ -11,78 +11,76 @@ const TaxRemittanceModal = ({
   selectedRow,
   handleSubmit,
   columnHeaders,
-  isCreating,
+  employeeIds,
 }) => {
-  const [formData, setFormData] = useState(selectedRow);
-  const [employeeIds, setEmployeeIds] = useState([]);
+  const [formData, setFormData] = useState(selectedRow || []);
   const [remittanceData, setRemittanceData] = useState([]);
   const [notif, setNotif] = useState({ isOpen: false, type: "error", title: "", message: "" });
+  const [isLoadingEmployees, setIsLoadingEmployees] = useState(false);
+
+  const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev";
+  const TAXREMITTANCE_ENDPOINT = `${API_URL}/api/payroll-remittances/`;
 
   useEffect(() => {
     if (isModalOpen) {
-      const fetchEmployeeIds = async () => {
-        try {
-          const response = await fetch(
-            "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev/api/payroll-journal/"
-          );
-          const data = await response.json();
-          const ids = data.map((item) => item.employee_id).filter((id) => id);
-          setEmployeeIds(ids);
-        } catch (error) {
-          console.error("Error fetching employee IDs:", error);
-          setEmployeeIds([]);
-        }
-      };
-
       const fetchRemittanceData = async () => {
         try {
-          const response = await fetch(
-            "https://vyr3yqctq8.execute-api.ap-southeast-1.amazonaws.com/dev/api/payroll-remittances/"
-          );
+          const response = await fetch(TAXREMITTANCE_ENDPOINT);
           const data = await response.json();
           setRemittanceData(data);
         } catch (error) {
           console.error("Error fetching remittance data:", error);
           setRemittanceData([]);
+        } finally {
+          setIsLoadingEmployees(false);
         }
       };
 
-      fetchEmployeeIds();
       fetchRemittanceData();
     }
-  }, [isModalOpen]);
 
-  useEffect(() => {
     if (selectedRow) {
-      const updatedRow = [...selectedRow];
-      if (isCreating && !updatedRow[0]) {
-        const currentYear = new Date().getFullYear();
-        const uniqueId = generateLowercaseId(6);
-        updatedRow[0] = `REM-${currentYear}-${uniqueId}`;
-        updatedRow[6] = `REF-REM-${Math.floor(100000 + Math.random() * 900000)}`;
-      }
-      setFormData(updatedRow);
+      setFormData([...selectedRow]);
+    } else {
+      setFormData(Array(columnHeaders.length).fill(""));
     }
-  }, [selectedRow, isCreating]);
+  }, [isModalOpen, selectedRow, columnHeaders]);
 
-  const generateLowercaseId = (length) => {
-    const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
+  const generateReferenceNumber = (paymentMethod) => {
+    const randomNum = Math.floor(100000 + Math.random() * 900000);
+    switch (paymentMethod) {
+      case "Cash":
+        return `REF-Cash-${randomNum}`;
+      case "Bank Transfer":
+        return `REF-Bank Transfer-${randomNum}`;
+      case "Credit Card":
+        return `REF-Credit Card-${randomNum}`;
+      default:
+        return "";
     }
-    return result;
+  };
+
+  const isValidDate = (dateString) => {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regex.test(dateString)) return false;
+    const date = new Date(dateString);
+    return date instanceof Date && !isNaN(date.getTime());
   };
 
   const handleInputChange = (index, value) => {
-    const isFieldEditable = isCreating
-      ? index !== 0 && index !== 6
-      : index === 7;
+    const isFieldEditable = index === 1 || index === 2 || index === 3 || index === 4 || index === 5 || index === 7;
 
     if (!isFieldEditable) return;
 
     const updatedFormData = [...formData];
     updatedFormData[index] = value;
+
+    if (index === 5) {
+      updatedFormData[6] = generateReferenceNumber(value);
+    }
+
     setFormData(updatedFormData);
   };
 
@@ -91,44 +89,47 @@ const TaxRemittanceModal = ({
   };
 
   const handleFormSubmit = () => {
-    if (isCreating) {
-      if (!formData[1]) {
-        showNotif("error", "Missing Employee ID", "Please select an Employee ID.");
-        return;
-      }
-      const employeeExists = remittanceData.some(
-        (remittance) => remittance.employee_id === formData[1]
-      );
-      if (!employeeExists && remittanceData.length > 0) {
-        showNotif("warning", "Employee Not Found", "Selected Employee ID has no remittance records.");
-        return;
-      }
-      if (!formData[2]) {
-        showNotif("error", "Missing Deduction Type", "Please select a Deduction Type.");
-        return;
-      }
-      if (!formData[3] || isNaN(parseFloat(formData[3]))) {
-        showNotif("error", "Invalid Amount", "Please enter a valid Amount.");
-        return;
-      }
-      if (!formData[4]) {
-        showNotif("error", "Missing Payment Date", "Please select a Payment Date.");
-        return;
-      }
-      if (!formData[5]) {
-        showNotif("error", "Missing Payment Method", "Please select a Payment Method.");
-        return;
-      }
+    if (!formData[1]) {
+      showNotif("error", "Missing Employee ID", "Please select an Employee ID.");
+      return;
     }
-    handleSubmit(formData, isCreating);
+    const chiefAccountantId = "HR-EMP-2025-f5eab3";
+    if (formData[1] !== chiefAccountantId) {
+      showNotif(
+        "error",
+        "Invalid Employee ID",
+        "Remittance is restricted to the Chief Accountant (ID: HR-EMP-2025-f5eab3)."
+      );
+      return;
+    }
+    if (!formData[2]) {
+      showNotif("error", "Missing Deduction Type", "Please select a Deduction Type.");
+      return;
+    }
+    if (!formData[3] || isNaN(parseFloat(formData[3])) || parseFloat(formData[3]) <= 0) {
+      showNotif("error", "Invalid Amount", "Please enter a valid positive Amount.");
+      return;
+    }
+    if (!formData[4] || !isValidDate(formData[4])) {
+      showNotif("error", "Invalid Payment Date", "Please select a valid Payment Date (YYYY-MM-DD).");
+      return;
+    }
+    if (!formData[5]) {
+      showNotif("error", "Missing Payment Method", "Please select a Payment Method.");
+      return;
+    }
+    if (!formData[7]) {
+      showNotif("error", "Missing Status", "Please select a Status.");
+      return;
+    }
+
+    const updatedFormData = [...formData];
+    handleSubmit(updatedFormData);
   };
 
-  // Function to render form fields based on their type
   const renderFormField = (header, index) => {
-    const isDisabled = isCreating
-      ? header === "Remittance ID" || header === "Reference Number"
-      : header !== "Status";
-    
+    const isDisabled = !(index === 1 || index === 2 || index === 3 || index === 4 || index === 5 || index === 7);
+
     if (header === "Remittance ID" || header === "Reference Number") {
       return (
         <Forms
@@ -147,11 +148,11 @@ const TaxRemittanceModal = ({
           <label>{header}</label>
           <Dropdown
             style="selection"
-            defaultOption="Select employee ID..."
+            defaultOption={isLoadingEmployees ? "Loading employees..." : "Select employee ID..."}
             options={employeeIds}
             value={formData[index] || ""}
             onChange={(val) => handleInputChange(index, val)}
-            disabled={isDisabled}
+            disabled={isDisabled || isLoadingEmployees}
             required={true}
           />
         </div>
@@ -263,7 +264,7 @@ const TaxRemittanceModal = ({
         <div className="modal-overlay">
           <div className="modal-container">
             <div className="modal-header">
-              <h2>{isCreating ? "Create Remittance Record" : "Update Remittance Record"}</h2>
+              <h2>Update Remittance Record</h2>
               <img
                 className="cursor-pointer hover:scale-110"
                 src="/accounting/Close.svg"
