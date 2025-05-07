@@ -131,6 +131,14 @@
 .delivery-receipt-wrapper table td:nth-child(4) {
   width: 8rem; /* Total Amount */
 }
+.delivery-receipt-wrapper table th:nth-child(5),
+.delivery-receipt-wrapper table td:nth-child(5) {
+  width: 10rem; /* Total Amount */
+}
+.delivery-receipt-wrapper table th:nth-child(6),
+.delivery-receipt-wrapper table td:nth-child(6) {
+  width: 15rem; /* Total Amount */
+}
 
 /* Checkbox Styling (Updated to match Internal Transfer) */
 .delivery-receipt-wrapper .checkbox-cell {
