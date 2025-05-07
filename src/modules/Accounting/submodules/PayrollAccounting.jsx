@@ -9,7 +9,9 @@ const PayrollAccounting = () => {
   const [payrollAccountingData, setPayrollAccountingData] = useState([]);
   const [payrollData, setPayrollData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [searching, setSearching] = useState("");
+  const [searchPayroll, setSearchPayroll] = useState("");
+  const [searchAccounting, setSearchAccounting] = useState("");
+
   const [isLoading, setIsLoading] = useState(true);
   const [validation, setValidation] = useState({
     isOpen: false,
@@ -358,7 +360,10 @@ const PayrollAccounting = () => {
                 <div class="logo-subtitle">Medical Equipment Manufacturing Company</div>
               </div>
               <div style="text-align: right; font-size: 14px; color: #546e7a;">
-                <div><strong>Generated:</strong> ${new Date().toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'})}</div>
+                <div><strong>Generated:</strong> ${new Date().toLocaleDateString(
+                  "en-US",
+                  { month: "long", day: "numeric", year: "numeric" }
+                )}</div>
               </div>
             </div>
   
@@ -381,12 +386,12 @@ const PayrollAccounting = () => {
   
             <div class="footer">
               <div>Kinetiq - PLM - Confidential</div>
-              <div>Generated on ${new Date().toLocaleString('en-US', {
-                month: 'long',
-                day: 'numeric', 
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+              <div>Generated on ${new Date().toLocaleString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
               })}</div>
             </div>
           </div>
@@ -499,7 +504,15 @@ const PayrollAccounting = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searching.toLowerCase().trim())
+      .includes(searchPayroll.toLowerCase().trim())
+  );
+
+  const filteredPayrollData = payrollData.filter((row) =>
+    [row[0], row[1], row[2], row[3], row[4], row[5]]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(searchAccounting.toLowerCase().trim())
   );
 
   const LoadingSpinner = () => (
@@ -521,8 +534,8 @@ const PayrollAccounting = () => {
             <Search
               type="text"
               placeholder="Search Record..."
-              value={searching}
-              onChange={(e) => setSearching(e.target.value)}
+              value={searchPayroll}
+              onChange={(e) => setSearchPayroll(e.target.value)}
             />
           </div>
         </div>
@@ -546,13 +559,24 @@ const PayrollAccounting = () => {
           <h1 className="subModule-title">Payroll</h1>
         </div>
 
+        <div className="parent-component-container">
+          <div className="component-container">
+            <Search
+              type="text"
+              placeholder="Search Record..."
+              value={searchAccounting}
+              onChange={(e) => setSearchAccounting(e.target.value)}
+            />
+          </div>
+        </div>
+
         <div className="title-subtitle-container">
           {isLoading ? (
             <LoadingSpinner />
           ) : (
             <Table
               columns={payroll_columns}
-              data={payrollData}
+              data={filteredPayrollData}
               showPrintButton={true}
               handlePrintRow={handlePrintRow}
             />
