@@ -212,7 +212,7 @@ const TabSystem = () => {
                                                     <td>{row.issued_by}</td>
                                                     <td>{row.item_name}</td>
                                                     <td>{row.item_quantity}</td>
-                                                    <td>{row.warehouselocation}</td> 
+                                                    <td>{row.warehouse_location}</td> 
                                                 </tr>
                                             ))
                                         ) : (
