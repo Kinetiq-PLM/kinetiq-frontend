@@ -25,6 +25,7 @@ const DeliveredShipmentsTable = ({ shipments, onShipmentSelect, selectedShipment
   
   // Get carrier name by ID
   const getCarrierName = (carrierId) => {
+    if (!carrierId) return 'Not Assigned';
     const carrier = carriers.find(c => c.carrier_id === carrierId);
     if (!carrier) return 'Not Assigned';
     
@@ -32,30 +33,38 @@ const DeliveredShipmentsTable = ({ shipments, onShipmentSelect, selectedShipment
     return getEmployeeFullName(carrier.carrier_name);
   };
   
-  // Format date
+  // Format date with better error handling
   const formatDate = (dateString) => {
     if (!dateString) return 'Not Set';
     
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Invalid Date';
-    
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid Date';
+      
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return 'Error';
+    }
   };
   
-  // Sort shipments
+  // Sort shipments with null/undefined protection
   const sortedShipments = [...shipments].sort((a, b) => {
     // Handle null/undefined values
-    if (a[sortField] === null || a[sortField] === undefined) return 1;
-    if (b[sortField] === null || b[sortField] === undefined) return -1;
+    const valueA = a[sortField];
+    const valueB = b[sortField];
+    
+    if (valueA === null || valueA === undefined) return sortDirection === 'asc' ? 1 : -1;
+    if (valueB === null || valueB === undefined) return sortDirection === 'asc' ? -1 : 1;
     
     // For dates
     if (sortField.includes('date')) {
-      const dateA = a[sortField] ? new Date(a[sortField]) : new Date(0);
-      const dateB = b[sortField] ? new Date(b[sortField]) : new Date(0);
+      const dateA = valueA ? new Date(valueA) : new Date(0);
+      const dateB = valueB ? new Date(valueB) : new Date(0);
       
       return sortDirection === 'asc' 
         ? dateA - dateB 
@@ -64,11 +73,11 @@ const DeliveredShipmentsTable = ({ shipments, onShipmentSelect, selectedShipment
     
     // For carrier_id, sort by employee name
     if (sortField === 'carrier_id') {
-      const carrierA = carriers.find(c => c.carrier_id === a.carrier_id);
-      const carrierB = carriers.find(c => c.carrier_id === b.carrier_id);
+      const carrierA = carriers.find(c => c.carrier_id === valueA);
+      const carrierB = carriers.find(c => c.carrier_id === valueB);
       
-      const nameA = carrierA ? getEmployeeFullName(carrierA.carrier_name).toLowerCase() : '';
-      const nameB = carrierB ? getEmployeeFullName(carrierB.carrier_name).toLowerCase() : '';
+      const nameA = carrierA && carrierA.carrier_name ? getEmployeeFullName(carrierA.carrier_name).toLowerCase() : '';
+      const nameB = carrierB && carrierB.carrier_name ? getEmployeeFullName(carrierB.carrier_name).toLowerCase() : '';
       
       return sortDirection === 'asc'
         ? nameA.localeCompare(nameB)
@@ -76,26 +85,26 @@ const DeliveredShipmentsTable = ({ shipments, onShipmentSelect, selectedShipment
     }
 
     // For strings
-    if (typeof a[sortField] === 'string') {
-      const valueA = a[sortField].toLowerCase();
-      const valueB = b[sortField].toLowerCase();
-      
+    if (typeof valueA === 'string') {
       return sortDirection === 'asc'
-        ? valueA.localeCompare(valueB)
-        : valueB.localeCompare(valueA);
+        ? valueA.toLowerCase().localeCompare(valueB.toLowerCase())
+        : valueB.toLowerCase().localeCompare(valueA.toLowerCase());
     }
     
     // For numbers and other types
     return sortDirection === 'asc'
-      ? a[sortField] - b[sortField]
-      : b[sortField] - a[sortField];
+      ? valueA - valueB
+      : valueB - valueA;
   });
   
   // Calculate pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
+  const totalItems = sortedShipments.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  
+  const indexOfLastItem = safeCurrentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedShipments.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(sortedShipments.length / itemsPerPage);
   
   // Get row class
   const getRowClass = (shipment, index) => {

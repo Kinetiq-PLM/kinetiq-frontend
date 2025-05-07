@@ -1164,7 +1164,9 @@
 }
 
 .shipment .status-badge {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  gap: 5px;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.8rem;
@@ -3816,3 +3818,4 @@
   color: white;
   border-color: #00a8a8;
 }
+

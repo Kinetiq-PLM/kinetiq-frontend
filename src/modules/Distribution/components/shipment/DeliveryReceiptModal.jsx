@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import DeliveryReceiptPDF from './DeliveryReceiptPDF';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import * as ReactDOM from 'react-dom/client';
 
 const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -10,6 +9,8 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) =>
   const [error, setError] = useState(null);
   const [customerName, setCustomerName] = useState('');
   const [customerData, setCustomerData] = useState(null);
+  const [allEmployees, setAllEmployees] = useState([]);
+  const [allCarriers, setAllCarriers] = useState([]);
   
   // Form state
   const [signature, setSignature] = useState('');
@@ -26,35 +27,48 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) =>
   // PDF reference
   const pdfRef = useRef(null);
 
-  // Fetch delivery receipt on component mount
+  // Fetch all necessary data on component mount
   useEffect(() => {
-    const fetchDeliveryReceipt = async () => {
+    const fetchAllData = async () => {
       try {
         setIsLoading(true);
         setError(null);
+        
+        // Fetch employees
+        const employeesResponse = await fetch('http://127.0.0.1:8000/api/employees/');
+        if (employeesResponse.ok) {
+          const employeesData = await employeesResponse.json();
+          setAllEmployees(employeesData);
+        }
+        
+        // Fetch carriers
+        const carriersResponse = await fetch('http://127.0.0.1:8000/api/carriers/');
+        if (carriersResponse.ok) {
+          const carriersData = await carriersResponse.json();
+          setAllCarriers(carriersData);
+        }
         
         if (!shipment.delivery_receipt_id) {
           throw new Error('No delivery receipt found for this shipment');
         }
         
-        const response = await fetch(`http://127.0.0.1:8000/api/delivery-receipts/${shipment.delivery_receipt_id}/`);
-        
-        if (!response.ok) {
-          const errorData = await response.json();
+        // Fetch delivery receipt
+        const deliveryReceiptResponse = await fetch(`http://127.0.0.1:8000/api/delivery-receipts/${shipment.delivery_receipt_id}/`);
+        if (!deliveryReceiptResponse.ok) {
+          const errorData = await deliveryReceiptResponse.json();
           throw new Error(errorData.detail || 'Failed to fetch delivery receipt');
         }
         
-        const data = await response.json();
-        setDeliveryReceipt(data);
+        const receiptData = await deliveryReceiptResponse.json();
+        setDeliveryReceipt(receiptData);
         
-        // Initialize form state with existing data
-        if (data.signature) {
-          setSignature(data.signature);
+        if (receiptData.signature) {
+          setSignature(receiptData.signature);
         }
         
-        // Fetch customer name if received_by appears to be a customer ID
-        if (data.received_by && data.received_by.startsWith('SALES-CUST-')) {
-          fetchCustomerName(data.received_by);
+        // Fetch customer details if we have a customer ID
+        if (receiptData.received_by && receiptData.received_by.startsWith('SALES-CUST-')) {
+          fetchCustomerName(receiptData.received_by);
         }
         
         setIsLoading(false);
@@ -64,32 +78,42 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) =>
       }
     };
     
-    fetchDeliveryReceipt();
+    fetchAllData();
   }, [shipment.delivery_receipt_id]);
 
   // Function to fetch customer name
   const fetchCustomerName = async (customerId) => {
     try {
       const response = await fetch(`http://127.0.0.1:8000/api/customers/${customerId}/`);
-      
       if (!response.ok) {
-        console.error('Failed to fetch customer details');
-        // Extract customer name from ID as fallback
-        if (customerId.startsWith('SALES-CUST-')) {
-          // Just display the ID as fallback
-          setCustomerName(`Customer ${customerId}`);
-        }
+        setCustomerName(`Customer ${customerId}`);
         return;
       }
       
-      const customerData = await response.json();
-      setCustomerData(customerData);
-      if (customerData && customerData.name) {
-        setCustomerName(customerData.name);
+      const data = await response.json();
+      setCustomerData(data);
+      if (data && data.name) {
+        setCustomerName(data.name);
       }
     } catch (err) {
       console.error('Error fetching customer details:', err);
     }
+  };
+
+  // Get employee name by ID
+  const getEmployeeNameById = (employeeId) => {
+    if (!employeeId) return 'N/A';
+    
+    const employee = allEmployees.find(emp => emp.employee_id === employeeId);
+    return employee ? employee.full_name : employeeId;
+  };
+  
+  // Get carrier employee name (fixes the carrier name issue)
+  const getCarrierName = (carrierId) => {
+    const carrier = allCarriers.find(c => c.carrier_id === carrierId);
+    if (!carrier) return 'N/A';
+    
+    return getEmployeeNameById(carrier.carrier_name);
   };
 
   // Clear the signature canvas
@@ -205,57 +229,76 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) =>
     });
   };
   
-  // Handle PDF generation and download
-  const handleGeneratePDF = async () => {
-    if (!pdfRef.current) return;
-    
+  // Update the handleGeneratePDF function
+  const handleGeneratePDF = () => {
     setIsPdfGenerating(true);
     
-    try {
-      const pdfElement = pdfRef.current;
+    // Map the shipment data correctly, including all available information
+    const deliveryData = {
+      id: deliveryReceipt?.delivery_receipt_id,
+      receipt_id: deliveryReceipt?.delivery_receipt_id,
+      customer_name: customerName || deliveryReceipt?.received_by,
+      contact_number: customerData?.phone_number,
+      delivery_address: shipment?.destination_location,
+      email: customerData?.email,
+      order_id: shipment?.shipment_id,
       
-      // Generate PDF using html2canvas and jsPDF
-      const canvas = await html2canvas(pdfElement, {
-        scale: 2, // Higher scale for better quality
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
+      // Map carrier info properly
+      carrier_id: shipment?.carrier_id,
+      carrier_service_type: shipment?.carrier_service_type,
       
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      // Use proper employee name for carrier
+      carrier_name: getCarrierName(shipment?.carrier_id),
+      packer_id: getEmployeeNameById(shipment?.packing_list_info?.packed_by),
       
-      // Calculate the dimensions to fit the PDF page
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
+      // Add shipping and financial information
+      total_amount: deliveryReceipt?.total_amount || shipment?.shipping_cost_info?.total_shipping_cost,
+      tracking_number: shipment?.tracking_number,
       
-      // Calculate the total height needed
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // Pass full source warehouse array instead of a string
+      source_warehouses: shipment?.source_warehouses || [],
+      source_location: shipment?.source_location,
       
-      // If the image is taller than the page, split it across multiple pages
-      let heightLeft = imgHeight;
-      let position = 0;
-      let pageOffset = 0;
+      // Add shipping dates
+      shipment_date: shipment?.shipment_date,
+      delivery_date: deliveryReceipt?.delivery_date,
       
-      // Add first page
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // Additional notes
+      notes: deliveryReceipt?.notes || "Thank you for your business!",
       
-      // Add more pages if needed
-      while (heightLeft > 0) {
-        position = -pageHeight * ++pageOffset;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      // Use the items_details array for the items
+      items: shipment?.items_details || []
+    };
+  
+    // Create a temporary div for rendering the PDF component
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    document.body.appendChild(tempDiv);
+  
+    // Use createRoot API for React 18
+    const root = ReactDOM.createRoot(tempDiv);
+    
+    // Render the component
+    root.render(
+      <DeliveryReceiptPDF deliveryData={deliveryData} />
+    );
+    
+    // Access the DOM after rendering
+    setTimeout(() => {
+      // Find the button in the rendered component and click it
+      const generateButton = tempDiv.querySelector('button');
+      if (generateButton) {
+        generateButton.click();
       }
       
-      pdf.save(`Delivery_Receipt_${deliveryReceipt?.delivery_receipt_id || 'Unknown'}.pdf`);
-      
-      setIsPdfGenerating(false);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      setIsPdfGenerating(false);
-    }
+      // Cleanup after PDF generation
+      setTimeout(() => {
+        root.unmount();
+        document.body.removeChild(tempDiv);
+        setIsPdfGenerating(false);
+      }, 2000);
+    }, 500);
   };
   
   // Determine if receipt can be updated
@@ -486,16 +529,7 @@ const DeliveryReceiptModal = ({ shipment, onSave, onCancel, employees = [] }) =>
         </div>
       </div>
       
-      {/* Hidden PDF component for generation */}
-      <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
-        <DeliveryReceiptPDF 
-          ref={pdfRef}
-          receipt={deliveryReceipt}
-          shipment={shipment}
-          customer={customerData}
-          employees={employees} // Add this prop
-        />
-      </div>
+      {/* The PDF component will be created dynamically when needed */}
     </div>
   );
 };
