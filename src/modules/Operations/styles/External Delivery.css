@@ -186,10 +186,9 @@
 }
 
 .delivery-receipt-wrapper .table-container th {
-  position: sticky;
-  top: 0;
+ 
   background-color: white;
-  z-index: 2;
+
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* optional subtle shadow */
 }
 
