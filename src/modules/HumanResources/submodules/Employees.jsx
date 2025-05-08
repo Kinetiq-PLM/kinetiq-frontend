@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Employees.css";
 import { FiSearch } from "react-icons/fi";
-
+import { FiUpload } from 'react-icons/fi';
 const Employees = () => {
   /*************************************
    * States for Employees
@@ -1772,18 +1772,22 @@ const Employees = () => {
                   </td>
                   <td>
                     <div className="hr-document-actions">
-                      <button 
-                        className="hr-view-btn"
-                        onClick={() => handleViewDocuments(emp)}
-                      >
-                        View
-                      </button>
+                      {emp.documents && Object.keys(JSON.parse(typeof emp.documents === 'string' ? emp.documents : '{}')).length > 0 ? (
+                        <button 
+                          className="hr-view-btn"
+                          onClick={() => handleViewDocuments(emp)}
+                        >
+                          View Files
+                        </button>
+                      ) : (
+                        <span className="hr-no-documents">No files</span>
+                      )}
                       {!isArchived && (
                         <button 
                           className="hr-upload-btn"
                           onClick={() => handleUploadDocument(emp)}
                         >
-                          Upload
+                          <FiUpload className="upload-icon" /> Upload Document
                         </button>
                       )}
                     </div>

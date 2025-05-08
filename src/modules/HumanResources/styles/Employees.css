@@ -1230,40 +1230,52 @@
 /* ---------------------------------------------------------
    DOCUMENT MANAGEMENT STYLES
    --------------------------------------------------------- */
+/* Updated Document Action Styles */
 .hr-document-actions {
   display: flex;
-  gap: 5px;
-  justify-content: center;
-}
-
-.hr-view-btn, .hr-upload-btn {
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: none;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .hr-view-btn {
-  background-color: #007bff;
-  color: white;
-}
-
-.hr-upload-btn {
-  background-color: #28a745;
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .hr-view-btn:hover {
-  background-color: #0069d9;
+  background-color: #1890ff;
+  color: white;
+  border-color: #1890ff;
+}
+
+.hr-upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  background-color: #e6fffb;
+  color: #006d75;
+  border: 1px solid #87e8de;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .hr-upload-btn:hover {
-  background-color: #218838;
+  background-color: #006d75;
+  color: white;
+  border-color: #006d75;
 }
 
 .hr-documents-table {
@@ -1301,11 +1313,13 @@
 }
 
 .hr-no-documents {
-  text-align: center;
-  color: #6c757d;
+  color: #888;
   font-style: italic;
+  font-size: 0.8rem;
 }
-
+.upload-icon {
+  font-size: 0.9rem;
+}
 .hr-loading-overlay {
   position: fixed;
   top: 0;
