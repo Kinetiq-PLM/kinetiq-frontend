@@ -1,7 +1,7 @@
 // src/modules/Administration/api/api.jsx
 import axios from 'axios';
-//const API_BASE_URL = 'http://localhost:8000/api';
-const API_BASE_URL = 'https://7lthyploub.execute-api.ap-southeast-1.amazonaws.com/dev/api';
+const API_BASE_URL = 'http://localhost:8000/api';
+//const API_BASE_URL = 'https://7lthyploub.execute-api.ap-southeast-1.amazonaws.com/dev/api';
 
 // Create axios instance with default config
 const api = axios.create({
