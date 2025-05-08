@@ -1,281 +1,126 @@
-/* ========== Base Styles ========== */
-.administration {
-  width: 100%;
-  padding: 10px;
-  height: 100%;
-  overflow: hidden;
-}
+/* Administration.css */
 
-.administration .admin-content {
-  background-color: #fff;
-  width: calc(100% - 20px); /* Account for padding */
-  max-width: 100%;
+/* Base container styles */
+.admin-dashboard {
+  width: 100%;
   height: 100%;
-  max-height: calc(100vh - 140px);
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  isolation: isolate;
-  position: relative;
-  overflow: hidden;
-  margin: 0 auto; /* Center the container */
 }
 
-/* ========== Typography & Headers ========== */
-.administration .page-title {
-  margin-bottom: 0 !important;
+.admin-container {
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Admin dashboard container */
+.admin-dashboard-container {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Page header styles */
+.page-header {
+  padding: 1px;
+  margin-bottom: 1px;
+}
+
+/* Theme color for text */
+.text-theme {
   color: #00a8a8;
 }
 
-.administration .title-divider {
-  margin: 12px 0 16px !important;
+/* Header divider */
+.header-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 0.75rem 1.5rem 0.5rem 1.5rem;
 }
 
-.administration .dashboard-content {
+/* Dashboard content area */
+.dashboard-content {
   flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
   overflow-y: auto;
-  overflow-x: hidden; /* Prevent horizontal overflow */
-  width: 100%;
-}
-
-/* Dashboard Cards Grid */
-.administration .dashboard-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-  padding-bottom: 20px;
-  width: 100%;
-  max-width: 100%;
-}
-
-/* Dashboard Card Styling */
-.administration .dashboard-card {
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background-color: #fff;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  min-width: 0; /* Allow card to shrink if needed */
-  overflow: hidden; /* Prevent content overflow */
-  max-width: 100%;
-}
-
-.administration .dashboard-card:hover {
-  background-color: #e6f7f7;
-  border-color: #00a8a8;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Card Icons */
-.administration .card-icon {
-  font-size: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.administration .card-icon.exchange-rate {
-  background-color: rgba(0, 168, 112, 0.1);
-  color: #00a870;
-}
-
-.administration .card-icon.users {
-  background-color: rgba(128, 90, 213, 0.1);
-  color: #805ad5;
-}
-
-.administration .card-icon.warehouse {
-  background-color: rgba(0, 168, 112, 0.1);
-  color: #00a870;
-}
-
-.administration .card-icon.policy {
-  background-color: rgba(0, 190, 213, 0.1);
-  color: #00bed5;
-}
-
-.administration .card-icon.audit {
-  background-color: rgba(229, 62, 62, 0.1);
-  color: #e53e3e;
-}
-
-.administration .card-icon.partner {
-  background-color: rgba(236, 201, 75, 0.1);
-  color: #ecc94b;
-}
-
-/* Card Content */
-.administration .card-content {
-  flex: 1;
-  min-width: 0; /* Allow content to shrink */
-  overflow: hidden; /* Prevent overflow */
-}
-
-.administration .card-title {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 2px;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.administration .card-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: #333;
-  margin: 2px 0;
-}
-
-.administration .card-subtitle {
-  font-size: 12px;
-  color: #999;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.administration .status-badge {
-  background-color: rgba(0, 168, 112, 0.1);
-  color: #00a870;
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 10px;
-}
-
-/* User Management Section */
-.administration .user-management-section {
-  margin-top: 20px;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden; /* Prevent horizontal overflow */
-  border-top: 1px solid #f0f0f0;
-  padding-top: 20px;
-  width: 100%;
-  max-width: 100%;
+  overflow-x: hidden;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 0.5rem;
 }
 
 /* Scroll Bar Styles */
 .admin-dashboard-container::-webkit-scrollbar,
 .dashboard-content::-webkit-scrollbar {
-width: 8px;
-height: 8px;
+  width: 8px;
+  height: 8px;
 }
 
 .admin-dashboard-container::-webkit-scrollbar-track,
 .dashboard-content::-webkit-scrollbar-track {
-background: #f0f0f0;
+  background: #f0f0f0;
 }
 
 .admin-dashboard-container::-webkit-scrollbar-thumb,
 .dashboard-content::-webkit-scrollbar-thumb {
-background: #00a8a8;
-border-radius: 4px;
+  background: #00a8a8;
+  border-radius: 4px;
 }
 
 .admin-dashboard-container::-webkit-scrollbar-thumb:hover,
 .dashboard-content::-webkit-scrollbar-thumb:hover {
-background: #008080;
+  background: #008080;
 }
 
 /* Firefox scrollbar */
 .admin-dashboard-container,
 .dashboard-content {
-scrollbar-width: thin;
-scrollbar-color: #00a8a8 #f0f0f0;
+  scrollbar-width: thin;
+  scrollbar-color: #00a8a8 #f0f0f0;
 }
 
-/* ========== Responsive Styles ========== */
-@media (max-width: 992px) {
-  .administration .admin-content {
-      padding: 12px;
-  }
-  
-  .administration .dashboard-cards {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 12px;
-  }
-  
-  .administration .card-icon {
-      width: 48px;
-      height: 48px;
-      font-size: 20px;
-  }
+/* Dashboard cards grid */
+.dashboard-cards {
+  margin-bottom: 1.5rem;
 }
 
-@media (max-width: 820px) {
-  .administration {
-      padding: 8px;
+.dashboard-card {
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: rgba(183, 229, 230, 0.489);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 0.5rem;
   }
   
-  .administration .admin-content {
-      padding: 10px;
-      border-radius: 4px;
-      width: calc(100% - 16px); /* Account for padding */
+  .dashboard-cards {
+    gap: 0.75rem;
   }
   
-  .administration .page-title {
-      font-size: 18px !important;
-  }
-  
-  .administration .title-divider {
-      margin: 8px 0 12px !important;
-  }
-  
-  .administration .dashboard-cards {
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 10px;
+  .dashboard-card {
+    padding: 0.75rem;
   }
 }
 
-@media (max-width: 576px) {
-  .administration .admin-content {
-      max-height: calc(100vh - 120px);
-      padding: 8px;
-      width: calc(100% - 16px); /* Account for padding */
-  }
-  
-  .administration .page-title {
-      font-size: 16px !important;
-  }
-  
-  .administration .title-divider {
-      margin: 6px 0 10px !important;
-  }
-  
-  .administration .dashboard-cards {
-      grid-template-columns: 1fr;
-      gap: 8px;
-  }
-  
-  .administration .card-icon {
-      width: 40px;
-      height: 40px;
-      font-size: 18px;
-  }
-  
-  .administration .card-value {
-      font-size: 18px;
-  }
-  
-  .administration .user-management-section {
-      margin-top: 12px;
-      padding-top: 12px;
-  }
+/* User management section */
+.user-management-section {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
