@@ -11,21 +11,21 @@ const EmployeeRequest = ({ loadSubModule, setActiveSubModule, employee_id }) => 
       description: "Submit a request for scheduled time off including sick leave, vacation, or personal leave",
       icon: <FaCalendarAlt />,
       color: "#00a9ac",
-      submodule: "LeaveRequest" // Change to match the name in HumanResources.jsx
+      submodule: "LeaveRequest" // Verify this matches the registration in parent app
     },
     {
       title: "Overtime Request",
       description: "Submit a request for overtime hours worked outside of your regular schedule",
       icon: <FaClock />,
       color: "#00a9ac",
-      submodule: "OvertimeRequest" // Update if necessary
+      submodule: "OvertimeRequest" // Verify this matches the registration in parent app
     },
     {
       title: "Resignation Request",
       description: "Submit a formal resignation notice and initiate the departure process",
       icon: <FaSignOutAlt />,
       color: "#00a9ac",
-      submodule: "ResignationRequest" 
+      submodule: "ResignationRequest" // Verify this matches the registration in parent app
     }
   ];
 
@@ -37,7 +37,7 @@ const EmployeeRequest = ({ loadSubModule, setActiveSubModule, employee_id }) => 
       e.stopPropagation();
     }
     
-    console.log(`Navigating to submodule: ${submodule}`);
+    console.log(`Attempting to navigate to submodule: ${submodule}`);
     
     try {
       // Check if the functions exist
@@ -52,16 +52,14 @@ const EmployeeRequest = ({ loadSubModule, setActiveSubModule, employee_id }) => 
       }
       
       // Save any necessary data to sessionStorage for the target submodule
-      // Similar to what's done in HumanResources.jsx
       sessionStorage.setItem('requestSource', 'employeePortal');
       
-      // Navigate to the submodule - Order matters here!
-      // We need to first set the active submodule, then load it
+      // Navigate to the submodule
       setActiveSubModule(submodule);
-      setTimeout(() => {
-        loadSubModule(submodule);
-        console.log('Navigation successful to:', submodule);
-      }, 0);
+      loadSubModule(submodule);
+      
+      // Add logging to verify navigation was successful
+      console.log('Navigation triggered to:', submodule);
     } catch (error) {
       console.error('Error navigating to submodule:', error);
       alert(`Failed to navigate to ${submodule}. Please try again or contact support.`);
@@ -94,7 +92,10 @@ const EmployeeRequest = ({ loadSubModule, setActiveSubModule, employee_id }) => 
                 </div>
                 <div className="emp-req-card-action">
                   <button 
-                    onClick={(e) => navigateToSubmodule(request.submodule, e)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Ensure the event doesn't bubble up
+                      navigateToSubmodule(request.submodule, e);
+                    }}
                     className="emp-req-action-button"
                   >
                     Submit Request
