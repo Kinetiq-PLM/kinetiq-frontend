@@ -13,7 +13,8 @@ import {
     message,
     Typography,
     Divider,
-    Pagination
+    Pagination,
+    Select
 } from "antd";
 import {
     UserOutlined,
@@ -27,11 +28,13 @@ import {
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
+const { Option } = Select;
 
 const Warehouse = () => {
     // State variables
     const [warehouse, setWarehouse] = useState([]);
     const [archivedWarehouse, setArchivedWarehouse] = useState([]);
+    const [warehouseManagers, setWarehouseManagers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [searchValue, setSearchValue] = useState("");
@@ -57,6 +60,7 @@ const Warehouse = () => {
 
     useEffect(() => {
         fetchWarehouse();  // Fetch the warehouse data when the component mounts
+        fetchWarehouseManagers();  // Fetch warehouse managers for dropdown
     }, []);  // Empty dependency array ensures it runs once on mount
 
     useEffect(() => {
@@ -86,6 +90,16 @@ const Warehouse = () => {
             console.error(error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchWarehouseManagers = async () => {
+        try {
+            const data = await warehouseAPI.getWarehouseManagerChoices();
+            setWarehouseManagers(data);
+        } catch (error) {
+            message.error("Failed to fetch warehouse managers");
+            console.error(error);
         }
     };
 
@@ -214,6 +228,12 @@ const Warehouse = () => {
         }
     };
 
+    // Get manager name from employee_id
+    const getManagerNameById = (employeeId) => {
+        const manager = warehouseManagers.find(manager => manager.value === employeeId);
+        return manager ? manager.display : employeeId;
+    };
+
     // Table columns definitions with sorting added
     const warehouseColumns = [
         {
@@ -245,7 +265,8 @@ const Warehouse = () => {
             key: "warehouse_manager",
             sorter: true,
             sortDirections: ['ascend', 'descend'],
-            width: 140
+            width: 140,
+            render: (value) => getManagerNameById(value)
         },
         {
             title: "Contact No",
@@ -318,7 +339,8 @@ const Warehouse = () => {
             key: "warehouse_manager",
             sorter: true,
             sortDirections: ['ascend', 'descend'],
-            width: 140
+            width: 140,
+            render: (value) => getManagerNameById(value)
         },
         {
             title: "Contact No",
@@ -491,9 +513,18 @@ const Warehouse = () => {
                         <Form.Item
                             name="warehouse_manager"
                             label="Warehouse Manager"
-                            rules={[{ required: true, message: "Please enter warehouse manager" }]}
+                            rules={[{ required: true, message: "Please select a warehouse manager" }]}
                         >
-                            <Input />
+                            <Select
+                                placeholder="Select a warehouse manager"
+                                loading={warehouseManagers.length === 0}
+                            >
+                                {warehouseManagers.map(manager => (
+                                    <Option key={manager.value} value={manager.value}>
+                                        {manager.display}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
 
                         <Form.Item
@@ -550,7 +581,7 @@ const Warehouse = () => {
                             </div>
                             <div className="detail-item">
                                 <Typography.Text strong>Warehouse Manager:</Typography.Text>
-                                <Typography.Text>{selectedRecord.warehouse_manager}</Typography.Text>
+                                <Typography.Text>{getManagerNameById(selectedRecord.warehouse_manager)}</Typography.Text>
                             </div>
                             <div className="detail-item">
                                 <Typography.Text strong>Contact No:</Typography.Text>

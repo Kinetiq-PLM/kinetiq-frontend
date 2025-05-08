@@ -539,7 +539,7 @@ export const warehouseAPI = {
   // Get all warehouses with optional search and ordering
   getWarehouses: async (params = {}) => {
     try {
-      const response = await api.get('/warehouse/', { params });
+      const response = await api.get('/warehouses/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching warehouses:', error);
@@ -550,7 +550,7 @@ export const warehouseAPI = {
   // Create a new warehouse
   createWarehouse: async (warehouseData) => {
     try {
-      const response = await api.post('/warehouse/', warehouseData);
+      const response = await api.post('/warehouses/', warehouseData);
       return response.data;
     } catch (error) {
       console.error('Error creating warehouse:', error);
@@ -561,7 +561,7 @@ export const warehouseAPI = {
   // Update a warehouse
   updateWarehouse: async (warehouseId, warehouseData) => {
     try {
-      const response = await api.put(`/warehouse/${warehouseId}/`, warehouseData);
+      const response = await api.put(`/warehouses/${warehouseId}/`, warehouseData);
       return response.data;
     } catch (error) {
       console.error('Error updating warehouse:', error);
@@ -572,7 +572,7 @@ export const warehouseAPI = {
   // Get a single warehouse
   getWarehouse: async (warehouseId) => {
     try {
-      const response = await api.get(`/warehouse/${warehouseId}/`);
+      const response = await api.get(`/warehouses/${warehouseId}/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching warehouse:', error);
@@ -583,7 +583,7 @@ export const warehouseAPI = {
   // Archive (soft delete) a warehouse
   archiveWarehouse: async (warehouseId) => {
     try {
-      const response = await api.delete(`/warehouse/${warehouseId}/`);
+      const response = await api.delete(`/warehouses/${warehouseId}/`);
       return response.data;
     } catch (error) {
       console.error('Error archiving warehouse:', error);
@@ -594,7 +594,7 @@ export const warehouseAPI = {
   // Get archived warehouses
   getArchivedWarehouses: async (params = {}) => {
     try {
-      const response = await api.get('/warehouse/archived/', { params });
+      const response = await api.get('/warehouses/archived/', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching archived warehouses:', error);
@@ -605,10 +605,34 @@ export const warehouseAPI = {
   // Restore an archived warehouse
   restoreWarehouse: async (warehouseId) => {
     try {
-      const response = await api.patch(`/warehouse/${warehouseId}/restore/`);
+      const response = await api.patch(`/warehouses/${warehouseId}/restore/`);
       return response.data;
     } catch (error) {
       console.error('Error restoring warehouse:', error);
+      throw error;
+    }
+  },
+
+  // Get warehouse managers (with role_id ADMIN-ROLE-2025-ce28ef)
+  getWarehouseManagers: async () => {
+    try {
+      const response = await api.get('/warehouse-managers/', {
+        params: { role_id: 'ADMIN-ROLE-2025-ce28ef' }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching warehouse managers:', error);
+      throw error;
+    }
+  },
+
+  // Get warehouse managers formatted for dropdown
+  getWarehouseManagerChoices: async () => {
+    try {
+      const response = await api.get('/warehouse-managers/choices/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching warehouse manager choices:', error);
       throw error;
     }
   }

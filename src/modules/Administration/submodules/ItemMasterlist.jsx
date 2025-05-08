@@ -237,44 +237,50 @@ const ItemMasterManagement = () => {
   };
 
   // handleAddItemSubmit function - For the Add/Edit Item modal
-  const handleAddItemSubmit = async (values) => {
-    try {
-      // Filter out undefined/null values for optional fields
-      const filteredValues = Object.fromEntries(
-        Object.entries(values).filter(([_, value]) => value !== undefined && value !== null)
-      );
+const handleAddItemSubmit = async (values) => {
+  try {
+    // Process form values to ensure empty fields are set to null
+    const processedValues = Object.keys(values).reduce((acc, key) => {
+      // Check if the value is undefined, null, empty string, or NaN
+      const isEmpty = values[key] === undefined || 
+                      values[key] === null || 
+                      values[key] === '' || 
+                      (typeof values[key] === 'number' && isNaN(values[key]));
       
-      if (modalMode === "add") {
-        // Only set required fields if they're missing
-        const itemData = {
-          ...filteredValues,
-          item_type: filteredValues.item_type || "Product",
-          unit_of_measure: filteredValues.unit_of_measure || "kg",
-          item_status: filteredValues.item_status || "Active",
-          manage_item_by: filteredValues.manage_item_by || "Serial Number"
-        };
-        
-        await itemMasterDataAPI.createItem(itemData);
-        message.success("Item created successfully");
+      // Set required fields to their default values if empty
+      if (isEmpty) {
+        if (key === 'item_type') {
+          acc[key] = modalMode === "edit" ? selectedRecord.item_type : "Product";
+        } else if (key === 'unit_of_measure') {
+          acc[key] = modalMode === "edit" ? selectedRecord.unit_of_measure : "kg";
+        } else if (key === 'item_status') {
+          acc[key] = modalMode === "edit" ? selectedRecord.item_status : "Active";
+        } else if (key === 'manage_item_by') {
+          acc[key] = modalMode === "edit" ? selectedRecord.manage_item_by : "Serial Number";
+        } else {
+          // For non-required fields, set to null if empty
+          acc[key] = null;
+        }
       } else {
-        // For edit mode, maintain existing values for required fields
-        const itemData = {
-          ...filteredValues,
-          item_type: filteredValues.item_type || selectedRecord.item_type,
-          unit_of_measure: filteredValues.unit_of_measure || selectedRecord.unit_of_measure,
-          item_status: filteredValues.item_status || selectedRecord.item_status,
-          manage_item_by: filteredValues.manage_item_by || selectedRecord.manage_item_by
-        };
-        
-        await itemMasterDataAPI.updateItem(selectedRecord.item_id, itemData);
-        message.success("Item updated successfully");
+        // Keep the original value if not empty
+        acc[key] = values[key];
       }
-      setAddItemModalVisible(false);
-      fetchItems();
-    } catch (error) {
-      message.error(`Failed to ${modalMode === "add" ? "create" : "update"} item: ${error.response?.data?.message || error.message}`);
+      return acc;
+    }, {});
+    
+    if (modalMode === "add") {
+      await itemMasterDataAPI.createItem(processedValues);
+      message.success("Item created successfully");
+    } else {
+      await itemMasterDataAPI.updateItem(selectedRecord.item_id, processedValues);
+      message.success("Item updated successfully");
     }
-  };
+    setAddItemModalVisible(false);
+    fetchItems();
+  } catch (error) {
+    message.error(`Failed to ${modalMode === "add" ? "create" : "update"} item: ${error.response?.data?.message || error.message}`);
+  }
+};
 
   // Item form handlers
   const handleViewItem = (record) => {
@@ -315,29 +321,30 @@ const ItemMasterManagement = () => {
     });
   };
 
-  const handleItemFormSubmit = async (values) => {
-    try {
-      // Ensure we don't overwrite required fields with null values
-      const updateData = {
-        ...values,
-        // Only include non-null values for nullable fields
-        preferred_vendor: values.preferred_vendor || null,
-        purchasing_uom: values.purchasing_uom || null,
-        items_per_purchase_unit: values.items_per_purchase_unit || null,
-        purchase_quantity_per_package: values.purchase_quantity_per_package || null,
-        sales_uom: values.sales_uom || null,
-        items_per_sale_unit: values.items_per_sale_unit || null,
-        sales_quantity_per_package: values.sales_quantity_per_package || null
-      };
+  // Item form handlers - For the view/edit modal
+const handleItemFormSubmit = async (values) => {
+  try {
+    // Process form values to ensure empty fields are set to null
+    const processedValues = Object.keys(values).reduce((acc, key) => {
+      // Check if the value is undefined, null, empty string, or NaN
+      const isEmpty = values[key] === undefined || 
+                      values[key] === null || 
+                      values[key] === '' || 
+                      (typeof values[key] === 'number' && isNaN(values[key]));
       
-      await itemMasterDataAPI.updateItem(selectedRecord.item_id, updateData);
-      message.success("Item updated successfully");
-      setItemModalVisible(false);
-      fetchItems();
-    } catch (error) {
-      message.error(`Failed to update item: ${error.response?.data?.message || error.message}`);
-    }
-  };
+      // For all fields in this form, set to null if empty (these are all non-required fields)
+      acc[key] = isEmpty ? null : values[key];
+      return acc;
+    }, {});
+    
+    await itemMasterDataAPI.updateItem(selectedRecord.item_id, processedValues);
+    message.success("Item updated successfully");
+    setItemModalVisible(false);
+    fetchItems();
+  } catch (error) {
+    message.error(`Failed to update item: ${error.response?.data?.message || error.message}`);
+  }
+};
 
   // Archive/Restore handlers
   const handleArchiveItem = async (itemId) => {
