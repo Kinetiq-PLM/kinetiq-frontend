@@ -509,6 +509,7 @@ const Employees = () => {
         axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees"),
         axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/archived/")
       ]);
+      console.log("Fetched employee data:", activeRes.data);
       setEmployees(activeRes.data);
       setArchivedEmployees(archivedRes.data);
     } catch (err) {
@@ -1772,16 +1773,37 @@ const Employees = () => {
                   </td>
                   <td>
                     <div className="hr-document-actions">
-                      {emp.documents && Object.keys(JSON.parse(typeof emp.documents === 'string' ? emp.documents : '{}')).length > 0 ? (
-                        <button 
-                          className="hr-view-btn"
-                          onClick={() => handleViewDocuments(emp)}
-                        >
-                          View Files
-                        </button>
-                      ) : (
-                        <span className="hr-no-documents">No files</span>
-                      )}
+                    {(() => {
+                      try {
+                        // Parse documents only once if it's a string
+                        let hasDocuments = false;
+                        if (emp.documents) {
+                          const docs = typeof emp.documents === 'string' 
+                            ? JSON.parse(emp.documents) 
+                            : emp.documents;
+                          
+                          // Check both required and optional sections
+                          if (docs) {
+                            const requiredDocs = docs.required || {};
+                            const optionalDocs = docs.optional || {};
+                            hasDocuments = Object.keys(requiredDocs).length > 0 || Object.keys(optionalDocs).length > 0;
+                          }
+                        }
+                        
+                        if (hasDocuments) {
+                          return (
+                            <button className="hr-view-btn" onClick={() => handleViewDocuments(emp)}>
+                              View Files
+                            </button>
+                          );
+                        }
+                        return <span className="hr-no-documents">No files</span>;
+                      } catch (e) {
+                        console.error("Error parsing documents:", e);
+                        return <span className="hr-no-documents">Error loading documents</span>;
+                      }
+                    })()}
+                      
                       {!isArchived && (
                         <button 
                           className="hr-upload-btn"
@@ -2203,22 +2225,26 @@ const Employees = () => {
       const response = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${employee.employee_id}/`);
       const employeeData = response.data;
       
-      console.log("Employee documents data:", employeeData.documents); // Add this
+      console.log("Employee documents data:", employeeData.documents);
       
+      // Initialize with proper structure
       let documents = { required: {}, optional: {} };
+      
       if (employeeData.documents) {
         try {
+          // Handle string or object format
           documents = typeof employeeData.documents === 'string' 
             ? JSON.parse(employeeData.documents) 
             : employeeData.documents;
-            
-          console.log("Parsed documents:", documents); // Add this
           
-          // Ensure the structure has required and optional properties
+          // Ensure the structure has required properties
           documents.required = documents.required || {};
           documents.optional = documents.optional || {};
+          
+          console.log("Parsed documents:", documents);
         } catch (e) {
           console.error("Error parsing documents:", e);
+          showToast("Error parsing document data", false);
         }
       }
       
@@ -2303,10 +2329,25 @@ const Employees = () => {
         verified_by: null
       };
       
+      console.log("Updated documents structure:", documents);
+      
       // Step 7: Update the employee's documents in your backend
       await axios.patch(
         `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/employees/${currentEmployee.employee_id}/`, 
         { documents: JSON.stringify(documents) }
+      );
+      
+      // Step 8: Update local state immediately before fetching fresh data
+      setEmployees(prevEmployees => 
+        prevEmployees.map(emp => {
+          if (emp.employee_id === currentEmployee.employee_id) {
+            return {
+              ...emp,
+              documents: JSON.stringify(documents) // Make sure it's stringified like the API expects
+            };
+          }
+          return emp;
+        })
       );
       
       showToast("Document uploaded successfully", true);
@@ -2316,8 +2357,11 @@ const Employees = () => {
       setUploadingDocumentType('');
       setShowUploadDocumentModal(false);
       
-      // Refresh employees data
-      fetchEmployees();
+      // Fetch fresh data after a short delay to ensure database has updated
+      setTimeout(() => {
+        fetchEmployees();
+      }, 500);
+      
     } catch (err) {
       console.error("Error uploading document:", err);
       // More detailed error logging
@@ -3476,62 +3520,63 @@ const Employees = () => {
         </div>
       )}
 
-      {/* Documents Viewing Modal */}
-      {showDocumentsModal && viewingDocuments && (
-        <div className="hr-employee-modal-overlay" onClick={() => setShowDocumentsModal(false)}>
-          <div className="hr-employee-modal" onClick={e => e.stopPropagation()}>
-            <h3>Employee Documents</h3>
-            
-            <div className="documents-section">
-              <h4>Required Documents</h4>
-              <table className="hr-documents-table">
-                <thead>
-                  <tr>
-                    <th>Document Type</th>
-                    <th>Status</th>
-                    <th>Verified By</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(viewingDocuments.required || {}).map(([docType, docInfo]) => (
-                    <tr key={docType}>
-                      <td>{docType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
-                      <td>
-                        <span className={`hr-tag ${docInfo.verified ? 'approved' : 'pending'}`}>
-                          {docInfo.verified ? 'Verified' : 'Pending'}
-                        </span>
-                      </td>
-                      <td>{docInfo.verified_by || '-'}</td>
-                      <td>
-                        {docInfo.path && (
-                          <a 
-                            href={docInfo.path} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="hr-view-document-btn"
-                          >
-                            View / Download
-                          </a>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                  {Object.keys(viewingDocuments.required || {}).length === 0 && (
+        {/* Documents Viewing Modal */}
+        {showDocumentsModal && viewingDocuments && (
+          <div className="hr-employee-modal-overlay" onClick={() => setShowDocumentsModal(false)}>
+            <div className="hr-employee-modal" onClick={e => e.stopPropagation()}>
+              <h3>Employee Documents</h3>
+              
+              <div className="documents-section">
+                <h4>Required Documents</h4>
+                <table className="hr-documents-table">
+                  <thead>
                     <tr>
-                      <td colSpan="4" className="hr-no-documents">No documents uploaded yet</td>
+                      <th>Document Type</th>
+                      <th>Status</th>
+                      <th>Verified By</th>
+                      <th>Action</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-            
-            <div className="hr-employee-modal-buttons">
-              <button className="hr-employee-cancel-btn" onClick={() => setShowDocumentsModal(false)}>Close</button>
+                  </thead>
+                  <tbody>
+                    {viewingDocuments && viewingDocuments.required && 
+                    Object.entries(viewingDocuments.required).map(([docType, docInfo]) => (
+                      <tr key={docType}>
+                        <td>{docType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+                        <td>
+                          <span className={`hr-tag ${docInfo.verified ? 'approved' : 'pending'}`}>
+                            {docInfo.verified ? 'Verified' : 'Pending'}
+                          </span>
+                        </td>
+                        <td>{docInfo.verified_by || '-'}</td>
+                        <td>
+                          {docInfo.path && (
+                            <a 
+                              href={docInfo.path} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="hr-view-document-btn"
+                            >
+                              View / Download
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                    {(!viewingDocuments?.required || Object.keys(viewingDocuments.required).length === 0) && (
+                      <tr>
+                        <td colSpan="4" className="hr-no-documents">No documents uploaded yet</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div className="hr-employee-modal-buttons">
+                <button className="hr-employee-cancel-btn" onClick={() => setShowDocumentsModal(false)}>Close</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Uploading Overlay */}
       {uploadingStatus === 'uploading' && (
