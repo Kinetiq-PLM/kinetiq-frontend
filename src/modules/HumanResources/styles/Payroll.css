@@ -301,6 +301,108 @@
   animation: slideIn 0.5s, fadeOut 0.5s 2.5s forwards;
 }
 
+/* Three-dots menu styling */
+.hr-payroll-actions {
+  position: relative;
+  cursor: pointer;
+  text-align: right;
+}
+
+.hr-payroll-dots {
+  font-size: 1.25rem;
+  padding: 0 0.5rem;
+  user-select: none;
+  position: relative;
+}
+
+.hr-payroll-dropdown {
+  position: absolute;
+  top: 1.5rem;
+  right: 0;
+  background-color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  z-index: 100;
+  width: 120px;
+}
+
+.hr-payroll-dropdown-item {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hr-payroll-dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* Modal styling for payroll edit */
+.hr-payroll-modal-overlay {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.hr-payroll-modal {
+  width: 500px;
+  max-width: 90vw;
+  max-height: 90vh;
+  padding: 2rem;
+  border-radius: 8px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.hr-payroll-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hr-payroll-modal-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.hr-payroll-modal-form label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  color: #374151;
+}
+
+.hr-payroll-modal-form input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.hr-payroll-modal-form input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  color: #666;
+}
+
+.hr-payroll-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
 /* ---------------------------------------------------------
    RESPONSIVE DESIGN
    --------------------------------------------------------- */
