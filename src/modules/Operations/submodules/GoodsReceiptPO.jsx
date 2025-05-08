@@ -767,7 +767,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           type: matchedItem.type,
         };
       }).filter(item => item !== null);
-      console.log(poItems)
       // Calculate initial amount
       const poInitialAmount = poItems.reduce((sum, item) => sum + (item.cost * item.quantity), 0);
       const taxAmount = parseFloat(quotation.tax || 0);
@@ -877,7 +876,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           quantity: parseInt(item.quantity || 0, 10)
         }));
   
-      console.log("Current document items (filtered):", currentItems);
+      //console.log("Current document items (filtered):", currentItems);
   
       // Find the selected purchase order
       const selectedPO = purchaseOrders.find(po => po.purchase_id === purchaseId);
@@ -978,20 +977,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         });
       } else {
         //console.log("Checking partial delivery match");
-        allItemsMatch = poItems.every(poItem => {
-          const currentQty = currentItems.find(ci => ci.item_id === poItem.item_id)?.quantity || 0;
-          const existingQty = existingPartialItems[poItem.item_id] || 0;
-          const totalQty = currentQty + existingQty;
-          const withinLimit = totalQty <= poItem.quantity;
-          const matchedItem = itemOptions.find(opt => opt.id === poItem.item_id);
-          if (!withinLimit) {
-            const mismatchMsg = `Item ${matchedItem?.name || poItem.item_id}: Total Qty ${totalQty} exceeds PO Qty ${poItem.quantity}`;
-            //console.log(mismatchMsg);
-            itemMismatches.push(mismatchMsg);
-          }
-          return withinLimit;
-        });
-  
+        
         noExtraItems = currentItems.every(ci => {
           const exists = poItems.some(poItem => poItem.item_id === ci.item_id);
           if (!exists) {
@@ -1003,13 +989,67 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           }
           return exists;
         });
+      
+        allItemsMatch = poItems.every(poItem => {
+          const currentItem = currentItems.find(ci => ci.item_id === poItem.item_id);
+          
+          // Skip if item doesn't exist in current document
+          if (!currentItem) {
+            //console.log(`Item ${poItem.item_id} not found in current items - skipping validation`);
+            return true;
+          }
+        
+          const currentQty = currentItem.quantity || 0;
+          const existingQty = existingPartialItems[poItem.item_id] || 0;
+          const totalQty = currentQty + existingQty;
+          const matchedItem = itemOptions.find(opt => opt.id === poItem.item_id);
+          /*
+          console.log([
+            `Validating item: ${matchedItem?.name || poItem.item_id}`,
+            `Current Qty: ${currentQty}`,
+            `Existing Qty: ${existingQty}`,
+            `Total Qty: ${totalQty}`,
+            `PO Qty: ${poItem.quantity}`,
+            `Has existing receipts: ${existingQty > 0 ? 'Yes' : 'No'}`
+          ].join(" | "));*/
+        
+          const shouldCheckExactMatch = existingQty === 0;
+          const exactMatch = shouldCheckExactMatch ? currentQty === poItem.quantity : true;
+          const withinLimit = totalQty <= poItem.quantity;
+          /*
+          console.log(`Validation rules:`, {
+            checkExactMatch: shouldCheckExactMatch,
+            exactMatch,
+            withinLimit
+          });*/
+        
+          if (!withinLimit) {
+            const mismatchMsg = existingQty > 0
+              ? `Item ${matchedItem?.name || poItem.item_id}: Combined quantity = ${totalQty} exceeds PO quantity ${poItem.quantity}`
+              : `Item ${matchedItem?.name || poItem.item_id}: Quantity ${currentQty} exceeds PO quantity ${poItem.quantity}`;
+            
+            //console.warn('Quantity limit violation:', mismatchMsg);
+            itemMismatches.push(mismatchMsg);
+          }
+        
+          if (shouldCheckExactMatch && !exactMatch) {
+            const mismatchMsg = `Item ${matchedItem?.name || poItem.item_id}: Quantity ${currentQty} doesn't match PO quantity ${poItem.quantity}`;
+            //console.warn('Exact match violation:', mismatchMsg);
+            itemMismatches.push(mismatchMsg);
+          }
+        
+          const isValid = withinLimit && (!shouldCheckExactMatch || exactMatch);
+          //console.log(`Validation result: ${isValid ? 'PASS' : 'FAIL'}`);
+          
+          return isValid;
+        });
       }
   
       // Combine all mismatches
       const allMismatches = [...mismatches, ...itemMismatches];
       setPoMismatchDetails(allMismatches.length > 0 ? allMismatches : null);
-  
-      /*console.log("Final match results:", {
+      /*
+      console.log("Final match results:", {
         allItemsMatch,
         noExtraItems,
         finalMatch: allItemsMatch && noExtraItems
@@ -1521,7 +1561,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
               {selectedButton === "Create" ? (
                 <select
                   className="copy-from-select"
-                  value={selectedPO}
+                  value="Copy From"
                   onChange={(e) => handlePOSelect(e.target.value)}
                 >
                   <option value="">Copy From</option>
