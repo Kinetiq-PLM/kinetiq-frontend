@@ -135,6 +135,7 @@
 
 .goods-r-po .dropdown-scrollbar select::-webkit-scrollbar-track {
   background: #f1f5f9;
+  border-radius: 4px;
 }
 
 
@@ -306,13 +307,18 @@
 
 
 
+::-webkit-scrollbar-thumb:hover {
+  background: #0f766e; /* Darker teal on hover */
+}
 
-
-
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #0d9488 #f1f5f9;
+}
 
 .goods-r-po .grpo-table::-webkit-scrollbar-thumb {
   background: #0d9488;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 
