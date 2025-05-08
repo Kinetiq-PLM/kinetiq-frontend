@@ -1,4 +1,4 @@
-/* Global Reset */
+
 *,
 *::before,
 *::after {
@@ -170,7 +170,6 @@
 }
 
 
-/* CHECKBOX STYLES */
 .deliveryApproval .table-container input[type="checkbox"] {
   appearance: none;
   width: 18px;
@@ -357,29 +356,60 @@
 
 
 
-/* Media query for smaller tablets */
+
 @media (max-width: 768px) {
   .deliveryApproval .body-content-container {
-    padding: 0.75rem; /* Reduced padding */
+    padding: 0.75rem; 
     width: 100%;
     min-width: auto;
   }
+  
   .deliveryApproval .details-grid {
-    padding: 0.75rem; /* Reduced padding */
+    padding: 0.75rem; 
     width: 100%;
     min-width: auto;
     overflow-x: auto;
   }
+  
   .deliveryApproval .detail-row input{
     min-width: 7rem;
   }
+  
   .deliveryApproval .header-container h2 {
-    font-size: 1.25rem; /* Smaller heading */
+    font-size: 1.25rem; 
   }
+  
   .deliveryApproval .table-container{
     overflow-x: auto;
     overflow-y: auto;
+    height: calc(100% - 220px); 
   }
+  
+
+  .deliveryApproval .form-container {
+    height: auto; 
+    min-height: 140px; 
+    padding: 0.75rem;
+    margin-bottom: 50px; 
+  }
+  
+
+  .deliveryApproval .form-row {
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+  }
+  
+  .deliveryApproval .form-group {
+    flex: 1 1 45%; 
+    margin-bottom: 8px;
+    min-width: 120px; 
+  }
+  
+  
+  .deliveryApproval .form-group.spacer {
+    display: none;
+  }
+  
   .deliveryApproval .form-group span{
     font-size: 0.9rem;
     white-space: nowrap;      
@@ -387,26 +417,50 @@
     overflow-y: hidden;      
     overflow-wrap: normal;     
     display: inline-block;  
+    max-width: 100%; 
   }
+  
   .deliveryApproval .form-group span::-webkit-scrollbar {
     width: 3px;
     height: 3px;
   }
 
   .deliveryApproval .form-group span::-webkit-scrollbar-track {
-      background: #f1f1f1;
+    background: #f1f1f1;
   }
 
   .deliveryApproval .form-group span::-webkit-scrollbar-thumb {
-      background: #00A8A8;
-      border-radius: 3px;
+    background: #00A8A8;
+    border-radius: 3px;
   }
 
   .deliveryApproval .form-group span::-webkit-scrollbar-thumb:hover {
-      background: #008080;
+    background: #008080;
   }
+  
+  .deliveryApproval .form-group select,
+  .deliveryApproval .form-group input {
+    max-width: 100%; 
+  }
+  
   .deliveryApproval .form-group select option{
     font-size: 0.7rem;
+  }
+  
+
+  .deliveryApproval .send-to-button-container {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: auto;
+    margin-top: 5px;
+    padding-right: 5px;
+    z-index: 10; 
+  }
+  
+  .deliveryApproval .send-to-button {
+    padding: 6px 20px;
+    font-size: 12px;
   }
 }
 .deliveryApproval .approval-tabs {
