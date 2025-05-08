@@ -168,6 +168,7 @@ const Operations = ({employee_id}) => {
             <PieChart width={chartSize.width} height={chartSize.height}>
             <Pie
               key={currentTypeIndex}  
+              data={pieData}
               dataKey="value"
               nameKey="name"
               cx="50%"
