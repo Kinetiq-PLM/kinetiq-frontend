@@ -1606,10 +1606,8 @@ const Employees = () => {
                     <th>Employee Name</th>
                     <th>Submission Date</th>
                     <th>Notice Period (Days)</th>
-                    <th>HR Approver ID</th>
-                    <th>HR Approver Name</th>
-                    <th>Approval Status</th>
                     <th>Clearance Status</th>
+                    <th>Reason</th>
                     <th>Documents</th>
                     <th>Created At</th>
                     <th>Updated At</th>
@@ -1624,15 +1622,6 @@ const Employees = () => {
                       <td>{resignation?.employee_name || "-"}</td>
                       <td>{resignation?.submission_date || "-"}</td>
                       <td>{resignation?.notice_period_days || "-"}</td>
-                      <td>{resignation?.hr_approver_id || "—"}</td>
-                      <td>{resignation?.hr_approver_name || "—"}</td>
-                      <td>
-                        {resignation?.approval_status ? (
-                          <span className={`hr-tag ${resignation.approval_status.toLowerCase()}`}>
-                            {resignation.approval_status}
-                          </span>
-                        ) : "-"}
-                      </td>
                       <td>
                         {resignation?.clearance_status ? (
                           <span className={`hr-tag ${resignation.clearance_status.toLowerCase().replace(/\s+/g, '-')}`}>
@@ -1640,6 +1629,7 @@ const Employees = () => {
                           </span>
                         ) : "-"}
                       </td>
+                      <td>{resignation?.reason || "-"}</td>
                       <td>
                         {resignation?.document_url ? (
                           <a 
