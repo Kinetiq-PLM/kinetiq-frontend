@@ -70,7 +70,13 @@ const Employees = () => {
   const [showAddResignationModal, setShowAddResignationModal] = useState(false);
   const [showEditResignationModal, setShowEditResignationModal] = useState(false);
   const [editingResignation, setEditingResignation] = useState(null);
-
+    // State for resignation document management
+  const [currentResignation, setCurrentResignation] = useState(null);
+  const [viewingResignationDocs, setViewingResignationDocs] = useState(null);
+  const [showResignationDocumentsModal, setShowResignationDocumentsModal] = useState(false);
+  const [showUploadResignationDocModal, setShowUploadResignationDocModal] = useState(false);
+  const [uploadingResignationFile, setUploadingResignationFile] = useState(null);
+  const [resignationDocType, setResignationDocType] = useState('');
   // Default state for new resignation
   const [newResignation, setNewResignation] = useState({
     employee_id: "",
@@ -1500,7 +1506,167 @@ const Employees = () => {
   /***************************************************************************
    * 5) Resignations CRUD: Add, Edit, View
    ***************************************************************************/
+// Resignation document handling functions
+const handleViewResignationDocuments = async (resignation) => {
+  try {
+    setCurrentResignation(resignation);
+    
+    // Fetch the resignation to get the latest document data
+    const response = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${resignation.resignation_id}/`);
+    const resignationData = response.data;
+    
+    // Initialize with proper structure
+    let documents = { required: {}, optional: {} };
+    
+    if (resignationData.documents) {
+      try {
+        // Handle string or object format
+        documents = typeof resignationData.documents === 'string' 
+          ? JSON.parse(resignationData.documents) 
+          : resignationData.documents;
+        
+        // Ensure the structure has required properties
+        documents.required = documents.required || {};
+        documents.optional = documents.optional || {};
+      } catch (e) {
+        console.error("Error parsing documents:", e);
+        showToast("Error parsing document data", false);
+      }
+    }
+    
+    // Handle legacy document_url field
+    if (resignationData.document_url && !documents.required.resignation_letter) {
+      documents.required.resignation_letter = {
+        path: resignationData.document_url,
+        verified: false,
+        verified_by: null
+      };
+    }
+    
+    setViewingResignationDocs(documents);
+    setShowResignationDocumentsModal(true);
+    setDotsMenuOpen(null);
+  } catch (err) {
+    console.error("Error fetching resignation documents:", err);
+    showToast("Failed to load resignation documents", false);
+  }
+};
 
+const handleUploadResignationDocument = (resignation) => {
+  setCurrentResignation(resignation);
+  setResignationDocType('');
+  setUploadingResignationFile(null);
+  setShowUploadResignationDocModal(true);
+  setDotsMenuOpen(null);
+};
+
+const handleResignationUploadSubmit = async (e) => {
+  e.preventDefault();
+  
+  if (!currentResignation || !uploadingResignationFile || !resignationDocType) {
+    showToast("Please select a file and document type", false);
+    return;
+  }
+  
+  try {
+    setUploadingStatus('uploading');
+    
+    // Define S3 directory based on resignation ID and document type
+    const S3_BASE_DIRECTORY = `Human_Resource_Management/Resignations/${currentResignation.resignation_id}/`;
+    const directory = `${S3_BASE_DIRECTORY}${resignationDocType}`;
+    
+    // Step 1: Get the upload URL from the API
+    const getUrlResponse = await axios.post('https://s9v4t5i8ej.execute-api.ap-southeast-1.amazonaws.com/dev/api/upload-to-s3/', {
+      filename: uploadingResignationFile.name,
+      directory: directory,
+      contentType: uploadingResignationFile.type
+    });
+    
+    // Step 2: Extract the upload URL and public file URL
+    const { uploadUrl, fileUrl } = getUrlResponse.data;
+    
+    // Step 3: Upload the file to the provided URL with proper content type
+    await axios.put(uploadUrl, uploadingResignationFile, {
+      headers: {
+        'Content-Type': uploadingResignationFile.type
+      }
+    });
+    
+    // Step 4: Fetch current documents for the resignation
+    const resignationResponse = await axios.get(`https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${currentResignation.resignation_id}/`);
+    
+    // Step 5: Parse existing documents or create a new structure
+    let documents = { required: {}, optional: {} };
+    
+    if (resignationResponse.data.documents) {
+      try {
+        documents = typeof resignationResponse.data.documents === 'string' 
+          ? JSON.parse(resignationResponse.data.documents) 
+          : resignationResponse.data.documents;
+          
+        documents.required = documents.required || {};
+        documents.optional = documents.optional || {};
+      } catch (e) {
+        console.error("Error parsing documents:", e);
+      }
+    }
+    
+    // Step 6: Update the documents structure with the new file
+    documents.required[resignationDocType] = {
+      verified: false,
+      path: fileUrl,
+      verified_by: null
+    };
+    
+    // Step 7: Update the resignation's documents in your backend
+    await axios.patch(
+      `https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/${currentResignation.resignation_id}/`, 
+      { documents: JSON.stringify(documents) }
+    );
+    
+    // Update local state immediately
+    setResignations(prevResignations => 
+      prevResignations.map(res => {
+        if (res.resignation_id === currentResignation.resignation_id) {
+          return {
+            ...res,
+            documents: JSON.stringify(documents)
+          };
+        }
+        return res;
+      })
+    );
+    
+    showToast("Document uploaded successfully", true);
+    
+    // Reset form and close modal
+    setUploadingResignationFile(null);
+    setResignationDocType('');
+    setShowUploadResignationDocModal(false);
+    
+    // Refresh data after a short delay
+    setTimeout(() => {
+      const fetchResignations = async () => {
+        try {
+          const resignationsRes = await axios.get("https://x0crs910m2.execute-api.ap-southeast-1.amazonaws.com/dev/api/resignation/resignations/");
+          setResignations(resignationsRes.data);
+        } catch (err) {
+          console.error("Error fetching resignations:", err);
+        }
+      };
+      fetchResignations();
+    }, 500);
+    
+  } catch (err) {
+    console.error("Error uploading document:", err);
+    const errorMessage = err.response?.data?.detail || 
+                      Object.values(err.response?.data || {}).flat().join(", ") || 
+                      "Failed to upload document";
+    showToast(errorMessage, false);
+  } finally {
+    setUploadingStatus('idle');
+  }
+};
   // Handle form input changes
   const handleResignationChange = (e) => {
     const { name, value } = e.target;
@@ -1632,19 +1798,50 @@ const Employees = () => {
                       </td>
                       <td>{resignation?.reason || "-"}</td>
                       <td>
-                        {resignation?.document_url ? (
-                          <a 
-                            href={resignation.document_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="hr-view-document-btn"
-                          >
-                            View Document
-                          </a>
-                        ) : (
-                          <span className="hr-no-document">—</span>
-                        )}
-                      </td>
+                      <div className="hr-document-actions">
+                      {(() => {
+                        try {
+                          // Parse documents only once if it's a string
+                          let hasDocuments = false;
+                          
+                          // Check for both document_url and structured documents
+                          if (resignation.document_url) {
+                            hasDocuments = true;
+                          } else if (resignation.documents) {
+                            const docs = typeof resignation.documents === 'string' 
+                              ? JSON.parse(resignation.documents) 
+                              : resignation.documents;
+                            
+                            // Check both required and optional sections
+                            if (docs) {
+                              const requiredDocs = docs.required || {};
+                              const optionalDocs = docs.optional || {};
+                              hasDocuments = Object.keys(requiredDocs).length > 0 || Object.keys(optionalDocs).length > 0;
+                            }
+                          }
+                          
+                          if (hasDocuments) {
+                            return (
+                              <button className="hr-view-btn" onClick={() => handleViewResignationDocuments(resignation)}>
+                                View Files
+                              </button>
+                            );
+                          }
+                          return <span className="hr-no-documents">No files</span>;
+                        } catch (e) {
+                          console.error("Error parsing documents:", e);
+                          return <span className="hr-no-documents">Error loading documents</span>;
+                        }
+                      })()}
+                        
+                        <button 
+                          className="hr-upload-btn"
+                          onClick={() => handleUploadResignationDocument(resignation)}
+                        >
+                          <FiUpload className="upload-icon" /> Upload Document
+                        </button>
+                      </div>
+                    </td>
                       <td>{resignation?.created_at || "-"}</td>
                       <td>{resignation?.updated_at || "-"}</td>
                       <td className="hr-employee-actions">
@@ -3455,7 +3652,126 @@ const Employees = () => {
           </div>
         </div>
       )}
+          {/* Resignation Documents Viewing Modal */}
+          {showResignationDocumentsModal && viewingResignationDocs && (
+            <div className="hr-employee-modal-overlay" onClick={() => setShowResignationDocumentsModal(false)}>
+              <div className="hr-employee-modal" onClick={e => e.stopPropagation()}>
+                <h3>Resignation Documents</h3>
+                
+                <div className="documents-section">
+                  <h4>Required Documents</h4>
+                  <table className="hr-documents-table">
+                    <thead>
+                      <tr>
+                        <th>Document Type</th>
+                        <th>Status</th>
+                        <th>Verified By</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {viewingResignationDocs && viewingResignationDocs.required && 
+                      Object.entries(viewingResignationDocs.required).map(([docType, docInfo]) => (
+                        <tr key={docType}>
+                          <td>{docType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+                          <td>
+                            <span className={`hr-tag ${docInfo.verified ? 'approved' : 'pending'}`}>
+                              {docInfo.verified ? 'Verified' : 'Pending'}
+                            </span>
+                          </td>
+                          <td>{docInfo.verified_by || '-'}</td>
+                          <td>
+                            {docInfo.path && (
+                              <a 
+                                href={docInfo.path} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="hr-view-document-btn"
+                              >
+                                View / Download
+                              </a>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                      {(!viewingResignationDocs?.required || Object.keys(viewingResignationDocs.required).length === 0) && (
+                        <tr>
+                          <td colSpan="4" className="hr-no-documents">No documents uploaded yet</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div className="hr-employee-modal-buttons">
+                  <button className="hr-employee-cancel-btn" onClick={() => setShowResignationDocumentsModal(false)}>Close</button>
+                </div>
+              </div>
+            </div>
+          )}
 
+          {/* Resignation Document Upload Modal */}
+          {showUploadResignationDocModal && (
+            <div className="hr-employee-modal-overlay">
+              <div className="hr-employee-modal">
+                <h3>Upload Document for Resignation {currentResignation?.resignation_id}</h3>
+                
+                <form onSubmit={handleResignationUploadSubmit} className="hr-employee-modal-form">
+                  <div className="form-group">
+                    <label htmlFor="resignation-document-type">Document Type *</label>
+                    <select 
+                      id="resignation-document-type"
+                      value={resignationDocType}
+                      onChange={(e) => setResignationDocType(e.target.value)}
+                      required
+                    >
+                      <option value="">Select Document Type</option>
+                      <option value="resignation_letter">Resignation Letter</option>
+                      <option value="clearance_form">Clearance Form</option>
+                      <option value="exit_interview">Exit Interview</option>
+                      <option value="handover_document">Handover Document</option>
+                      <option value="other_document">Other Supporting Document</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="resignation-document-file">File *</label>
+                    <input 
+                      type="file"
+                      id="resignation-document-file"
+                      onChange={(e) => setUploadingResignationFile(e.target.files[0])}
+                      required
+                    />
+                    <span className="input-help-text">
+                      Max file size: 5MB. Supported formats: PDF, DOC, DOCX, JPG, PNG.
+                    </span>
+                  </div>
+                  
+                  <div className="hr-employee-modal-buttons">
+                    <button 
+                      type="button" 
+                      className="hr-employee-cancel-btn" 
+                      onClick={() => {
+                        setShowUploadResignationDocModal(false);
+                        setResignationDocType("");
+                        setUploadingResignationFile(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    
+                    <button 
+                      type="submit" 
+                      className="submit-btn"
+                      disabled={uploadingStatus === 'uploading' || !uploadingResignationFile || !resignationDocType}
+                    >
+                      {uploadingStatus === 'uploading' ? 'Uploading...' : 'Upload Document'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
       {/* Document Upload Modal */}
       {showUploadDocumentModal && (
         <div className="hr-employee-modal-overlay">
