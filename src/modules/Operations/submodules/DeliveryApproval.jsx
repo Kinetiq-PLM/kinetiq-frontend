@@ -26,8 +26,6 @@ const BodyContent = ({employee_id}) => {
         setSelectedData(row);
     };
 
-
-    //Update logistics
     const handleSubmit = async () => {
 
         if (!selectedData) {
@@ -77,12 +75,10 @@ const BodyContent = ({employee_id}) => {
        
     };
 
-
-    //Table Data
     const fetchData = async () => {
         try {
             setLoading(true);
-            setError(null); // Reset error state
+            setError(null); 
    
             const response = await fetch("http://127.0.0.1:8000/operation/delivery-approval/");
             if (!response.ok) throw new Error("Connection to database failed");

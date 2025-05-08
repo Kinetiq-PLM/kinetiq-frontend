@@ -23,7 +23,7 @@ const GoodsTracking = ({employee_id}) => {
     transaction_id: "",
     document_no: "",
     status: "Draft",
-    posting_date: new Date().toISOString().split('T')[0], // Today's date
+    posting_date: new Date().toISOString().split('T')[0], 
     document_date: new Date().toISOString().split('T')[0],
     vendor_code: "",
     employee_id: "",
@@ -78,7 +78,7 @@ const GoodsTracking = ({employee_id}) => {
   const fetchData = async () => {
       try {
           setLoading(true);
-          setError(null); // Reset error state
+          setError(null); 
           const response = await fetch("http://127.0.0.1:8000/operation/goods-tracking/");
           if (!response.ok) throw new Error("Connection to database failed");
  
@@ -103,7 +103,7 @@ const GoodsTracking = ({employee_id}) => {
     fetchData();
   }, []);
   const refreshData = async () => {
-    await fetchData(); // Re-fetch data from the API
+    await fetchData(); 
     if (goodsTrackingData.length > 0) {
       setSelectedRow(0);
       setSelectedData(goodsTrackingData[0]);
@@ -128,7 +128,7 @@ const GoodsTracking = ({employee_id}) => {
       return <GoodsReceiptPO
       onBack={() => setShowGoodsReceiptPO(false)}
       onSuccess={refreshData}
-      selectedData={emptyGoodsReceiptPO} // Pass the selected row data
+      selectedData={emptyGoodsReceiptPO}
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -136,7 +136,7 @@ const GoodsTracking = ({employee_id}) => {
       return <GoodsReceiptPO
       onBack={() => setShowGoodsReceiptPO(false)}
       onSuccess={refreshData}
-      selectedData={selectedData} // Pass the selected row data
+      selectedData={selectedData}
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -147,7 +147,7 @@ const GoodsTracking = ({employee_id}) => {
       return <GoodsReceipt
       onBack={() => setShowGoodsReceipt(false)}
       onSuccess={refreshData}
-      selectedData={emptyGoodsReceiptPO} // Pass the selected row data
+      selectedData={emptyGoodsReceiptPO}
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -155,7 +155,7 @@ const GoodsTracking = ({employee_id}) => {
       return <GoodsReceipt
       onBack={() => setShowGoodsReceipt(false)}
       onSuccess={refreshData}
-      selectedData={selectedData} // Pass the selected row data
+      selectedData={selectedData} 
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -167,7 +167,7 @@ const GoodsTracking = ({employee_id}) => {
       return <GoodsIssue
       onBack={() => setShowGoodsIssue(false)}
       onSuccess={refreshData}
-      selectedData={emptyGoodsReceiptPO} // Pass the selected row data
+      selectedData={emptyGoodsReceiptPO}
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -175,7 +175,7 @@ const GoodsTracking = ({employee_id}) => {
       return <GoodsIssue
       onBack={() => setShowGoodsIssue(false)}
       onSuccess={refreshData}
-      selectedData={selectedData} // Pass the selected row data
+      selectedData={selectedData}
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -186,7 +186,7 @@ const GoodsTracking = ({employee_id}) => {
       return <ARCreditMemo
       onBack={() => setShowARCreditMemo(false)}
       onSuccess={refreshData}
-      selectedData={emptyGoodsReceiptPO} // Pass the selected row data
+      selectedData={emptyGoodsReceiptPO}
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -194,7 +194,7 @@ const GoodsTracking = ({employee_id}) => {
       return <ARCreditMemo
       onBack={() => setShowARCreditMemo(false)}
       onSuccess={refreshData}
-      selectedData={selectedData} // Pass the selected row data
+      selectedData={selectedData} 
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -267,7 +267,6 @@ const GoodsTracking = ({employee_id}) => {
                     <tr key={row.document_id}>
                       <td>
                       <input type="checkbox" className="teal-checkbox" checked={selectedRow === index} onChange={() => handleCheckboxChange(index, row)} />
-
                       </td>
                       <td>{index + 1}</td>
                       <td>{row.transaction_id}</td>

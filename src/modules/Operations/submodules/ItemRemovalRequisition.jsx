@@ -69,7 +69,7 @@ const ItemRemoval = () => {
     const fetchData = async () => {
       try {
           setLoading(true);
-          setError(null); // Reset error state
+          setError(null); 
   
           const response = await fetch("http://127.0.0.1:8000/operation/item-removal/");
           if (!response.ok) throw new Error("Connection to database failed");
@@ -77,20 +77,17 @@ const ItemRemoval = () => {
           const data = await response.json();
           if (!Array.isArray(data)) throw new Error("Invalid goods data format");
   
-          // Sort the data:
           const sortedData = data.sort((a, b) => {
-              // Check if one is pending and the other is not
               if (a.deprecation_status === 'Pending' && b.deprecation_status !== 'Pending') {
-                  return -1; // 'a' comes first
+                  return -1;
               }
               if (a.deprecation_status !== 'Pending' && b.deprecation_status === 'Pending') {
-                  return 1; // 'b' comes first
+                  return 1; 
               }
   
-              // If both are either pending or not pending, sort by reported_date
               const dateA = new Date(a.reported_date);
               const dateB = new Date(b.reported_date);
-              return dateB - dateA; // Most recent first
+              return dateB - dateA; 
           });
   
           setTableData(sortedData);
@@ -161,7 +158,6 @@ const ItemRemoval = () => {
                     filteredData.map((row, index) => (
                     <tr key={row.report_id}>
                         <td>
-                      
                         <input
                           type="checkbox"
                           className="checkbox"

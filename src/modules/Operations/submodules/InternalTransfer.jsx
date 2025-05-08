@@ -78,7 +78,7 @@ const ApprovalTable = ({employee_id}) => {
   const fetchDeliveryRequest = async () => {
       try {
           setLoading(true);
-          setError(null); // Reset error state
+          setError(null); 
           const syncDataResponse = await fetch("http://127.0.0.1:8000/operation/external-modules/sync-production/");
           const response = await fetch("http://127.0.0.1:8000/operation/internal-transfer-delivery-request/");
           const reworkResponse = await fetch("http://127.0.0.1:8000/operation/external-modules/rework-order/");
@@ -123,7 +123,6 @@ const ApprovalTable = ({employee_id}) => {
     }
   }, [activePrimaryTab, deliveryRequestData, ITReworkOrderData]);
  
-  // Filtered Data
   const filteredData = activePrimaryTab === "Delivery Request" ? deliveryRequestData : ITReworkOrderData;
 
 
@@ -142,7 +141,6 @@ const ApprovalTable = ({employee_id}) => {
   const updateDeliveryRequest = async () => {
     if (!selectedData || !selectedWarehouse) return;
  
-    // Find the selected warehouse_id from the location name
     const selected = warehouseList.find(w => w.warehouse_location === selectedWarehouse);
     if (!selected) {
       toast.error("Invalid warehouse selection.");

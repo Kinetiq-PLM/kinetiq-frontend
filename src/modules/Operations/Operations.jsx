@@ -34,7 +34,6 @@ const Operations = ({employee_id}) => {
 
     window.addEventListener('resize', handleResize);
     
-    // Fetch data from API
     if (documents.length === 0) {
       fetchData();
     }
@@ -71,12 +70,10 @@ const Operations = ({employee_id}) => {
   
         total += amount;
   
-        // Total bucket
         if (grouped['Total'][status] !== undefined) {
           grouped['Total'][status]++;
         }
   
-        // Specific type bucket
         if (grouped[type] && grouped[type][status] !== undefined) {
           grouped[type][status]++;
         }
@@ -106,7 +103,6 @@ const Operations = ({employee_id}) => {
     setActiveIndex(index);
   };
 
-  // Prepare data for pie chart
   const currentType = docTypes[currentTypeIndex];
   const counts = statusByType[currentType] || { Draft: 0, Open: 0, Closed: 0, Cancelled: 0 };
 
@@ -134,7 +130,7 @@ const Operations = ({employee_id}) => {
       .then(data => {
         const match = data.employees.find(emp => emp.employee_id === employee_id);
         if (match) {
-          setEmployeeName(match.first_name); // Or match.employee_name if you want full name
+          setEmployeeName(match.first_name); 
         }
       })
       .catch(error => {
@@ -171,8 +167,7 @@ const Operations = ({employee_id}) => {
             <p className="operations-breadcrumb">Operations / Dashboard</p>
             <PieChart width={chartSize.width} height={chartSize.height}>
             <Pie
-              key={currentTypeIndex}  // ADD THIS LINE
-              data={pieData}
+              key={currentTypeIndex}  
               dataKey="value"
               nameKey="name"
               cx="50%"
@@ -214,7 +209,7 @@ const Operations = ({employee_id}) => {
                     className={`operations-status-card operations-${item.name.toLowerCase()}-card`}
                     style={{
                       transition: `all ${PIE_ANIMATION_DURATION}ms ease-out`,
-                      opacity: currentTypeIndex % 2 ? 0.9 : 1 // Optional: slight opacity change
+                      opacity: currentTypeIndex % 2 ? 0.9 : 1  
                     }}
                   >
                     <p className="operations-status-count">{item.value}</p>

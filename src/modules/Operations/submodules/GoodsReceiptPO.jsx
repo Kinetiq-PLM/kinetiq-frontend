@@ -21,7 +21,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     if (!selectedData?.document_items) return 0;
     
     return selectedData.document_items.reduce((sum, item) => {
-      // First try item_price, then check duplicateDetails for a price
       const price = item.item_price !== 0 ? item.item_price : 
                     (duplicateDetails[item.item_id]?.[0]?.price || 0);
       return sum + (parseFloat(item.quantity) * parseFloat(price));
@@ -44,12 +43,12 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
   useEffect(() => {
     if (selectedData?.status) {
-      setSelectedStatus(selectedData.status); // Set selectedStatus from selectedData
+      setSelectedStatus(selectedData.status); 
     }
   }, [selectedData]);
   useEffect(() => {
     if (selectedData?.delivery_note) {
-      setSelectedDelNote(selectedData.delivery_note); // Set selectedStatus from selectedData
+      setSelectedDelNote(selectedData.delivery_note);
     }
   }, [selectedData]);
 
@@ -105,7 +104,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
  
   const today = new Date().toISOString().slice(0, 10);
-  // Initialize document details differently for create mode
   const [documentDetails, setDocumentDetails] = useState({
     purchase_id: isCreateMode ? "" : selectedData.purchase_id || null,
     vendor_code: isCreateMode ? "" : vendorID,
@@ -163,9 +161,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     updatedItems[index][field] = e.target.value;
     setDocumentItems(updatedItems);
 
-    // Check if the row is NOT the last row and the item_name was cleared
     if (index !== updatedItems.length - 1 && currentItem.item_name.trim() === '') {
-      // If this item exists in the database, delete it
       try {
         await fetch(`http://127.0.0.1:8000/operation/document-item/${currentItem.content_id}/`, {
           method: 'PATCH',
@@ -173,19 +169,17 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            document_id: "",  // or null, depending on the backend expectations
+            document_id: "", 
           }),
         });
       } catch (error) {
         toast.error('Error deleting row from database:', error);
       }
  
-      // Remove the item from local state
       updatedItems.splice(index, 1);
       setDocumentItems(updatedItems);
     }
 
-    // If you're editing the last row and it was just filled, add a new row
     if (index === documentItems.length - 1) {
       handleAddRow();
     }
@@ -207,17 +201,14 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const handleAddRow = () => {
     const lastRow = documentItems[documentItems.length - 1];
     
-    // Only add a new row if the last row is filled (but don't make API calls yet)
     if (isRowFilled(lastRow)) {
       const updatedItems = [...documentItems];
       
-      // Calculate total for the current row
       updatedItems[updatedItems.length - 1] = {
         ...lastRow,
         total: (parseFloat(lastRow.quantity) * parseFloat(lastRow.cost)).toFixed(2)
       };
       
-      // Add new empty row with all possible fields
       updatedItems.push({
         item_id: '',
         item_name: '',
@@ -256,7 +247,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     fetch('http://127.0.0.1:8000/operation/get-warehouseID/')
       .then((res) => res.json())
       .then((data) => {
-        // Sort A–Z by location
         const sorted = data.sort((a, b) => a.warehouse_location.localeCompare(b.warehouse_location));
         setWarehouseOptions(sorted);
       })
@@ -265,7 +255,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
  
   const [itemOptions, setItemOptions] = useState([]);
 
-  // Inside your item fetch useEffect:
   useEffect(() => {
       fetch('http://127.0.0.1:8000/operation/item/')
         .then(res => res.json())
@@ -335,11 +324,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     const updatedItems = [...documentItems];
     const currentItem = updatedItems[index];
  
-    // If "-- Select Item --" was chosen (empty value)
     if (selectedName === "") {
-      // Only delete if it's not the last row
       if (index !== updatedItems.length - 1) {
-        // If this item exists in the database, delete it
         try {
           const userConfirmed = await new Promise((resolve) => {
             toast.info(
@@ -378,7 +364,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           });
   
           if (!userConfirmed) {
-            // Reset the select value to the previous item name
             updatedItems[index] = {
               ...currentItem,
               item_name: currentItem.item_name || ''
@@ -395,7 +380,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              document_id: "",  // or null, depending on the backend expectations
+              document_id: "",  
             }),
           });
          
@@ -406,10 +391,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           return;
         }
  
-        // Remove the item from local state
         updatedItems.splice(index, 1);
       } else {
-        // For last row, just clear the values
         updatedItems[index] = {
           ...currentItem,
           item_id: '',
@@ -423,7 +406,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       return;
     }
  
-    // Normal item selection
     const selectedItem = itemOptions.find(opt => opt.name === selectedName);
     if (!selectedItem) return;
     const duplicatePrices = duplicateDetails[selectedItem.id] || [];
@@ -434,7 +416,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         item_id: selectedItem.id,
         cost: duplicatePrices[0]?.price || selectedItem.cost,
         unit_of_measure: selectedItem.unit,
-        available_costs: null // No cost selection needed
+        available_costs: null 
       };
     } else {
       const latestPrice = duplicatePrices[0]?.price;
@@ -442,7 +424,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         ...currentItem,
         item_name: selectedItem.name,
         item_id: selectedItem.id,
-        cost: latestPrice || 0, // Default to latest price if available
+        cost: latestPrice || 0, 
         unit_of_measure: selectedItem.unit,
         available_costs: duplicatePrices.map(priceObj => ({
           price: priceObj.price,
@@ -453,7 +435,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   
     setDocumentItems(updatedItems);
  
-    // Add new row if this is the last row and we're selecting an item
     if (index === updatedItems.length - 1) {
       handleAddRow();
     }
@@ -462,7 +443,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     const updatedItems = [...documentItems];
     updatedItems[index].cost = selectedPrice;
     
-    // Recalculate total for this row
     updatedItems[index].total = (
       parseFloat(updatedItems[index].quantity || 0) * 
       parseFloat(selectedPrice)
@@ -491,11 +471,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     }));
   };
 
-  // Add a new function to handle create operation
   const handleCreateDocument = async () => {
     try {
       
-      // Prepare the document items for creation
       const itemsToCreate = documentItems
       .slice(0, -1)
       .filter(item => isRowFilled(item));
@@ -507,7 +485,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         toast.error("Buyer information is required");
         return;
       }
-      // Prepare the payload for the create API
       const payload = {
         vendor_code: vendorID,
         document_type: "Goods Receipt PO",
@@ -538,7 +515,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         }))
       };
 
-      // Call the create API
       const response = await fetch('http://127.0.0.1:8000/operation/goods-tracking/custom-create/', {
         method: 'POST',
         headers: {
@@ -556,7 +532,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       if(onSuccess){
         await onSuccess(result);
       }      
-      // Call onSuccess with the created data if needed
       
      
     } catch (error) {
@@ -566,7 +541,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   };
 
   const handleBackWithUpdate = async () => {
-    const updatedDocumentItems = documentItems.slice(0, -1);  // Assuming you want to update all document items except the last one
+    const updatedDocumentItems = documentItems.slice(0, -1); 
     let rowNum = 0
     if (!selectedOwner){
       toast.error("Owner is required")
@@ -696,7 +671,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [selectedPO, setSelectedPO] = useState("");
 
-  // Fetch purchase orders
   const fetchPurchaseOrders = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/operation/purchase_order/");
@@ -720,10 +694,9 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       return;
     }
     
-    setSelectedPO(poId); // Update the selected PO state
+    setSelectedPO(poId); 
  
     try {
-      // Fetch the selected purchase order details
       const response = await fetch(`http://127.0.0.1:8000/operation/purchase_order/${poId}/`);
       if (!response.ok) throw new Error("Failed to fetch purchase order details");
  
@@ -733,7 +706,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
       setSelectedVendor(getVendor.company_name || "");
       setVendorID(getVendor.vendor_code || "");
       setContactPerson(quotation.contact_person || "");
-      // Update document details with PO information
 
       setDocumentDetails(prev => ({
         ...prev,
@@ -751,7 +723,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         purchase_id: poId
       }));
  
-      // Get item details from pre-fetched itemOptions
       
       const poItems = (selectedPO.quotation_contents || []).map(content => {
         const itemId = content.item_id;
@@ -767,19 +738,16 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
           type: matchedItem.type,
         };
       }).filter(item => item !== null);
-      // Calculate initial amount
       const poInitialAmount = poItems.reduce((sum, item) => sum + (item.cost * item.quantity), 0);
       const taxAmount = parseFloat(quotation.tax || 0);
       const discountAmount = parseFloat(quotation.discount_amount || 0);
       const freight = parseFloat(quotation.freight || 0);
 
-      // Calculate tax rate
       const taxBase = poInitialAmount - discountAmount;
       const taxRate = taxBase > 0 ? (taxAmount / taxBase) * 100 : 0;
 
       setInitialAmount(poInitialAmount.toFixed(2));
 
-      // Set document details again to include tax rate
       setDocumentDetails(prev => ({
         ...prev,
         tax_amount: Number(parseFloat(taxAmount|| 0).toFixed(2)),
@@ -842,9 +810,8 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
   useEffect(() => {
     const newInitialAmount = documentItems
-      .slice(0, -1) // exclude the last empty row
+      .slice(0, -1) 
       .reduce((sum, item) => {
-        // Use the price from the item object (which comes from duplicateDetails or itemOptions)
         const price = parseFloat(item.cost || duplicateDetails[item.item_id]?.[0]?.price || 0);
         return sum + (parseFloat(item.quantity || 0) * price);
       }, 0)
@@ -855,7 +822,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
   const checkCurrentDocumentItemsMatch = useCallback(async (purchaseId, deliveryNote) => {
     if (!purchaseId) {
-      //console.log("No purchase ID provided - setting match to false");
       setPurchaseItemsMatch(false);
       setPoMismatchDetails(null);
       return;
@@ -864,12 +830,10 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
     try {
       //console.log("Starting items match check for PO:", purchaseId);
       
-      // Reset mismatch details
       const mismatches = [];
       
-      // Get current document items (excluding last empty row)
       const currentItems = documentItems.slice(0, -1)
-        .filter(item => item.item_id) // Only include items with IDs
+        .filter(item => item.item_id)
         .map(item => ({
           item_id: item.item_id,
           item_name: item.item_name,
@@ -878,7 +842,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   
       //console.log("Current document items (filtered):", currentItems);
   
-      // Find the selected purchase order
       const selectedPO = purchaseOrders.find(po => po.purchase_id === purchaseId);
       if (!selectedPO) {
         //console.log("PO not found in local state - setting match to false");
@@ -887,30 +850,25 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         return;
       }
   
-      // Check if vendor_code matches
       if (vendorID !== selectedPO.quotation_id.vendor_code.vendor_code) {
         const mismatchMsg = `Vendor mismatch: ${selectedVendor} (Current) ≠ ${selectedPO.quotation_id.vendor_code.company_name} (PO)`;
         //console.log(mismatchMsg);
         mismatches.push(mismatchMsg);
       }
   
-      // Check if buyer matches
       if (documentDetails.buyer !== selectedPO.quotation_id.buyer) {
         const mismatchMsg = `Buyer mismatch: ${documentDetails.buyer} (Current) ≠ ${selectedPO.quotation_id.buyer} (PO)`;
         //console.log(mismatchMsg);
         mismatches.push(mismatchMsg);
       }
   
-      // Update mismatch details state
       setPoMismatchDetails(mismatches.length > 0 ? mismatches : null);
   
-      // If we have any mismatches, don't proceed with item checks
       if (mismatches.length > 0) {
         setPurchaseItemsMatch(false);
         return;
       }
   
-      // Get items from purchase order
       const poItems = (selectedPO.quotation_contents || []).map(content => ({
         item_id: content.item_id,
         quantity: parseInt(content.purchase_quantity || 0, 10)
@@ -918,7 +876,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   
       //console.log("PO items from quotation contents:", poItems);
   
-      // For partial delivery, check existing goods receipts
       let existingPartialItems = {};
       if (deliveryNote === "Partial Delivery") {
         //console.log("Partial delivery - checking existing receipts");
@@ -926,7 +883,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         if (!response.ok) throw new Error("Failed to fetch goods receipts");
         const goodsReceipts = await response.json();
   
-        // Find all partial deliveries for this purchase ID (excluding current document if editing)
         const partialReceipts = goodsReceipts.filter(gr => 
           gr.purchase_id === purchaseId && 
           gr.delivery_note === "Partial Delivery" &&
@@ -935,7 +891,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
   
         //console.log("Found partial receipts:", partialReceipts.length);
   
-        // Sum quantities from all partial receipts
         partialReceipts.forEach(gr => {
           gr.document_items.forEach(item => {
             existingPartialItems[item.item_id] = 
@@ -946,7 +901,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         //console.log("Existing partial items quantities:", existingPartialItems);
       }
   
-      // Check matching based on delivery note type
       let allItemsMatch = true;
       let noExtraItems = true;
       const itemMismatches = [];
@@ -993,7 +947,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         allItemsMatch = poItems.every(poItem => {
           const currentItem = currentItems.find(ci => ci.item_id === poItem.item_id);
           
-          // Skip if item doesn't exist in current document
           if (!currentItem) {
             //console.log(`Item ${poItem.item_id} not found in current items - skipping validation`);
             return true;
@@ -1045,7 +998,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
         });
       }
   
-      // Combine all mismatches
       const allMismatches = [...mismatches, ...itemMismatches];
       setPoMismatchDetails(allMismatches.length > 0 ? allMismatches : null);
       /*
@@ -1475,7 +1427,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                       </td>
                       <td>
                         {item.item_id && duplicateDetails[item.item_id]?.length > 1 ? (
-                          // Show dropdown if item has multiple prices
                           <select
                             value={item.cost || ''}
                             onChange={(e) => handleCostSelection(index, parseFloat(e.target.value))}
@@ -1488,7 +1439,6 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
                             ))}
                           </select>
                         ) : (
-                          // Show read-only input with first available cost
                           <input
                             type="number"
                             value={
