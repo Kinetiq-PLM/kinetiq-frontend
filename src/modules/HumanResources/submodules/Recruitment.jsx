@@ -621,15 +621,16 @@ const Recruitment = () => {
                 <tr>
                   {isArchived && <th>Select</th>}
                   <th>Job ID</th>
-                  <th>Department</th>
-                  <th>Position</th>
+                  <th>Department ID</th>
+                  <th>Position ID</th>
+                  <th>Position Title</th>
                   <th>Description</th>
                   <th>Requirements</th>
                   <th>Employment Type</th>
                   <th>Base Salary</th>
                   <th>Daily Rate</th>
                   <th>Duration (Days)</th>
-                  <th>Finance Approval</th>
+                  <th>Finance Approval Status</th>
                   <th>Posting Status</th>
                   <th>Created At</th>
                   <th>Updated At</th>
@@ -650,6 +651,7 @@ const Recruitment = () => {
                     )}
                     <td>{posting.job_id}</td>
                     <td>{posting.dept_id}</td>
+                    <td>{posting.position_id}</td>
                     <td>{posting.position_title}</td>
                     <td>{posting.description}</td>
                     <td>{posting.requirements}</td>
@@ -673,8 +675,8 @@ const Recruitment = () => {
                         {posting.posting_status || 'Unknown'}
                       </span>
                     </td>
-                    <td>{posting.created_at}</td>
-                    <td>{posting.updated_at}</td>
+                    <td>{formatDate(posting.created_at)}</td>
+                    <td>{formatDate(posting.updated_at)}</td>
                     <td className="recruitment-actions">
                       <div
                         className="recruitment-dots"
