@@ -746,9 +746,6 @@ const Recruitment = () => {
                   <th>Resume Path</th>
                   <th>Application Status</th>
                   <th>Documents</th>
-                  <th>Interview Details</th>
-                  <th>Offer Details</th>
-                  <th>Contract Details</th>
                   <th>Created At</th>
                   <th>Updated At</th>
                   <th></th>
@@ -814,42 +811,6 @@ const Recruitment = () => {
                           </button>
                         )}
                       </div>
-                    </td>
-                    <td>
-                      {candidate.interview_details ? (
-                        <button 
-                          className="recruitment-view-btn"
-                          onClick={() => handleViewInterviewDetails(candidate.interview_details)}
-                        >
-                          View Details
-                        </button>
-                      ) : (
-                        '-'
-                      )}
-                    </td>
-                    <td>
-                      {candidate.offer_details ? (
-                        <button 
-                          className="recruitment-view-btn"
-                          onClick={() => handleViewOfferDetails(candidate.offer_details)}
-                        >
-                          View Offer
-                        </button>
-                      ) : (
-                        '-'
-                      )}
-                    </td>
-                    <td>
-                      {candidate.contract_details ? (
-                        <button 
-                          className="recruitment-view-btn"
-                          onClick={() => handleViewContractDetails(candidate.contract_details)}
-                        >
-                          View Contract
-                        </button>
-                      ) : (
-                        '-'
-                      )}
                     </td>
                     <td>{formatDate(candidate.created_at)}</td>
                     <td>{formatDate(candidate.updated_at)}</td>
