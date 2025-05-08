@@ -1731,6 +1731,7 @@ const Employees = () => {
                 <th>Phone</th>
                 <th>Employment Type</th> {/* Added column */}
                 <th>Reports To</th> {/* Added column */}
+                <th>Department Superior</th>  {/* New column header */}
                 <th>Status</th>
                 <th>Is Supervisor</th>
                 <th>Documents</th>
@@ -1766,6 +1767,9 @@ const Employees = () => {
                     </span>
                   </td>
                   <td>{emp.reports_to || "—"}</td>
+                  <td>
+                  {emp.dept_superior_id ? emp.dept_superior_id : "—"}
+                  </td>
                   <td>
                     <span className={`hr-tag ${emp.status.toLowerCase()}`}>
                       {emp.status}
