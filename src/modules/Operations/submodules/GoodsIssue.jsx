@@ -856,7 +856,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
     <div className="gi">
       <div className="body-content-container">
         <ToastContainer transition={Slide} />
-        <div className="back-button" onClick={handleBackWithUpdate}>← Save</div>
+        <div className="back-button" onClick={handleBackWithUpdate}>Save</div>
         <div className="content-wrapper">
           <div className="details-grid">
             <div className="details-section">
