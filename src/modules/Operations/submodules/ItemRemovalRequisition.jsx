@@ -41,7 +41,6 @@ const ItemRemoval = () => {
         external_id: selectedData.report_id,
         status: "pending"
       }
-      console.log(updatePayload)
       try {
           const response = await fetch(`http://127.0.0.1:8000/operation/send-to-management/`, {
               method: "POST",

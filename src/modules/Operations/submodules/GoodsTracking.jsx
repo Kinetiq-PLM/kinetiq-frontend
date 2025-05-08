@@ -72,7 +72,6 @@ const GoodsTracking = ({employee_id}) => {
   const handleCheckboxChange = (index, row) => {
     setSelectedRow(index);
     setSelectedData(row);
-    console.log(selectedData)
   };
 
   const fetchData = async () => {

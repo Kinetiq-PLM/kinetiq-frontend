@@ -589,7 +589,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
             purchase_date: item.purchase_date || null,
             item_no: item?.item_no || null
           }
-          console.log(payload)
           let itemResponse
           if (item.content_id){
             itemResponse = await fetch(`http://127.0.0.1:8000/operation/document-item/${item.content_id}/`, {
@@ -636,7 +635,6 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           tax_amount: parseFloat(documentDetails.tax_amount).toFixed(2) || 0,
           transaction_cost: parseFloat(documentDetails.transaction_cost).toFixed(2) || 0
         };
-        console.log(updatedDocumentsData)
         const goodsTrackingResponse = await fetch(`http://127.0.0.1:8000/operation/goods-tracking/${selectedData.document_id}/`, {
           method: 'PUT',
           headers: {

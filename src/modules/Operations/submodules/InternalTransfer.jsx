@@ -145,8 +145,6 @@ const ApprovalTable = ({employee_id}) => {
     if (!selected) {
       toast.error("Invalid warehouse selection.");
       return;
-    }else{
-      console.log(selected.warehouse_id)
     }
  
     try {
@@ -218,7 +216,6 @@ const ApprovalTable = ({employee_id}) => {
         fetchDeliveryRequest()
         return;
       }
-      console.log(data.reason_rework)
       const response = await fetch('http://127.0.0.1:8000/operation/external-modules/update-rework/', {
         method: 'POST',
         headers: {
