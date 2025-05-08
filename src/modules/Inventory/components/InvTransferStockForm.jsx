@@ -63,7 +63,7 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
       };
 
       // post req first sa warehouse movement 
-      const warehouseMovementResponse = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-transfer/", {
+      const warehouseMovementResponse = await fetch("http://127.0.0.1:8000/api/warehousemovement-transfer/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(warehouseMovementData),
@@ -85,7 +85,7 @@ const InvTransferStockForm = ({ onClose, selectedItem, warehouseList }) => {
       }
 
       // post req first sa movement items
-      const warehouseMovementItemResponse = await fetch("https://y7jvlug8j6.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-items/", {
+      const warehouseMovementItemResponse = await fetch("http://127.0.0.1:8000/api/warehousemovement-items/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(warehouseMovementItemData),

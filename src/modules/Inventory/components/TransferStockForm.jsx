@@ -77,7 +77,7 @@ const TransferStockForm = ({ onClose, transferItems, warehouseList, settransferI
       };
 
       const warehouseMovementResponse = await fetch(
-        "https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-transfer/",
+        "http://127.0.0.1:8000/api/warehousemovement-transfer/",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -102,7 +102,7 @@ const TransferStockForm = ({ onClose, transferItems, warehouseList, settransferI
 
       // Send all movement items in a single POST request
       const warehouseMovementItemResponse = await fetch(
-        "https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehousemovement-items/",
+        "http://127.0.0.1:8000/api/warehousemovement-items/",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -150,35 +150,35 @@ const TransferStockForm = ({ onClose, transferItems, warehouseList, settransferI
 
         <form onSubmit={handleSubmit}>
 
- {/* Destination Warehouse */}
- <div className="mt-3">
-                <label>Destination Warehouse</label>
-                <select
-                  value={warehouseDestination}
-                  onChange={(e) => setWarehouseDestination(e.target.value)}
-                  required
+          {/* Destination Warehouse */}
+          <div className="mt-3">
+            <label>Destination Warehouse</label>
+            <select
+              value={warehouseDestination}
+              onChange={(e) => setWarehouseDestination(e.target.value)}
+              required
+            >
+              <option value="">Select Destination</option>
+              {warehouseList.map((warehouse) => (
+                <option
+                  key={warehouse.warehouse_id}
+                  value={warehouse.warehouse_id}
                 >
-                  <option value="">Select Destination</option>
-                  {warehouseList.map((warehouse) => (
-                    <option
-                      key={warehouse.warehouse_id}
-                      value={warehouse.warehouse_id}
-                    >
-                      {warehouse.warehouse_location}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  {warehouse.warehouse_location}
+                </option>
+              ))}
+            </select>
+          </div>
 
-              {/* Comments */}
-              <div className="mt-3">
-                <label>Comments</label>
-                <textarea
-                  value={comments}
-                  onChange={(e) => setComments(e.target.value)}
-                  placeholder="Optional comments"
-                />
-              </div>
+          {/* Comments */}
+          <div className="mt-3">
+            <label>Comments</label>
+            <textarea
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              placeholder="Optional comments"
+            />
+          </div>
 
           {transferItems.length > 0 ? (
             <>
@@ -206,16 +206,16 @@ const TransferStockForm = ({ onClose, transferItems, warehouseList, settransferI
                   <div className=" flex gap-5 w-[200px]">
                     <span className="w-[80px]">
                       <label>Quantity</label>
-                    <input
-                    className="quantity"
-                      type="number"
-                      placeholder="00"
-                      value={quantities[item.inventory_item_id] || ""}
-                      onChange={(e) =>
-                        handleQuantityChange(item.inventory_item_id, e.target.value)
-                      }
-                      required
-                    />
+                      <input
+                        className="quantity"
+                        type="number"
+                        placeholder="00"
+                        value={quantities[item.inventory_item_id] || ""}
+                        onChange={(e) =>
+                          handleQuantityChange(item.inventory_item_id, e.target.value)
+                        }
+                        required
+                      />
                     </span>
 
                     <span className="mt-auto mb-auto">
@@ -227,14 +227,14 @@ const TransferStockForm = ({ onClose, transferItems, warehouseList, settransferI
                         Remove
                       </button>
                     </span>
-                    
+
                   </div>
 
 
                 </div>
               ))}
 
-             
+
             </>
           ) : (
             <div className="text-center mt-6 text-red-500 font-medium">

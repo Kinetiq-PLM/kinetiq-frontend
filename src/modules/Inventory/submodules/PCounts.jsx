@@ -87,7 +87,7 @@ const BodyContent = () => {
     const fetchWarehouses = async () => {
       try {
         // Use localhost base API URL
-        const res = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
+        const res = await fetch("http://127.0.0.1:8000/api/warehouse-list/");
         if (!res.ok) {
           throw new Error(`HTTP error fetching warehouses! Status: ${res.status}`);
         }
@@ -109,7 +109,7 @@ const BodyContent = () => {
     const fetchInventoryItems = async () => {
       try {
         // Use localhost base API URL
-        const res = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/");
+        const res = await fetch("http://127.0.0.1:8000/api/inventory-items/");
         if (!res.ok) {
           throw new Error(`HTTP error fetching inventory items! Status: ${res.status}`);
         }
@@ -133,7 +133,7 @@ const BodyContent = () => {
     const fetchCyclicCounts = async () => {
       try {
         // Use localhost base API URL
-        const res = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/");
+        const res = await fetch("http://127.0.0.1:8000/api/cyclic_counts/");
         if (!res.ok) {
           throw new Error(`HTTP error fetching cyclic counts! Status: ${res.status}`);
         }
@@ -207,7 +207,7 @@ const BodyContent = () => {
     if (!pendingStatusChange || !selectedRow) return;
 
     // Use localhost base API URL
-    fetch(`https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/${selectedRow.inventory_count_id}/status/`, {
+    fetch(`http://127.0.0.1:8000/api/cyclic_counts/${selectedRow.inventory_count_id}/status/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

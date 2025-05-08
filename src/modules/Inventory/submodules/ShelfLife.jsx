@@ -29,7 +29,7 @@ const BodyContent = () => {
 
 
     useEffect(() => {
-        fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/expiry-report/")
+        fetch("http://127.0.0.1:8000/api/expiry-report/")
             .then((res) => res.json())
             .then((data) => {
                 setExpiringItemsData(data);
@@ -44,7 +44,7 @@ const BodyContent = () => {
 
     // assets fetching
     useEffect(() => {
-        fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/assets-depreciation-report/")
+        fetch("http://127.0.0.1:8000/api/assets-depreciation-report/")
             .then((res) => res.json())
             .then((data) => {
                 setAssetsData(data);
@@ -60,7 +60,7 @@ const BodyContent = () => {
 
     // warehouse list fetching
     useEffect(() => {
-        fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/")
+        fetch("http://127.0.0.1:8000/api/warehouse-list/")
             .then((res) => res.json())
             .then((data) => {
                 setWarehouseList(data);

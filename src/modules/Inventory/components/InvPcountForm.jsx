@@ -45,7 +45,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
     const fetchWarehouses = async () => {
         try {
             // Using the updated API endpoint for warehouses
-            const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/warehouse-list/");
+            const response = await fetch("http://127.0.0.1:8000/api/warehouse-list/");
 
             if (!response.ok) {
                 throw new Error(`Error fetching warehouses: ${response.status}`);
@@ -124,7 +124,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
             setInventoryItemsList(itemsList);
         } else {
             // Using the updated local API endpoint for inventory items
-            fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/inventory-items/")
+            fetch("http://127.0.0.1:8000/api/inventory-items/")
                 .then((res) => {
                     if (!res.ok) {
                         throw new Error(`Error fetching inventory items: ${res.status}`);
@@ -256,7 +256,7 @@ const InvPcountForm = ({ onClose, selectedItem, warehouses = [], inventoryItems 
 
         try {
             // Using the original API endpoint for cyclic counts
-            const response = await fetch("https://65umlgnumg.execute-api.ap-southeast-1.amazonaws.com/dev/api/cyclic_counts/", {
+            const response = await fetch("http://127.0.0.1:8000/api/cyclic_counts/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newRecord),
