@@ -269,9 +269,15 @@
 
 /* Media query for tablet devices */
 @media (max-width: 1024px) {
+  .gr {
+    overflow-x: hidden; /* Prevent horizontal overflow at the root level */
+  }
+
   .gr .body-content-container {
     padding: 0.75rem; /* Reduced padding */
     min-width: auto; /* Remove minimum width constraint */
+    max-width: 100%; /* Ensure container doesn't exceed viewport width */
+    overflow-x: hidden; /* Prevent horizontal overflow */
   }
   
   .gr .header-container h2 {
@@ -279,20 +285,33 @@
   }
   
   .gr .operations-gt-table table {
-    min-width: 800px; /* Ensure table is wide enough to require scrolling when sidebar is open */
+    width: 100%; /* Set width to 100% */
+    min-width: 800px; /* Minimum width for content */
     table-layout: fixed; /* Fixed table layout for better control */
   }
   
   .gr .operation_table_container {
-    overflow-x: auto; /* Enable horizontal scrolling at the container level */
+    position: relative; /* Make position relative for proper child positioning */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    width: 100%; /* Full width */
+    max-width: 100%; /* Don't exceed parent width */
   }
   
   .gr .operations-gt-table {
-    overflow-x: visible; /* Show content beyond the container */
+    position: static; /* Change from absolute to static positioning */
     width: 100%;
+    overflow-y: visible; /* Allow vertical overflow */
+    overflow-x: visible; /* Allow horizontal overflow within the scrollable container */
   }
   
-  /* Ensure scrollbar is visible */
+  /* Status badge adjustments for tablet */
+  .gr .status-badge {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.9rem;
+    min-width: 70px;
+  }
+  
+  /* Ensure scrollbar is visible and functional */
   .gr .operation_table_container::-webkit-scrollbar {
     height: 8px;
     display: block;

@@ -257,8 +257,8 @@
   width: 100%;
   margin-top: 0.5rem;
   position: relative;
-  overflow-x: auto; /* Horizontal scroll if needed */
-  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  overflow-x: auto; 
+  -webkit-overflow-scrolling: touch; 
 
   height: 350px;
 }
@@ -306,7 +306,7 @@
 
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0f766e; /* Darker teal on hover */
+  background: #0f766e; 
 }
 
 * {

@@ -167,7 +167,7 @@ const GoodsTracking = ({employee_id}) => {
       return <GoodsIssue
       onBack={() => setShowGoodsIssue(false)}
       onSuccess={refreshData}
-      selectedData={emptyGoodsReceiptPO} // Pass the selected row data
+      selectedData={emptyGoodsReceiptPO} 
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -175,7 +175,7 @@ const GoodsTracking = ({employee_id}) => {
       return <GoodsIssue
       onBack={() => setShowGoodsIssue(false)}
       onSuccess={refreshData}
-      selectedData={selectedData} // Pass the selected row data
+      selectedData={selectedData} 
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -186,7 +186,7 @@ const GoodsTracking = ({employee_id}) => {
       return <ARCreditMemo
       onBack={() => setShowARCreditMemo(false)}
       onSuccess={refreshData}
-      selectedData={emptyGoodsReceiptPO} // Pass the selected row data
+      selectedData={emptyGoodsReceiptPO} 
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
@@ -194,7 +194,7 @@ const GoodsTracking = ({employee_id}) => {
       return <ARCreditMemo
       onBack={() => setShowARCreditMemo(false)}
       onSuccess={refreshData}
-      selectedData={selectedData} // Pass the selected row data
+      selectedData={selectedData} 
       selectedButton={selectedButton}
       employee_id={employee_id}
       />
