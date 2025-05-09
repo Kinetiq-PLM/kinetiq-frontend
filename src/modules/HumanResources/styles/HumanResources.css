@@ -699,6 +699,7 @@
   padding: 1.25rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border-left: 4px solid transparent;
+  border: 1px solid #eaeaea; /* Added complete border */
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -1452,8 +1453,14 @@
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
-
+/* Animation for report summary cards on hover */
+.hr-report-summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
 .hr-report-summary-card h3 {
   margin: 0;
   font-size: 1rem;
