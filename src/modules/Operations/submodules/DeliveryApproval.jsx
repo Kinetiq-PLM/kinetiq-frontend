@@ -246,14 +246,11 @@ const BodyContent = ({employee_id}) => {
                     </div>
                 </div>  
                 {/* End of Form Container */}
- 
 
-
-                {/* Send To Button (Outside Form Container) */}
+                {/* Button Container */}
                 <div className="send-to-button-container">
                     <button className="send-to-button" onClick={handleSubmit}>Save</button>
                 </div>
-
 
             </div>
         </div>
