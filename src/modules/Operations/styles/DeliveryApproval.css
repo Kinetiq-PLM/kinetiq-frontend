@@ -110,6 +110,45 @@
 
 
 /* Tab Styling */
+.deliveryApproval .tabs-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.deliveryApproval .tab {
+  font-size: 0.875rem;
+  font-weight: normal;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: #666;
+  position: relative;
+  transition: color 0.3s ease;
+  background: none;
+  border: none;
+  margin-right: 0.5rem;
+}
+
+.deliveryApproval .tab.active {
+  color: #00A8A8;
+  font-weight: 500;
+}
+
+.deliveryApproval .tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 2px;
+  background-color: #00A8A8;
+}
+
+/* Keep the old tab styling for backward compatibility */
 .deliveryApproval .approval-tabs {
   display: flex;
   justify-content: flex-start;
