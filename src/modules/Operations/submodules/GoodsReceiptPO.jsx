@@ -5,6 +5,24 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Slide } from 'react-toastify';
 import { Tooltip } from 'react-tooltip';
 
+// Custom styles for the COPY FROM dropdown scrollbar
+const customSelectStyles = `
+  .copy-from-button::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .copy-from-button::-webkit-scrollbar-thumb {
+    background: #0d9488;
+    border-radius: 3px;
+  }
+
+  .copy-from-button::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+`;
+
 const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, employee_id }) => {
   const date_today = new Date().toISOString().split('T')[0];
   const isCreateMode = selectedButton === "Create";
@@ -1026,6 +1044,7 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
   return (
     <div className="goods-r-po">
+      <style>{customSelectStyles}</style>
       <div className="body-content-container">
         <div className="back-button" onClick={handleBackWithUpdate}> ← Save</div>
         <div className="content-wrapper">
@@ -1506,31 +1525,76 @@ const GoodsReceiptPO = ({ onBack, onSuccess, selectedData, selectedButton, emplo
 
 
 
-          <div className="button-section">
-            <div className="copy-from-button dropdown-scrollbar">
+          <div className="button-section" style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div className="copy-from-container">
               {selectedButton === "Create" ? (
                 <select
-                  className="copy-from-select"
+                  className="copy-from-sele"
                   value="Copy From"
                   onChange={(e) => handlePOSelect(e.target.value)}
+                  style={{ 
+                    width: 'auto', 
+                    maxWidth: '120px',
+                    padding: '0.5rem 1rem',
+                    paddingRight: '2rem',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    backgroundColor: '#0d9488',
+                    cursor: 'pointer',
+                    border: 'none',
+                    borderRadius: '0.375rem',
+                    appearance: 'none',
+                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 0.5rem center',
+                    backgroundSize: '1rem'
+                  }}
                 >
-                  <option value="">Copy From</option>
+                  <option value="" style={{ color: '#374151', backgroundColor: 'white' }}>Copy From</option>
                   {purchaseOrders.map(po => (
-                    <option key={po.purchase_id} value={po.purchase_id}>
+                    <option 
+                      key={po.purchase_id} 
+                      value={po.purchase_id}
+                      style={{ color: '#374151', backgroundColor: 'white' }}
+                    >
                       {po.purchase_id.split('-').slice(-2).join('-')}
                     </option>
                   ))}
                 </select>
               ) : (
-                <div className="copy-from-select"
-                  type="text"
-                  readOnly
-                  style={{ cursor: 'not-allowed' }}
-                >Copy From</div>
+                <button 
+                  className="copy-from-button"
+                  type="button"
+                  disabled
+                  style={{ 
+                    cursor: 'not-allowed',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    backgroundColor: '#0d9488',
+                    border: 'none',
+                    borderRadius: '0.375rem',
+                    padding: '0.5rem 1rem',
+                    opacity: '0.7'
+                  }}
+                >Copy From</button>
               )}
             </div>
-            <div className="right-buttons">
-              <button className="cancel-button" onClick={onBack}>Cancel</button>
+            <div className="right-buttons" style={{ display: 'flex', gap: '0.75rem' }}>
+              <button 
+                className="cancel-button" 
+                onClick={onBack}
+                style={{ 
+                  padding: '0.5rem 1rem',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '0.375rem',
+                  backgroundColor: 'white',
+                  color: '#374151',
+                  fontSize: '0.875rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
