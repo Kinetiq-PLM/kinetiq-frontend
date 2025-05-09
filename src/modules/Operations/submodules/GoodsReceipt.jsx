@@ -789,7 +789,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
   return (
     <div className="goods-r">
       <div className="body-content-container">
-        <div className="back-button" onClick={handleBackWithUpdate}>Save</div>
+        <div className="back-button" onClick={handleBackWithUpdate}>→ Save</div>
         <div className="content-wrapper">
           <ToastContainer transition={Slide} />
           <div className="details-grid">
