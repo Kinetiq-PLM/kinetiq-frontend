@@ -107,8 +107,8 @@
 
 .InternalTransfer .input-container {
     width: 100%;
-    margin-top: 1.5rem;
-    padding: 1rem;
+    margin-top: 2rem;
+    padding: 1rem 4rem; /* Increased horizontal padding */
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -266,7 +266,8 @@
     display: flex;
     justify-content: flex-end;
     margin-top: 1rem;
-    width: 100%;
+    width: 95%; /* Reduced width to move button away from right edge */
+    margin-right: 1rem; /* Added right margin */
 }
 
 .InternalTransfer .send-to-button {
@@ -416,9 +417,49 @@
 /* Media query for smaller tablets */
 @media (max-width: 768px) {
     .InternalTransfer .body-content-container {
-      padding: 0.75rem; /* Reduced padding */
+      padding: 0.75rem; 
       width: 100%;
       min-width: auto;
+    }
+    
+
+    .InternalTransfer .input-container {
+      padding: 1rem 2.5rem; 
+    }
+    
+    .InternalTransfer .input-row {
+      gap: 2rem; 
+    }
+    
+   
+    .InternalTransfer .input-row:nth-child(1),
+    .InternalTransfer .input-row:nth-child(2) {
+      margin-bottom: 1.5rem; 
+    }
+    
+   
+    .InternalTransfer .input-container.reworkOrder .input-row {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    
+    .InternalTransfer .input-container.reworkOrder .input-group {
+      width: calc(50% - 1.5rem);
+      min-width: 120px;
+    }
+    
+    /* Ensure first row has Product ID and Rework Reason side by side */
+    .InternalTransfer .input-container.reworkOrder .input-row:nth-child(1) .input-group:nth-child(1),
+    .InternalTransfer .input-container.reworkOrder .input-row:nth-child(1) .input-group:nth-child(2) {
+      flex: 0 0 calc(50% - 1.5rem);
+    }
+    
+    /* Ensure second row has Actual Quantity and Rework Quantity side by side */
+    .InternalTransfer .input-container.reworkOrder .input-row:nth-child(2) .input-group:nth-child(1),
+    .InternalTransfer .input-container.reworkOrder .input-row:nth-child(2) .input-group:nth-child(2) {
+      flex: 0 0 calc(50% - 1.5rem);
     }
     .InternalTransfer .details-grid {
       padding: 0.75rem; /* Reduced padding */
