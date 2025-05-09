@@ -9,6 +9,7 @@ const BodyContent = ({employee_id}) => {
     const [approvalStatus, setApprovalStatus] = useState("Pending");
     const [approvalDate, setApprovalDate] = useState("");
     const [approvedBy, setApprovedBy] = useState("");
+    const [activeTab, setActiveTab] = useState("All");
 
     const current = new Date();
     const current_date = `${current.getFullYear()}-${(current.getMonth() + 1).toString().padStart(2, '0')}-${current.getDate().toString().padStart(2, '0')}`;
@@ -26,6 +27,8 @@ const BodyContent = ({employee_id}) => {
         setSelectedData(row);
     };
 
+
+    //Update logistics
     const handleSubmit = async () => {
 
         if (!selectedData) {
@@ -75,10 +78,12 @@ const BodyContent = ({employee_id}) => {
        
     };
 
+
+    //Table Data
     const fetchData = async () => {
         try {
             setLoading(true);
-            setError(null); 
+            setError(null); // Reset error state
    
             const response = await fetch("http://127.0.0.1:8000/operation/delivery-approval/");
             if (!response.ok) throw new Error("Connection to database failed");
@@ -131,6 +136,26 @@ const BodyContent = ({employee_id}) => {
                 {/* Table Container */}
                 <div className="table-container">
                 <ToastContainer transition={Slide} />
+                    <div className="tabs-container">
+                        <div 
+                            className={`tab ${activeTab === "All" ? "active" : ""}`}
+                            onClick={() => setActiveTab("All")}
+                        >
+                            All
+                        </div>
+                        <div 
+                            className={`tab ${activeTab === "Approved" ? "active" : ""}`}
+                            onClick={() => setActiveTab("Approved")}
+                        >
+                            Approved
+                        </div>
+                        <div 
+                            className={`tab ${activeTab === "Pending" ? "active" : ""}`}
+                            onClick={() => setActiveTab("Pending")}
+                        >
+                            Pending
+                        </div>
+                    </div>
                     <table>
                         <thead>
                             <tr>
@@ -148,7 +173,9 @@ const BodyContent = ({employee_id}) => {
                                 <td colSpan="7" className="text-center">Loading...</td>
                                 </tr>
                             ) : deliveryapproval_data.length > 0 ? (
-                                deliveryapproval_data.map((row, index) => (
+                                deliveryapproval_data
+                                .filter(row => activeTab === "All" || row.approval_status === activeTab)
+                                .map((row, index) => (
                                 <tr key = {row.approval_request_id}>
                                     <td>
                                         <input
@@ -255,3 +282,4 @@ export default BodyContent;
 
 
 
+            
