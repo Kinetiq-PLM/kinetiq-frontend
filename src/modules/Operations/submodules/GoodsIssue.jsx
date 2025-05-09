@@ -826,7 +826,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
     <div className="gi">
       <div className="body-content-container">
         <ToastContainer transition={Slide} />
-        <div className="back-button" onClick={handleBackWithUpdate}> → Save</div>
+        <div className="back-button" onClick={handleBackWithUpdate}> ← Save</div>
         <div className="content-wrapper">
           <div className="details-grid">
             <div className="details-section">
@@ -1248,7 +1248,7 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
           <div className="button-section">
             <button 
               className="copy-from-button" 
-              style={{ backgroundColor: '#098F8F', color: 'white', cursor: 'not-allowed' }}
+              style={{ cursor: 'not-allowed' }}
               >
               Copy From
             </button>

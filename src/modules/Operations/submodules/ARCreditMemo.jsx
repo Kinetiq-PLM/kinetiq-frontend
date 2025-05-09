@@ -875,7 +875,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
   return (
     <div className="ar-cred">
       <div className="body-content-container">
-        <div className="back-button" onClick={handleBackWithUpdate}>→ Save</div>
+        <div className="back-button" onClick={handleBackWithUpdate}> ← Save</div>
         <div className="content-wrapper">
         <ToastContainer transition={Slide} />
           <div className="details-grid">
@@ -1263,7 +1263,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           <div className="button-section">
           <button
             className="copy-from-button"
-            style={{ backgroundColor: '#098F8F', color: 'white', cursor: 'not-allowed' }}
+            style={{ cursor: 'not-allowed' }}
             >
             Copy From
           </button>
