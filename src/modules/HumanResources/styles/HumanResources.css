@@ -1420,19 +1420,20 @@
 /* Make summary cards display in a row at the top */
 .hr-report-summary-cards {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
   gap: 1.25rem;
   width: 100%;
   margin-bottom: 1.5rem;
+  justify-content: space-between;
 }
 
 /* Adjust summary card styling */
 .hr-report-summary-card {
-  width: 280px; /* Keep fixed width */
-  min-width: 280px;
-  flex-shrink: 0;
-  margin-bottom: 0.5rem;
+  flex: 1; /* Makes each card take equal width */
+  min-width: 0; /* Allows cards to shrink if needed */
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* Charts container to ensure charts are stacked below cards */
