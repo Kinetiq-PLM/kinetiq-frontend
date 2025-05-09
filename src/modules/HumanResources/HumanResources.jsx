@@ -29,7 +29,7 @@ import OvertimeSummaryReport from './components/reports/OvertimeSummaryReport';
 import PayrollSummaryReport from './components/reports/PayrollSummaryReport';
 import PositionsSummaryReport from './components/reports/PositionsSummaryReport';
 import ResignationsSummaryReport from './components/reports/ResignationsSummaryReport';
-
+import EmployeePerformanceTable from './components/EmployeePerformanceTable';
 // Define Kinetiq brand colors for charts
 const kinetiqColors = {
   primary: "#00a9ac",
@@ -704,56 +704,9 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
             <div className="hr-main-grid">
               <div className="hr-column-main">
                 {/* Performance table */}
-                <div className="hr-candidates-section">
-                  <div className="hr-section-header">
-                    <h3><strong>Employee Performance</strong></h3>
-                    <button 
-                      className="hr-view-all-btn" 
-                      onClick={() => navigateTo('/employee-performance')}
-                    >
-                      View All
-                    </button>
-                  </div>
-                  <div className="hr-performance-table-container">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Employee Name</th>
-                          <th>Rating</th>
-                          <th>Review Date</th>
-                        </tr>
-                      </thead>
-                      <tbody className="hr-performance-tbody">
-                        {loading ? (
-                          <tr>
-                            <td colSpan="3" style={{textAlign: "center"}}>Loading performance data...</td>
-                          </tr>
-                        ) : error ? (
-                          <tr>
-                            <td colSpan="3" style={{textAlign: "center"}}>Error loading performance data</td>
-                          </tr>
-                        ) : employeePerformance.length === 0 ? (
-                          <tr>
-                            <td colSpan="3" style={{textAlign: "center"}}>No performance records found</td>
-                          </tr>
-                        ) : (
-                          employeePerformance.map((perf) => (
-                            <tr key={perf.performance_id}>
-                              <td>{perf.employee_name}</td>
-                              <td>
-                                <span className={`hr-tag rating-${perf.rating}`}>
-                                  {RATING_LABELS[perf.rating] || perf.rating}
-                                </span>
-                              </td>
-                              
-                              <td>{perf.review_date}</td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                <EmployeePerformanceTable 
+                  onViewAll={() => navigateTo('/employee-performance')} 
+                />
                 
                 {/* Leave requests section - Department KPIs section removed */}
                 <div className="hr-leave-requests-section">
