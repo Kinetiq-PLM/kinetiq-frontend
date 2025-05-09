@@ -474,6 +474,47 @@
 }
 
 
+/* Button section styling */
+.ar-cred .button-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.ar-cred .right-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.ar-cred .copy-from-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #0d9488;
+  border-radius: 0.375rem;
+  color: white;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.ar-cred .cancel-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #E5E7EB;
+  background: white;
+  border-radius: 0.375rem;
+  color: #374151;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.ar-cred .copy-from-button:hover {
+  background-color: #0b877b;
+}
+
+.ar-cred .cancel-button:hover {
+  background: #F9FAFB;
+}
+
 /* Media query for smaller tablets */
 @media (max-width: 768px) {
   .ar-cred .body-content-container {
@@ -516,6 +557,12 @@
     font-size: 0.7rem !important;
     position: relative;
     width: 10px;
+  }
+  
+  /* Keep buttons side by side in tablet view */
+  .ar-cred .button-section {
+    flex-direction: row;
+    justify-content: space-between;
   }
 }
 

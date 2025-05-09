@@ -1218,7 +1218,7 @@ const GoodsReceipt = ({ onBack, onSuccess, selectedData, selectedButton, employe
           <div className="button-section">
             <button
               className="copy-from-button"
-              style={{ backgroundColor: '#098F8F', color: 'white', cursor: 'not-allowed' }}
+              style={{ cursor: 'not-allowed' }}
               >
               Copy From
             </button>
