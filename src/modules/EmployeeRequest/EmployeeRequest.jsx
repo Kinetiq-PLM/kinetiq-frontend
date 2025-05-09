@@ -11,21 +11,21 @@ const EmployeeRequest = ({ loadSubModule, setActiveSubModule, employee_id }) => 
       description: "Submit a request for scheduled time off including sick leave, vacation, or personal leave",
       icon: <FaCalendarAlt />,
       color: "#00a9ac",
-      submodule: "LeaveRequest" // Verify this matches the registration in parent app
+      submodule: "Leave Request" // Verify this matches the registration in parent app
     },
     {
       title: "Overtime Request",
       description: "Submit a request for overtime hours worked outside of your regular schedule",
       icon: <FaClock />,
       color: "#00a9ac",
-      submodule: "OvertimeRequest" // Verify this matches the registration in parent app
+      submodule: "Overtime Request" // Verify this matches the registration in parent app
     },
     {
       title: "Resignation Request",
       description: "Submit a formal resignation notice and initiate the departure process",
       icon: <FaSignOutAlt />,
       color: "#00a9ac",
-      submodule: "ResignationRequest" // Verify this matches the registration in parent app
+      submodule: "Resignation Request" // Verify this matches the registration in parent app
     }
   ];
 

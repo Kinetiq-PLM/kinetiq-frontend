@@ -167,18 +167,17 @@ const HRDashboard = ({ loadSubModule, setActiveSubModule }) => {
   const navigateTo = (submoduleName, params = {}) => {
     // Map path to the actual submodule name as defined in App.jsx
     const pathToSubmoduleMap = {
-      '/attendance': 'AttendanceTracking', // Changed from 'Attendance Tracking'
+      '/attendance': 'Attendance Tracking', // Changed from 'Attendance Tracking'
       '/employees': 'Employees',
-      '/leave-requests': 'LeaveRequests', // Changed from 'Leave Requests'
-      '/employee-performance': 'EmployeePerformance', // Changed from 'Employee Performance'
+      '/leave-requests': 'Leave Requests', // Changed from 'Leave Requests'
+      '/employee-performance': 'Employee Performance', // Changed from 'Employee Performance'
       '/departments': 'Departments',
       '/payroll': 'Payroll',
       '/recruitment': 'Recruitment',
-      '/workforce-allocation': 'WorkforceAllocation', // Changed from 'Workforce Allocation'
-      '/resignation': 'ResignationRequest', // Changed from 'Resignation'
+      '/workforce-allocation': 'Workforce Allocation', // Changed from 'Workforce Allocation'
+      '/resignation': 'Resignation Request', // Changed from 'Resignation'
       '/job-posting': 'JobPosting', // Changed from 'Job Posting'
-      '/leave-balances': 'LeaveBalances', // Changed from 'Leave Balances'
-      '/training': 'Training'
+      '/leave-balances': 'Leave Balances', // Changed from 'Leave Balances'
     };
     
     const submodule = pathToSubmoduleMap[submoduleName];
