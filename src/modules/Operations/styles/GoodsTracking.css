@@ -77,12 +77,13 @@
 
 .gr .operations-gt-table {
   height: 100%;
-  overflow: auto;
+  overflow-y: auto;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100%;
 }
 
 .gr .operations-gt-table::-webkit-scrollbar {
@@ -102,6 +103,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  table-layout: fixed;
 }
 
 .gr .operations-gt-table thead {
@@ -117,6 +119,9 @@
   font-weight: 500;
   color: #64748b;
   border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .gr .operations-gt-table td {
@@ -125,16 +130,51 @@
   border-bottom: 1px solid #e2e8f0;
   color: #334155;
   background-color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .gr .operations-gt-table tbody tr:hover {
   background-color: #f8fafc;
 }
 
-.gr .checkbox-column {
+/* Column width definitions */
+.gr .operations-gt-table th:nth-child(1),
+.gr .operations-gt-table td:nth-child(1) {
   width: 48px;
   text-align: center;
   padding: 1rem 0.5rem !important;
+}
+
+.gr .operations-gt-table th:nth-child(2),
+.gr .operations-gt-table td:nth-child(2) {
+  width: 50px;
+}
+
+.gr .operations-gt-table th:nth-child(3),
+.gr .operations-gt-table td:nth-child(3) {
+  width: 150px;
+}
+
+.gr .operations-gt-table th:nth-child(4),
+.gr .operations-gt-table td:nth-child(4) {
+  width: 150px;
+}
+
+.gr .operations-gt-table th:nth-child(5),
+.gr .operations-gt-table td:nth-child(5) {
+  width: 120px;
+}
+
+.gr .operations-gt-table th:nth-child(6),
+.gr .operations-gt-table td:nth-child(6) {
+  width: 120px;
+}
+
+.gr .operations-gt-table th:nth-child(7),
+.gr .operations-gt-table td:nth-child(7) {
+  width: 120px;
 }
 
 .gr .teal-checkbox {
@@ -231,6 +271,7 @@
 @media (max-width: 1024px) {
   .gr .body-content-container {
     padding: 0.75rem; /* Reduced padding */
+    min-width: auto; /* Remove minimum width constraint */
   }
   
   .gr .header-container h2 {
@@ -238,10 +279,32 @@
   }
   
   .gr .operations-gt-table table {
-    min-width: 500px; /* Smaller minimum width */
+    min-width: 800px; /* Ensure table is wide enough to require scrolling when sidebar is open */
+    table-layout: fixed; /* Fixed table layout for better control */
   }
-  .gr .table-wrapper {
-    overflow-x: auto;
+  
+  .gr .operation_table_container {
+    overflow-x: auto; /* Enable horizontal scrolling at the container level */
+  }
+  
+  .gr .operations-gt-table {
+    overflow-x: visible; /* Show content beyond the container */
+    width: 100%;
+  }
+  
+  /* Ensure scrollbar is visible */
+  .gr .operation_table_container::-webkit-scrollbar {
+    height: 8px;
+    display: block;
+  }
+  
+  .gr .operation_table_container::-webkit-scrollbar-thumb {
+    background: #0d9488;
+    border-radius: 4px;
+  }
+  
+  .gr .operation_table_container::-webkit-scrollbar-track {
+    background: #ddd;
   }
 }
 
