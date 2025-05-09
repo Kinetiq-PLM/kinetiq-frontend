@@ -11,6 +11,7 @@ const BodyContent = () => {
   const [activeTab, setActiveTab] = useState("General Ledger");
   const [data, setData] = useState([]);
   const [defaultSortedData, setDefaultSortedData] = useState([]);
+  const [dateSortOption, setDateSortOption] = useState("");
   const [sortOption, setSortOption] = useState("");
   const [searching, setSearching] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -172,6 +173,19 @@ const BodyContent = () => {
     }
   };
 
+  const handleDateSort = (selected) => {
+    setDateSortOption(selected);
+    const currentData = getCurrentTabData();
+
+    const sorted = [...currentData].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return selected === "Ascending" ? dateA - dateB : dateB - dateA;
+    });
+
+    setData(sorted);
+  };
+
   const filteredData = getCurrentTabData().filter((item) => {
     const searchContent = [
       item.entryLineId,
@@ -231,26 +245,8 @@ const BodyContent = () => {
       <div className="body-content-container">
         <div className="title-subtitle-container">
           <h1 className="subModule-title">{activeTab}</h1>
-        </div>
 
-        <div className="parent-component-container">
-          <div className="component-container">
-            <Dropdown
-              options={["Ascending", "Descending"]}
-              style="selection"
-              defaultOption="Sort Debit Credit.."
-              value={sortOption}
-              onChange={handleSort}
-            />
-            <Search
-              type="text"
-              placeholder="Search Entries.."
-              value={searching}
-              onChange={(e) => setSearching(e.target.value)}
-            />
-          </div>
-
-          <div className="flex border-b-2 border-gray-400">
+          <div className="flex border-b-2 border-gray-400 w-fit">
             {["General Ledger", "Accounts Payable", "Accounts Receivable"].map(
               (tab) => (
                 <button
@@ -269,6 +265,34 @@ const BodyContent = () => {
                 </button>
               )
             )}
+          </div>
+        </div>
+
+        {/* Components: Dropdown and Search */}
+        <div className="parent-component-container">
+          <div className="component-container">
+            <Dropdown
+              options={["Ascending", "Descending"]}
+              style="selection"
+              defaultOption="Sort by Debit + Credit"
+              value={sortOption}
+              onChange={handleSort}
+            />
+
+            <Dropdown
+              options={["Ascending", "Descending"]}
+              style="selection"
+              defaultOption="Sort by Date"
+              value={dateSortOption}
+              onChange={handleDateSort}
+            />
+
+            <Search
+              type="text"
+              placeholder="Search Entries.."
+              value={searching}
+              onChange={(e) => setSearching(e.target.value)}
+            />
           </div>
         </div>
 
