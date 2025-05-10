@@ -428,9 +428,8 @@
     }
     
     .InternalTransfer .input-container {
-      padding: 1rem 2.5rem;
-      min-height: 240px;
-      flex: 1;
+      padding: 1.5rem 2.5rem;
+      min-height: 310px;
     }
     
     .InternalTransfer .input-row {
