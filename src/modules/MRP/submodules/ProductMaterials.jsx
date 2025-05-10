@@ -293,17 +293,25 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             setProductId("");
             setProductName("");
             setProductDescription("");
+            setNewMaterialId("");
+            setNewRawMaterial("");
+            setNewQuantity("");
+            setNewUnits("");
+            setIsCustomMaterial(false);
         }
-    
+
         if (!addRawMaterial) {
             setNewMaterialId("");
             setNewRawMaterial("");
             setNewQuantity("");
             setNewUnits("");
             setIsCustomMaterial(false);
+
+            // ✅ Always reset rows when closing raw material modal
+            setRawMaterialRows([{ mat_id: "", mat_name: "", quantity: "", mat_unit_of_measure: "", item_cost: 0 }]);
         } else {
             fetchMaterials();
-    
+
             if (newMaterialId && !isCustomMaterial) {
                 const matched = matData.find(item => item.mat_id === newMaterialId);
                 if (matched) {
@@ -313,6 +321,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 }
             }
         }
+
     
         if (!editRawMaterial) {
             setEditMaterialId("");
@@ -455,9 +464,6 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </select>
                         </div>
 
-
-
-
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', maxWidth: 320 }}>
                         <label style={{ fontWeight: 500, fontSize: 16, color: '#585757' }}>Product:</label>
                         <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} style={{ ...inputStyle, width: '100%' }} />
@@ -479,7 +485,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
                     <span style={{ color: '#969696' }}>Close</span>
                     </button>
-                    <button onClick={() => {setAddRawMaterial(true)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <button onClick={() => setAddRawMaterial(true)} disabled={!productId} style={{...buttonStyle('#00A8A8', '#00A8A8', 'white'), opacity: !productId ? 0.6 : 1, cursor: !productId ? 'not-allowed' : 'pointer'}}>
                     <span>Next</span>
                     <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                     </button>
@@ -598,7 +604,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
                         <span style={{ color: '#969696' }}>Close</span>
                     </button>
-                    <button onClick={() => setChecker(true)} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <button onClick={() => setChecker(true)} disabled={rawMaterialRows.some(row => !row.mat_id)} style={{...buttonStyle('#00A8A8', '#00A8A8', 'white'), opacity: rawMaterialRows.some(row => !row.mat_id) ? 0.6 : 1, cursor: rawMaterialRows.some(row => !row.mat_id) ? 'not-allowed' : 'pointer'}}>
                         <span>Add</span>
                         <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                     </button>
@@ -664,7 +670,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                     <div className="MRPIcon3" style={{ width: 15, height: 21, marginRight: 10 }} />
                     <span style={{ color: '#969696' }}>Close</span>
                     </button>
-                    <button onClick={() => setChecker3(true)} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <button onClick={() => setChecker3(true)} disabled={!editMaterialId} style={{...buttonStyle('#00A8A8', '#00A8A8', 'white'), opacity: !editMaterialId ? 0.6 : 1, cursor: !editMaterialId ? 'not-allowed' : 'pointer'}}>
                     <span>Edit</span>
                     <div className="MRPIcon5" style={{ width: 13, height: 21, marginLeft: 8 }} />
                     </button>
@@ -742,7 +748,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <span style={{color: '#969696'}}>Back</span>
                     </button>
                     <button onClick={() => {setCreated3(true),setChecker3(false),setEditRawMaterial2(false)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
-                        <span>Add Product</span>
+                        <span>Edit Product</span>
                         <div className="MRPIcon5" style={{width: 13, height: 21, marginLeft: 8}} />
                     </button>
                     </div>
@@ -765,7 +771,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </div>
                     </div>
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
-                    <button onClick={() => {setCreated(false),setChecker(false),setAddProduct(false)}} style={buttonStyle2('#fff')}>
+                    <button onClick={() => {setCreated(false),setChecker(false),setAddProduct(false),setAddProduct(false),setAddRawMaterial(false)}} style={buttonStyle2('#fff')}>
                         <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
                         <span style={{color: '#969696'}}>Close</span>
                     </button>
@@ -813,7 +819,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         </div>
                     </div>
                     <div style={{width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto'}}>
-                    <button onClick={() => {setCreated3(false),setChecker3(false),setEditRawMaterial(false)}} style={buttonStyle2('#fff')}>
+                    <button onClick={() => {setCreated3(false),setChecker3(false),setEditRawMaterial(false),setRawMaterial(false)}} style={buttonStyle2('#fff')}>
                         <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
                         <span style={{color: '#969696'}}>Close</span>
                     </button>
