@@ -50,14 +50,16 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [rawMaterials, setRawMaterials] = useState([]);
     const [mrpData, setMrpData] = useState([]);
+    const [prodData, setProdData] = useState([]);
+    const [matData, setMatData] = useState([]);
 
     const materialIdOptions = rawMaterials.map(item => item.materialId);
 
     const [principalOrder, setPrincipalItemOrder] = useState([]);
     const [pnpOrder, setPnpOrder] = useState([]);
     const [prinOrder, setPrincipalOrder] = useState([]);
-    //const baseurl = "http://127.0.0.1:8000";
-    const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
+    const baseurl = "http://127.0.0.1:8000";
+    //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
     useEffect(() => {
         const fetchMrpData = async () => {
@@ -101,6 +103,80 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             setRawMaterials(formattedData);
         } catch (error) {
             console.error("Error fetching raw materials:", error);
+        }
+    };
+
+
+    useEffect(() => {
+        const fetchNewProducts = async () => {
+            try {
+                const response = await fetch(`${baseurl}/product_material/selectproduct/`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch new Products");
+                }
+                const data = await response.json();
+
+                const formattedData = data.map((item) => ({
+                    prod_id: item.item_id,
+                    prod_name: item.item_name,
+                    prod_description: item.item_description,
+                }));
+
+                setProdData(formattedData);
+            } catch (error) {
+                console.error("Error fetching new Products:", error);
+            }
+        };
+
+        fetchNewProducts();
+    }, []);
+
+
+        const fetchMaterials = async () => {
+            try {
+                const response = await fetch(`${baseurl}/product_material/selectmaterial/`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch Materials");
+                }
+                const data = await response.json();
+
+                const formattedData = data.map((item) => ({
+                    mat_id: item.item_id,
+                    mat_name: item.item_name,
+                    mat_unit_of_measure: item.unit_of_measure,
+                    mat_price: item.item_price,
+                }));
+
+                setMatData(formattedData);
+            } catch (error) {
+                console.error("Error fetching Materials:", error);
+            }
+        };
+
+    const sendRecipe = async () => {
+        try {
+
+            const payload = rawMaterialRows.map(item => ({
+                quantity_required: item.quantity,
+                cost_of_used_materials: item.item_cost,
+                product_id: productId,
+                material_id: item.mat_id
+                
+            }));
+
+            console.log('Payload:', payload);
+
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'recipe.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+        } catch (error) {
+            console.error('Error sending Principal Item:', error);
         }
     };
 
@@ -226,14 +302,14 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
             setNewUnits("");
             setIsCustomMaterial(false);
         } else {
-            fetchAllMaterialOptions();
+            fetchMaterials();
     
             if (newMaterialId && !isCustomMaterial) {
-                const matched = allMaterialOptions.find(item => item.materialId === newMaterialId);
+                const matched = matData.find(item => item.mat_id === newMaterialId);
                 if (matched) {
-                    setNewRawMaterial(matched.rawMaterial || "");
+                    setNewRawMaterial(matched.mat_id || "");
                     setNewQuantity(matched.quantity || "");
-                    setNewUnits(matched.units || "");
+                    setNewUnits(matched.mat_unit_of_measure || "");
                 }
             }
         }
@@ -369,11 +445,11 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             style={{ ...inputStyle, width: '100%', appearance: 'none', cursor: 'pointer' }}
                         >
                             <option value="">Select Product ID</option>
-                            {mrpData
-                            .sort((a, b) => a.type.localeCompare(b.type))
+                            {prodData
+                            .sort((a, b) => a.prod_name.localeCompare(b.prod_name))
                             .map((item, index) => (
-                                <option key={index} value={item.number}>
-                                {item.number} ({item.type})
+                                <option key={index} value={item.prod_id}>
+                                {item.prod_id} ({item.prod_name})
                                 </option>
                             ))}
                         </select>
@@ -426,28 +502,29 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         
                         {/* Material ID Select */}
                         <select
-                        value={row.materialId}
+                        value={row.mat_id}
                         onChange={(e) => {
                         const selectedId = e.target.value;
-                        const selected = allMaterialOptions.find(item => item.materialId === selectedId);
+                        const selected = matData.find(item => item.mat_id === selectedId);
                         const updated = [...rawMaterialRows];
                         updated[index] = {
                             ...updated[index],
-                            materialId: selectedId,
-                            rawMaterial: selected?.rawMaterial || '',
-                            quantity: selected?.quantity || '',
-                            units: selected?.units || ''
+                            mat_id: selectedId,
+                            mat_name: selected?.mat_name || '',
+                            quantity: selected?.quantity || '1.00',
+                            mat_unit_of_measure: selected?.mat_unit_of_measure || '',
+                            item_cost: selected?.mat_price || 0
                         };
                         setRawMaterialRows(updated);
                         }}
                         style={{ ...inputStyle, width: 180 }}
                         >
                         <option value="">Select Material ID</option>
-                        {allMaterialOptions
-                            .sort((a, b) => a.rawMaterial.localeCompare(b.rawMaterial))
+                        {matData
+                            .sort((a, b) => a.mat_name.localeCompare(b.mat_name))
                             .map((item, idx) => (
-                            <option key={idx} value={item.materialId}>
-                                {item.materialId} {item.rawMaterial}
+                            <option key={idx} value={item.mat_id}>
+                                {item.mat_id} {item.mat_name}
                             </option>
                         ))}
                         </select>
@@ -455,7 +532,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         {/* Raw Material (autofilled) */}
                         <input
                         type="text"
-                        value={row.rawMaterial}
+                        value={row.mat_name}
                         readOnly
                         style={{ ...inputStyle, width: 150 }}
                         />
@@ -463,12 +540,19 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <input
                         type="text"
                         value={row.quantity}
-                        readOnly
+                        onChange={(e) => {
+                        const updated = [...rawMaterialRows];
+                        updated[index] = {
+                            ...updated[index],
+                            quantity: e.target.value, // Update the quantity
+                        };
+                        setRawMaterialRows(updated);
+                        }}
                         style={{ ...inputStyle, width: 70 }}
                         />
                         <input
                         type="text"
-                        value={row.units}
+                        value={row.mat_unit_of_measure}
                         readOnly
                         style={{ ...inputStyle, width: 70 }}
                         />
@@ -605,7 +689,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                         <div className="MRPIcon3" style={{width: 15, height: 21, marginRight: 10}} />
                         <span style={{color: '#969696'}}>Back</span>
                     </button>
-                    <button onClick={() => {setCreated(true)}} style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
+                    <button onClick={() => {setCreated(true); sendRecipe();} } style={buttonStyle('#00A8A8', '#00A8A8', 'white')}>
                         <span>Add Product</span>
                         <div className="MRPIcon5" style={{width: 13, height: 21, marginLeft: 8}} />
                     </button>
