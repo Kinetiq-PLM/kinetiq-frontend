@@ -24,6 +24,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [selectedOrderNo, setSelectedOrderNo] = useState([]);
     const [bomDetails, setBomDetails] = useState([]);
     const [projPro, setProjMats] = useState([]);
+    const [laborCostId, setLaborCostId] = useState([]);
     const [principalItems, setPrincipalItems] = useState([]);
     const [npProducts, setNPProducts] = useState([]);
     const [selectedProductId, setSelectedProductId] = useState(null);
@@ -42,8 +43,8 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     const [totalCostOfProduction, setTotalCostOfProduction] = useState(0);
     const [totalLaborCost, setTotalLaborCost] = useState(0);
     const [totalOrderCost, setTotalOrderCost] = useState(0);
-    //const baseurl = "http://127.0.0.1:8000";
-    const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
+    const baseurl = "http://127.0.0.1:8000";
+    //const baseurl = "https://aw081x7836.execute-api.ap-southeast-1.amazonaws.com/dev"
 
 
 
@@ -245,6 +246,7 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         }
         const data = await response.json();
         const formattedData = data.map((item) => ({
+            proj_production_order_detail_id: item.production_order_detail_id,
             productioncost: parseFloat(item.cost_of_production),
         }));
 
@@ -266,9 +268,12 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         }
         const data = await response.json();
         const formattedData = data.map((item) => ({
+            proj_labor_cost_id: item.labor_cost_id,
             days_worked: item.days_worked,
             daily_rate: parseFloat(item.daily_rate)
         }));
+
+        setLaborCostId(formattedData);
 
         const totalCost = formattedData.reduce(
             (sum, item) => sum + item.days_worked * item.daily_rate,
@@ -351,18 +356,27 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
         const sendProjectData = async () => {
             try {
 
-                const payload = projPro.map(item => ({
+                const payload = projPro.map((item, index) => ({
                     project_id: projectId[0]?.projectID || null,
                     product_mats_id: item.proj_product_mats_id,
                     overall_quantity_of_material: parseInt(item.proj_quantity_required) || 1,
                     cost_per_raw_material: parseFloat(item.proj_cost_per_raw_material) || 1.00,
                     total_cost_of_raw_materials: parseFloat(item.proj_total_cost_of_raw_materials) || 1.00,
-                    production_order_detail_id: null,
-                    labor_cost_id: null,
+                    production_order_detail_id: costOfProduction[index % costOfProduction.length]?.proj_production_order_detail_id || null,
+                    labor_cost_id: laborCostId[index % laborCostId.length]?.proj_labor_cost_id || null,
                     total_cost: parseFloat(totalOrderCost) || 1.00
                 }));
         
                 console.log("Payload:", payload);
+
+                // const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                // const url = URL.createObjectURL(blob);
+                // const link = document.createElement('a');
+                // link.href = url;
+                // link.download = 'proj_payload.json';
+                // document.body.appendChild(link);
+                // link.click();
+                // document.body.removeChild(link);
         
                 const response = await fetch(`${baseurl}/insertbom/`, {
                     method: 'POST',
@@ -374,18 +388,17 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                 const data = await response.json();
                 console.log('Successfully submitted BOM:', data);
 
-                // COMMENT MUNA KASI DI PA AYOS
-                // const updateResponse = await fetch(`${baseurl}/update_tracking_status/`, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     },
-                //     body: JSON.stringify({ order_id: selectedRowData.number })
-                // });
+                const updateResponse = await fetch(`${baseurl}/update_tracking_status/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ order_id: selectedRowData.number })
+                });
         
-                // if (!updateResponse.ok) throw new Error('Failed to update tracking status');
-                // const updateData = await updateResponse.json();
-                // console.log('Tracking status updated:', updateData);
+                if (!updateResponse.ok) throw new Error('Failed to update tracking status');
+                const updateData = await updateResponse.json();
+                console.log('Tracking status updated:', updateData);
 
             } catch (error) {
                 console.error('Error sending BOM:', error);
