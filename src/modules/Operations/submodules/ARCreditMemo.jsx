@@ -168,6 +168,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
     owner: isCreateMode ? employee_id : selectedData.owner,
     transaction_id: isCreateMode ? "" : selectedData.transaction_id || "",
     ar_credit_memo: isCreateMode ? "" : selectedData.ar_credit_memo || "",
+    invoice_id: isCreateMode ? "" : selectedData.invoice_id || "",
     delivery_date: isCreateMode ? today : selectedData.delivery_date || "",
     status: isCreateMode ? "Draft" : selectedStatus,
     posting_date: isCreateMode ? today  : selectedData.posting_date || "",
@@ -202,6 +203,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             ...prev,
             document_no: data.next_document_no,
             transaction_id: data.next_transaction_id,
+            ar_credit_memo: data.next_credit_memo_id
           }));
          
         } catch (error) {
@@ -553,6 +555,8 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         document_date: documentDetails.document_date,
         buyer: vendorID,
         owner: documentDetails.owner,
+        ar_credit_memo: documentDetails.ar_credit_memo,
+        invoice_id : documentDetails.invoice_id,
         initial_amount: parseFloat(initialAmount).toFixed(2) || 0, 
         discount_rate: parseFloat(documentDetails.discount_rate).toFixed(2) || 0,
         discount_amount: parseFloat(documentDetails.discount_amount).toFixed(2) || 0,
@@ -701,6 +705,7 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             document_date: documentDetails.document_date,
             buyer: vendorID,
             owner: documentDetails.owner,
+            invoice_id : documentDetails.invoice_id,
             initial_amount: parseFloat(initialAmount).toFixed(2) || 0, 
             discount_rate: parseFloat(documentDetails.discount_rate).toFixed(2) || 0,
             discount_amount: parseFloat(documentDetails.discount_amount).toFixed(2) || 0,

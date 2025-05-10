@@ -531,6 +531,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
           quantity: parseInt(item.quantity, 10),
           item_price: parseFloat(item.cost) || 0,
           total: parseFloat(item.total) || 0,
+          manuf_date: item.manuf_date,
+          expiry_date: item.expiry_date,
           warehouse_id: item.warehouse_id,
           item_no: null
         }))
@@ -607,6 +609,8 @@ const GoodsIssue = ({ onBack, onSuccess, selectedData, selectedButton, employee_
             quantity: parseInt(item.quantity, 10),
             item_price: parseFloat(item.cost) || 0,
             total: parseFloat(item.total) || 0,
+            manuf_date: item.manuf_date,
+            expiry_date: item.expiry_date,
             warehouse_id: item.warehouse_id,
             purchase_date: item.purchase_date,
             item_no: item?.item_no || null
