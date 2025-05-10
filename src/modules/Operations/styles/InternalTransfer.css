@@ -429,7 +429,7 @@
     
     .InternalTransfer .input-container {
       padding: 1rem 2.5rem;
-      min-height: 240px; /* Set minimum height for both containers */
+      min-height: 240px;
       flex: 1;
     }
     
@@ -442,10 +442,12 @@
       margin-bottom: 1.5rem; 
     }
     
-    /* Position the button container consistently at the bottom */
+
     .InternalTransfer .button-container {
-      margin-top: auto;
-      padding-bottom: 1rem;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+      padding-bottom: 0.5rem;
     }
     
    
