@@ -116,6 +116,8 @@
     overflow-x: auto;
     height: auto;
     min-height: fit-content;
+    display: flex;
+    flex-direction: column;
   }
   
 
@@ -268,6 +270,7 @@
     margin-top: 1rem;
     width: 95%; /* Reduced width to move button away from right edge */
     margin-right: 1rem; /* Added right margin */
+    position: relative;
 }
 
 .InternalTransfer .send-to-button {
@@ -420,21 +423,29 @@
       padding: 0.75rem; 
       width: 100%;
       min-width: auto;
+      display: flex;
+      flex-direction: column;
     }
     
-
     .InternalTransfer .input-container {
-      padding: 1rem 2.5rem; 
+      padding: 1rem 2.5rem;
+      min-height: 240px; /* Set minimum height for both containers */
+      flex: 1;
     }
     
     .InternalTransfer .input-row {
       gap: 2rem; 
     }
     
-   
     .InternalTransfer .input-row:nth-child(1),
     .InternalTransfer .input-row:nth-child(2) {
       margin-bottom: 1.5rem; 
+    }
+    
+    /* Position the button container consistently at the bottom */
+    .InternalTransfer .button-container {
+      margin-top: auto;
+      padding-bottom: 1rem;
     }
     
    
