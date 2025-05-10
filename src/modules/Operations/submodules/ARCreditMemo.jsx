@@ -281,7 +281,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         unit_of_measure: '',
         quantity: '',
         cost: '',
-        warehouse_id: '',
         item_no: ''
       });
   
@@ -570,7 +569,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
           item_price: parseFloat(item.cost) || 0,
           ar_discount: parseFloat(item.ar_discount) || 0,
           total: parseFloat(item.total) || 0,
-          warehouse_id: item.warehouse_id,
           item_no: null
         }))
       };
@@ -662,7 +660,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
               item_price: parseFloat(item.cost) || 0,
               ar_discount: parseFloat(item.ar_discount) || 0,
               total: parseFloat(item.total) || 0,
-              warehouse_id: item.warehouse_id,
               manuf_date: item.manuf_date,
               expiry_date: item.expiry_date,
               purchase_date: item.purchase_date || null,
@@ -854,7 +851,6 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
             quantity: item.quantity,
             cost: item.item_price !== 0 ? item.item_price : (duplicateDetails[item.item_id]?.[0]?.price || 0),
             ar_discount: item.ar_discount || 0, 
-            warehouse_id: item.warehouse_id,
             item_no: item.item_no 
           })), 
           {}
