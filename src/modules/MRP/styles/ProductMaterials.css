@@ -499,7 +499,7 @@
 }
 
 /* Truncate long text in select options */
-.select-truncate option {
+.mats .select-truncate option {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -507,7 +507,25 @@
 }
 
 /* Optional: match select dropdown with input width */
-.select-truncate {
+.mats .select-truncate {
   width: 100%;
   max-width: 320px; /* match your input box */
+}
+
+.mats .scrollable-raw-materials::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mats .scrollable-raw-materials::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.mats .scrollable-raw-materials::-webkit-scrollbar-thumb {
+  background: #00A8A8;
+  border-radius: 8px;
+}
+
+.mats .scrollable-raw-materials::-webkit-scrollbar-thumb:hover {
+  background: #007d7d;
 }
