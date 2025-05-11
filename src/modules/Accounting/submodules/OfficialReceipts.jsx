@@ -255,6 +255,8 @@ const OfficialReceipts = () => {
       if (field === "salesInvoiceId") {
         const selectedReceipt = receipts.find((r) => r.invoice_id === value);
         newForm.customerId = selectedReceipt?.customer_id || "SALES-CUST-2025";
+        newForm.totalAmount = selectedReceipt?.total_amount?.toString() || "";
+        newForm.amountDue = selectedReceipt?.amount_due?.toString() || "";
       }
       return newForm;
     });
