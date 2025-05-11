@@ -597,18 +597,10 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
 
 
 
-
-
       const result = await response.json();
-      if (onSuccess) {
-        await onSuccess();
-        toast.dismiss()
-        toast.success("Successfully updated documents.", {
-          autoClose: 1000,
-          onClose: () => onBack(), 
-        });
-      }   
-     
+      if(onSuccess){
+        await onSuccess(result);
+      }
     } catch (error) {
       toast.error(`Failed to create document. Please try again later`);
       console.log(error)
@@ -725,11 +717,11 @@ const ARCreditMemo = ({ onBack, onSuccess, selectedData, selectedButton, employe
         }
         if (onSuccess) {
           await onSuccess();
-          toast.success("Successfully updated documents.");
-          
-        }
-        if (onBack) {
-          onBack(); 
+          toast.dismiss()
+          toast.success("Successfully updated documents.", {
+            autoClose: 1000,
+            onClose: () => onBack(), 
+          });
         }
       } catch (error) {
         toast.error(`Failed to update data. Please try again later`);
