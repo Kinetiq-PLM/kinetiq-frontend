@@ -112,26 +112,23 @@
   background: #F9FAFB;
   color: #374151;
   font-size: 0.813rem;
-  height: 1.4rem;
+  height: 1.6rem; 
 }
 
 
-.goods-r-po .dropdown-scrollbar select::-webkit-scrollbar,
-.goods-r-po .copy-from-sele::-webkit-scrollbar {
+.goods-r-po .dropdown-scrollbar select::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 
-.goods-r-po .dropdown-scrollbar select::-webkit-scrollbar-thumb,
-.goods-r-po .copy-from-sele::-webkit-scrollbar-thumb {
+.goods-r-po .dropdown-scrollbar select::-webkit-scrollbar-thumb {
   background: #0d9488;
   border-radius: 3px;
 }
 
 
-.goods-r-po .dropdown-scrollbar select::-webkit-scrollbar-track,
-.goods-r-po .copy-from-sele::-webkit-scrollbar-track {
+.goods-r-po .dropdown-scrollbar select::-webkit-scrollbar-track {
   background: #f1f5f9;
   border-radius: 4px;
 }
@@ -257,8 +254,8 @@
   width: 100%;
   margin-top: 0.5rem;
   position: relative;
-  overflow-x: auto; 
-  -webkit-overflow-scrolling: touch; 
+  overflow-x: auto; /* Horizontal scroll if needed */
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
 
   height: 350px;
 }
@@ -306,7 +303,7 @@
 
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0f766e; 
+  background: #0f766e; /* Darker teal on hover */
 }
 
 * {
@@ -340,7 +337,7 @@
 .goods-r-po .table-container {
   margin-top: 1rem;
   flex: 1;
-  min-height: 250px;
+  min-height: 0;
   position: relative;
   overflow: auto;
 }
@@ -619,11 +616,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
-  padding: 10px 0;
-  position: relative;
-  z-index: 10;
-  width: 100%;
 }
 
 
@@ -881,12 +873,12 @@
   width: 0.1;
 }
 
-
+/* Button section styling */
 .goods-r-po .button-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 5rem;
+  margin-top: 1rem;
 }
 
 .goods-r-po .right-buttons {
@@ -906,7 +898,6 @@
     height: auto;
     line-height: normal;
     box-sizing: border-box;
-    max-width: 130px; 
   }
 
 .goods-r-po .copy-from-select {
@@ -938,15 +929,15 @@
   background: #F9FAFB;
 }
 
-
+/* Media query for smaller tablets */
 @media (max-width: 768px) {
   .goods-r-po .body-content-container {
-    padding: 0.75rem;
+    padding: 0.75rem; /* Reduced padding */
     width: 100%;
     min-width: auto;
   }
   .goods-r-po .details-grid {
-    padding: 0.75rem;
+    padding: 0.75rem; /* Reduced padding */
     width: 100%;
     min-width: auto;
     overflow-x: auto;
@@ -955,19 +946,19 @@
     min-width: 7rem;
   }
   .goods-r-po .header-container h2 {
-    font-size: 1.25rem; 
+    font-size: 1.25rem; /* Smaller heading */
   }
   
   .goods-r-po .operations-gt-table table {
-    min-width: 100px; 
+    min-width: 100px; /* Smaller minimum width */
   }
   .goods-r-po .operations-gt-table th,
   .goods-r-po .operations-gt-table td {
-    padding: 0.5rem; 
+    padding: 0.5rem; /* Even smaller padding */
   }
   
   .goods-r-po .action-buttons {
-    justify-content: center; 
+    justify-content: center; /* Center buttons on small screens */
   }
   .goods-r-po .table-wrapper {
     overflow-x: auto;
@@ -981,18 +972,11 @@
     position: relative;
     width: 10px;
   }
-   
+  
+  /* Keep buttons side by side in tablet view */
   .goods-r-po .button-section {
     flex-direction: row;
     justify-content: space-between;
-    width: 100%;
-    margin-top: 3rem;
-    padding-bottom: 1.5rem;
-  }
-  
-  .goods-r-po .copy-from-container,
-  .goods-r-po .right-buttons {
-    margin-top: 4rem;
   }
 }
 .goods-r-po .select-error {
