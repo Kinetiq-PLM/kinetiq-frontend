@@ -11,7 +11,8 @@ const CreateReceiptModal = ({
   handleInputChange,
   handleSubmit,
   setValidation,
-  invoiceOptions, // Added prop for Sales Invoice ID dropdown
+  invoiceOptions,
+  invoices, // Added prop for invoice data
 }) => {
   const [bankAccounts, setBankAccounts] = useState([]);
   const [showBankInput, setShowBankInput] = useState(false);
@@ -175,15 +176,18 @@ const CreateReceiptModal = ({
 
             {/* Invoice ID section */}
             <div className="mt-4">
-              <Forms
-                type="text"
-                formName="Sales Invoice ID*"
-                placeholder="Enter sales invoice ID"
-                value={reportForm.salesInvoiceId}
-                onChange={(e) =>
-                  handleInputChange("salesInvoiceId", e.target.value)
-                }
-              />
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">
+                  Select Sales Invoice ID*
+                </label>
+                <Dropdown
+                  style="selection"
+                  defaultOption="Select invoice..."
+                  options={invoiceOptions}
+                  value={reportForm.salesInvoiceId}
+                  onChange={(value) => handleInputChange("salesInvoiceId", value)}
+                />
+              </div>
             </div>
 
             {/* Amount sections in a row */}
@@ -192,29 +196,25 @@ const CreateReceiptModal = ({
                 <Forms
                   type="number"
                   formName="Total Amount*"
-                  placeholder="Enter total amount"
+                  placeholder="Total amount"
                   value={reportForm.totalAmount}
-                  onChange={(e) =>
-                    handleInputChange("totalAmount", e.target.value)
-                  }
+                  disabled={true}
                 />
               </div>
               <div className="md:w-1/3">
                 <Forms
                   type="number"
                   formName="Amount Due*"
-                  placeholder="Enter amount due"
+                  placeholder="Amount due"
                   value={reportForm.amountDue}
-                  onChange={(e) =>
-                    handleInputChange("amountDue", e.target.value)
-                  }
+                  disabled={true}
                 />
               </div>
               <div className="md:w-1/3">
                 <Forms
                   type="number"
                   formName="Amount Paid*"
-                  placeholder="Enter Amount paid"
+                  placeholder="Enter amount paid"
                   value={reportForm.amountPaid}
                   onChange={(e) =>
                     handleInputChange("amountPaid", e.target.value)
@@ -224,47 +224,47 @@ const CreateReceiptModal = ({
             </div>
 
             <div className="flex gap-10">
-            {/* Payment Method Section */}
-            <div className="mt-4">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium">
-                  Select Payment Method*
-                </label>
-                <Dropdown
-                  style="selection"
-                  defaultOption="Select payment method..."
-                  options={["Cash", "Bank Transfer", "Check", "Mobile Payment"]}
-                  value={reportForm.paymentMethod}
-                  onChange={(value) => {
-                    handleInputChange("paymentMethod", value);
-                    if (value !== "Bank Transfer") {
-                      handleInputChange("bankAccount", "");
-                    }
-                    if (value !== "Check") {
-                      handleInputChange("checkNumber", "");
-                    }
-                    if (value !== "Mobile Payment") {
-                      handleInputChange("transactionId", "");
-                    }
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Payment method specific fields */}
-            {reportForm.paymentMethod === "Check" && (
+              {/* Payment Method Section */}
               <div className="mt-4">
-                <Forms
-                  type="text"
-                  formName="Check Number*"
-                  placeholder="Enter check number"
-                  value={reportForm.checkNumber}
-                  onChange={(e) =>
-                    handleInputChange("checkNumber", e.target.value)
-                  }
-                />
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">
+                    Select Payment Method*
+                  </label>
+                  <Dropdown
+                    style="selection"
+                    defaultOption="Select payment method..."
+                    options={["Cash", "Bank Transfer", "Check", "Mobile Payment"]}
+                    value={reportForm.paymentMethod}
+                    onChange={(value) => {
+                      handleInputChange("paymentMethod", value);
+                      if (value !== "Bank Transfer") {
+                        handleInputChange("bankAccount", "");
+                      }
+                      if (value !== "Check") {
+                        handleInputChange("checkNumber", "");
+                      }
+                      if (value !== "Mobile Payment") {
+                        handleInputChange("transactionId", "");
+                      }
+                    }}
+                  />
+                </div>
               </div>
-            )}
+
+              {/* Payment method specific fields */}
+              {reportForm.paymentMethod === "Check" && (
+                <div className="mt-4">
+                  <Forms
+                    type="text"
+                    formName="Check Number*"
+                    placeholder="Enter check number"
+                    value={reportForm.checkNumber}
+                    onChange={(e) =>
+                      handleInputChange("checkNumber", e.target.value)
+                    }
+                  />
+                </div>
+              )}
 
               {reportForm.paymentMethod === "Mobile Payment" && (
                 <div className="mt-4">
