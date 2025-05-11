@@ -481,7 +481,7 @@ const ApprovalTable = ({employee_id}) => {
           </div>
         )}
         <div className="button-container">
-          <button className="send-to-button" onClick={handleSendClick}>Save</button>
+          <button className="send-to-button" onClick={handleSendClick} style={{ position: 'relative', bottom: '5px' }}>Save</button>
         </div>
       </div>
     </div>

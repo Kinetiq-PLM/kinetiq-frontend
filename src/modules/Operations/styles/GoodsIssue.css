@@ -99,6 +99,7 @@
   gap: 0.75rem;
   max-width: 100%;
   margin-bottom: 1rem;
+  min-width: 0; 
 }
 
 
@@ -273,6 +274,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   flex: 1;
+  min-width: 0; /* Prevents overflow in flex containers */
 }
 
 
@@ -287,6 +289,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.4rem 1rem;
   padding: 0.5rem;
+  min-width: 0; /* Prevents overflow in flex containers */
 }
 
 
@@ -726,16 +729,49 @@
   }
   
   .gi .details-grid {
-    padding: 0.75rem;
+    grid-template-columns: 220px 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem;
     width: 100%;
     min-width: auto;
     overflow-x: auto;
+  }
+  
+  .gi .tab-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .gi .tab-content.cost-details {
+    gap: 0.3rem 0.5rem;
+  }
+  
+  .gi .detail-row input,
+  .gi .detail-row select,
+  .gi .date-input input {
+    min-width: 7rem;
+    font-size: 0.75rem;
+  }
+  
+  .gi .detail-row label {
+    font-size: 0.7rem;
   }
   
   /* Keep buttons side by side in tablet view */
   .gi .button-section {
     flex-direction: row;
     justify-content: space-between;
+  }
+  
+  .gi .dropdown-scrollbar tr td select {
+    font-size: 0.9rem !important;
+    position: relative;
+  }
+  
+  .gi .dropdown-scrollbar tr td select option {
+    font-size: 0.7rem !important;
+    position: relative;
+    width: 10px;
   }
 }
 

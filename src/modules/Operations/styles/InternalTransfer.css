@@ -116,6 +116,8 @@
     overflow-x: auto;
     height: auto;
     min-height: fit-content;
+    display: flex;
+    flex-direction: column;
   }
   
 
@@ -268,6 +270,7 @@
     margin-top: 1rem;
     width: 95%; /* Reduced width to move button away from right edge */
     margin-right: 1rem; /* Added right margin */
+    position: relative;
 }
 
 .InternalTransfer .send-to-button {
@@ -420,21 +423,30 @@
       padding: 0.75rem; 
       width: 100%;
       min-width: auto;
+      display: flex;
+      flex-direction: column;
     }
     
-
     .InternalTransfer .input-container {
-      padding: 1rem 2.5rem; 
+      padding: 1.5rem 2.5rem;
+      min-height: 310px;
     }
     
     .InternalTransfer .input-row {
       gap: 2rem; 
     }
     
-   
     .InternalTransfer .input-row:nth-child(1),
     .InternalTransfer .input-row:nth-child(2) {
       margin-bottom: 1.5rem; 
+    }
+    
+
+    .InternalTransfer .button-container {
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+      padding-bottom: 0.5rem;
     }
     
    
