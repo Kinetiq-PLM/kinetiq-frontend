@@ -100,7 +100,7 @@
 .ar-cred .detail-row input,
 .ar-cred .detail-row select,
 .ar-cred .date-input input {
-  width: 100%;
+  width: 100%; 
   padding: 0.2rem 0.4rem;
   border: 1px solid #E5E7EB;
   border-radius: 0.25rem;
