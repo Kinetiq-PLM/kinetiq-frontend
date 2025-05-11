@@ -1,44 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import { 
-  FaUser, 
   FaBox, 
-  FaClipboardCheck, 
-  FaInfoCircle, 
-  FaTags,
-  FaWarehouse,
-  FaCalendarAlt,
-  FaRegCheckCircle,
-  FaCheckDouble,
-  FaShippingFast,
+  FaBoxOpen, 
+  FaBoxes, 
+  FaUser, 
+  FaTags, 
+  FaChevronUp, 
   FaChevronDown,
-  FaChevronUp,
+  FaRegCheckCircle,
+  FaShippingFast,
   FaExclamationCircle,
-  FaBoxOpen,
-  FaBoxes
-} from "react-icons/fa";
+  FaInfoCircle,
+  FaWarehouse,
+  FaCheckDouble
+} from 'react-icons/fa';
 
 const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSave, onStatusUpdate }) => {
   // State for edited values
   const [editedValues, setEditedValues] = useState({});
-  // Remove packingCost state as we're removing cost functionality
   const [maxItemsCount, setMaxItemsCount] = useState(0);
-  
-  // Add a state for total quantity
   const [totalItemsQuantity, setTotalItemsQuantity] = useState(0);
   
-  // New state to track packed items by warehouse and inventory item
+  // State to track packed items by warehouse and inventory item
   const [packedItems, setPackedItems] = useState({});
   
   // Accordion state for collapsible sections
   const [expandedSections, setExpandedSections] = useState({
     info: true,
-    pickingInfo: true,
     employee: true,
     packingType: true,
     items: true
   });
   
-  // Check if packing list is already packed or shipped (both are final states for this module)
+  // Check if packing list is already packed or shipped (both are final states)
   const isPacked = packingList?.packing_status === 'Packed';
   const isShipped = packingList?.packing_status === 'Shipped';
   const isNotEditable = isPacked || isShipped;
@@ -50,19 +44,11 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
         try {
           const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${packingList.picking_list_id}/`);
           if (response.ok) {
-            const pickingList = await response.json();
-            if (pickingList.items_count) {
-              // Store the max items count
-              setMaxItemsCount(pickingList.items_count);
-              
-              // If total_items_packed is null, initialize it with items_count
-              if (!packingList.total_items_packed || packingList.total_items_packed === null) {
-                handleInputChange('total_items_packed', pickingList.items_count);
-              }
-            }
+            const data = await response.json();
+            setMaxItemsCount(data.items_count || 0);
           }
         } catch (error) {
-          console.error("Error fetching picking list:", error);
+          console.error("Error fetching picking list details:", error);
         }
       };
       
@@ -92,15 +78,10 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
         if (packingList.packed_items_data && 
             packingList.packed_items_data[warehouseId] && 
             packingList.packed_items_data[warehouseId][itemId]) {
-          // Use the exact quantity from saved data
-          packedQty = parseInt(packingList.packed_items_data[warehouseId][itemId].packedQuantity) || 0;
+          packedQty = packingList.packed_items_data[warehouseId][itemId].packedQuantity || 0;
         } else if (isPacked) {
-          // If fully packed/shipped status, use max quantity
+          // If no packed data but status is packed, assume all items are packed
           packedQty = maxQuantity;
-        } else if (packingList.total_items_packed > 0) {
-          // For partially packed items without specific data, distribute evenly
-          // This is a fallback and shouldn't be needed if packed_items_data is working
-          packedQty = Math.min(Math.round(packingList.total_items_packed / packingList.items_details.length), maxQuantity);
         }
         
         initialPackedItems[warehouseId][itemId] = {
@@ -176,7 +157,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     let totalPacked = 0;
     Object.values(packedItems).forEach(warehouseItems => {
       Object.values(warehouseItems).forEach(item => {
-        totalPacked += item.packedQuantity;
+        totalPacked += item.packedQuantity || 0;
       });
     });
     
@@ -310,7 +291,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     return `status-badge status-${status.toLowerCase()}`;
   };
   
-  // Get completion percentage based on filled fields - updated without cost factors
+  // Get completion percentage based on filled fields
   const getCompletionPercentage = () => {
     let totalScore = 0;
     let maxScore = 3; // Now only 3 factors (employee, packing type, items packed)
@@ -341,30 +322,26 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     const maxQty = packedItems[warehouseId]?.[itemId]?.maxQuantity || 0;
     const validatedQuantity = Math.min(Math.max(0, newQuantity), maxQty);
     
-    // Update the packed items state
-    setPackedItems(prev => ({
-      ...prev,
-      [warehouseId]: {
-        ...prev[warehouseId],
-        [itemId]: {
-          ...prev[warehouseId][itemId],
-          packedQuantity: validatedQuantity
-        }
+    // Update the packed items state with the new structure
+    setPackedItems(prev => {
+      const updated = {...prev};
+      
+      if (!updated[warehouseId]) {
+        updated[warehouseId] = {};
       }
-    }));
+      
+      updated[warehouseId][itemId] = {
+        ...(updated[warehouseId][itemId] || {}),
+        packedQuantity: validatedQuantity
+      };
+      
+      return updated;
+    });
     
-    // Update the total_items_packed
-    const updatedPackedItems = {
-      ...packedItems,
-      [warehouseId]: {
-        ...(packedItems[warehouseId] || {}),
-        [itemId]: {
-          ...(packedItems[warehouseId]?.[itemId] || {}),
-          packedQuantity: validatedQuantity
-        }
-      }
-    };
-    updateTotalItemsPacked(updatedPackedItems);
+    // Update the total_items_packed with a delay to ensure state is updated
+    setTimeout(() => {
+      updateTotalItemsPacked(packedItems);
+    }, 0);
   };
   
   // Function to update the total_items_packed based on all packed items
@@ -374,7 +351,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     // Sum up all packed quantities across all warehouses and items
     Object.values(packedItemsData).forEach(warehouseItems => {
       Object.values(warehouseItems).forEach(item => {
-        total += item.packedQuantity;
+        total += item.packedQuantity || 0;
       });
     });
     
@@ -413,6 +390,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     const updatedPackedItems = {};
     Object.entries(packedItems).forEach(([warehouseId, warehouseItems]) => {
       updatedPackedItems[warehouseId] = {};
+      
       Object.entries(warehouseItems).forEach(([itemId, itemData]) => {
         updatedPackedItems[warehouseId][itemId] = {
           ...itemData,
@@ -425,9 +403,9 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
     updateTotalItemsPacked(updatedPackedItems);
   };
 
-  // Render items section
+  // Render items section with improved UI
   const renderItemsSection = () => {
-    // Group items by warehouse
+    // Organize data by warehouse
     const warehouseGroups = [];
     const warehouseMap = {};
     let totalQuantity = 0;
@@ -444,6 +422,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
         const packedQty = packedItems[warehouseId]?.[item.inventory_item_id]?.packedQuantity || 0;
         totalPackedQuantity += packedQty;
         
+        // Initialize warehouse if needed
         if (!warehouseMap[warehouseId]) {
           const group = {
             warehouseId,
@@ -455,13 +434,13 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
           warehouseMap[warehouseId] = group;
           warehouseGroups.push(group);
         }
+        
+        // Add item to the warehouse
         warehouseMap[warehouseId].items.push(item);
         warehouseMap[warehouseId].totalQuantity += parseInt(item.quantity) || 0;
         warehouseMap[warehouseId].totalPackedQuantity += packedQty;
       });
     }
-  
-    const hasMultipleWarehouses = warehouseGroups.length > 1;
   
     return (
       <div className="items-section">
@@ -490,27 +469,27 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
         )}
   
         {warehouseGroups.length > 0 ? (
-          warehouseGroups.map((group, groupIndex) => (
-            <div key={group.warehouseId} className="warehouse-group">
+          warehouseGroups.map((warehouse, warehouseIndex) => (
+            <div key={warehouse.warehouseId} className="warehouse-group">
               <h5 className="warehouse-name">
-                <FaWarehouse className="warehouse-icon" /> {group.warehouseName}
+                <FaWarehouse className="warehouse-icon" /> {warehouse.warehouseName}
                 <span className="warehouse-items-count">
-                  {group.items.length} item{group.items.length !== 1 ? 's' : ''}, 
-                  {group.totalPackedQuantity}/{group.totalQuantity} units packed
+                  {warehouse.items.length} item(s),
+                  {warehouse.totalPackedQuantity}/{warehouse.totalQuantity} units packed
                 </span>
                 
                 {!isNotEditable && (
                   <div className="warehouse-actions">
                     <button 
                       className="pack-button" 
-                      onClick={() => markAllItemsInWarehouse(group.warehouseId, true)}
+                      onClick={() => markAllItemsInWarehouse(warehouse.warehouseId, true)}
                       disabled={isNotEditable}
                     >
                       Pack All
                     </button>
                     <button 
                       className="unpack-button" 
-                      onClick={() => markAllItemsInWarehouse(group.warehouseId, false)}
+                      onClick={() => markAllItemsInWarehouse(warehouse.warehouseId, false)}
                       disabled={isNotEditable}
                     >
                       Unpack All
@@ -531,8 +510,8 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                     </tr>
                   </thead>
                   <tbody>
-                    {group.items.map((item, itemIndex) => {
-                      const warehouseId = group.warehouseId;
+                    {warehouse.items.map((item, itemIndex) => {
+                      const warehouseId = warehouse.warehouseId;
                       const itemId = item.inventory_item_id;
                       const packedQuantity = packedItems[warehouseId]?.[itemId]?.packedQuantity || 0;
                       const maxQuantity = parseInt(item.quantity) || 0;
@@ -584,7 +563,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
                   </tbody>
                 </table>
               </div>
-              {groupIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
+              {warehouseIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
             </div>
           ))
         ) : (
@@ -608,7 +587,7 @@ const EditPackingModal = ({ packingList, employees, packingTypes, onClose, onSav
       </div>
     );
   };
-  
+
   return (
     <div className="packing modal-overlay" onClick={onClose}>
       <div className="edit-packing-modal improved" onClick={e => e.stopPropagation()}>

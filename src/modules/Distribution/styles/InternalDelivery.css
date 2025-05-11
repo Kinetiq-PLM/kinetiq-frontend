@@ -451,3 +451,141 @@
     padding: 1.5rem 0.5rem;
   }
 }
+
+/* Add these styles to both CSS files */
+
+/* Filter group styling */
+.external-delivery .filters-group,
+.internal-delivery .filters-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Filter select styling */
+.external-delivery .filter-select,
+.internal-delivery .filter-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: white;
+  cursor: pointer;
+  min-width: 120px;
+  transition: all 0.2s ease;
+}
+
+.external-delivery .filter-select:focus,
+.internal-delivery .filter-select:focus {
+  outline: none;
+  border-color: #00a8a8;
+  box-shadow: 0 0 0 2px rgba(0, 168, 168, 0.1);
+}
+
+/* Icon styling */
+.external-delivery .search-icon,
+.internal-delivery .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+/* Approval button styling */
+.external-delivery .approve-button,
+.internal-delivery .approve-button {
+  background-color: #00a8a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin: 0 auto;
+}
+
+.external-delivery .approve-button:hover:not(:disabled),
+.internal-delivery .approve-button:hover:not(:disabled) {
+  background-color: #008c8c;
+}
+
+.external-delivery .approve-button:disabled,
+.internal-delivery .approve-button:disabled {
+  background-color: #b3b3b3;
+  cursor: not-allowed;
+}
+
+/* Loading spinner */
+.external-delivery .spinner-icon,
+.internal-delivery .spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+/* Approved text styling */
+.external-delivery .approved-text,
+.internal-delivery .approved-text {
+  color: #28a745;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.external-delivery .check-icon,
+.internal-delivery .check-icon {
+  color: #28a745;
+}
+
+/* Sort icon styling */
+.external-delivery .sort-icon,
+.internal-delivery .sort-icon {
+  display: inline-flex;
+  margin-left: 0.25rem;
+  color: #00a8a8;
+  vertical-align: middle;
+}
+
+/* Enhanced table styling */
+.external-delivery .delivery-table,
+.internal-delivery .delivery-table {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.external-delivery .delivery-table th,
+.internal-delivery .delivery-table th {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+}
+
+/* Enhanced responsive design */
+@media (max-width: 992px) {
+  .external-delivery .filters-row,
+  .internal-delivery .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .external-delivery .search-container,
+  .internal-delivery .search-container {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+  
+  .external-delivery .filters-group,
+  .internal-delivery .filters-group {
+    width: 100%;
+  }
+}

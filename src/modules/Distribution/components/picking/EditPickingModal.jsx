@@ -1,6 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/Picking.css';
-import { FaRegSquare, FaCheckSquare, FaWarehouse, FaBoxOpen, FaClock } from 'react-icons/fa';
+import { 
+  FaRegSquare, 
+  FaCheckSquare, 
+  FaWarehouse, 
+  FaBoxOpen, 
+  FaClock, 
+  FaFileAlt, 
+  FaBoxes,
+  FaInfoCircle,
+  FaShoppingCart,
+  FaTools,
+  FaExchangeAlt,
+  FaQuestionCircle,
+  FaSpinner,
+  FaCheckCircle,
+  FaSave,
+  FaPlay,
+  FaCheck,
+  FaUser,
+  FaClipboardList,
+  FaExclamationTriangle
+} from 'react-icons/fa';
+import PartialDeliveryInfo from './PartialDeliveryInfo';
 
 const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, warehouses, onStatusUpdate }) => {
   const [selectedEmployee, setSelectedEmployee] = useState('');
@@ -9,6 +31,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
   const [pickingItems, setPickingItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pickingProgress, setPickingProgress] = useState(0);
+  const [deliveryNotesInfo, setDeliveryNotesInfo] = useState(null);
   
   // Check if picking list is completed
   const isCompleted = pickingList?.picked_status === 'Completed';
@@ -18,9 +41,46 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     if (pickingList) {
       setSelectedEmployee(pickingList.picked_by || '');
       setModified(false); // Reset modified state when picking list changes
+      
+      // If this is a sales order, fetch delivery notes info
+      if (pickingList.delivery_type === 'sales') {
+        fetchDeliveryNotesInfo(pickingList.delivery_id);
+      } else {
+        // Reset delivery notes info for non-sales orders
+        setDeliveryNotesInfo(null);
+      }
     }
   }, [pickingList]);
   
+  // Fetch delivery notes info for sales orders
+  const fetchDeliveryNotesInfo = async (orderID) => {
+    if (!orderID) return;
+    
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/delivery-notes/order/${orderID}/`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setDeliveryNotesInfo(data);
+      } else {
+        console.error('Failed to fetch delivery notes info');
+      }
+    } catch (error) {
+      console.error('Error fetching delivery notes info:', error);
+    }
+  };
+  
+  // Add this function to get the batch display text based on delivery notes info
+  const getBatchDisplay = () => {
+    if (!deliveryNotesInfo || !deliveryNotesInfo.is_partial_delivery) return null;
+    
+    return (
+      <span className="batch-badge">
+        Batch {deliveryNotesInfo.current_delivery} of {deliveryNotesInfo.total_deliveries}
+      </span>
+    );
+  };
+
   // Fetch picking items when picking list changes
   useEffect(() => {
     if (pickingList && (pickingList.picked_status === 'In Progress' || pickingList.picked_status === 'Completed')) {
@@ -61,6 +121,20 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     }
   };
   
+  const getDisplayName = (item, field, defaultValue) => {
+    if (item && item[field] && item[field] !== 'Unknown Item' && item[field] !== 'Unknown Warehouse') {
+      return item[field];
+    }
+    
+    // For warehouse lookups, try to get from the warehouses list
+    if (field === 'warehouse_name' && item.warehouse_id) {
+      const warehouse = warehouses.find(w => w.id === item.warehouse_id);
+      if (warehouse) return warehouse.name;
+    }
+    
+    return defaultValue;
+  };
+
   // Get status action label
   const getStatusActionLabel = (currentStatus) => {
     switch (currentStatus) {
@@ -73,10 +147,10 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
   // Get status icon
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'Not Started': return '⏱️';
-      case 'In Progress': return '🔄';
-      case 'Completed': return '✅';
-      default: return '❓';
+      case 'Not Started': return <FaClock className="status-icon" />;
+      case 'In Progress': return <FaSpinner className="status-icon" />;
+      case 'Completed': return <FaCheckCircle className="status-icon" />;
+      default: return <FaQuestionCircle className="status-icon" />;
     }
   };
   
@@ -117,20 +191,20 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
   // Get delivery type icon
   const getDeliveryTypeIcon = (type) => {
     switch (type) {
-      case 'sales': return '🛒';
-      case 'service': return '🔧';
-      case 'content': return '📦';
-      case 'stock': return '🔄';
-      default: return '❓';
+      case 'sales': return <FaShoppingCart className="icon-spacing" />;
+      case 'service': return <FaTools className="icon-spacing" />;
+      case 'content': return <FaBoxOpen className="icon-spacing" />;
+      case 'stock': return <FaExchangeAlt className="icon-spacing" />;
+      default: return <FaQuestionCircle className="icon-spacing" />;
     }
   };
   
-  // Function to render items tab with warehouse grouping
+  // Function to render items tab with warehouse and delivery note grouping
   const renderItemsTab = () => {
-    // Group items by warehouse
+    // Group items by warehouse and delivery note
     const warehouseGroups = [];
     const warehouseMap = {};
-  
+    
     // Show loading indicator
     if (loading) {
       return (
@@ -140,71 +214,47 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         </div>
       );
     }
-  
-    // If status is "Not Started", show instruction message
-    if (pickingList.picked_status === 'Not Started') {
-      return (
-        <div className="items-section not-started">
-          <div className="info-message">
-            <FaClock className="info-icon" />
-            <h4>Picking Not Started Yet</h4>
-            <p>To view and pick items, please:</p>
-            <ol>
-              <li>Go to the General Info tab</li>
-              <li>Assign an employee</li>
-              <li>Click "Start Picking" button</li>
-            </ol>
-            <p>Or simply try to mark an item as picked and the system will automatically update the status.</p>
-          </div>
-        </div>
-      );
-    }
-
-    // If no employee is assigned, show a message
-    if (!selectedEmployee) {
-      return (
-        <div className="items-section no-employee">
-          <div className="warning-message">
-            <FaClock className="warning-icon" />
-            <h4>Employee Assignment Required</h4>
-            <p>Please assign an employee in the General Info tab before picking items.</p>
-          </div>
-        </div>
-      );
-    }
-  
+    
     // Use pickingItems if available, otherwise fall back to items_details
     const items = pickingItems.length > 0 ? pickingItems : 
       (pickingList?.items_details?.length ? pickingList.items_details : []);
-  
+    
     // Only process if we have items
     if (items.length) {
-      // Group items by warehouse
+      // First group by warehouse
       items.forEach(item => {
         const warehouseId = item.warehouse_id || 'unknown';
+        
         if (!warehouseMap[warehouseId]) {
           const group = {
             warehouseId,
             warehouseName: item.warehouse_name || 'Unknown Warehouse',
-            items: []
+            deliveryNotes: {}
           };
           warehouseMap[warehouseId] = group;
           warehouseGroups.push(group);
         }
-        warehouseMap[warehouseId].items.push(item);
+        
+        // Now group by delivery note within each warehouse
+        const deliveryNoteId = item.delivery_note_id || 'none';
+        
+        if (!warehouseMap[warehouseId].deliveryNotes[deliveryNoteId]) {
+          warehouseMap[warehouseId].deliveryNotes[deliveryNoteId] = {
+            deliveryNoteId,
+            items: []
+          };
+        }
+        
+        warehouseMap[warehouseId].deliveryNotes[deliveryNoteId].items.push(item);
       });
     }
-  
+    
     const hasMultipleWarehouses = warehouseGroups.length > 1;
-  
+    
     return (
       <div className="items-section">
-        <h4 className="section-title">
-          <span className="section-icon">📦</span>
-          Items to Pick ({items.length})
-        </h4>
-  
-        {/* Add progress bar */}
+        
+        {/* Progress bar remains unchanged */}
         {isCompleted ? (
           <div className="picking-progress">
             <div className="progress-bar-container">
@@ -220,64 +270,93 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
             <div className="progress-text">{pickingProgress}% completed</div>
           </div>
         )}
-  
+        
         {warehouseGroups.length > 0 ? (
-          warehouseGroups.map((group, groupIndex) => (
-            <div key={group.warehouseId} className="warehouse-group">
+          warehouseGroups.map((warehouse, warehouseIndex) => (
+            <div key={warehouse.warehouseId} className="warehouse-group">
               <h5 className="warehouse-name">
-                <FaWarehouse className="warehouse-icon" /> {group.warehouseName}
-                <span className="warehouse-progress">
-                  {group.items.filter(item => item.is_picked).length} / {group.items.length} items picked
-                </span>
+              <FaWarehouse className="warehouse-icon" /> {getDisplayName(warehouse, 'warehouseName', 'Unknown Warehouse')}
+                {Object.values(warehouse.deliveryNotes).length > 1 && (
+                  <span className="warehouse-progress">
+                    Multiple Delivery Notes ({Object.values(warehouse.deliveryNotes).length})
+                  </span>
+                )}
               </h5>
               
-              <div className="items-table-container">
-                <table className="items-table">
-                  <thead>
-                    <tr>
-                      <th>Status</th>
-                      <th>Item Name</th>
-                      <th>Quantity</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {group.items.map((item, index) => (
-                      <tr key={item.inventory_item_id || index} 
-                          className={`${index % 2 === 0 ? 'even-row' : 'odd-row'} ${item.is_picked ? 'picked-row' : ''}`}>
-                        <td>
-                          {item.is_picked ? 
-                            <span className="picked-status">Picked</span> : 
-                            <span className="not-picked-status">Not Picked</span>
-                          }
-                        </td>
-                        <td>{item.item_name || 'Unknown Item'}</td>
-                        <td className="centered-cell">{parseInt(item.quantity) || 0}</td>
-                        <td>
-                          {!isCompleted && (
-                            <button 
-                              className={`item-toggle-button ${item.is_picked ? 'unpick' : 'pick'}`}
-                              onClick={() => toggleItemPicked(item)}
-                              disabled={!selectedEmployee}
-                            >
+              {Object.values(warehouse.deliveryNotes).map((deliveryNote, dnIndex) => (
+                <div key={deliveryNote.deliveryNoteId} className="delivery-note-group">
+                  {/* Add a header for the delivery note if it exists */}
+                  {/* {deliveryNote.deliveryNoteId !== 'none' && (
+                    <div className="delivery-note-header">
+                      <FaFileAlt className="delivery-note-icon" /> 
+                      <span className="delivery-note-id">
+                        Delivery Note: {deliveryNote.deliveryNoteId}
+                      </span>
+                      <span className="item-count">
+                        ({deliveryNote.items.length} items)
+                      </span>
+                    </div>
+                  )} */}
+                  
+                  <div className="items-table-container">
+                    <table className="items-table">
+                      <thead>
+                        <tr>
+                          <th>Status</th>
+                          <th>Item Name</th>
+                          <th>Quantity</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {deliveryNote.items.map((item, index) => (
+                          <tr 
+                            key={item.inventory_item_id || index}
+                            className={`${index % 2 === 0 ? 'even-row' : 'odd-row'} ${item.is_picked ? 'picked-row' : ''}`}
+                          >
+                            <td>
                               {item.is_picked ? 
-                                <>
-                                  <FaCheckSquare /> Unpick
-                                </> : 
-                                <>
-                                  <FaRegSquare /> Mark as Picked
-                                </>
+                                <span className="picked-status">Picked</span> : 
+                                <span className="not-picked-status">Not Picked</span>
                               }
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                            </td>
+                            <td>{getDisplayName(item, 'item_name', 'Unknown Item')}</td>
+                            <td className="centered-cell">{parseInt(item.quantity) || 0}</td>
+                            <td>
+                              {!isCompleted && (
+                                <button 
+                                  className={`item-toggle-button ${item.is_picked ? 'unpick' : 'pick'}`}
+                                  onClick={() => toggleItemPicked(item)}
+                                  disabled={!selectedEmployee}
+                                >
+                                  {item.is_picked ? 
+                                    <>
+                                      <FaCheckSquare /> Unpick
+                                    </> : 
+                                    <>
+                                      <FaRegSquare /> Mark as Picked
+                                    </>
+                                  }
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Add a separator between delivery notes */}
+                  {dnIndex < Object.values(warehouse.deliveryNotes).length - 1 && (
+                    <hr className="delivery-note-divider" />
+                  )}
+                </div>
+              ))}
               
-              {groupIndex < warehouseGroups.length - 1 && <hr className="warehouse-divider" />}
+              {/* Add a separator between warehouses */}
+              {warehouseIndex < warehouseGroups.length - 1 && (
+                <hr className="warehouse-divider" />
+              )}
             </div>
           ))
         ) : (
@@ -352,19 +431,37 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
     
     try {
       setLoading(true);
+      
       // First try to get existing items
       let response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${pickingList.picking_list_id}/items/`);
       let data = await response.json();
       
       // If no items exist yet, create them
       if (!response.ok || data.length === 0) {
-        await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${pickingList.picking_list_id}/create-items/`, {
+        const createResponse = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/create-items/`, {
           method: 'POST'
         });
         
+        if (!createResponse.ok) {
+          throw new Error('Failed to create picking items');
+        }
+        
+        // Wait a moment to ensure the database has processed the creation
+        // and populated the names from related tables
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
         // Fetch again after creating
-        response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-lists/${pickingList.picking_list_id}/items/`);
+        response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/items/`);
+        
+        // Check if we received items with names
         data = await response.json();
+        
+        // If we still have missing data, fetch one more time after a delay
+        if (data.length > 0 && data.some(item => !item.item_name || !item.warehouse_name)) {
+          await new Promise(resolve => setTimeout(resolve, 700));
+          response = await fetch(`http://127.0.0.1:8000/api/picking-lists/${pickingList.picking_list_id}/items/`);
+          data = await response.json();
+        }
       }
       
       setPickingItems(data);
@@ -443,9 +540,9 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         onStatusUpdate(pickingList, 'In Progress', selectedEmployee, null);
       }
       
-      // Now update the item status
-      const response = await fetch(`https://r7d8au0l77.execute-api.ap-southeast-1.amazonaws.com/dev/api/picking-items/${item.picking_item_id}/update/`, {
-        method: 'PUT',
+      // Now update the item status - THIS IS THE MAIN FIX - METHOD NEEDS TO BE PUT
+      const response = await fetch(`http://127.0.0.1:8000/api/picking-items/${item.picking_item_id}/update/`, {
+        method: 'PUT', // CHANGED: Added method: 'PUT' here - this was missing!
         headers: {
           'Content-Type': 'application/json',
         },
@@ -454,6 +551,11 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
           picked_by: selectedEmployee,
           picked_at: !item.is_picked ? new Date().toISOString() : null,
           quantity_picked: !item.is_picked ? item.quantity : 0,
+          // ADDED: Include these fields to preserve them
+          item_name: item.item_name,
+          warehouse_name: item.warehouse_name,
+          warehouse_id: item.warehouse_id,
+          item_no: item.item_no,
         }),
       });
       
@@ -500,9 +602,17 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
         <div className="modal-body">
           {/* Status indicator */}
           <div className={`status-indicator status-${pickingList.picked_status?.toLowerCase().replace(' ', '-')}`}>
-            <span className="status-icon">{getStatusIcon(pickingList.picked_status)}</span>
+            {getStatusIcon(pickingList.picked_status)}
             <span className="status-text">{pickingList.picked_status}</span>
           </div>
+
+          {/* Show partial delivery info if this is a partial delivery */}
+          {deliveryNotesInfo && deliveryNotesInfo.is_partial_delivery && (
+            <PartialDeliveryInfo 
+              pickingList={pickingList} 
+              deliveryNotesInfo={deliveryNotesInfo} 
+            />
+          )}
 
           {/* Tab Navigation */}
           <div className="modal-tabs">
@@ -510,14 +620,14 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
               className={`tab-button ${activeTab === 'general' ? 'active' : ''}`}
               onClick={() => setActiveTab('general')}
             >
-              <span className="tab-icon">ℹ️</span>
+              <FaInfoCircle className="tab-icon" />
               General Info
             </button>
             <button 
               className={`tab-button ${activeTab === 'items' ? 'active' : ''}`}
               onClick={() => setActiveTab('items')}
             >
-              <span className="tab-icon">📦</span>
+              <FaBoxes className="tab-icon" />
               Items ({pickingList.items_details?.length || 0})
             </button>
           </div>
@@ -527,13 +637,12 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
             <>
               {/* Main information panel */}
               <div className="info-panel">
-                <h4 className="section-title">General Information</h4>
                 <div className="picking-details enhanced">
                   <div className="detail-row">
                     <div className="detail-item">
                       <span className="detail-label">Delivery Type</span>
                       <span className="detail-value">
-                        <span className="icon">{getDeliveryTypeIcon(pickingList.delivery_type)}</span>
+                        {getDeliveryTypeIcon(pickingList.delivery_type)}
                         {pickingList.is_external ? 'External' : 'Internal'} - 
                         {getDeliveryTypeDisplay(pickingList.delivery_type)}
                       </span>
@@ -562,7 +671,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
                 {/* Employee Assignment Section */}
                 <div className="edit-section">
                   <h4 className="section-title">
-                    <span className="section-icon">👤</span>
+                    <FaUser className="section-icon" />
                     Assign Employee
                     {!isCompleted && <span className="required-indicator">*</span>}
                   </h4>
@@ -599,7 +708,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
                 {/* Warehouse Section - Display Only */}
                 <div className="edit-section">
                   <h4 className="section-title">
-                    <span className="section-icon">🏢</span>
+                    <FaWarehouse className="section-icon" />
                     Warehouse
                   </h4>
                   
@@ -627,7 +736,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
               {!isCompleted && (
                 <div className="edit-section status-workflow-section">
                   <h4 className="section-title">
-                    <span className="section-icon">📋</span>
+                    <FaClipboardList className="section-icon" />
                     Workflow Actions
                   </h4>
                   
@@ -661,7 +770,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
                         disabled={isStatusUpdateDisabled()}
                       >
                         <span className="button-icon">
-                          {pickingList.picked_status === 'Not Started' ? '▶' : '✓'}
+                          {pickingList.picked_status === 'Not Started' ? <FaPlay /> : <FaCheck />}
                         </span>
                         {getStatusActionLabel(pickingList.picked_status)}
                       </button>
@@ -680,7 +789,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
               {isCompleted && (
                 <div className="completed-section">
                   <div className="completed-message">
-                    <span className="completed-icon">✅</span>
+                    <FaCheckCircle className="completed-icon" />
                     This picking list was completed on {formatDate(pickingList.picked_date)}
                   </div>
                 </div>
@@ -702,7 +811,7 @@ const EditPickingModal = ({ show, onClose, pickingList, onSave, employees, wareh
               onClick={handleSave}
               disabled={!modified || isCompleted}
             >
-              <span className="button-icon">💾</span>
+              <FaSave className="button-icon" />
               Save Changes
             </button>
           )}
