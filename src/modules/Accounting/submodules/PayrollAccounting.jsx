@@ -11,6 +11,7 @@ const PayrollAccounting = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [searchPayroll, setSearchPayroll] = useState("");
   const [searchAccounting, setSearchAccounting] = useState("");
+  const [activeTab, setActiveTab] = useState("accounting"); // Default to accounting tab
 
   const [isLoading, setIsLoading] = useState(true);
   const [validation, setValidation] = useState({
@@ -499,12 +500,12 @@ const PayrollAccounting = () => {
     }
   };
 
-  const filteredData = payrollAccountingData.filter((row) =>
+  const filteredAccountingData = payrollAccountingData.filter((row) =>
     [row[0], row[1], row[2], row[3], row[4], row[5]]
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searchPayroll.toLowerCase().trim())
+      .includes(searchAccounting.toLowerCase().trim())
   );
 
   const filteredPayrollData = payrollData.filter((row) =>
@@ -512,7 +513,7 @@ const PayrollAccounting = () => {
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
-      .includes(searchAccounting.toLowerCase().trim())
+      .includes(searchPayroll.toLowerCase().trim())
   );
 
   const LoadingSpinner = () => (
@@ -526,62 +527,92 @@ const PayrollAccounting = () => {
     <div className="accountsPayable">
       <div className="body-content-container">
         <div className="title-subtitle-container">
-          <h1 className="subModule-title">Payroll Accounting</h1>
+          <h1 className="subModule-title">Payroll Management</h1>
         </div>
 
-        <div className="parent-component-container">
-          <div className="component-container">
-            <Search
-              type="text"
-              placeholder="Search Record..."
-              value={searchPayroll}
-              onChange={(e) => setSearchPayroll(e.target.value)}
-            />
+        {/* Tab Navigation */}
+        <div className="tabs-container mb-4">
+          <div className="flex border-b w-fit">
+            <button
+              className={`py-2 px-6 mr-2 font-medium text-sm focus:outline-none cursor-pointer ${
+                activeTab === "accounting"
+                  ? "border-b-2 border-teal-500 text-teal-500"
+                  : "text-black hover:text-teal-500"
+              }`}
+              onClick={() => setActiveTab("accounting")}
+            >
+              Payroll Accounting
+            </button>
+            <button
+              className={`py-2 px-6 mr-2 font-medium text-sm focus:outline-none cursor-pointer ${
+                activeTab === "payroll"
+                  ? "border-b-2 border-teal-500 text-teal-600"
+                  : "text-black hover:text-teal-500"
+              }`}
+              onClick={() => setActiveTab("payroll")}
+            >
+              Payroll Details
+            </button>
           </div>
         </div>
 
-        <div className="title-subtitle-container">
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <Table
-              columns={payrollAccounting_columns}
-              data={filteredData}
-              handleEditRow={handleOpenModal}
-              showEditButton={true}
-            />
-          )}
-        </div>
+        {/* Accounting Tab Content */}
+        {activeTab === "accounting" && (
+          <>
+            <div className="parent-component-container">
+              <div className="component-container">
+                <Search
+                  type="text"
+                  placeholder="Search Accounting Record..."
+                  value={searchAccounting}
+                  onChange={(e) => setSearchAccounting(e.target.value)}
+                />
+              </div>
+            </div>
 
-        <div className="my-20"></div>
+            <div className="title-subtitle-container">
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <Table
+                  columns={payrollAccounting_columns}
+                  data={filteredAccountingData}
+                  handleEditRow={handleOpenModal}
+                  showEditButton={true}
+                />
+              )}
+            </div>
+          </>
+        )}
 
-        <div className="title-subtitle-container">
-          <h1 className="subModule-title">Payroll</h1>
-        </div>
+        {/* Payroll Tab Content */}
+        {activeTab === "payroll" && (
+          <>
+            <div className="parent-component-container">
+              <div className="component-container">
+                <Search
+                  type="text"
+                  placeholder="Search Payroll Record..."
+                  value={searchPayroll}
+                  onChange={(e) => setSearchPayroll(e.target.value)}
+                />
+              </div>
+            </div>
 
-        <div className="parent-component-container">
-          <div className="component-container">
-            <Search
-              type="text"
-              placeholder="Search Record..."
-              value={searchAccounting}
-              onChange={(e) => setSearchAccounting(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="title-subtitle-container">
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <Table
-              columns={payroll_columns}
-              data={filteredPayrollData}
-              showPrintButton={true}
-              handlePrintRow={handlePrintRow}
-            />
-          )}
-        </div>
+            <div className="title-subtitle-container">
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <Table
+                  columns={payroll_columns}
+                  data={filteredPayrollData}
+                  showPrintButton={true}
+                  handlePrintRow={handlePrintRow}
+                />
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {modalOpen && (
