@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../ModalInput.css";
 import Button from "../button/Button";
-import Dropdown from "../dropdown/Dropdown";
-import Search from "../search/Search";
 import NotifModal from "../modalNotif/NotifModal";
 import axios from "axios";
+import "./AddAccountModal.css";
 
 const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
   const [allAccounts, setAllAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAccount, setSelectedAccount] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const inputRef = useRef(null);
+  const dropdownRef = useRef(null);
   const [validation, setValidation] = useState({
     isOpen: false,
     type: "warning",
@@ -43,11 +45,54 @@ const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
     fetchAccounts();
   }, [isModalOpen]);
 
+  // Filter accounts based on search term
   const filteredAccounts = allAccounts.filter((a) =>
     `${a.account_name} ${a.gl_account_id}`
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   );
+
+  // Handle clicks outside the dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target) &&
+        inputRef.current && 
+        !inputRef.current.contains(event.target)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleInputChange = (e) => {
+    setSearchTerm(e.target.value);
+    setIsDropdownOpen(true);
+    
+    // If exact match found, select it
+    const exactMatch = allAccounts.find(
+      (a) => `${a.account_name} (ID: ${a.gl_account_id})` === e.target.value
+    );
+    
+    if (exactMatch) {
+      setSelectedAccount(exactMatch);
+    } else {
+      setSelectedAccount(null);
+    }
+  };
+
+  const handleAccountSelect = (account) => {
+    setSelectedAccount(account);
+    setSearchTerm(`${account.account_name} (ID: ${account.gl_account_id})`);
+    setIsDropdownOpen(false);
+    inputRef.current.focus();
+  };
 
   const onAddAccount = () => {
     if (!selectedAccount) {
@@ -69,7 +114,6 @@ const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
     handleSubmit(accountData);  
     setTimeout(() => closeModal(), 100);
   };
-  
 
   if (!isModalOpen) return null;
 
@@ -88,37 +132,49 @@ const AddAccountModal = ({ isModalOpen, closeModal, handleSubmit }) => {
           </div>
 
           <div className="modal-body mt-4">
-            <Search
-              type="text"
-              placeholder="Search name or ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-
-            <div className="mt-3">
-              <Dropdown
-                options={filteredAccounts.map(
-                  (a) => `${a.account_name} (ID: ${a.gl_account_id})`
+            <div className="account-search-container">
+              <label htmlFor="account-search">Search accounts</label>
+              <div className="relative">
+                <input
+                  id="account-search"
+                  ref={inputRef}
+                  type="text"
+                  className="account-search-input"
+                  placeholder="Search by name or ID..."
+                  value={searchTerm}
+                  onChange={handleInputChange}
+                  onFocus={() => setIsDropdownOpen(true)}
+                  autoComplete="off"
+                />
+                {isDropdownOpen && filteredAccounts.length > 0 && (
+                  <div ref={dropdownRef} className="account-dropdown scrollable">
+                    {filteredAccounts.map((account) => (
+                      <div
+                        key={account.gl_account_id}
+                        className={`account-item ${
+                          selectedAccount?.gl_account_id === account.gl_account_id ? "selected" : ""
+                        }`}
+                        onClick={() => handleAccountSelect(account)}
+                      >
+                        <div className="account-name">{account.account_name}</div>
+                        <div className="account-id">ID: {account.gl_account_id}</div>
+                      </div>
+                    ))}
+                  </div>
                 )}
-                style="selection"
-                defaultOption="Select Account..."
-                value={
-                  selectedAccount
-                    ? `${selectedAccount.account_name} (ID: ${selectedAccount.gl_account_id})`
-                    : ""
-                }
-                onChange={(label) => {
-                  const matched = allAccounts.find(
-                    (a) => `${a.account_name} (ID: ${a.gl_account_id})` === label
-                  );
-                  setSelectedAccount(matched || null);
-                }}
-              />
+              </div>
             </div>
 
             {selectedAccount && (
-              <div className="mt-4 text-sm text-gray-600">
-                <strong>GL Account ID:</strong> {selectedAccount.gl_account_id}
+              <div className="mt-4 selected-account-details">
+                <div className="detail-row">
+                  <span className="detail-label">GL Account ID:</span>
+                  <span className="detail-value">{selectedAccount.gl_account_id}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Account Code:</span>
+                  <span className="detail-value">{selectedAccount.account_code || "N/A"}</span>
+                </div>
               </div>
             )}
           </div>

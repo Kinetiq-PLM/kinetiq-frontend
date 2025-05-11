@@ -1,0 +1,184 @@
+.account-search-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.account-search-container label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.account-search-input {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: white;
+  border: 1px solid #cbd5e0;
+  font-size: 14px;
+  color: #1a202c;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.account-search-input:hover {
+  border-color: #a0aec0;
+}
+
+.account-search-input:focus {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+}
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 50;
+}
+
+.account-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
+}
+
+.account-item:last-child {
+  border-bottom: none;
+}
+
+.account-item:hover {
+  background-color: #f8fafc;
+}
+
+.account-item.selected {
+  background-color: #e6f7ff;
+}
+
+.account-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.account-id {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.no-results, .more-results {
+  padding: 12px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.selected-account-details {
+  background-color: #f8fafc;
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 6px;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 13px;
+  color: #334155;
+  font-weight: 400;
+}
+
+/* ─────────── Responsive Design ─────────── */
+
+/* Mobile (small) ≤ 480px */
+@media (max-width: 480px) {
+  .account-search-container label {
+    font-size: 11px;
+  }
+  
+  .account-search-input {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+  
+  .account-item {
+    padding: 8px 10px;
+  }
+  
+  .account-name {
+    font-size: 13px;
+  }
+  
+  .account-id {
+    font-size: 11px;
+  }
+  
+  .selected-account-details {
+    padding: 10px;
+  }
+  
+  .detail-label, .detail-value {
+    font-size: 12px;
+  }
+}
+
+/* Mobile (large) ≤ 768px */
+@media (max-width: 768px) {
+  .account-dropdown {
+    max-height: 240px;
+  }
+}
+
+/* Scrollbar Styling for WebKit Browsers */
+.account-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.account-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.account-dropdown::-webkit-scrollbar-thumb {
+  background-color: #3182ce; /* blue */
+  border-radius: 6px;
+  border: 2px solid #f1f1f1; /* Optional: creates padding effect */
+}
+
+.account-dropdown::-webkit-scrollbar-thumb:hover {
+  background-color: #2b6cb0; /* darker blue on hover */
+}
+
+/* Scrollbar Styling for Firefox */
+.account-dropdown {
+  scrollbar-width: thin;
+  scrollbar-color: #3182ce #f1f1f1;
+}
