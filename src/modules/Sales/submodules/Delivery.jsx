@@ -68,7 +68,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
 
   const [isOrderListOpen, setIsOrderListOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(true);
   // columns for table
   const columns = [
     { key: "product_id", label: "Product ID", editable: false },
@@ -440,6 +440,7 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
         ) {
           setIsProcessor(true);
         }
+        setIsLoading(false);
       } catch (err) {
         showAlert({
           type: "error",
@@ -552,18 +553,20 @@ const Delivery = ({ loadSubModule, setActiveSubModule, employee_id }) => {
             </div>
 
             {/* Employee ID Input */}
-            <div className="flex mb-2 w-full mt-4 gap-4 items-center">
-              <p className="">Sales Rep ID</p>
-              <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
-                <p className="text-sm">
-                  {selectedEmployee
-                    ? selectedEmployee.employee_id
-                    : employee_id}
-                </p>
+            {!isLoading && (
+              <div className="flex mb-2 w-full mt-4 gap-4 items-center">
+                <p className="">Sales Rep ID</p>
+                <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
+                  <p className="text-sm">
+                    {selectedEmployee
+                      ? selectedEmployee.employee_id
+                      : employee_id}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
-            {isProcessor && (
+            {!isLoading && isProcessor && (
               <div className="flex mb-2 w-full mt-4 gap-4 items-center">
                 <p className="">Processor ID</p>
                 <div className="border border-[#9a9a9a] flex-1 p-1 flex transition-all duration-300 justify-between transform items-center h-[30px] rounded truncate">
