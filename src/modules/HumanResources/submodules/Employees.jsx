@@ -3603,22 +3603,7 @@ const handleResignationUploadSubmit = async (e) => {
               </div>
               
               <div className="form-column">
-                <div className="form-group">
-                  <label>Approval Status *</label>
-                  <select
-                    name="approval_status"
-                    value={editingResignation.approval_status || "Pending"}
-                    onChange={(e) => setEditingResignation({
-                      ...editingResignation,
-                      approval_status: e.target.value
-                    })}
-                    required
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    
-                  </select>
-                </div>
+
                 
                 <div className="form-group">
                   <label>Clearance Status *</label>
