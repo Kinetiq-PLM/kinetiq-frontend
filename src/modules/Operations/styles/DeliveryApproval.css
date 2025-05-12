@@ -421,6 +421,13 @@
     margin-left: 0;
   }
   
+  /* Align labels with textboxes in tablet view */
+  .deliveryApproval .form-group label {
+    padding-left: 0;
+    display: block;
+    width: 100%;
+  }
+  
 
   .deliveryApproval .form-group.approval-date,
   .deliveryApproval .form-group select[value='Pending'],
@@ -446,10 +453,10 @@
     padding: 1rem;
   }
   
-  /* Specific adjustment for Approved By field - slightly wider */
+  /* Specific adjustment for Approved By field */
   .deliveryApproval .form-group:last-child span {
     width: 100%;
-    max-width: 290px;
+    max-width: 195px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -506,6 +513,12 @@
     flex: 1 1 45%; 
     margin-bottom: 8px;
     min-width: 120px; 
+  }
+  
+  .deliveryApproval .form-group label {
+    padding-left: 0;
+    margin-bottom: 3px;
+    font-size: 0.85rem;
   }
   
   
