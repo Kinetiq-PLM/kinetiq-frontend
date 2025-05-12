@@ -291,7 +291,7 @@ const ApprovalTable = ({employee_id}) => {
                 ) : (
                   <>
                     <th className="reworkTH"></th>
-                    <th className="reworkTH">Request ID</th>
+                    <th className="reworkTH">Rework ID</th>
                     <th className="reworkTH">Product Name</th>
                     <th className="reworkTH">Reason for Rework</th>
                     <th className="reworkTH">Actual Quantity</th>
