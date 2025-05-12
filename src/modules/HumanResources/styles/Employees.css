@@ -380,20 +380,20 @@
 
 .hr-tag.not-started {
   background-color: #fff3cd;
-  color: #664d03;
-  border: 1px solid #4d3a02; /* Darker shade of the text color */
+  color: #766021;
+  border: 1px solid #ab8718; /* Darker shade of the text color */
 }
 
 .hr-tag.in-progress {
   background-color: #cfe2ff;
-  color: #084298;
-  border: 1px solid #063375; /* Darker shade of the text color */
+  color: #1d519e;
+  border: 1px solid #175ac5; /* Darker shade of the text color */
 }
 
 .hr-tag.completed {
   background-color: #d1e7dd;
-  color: #0f5132;
-  border: 1px solid #0a3b25; /* Darker shade of the text color */
+  color: #147045;
+  border: 1px solid #1bb16d; /* Darker shade of the text color */
 }
 
 /* Clearance Status Pills for Resignation */
