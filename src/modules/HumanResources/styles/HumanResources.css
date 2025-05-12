@@ -1209,6 +1209,56 @@
   transition: opacity 0.3s ease;
 }
 
+/* Enhanced scrollbar styling for report containers */
+.hr-report-container {
+  scrollbar-width: thin;
+  scrollbar-color: #00a8a8 rgba(0, 0, 0, 0.05);
+}
+
+.hr-report-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-report-container::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+  border-radius: 4px;
+}
+
+.hr-report-container::-webkit-scrollbar-thumb:hover {
+  background-color: #008080;
+}
+
+.hr-report-container::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+/* Department and superiors lists scrollbar styling */
+.hr-report-chart-full div[style*="overflowY: auto"] {
+  scrollbar-width: thin;
+  scrollbar-color: #00a8a8 rgba(0, 0, 0, 0.05);
+}
+
+.hr-report-chart-full div[style*="overflowY: auto"]::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hr-report-chart-full div[style*="overflowY: auto"]::-webkit-scrollbar-thumb {
+  background-color: #00a8a8;
+  border-radius: 4px;
+}
+
+.hr-report-chart-full div[style*="overflowY: auto"]::-webkit-scrollbar-thumb:hover {
+  background-color: #008080;
+}
+
+.hr-report-chart-full div[style*="overflowY: auto"]::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 1400px) {
   .hr-metrics-grid {
