@@ -346,9 +346,7 @@
   height: 32px;
   display: flex;
   align-items: center;
-  margin-left: 0; /* Remove left margin */
-  position: relative;
-  left: 15px; /* Adjust position to align with other elements */
+  margin-left: 15px;
   font-size: 13px;
 }
 
@@ -422,7 +420,17 @@
     max-width: 100%;
     margin-left: 0;
   }
-    .deliveryApproval .form-group.spacer {
+  
+
+  .deliveryApproval .form-group.approval-date,
+  .deliveryApproval .form-group select[value='Pending'],
+  .deliveryApproval .form-group select[value='Approved'] {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .deliveryApproval .form-group.spacer {
     display: none;
   }
 
@@ -438,10 +446,10 @@
     padding: 1rem;
   }
   
-  /* Specific adjustment for Approved By field */
+  /* Specific adjustment for Approved By field - slightly wider */
   .deliveryApproval .form-group:last-child span {
     width: 100%;
-    max-width: 250px;
+    max-width: 290px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
