@@ -4,12 +4,15 @@ import "../styles/Reports.css";
 import GenerateReports from "./GenerateReports";
 import ProjectForms from "./ProjectForms";
 
+// Configure axios defaults
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
-axios.defaults.baseURL = 'https://c95i46nr4l.execute-api.ap-southeast-1.amazonaws.com/dev';
+// Use import.meta.env for Vite environment variables
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5174';
+axios.defaults.baseURL = API_BASE_URL;
 
-
+// Add axios interceptor for better error handling
 axios.interceptors.response.use(
   response => response,
   error => {
@@ -17,6 +20,74 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Mock data for fallback when API is unavailable
+const MOCK_REPORT_TYPES = [
+  'Sales Order',
+  'Resource Availability',
+  'Bill of Material',
+  'Information',
+  'Progress Report',
+  'Project Details',
+  'Inventory Movement',
+];
+
+const MOCK_DEPARTMENTS = [
+  'Accounting',
+  'Admin',
+  'Distribution',
+  'Finance',
+  'Human Resources',
+  'Inventory',
+  'Management',
+  'MRP',
+  'Operations',
+  'Production',
+  'Project Management',
+  'Purchasing',
+  'Sales',
+  'Services',
+  'Solution Customizing',
+  'Department - IT Team',
+  'Department - Project Management',
+];
+
+const MOCK_EXTERNAL_PROJECTS = [
+  { project_id: 'EXT001', project_status: 'Active' },
+  { project_id: 'EXT002', project_status: 'Completed' },
+  { project_id: 'EXT003', project_status: 'On Hold' },
+];
+
+const MOCK_INTERNAL_PROJECTS = [
+  { intrnl_project_id: 'INT001', intrnl_project_status: 'Active' },
+  { intrnl_project_id: 'INT002', intrnl_project_status: 'Completed' },
+  { intrnl_project_id: 'INT003', intrnl_project_status: 'Planning' },
+];
+
+const MOCK_REPORTS = [
+  {
+    report_monitoring_id: 1,
+    project_id: 'EXT001',
+    intrnl_project_id: null,
+    report_type: 'Progress Report',
+    report_title: 'Q1 Progress Update',
+    received_from: 'Project Management',
+    date_created: '2023-03-15',
+    assigned_to: 'Management',
+    description: 'Quarterly progress report for project EXT001'
+  },
+  {
+    report_monitoring_id: 2,
+    project_id: null,
+    intrnl_project_id: 'INT002',
+    report_type: 'Inventory Movement',
+    report_title: 'Monthly Inventory Report',
+    received_from: 'Inventory',
+    date_created: '2023-04-01',
+    assigned_to: 'Operations',
+    description: 'Monthly inventory movement analysis'
+  }
+];
 
 const BodyContent = () => {
   const [showProjectForms, setShowProjectForms] = useState(false);
@@ -34,13 +105,12 @@ const BodyContent = () => {
   const [reportData, setReportData] = useState([]);
   const [selectedReports, setSelectedReports] = useState([]);
   
-  
   const [showGenerateReports, setShowGenerateReports] = useState(false);
   
-  const [reportTypes, setReportTypes] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [externalProjects, setExternalProjects] = useState([]);
-  const [internalProjects, setInternalProjects] = useState([]);
+  const [reportTypes, setReportTypes] = useState(MOCK_REPORT_TYPES);
+  const [departments, setDepartments] = useState(MOCK_DEPARTMENTS);
+  const [externalProjects, setExternalProjects] = useState(MOCK_EXTERNAL_PROJECTS);
+  const [internalProjects, setInternalProjects] = useState(MOCK_INTERNAL_PROJECTS);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -51,6 +121,7 @@ const BodyContent = () => {
     externalProjects: false,
     internalProjects: false
   });
+  const [offlineMode, setOfflineMode] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +138,7 @@ const BodyContent = () => {
         
         console.log("Fetching data from API...");
         
+        // Fetch reports with fallback
         try {
           const reportsResponse = await axios.get('/api/reports/');
           console.log('Reports response:', reportsResponse.data);
@@ -75,70 +147,56 @@ const BodyContent = () => {
         } catch (err) {
           console.error('Error fetching reports:', err);
           setApiErrors(prev => ({ ...prev, reports: true }));
+          setReportData(MOCK_REPORTS);
+          setOfflineMode(true);
         }
         
+        // Fetch report types with fallback
         try {
           const typesResponse = await axios.get('/api/reports/report_types/');
           console.log('Report types response:', typesResponse.data);
-          setReportTypes(typesResponse.data || []);
+          setReportTypes(typesResponse.data || MOCK_REPORT_TYPES);
         } catch (err) {
           console.error('Error fetching report types:', err);
           setApiErrors(prev => ({ ...prev, reportTypes: true }));
-          setReportTypes([
-            'Sales Order',
-            'Resource Availability',
-            'Bill of Material',
-            'Information',
-            'Progress Report',
-            'Project Details',
-            'Inventory Movement',
-          ]);
+          // Already set to MOCK_REPORT_TYPES in state initialization
+          setOfflineMode(true);
         }
         
+        // Fetch departments with fallback
         try {
           const deptsResponse = await axios.get('/api/reports/departments/');
           console.log('Departments response:', deptsResponse.data);
-          setDepartments(deptsResponse.data || []);
+          setDepartments(deptsResponse.data || MOCK_DEPARTMENTS);
         } catch (err) {
           console.error('Error fetching departments:', err);
           setApiErrors(prev => ({ ...prev, departments: true }));
-          setDepartments([
-            'Accounting',
-            'Admin',
-            'Distribution',
-            'Finance',
-            'Human Resources',
-            'Inventory',
-            'Management',
-            'MRP',
-            'Operations',
-            'Production',
-            'Project Management',
-            'Purchasing',
-            'Sales',
-            'Services',
-            'Solution Customizing',
-            'Department - IT Team',
-            'Department - Project Management',
-          ]);
+          // Already set to MOCK_DEPARTMENTS in state initialization
+          setOfflineMode(true);
         }
         
+        // Fetch external projects with fallback
         try {
           const externalProjectsResponse = await axios.get('/api/external-projects/');
           console.log('External projects response:', externalProjectsResponse.data);
-          setExternalProjects(externalProjectsResponse.data || []);
+          setExternalProjects(externalProjectsResponse.data || MOCK_EXTERNAL_PROJECTS);
         } catch (err) {
           console.error('Error fetching external projects:', err);
           setApiErrors(prev => ({ ...prev, externalProjects: true }));
+          // Already set to MOCK_EXTERNAL_PROJECTS in state initialization
+          setOfflineMode(true);
         }
         
+        // Fetch internal projects with fallback
         try {
           const internalProjectsResponse = await axios.get('/api/internal-projects/');
           console.log('Internal projects response:', internalProjectsResponse.data);
-          setInternalProjects(internalProjectsResponse.data || []);
+          setInternalProjects(internalProjectsResponse.data || MOCK_INTERNAL_PROJECTS);
         } catch (err) {
           console.error('Error fetching internal projects:', err);
           setApiErrors(prev => ({ ...prev, internalProjects: true }));
+          // Already set to MOCK_INTERNAL_PROJECTS in state initialization
+          setOfflineMode(true);
         }
         
         setLoading(false);
@@ -146,6 +204,7 @@ const BodyContent = () => {
         console.error('API Error:', err);
         setError('Error fetching data: ' + (err.response?.data?.error || err.message));
         setLoading(false);
+        setOfflineMode(true);
       }
     };
     
@@ -172,15 +231,35 @@ const BodyContent = () => {
       
       console.log("Submitting report data:", reportData);
       
-      const response = await axios.post('/api/reports/', reportData);
-      console.log('Create report response:', response.data);
-      
-      try {
-        const reportsResponse = await axios.get('/api/reports/');
-        setReportData(Array.isArray(reportsResponse.data) ? 
-          reportsResponse.data : reportsResponse.data.results || []);
-      } catch (err) {
-        console.error('Error refreshing reports:', err);
+      if (offlineMode) {
+        // In offline mode, just add to local state with a mock ID
+        const newReport = {
+          ...reportData,
+          report_monitoring_id: Date.now() // Use timestamp as a temporary ID
+        };
+        
+        setReportData(prevReports => [...prevReports, newReport]);
+        console.log('Added report in offline mode:', newReport);
+      } else {
+        // Online mode - send to API
+        try {
+          const response = await axios.post('/api/reports/', reportData);
+          console.log('Create report response:', response.data);
+          
+          // Refresh reports list
+          const reportsResponse = await axios.get('/api/reports/');
+          setReportData(Array.isArray(reportsResponse.data) ? 
+            reportsResponse.data : reportsResponse.data.results || []);
+        } catch (err) {
+          console.error('API Error:', err);
+          // Fall back to offline mode if API call fails
+          const newReport = {
+            ...reportData,
+            report_monitoring_id: Date.now()
+          };
+          setReportData(prevReports => [...prevReports, newReport]);
+          setOfflineMode(true);
+        }
       }
       
       setShowReportList(true);
@@ -211,14 +290,12 @@ const BodyContent = () => {
     setCurrentForm(1);
   };
 
-  
   const handleShowGenerateReports = () => {
     setShowReportList(false);
     setCurrentForm(null);
     setShowGenerateReports(true);
   };
 
-  
   const handleBackFromGenerateReports = () => {
     setShowGenerateReports(false);
     setShowReportList(true);
@@ -231,18 +308,30 @@ const BodyContent = () => {
       setLoading(true);
       setError(null);
       
-      for (const index of selectedReports) {
-        const reportId = reportData[index].report_monitoring_id;
-        console.log(`Deleting report with ID: ${reportId}`);
-        await axios.delete(`/api/reports/${reportId}/`);
-      }
-      
-      try {
-        const reportsResponse = await axios.get('/api/reports/');
-        setReportData(Array.isArray(reportsResponse.data) ? 
-          reportsResponse.data : reportsResponse.data.results || []);
-      } catch (err) {
-        console.error('Error refreshing reports after deletion:', err);
+      if (offlineMode) {
+        // In offline mode, just remove from local state
+        const newReportData = reportData.filter((_, index) => !selectedReports.includes(index));
+        setReportData(newReportData);
+      } else {
+        // Online mode - send delete requests to API
+        try {
+          for (const index of selectedReports) {
+            const reportId = reportData[index].report_monitoring_id;
+            console.log(`Deleting report with ID: ${reportId}`);
+            await axios.delete(`/api/reports/${reportId}/`);
+          }
+          
+          // Refresh reports list
+          const reportsResponse = await axios.get('/api/reports/');
+          setReportData(Array.isArray(reportsResponse.data) ? 
+            reportsResponse.data : reportsResponse.data.results || []);
+        } catch (err) {
+          console.error('API Error:', err);
+          // Fall back to offline mode if API call fails
+          const newReportData = reportData.filter((_, index) => !selectedReports.includes(index));
+          setReportData(newReportData);
+          setOfflineMode(true);
+        }
       }
       
       setSelectedReports([]);
@@ -289,8 +378,8 @@ const BodyContent = () => {
     setShowReportList(true);
   };
   
-
-  if (loading && (!reportTypes.length && !departments.length)) {
+  // Only show loading screen briefly when first loading
+  if (loading && reportData.length === 0 && currentForm === 1) {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
@@ -301,7 +390,6 @@ const BodyContent = () => {
   
   const hasApiErrors = Object.values(apiErrors).some(val => val);
   
-  
   return (
     <div className="body-content-container">
       {error && (
@@ -311,7 +399,14 @@ const BodyContent = () => {
         </div>
       )}
       
-      {hasApiErrors && (
+      {offlineMode && (
+        <div className="warning-banner">
+          <p>Running in offline mode. Changes will not be saved to the server.</p>
+          <button className="reload-btn" onClick={() => window.location.reload()}>Try Reconnecting</button>
+        </div>
+      )}
+      
+      {hasApiErrors && !offlineMode && (
         <div className="warning-banner">
           <p>Some data could not be loaded. The form may have limited functionality.</p>
           <button className="reload-btn" onClick={() => window.location.reload()}>Reload Page</button>
@@ -324,7 +419,7 @@ const BodyContent = () => {
             <span className="back-arrow">←</span> Back to Report List
           </button>
           <div className="project-forms-content">
-            <ProjectForms />
+            <ProjectForms offlineMode={offlineMode} />
           </div>
         </div>
       ) : showGenerateReports ? (
@@ -338,6 +433,7 @@ const BodyContent = () => {
               reportTypes={reportTypes}
               externalProjects={externalProjects}
               internalProjects={internalProjects}
+              offlineMode={offlineMode}
             />
           </div>
         </div>
@@ -362,7 +458,7 @@ const BodyContent = () => {
                         className="form-select"
                         value={newProjectID}
                         onChange={handleExternalProjectChange}
-                        disabled={loading || newInternalprojectid !== "" || apiErrors.externalProjects}
+                        disabled={loading || newInternalprojectid !== ""}
                       >
                         <option value="">Select Project ID</option>
                         {externalProjects.map((project) => (
@@ -371,9 +467,6 @@ const BodyContent = () => {
                           </option>
                         ))}
                       </select>
-                      {apiErrors.externalProjects && (
-                        <div className="field-error">External projects could not be loaded</div>
-                      )}
                     </div>
 
                     <div className="form-group">
@@ -382,7 +475,7 @@ const BodyContent = () => {
                         className="form-select"
                         value={newInternalprojectid}
                         onChange={handleInternalProjectChange}
-                        disabled={loading || newProjectID !== "" || apiErrors.internalProjects}
+                        disabled={loading || newProjectID !== ""}
                       >
                         <option value="">Select Internal Project ID</option>
                         {internalProjects.map((project) => (
@@ -391,9 +484,6 @@ const BodyContent = () => {
                           </option>
                         ))}
                       </select>
-                      {apiErrors.internalProjects && (
-                        <div className="field-error">Internal projects could not be loaded</div>
-                      )}
                     </div>
 
                     <div className="form-group">
@@ -595,7 +685,11 @@ const BodyContent = () => {
                     ) : (
                       <tr>
                         <td colSpan="9" className="no-data-message">
-                          {apiErrors.reports ? "Could not load reports" : "No reports found"}
+                          {offlineMode 
+                            ? "No reports available in offline mode" 
+                            : apiErrors.reports 
+                              ? "Could not load reports" 
+                              : "No reports found"}
                         </td>
                       </tr>
                     )}

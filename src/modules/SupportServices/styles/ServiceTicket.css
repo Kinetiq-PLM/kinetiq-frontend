@@ -58,9 +58,8 @@
 .servtick .filter-submit-container {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   padding: 0 0.25rem;
 }
 
@@ -333,10 +332,10 @@
 }
 
 .servtick .modal-form textarea {
-  height: 5.5rem;
+  height: 5.5rem !important;
 }
 .servtick .form-row .form-group.desc textarea {
-  height: 8.5rem;
+  height: 8.5rem !important ;
 }
 
 .servtick .search-filter-container {

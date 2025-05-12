@@ -7,98 +7,36 @@ import ServiceAnalysisIcon from "/icons/SupportServices/ServiceAnalysisIcon.png"
 
 import { GET } from "../../api/api"
 
-const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
-  const [requestId, setRequestId] = useState("")
-  // const [technicianId, setTechnicianId] = useState(technician)
-  const [technicianId, setTechnicianId] = useState('HR-EMP-2025-8d9f9b')
+const AddServiceAnalysisModal = ({ isOpen, onClose, request, onAdd, technician }) => {
+  const [requestId, setRequestId] = useState(request.service_request_id)
+  const [technicianId, setTechnicianId] = useState(technician)
+  // const [technicianId, setTechnicianId] = useState('HR-EMP-2025-8d9f9b')
   const [analysisDate, setAnalysisDate] = useState("")
   const [analysisStatus, setAnalysisStatus] = useState("")
-  const [customerId, setCustomerId] = useState("")
-  const [name, setName] = useState("")
-  const [emailAddress, setEmailAddress] = useState("")
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [address, setAddress] = useState("")
-  const [productId, setProductId] = useState("")
+  const customerId = request?.customer?.customer_id || "";
+  const name = request?.customer?.name || "";
+  const emailAddress = request?.customer?.email_address || "";
+  const phoneNumber = request?.customer?.phone_number || "";
+  const address = request.customer
+    ? `${request.customer.address_line1 || ""} ${request.customer.address_line2 || ""}`.trim()
+    : "";
+  const productId = request?.service_call?.product?.item_id || "";
+  
   const [contractId, setContractId] = useState("")
   const [terminationDate, setTerminationDate] = useState("")
   const [showErrorModal, setShowErrorModal] = useState(false)
   const [errorModalMessage, setErrorModalMessage] = useState("")
 
-  const [requestStatus, setRequestStatus] = useState("")
+  const dateInputRef = useRef();
 
-  const [requests, setRequests] = useState([]);
-  const [isReqDropdown, setOpenReqDD] = useState(false);
-  
-  const fetchRequests = async () => {
-    try {
-      const data = await GET(`request/requests/technician/${technician}/`);
-      // const data = await GET(`request/requests/technician/HR-EMP-2025-8d9f9b/`);
+  const toggleDatePicker = () => {
+    const dateInput = dateInputRef.current;
 
-      //const data = await GET("request/");
-      setRequests(data);
-    } catch (error) {
-      console.error("Error fetching requests:", error);
-    }
+    if (!dateInput || dateInput.disabled || dateInput.readOnly) return;
+
+    dateInput.showPicker?.();
   };
-  
-    const handleToggleRequests = () => {
-      if (!isReqDropdown) {
-        fetchRequests(); 
-        setOpenReqDD(true);
-      }
-      setOpenReqDD(!isReqDropdown);
-    };
-  
-    const handleSelectReq = (request) => {
-      setRequestId(request.service_request_id);
-      setCustomerId(request.customer?.customer_id || "");
-      setName(request.customer?.name || "");
-      setEmailAddress(request.customer?.email_address || "");
-      setAddress(request.customer ? `${request.customer.address_line1 || ""} ${request.customer.address_line2 || ""}`.trim() : "")
-      setPhoneNumber(request.customer?.phone_number || "");
-      setProductId(request.service_call?.product?.product_id || "");
 
-      setRequestStatus(request?.request_status || "")
-      setOpenReqDD(false);
-    };
-
-    const [technicians, setTechnicians] = useState([]);
-    const [isTechDropdown, setOpenTechDD] = useState(false);
-
-    const fetchTechnicians = async () => {
-      try {
-        const response = await GET("call/calls/technicians/");;
-        setTechnicians(response);
-      } catch (error) {
-        console.error("Error fetching technicians:", error);
-      }
-    }
-  
-    const handleToggleDropdownTech = () => {
-      if (!isTechDropdown) {
-        fetchTechnicians(); 
-        setOpenTechDD(true);
-      }
-      setOpenTechDD(!isTechDropdown);
-    };
-  
-    const handleSelectTechnician = (technician) => {
-      setTechnicianId(technician.employee_id);
-      setOpenTechDD(false);
-    };
-
-    const [isPickerOpen, setIsPickerOpen] = useState(false);
-
-    const toggleDatePicker = () => {
-      const dateInput = document.getElementById("analysisDate");
-      if (isPickerOpen) {
-        dateInput.blur(); 
-      } else {
-        dateInput.showPicker(); 
-      }
-      
-      setIsPickerOpen(!isPickerOpen); 
-    };
 
     const [isOpenStatusDD, setOpenStatusDD] = useState(false);
 
@@ -138,11 +76,6 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
     };
 
   const handleAdd = () => {
-    if (requestStatus !== "Approved") {
-      setErrorModalMessage("Cannot schedule a service analysis for a request that is not approved yet!"); 
-      setShowErrorModal(true);  
-    }
-
     onAdd({
       service_request_id: requestId,
       analysis_date: analysisDate,
@@ -154,19 +87,11 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
     })
   }
 
-  const requestRef = useRef(null);
   const statusRef = useRef(null);
-  const techRef = useRef(null);
   const contractRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (requestRef.current && !requestRef.current.contains(event.target)) {
-        setOpenReqDD(false); // Close the dropdown
-      }
-      if (techRef.current && !techRef.current.contains(event.target)) {
-        setOpenTechDD(false); // Close the dropdown
-      }
       if (statusRef.current && !statusRef.current.contains(event.target)) {
         setOpenStatusDD(false); // Close the dropdown
       }
@@ -204,72 +129,138 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
           <div className="modal-form">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="requestId">Request ID <span className="required">*</span></label>
-                <div className="select-wrapper" ref={requestRef}>
+                <label htmlFor="requestId">Request ID</label>
+                <div className="select-wrapper">
                   <input
                     type="text"
                     id="requestId"
                     value={requestId}
-                    onChange={(e) => {
-                      setRequestId(e.target.value);
-                      setOpenReqDD(true)
-                    }}
-                    onClick={handleToggleRequests}
+                    readOnly
                     placeholder="Enter request ID"
                   />
-                  <span className="select-arrow" onClick={handleToggleRequests} >▼</span>
-                  {isReqDropdown && (
-                  <ul className="dropdown-list">
-                    {requests.length > 0 ? (
-                      requests
-                        .filter((request) =>
-                        request.service_request_id.toLowerCase().includes(requestId.toLowerCase())
-                        )
-                        .map((request) => (
-                          <li key={request.service_request_id} onClick={() => handleSelectReq(request)}>
-                            {request.service_request_id}
-                          </li>
-                        ))
-                    ) : (
-                      <li>No request ID found</li>
-                    )}
-                  </ul>
-                )}
                 </div>
               </div>
               <div className="form-group">
-                <label htmlFor="technicianId">Technician ID <span className="required">*</span></label>
-                <div className="select-wrapper" ref={techRef}>
+                <label htmlFor="technicianId">Technician ID</label>
+                <div className="select-wrapper">
                   <input
                     type="text"
                     id="technicianId"
                     value={technicianId}
                     readOnly
-                    // onChange={(e) => {
-                    //   setTechnicianId(e.target.value);
-                    //   setOpenTechDD(true);
-                    // }}
-                    // onClick = {handleToggleDropdownTech}
                     placeholder="Enter technician ID"
                   />
-                  {/* <span className="select-arrow" onClick={handleToggleDropdownTech}>▼</span>
-                      {isTechDropdown && (
-                        <ul className="dropdown-list">
-                          {technicians.length > 0 ? (
-                            technicians
-                              .filter((technician) =>
-                                technician.employee_id.toLowerCase().includes(technicianId.toLowerCase())
-                              )
-                              .map((technician) => (
-                                <li key={technician.employee_id} onClick={() => handleSelectTechnician(technician)}>
-                                  {technician.employee_id}
-                                </li>
-                              ))
-                          ) : (
-                            <li>No technicians ID found</li>
-                          )}
-                        </ul>
-                      )} */}
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="customerId">Customer ID</label>
+                <input
+                  type="text"
+                  id="customerId"
+                  readOnly
+                  value={customerId}
+                  placeholder="Enter customer ID"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="name">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  readOnly
+                  value={name}
+                  placeholder="Enter name"
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="emailAddress">Email Address</label>
+                <input
+                  type="email"
+                  id="emailAddress"
+                  readOnly
+                  value={emailAddress}
+                  placeholder="Enter email address"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="productId">Product ID</label>
+                <input
+                  type="text"
+                  id="productId"
+                  readOnly
+                  value={productId}
+                  placeholder="Enter product ID"
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="phoneNumber">Number</label>
+                <input
+                  type="text"
+                  id="phoneNumber"
+                  readOnly
+                  value={phoneNumber}
+                  placeholder="Enter phone number"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="contractId">Contract ID</label>
+                <div className="select-wrapper" ref={contractRef}>
+                  <input
+                    type="text"
+                    id="contractId"
+                    readOnly
+                    value={contractId}
+                    onChange={(e) => setContractId(e.target.value)}
+                    placeholder="Enter contract ID"
+                  />
+                  <span className="select-arrow" onClick={handleToggleDropdownContract}>▼</span>
+                    {isContractDropdown && (
+                      <ul className="dropdown-list dropdown-list">
+                        {contracts.length > 0 ? (
+                          contracts.map((contract) => (
+                            <li key={contract.contract_id} onClick={() => handleSelectContract(contract)}>
+                              {contract.contract_id}
+                            </li>
+                          ))
+                        ) : (
+                          <li>No contracts found</li>
+                        )}
+                      </ul>
+                    )}
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="address">Address</label>
+                <input
+                  type="text"
+                  id="address"
+                  readOnly
+                  value={address}
+                  placeholder="Enter address"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="terminationDate">Termination Date</label>
+                <div className="date-input-wrapper">
+                  <input
+                    type="text"
+                    id="terminationDate"
+                    value={terminationDate}
+                    readOnly
+                    placeholder="Enter termination date"
+                  />
                 </div>
               </div>
             </div>
@@ -281,6 +272,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
                   <input
                     type="date"
                     id="analysisDate"
+                    ref={dateInputRef}
                     value={analysisDate}
                     onChange={(e) => setAnalysisDate(e.target.value)}
                     placeholder="Enter analysis date"
@@ -307,7 +299,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
                   />
                   <span className="select-arrow" onClick={handleStatusDropdown}>▼</span>
                   {isOpenStatusDD && (
-                    <ul className="dropdown-list">
+                    <ul className="dropdown-list status-dropdown-list">
                       {["Scheduled", "Done"].map((status) => (
                         <li key={status} onClick={() => handleSelectStatus(status)}>
                           {status}
@@ -319,128 +311,6 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="customerId">Customer ID</label>
-                <input
-                  type="text"
-                  id="customerId"
-                  readOnly
-                  value={customerId}
-                  onChange={(e) => setCustomerId(e.target.value)}
-                  placeholder="Enter customer ID"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="name">Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  readOnly
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter name"
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="emailAddress">Email Address</label>
-                <input
-                  type="email"
-                  id="emailAddress"
-                  readOnly
-                  value={emailAddress}
-                  onChange={(e) => setEmailAddress(e.target.value)}
-                  placeholder="Enter email address"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="productId">Product ID</label>
-                <input
-                  type="text"
-                  id="productId"
-                  readOnly
-                  value={productId}
-                  onChange={(e) => setProductId(e.target.value)}
-                  placeholder="Enter product ID"
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="phoneNumber">Number</label>
-                <input
-                  type="text"
-                  id="phoneNumber"
-                  readOnly
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="Enter phone number"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="contractId">Contract ID</label>
-                <div className="select-wrapper" ref={contractRef}>
-                  <input
-                    type="text"
-                    id="contractId"
-                    readOnly
-                    value={contractId}
-                    onChange={(e) => setContractId(e.target.value)}
-                    placeholder="Enter contract ID"
-                  />
-                  <span className="select-arrow" onClick={handleToggleDropdownContract}>▼</span>
-                    {isContractDropdown && (
-                      <ul className="dropdown-list">
-                        {contracts.length > 0 ? (
-                          contracts.map((contract) => (
-                            <li key={contract.contract_id} onClick={() => handleSelectContract(contract)}>
-                              {contract.contract_id}
-                            </li>
-                          ))
-                        ) : (
-                          <li>No contracts found</li>
-                        )}
-                      </ul>
-                    )}
-                </div>
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="address">Address</label>
-                <input
-                  type="text"
-                  id="address"
-                  readOnly
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Enter address"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="terminationDate">Termination Date</label>
-                <div className="date-input-wrapper">
-                  <input
-                    type="text"
-                    id="terminationDate"
-                    value={terminationDate}
-                    readOnly
-                    onChange={(e) => setTerminationDate(e.target.value)}
-                    placeholder="Enter termination date"
-                  />
-                  {/* <img
-                    src={CalendarInputIcon || "/placeholder.svg?height=16&width=16"}
-                    alt="Calendar"
-                    className="calendar-icon"
-                  /> */}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -455,7 +325,7 @@ const AddServiceAnalysisModal = ({ isOpen, onClose, onAdd, technician }) => {
             onClick={handleAdd}
             disabled={!(requestId && analysisDate && technicianId && analysisStatus)}
           >
-            Add
+            Schedule
           </button>
         </div>
       </div>

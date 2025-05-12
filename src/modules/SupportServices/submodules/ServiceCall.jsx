@@ -19,7 +19,7 @@ import { POST_NOTIF } from "../api/api"
 const ServiceCall = ({user_id, employee_id}) => {
   // State for service calls
   const [serviceCalls, setServiceCalls] = useState([])
-  const [filterBy, setFilterBy] = useState("")
+  const [filterBy, setFilterBy] = useState("open")
   const [showFilterOptions, setShowFilterOptions] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 

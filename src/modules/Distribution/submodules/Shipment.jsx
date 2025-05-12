@@ -175,6 +175,31 @@ const Shipment = () => {
     return employee ? employee.full_name : employeeId; // Fallback to ID if employee not found
   };
   
+  // Helper function to get readable shipment type based on delivery_id prefix
+  const getReadableShipmentType = (shipment) => {
+    if (!shipment) return 'Unknown'; // Handle case where shipment object is null/undefined
+    
+    const deliveryId = shipment.delivery_id;
+    
+    if (!deliveryId) {
+      // Fallback if delivery_id is missing, maybe use original type or default
+      return shipment.delivery_type || 'Unknown'; 
+    }
+    
+    if (deliveryId.startsWith('SERVICES-DO-')) {
+      return 'External - Service Order';
+    } else if (deliveryId.startsWith('SALES-ORD-')) {
+      return 'External - Sales Order';
+    } else if (deliveryId.startsWith('INV-WM-')) {
+      return 'Internal - Stock Transfer';
+    } else if (deliveryId.startsWith('OPS-DOI-')) {
+      return 'Internal - Content Delivery';
+    } else {
+      // Fallback for unknown prefixes, use original type or default
+      return shipment.delivery_type || 'Unknown Prefix'; 
+    }
+  };
+  
   // Handle tab change
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -649,6 +674,7 @@ const Shipment = () => {
                 carriers={carriers}
                 employees={employees}
                 getEmployeeFullName={getEmployeeFullName}
+                getReadableShipmentType={getReadableShipmentType} // Add this prop
               />
             ) : activeTab === "delivered" ? (
               <DeliveredShipmentsTable
@@ -658,6 +684,7 @@ const Shipment = () => {
                 carriers={carriers}
                 employees={employees}
                 getEmployeeFullName={getEmployeeFullName}
+                getReadableShipmentType={getReadableShipmentType} // Add this prop
               />
             ) : (
               <FailedShipmentsTable 
@@ -667,6 +694,7 @@ const Shipment = () => {
                 carriers={carriers}
                 employees={employees}
                 getEmployeeFullName={getEmployeeFullName}
+                getReadableShipmentType={getReadableShipmentType} // Add this prop
               />
             )}
           </div>
@@ -700,6 +728,7 @@ const Shipment = () => {
             shipment={selectedShipment}
             onSave={handleUpdateDeliveryReceipt}
             onCancel={() => setShowDeliveryReceiptModal(false)}
+            employees={employees}
           />
         )}
         

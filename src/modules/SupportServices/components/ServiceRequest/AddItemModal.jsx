@@ -11,6 +11,9 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
   const [itemId, setItemId] = useState("")
   const [quantity, setQuantity] = useState("")
   const [itemName, setItemName] = useState("")
+  const [warehouseId, setWarehouseId] = useState("")
+  const [warehouseName, setWarehouseName] = useState("")
+  const [warehouseLocation, setWarehouseLocation] = useState("")
 
   const [items, setItems] = useState([]);
   const [isItemsDropdown, setItemsDropdown] = useState(false)
@@ -37,14 +40,20 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
 
   const handleSelectItem = (item) => {
     setItemId(item.inventory_item_id);
-    setItemName(item?.material?.material_name || item?.productdocu?.product?.product_name || "");
+    setItemName(item?.item?.item_name || "");
+    setWarehouseId(item.warehouse?.warehouse_id || "");
+    setWarehouseName(item.warehouse?.warehouse_name || "");
+    setWarehouseLocation(item.warehouse?.warehouse_location || "");
 
     setItemsDropdown(false);
   };
 
   const handleSelectItemInventory = (item) => {
     setItemId(item.inventory_item_id);
-    setItemName(item?.material?.material_name || item?.productdocu?.product?.product_name || "");
+    setItemName(item?.item?.item_name || "");
+    setWarehouseId(item.warehouse?.warehouse_id || "");
+    setWarehouseName(item.warehouse?.warehouse_name || "");
+    setWarehouseLocation(item.warehouse?.warehouse_location || "");
   };
 
   const handleViewInventory = () => {
@@ -65,6 +74,7 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
       total_price: "0.00",
       service_order_id: order,
       item_name: itemName,
+      warehouse_id: warehouseId
     })
   }
 
@@ -142,19 +152,22 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
               </div>
             </div>
             <div className="form-group">
-                <label htmlFor="quantity">Quantity <span className="required">*</span></label>
-                <input
-                  type="text"
-                  id="quantity"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  placeholder="Enter quantity"
-                />
+                <label htmlFor="warehouseId">Warehouse ID</label>
+                <div className="select-wrapper">
+                  <input
+                    type="text"
+                    id="warehouseId"
+                    readOnly
+                    value={warehouseId}
+                    onChange={(e) => setWarehouseId(e.target.value)}
+                    placeholder="Enter warehouse ID"
+                  />
+                </div>
               </div>
             </div>
 
             <div className="form-row">
-              <div className="form-group">
+            <div className="form-group">
                 <label htmlFor="itemName">Item Name</label>
                 <input
                   type="text"
@@ -165,7 +178,52 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
                   placeholder="Enter item name"
                 />
               </div>
-              <div className="add-cancel-button">
+              <div className="form-group">
+                <label htmlFor="warehouseName">Warehouse Name</label>
+                <div className="select-wrapper">
+                  <input
+                    type="text"
+                    id="warehouseName"
+                    readOnly
+                    value={warehouseName}
+                    onChange={(e) => setWarehouseName(e.target.value)}
+                    placeholder="Enter warehouse name"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+            <div className="form-group">
+                <label htmlFor="quantity">Quantity <span className="required">*</span></label>
+                <input
+                  type="text"
+                  id="quantity"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  placeholder="Enter quantity"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="warehouseLocation">Warehouse Location</label>
+                <input
+                  type="text"
+                  id="warehouseLocation"
+                  readOnly
+                  value={warehouseLocation}
+                  onChange={(e) => setWarehouseLocation(e.target.value)}
+                  placeholder="Enter warehouse location"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="inventory-request-section">  
+          <button className="update-modal-button" onClick={handleViewInventory}>
+              View Inventory
+            </button>
+          <div className="add-cancel-button">
               <button className="cancel-button" onClick={onClose}>
                 Cancel
               </button>
@@ -179,25 +237,8 @@ const AddItemModal = ({ isOpen, onClose, onAdd, order }) => {
                 Add
               </button>
               </div>
-              
-            </div>
-          </div>
         </div>
-
-        <div className="inventory-request-section">  
-          <div className="request-group">
-            <p>&nbsp;</p>
-            <button className="view-inventory-button" onClick={handleViewInventory}>
-              View Inventory
-            </button>
-          </div>
-          <div className="request-group">
-            <p>Item not in stock? Request here:</p>
-            <button className="purchase-request-button">
-              Purchase Request
-            </button>
-          </div>
-        </div>
+        
 
         {showViewInventoryModal && (
         <ViewInventoryModal

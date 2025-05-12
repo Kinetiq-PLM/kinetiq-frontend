@@ -34,255 +34,45 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
     useEffect(() => {
         const fetchMrpData = async () => {
             try {
-                const response = await fetch(`${baseurl}/bills_of_material/orderlist/`);
+                const response = await fetch(`${baseurl}/product_material/productmaterial/`);
                 if (!response.ok) {
-                    throw new Error("Failed to fetch MRP data");
+                    throw new Error("Failed to fetch Products data");
                 }
                 const data = await response.json();
 
                 const formattedData = data.map((item) => ({
-                    number: item.order_no,
-                    type: item.type,
-                    details: item.details,
-                    date: item.date.trim(),
+                    number: item.product_id,
+                    type: item.item_name,
+                    details: item.item_description,
                 }));
 
                 setMrpData(formattedData);
             } catch (error) {
-                console.error("Error fetching MRP data:", error);
+                console.error("Error fetching Products data:", error);
             }
         };
 
         fetchMrpData();
     }, []);
 
-    useEffect(() => {
-        const fetchServiceOrderItems = async () => {
-            try {
-                const response = await fetch(`${baseurl}/bills_of_material/principalorders/`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch service order items");
-                }
-                const data = await response.json();
-        
-                const formattedData = data.map((item) => ({
-                    serviceOrderItemId: item.service_order_item_id,
-                    type: item.type,
-                    description: item.description,
-                    date: item.date.trim(),
-                }));
-        
-                setPrincipalItemOrder(formattedData);
-            } catch (error) {
-                console.error("Error fetching service order items:", error);
-            }
-        };
-        fetchServiceOrderItems();
-    }, []);
-
-    useEffect(() => {
-        const fetchOrderPnp = async () => {
-            try {
-                const response = await fetch(`${baseurl}/bills_of_material/trackingnpop/`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch Project Non Project Orders");
-                }
-                const data = await response.json();
-
-                const formattedData = data.map((item) => ({
-                    pnp_orderID: item.order_id,
-                    pnp_status: item.status,
-                }));
-
-                setPnpOrder(formattedData);
-            } catch (error) {
-                console.error("Error fetching Project Non Project Orders:", error);
-            }
-        };
-
-        fetchOrderPnp();
-    }, []);
-
-    useEffect(() => {
-        const fetchPrincipalOrder = async () => {
-            try {
-                const response = await fetch(`${baseurl}/bills_of_material/trackingprincipal/`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch Principal Orders");
-                }
-                const data = await response.json();
-
-                const formattedData = data.map((item) => ({
-                    sr_orderID: item.service_order_item_id,
-                    sr_status: item.status,
-                }));
-
-                setPrincipalOrder(formattedData);
-            } catch (error) {
-                console.error("Error fetching Principal Orders:", error);
-            }
-        };
-
-        fetchPrincipalOrder();
-    }, []);
-
-    const fetchOrderStatement = async (orderId) => {
-        try {
-            const response = await fetch(`${baseurl}/bills_of_material/orderstatements/by-order/${orderId}/`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch order statements");
-            }
-            const data = await response.json();
-            const statementIds = data.map((item) => item.statement_id);
-
-            console.log(statementIds);
-
-            if (statementIds.length > 0) {
-                fetchBomDetails(statementIds[0]);
-                fetchNonProjectProduct(statementIds[0])
-                fetchProjectProductMats(statementIds[0])
-            } else {
-                console.warn("No statement IDs found.");
-            }
-
-            setSelectedOrderNo(statementIds);
-        } catch (error) {
-            console.error("Error fetching Order Statements", error);
-        }
-    };
-    
-    const fetchBomDetails = async (statementId) => {
-        try {
-            const response = await fetch(`${baseurl}/bills_of_material/productpricing/by-statement/${statementId}/`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch BOM details");
-            }
-            const data = await response.json();
-
-            const formattedData = data.map((item, index) => ({
-                no: index + 1,
-                product_id: item.product_id,
-                product_name: item.product_name,
-                product_description: item.product_description,
-                qtyProduct: item.quantity,
-                totalCost: parseFloat(item.cost),
-            }));
-
-            setBomDetails(formattedData);
-        } catch (error) {
-            console.error("Error fetching BOM details:", error);
-        }
-    };
-
-    const fetchNonProjectProduct = async (statementId) => {
-        try {
-            const response = await fetch(`${baseurl}/bills_of_material/npproductcost/statement/${statementId}/`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch Products");
-            }
-            const data = await response.json();
-
-            const formattedData = data.map((item, index) => ({
-                number: index + 1,
-                np_product_id: item.product_id,
-                np_product_name: item.product_name,
-                np_product_description: item.description,
-                np_qtyProduct: item.quantity,
-                np_totalCost: parseFloat(item.product_cost),
-            }));
-
-            setNPProducts(formattedData);
-        } catch (error) {
-            console.error("Error fetching Non Project Products:", error);
-        }
-    };
-
 
     const fetchRawMaterials = async (productId) => {
-    try {
-        const response = await fetch(`${baseurl}/bills_of_material/costofrawmats/by-product/${productId}/`);
-        if (!response.ok) {
-            throw new Error("Failed to fetch raw materials");
-        }
-        const data = await response.json();
-        const formattedData = data.map((item) => ({
-            rawMaterial: item.raw_material,
-            materialId: item.material_id,
-            rmquantity: item.rm_quantity,
-            rmunits: item.units,
-            rmunitCost: parseFloat(item.unit_cost).toFixed(2),
-            rmtotalCost: parseFloat(item.total_cost).toFixed(2),
-        }));
-
-        setRawMaterials(formattedData);
-    } catch (error) {
-        console.error("Error fetching raw materials:", error);
-    }
-    };
-
-    const fetchPrincipalDetails = async (serviceorderID) => {
         try {
-            const response = await fetch(`${baseurl}/bills_of_material/principalitemorder/by-serviceid/${serviceorderID}/`);
+            const response = await fetch(`${baseurl}/product_material/productrawmaterial/by-product/${productId}/`);
             if (!response.ok) {
-                throw new Error("Failed to fetch BOM details");
-            }
-            const data = await response.json();
-
-            const formattedData = data.map((item, index) => ({
-                no: index + 1,
-                prin_material_id: item.material_id,
-                prin_uom: item.unit_of_measure,
-                prin_item_name: item.item_name,
-                prin_item_id: item.item_id,
-                prin_quantity: item.item_quantity,
-                prin_itemcost: parseFloat(item.item_price),
-                prin_totalitemcost: parseFloat(item.total_item_price)
-            }));
-
-            setPrincipalItems(formattedData);
-        } catch (error) {
-            console.error("Error fetching BOM details:", error);
-        }
-    };
-
-    const [projectId, setProjectID] = useState([]);
-
-    const fetchProjectID = async (orderId) => {
-        try {
-            const response = await fetch(`${baseurl}/bills_of_material/orderproductioncost/${orderId}/`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch project id");
+                throw new Error("Failed to fetch raw materials");
             }
             const data = await response.json();
             const formattedData = data.map((item) => ({
-                projectID: item.project_id,
+                rawMaterial: item.item_name,
+                materialId: item.material_id,
+                rmquantity: item.quantity_required,
+                rmunits: item.unit_of_measure,
             }));
     
-            setProjectID(formattedData);
-            
+            setRawMaterials(formattedData);
         } catch (error) {
-            console.error("Error fetching production costs:", error);
-        }
-    };
-        
-    const fetchProjectProductMats = async (statementId) => {
-        try {
-            const response = await fetch(`${baseurl}/bills_of_material/projectproductmats/by-statement/${statementId}/`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch Project Product Mats");
-            }
-            const data = await response.json();
-
-            const formattedData = data.map((item) => ({
-                proj_product_mats_id: item.product_mats_id,
-                proj_quantity_required: item.quantity_required,
-                proj_cost_per_raw_material: item.cost_per_raw_material,
-                proj_total_cost_of_raw_materials: item.total_cost_of_raw_materials,
-            }));
-
-            setProjMats(formattedData);
-        } catch (error) {
-            console.error("Error fetching Project Product Mats:", error);
+            console.error("Error fetching raw materials:", error);
         }
     };
 
@@ -413,12 +203,12 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
                             <div className="table-cell2" key={label} data-label={label} style={{flex: '1 1 25%', minWidth: 150, padding: '12px', fontWeight: 700, textAlign: 'center', color: '#585757', fontFamily: 'Inter', fontSize: 18}}>{label}</div>
                         ))}
                     </div>
-                    {mergedRows2.map((item, index) => (
-                        <div key={index} className="table-row" onClick={() => {setSelectedRowData(item); fetchOrderStatement(item.number); fetchProjectID(item.number); fetchCostProduction(item.number); fetchCostLabor(item.number); fetchPrincipalDetails(item.number); setIsProjectType(item.type); setIsOpen(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")} style={{display: "flex", flexWrap: "wrap", cursor: "pointer", borderBottom: "1px solid #E8E8E8"}}>
+                    {mrpData.map((item, index) => (
+                        <div key={index} className="table-row" onClick={() => {setSelectedRowData(item);setIsOpen(true);}} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 200, 200, 0.2)")} onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")} style={{display: "flex", flexWrap: "wrap", cursor: "pointer", borderBottom: "1px solid #E8E8E8"}}>
                             <div className="table-cell" style={rowCellStyle} data-label="Product ID">{item.number}</div>
                             <div className="table-cell" style={rowCellStyle} data-label="Product">{item.type}</div>
                             <div className="table-cell" style={rowCellStyle} data-label="Product Description">{item.details || '—'}</div>
-                            <div className="table-cell" data-label="Raw Materials" onClick={() => {setSelectedProductId(item.product_id); fetchRawMaterials(item.product_id); setRawMaterial(true);}} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
+                            <div className="table-cell" data-label="Raw Materials" onClick={() => {fetchRawMaterials(item.number);setRawMaterial(true);}} style={{ ...rowCellStyle, cursor: 'pointer', color: '#00A8A8' }}>Show List</div>
                         </div>
                     ))}
                 </div>

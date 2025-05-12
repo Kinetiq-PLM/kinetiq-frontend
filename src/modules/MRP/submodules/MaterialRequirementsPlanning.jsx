@@ -291,10 +291,9 @@ const BodyContent = ({loadSubModule, setActiveSubModule}) => {
 
             const formattedData = data.map((item, index) => ({
                 no: index + 1,
-                prin_material_id: item.material_id,
+                prin_material_id: item.item_id,
                 prin_uom: item.unit_of_measure,
                 prin_item_name: item.item_name,
-                prin_item_id: item.item_id,
                 prin_quantity: item.item_quantity,
                 prin_itemcost: parseFloat(item.item_price),
                 prin_totalitemcost: parseFloat(item.total_item_price)

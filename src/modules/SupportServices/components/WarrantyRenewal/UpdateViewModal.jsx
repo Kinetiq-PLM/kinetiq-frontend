@@ -35,9 +35,8 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, renewalData }) => {
       setCallId(renewalData.service_call?.service_call_id || "")
       setCustomerId(renewalData.service_call?.customer?.customer_id || "")
       setName(renewalData.service_call?.customer?.name || "")
-      setProductName(renewalData.service_call?.product?.product_name || "")
-      setProductId(renewalData.service_call?.product?.product_id || "")
-      setSellingPrice(renewalData.service_call?.product?.selling_price || "")
+      setProductName(renewalData.service_call?.product?.item_name || "")
+      setProductId(renewalData.service_call?.product?.item_id || "")
       setContractId(renewalData.contract?.contract_id || "")
       setContractStatus(renewalData.contract?.contract_status || "")
       setDuration(renewalData.duration)
@@ -45,6 +44,12 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, renewalData }) => {
       setRenewalFee(renewalData.renewal_fee)
     }
   }, [renewalData])
+
+  useEffect(() => {
+    if (productId) {
+      fetchPrice(productId);
+    }
+  }, [productId])
 
   useEffect(() => {
     if (duration && sellingPrice) {
@@ -55,6 +60,16 @@ const UpdateViewModal = ({ isOpen, onClose, onUpdate, renewalData }) => {
       setRenewalFee(""); 
     }
   }, [duration, sellingPrice]);
+
+  const fetchPrice = async (productId) => {
+    try {
+      const response = await GET(`renewal/price/${productId}`);
+      console.log("contracts", response)
+      setSellingPrice(response.item_price);
+    } catch (error) {
+      console.error("Error fetching contracts:", error);
+    }
+  };
 
   // fetches a list of techs
   const fetchContracts = async () => {

@@ -623,19 +623,19 @@ try {
   console.log("Fetched Budget Approvals:", data);
   
   const mappedData = data.map(sub => ({
-    approvalsId: sub.budget_approvals_id || "",
-    requestId: sub?.validation?.budget_submission?.budget_submission_id || "",
-    departmentId: sub?.validation?.budget_submission?.dept?.dept_id || "",
-    amount: sub?.validation?.amount_requested || "",
-    approvedAmount: sub?.validation?.final_approved_amount || "",
-    submissionDate: sub?.validation?.budget_submission?.date_submitted || "",
-    validatedBy: sub?.validation?.validated_by || "",
-    validationDate: sub?.validation?.validation_date || "",
-    approvedBy: sub?.approved_by || "",
-    approvalDate: sub?.approval_date || "",
-    remarks: sub?.remarks || "",
-    validationStatus: sub?.validation?.validation_status || "",
-    approvalStatus: sub.approval_status || ""
+    approvalsId: sub.budget_approvals_id || "N/A",
+    requestId: sub?.validation?.budget_submission?.budget_submission_id || "N/A",
+    departmentId: sub?.validation?.budget_submission?.dept?.dept_id || "N/A",
+    amount: sub?.validation?.amount_requested || "N/A",
+    approvedAmount: sub?.validation?.final_approved_amount || "N/A",
+    submissionDate: sub?.validation?.budget_submission?.date_submitted || "N/A",
+    validatedBy: sub?.validation?.validated_by || "N/A",
+    validationDate: sub?.validation?.validation_date || "N/A",
+    approvedBy: sub?.approved_by || "N/A",
+    approvalDate: sub?.approval_date || "N/A",
+    remarks: sub?.remarks || "N/A",
+    validationStatus: sub?.validation?.validation_status || "N/A",
+    approvalStatus: sub.approval_status || "N/A"
   }));
   
   setOriginalData(mappedData);
@@ -734,7 +734,7 @@ return (
 <InfoCard className="summary-infocard">
 <div className="summary-container">
 <div className="date-status-container">
-<div className="summary-date-range">August 2025 - August 2026</div>
+<div className="summary-date-range">January 2025 - January 2026</div>
 <div className="summary-status">
 <span className="status-prefix">Status:</span>
 <span className={`summary-status-label ${budgetPlanStatus.toLowerCase()}`}>
@@ -788,7 +788,7 @@ Total Remaining
 {/* Budget Submission List content */}
 <InfoCard className="summary-infocard">
 <div className="summary-container">
-<div className="summary-date-range">August 2025 - August 2026</div>
+<div className="summary-date-range">January 2025 - January 2026</div>
 <div className="date-range-border"></div>
 <div className="summary-details">
 <div className="summary-total-budget">
@@ -1009,7 +1009,7 @@ Save Changes
 <>
 <InfoCard className="summary-infocard">
 <div className="summary-container">
-<div className="summary-date-range">August 2025 - August 2026</div>
+<div className="summary-date-range">January 2025 - January 2026</div>
 <div className="date-range-border"></div>
 <div className="summary-details">
 <div className="summary-total-budget">

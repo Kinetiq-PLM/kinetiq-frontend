@@ -139,7 +139,7 @@ const BodyContent = ({employee_id}) => {
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>ID</th>
+                                <th>Request ID</th>
                                 <th>Date Requested</th>
                                 <th>Approval Status</th>
                                 <th>Approval Date</th>
