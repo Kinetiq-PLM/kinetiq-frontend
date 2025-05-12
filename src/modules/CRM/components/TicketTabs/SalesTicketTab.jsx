@@ -47,6 +47,8 @@ const SalesTicketTab = ({
             "REG-2504-ba0c",
             "REG-2504-ed23",
             "REG-2504-8f19",
+            "REG-2504-81ab",
+            "REG-2504-b330",
           ].includes(res.position_id)
         ) {
           setBtnDisabled(true);
