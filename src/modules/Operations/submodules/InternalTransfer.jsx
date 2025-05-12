@@ -280,7 +280,7 @@ const ApprovalTable = ({employee_id}) => {
                 {activePrimaryTab === "Delivery Request" ? (
                   <>
                     <th className="deliveryTH"></th>
-                    <th className="deliveryTH">Request ID</th> {/* ID column next */}
+                    <th className="deliveryTH">Delivery ID</th> {/* ID column next */}
                     <th className="deliveryTH">Item Name</th>
                     <th className="deliveryTH">Quantity</th>
                     <th className="deliveryTH">Date</th>
@@ -431,7 +431,7 @@ const ApprovalTable = ({employee_id}) => {
           <div className="input-container reworkOrder">
             <div className="input-row">
               <div className="input-group">
-                <label>Product ID</label>
+                <label>Rework ID</label>
                 <input 
                   type="text" 
                   className="short-input req-input" 
@@ -481,7 +481,7 @@ const ApprovalTable = ({employee_id}) => {
           </div>
         )}
         <div className="button-container">
-          <button className="send-to-button" onClick={handleSendClick} style={{ position: 'relative', bottom: '5px' }}>Save</button>
+          <button className="send-to-button" onClick={handleSendClick} style={{ position: 'relative', bottom: '8px' }}>Save</button>
         </div>
       </div>
     </div>
