@@ -29,6 +29,7 @@
   font-family: 'Inter', sans-serif;
   color: var(--text-color);
   border-radius: 10px;
+  overflow: scroll; 
 }
 
 .main-content {
@@ -37,7 +38,7 @@
 }
 
 /* Form Styles */
-.form-container {
+.new-report-form {
   background-color: white;
   border-radius: var(--border-radius);
   padding: 1.5rem;
@@ -139,7 +140,6 @@
   cursor: not-allowed;
 }
 
-/* Form Actions */
 .form-actions {
   display: flex;
   flex-wrap: wrap;
@@ -166,6 +166,7 @@
   display: flex;
   gap: 1rem;
 }
+
 
 /* Buttons */
 .action-btn {
@@ -202,6 +203,16 @@
 
 .edit-btn:hover:not(:disabled) {
   background-color: darkgray;
+}
+
+.back-to-list-btn{
+  background-color: lightgray;
+  width: 100px;
+  border-radius: 5px;
+}
+.back-to-list-btn:hover{
+  background: darkgray;
+  color: black;
 }
 
 .attach-btn {
@@ -580,5 +591,37 @@
   
   .checkbox-cell {
     display: none;
+  }
+}
+
+.rejection-notice-container {
+  position: absolute; /* Change to absolute positioning */
+  bottom: 20px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */
+  z-index: 1000; /* Ensure it appears above other content */
+  display: flex; /* Use flexbox for centering */
+  justify-content: flex-end; /* Align to the right */
+}
+
+.rejection-notice-btn {
+  background-color: #f44336; /* Red color for rejection */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.rejection-notice-btn:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}
+
+/* Media query for smaller screens */
+@media (max-width: 600px) {
+  .rejection-notice-btn {
+    padding: 8px 16px; /* Adjust padding for smaller screens */
+    font-size: 14px; /* Adjust font size for smaller screens */
   }
 }

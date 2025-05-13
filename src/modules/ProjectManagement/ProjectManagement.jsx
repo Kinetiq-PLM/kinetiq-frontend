@@ -42,6 +42,8 @@ const BodyContent = () => {
         complete: [],
         incomplete: []
     });
+
+    
     
     // Employee details state
     const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -80,18 +82,33 @@ const BodyContent = () => {
             id: 1,
             title: 'Project Scheduling',
             description: 'Plan tasks and track deadlines. Also, assign responsibilities, and monitor.',
+            overdue: '2 days',
+            task: 'Review project timeline',
+            deadline: '2023-11-30',
+            employee: 'John Smith',
             completed: false,
         },
         {
             id: 2,
             title: 'Project Scheduling',
             description: 'Plan tasks and track deadlines. Also, assign responsibilities, and monitor.',
+            overdue: '1 day',
+            task: 'Assign team resources',
+            deadline: '2023-11-29',
+            employee: 'Jane Doe',
             completed: true,
         }
     ]);
     const [showForm, setShowForm] = useState(false);
     const [newTitle, setNewTitle] = useState('');
     const [newDescription, setNewDescription] = useState('');
+    const [newOverdue, setNewOverdue] = useState('');
+    const [newTask, setNewTask] = useState('');
+    const [newDeadline, setNewDeadline] = useState('');
+    const [newEmployee, setNewEmployee] = useState('');
+    const [newStatus, setNewStatus] = useState('');
+    const [newAssignedto, setNewAssignedto] = useState('');
+
   
     // Fetch data on component mount
     useEffect(() => {
@@ -544,27 +561,43 @@ const BodyContent = () => {
     };
 
     const handleSubmit = (e) => {
-        e.preventDefault();
+    e.preventDefault();
+    
+    if (newTitle.trim() !== '') {
+        const newItem = {
+            id: Date.now(),
+            title: newTitle,
+            description: newDescription,
+            overdue: newOverdue,
+            task: newTask,
+            deadline: newDeadline,
+            employee: newEmployee, // Fix: newEmpployee -> newEmployee
+            status: newStatus,
+            assignedTo: newAssignedto,
+            completed: false
+        };
         
-        if (newTitle.trim() !== '') {
-            const newItem = {
-                id: Date.now(),
-                title: newTitle,
-                description: newDescription,
-                completed: false
-            };
-            
-            setReminderItems([...reminderItems, newItem]);
-            setNewTitle('');
-            setNewDescription('');
-            setShowForm(false);
-        }
-    };
+        setReminderItems([...reminderItems, newItem]);
+        setNewTitle('');
+        setNewDescription('');
+        setNewOverdue('');
+        setNewTask('');
+        setNewDeadline('');
+        setNewEmployee('');
+        setNewStatus('');
+        setNewAssignedto('');
+        setShowForm(false);
+    }
+};
 
     const handleCancel = () => {
         setShowForm(false);
         setNewTitle('');
         setNewDescription('');
+        setNewOverdue('');
+        setNewTask('');
+        setNewDeadline('');
+        setNewEmployee('');
     };
     
     return (
@@ -727,6 +760,84 @@ const BodyContent = () => {
                                             required
                                         />
                                     </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="reminder-overdue">Overdue</label>
+                                        <input
+                                            id="reminder-overdue"
+                                            type="text"
+                                            placeholder="Enter Due Date"
+                                            value={newOverdue}
+                                            onChange={(e) => setNewOverdue(e.target.value)}
+                                            className="form-control"
+                                            required
+                                        />
+                                    </div>
+
+                                     <div className="form-group">
+                                        <label htmlFor="reminder-task">Task</label>
+                                        <input
+                                            id="reminder-task"
+                                            type="text"
+                                            placeholder="Enter Task"
+                                            value={newTask}
+                                            onChange={(e) => setNewTask(e.target.value)}
+                                            className="form-control"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="reminder-deadline">Deadline</label>
+                                        <input
+                                            id="reminder-deadline"
+                                            type=""
+                                            placeholder="Enter Deadline"
+                                            value={newDeadline}
+                                            onChange={(e) => setNewDeadline(e.target.value)}
+                                            className="form-control"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="reminder-employee">Employee</label>
+                                        <input
+                                            id="reminder-employee"
+                                            type="text"
+                                            placeholder="Enter Employee"
+                                            value={newEmployee}
+                                            onChange={(e) => setNewEmployee(e.target.value)}
+                                            className="form-control"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="reminder-status">Status</label>
+                                        <input
+                                            id="reminder-status"
+                                            type="text"
+                                            placeholder="Enter Status"
+                                            value={newStatus}
+                                            onChange={(e) => setNewStatus(e.target.value)}
+                                            className="form-control"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="reminder-assignedto">Assigned To</label>
+                                        <input
+                                            id="reminder-assignedto"
+                                            type="text"
+                                            placeholder="Assigned To:"
+                                            value={newAssignedto}
+                                            onChange={(e) => setNewAssignedto(e.target.value)}
+                                            className="form-control"
+                                            required
+                                        />
+                                    </div>
                                     
                                     <div className="form-buttons">
                                         <button 
@@ -753,6 +864,44 @@ const BodyContent = () => {
                                     <div className="reminder-content">
                                         <h3><b>{item.title}</b></h3>
                                         <p>{item.description}</p>
+                                        {item.overdue && (
+                                            <div className="reminder-detail">
+                                                <span className="detail-label">Overdue:</span>
+                                                <span className="detail-value">{item.overdue}</span>
+                                            </div>
+                                        )}
+                                        {item.task && (
+                                            <div className="reminder-detail">
+                                                <span className="detail-label">Task:</span>
+                                                <span className="detail-value">{item.task}</span>
+                                            </div>
+                                        )}
+                                        {item.deadline && (
+                                            <div className="reminder-detail">
+                                                <span className="detail-label">Deadline:</span>
+                                                <span className="detail-value">{item.deadline}</span>
+                                            </div>
+                                        )}
+                                        {item.employee && (
+                                            <div className="reminder-detail">
+                                                <span className="detail-label">Employee:</span>
+                                                <span className="detail-value">{item.employee}</span>
+                                            </div>
+                                        )}
+
+                                         {item.Status && (
+                                            <div className="reminder-detail">
+                                                <span className="detail-label">Status:</span>
+                                                <span className="detail-value">{item.Status}</span>
+                                            </div>
+                                        )}
+
+                                        {item.Assignedto && (
+                                            <div className="reminder-detail">
+                                                <span className="detail-label">Assigned To:</span>
+                                                <span className="detail-value">{item.Assignedto}</span>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="reminder-actions">
                                         <div 
@@ -782,123 +931,6 @@ const BodyContent = () => {
                         </div>
                     </div>
                     
-                    {/* Overdue Tasks Section */}
-                    <div className="dashboard-section overdue-tasks-section">
-                        <div className="section-header">
-                            <h2>Overdue Task</h2>
-                        </div>
-                        <div className="section-content">
-                            <table className="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Overdue</th>
-                                        <th>Task</th>
-                                        <th>Deadline</th>
-                                        <th>Employee</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {isLoading.overdueTasks ? (
-                                        <tr><td colSpan="4" className="loading-cell">Loading...</td></tr>
-                                    ) : errors.overdueTasks ? (
-                                        <tr><td colSpan="4" className="error-cell">Error: {errors.overdueTasks}</td></tr>
-                                    ) : paginatedOverdueTasks.length === 0 ? (
-                                        <tr><td colSpan="4" className="no-data-cell">No overdue tasks</td></tr>
-                                    ) : (
-                                        paginatedOverdueTasks.map((item, index) => (
-                                            <tr key={index}>
-                                                <td className="due"><b>{item.Overdue}</b></td>
-                                                <td>{item.Task}</td>
-                                                <td>{item.Deadline}</td>
-                                                <td>
-                                                    <EmployeeDisplay 
-                                                        employee={{
-                                                            EmployeeID: item.EmployeeID,
-                                                            EmployeeName: item.Employee
-                                                        }} 
-                                                    />
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                            {renderPagination('overdueTasks', currentPage.overdueTasks, totalOverduePages)}
-                        </div>
-                    </div>
-
-                    {/* Today's Tasks Section - Updated to show only today's tasks */}
-                    <div className="dashboard-section todays-tasks-section">
-                        <div className="section-header">
-                            <div className="header-title-group">
-                                <h2>Today's Tasks</h2>
-                                <span className="section-subtitle">Tasks due today: {todayTasks.length}</span>
-                            </div>
-                        </div>
-                        <div className="section-content">
-                            <table className="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Task</th>
-                                        <th>Deadline</th>
-                                        <th>Assigned To</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {isLoading.todayTasks ? (
-                                        <tr><td colSpan="4" className="loading-cell">Loading...</td></tr>
-                                    ) : errors.todayTasks ? (
-                                        <tr><td colSpan="4" className="error-cell">Error: {errors.todayTasks}</td></tr>
-                                    ) : paginatedTodayTasks.length === 0 ? (
-                                        <tr><td colSpan="4" className="no-data-cell">No tasks due today</td></tr>
-                                    ) : (
-                                        paginatedTodayTasks.map((task, index) => (
-                                            <tr key={index}>
-                                                <td className="task-status">
-                                                    <span 
-                                                        className={`status-badge ${task.Status === 'completed' ? 'ok' : 'pending'}`}
-                                                        onClick={() => handleTaskStatusChange(
-                                                            task.TaskID, 
-                                                            task.Status === 'completed' ? 'in progress' : 'completed'
-                                                        )}
-                                                    >
-                                                        {task.Status === 'completed' ? 'Completed' : 'Pending'}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                        <span>{task.Task}</span>
-                                                        <small style={{ color: 'var(--light-text)' }}>
-                                                            {task.ProjectName}
-                                                        </small>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span className={`priority-indicator ${
-                                                        new Date(task.Deadline) < new Date() ? 'priority-high' : 
-                                                        new Date(task.Deadline).toDateString() === new Date().toDateString() ? 'priority-medium' : 
-                                                        'priority-low'
-                                                    }`}>
-                                                        {formatDeadline(task.Deadline)}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <EmployeeDisplay 
-                                                        employee={{
-                                                            EmployeeID: task.EmployeeID,
-                                                            EmployeeName: task.EmployeeName
-                                                        }} 
-                                                    />
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                            {renderPagination('todayTasks', currentPage.todayTasks, totalTodayTasksPages)}
-                        </div>
-                    </div>
 
                     {/* Project Summary Section */}
                     <div className="dashboard-section project-summary-section">
@@ -1022,152 +1054,152 @@ const BodyContent = () => {
                                                 </div>
                                             )}
                                             {projectDetail.project_issues && (
-                                                                                                <div className="detail-item full-width">
-                                                                                                <span className="detail-label">Project Issue:</span>
-                                                                                                <span className="detail-value">{projectDetail.project_issues}</span>
-                                                                                            </div>
-                                                                                        )}
-                                                                                    </>
-                                                                                )}
-                                            
-                                                                                {/* Internal Project */}
-                                                                                {selectedProject.type === 'Internal' && (
-                                                                                    <>
-                                                                                        <div className="detail-item">
-                                                                                            <span className="detail-label">Project Tracking ID:</span>
-                                                                                            <span className="detail-value">{projectDetail.intrnl_project_tracking_id}</span>
-                                                                                        </div>
-                                                                                        <div className="detail-item">
-                                                                                            <span className="detail-label">Project ID:</span>
-                                                                                            <span className="detail-value">{projectDetail.intrnl_project_id}</span>
-                                                                                        </div>
-                                                                                        <div className="detail-item">
-                                                                                            <span className="detail-label">Project Type:</span>
-                                                                                            <span className="detail-value">Internal</span>
-                                                                                        </div>
-                                                                                        <div className="detail-item">
-                                                                                            <span className="detail-label">Start Date:</span>
-                                                                                            <span className="detail-value">{projectDetail.intrnl_start_date}</span>
-                                                                                        </div>
-                                                                                        <div className="detail-item">
-                                                                                            <span className="detail-label">Estimated End Date:</span>
-                                                                                            <span className="detail-value">{projectDetail.intrnl_estimated_end_date}</span>
-                                                                                        </div>
-                                                                                        {projectDetail.intrnl_project_issue && (
-                                                                                            <div className="detail-item full-width">
-                                                                                                <span className="detail-label">Project Issue:</span>
-                                                                                                <span className="detail-value">{projectDetail.intrnl_project_issue}</span>
-                                                                                            </div>
-                                                                                        )}
-                                                                                    </>
-                                                                                )}
-                                                                                
-                                                                                {/* Project Tasks Section */}
-                                                                                {projectDetail.tasks && projectDetail.tasks.length > 0 && (
-                                                                                    <div className="detail-item full-width">
-                                                                                        <span className="detail-label">Project Tasks:</span>
-                                                                                        <div className="tasks-container">
-                                                                                            <table className="details-table">
-                                                                                                <thead>
-                                                                                                    <tr>
-                                                                                                        <th>Task</th>
-                                                                                                        <th>Status</th>
-                                                                                                        <th>Deadline</th>
-                                                                                                    </tr>
-                                                                                                </thead>
-                                                                                                <tbody>
-                                                                                                    {projectDetail.tasks.map((task, idx) => (
-                                                                                                        <tr key={idx}>
-                                                                                                            <td>{task.description}</td>
-                                                                                                            <td>
-                                                                                                                <span className={`status-badge ${task.status === 'completed' ? 'ok' : 'issue'}`}>
-                                                                                                                    {task.status}
-                                                                                                                </span>
-                                                                                                            </td>
-                                                                                                            <td>{task.deadline}</td>
-                                                                                                        </tr>
-                                                                                                    ))}
-                                                                                                </tbody>
-                                                                                            </table>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                        ) : (
-                                                                            <div className="no-data-cell">No detailed information available for this project.</div>
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="modal-footer">
-                                                                        <button className="cancel-btn" onClick={closeDetailsModal}>Close</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                        
-                                                        {/* Employee Details Modal */}
-                                                        {showEmployeeModal && selectedEmployee && (
-                                                            <div className="employee-details-modal">
-                                                                <div className="modal-content">
-                                                                    <div className="modal-header">
-                                                                        <h2>Employee: {selectedEmployee.EmployeeName}</h2>
-                                                                        <button className="close-button" onClick={closeEmployeeModal}>×</button>
-                                                                    </div>
-                                                                    <div className="modal-body">
-                                                                        {isLoadingEmployee ? (
-                                                                            <div className="loading-cell">Loading employee details...</div>
-                                                                        ) : employeeError ? (
-                                                                            <div className="error-cell">Error: {employeeError}</div>
-                                                                        ) : employeeDetails ? (
-                                                                            <div className="employee-details-container">
-                                                                                <div className="employee-avatar-large">
-                                                                                    <div className="avatar-circle">
-                                                                                        {getInitials(selectedEmployee.EmployeeName)}
-                                                                                    </div>
-                                                                                    <h3>{employeeDetails.first_name} {employeeDetails.last_name}</h3>
-                                                                                    <div className="employee-status-badge">
-                                                                                        {employeeDetails.status}
-                                                                                    </div>
-                                                                                </div>
-                                                                                
-                                                                                <div className="employee-info-grid">
-                                                                                    <div className="info-item">
-                                                                                        <div className="info-label">Employee ID</div>
-                                                                                        <div className="info-value">{employeeDetails.employee_id}</div>
-                                                                                    </div>
-                                                                                    
-                                                                                    <div className="info-item">
-                                                                                        <div className="info-label">Department</div>
-                                                                                        <div className="info-value">{employeeDetails.dept_name || 'Not Assigned'}</div>
-                                                                                    </div>
-                                                                                    
-                                                                                    <div className="info-item">
-                                                                                        <div className="info-label">Position</div>
-                                                                                        <div className="info-value">{employeeDetails.position_title || 'Not Assigned'}</div>
-                                                                                    </div>
-                                                                                    
-                                                                                    <div className="info-item">
-                                                                                        <div className="info-label">Phone</div>
-                                                                                        <div className="info-value">{employeeDetails.phone || 'Not Available'}</div>
-                                                                                    </div>
-                                                                                    
-                                                                                    <div className="info-item">
-                                                                                        <div className="info-label">Employment Type</div>
-                                                                                        <div className="info-value">{employeeDetails.employment_type || 'Not Specified'}</div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        ) : (
-                                                                            <div className="no-data-cell">No detailed information available for this employee.</div>
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="modal-footer">
-                                                                        <button className="primary-btn" onClick={closeEmployeeModal}>Close</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                );
-                                            };
-                                            
-                                            export default BodyContent;
+                                                <div className="detail-item full-width">
+                                                    <span className="detail-label">Project Issue:</span>
+                                                    <span className="detail-value">{projectDetail.project_issues}</span>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                    
+                                    {/* Internal Project */}
+                                    {selectedProject.type === 'Internal' && (
+                                        <>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project Tracking ID:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_project_tracking_id}</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project ID:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_project_id}</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Project Type:</span>
+                                                <span className="detail-value">Internal</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Start Date:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_start_date}</span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="detail-label">Estimated End Date:</span>
+                                                <span className="detail-value">{projectDetail.intrnl_estimated_end_date}</span>
+                                            </div>
+                                            {projectDetail.intrnl_project_issue && (
+                                                <div className="detail-item full-width">
+                                                    <span className="detail-label">Project Issue:</span>
+                                                    <span className="detail-value">{projectDetail.intrnl_project_issue}</span>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                    
+                                    {/* Project Tasks Section */}
+                                    {projectDetail.tasks && projectDetail.tasks.length > 0 && (
+                                        <div className="detail-item full-width">
+                                            <span className="detail-label">Project Tasks:</span>
+                                            <div className="tasks-container">
+                                                <table className="details-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Task</th>
+                                                            <th>Status</th>
+                                                            <th>Deadline</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {projectDetail.tasks.map((task, idx) => (
+                                                            <tr key={idx}>
+                                                                <td>{task.description}</td>
+                                                                <td>
+                                                                    <span className={`status-badge ${task.status === 'completed' ? 'ok' : 'issue'}`}>
+                                                                        {task.status}
+                                                                    </span>
+                                                                </td>
+                                                                <td>{task.deadline}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="no-data-cell">No detailed information available for this project.</div>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <button className="cancel-btn" onClick={closeDetailsModal}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Employee Details Modal */}
+            {showEmployeeModal && selectedEmployee && (
+                <div className="employee-details-modal">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2>Employee: {selectedEmployee.EmployeeName}</h2>
+                            <button className="close-button" onClick={closeEmployeeModal}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            {isLoadingEmployee ? (
+                                <div className="loading-cell">Loading employee details...</div>
+                            ) : employeeError ? (
+                                <div className="error-cell">Error: {employeeError}</div>
+                            ) : employeeDetails ? (
+                                <div className="employee-details-container">
+                                    <div className="employee-avatar-large">
+                                        <div className="avatar-circle">
+                                            {getInitials(selectedEmployee.EmployeeName)}
+                                        </div>
+                                        <h3>{employeeDetails.first_name} {employeeDetails.last_name}</h3>
+                                        <div className="employee-status-badge">
+                                            {employeeDetails.status}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="employee-info-grid">
+                                        <div className="info-item">
+                                            <div className="info-label">Employee ID</div>
+                                            <div className="info-value">{employeeDetails.employee_id}</div>
+                                        </div>
+                                        
+                                        <div className="info-item">
+                                            <div className="info-label">Department</div>
+                                            <div className="info-value">{employeeDetails.dept_name || 'Not Assigned'}</div>
+                                        </div>
+                                        
+                                        <div className="info-item">
+                                            <div className="info-label">Position</div>
+                                            <div className="info-value">{employeeDetails.position_title || 'Not Assigned'}</div>
+                                        </div>
+                                        
+                                        <div className="info-item">
+                                            <div className="info-label">Phone</div>
+                                            <div className="info-value">{employeeDetails.phone || 'Not Available'}</div>
+                                        </div>
+                                        
+                                        <div className="info-item">
+                                            <div className="info-label">Employment Type</div>
+                                            <div className="info-value">{employeeDetails.employment_type || 'Not Specified'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="no-data-cell">No detailed information available for this employee.</div>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <button className="primary-btn" onClick={closeEmployeeModal}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default BodyContent;

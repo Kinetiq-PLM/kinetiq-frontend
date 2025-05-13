@@ -1782,3 +1782,19 @@
     font-size: 4.5rem;
   }
 }
+
+.reminder-detail {
+    display: flex;
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+.detail-label {
+    font-weight: bold;
+    margin-right: 8px;
+    min-width: 80px;
+}
+
+.detail-value {
+    color: #444;
+}
